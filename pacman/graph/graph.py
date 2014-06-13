@@ -3,7 +3,7 @@ __author__ = 'stokesa6'
 class Graph(object):
     """ a graph object """
 
-    def __init__(label, vertices=None, edges=None):
+    def __init__(self, label, vertices=None, edges=None):
         """ create a graph object
         :param label: a identifier for the graph
         :param vertices: a collection of vertices
