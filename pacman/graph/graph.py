@@ -5,7 +5,7 @@ class Graph(object):
 
     def __init__(self, label, vertices=None, edges=None):
         """ create a graph object
-        :param label: a identifier for the graph
+        :param label: an identifier for the graph
         :param vertices: a collection of vertices
         :param edges: a collection of edges
         :type label: str
@@ -30,7 +30,7 @@ class Graph(object):
 
     def add_vertices(self, vertices):
         """ adds a collection of vertex objects to this graph object
-        :param vertices: a iterable object containing vertex objects to be
+        :param vertices: an iterable object containing vertex objects to be
                          added to the graph
         :type vertices: iterable object
         :return: None
@@ -52,7 +52,7 @@ class Graph(object):
 
     def add_edges(self, edges):
         """ adds a collection of edge objects to this graph object
-        :param edges: a iterable object containing edge objects to be
+        :param edges: an iterable object containing edge objects to be
                       added to the graph
         :type edges: iterable object
         :return: None
@@ -63,7 +63,7 @@ class Graph(object):
 
     def outgoing_edges_from_vertex(self, vertex):
         """ locates a collection of edges which contain the vertex as its
-            pre_vertex. Can return an empty collection if no edges exists that
+            pre_vertex. Can return an empty collection if no edges exist that
             meet the criteria
         :param vertex: the vertex which will be used to locate its outgoing
                        edges
@@ -76,7 +76,7 @@ class Graph(object):
 
     def incoming_edges_from_vertex(self, vertex):
         """ locates a collection of edges which contain the vertex as its
-            post_vertex. Can return an empty collection if no edges exists that
+            post_vertex. Can return an empty collection if no edges exist that
             meet the criteria
         :param vertex: the vertex which will be used to locate its incoming
                        edges
@@ -90,7 +90,7 @@ class Graph(object):
     @property
     def vertices(self):
         """returns the vertices collection from this graph object
-        :return: a iterable object that contains the vertices of this graph
+        :return: an iterable object that contains the vertices of this graph
         :rtype: iterable object
         """
 
@@ -98,7 +98,6 @@ class Graph(object):
     def edges(self):
         """
         returns the edges collection from this graph object
-        :return: a iterable object that contains the edges of this graph
+        :return: an iterable object that contains the edges of this graph
         :rtype: iterable object
         """
-

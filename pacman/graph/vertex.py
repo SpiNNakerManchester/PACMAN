@@ -1,3 +1,5 @@
+__author__ = 'stokesa6,daviess'
+
 class Vertex(object):
     """ a vertex object """
 
