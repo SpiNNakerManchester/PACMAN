@@ -1,11 +1,12 @@
 __author__ = 'stokesa6,daviess'
 
-class Vertex(object):
-    """ a vertex object """
 
+class Vertex(object):
+    """ Creates a new vertex object """
     
     def __init__(self, label, n_atoms, constraints=None):
-        """ Create a new vertex
+        """
+
         :param label: The name of the vertex
         :type label: str 
         :param n_atoms: The number of atoms that the vertex can be split into
@@ -20,7 +21,9 @@ class Vertex(object):
     
     @property
     def label(self):
-        """ Get the label of the vertex
+        """
+        Returns the label of the vertex
+
         :return: The name of the vertex
         :rtype: str
         :raises None: Raises no known exceptions
@@ -29,7 +32,9 @@ class Vertex(object):
     
     @property
     def n_atoms(self):
-        """ Get the number of atoms in the vertex
+        """
+        Returns the number of atoms in the vertex
+
         :return: The number of atoms in the vertex
         :rtype: int
         :raises None: Raises no known exceptions

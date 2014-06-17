@@ -1,10 +1,12 @@
 __author__ = 'daviess'
 
+
 class Subedge(object):
-    """A subedge object"""
+    """Creates a new subedge object related to an edge"""
 
     def __init__(self, label, edge, pre_subvertex, post_subvertex):
-        """Create a new edge
+        """
+
         :param label: The name of the edge
         :type label: str
         :param edge: The edge to which this subedge refers
@@ -21,7 +23,9 @@ class Subedge(object):
 
     @property
     def pre_subvertex(self):
-        """ Return the outgoing subvertex
+        """
+        Returns the outgoing subvertex
+
         :return: the outgoing subvertex
         :rtype: pacman.subgraph.subvertex.Subvertex
         :raises None: Raises no known exceptions
@@ -30,7 +34,9 @@ class Subedge(object):
 
     @property
     def post_subvertex(self):
-        """ Return the incoming subvertex
+        """
+        Returns the incoming subvertex
+
         :return: the incoming subvertex
         :rtype: pacman.subgraph.subvertex.Subvertex
         :raises None: Raises no known exceptions
@@ -39,7 +45,9 @@ class Subedge(object):
 
     @property
     def edge(self):
-        """ Return the edge to which this subedge refers
+        """
+        Returns the edge to which this subedge refers
+
         :return: the edge to which this subedge refers
         :rtype: pacman.graph.edge.Edge
         :raises None: Raises no known exceptions
@@ -48,7 +56,9 @@ class Subedge(object):
 
     @property
     def label(self):
-        """ Get the label of the subedge
+        """
+        Returns the label of the subedge
+
         :return: The name of the subedge
         :rtype: str
         :raises None: Raises no known exceptions
