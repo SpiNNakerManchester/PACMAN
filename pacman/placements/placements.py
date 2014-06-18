@@ -7,18 +7,27 @@ class Placements(object):
     of the subgraph onto the machine
     """
 
-    def __init__(self, subgraph, machine):
+    def __init__(self):
         """
 
-        :param subgraph: subgraph to which the placements refers
-        :param machine: machine on which the placements is performed
-        :type subgraph: pacman.subgraph.subgraph.Subgraph
-        :type machine: pacman.machine.machine.Machine
         :return: a new placements object
         :rtype: pacman.placements.placements.Placements
         :raises None: does not raise any known exceptions
         """
         pass
+
+#    def __init__(self, subgraph, machine):
+#        """
+#
+#        :param subgraph: subgraph to which the placements refers
+#        :param machine: machine on which the placements is performed
+#        :type subgraph: pacman.subgraph.subgraph.Subgraph
+#        :type machine: pacman.machine.machine.Machine
+#        :return: a new placements object
+#        :rtype: pacman.placements.placements.Placements
+#        :raises None: does not raise any known exceptions
+#        """
+#        pass
 
     def add_placement(self, subvertex, chip, processor):
         """
@@ -33,7 +42,10 @@ class Placements(object):
         :type processor: pacman.machine.processor.Processor
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raises InvalidChipException: if the specified chip does not exist\
+                in the current machine configuration
+                InvalidProcessorException: if the specified processor does\
+                not exist in the current machine configuration
         """
         pass
 

@@ -4,16 +4,19 @@ __author__ = 'daviess'
 class Chip(object):
     """ Creates a new SpiNNaker chip object """
 
-    def __init__(self, location, processors=None, router=None, sdram=None, ethernet=None):
+    def __init__(self, x, y, processors=None, router=None, sdram=None, ethernet=None):
         """
 
-        :param location: a tuple (x, y) representing the chip's position in\
+        :param x: the x coordinate of the chip's position in\
+               the two-dimentional grid of SpiNNaker chips
+        :param y: the y coordinate of the chip's position in\
                the two-dimentional grid of SpiNNaker chips
         :param processors: a list of SpiNNaker processor objects
         :param router: a router object
         :param sdram: a memory object
         :param ethernet: the IP address of the chip or None if no ethernet attached
-        :type location: a tuple (x, y)
+        :type x: int
+        :type y: int
         :type processors: None or list of pacman.machine.chip.Processor
         :type router: None or pacman.machine.chip.Router
         :type sdram: None or pacman.machine.chip.SDRAM
@@ -80,6 +83,45 @@ class Chip(object):
         :type ip_address: None or str
         :return: None
         :rtype: None
+        :raises None: does not raise any known exceptions
+        """
+        pass
+
+    @property
+    def location(self):
+        """
+        Returns the location of the chip as a dictionary containing two\
+        keys "x" and "y" associated with two integer numbers representing\
+        the location of the chip in the two-dimensional grid of SpiNNaker chips
+
+        :return: a dictionary containing two keys "x" and "y" associated\
+        with two integer numbers representing the location of the chip in\
+        the two-dimensional grid of SpiNNaker chips
+        :rtype: {"x": int, "y": int}
+        :raises None: does not raise any known exceptions
+        """
+        pass
+
+    @property
+    def x(self):
+        """
+        Returns an integer representing the x location of the chip in\
+        the two-dimensional grid of SpiNNaker chips
+
+        :return: the x position of the chip
+        :rtype: int
+        :raises None: does not raise any known exceptions
+        """
+        pass
+
+    @property
+    def y(self):
+        """
+        Returns an integer representing the y location of the chip in\
+        the two-dimensional grid of SpiNNaker chips
+
+        :return: the y position of the chip
+        :rtype: int
         :raises None: does not raise any known exceptions
         """
         pass

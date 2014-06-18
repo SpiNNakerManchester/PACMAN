@@ -44,3 +44,31 @@ class Machine(object):
         :rtype: iterable chip object
         :raises None: does not raise any known exceptions
         """
+
+    def get_chip_at_location_xy(self, x, y):
+        """
+        Returns the SpiNNaker chip at a specific (x, y) location
+
+        :param x: the x coordinate of the requested chip
+        :param y: the y coordinate of the requested chip
+        :type x: int
+        :type y: int
+        :return: the chip at the specified location
+        :rtype: pacman.machine.chip.Chip or None
+        :raises None: does not raise any known exceptions
+        """
+        pass
+
+    def get_chip_at_location(self, location):
+        """
+        Returns the SpiNNaker chip at a specific (x, y) location\
+        where the coordinates are expressed in a dictionary with\
+        two keys
+
+        :param location: the x coordinate of the requested chip
+        :type location: {"x": int, "y": int}
+        :return: the chip at the specified location
+        :rtype: pacman.machine.chip.Chip or None
+        :raises None: does not raise any known exceptions
+        """
+        pass

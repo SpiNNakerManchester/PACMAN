@@ -15,17 +15,17 @@ class RoutingInfo(object):
         """
         pass
 
-    def add_routing_info(self, keys, mask, subedge):
+    def add_routing_info(self, subedge, keys, mask):
         """
         Associate a set of key and mask to a subedge
 
-        :param keys: the routing key of a specific subedge
-        :param mask: the mask of a specific subedge
         :param subedge: the subedge to associate with the\
                routing key and the mask
+        :param keys: the routing key of a specific subedge
+        :param mask: the mask of a specific subedge
+        :type subedge: pacman.subgraph.subvertex.Subvertex
         :type keys: int
         :type mask: int
-        :type subedge: pacman.subgraph.subvertex.Subvertex
         :return: None
         :rtype: None
         :raises None: does not raise any known exceptions
@@ -48,13 +48,23 @@ class RoutingInfo(object):
         Finds the routing information associated with a particular key
 
         :param key: the key to look for in the collection of routing information
-        :type keys: int
+        :type key: int
 
-        :return: the routing information with the specified routing key
-        :rtype: pacman.routing_info.info.Info
+        :return: the routing information associated with the specified routing key or None
+        :rtype: pacman.routing_info.info.Info or None
         :raises None: does not raise any known exceptions
         """
         pass
 
     def find_routing_info_from_subedge(self, subedge):
+        """
+        Finds the routing information associated with a particular subedge
+
+        :param subedge: the key to look for in the collection of routing information
+        :type subedge: pacman.subgraph.subvertex.Subvertex
+
+        :return: the routing information associated with the specified subvertex or None
+        :rtype: pacman.routing_info.info.Info or None
+        :raises None: does not raise any known exceptions
+        """
         pass
