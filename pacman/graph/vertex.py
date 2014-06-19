@@ -17,7 +17,13 @@ class Vertex(object):
         :rtype: pacman.graph.vertex.Vertex
         :raise None: Raises no known exceptions
         """
-        pass
+        self._label = label
+        self._n_atoms = n_atoms
+        self._constraints = list()
+
+        if constraints is not None:
+            for next_constraint in constraints:
+                self._constraints.append(next_constraint)
     
     @property
     def label(self):
@@ -28,7 +34,7 @@ class Vertex(object):
         :rtype: str
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._label
     
     @property
     def n_atoms(self):
@@ -39,11 +45,11 @@ class Vertex(object):
         :rtype: int
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._n_atoms
     
     @property
     def constraints(self):
         """ 
         
         """
-        pass
+        return self._constraints

@@ -1,5 +1,8 @@
 __author__ = 'stokesa6'
 
+from pacman.graph.vertex import Vertex
+from pacman.graph.edge import Edge
+
 
 class Graph(object):
     """ Creates a new graph object """
@@ -17,7 +20,13 @@ class Graph(object):
         :rtype: pacman.graph.graph.Graph
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._vertices = list()
+        self._edges = list()
+
+        self.add_vertices(vertices)
+        self.add_edges(edges)
+
+        return self
 
     def add_vertex(self, vertex):
         """
@@ -29,7 +38,9 @@ class Graph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if vertex is not None and type(vertex) == type(Vertex):
+            self._vertices.append(vertex)
+
 
     def add_vertices(self, vertices):
         """
@@ -42,7 +53,10 @@ class Graph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if vertices is not None:
+            for next_vertex in vertices:
+                if type(next_vertex) == type(Vertex):
+                    self._vertices.append(next_vertex)
 
 
     def add_edge(self, edge):
@@ -55,7 +69,8 @@ class Graph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if edge is not None and type(edge) == type(Edge):
+            self._edges.append(edge)
 
     def add_edges(self, edges):
         """
@@ -68,7 +83,10 @@ class Graph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if edges is not None:
+            for next_edge in edges:
+                if type(next_edge) == type(Edge):
+                    self._edges.append(next_edge)
 
     def outgoing_edges_from_vertex(self, vertex):
         """
@@ -108,7 +126,7 @@ class Graph(object):
         :return: an iterable object that contains the vertices of this graph
         :rtype: iterable object
         """
-        pass
+        return self._vertices
 
     @property
     def edges(self):
@@ -118,4 +136,5 @@ class Graph(object):
         :return: an iterable object that contains the edges of this graph
         :rtype: iterable object
         """
-        pass
+        return self._edges
+

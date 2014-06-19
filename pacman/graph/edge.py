@@ -17,7 +17,9 @@ class Edge(object):
         :rtype: pacman.graph.edge.Edge
         :raise None: Raises no known exceptions
         """
-        pass
+        self._label = label
+        self._pre_vertex = pre_vertex
+        self._post_vertex = post_vertex
 
     @property
     def pre_vertex(self):
@@ -28,7 +30,7 @@ class Edge(object):
         :rtype: pacman.graph.vertex.Vertex
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._pre_vertex
 
     @property
     def post_vertex(self):
@@ -39,7 +41,7 @@ class Edge(object):
         :rtype: pacman.graph.vertex.Vertex
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._post_vertex
 
     @property
     def label(self):
@@ -50,4 +52,4 @@ class Edge(object):
         :rtype: str
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._label
