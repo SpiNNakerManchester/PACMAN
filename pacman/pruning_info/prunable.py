@@ -13,7 +13,7 @@ class Prunable(object):
         :type subedge: pacman.subgraph.subedge.Subedge
         :return: a prunable object containing the subedge which may be pruned
         :rtype: pacman.pruning_info.prunable.Prunable
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -24,6 +24,6 @@ class Prunable(object):
 
         :return: the subedge which may be pruned
         :rtype: pacman.subgraph.subedge.Subedge
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

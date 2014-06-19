@@ -18,7 +18,7 @@ class Info(object):
         :type mask: int
         :return: the new routing_info association
         :rtype: pacman.routing_info.routing_info.RoutingInfo
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -29,7 +29,7 @@ class Info(object):
 
         :return: the subedge object
         :rtype: pacman.subgraph.subedge.Subedge
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -40,7 +40,7 @@ class Info(object):
 
         :return: the routing key
         :rtype: int
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -51,6 +51,6 @@ class Info(object):
 
         :return: the mask
         :rtype: int
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

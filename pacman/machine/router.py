@@ -12,7 +12,7 @@ class Router(object):
         :type links: None or list of int
         :return: a router object
         :rtype: pacman.machine.chip.Router
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -24,7 +24,7 @@ class Router(object):
         :type link: int
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -36,7 +36,7 @@ class Router(object):
         :type link: list of int
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -48,7 +48,7 @@ class Router(object):
         :type link: int
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -60,7 +60,7 @@ class Router(object):
         :type link: list of int
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -71,7 +71,7 @@ class Router(object):
 
         :return: the set of available links
         :rtype: list of int
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 

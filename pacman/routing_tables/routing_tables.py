@@ -12,7 +12,7 @@ class RoutingTables(object):
 
         :return: a RoutingTables object which contains all the routing tables and the routing entries
         :rtype: pacman.routing_tables.routing_tables.RoutingTables
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -26,7 +26,7 @@ class RoutingTables(object):
         :type chip: pacman.machine.chip.Chip
         :return: None
         :rtype: None
-        :raises InvalidChipException: if the specified chip does not exist\
+        :raise pacman.exceptions.InvalidChipException: if the specified chip does not exist\
                 in the current machine configuration
         """
         pass
@@ -38,6 +38,6 @@ class RoutingTables(object):
 
         :return: the list of routing table objects
         :rtype: list of pacman.routing_table.routing_table.RoutingTable
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

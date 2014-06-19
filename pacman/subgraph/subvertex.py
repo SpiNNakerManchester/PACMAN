@@ -21,7 +21,7 @@ class Subvertex(object):
         :type constraints: list of Constraint objects
         :return: a Vertex object
         :rtype: pacman.graph.vertex.Vertex
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -32,7 +32,7 @@ class Subvertex(object):
 
         :return: The name of the subvertex
         :rtype: str
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -43,7 +43,7 @@ class Subvertex(object):
 
         :return: The number of atoms in the subvertex
         :rtype: int
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -54,7 +54,7 @@ class Subvertex(object):
 
         :return: The id of the first atom in the subvertex
         :rtype: int
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -65,7 +65,7 @@ class Subvertex(object):
 
         :return: The id of the last atom in the subvertex
         :rtype: int
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -83,6 +83,6 @@ class Subvertex(object):
 
         :return: The vertex object to which the subvertex refers
         :rtype: pacman.graph.vertex.Vertex
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass

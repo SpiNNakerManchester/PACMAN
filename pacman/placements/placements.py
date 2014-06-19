@@ -12,7 +12,7 @@ class Placements(object):
 
         :return: a new placements object
         :rtype: pacman.placements.placements.Placements
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -25,7 +25,7 @@ class Placements(object):
 #        :type machine: pacman.machine.machine.Machine
 #        :return: a new placements object
 #        :rtype: pacman.placements.placements.Placements
-#        :raises None: does not raise any known exceptions
+#        :raise None: does not raise any known exceptions
 #        """
 #        pass
 
@@ -42,10 +42,10 @@ class Placements(object):
         :type processor: pacman.machine.processor.Processor
         :return: None
         :rtype: None
-        :raises InvalidChipException: if the specified chip does not exist\
-                in the current machine configuration
-                InvalidProcessorException: if the specified processor does\
-                not exist in the current machine configuration
+        :raise pacman.exceptions.InvalidChipException: if the specified\
+        chip does not exist in the current machine configuration
+        :raise pacman.exceptions.InvalidProcessorException: if the\
+        specified processor does not exist in the current machine configuration
         """
         pass
 
@@ -56,6 +56,6 @@ class Placements(object):
 
         :return: list of placements
         :rtype: pacman.placements.placement.Placement
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

@@ -15,7 +15,7 @@ class Edge(object):
         :type post_vertex: pacman.graph.vertex.Vertex
         :return: an Edge
         :rtype: pacman.graph.edge.Edge
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -26,7 +26,7 @@ class Edge(object):
 
         :return: the outgoing vertex
         :rtype: pacman.graph.vertex.Vertex
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -37,7 +37,7 @@ class Edge(object):
 
         :return: the incoming vertex
         :rtype: pacman.graph.vertex.Vertex
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -48,6 +48,6 @@ class Edge(object):
 
         :return: The name of the edge
         :rtype: str
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass

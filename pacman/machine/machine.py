@@ -10,7 +10,7 @@ class Machine(object):
         :type chips: list of pacman.machine.chip.Chip
         :return: a new machine object
         :rtype: pacman.machine.machine.Machine
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -21,7 +21,7 @@ class Machine(object):
         :type chip: pacman.machine.chip.Chip
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -32,7 +32,7 @@ class Machine(object):
         :type chips: list of pacman.machine.chip.Chip
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -42,8 +42,9 @@ class Machine(object):
         Returns the chips allocated to the machine object
         :return: a collection of chip objects
         :rtype: iterable chip object
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
+        pass
 
     def get_chip_at_location_xy(self, x, y):
         """
@@ -55,7 +56,7 @@ class Machine(object):
         :type y: int
         :return: the chip at the specified location
         :rtype: pacman.machine.chip.Chip or None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -69,6 +70,6 @@ class Machine(object):
         :type location: {"x": int, "y": int}
         :return: the chip at the specified location
         :rtype: pacman.machine.chip.Chip or None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

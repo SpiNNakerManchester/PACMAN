@@ -15,7 +15,7 @@ class Vertex(object):
         :type constraints: list of Constraint objects
         :return: a Vertex object
         :rtype: pacman.graph.vertex.Vertex
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
     
@@ -26,7 +26,7 @@ class Vertex(object):
 
         :return: The name of the vertex
         :rtype: str
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
     
@@ -37,7 +37,7 @@ class Vertex(object):
 
         :return: The number of atoms in the vertex
         :rtype: int
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
     

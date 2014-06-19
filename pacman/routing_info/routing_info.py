@@ -11,7 +11,7 @@ class RoutingInfo(object):
 
         :return: a new RoutingInfo object
         :rtype: pacman.routing_info.routing_info.RoutingInfo
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -28,7 +28,7 @@ class RoutingInfo(object):
         :type mask: int
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -39,7 +39,7 @@ class RoutingInfo(object):
 
         :return: list of routing information
         :rtype: list of pacman.routing_info.info.Info
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -52,7 +52,7 @@ class RoutingInfo(object):
 
         :return: the routing information associated with the specified routing key or None
         :rtype: pacman.routing_info.info.Info or None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -65,6 +65,6 @@ class RoutingInfo(object):
 
         :return: the routing information associated with the specified subvertex or None
         :rtype: pacman.routing_info.info.Info or None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

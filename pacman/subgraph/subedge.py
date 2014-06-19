@@ -17,7 +17,7 @@ class Subedge(object):
         :type post_subvertex: pacman.subgraph.subvertex.Subvertex
         :return: a Subedge
         :rtype: pacman.subgraph.subedge.Subedge
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -28,7 +28,7 @@ class Subedge(object):
 
         :return: the outgoing subvertex
         :rtype: pacman.subgraph.subvertex.Subvertex
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -39,7 +39,7 @@ class Subedge(object):
 
         :return: the incoming subvertex
         :rtype: pacman.subgraph.subvertex.Subvertex
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -50,7 +50,7 @@ class Subedge(object):
 
         :return: the edge to which this subedge refers
         :rtype: pacman.graph.edge.Edge
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass
 
@@ -61,6 +61,6 @@ class Subedge(object):
 
         :return: The name of the subedge
         :rtype: str
-        :raises None: Raises no known exceptions
+        :raise None: Raises no known exceptions
         """
         pass

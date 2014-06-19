@@ -11,7 +11,7 @@ class PruningInfo(object):
 
         :return: a new PruningInfo object
         :rtype: pacman.pruning_info.pruning_info.PruningInfo
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -23,7 +23,7 @@ class PruningInfo(object):
         :type subedge: pacman.subgraph.subedge.Subedge
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -34,6 +34,6 @@ class PruningInfo(object):
 
         :return: the list of prunable edges
         :rtype: list of pacman.subgraph.subedge.Subedge
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

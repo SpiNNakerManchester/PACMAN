@@ -17,7 +17,7 @@ class Subgraph(object):
         :type subedges: None or iterable object
         :return: a new subgraph object
         :rtype: pacman.subgraph.subgraph.Subgraph
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -29,7 +29,7 @@ class Subgraph(object):
         :type subvertex: pacman.subgraph.subvertex.Subvertex
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -42,7 +42,7 @@ class Subgraph(object):
         :type subvertices: iterable object
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -55,7 +55,7 @@ class Subgraph(object):
         :type subedge: pacman.subgraph.subedge.Subedge
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -68,7 +68,7 @@ class Subgraph(object):
         :type subedges: iterable object
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -83,7 +83,7 @@ class Subgraph(object):
         :type subvertex:  pacman.subgraph.subvertex.Subvertex
         :return: a list of subedges which have subvertex as their pre_subvertex
         :rtype: iterable object
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -98,7 +98,7 @@ class Subgraph(object):
         :type subvertex:  pacman.subgraph.subvertex.Subvertex
         :return: a list of subedges which have subvertex as their post_subvertex
         :rtype: iterable object
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 

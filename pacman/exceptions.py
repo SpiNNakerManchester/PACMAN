@@ -5,7 +5,7 @@ class PacmanException(Exception):
     """
     Superclass of all exceptions from the pacman module.
 
-    :raises None: does not raise any known exceptions
+    :raise None: does not raise any known exceptions
     """
     pass
 
@@ -15,7 +15,7 @@ class InvalidChipException(PacmanException):
     Exception thrown when a subvertex is placed in a chip\
     which does not exist in the machine structure
 
-    :raises None: does not raise any known exceptions
+    :raise None: does not raise any known exceptions
     """
     pass
 
@@ -25,7 +25,7 @@ class InvalidProcessorException(PacmanException):
     Exception thrown when a subvertex is placed in a processor\
     which does not exist in the machine structure
 
-    :raises None: does not raise any known exceptions
+    :raise None: does not raise any known exceptions
     """
     pass
 
@@ -33,5 +33,5 @@ class InvalidProcessorException(PacmanException):
 #class Exception(PacmanException):
 #    """thrown when a response code from the spinnaker board
 #       is not recongised by spinnman
-#    :raises None: does not raise any known exceptions"""
+#    :raise None: does not raise any known exceptions"""
 #    pass

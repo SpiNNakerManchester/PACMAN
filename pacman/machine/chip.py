@@ -23,7 +23,7 @@ class Chip(object):
         :type ethernet: None or str representing an IP address
         :return: a SpiNNaker chip object
         :rtype: pacman.machine.chip.Chip
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -35,7 +35,7 @@ class Chip(object):
         :type processor: pacman.machine.chip.Processor
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -47,7 +47,7 @@ class Chip(object):
         :type processors: list of pacman.machine.chip.Processor
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -59,7 +59,7 @@ class Chip(object):
         :type router: pacman.machine.chip.Router
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -71,7 +71,7 @@ class Chip(object):
         :type SDRAM: pacman.machine.chip.SDRAM
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -83,7 +83,7 @@ class Chip(object):
         :type ip_address: None or str
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -98,7 +98,7 @@ class Chip(object):
         with two integer numbers representing the location of the chip in\
         the two-dimensional grid of SpiNNaker chips
         :rtype: {"x": int, "y": int}
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -110,7 +110,7 @@ class Chip(object):
 
         :return: the x position of the chip
         :rtype: int
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -122,7 +122,7 @@ class Chip(object):
 
         :return: the y position of the chip
         :rtype: int
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -133,7 +133,7 @@ class Chip(object):
 
         :return: list of available processors
         :rtype: list of pacman.machine.chip.Processor
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -144,7 +144,7 @@ class Chip(object):
 
         :return: router object associated with the chip
         :rtype: pacman.machine.chip.Router
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -155,7 +155,7 @@ class Chip(object):
 
         :return: SDRAM object associated with the chip
         :rtype: pacman.machine.chip.SDRAM
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -167,6 +167,6 @@ class Chip(object):
 
         :return: IP address of the chip, or None
         :rtype: str or None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass

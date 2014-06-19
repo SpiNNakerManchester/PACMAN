@@ -15,7 +15,7 @@ class Graph(object):
         :type edges: None or iterable object
         :return: a new graph object
         :rtype: pacman.graph.graph.Graph
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -27,7 +27,7 @@ class Graph(object):
         :type vertex: pacman.graph.vertex.Vertex
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -40,7 +40,7 @@ class Graph(object):
         :type vertices: iterable object
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -53,7 +53,7 @@ class Graph(object):
         :type edge: pacman.graph.edge.Edge
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -66,7 +66,7 @@ class Graph(object):
         :type edges: iterable object
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -81,7 +81,7 @@ class Graph(object):
         :type vertex:  pacman.graph.vertex.Vertex
         :return: a list of edges which have vertex as their pre_vertex
         :rtype: iterable object
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -96,7 +96,7 @@ class Graph(object):
         :type vertex:  pacman.graph.vertex.Vertex
         :return: a list of edges which have vertex as their post_vertex
         :rtype: iterable object
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 

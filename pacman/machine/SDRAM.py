@@ -11,7 +11,7 @@ class SDRAM(object):
         :type size: int
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         self._memory_size = size
         pass
@@ -23,7 +23,7 @@ class SDRAM(object):
 
         :return: the size of SDRAM in bytes
         :rtype: int
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         return self._memory_size
 
@@ -35,6 +35,6 @@ class SDRAM(object):
         :type size: int
         :return: None
         :rtype: None
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         self._memory_size = size

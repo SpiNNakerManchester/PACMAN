@@ -11,7 +11,7 @@ class Processor(object):
         :type id: int
         :return: a SpiNNaker chip object
         :rtype: pacman.machine.chip.Processor
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
@@ -22,7 +22,7 @@ class Processor(object):
 
         :return: id of the processor
         :rtype: int
-        :raises None: does not raise any known exceptions
+        :raise None: does not raise any known exceptions
         """
         pass
 
