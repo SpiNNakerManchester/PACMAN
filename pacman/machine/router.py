@@ -2,19 +2,22 @@ __author__ = 'daviess'
 
 
 class Router(object):
-    """ Creates a new router object with a number of available links"""
+    """ Creates a new router object with a list of available links"""
 
     def __init__(self, links=None):
         """
 
-        :param links: list of available links (from 0 to 5 following\
-                      SpiNNaker datasheet) or None
-        :type links: None or list of int
+        :param links: list of 6 elements each set to 1 or 0 depending if the\
+        link is functional or not. In alternative None if no links are specified
+        :type links: list of int or None
         :return: a router object
         :rtype: pacman.machine.chip.Router
         :raise None: does not raise any known exceptions
         """
-        pass
+        if links is None or links.__len__() != 6:
+            self._links = [0 for i in xrange(6)]
+        else:
+            self._links = links
 
     def add_link(self, link):
         """
@@ -26,19 +29,7 @@ class Router(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
-
-    def add_links(self, links):
-        """
-        Adds a set of links to router's available links
-
-        :param link: the set of links to add
-        :type link: list of int
-        :return: None
-        :rtype: None
-        :raise None: does not raise any known exceptions
-        """
-        pass
+        self._links[link] = 1
 
     def del_link(self, link):
         """
@@ -50,19 +41,21 @@ class Router(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._links[link] = 0
 
-    def del_links(self, links):
+    def set_links(self, links):
         """
-        Removes a set of links from router's available links
+        Adds a set of links to router's available links
 
-        :param link: the set of links to remove
+        :param link: list of 6 elements each set to 1 or 0 depending if the\
+        link is functional or not.
         :type link: list of int
         :return: None
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if links is not None and links.__len__() == 6:
+            self._links = links
 
     @property
     def links(self):
@@ -73,5 +66,5 @@ class Router(object):
         :rtype: list of int
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._links
 

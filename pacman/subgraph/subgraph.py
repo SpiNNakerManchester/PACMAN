@@ -4,22 +4,28 @@ __author__ = 'daviess'
 class Subgraph(object):
     """ Creates a subgraph object related to a graph """
 
-    def __init__(self, label, graph, subvertices=None, subedges=None):
+    def __init__(self, graph, label=None, subvertices=None, subedges=None):
         """
 
-        :param label: an identifier for the subgraph
         :param graph: the graph object to which this subgraph refers
+        :param label: an identifier for the subgraph
         :param subvertices: a collection of vertices
         :param subedges: a collection of edges
-        :type label: str
         :type graph: pacman.graph.graph.Graph
+        :type label: str or None
         :type subvertices: None or iterable object
         :type subedges: None or iterable object
         :return: a new subgraph object
         :rtype: pacman.subgraph.subgraph.Subgraph
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._label = label
+        self._graph = graph
+        self._subvertices = list()
+        self._subedges = list()
+
+        self.add_subvertices(subvertices)
+        self.add_subedges(subedges)
 
     def add_subvertex(self, subvertex):
         """
@@ -110,6 +116,7 @@ class Subgraph(object):
         :return: a graph object connected with this subgraph
         :rtype: pacman.graph.graph.Graph
         """
+        return self._graph
 
     @property
     def subvertices(self):
@@ -119,6 +126,7 @@ class Subgraph(object):
         :return: an iterable object that contains the subvertices of this subgraph
         :rtype: iterable object
         """
+        return self._subvertices
 
     @property
     def subedges(self):
@@ -128,3 +136,15 @@ class Subgraph(object):
         :return: an iterable object that contains the subedges of this subgraph
         :rtype: iterable object
         """
+        return self._subedges
+
+    @property
+    def label(self):
+        """
+        Returns the label of the subgraph
+
+        :return: The name of the subgraph
+        :rtype: str or None
+        :raise None: Raises no known exceptions
+        """
+        return self._label

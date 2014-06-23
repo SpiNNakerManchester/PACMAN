@@ -4,17 +4,17 @@ __author__ = 'daviess'
 class Subedge(object):
     """Creates a new subedge object related to an edge"""
 
-    def __init__(self, label, edge, pre_subvertex, post_subvertex):
+    def __init__(self, edge, pre_subvertex, post_subvertex, label=None):
         """
 
-        :param label: The name of the edge
-        :type label: str
         :param edge: The edge to which this subedge refers
-        :type edge: pacman.graph.edge.Edge
         :param pre_subvertex: the outgoing subvertex
-        :type pre_subvertex: pacman.subgraph.subvertex.Subvertex
         :param post_subvertex: the incoming subvertex
+        :param label: The name of the edge
+        :type edge: pacman.graph.edge.Edge
+        :type pre_subvertex: pacman.subgraph.subvertex.Subvertex
         :type post_subvertex: pacman.subgraph.subvertex.Subvertex
+        :type label: str or None
         :return: a Subedge
         :rtype: pacman.subgraph.subedge.Subedge
         :raise None: Raises no known exceptions
@@ -60,7 +60,7 @@ class Subedge(object):
         Returns the label of the subedge
 
         :return: The name of the subedge
-        :rtype: str
+        :rtype: str or None
         :raise None: Raises no known exceptions
         """
         pass

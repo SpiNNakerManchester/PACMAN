@@ -1,18 +1,24 @@
 __author__ = 'daviess'
 
+from pacman.machine.chip import Chip
+from pacman.exceptions import ChipAlreadyExistsException
+
 
 class Machine(object):
     """ Creates a SpiNNaker machine object """
 
-    def __init__(self, chips):
+    def __init__(self, chips=None):
         """
         :param chips: a list of usable chip objects
-        :type chips: list of pacman.machine.chip.Chip
+        :type chips: list of pacman.machine.chip.Chip or None
         :return: a new machine object
         :rtype: pacman.machine.machine.Machine
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._chips = dict()
+
+        if chips is not None:
+            self.add_chips(chips)
 
     def add_chip(self, chip):
         """
@@ -21,9 +27,14 @@ class Machine(object):
         :type chip: pacman.machine.chip.Chip
         :return: None
         :rtype: None
-        :raise None: does not raise any known exceptions
+        :raise ChipAlreadyExistsException: When the chip being added already\
+        exists in the machine
         """
-        pass
+        if isinstance(chip, Chip):
+            if self.does_chip_exist_at_xy(chip._x, chip._y):
+                raise ChipAlreadyExistsException
+            else:
+                self._chips[chip.__repr__()] = chip
 
     def add_chips(self, chips):
         """
@@ -34,21 +45,25 @@ class Machine(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if chips is not None:
+            for next_chip in chips:
+                self.add_chip(next_chip)
 
     @property
     def chips(self):
         """
         Returns the chips allocated to the machine object
+
         :return: a collection of chip objects
         :rtype: iterable chip object
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._chips
 
-    def get_chip_at_location_xy(self, x, y):
+    def get_chip_at_xy(self, x, y):
         """
-        Returns the SpiNNaker chip at a specific (x, y) location
+        Returns the SpiNNaker chip at a specific (x, y) location or None\
+        if the chip does not exist
 
         :param x: the x coordinate of the requested chip
         :param y: the y coordinate of the requested chip
@@ -58,13 +73,18 @@ class Machine(object):
         :rtype: pacman.machine.chip.Chip or None
         :raise None: does not raise any known exceptions
         """
-        pass
+        temp_chip = Chip(x, y)
+        chip_repr = temp_chip.__repr__()
+        if chip_repr in self._chips:
+            return self._chips[chip_repr]
+        else:
+            return None
 
     def get_chip_at_location(self, location):
         """
         Returns the SpiNNaker chip at a specific (x, y) location\
         where the coordinates are expressed in a dictionary with\
-        two keys
+        two keys or None if the chip does not exist
 
         :param location: the x coordinate of the requested chip
         :type location: {"x": int, "y": int}
@@ -72,4 +92,34 @@ class Machine(object):
         :rtype: pacman.machine.chip.Chip or None
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self.get_chip_at_xy(location["x"], location["y"])
+
+
+    def does_chip_exist_at_xy(self, x, y):
+        """
+        Returns True or False based on the existence of the\
+        specified chip in the machine
+
+        :param x: x location of the chip to test for existence
+        :param y: y location of the chip to test for existence
+        :type x: int
+        :type y: int
+        :return: True or False based on the existence of the chip
+        :rtype: boolean
+        :raise None: does not raise any known exceptions
+        """
+        temp_chip = Chip(x, y)
+        return temp_chip.__repr__() in self._chips
+
+    def does_chip_exist_at_location(self, location):
+        """
+        Returns True or False based on the existence of the\
+        specified chip in the machine
+
+        :param location: the x coordinate of the requested chip
+        :type location: {"x": int, "y": int}
+        :return: True or False based on the existence of the chip
+        :rtype: boolean
+        :raise None: does not raise any known exceptions
+        """
+        return self.does_chip_exist_at_xy(location["x"], location["y"])

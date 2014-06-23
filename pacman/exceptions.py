@@ -1,4 +1,4 @@
-__author__ = 'stokesa6,daviess'
+__author__ = 'daviess,stokesa6'
 
 
 class PacmanException(Exception):
@@ -29,6 +29,22 @@ class InvalidProcessorException(PacmanException):
     """
     pass
 
+
+class ChipAlreadyExistsException(PacmanException):
+    """
+    Exception thrown when a chip that is being added already\
+    exists in the machine
+
+    :raise None: does not raise any known exceptions"""
+    pass
+
+class ProcessorAlreadyExistsException(PacmanException):
+    """
+    Exception thrown when a processor that is being added already\
+    exists in the machine
+
+    :raise None: does not raise any known exceptions"""
+    pass
 
 #class Exception(PacmanException):
 #    """thrown when a response code from the spinnaker board

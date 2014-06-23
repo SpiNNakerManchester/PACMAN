@@ -7,26 +7,25 @@ from pacman.graph.edge import Edge
 class Graph(object):
     """ Creates a new graph object """
 
-    def __init__(self, label, vertices=None, edges=None):
+    def __init__(self, label=None, vertices=None, edges=None):
         """
 
         :param label: an identifier for the graph
         :param vertices: a collection of vertices
         :param edges: a collection of edges
-        :type label: str
+        :type label: str or None
         :type vertices: None or iterable object
         :type edges: None or iterable object
         :return: a new graph object
         :rtype: pacman.graph.graph.Graph
         :raise None: does not raise any known exceptions
         """
+        self._label = label
         self._vertices = list()
         self._edges = list()
 
         self.add_vertices(vertices)
         self.add_edges(edges)
-
-        return self
 
     def add_vertex(self, vertex):
         """
@@ -38,7 +37,7 @@ class Graph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        if vertex is not None and type(vertex) == type(Vertex):
+        if vertex is not None and isinstance(vertex, Vertex):
             self._vertices.append(vertex)
 
 
@@ -55,7 +54,7 @@ class Graph(object):
         """
         if vertices is not None:
             for next_vertex in vertices:
-                if type(next_vertex) == type(Vertex):
+                if isinstance(next_vertex, Vertex):
                     self._vertices.append(next_vertex)
 
 
@@ -69,7 +68,7 @@ class Graph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        if edge is not None and type(edge) == type(Edge):
+        if edge is not None and isinstance(edge, Edge):
             self._edges.append(edge)
 
     def add_edges(self, edges):
@@ -85,7 +84,7 @@ class Graph(object):
         """
         if edges is not None:
             for next_edge in edges:
-                if type(next_edge) == type(Edge):
+                if isinstance(next_edge, Edge):
                     self._edges.append(next_edge)
 
     def outgoing_edges_from_vertex(self, vertex):
@@ -117,6 +116,17 @@ class Graph(object):
         :raise None: does not raise any known exceptions
         """
         pass
+
+    @property
+    def label(self):
+        """
+        Returns the label of the graph
+
+        :return: The name of the graph
+        :rtype: str or None
+        :raise None: Raises no known exceptions
+        """
+        return self._label
 
     @property
     def vertices(self):

@@ -13,7 +13,7 @@ class Processor(object):
         :rtype: pacman.machine.chip.Processor
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._id = id
 
     @property
     def id(self):
@@ -24,6 +24,10 @@ class Processor(object):
         :rtype: int
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._id
 
+    def __repr__(self):
+        return self.__str__()
 
+    def __str__(self):
+        return "{}".format(self._id)

@@ -4,15 +4,15 @@ __author__ = 'stokesa6,daviess'
 class Edge(object):
     """ Creates a new edge object """
 
-    def __init__(self, label, pre_vertex, post_vertex):
+    def __init__(self, pre_vertex, post_vertex, label=None):
         """
 
-        :param label: The name of the edge
-        :type label: str
         :param pre_vertex: the outgoing vertex
-        :type pre_vertex: pacman.graph.vertex.Vertex
         :param post_vertex: the incoming vertex
+        :param label: The name of the edge
+        :type pre_vertex: pacman.graph.vertex.Vertex
         :type post_vertex: pacman.graph.vertex.Vertex
+        :type label: str or None
         :return: an Edge
         :rtype: pacman.graph.edge.Edge
         :raise None: Raises no known exceptions
@@ -49,7 +49,7 @@ class Edge(object):
         Gets the label of the edge
 
         :return: The name of the edge
-        :rtype: str
+        :rtype: str or None
         :raise None: Raises no known exceptions
         """
         return self._label
