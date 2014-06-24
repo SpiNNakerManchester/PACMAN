@@ -54,8 +54,7 @@ class Graph(object):
         """
         if vertices is not None:
             for next_vertex in vertices:
-                if isinstance(next_vertex, Vertex):
-                    self._vertices.append(next_vertex)
+                self.add_vertex(next_vertex)
 
 
     def add_edge(self, edge):
@@ -84,8 +83,7 @@ class Graph(object):
         """
         if edges is not None:
             for next_edge in edges:
-                if isinstance(next_edge, Edge):
-                    self._edges.append(next_edge)
+                self.add_edge(next_edge)
 
     def outgoing_edges_from_vertex(self, vertex):
         """
@@ -97,10 +95,16 @@ class Graph(object):
                        edges
         :type vertex:  pacman.graph.vertex.Vertex
         :return: a list of edges which have vertex as their pre_vertex
-        :rtype: iterable object
+        :rtype: list of pacman.graph.edge.Edge
         :raise None: does not raise any known exceptions
         """
-        pass
+        return_list = list()
+
+        for temp_edge in self._edges:
+            if temp_edge.pre_vertex == vertex:
+                return_list.append(temp_edge)
+
+        return return_list
 
     def incoming_edges_to_vertex(self, vertex):
         """
@@ -112,10 +116,16 @@ class Graph(object):
                        edges
         :type vertex:  pacman.graph.vertex.Vertex
         :return: a list of edges which have vertex as their post_vertex
-        :rtype: iterable object
+        :rtype: list of pacman.graph.edge.Edge
         :raise None: does not raise any known exceptions
         """
-        pass
+        return_list = list()
+
+        for temp_edge in self._edges:
+            if temp_edge.post_vertex == vertex:
+                return_list.append(temp_edge)
+
+        return return_list
 
     @property
     def label(self):

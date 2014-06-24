@@ -1,5 +1,8 @@
 __author__ = 'daviess'
 
+from pacman.subgraph.subvertex import Subvertex
+from pacman.subgraph.subedge import Subedge
+
 
 class Subgraph(object):
     """ Creates a subgraph object related to a graph """
@@ -37,21 +40,23 @@ class Subgraph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if subvertex is not None and isinstance(subvertex, Subvertex):
+            self._subvertices.append(subvertex)
 
     def add_subvertices(self, subvertices):
         """
         Adds a collection of subvertex objects to this subgraph object
 
-        :param subvertices: an iterable object containing subvertex objects to be added\
-                         to the subgraph
+        :param subvertices: an iterable object containing subvertex objects\
+        to be added to the subgraph
         :type subvertices: iterable object
         :return: None
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
-
+        if subvertices is not None:
+            for next_subvertex in subvertices:
+                self.add_subvertex(next_subvertex)
 
     def add_subedge(self, subedge):
         """
@@ -63,20 +68,23 @@ class Subgraph(object):
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if subedge is not None and isinstance(subedge, Subedge):
+            self._subedges.append(subedge)
 
     def add_subedges(self, subedges):
         """
         Adds a collection of subedge objects to this subgraph object
 
-        :param subedges: an iterable object containing subedge objects to be added\
-                         to the subgraph
+        :param subedges: an iterable object containing subedge objects to
+        be added to the subgraph
         :type subedges: iterable object
         :return: None
         :rtype: None
         :raise None: does not raise any known exceptions
         """
-        pass
+        if subedges is not None:
+            for next_subedge in subedges:
+                self.add_subedge(next_subedge)
 
     def outgoing_subedges_from_subvertex(self, subvertex):
         """
@@ -91,7 +99,13 @@ class Subgraph(object):
         :rtype: iterable object
         :raise None: does not raise any known exceptions
         """
-        pass
+        return_list = list()
+
+        for temp_subedge in self._subedges:
+            if temp_subedge.pre_subvertex == subvertex:
+                return_list.append(temp_subedge)
+
+        return return_list
 
     def incoming_subedges_from_subvertex(self, subvertex):
         """
@@ -106,7 +120,13 @@ class Subgraph(object):
         :rtype: iterable object
         :raise None: does not raise any known exceptions
         """
-        pass
+        return_list = list()
+
+        for temp_subedge in self._subedges:
+            if temp_subedge.post_subvertex == subvertex:
+                return_list.append(temp_subedge)
+
+        return return_list
 
     @property
     def graph(self):
@@ -123,7 +143,8 @@ class Subgraph(object):
         """
         Returns the subvertices collection from this subgraph object
 
-        :return: an iterable object that contains the subvertices of this subgraph
+        :return: an iterable object that contains the subvertices of this\
+        subgraph
         :rtype: iterable object
         """
         return self._subvertices

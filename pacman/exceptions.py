@@ -46,6 +46,15 @@ class ProcessorAlreadyExistsException(PacmanException):
     :raise None: does not raise any known exceptions"""
     pass
 
+class ProcessorAlreadyInUseException(PacmanException):
+    """
+    Exception thrown when a subvertex is mapped to a processor\
+    which is already target of the placement for a different subvertex
+
+    :raise None: does not raise any known exceptions"""
+    pass
+
+
 #class Exception(PacmanException):
 #    """thrown when a response code from the spinnaker board
 #       is not recongised by spinnman
