@@ -1,15 +1,18 @@
 __author__ = 'daviess'
 
-from pacman.machine.chip import Chip
+from pacman.structures.machine.chip import Chip
 from pacman.exceptions import ChipAlreadyExistsException
 
 
 class Machine(object):
     """ Creates a SpiNNaker machine object """
 
-    def __init__(self, chips=None):
+    def __init__(self, dimensions, chips=None):
         """
         :param chips: a list of usable chip objects
+        :param dimensions: a tuple contains the x and y dimensions of
+                           the machine
+        :type dimensions: dict with x and y as keys
         :type chips: list of pacman.machine.chip.Chip or None
         :return: a new machine object
         :rtype: pacman.machine.machine.Machine
@@ -19,6 +22,9 @@ class Machine(object):
 
         if chips is not None:
             self.add_chips(chips)
+        #somehow detemrine machien dimenions from its inputs
+        self._x_dim = dimensions['x']
+        self._y_dim = dimensions['y']
 
     def add_chip(self, chip):
         """
@@ -31,7 +37,7 @@ class Machine(object):
         exists in the machine
         """
         if isinstance(chip, Chip):
-            if self.does_chip_exist_at_xy(chip._x, chip._y):
+            if self.does_chip_exist_at_xy(chip.x, chip.y):
                 raise ChipAlreadyExistsException
             else:
                 self._chips[chip.__repr__()] = chip
@@ -94,7 +100,6 @@ class Machine(object):
         """
         return self.get_chip_at_xy(location["x"], location["y"])
 
-
     def does_chip_exist_at_xy(self, x, y):
         """
         Returns True or False based on the existence of the\
@@ -123,3 +128,13 @@ class Machine(object):
         :raise None: does not raise any known exceptions
         """
         return self.does_chip_exist_at_xy(location["x"], location["y"])
+
+    @property
+    def dimenions(self):
+        """Returns a tuple containing the machines dimensions
+
+        :return: a tuple containing the x and y dimension of the machine
+        :rtype: tuple
+        :raise None: does not raise any known exceptions
+        """
+        return {'x': self._x_dim, 'y': self._y_dim}

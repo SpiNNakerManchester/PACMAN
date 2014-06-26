@@ -1,8 +1,9 @@
+from pacman.structures.machine import SDRAM
+
 __author__ = 'daviess'
 
-from pacman.machine.processor import Processor
-from pacman.machine.router import Router
-from pacman.machine.SDRAM import SDRAM
+from pacman.structures.machine.processor import Processor
+from pacman.structures.machine.router import Router
 from pacman.exceptions import ProcessorAlreadyExistsException
 
 

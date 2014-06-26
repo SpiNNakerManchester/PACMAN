@@ -1,6 +1,6 @@
 __author__ = 'daviess'
 
-from pacman.placements.placement import Placement
+from pacman.structures.placements.placement import Placement
 from pacman.exceptions import InvalidChipException, InvalidProcessorException,\
     ProcessorAlreadyInUseException
 

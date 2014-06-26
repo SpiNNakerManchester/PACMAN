@@ -1,7 +1,7 @@
 __author__ = 'stokesa6'
 
-from pacman.graph.vertex import Vertex
-from pacman.graph.edge import Edge
+from pacman.structures.graph.vertex import Vertex
+from pacman.structures.graph.edge import Edge
 
 
 class Graph(object):

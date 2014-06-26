@@ -1,7 +1,7 @@
 __author__ = 'daviess'
 
-from pacman.subgraph.subvertex import Subvertex
-from pacman.subgraph.subedge import Subedge
+from pacman.structures.subgraph.subvertex import Subvertex
+from pacman.structures.subgraph.subedge import Subedge
 
 
 class Subgraph(object):

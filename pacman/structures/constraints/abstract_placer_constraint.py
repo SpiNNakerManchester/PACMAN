@@ -1,6 +1,6 @@
 __author__ = 'daviess'
 
-from pacman.constraints.abstract_constraint import AbstractConstraint
+from pacman.structures.constraints.abstract_constraint import AbstractConstraint
 
 
 class AbstractPlacerConstraint(AbstractConstraint):

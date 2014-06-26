@@ -1,6 +1,6 @@
 __author__ = 'daviess'
 
-from pacman.constraints.abstract_partitioner_constraint import AbstractPartitionerConstraint
+from pacman.structures.constraints.abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
 class SizePartitionerConstraint(AbstractPartitionerConstraint):
