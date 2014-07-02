@@ -1,62 +1,92 @@
-__author__ = 'daviess,stokesa6'
-
-
 class PacmanException(Exception):
-    """
-    Superclass of all exceptions from the pacman module.
-
-    :raise None: does not raise any known exceptions
+    """ Indicates a general exception from Pacman
     """
     pass
 
 
-class InvalidChipException(PacmanException):
+class PacmanInvalidParameterException(PacmanException):
+    """ An exception which indicates that a parameter has an invalid value
     """
-    Exception thrown when a subvertex is placed in a chip\
-    which does not exist in the machine structure
-
-    :raise None: does not raise any known exceptions
+    
+    def __init__(self, parameter, value, problem):
+        """
+        
+        :param parameter: The name of the parameter
+        :type parameter: str
+        :param value: The value of the parameter
+        :type value: str
+        :param problem: The problem with the value of the parameter
+        :type problem: str
+        """
+        pass
+    
+class PacmanAlreadyExistsException(PacmanException):
+    """ An exception that indicates that something already exists and that
+        adding another would be a conflict
     """
-    pass
-
-
-class InvalidProcessorException(PacmanException):
+    
+    def __init__(self, item_type, item_id):
+        """
+        
+        :param item_type: The type of the item that already exists
+        :type item_type: str
+        :param item_id: The id of the item which is in conflict
+        :type item_id: str
+        """
+        pass
+    
+class PacmanPartitionException(PacmanException):
+    """ An exception that indicates that something went wrong with paritioning
     """
-    Exception thrown when a subvertex is placed in a processor\
-    which does not exist in the machine structure
-
-    :raise None: does not raise any known exceptions
+    
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the partitioning
+        :type problem: str
+        """
+        pass
+    
+class PacmanPlaceException(PacmanException):
+    """ An exception that indicates that something went wrong with placement
     """
-    pass
-
-
-class ChipAlreadyExistsException(PacmanException):
+    
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the placement
+        :type problem: str
+        """
+        pass
+    
+class PacmanPruneException(PacmanException):
+    """ An exception that indicates that something went wrong with pruning
     """
-    Exception thrown when a chip that is being added already\
-    exists in the machine
-
-    :raise None: does not raise any known exceptions"""
-    pass
-
-class ProcessorAlreadyExistsException(PacmanException):
+    
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the pruning
+        :type problem: str
+        """
+        pass
+    
+class PacmanRouteInfoAllocationException(PacmanException):
+    """ An exception that indicates that something went wrong with route info\
+        allocation
     """
-    Exception thrown when a processor that is being added already\
-    exists in the machine
-
-    :raise None: does not raise any known exceptions"""
-    pass
-
-class ProcessorAlreadyInUseException(PacmanException):
+    
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the allocation
+        :type problem: str
+        """
+        pass
+    
+class PacmanRoutingException(PacmanException):
+    """ An exception that indicates that something went wrong with routing
     """
-    Exception thrown when a subvertex is mapped to a processor\
-    which is already target of the placement for a different subvertex
-
-    :raise None: does not raise any known exceptions"""
-    pass
-
-
-#class Exception(PacmanException):
-#    """thrown when a response code from the spinnaker board
-#       is not recongised by spinnman
-#    :raise None: does not raise any known exceptions"""
-#    pass
+    
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the routing
+        :type problem: str
+        """
+        pass
