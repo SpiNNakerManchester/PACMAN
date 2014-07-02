@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.machine.machine &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pacman.model.machine.machine</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">pacman.model.machine.chip</span> <span class="kn">import</span> <span class="n">Chip</span>
+<span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanAlreadyExistsException</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="k">def</span> <span class="nf">_get_chip_dict_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get the dictionary key for a given x, y chip coordinate</span>
+<span class="sd">    </span>
+<span class="sd">    :param x: The chip x-coordinate</span>
+<span class="sd">    :type x: int</span>
+<span class="sd">    :param y: The chip y-coordinate</span>
+<span class="sd">    :type y: int</span>
+<span class="sd">    :return: A string that can be used as a dictionary id</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&quot;{},{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Machine"><a class="viewcode-back" href="../../../../pacman.model.machine.machine.html#pacman.model.machine.machine.Machine">[docs]</a><span class="k">class</span> <span class="nc">Machine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A Representation of a Machine with a number of Chips</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chips</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param chips: An iterable of chips in the machine</span>
+<span class="sd">        :type chips: iterable of :py:class:`pacman.model.machine.chip.Chip`</span>
+<span class="sd">        :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\</span>
+<span class="sd">                    chips have the same x and y coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c"># The maximum chip x coordinate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_x</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="c"># The maximum chip y coordinate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_y</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="c"># The dictionary of chips</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chips</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_chips</span><span class="p">(</span><span class="n">chips</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Machine.add_chip"><a class="viewcode-back" href="../../../../pacman.model.machine.machine.html#pacman.model.machine.machine.Machine.add_chip">[docs]</a>    <span class="k">def</span> <span class="nf">add_chip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a chip to the machine</span>
+<span class="sd">        </span>
+<span class="sd">        :param chip: The chip to add to the machine</span>
+<span class="sd">        :type chip: :py:class:`pacman.model.machine.chip.Chip`</span>
+<span class="sd">        :return: Nothing is returned</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanAlreadyExistsException: If a chip with\</span>
+<span class="sd">                    the same x and y coordinates already exists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chip_id</span> <span class="o">=</span> <span class="n">_get_chip_dict_id</span><span class="p">(</span><span class="n">chip</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">chip</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chip_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chips</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PacmanAlreadyExistsException</span><span class="p">(</span>
+                    <span class="s">&quot;chip&quot;</span><span class="p">,</span> <span class="s">&quot;{}, {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chip</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">chip</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chips</span><span class="p">[</span><span class="n">chip_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">chip</span>
+        
+        <span class="k">if</span> <span class="n">chip</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_x</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_x</span> <span class="o">=</span> <span class="n">chip</span><span class="o">.</span><span class="n">x</span>
+        <span class="k">if</span> <span class="n">chip</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_y</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_y</span> <span class="o">=</span> <span class="n">chip</span><span class="o">.</span><span class="n">y</span>
+</div>
+<div class="viewcode-block" id="Machine.add_chips"><a class="viewcode-back" href="../../../../pacman.model.machine.machine.html#pacman.model.machine.machine.Machine.add_chips">[docs]</a>    <span class="k">def</span> <span class="nf">add_chips</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chips</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add some chips to the machine</span>
+<span class="sd">        </span>
+<span class="sd">        :param chips: an iterable of chips</span>
+<span class="sd">        :type chips: iterable of :py:class:`pacman.model.machine.chip.Chip`</span>
+<span class="sd">        :return: Nothing is returned</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanAlreadyExistsException: If a chip with\</span>
+<span class="sd">                    the same x and y coordinates already exists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">next_chip</span> <span class="ow">in</span> <span class="n">chips</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_chip</span><span class="p">(</span><span class="n">next_chip</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chips</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; An iterable of chips in the machine</span>
+
+<span class="sd">        :return: An iterable of chips</span>
+<span class="sd">        :rtype: iterable of :py:class:`pacman.model.machine.chip.Chip`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chips</span>
+
+<div class="viewcode-block" id="Machine.get_chip_at"><a class="viewcode-back" href="../../../../pacman.model.machine.machine.html#pacman.model.machine.machine.Machine.get_chip_at">[docs]</a>    <span class="k">def</span> <span class="nf">get_chip_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the chip at a specific (x, y) location</span>
+
+<span class="sd">        :param x: the x-coordinate of the requested chip</span>
+<span class="sd">        :type x: int</span>
+<span class="sd">        :param y: the y-coordinate of the requested chip</span>
+<span class="sd">        :type y: int</span>
+<span class="sd">        :return: the chip at the specified location, or None if no such chip</span>
+<span class="sd">        :rtype: :py:class:`pacman.model.machine.chip.Chip`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chip_id</span> <span class="o">=</span> <span class="n">_get_chip_dict_id</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chip_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chips</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chips</span><span class="p">[</span><span class="n">chip_id</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="Machine.is_chip_at"><a class="viewcode-back" href="../../../../pacman.model.machine.machine.html#pacman.model.machine.machine.Machine.is_chip_at">[docs]</a>    <span class="k">def</span> <span class="nf">is_chip_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Determines if a chip exists at the given coordinates</span>
+
+<span class="sd">        :param x: x location of the chip to test for existence</span>
+<span class="sd">        :type x: int</span>
+<span class="sd">        :param y: y location of the chip to test for existence</span>
+<span class="sd">        :type y: int</span>
+<span class="sd">        :return: True if the chip exists, False otherwise</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chip_id</span> <span class="o">=</span> <span class="n">_get_chip_dict_id</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chip_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chips</span>
+    </div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_chip_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The maximum x-coordinate of any chip in the board</span>
+<span class="sd">        </span>
+<span class="sd">        :return: The maximum x-coordinate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_x</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_chip_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The maximum y-coordinate of any chip in the board</span>
+<span class="sd">        </span>
+<span class="sd">        :return: The maximum y-coordinate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_chip_y</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

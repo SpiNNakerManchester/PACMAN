@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.placements.placement module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.placements package" href="pacman.model.placements.html" />
+    <link rel="next" title="pacman.model.placements.placements module" href="pacman.model.placements.placements.html" />
+    <link rel="prev" title="pacman.model.placements package" href="pacman.model.placements.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.placements.placements.html" title="pacman.model.placements.placements module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.placements.html" title="pacman.model.placements package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.placements.html" accesskey="U">pacman.model.placements package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.placements.html"
+                        title="previous chapter">pacman.model.placements package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.placements.placements.html"
+                        title="next chapter">pacman.model.placements.placements module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.placements.placement.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.placements.placement">
+<span id="pacman-model-placements-placement-module"></span><h1>pacman.model.placements.placement module<a class="headerlink" href="#module-pacman.model.placements.placement" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.placements.placement.Placement">
+<em class="property">class </em><tt class="descclassname">pacman.model.placements.placement.</tt><tt class="descname">Placement</tt><big>(</big><em>subvertex</em>, <em>x</em>, <em>y</em>, <em>p</em><big>)</big><a class="reference internal" href="_modules/pacman/model/placements/placement.html#Placement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.placements.placement.Placement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a placement of a subvertex on a specific processor on a        specific chip in the machine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>subvertex</strong> (<a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; The subvertex that has been placed</li>
+<li><strong>x</strong> (<em>int</em>) &#8211; the x-oordinate of the chip on which the subvertex is placed</li>
+<li><strong>y</strong> (<em>int</em>) &#8211; the y-coordinate of the chip on which the subvertex is placed</li>
+<li><strong>p</strong> (<em>int</em>) &#8211; the id of the processor on which the subvertex is placed</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body"><p class="first last">does not raise any known exceptions</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">p</span></tt></td>
+<td>The id of the processor of the chip where the subvertex is placed</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">subvertex</span></tt></td>
+<td>The subvertex that was placed</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">x</span></tt></td>
+<td>The x-coordinate of the chip where the subvertex is placed</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">y</span></tt></td>
+<td>The y-coordinate of the chip where the subvertex is placed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.placements.placements.html" title="pacman.model.placements.placements module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.placements.html" title="pacman.model.placements package"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.placements.html" >pacman.model.placements package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

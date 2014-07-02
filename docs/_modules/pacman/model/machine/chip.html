@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.machine.chip &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pacman.model.machine.chip</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanAlreadyExistsException</span>
+
+<div class="viewcode-block" id="Chip"><a class="viewcode-back" href="../../../../pacman.model.machine.chip.html#pacman.model.machine.chip.Chip">[docs]</a><span class="k">class</span> <span class="nc">Chip</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a chip with a number of cores, an amount of SDRAM shared</span>
+<span class="sd">        between the cores, and a router</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">processors</span><span class="p">,</span> <span class="n">router</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">ip_address</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param x: the x-coordinate of the chip&#39;s position in the\</span>
+<span class="sd">                    two-dimentional grid of chips</span>
+<span class="sd">        :type x: int</span>
+<span class="sd">        :param y: the y-coordinate of the chip&#39;s position in the\</span>
+<span class="sd">                    two-dimentional grid of chips</span>
+<span class="sd">        :type y: int</span>
+<span class="sd">        :param processors: an iterable of processor objects</span>
+<span class="sd">        :type processors: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.machine.processor.Processor`</span>
+<span class="sd">        :param router: a router for the chip</span>
+<span class="sd">        :type router: :py:class:`pacman.model.machine.router.Router`</span>
+<span class="sd">        :param sdram: an SDRAM for the chip</span>
+<span class="sd">        :type sdram: :py:class:`pacman.model.machine.sdram.SDRAM`</span>
+<span class="sd">        :param ip_address: the IP address of the chip or None if no ethernet\</span>
+<span class="sd">                    attached</span>
+<span class="sd">        :type ip_address: str</span>
+<span class="sd">        :raise pacman.exceptions.PacmanAlreadyExistsException: If processors\</span>
+<span class="sd">                      contains any two processors with the same processor_id </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">processor</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">processors</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">processor_id</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">processor</span><span class="o">.</span><span class="n">processor_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PacmanAlreadyExistsException</span><span class="p">(</span><span class="s">&quot;processor&quot;</span><span class="p">,</span> 
+                        <span class="n">processor</span><span class="o">.</span><span class="n">processor_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">[</span><span class="n">processor</span><span class="o">.</span><span class="n">processor_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">processor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_router</span> <span class="o">=</span> <span class="n">router</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sdram</span> <span class="o">=</span> <span class="n">sdram</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ip_address</span> <span class="o">=</span> <span class="n">ip_address</span>
+
+<div class="viewcode-block" id="Chip.is_processor_with_id"><a class="viewcode-back" href="../../../../pacman.model.machine.chip.html#pacman.model.machine.chip.Chip.is_processor_with_id">[docs]</a>    <span class="k">def</span> <span class="nf">is_processor_with_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Determines if a processor with the given id exists in the chip</span>
+
+<span class="sd">        :param processor_id: the processor id to check for</span>
+<span class="sd">        :type processor_id: int</span>
+<span class="sd">        :return: True or False based on the existence of the processor</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">processor_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span>
+</div>
+<div class="viewcode-block" id="Chip.get_processor_with_id"><a class="viewcode-back" href="../../../../pacman.model.machine.chip.html#pacman.model.machine.chip.Chip.get_processor_with_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_processor_with_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the processor with the specified id or None if the processor\</span>
+<span class="sd">            does not exist</span>
+
+<span class="sd">        :param processor_id: the id of the processor to return</span>
+<span class="sd">        :type processor_id: int</span>
+<span class="sd">        :return: the processor with the specified id or None if no such\</span>
+<span class="sd">                    processor</span>
+<span class="sd">        :rtype: :py:class:`pacman.model.machine.processor.Processor`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">processor_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">[</span><span class="n">processor_id</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The x-coordinate of the chip in the two-dimensional grid of chips</span>
+
+<span class="sd">        :return: the x-coordinate of the chip</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The y-coordinate of the chip in the two-dimensional grid of chips</span>
+
+<span class="sd">        :return: the y-coordinate of the chip</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">processors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; An iterable of available processors</span>
+
+<span class="sd">        :return: iterable of processors</span>
+<span class="sd">        :rtype: iterable of :py:class:pacman.model.machine.processor.Processor`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="o">.</span><span class="n">itervalues</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">router</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The router object associated with the chip</span>
+
+<span class="sd">        :return: router associated with the chip</span>
+<span class="sd">        :rtype: :py:class:`pacman.model.machine.router.Router`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The sdram associated with the chip</span>
+
+<span class="sd">        :return: sdram associated with the chip</span>
+<span class="sd">        :rtype: :py:class:`pacman.model.machine.sdram.SDRAM`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sdram</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ip_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The IP address of the chip</span>
+
+<span class="sd">        :return: IP address of the chip, or None if there is no ethernet\</span>
+<span class="sd">                    connected to the chip</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ip_address</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

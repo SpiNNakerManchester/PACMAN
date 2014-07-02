@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.machine.link module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.machine package" href="pacman.model.machine.html" />
+    <link rel="next" title="pacman.model.machine.machine module" href="pacman.model.machine.machine.html" />
+    <link rel="prev" title="pacman.model.machine.chip module" href="pacman.model.machine.chip.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.machine.html" title="pacman.model.machine.machine module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.chip.html" title="pacman.model.machine.chip module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.machine.html" accesskey="U">pacman.model.machine package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.machine.chip.html"
+                        title="previous chapter">pacman.model.machine.chip module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.machine.machine.html"
+                        title="next chapter">pacman.model.machine.machine module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.machine.link.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.machine.link">
+<span id="pacman-model-machine-link-module"></span><h1>pacman.model.machine.link module<a class="headerlink" href="#module-pacman.model.machine.link" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.machine.link.Link">
+<em class="property">class </em><tt class="descclassname">pacman.model.machine.link.</tt><tt class="descname">Link</tt><big>(</big><em>source_x</em>, <em>source_y</em>, <em>source_link_id</em>, <em>destination_x</em>, <em>destination_y</em>, <em>multicast_default_from</em>, <em>multicast_default_to</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/link.html#Link"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.link.Link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a directional link between chips in the machine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>source_x</strong> (<em>int</em>) &#8211; The x-coordinate of the source chip of the link</li>
+<li><strong>source_y</strong> (<em>int</em>) &#8211; The y-coordinate of the source chip of the link</li>
+<li><strong>source_link_id</strong> (<em>int</em>) &#8211; The id of the link in the source chip</li>
+<li><strong>destination_x</strong> (<em>int</em>) &#8211; The x-coordinate of the destination chip of the                    link</li>
+<li><strong>destination_y</strong> (<em>int</em>) &#8211; The y-coordinate of the destination chip of the                    link</li>
+<li><strong>multicast_default_from</strong> (<em>int</em>) &#8211; The id of the link in the source chip                    such that multicast traffic received from that link will                    default to this link if no routing entry exists, or None
+if this link is not the default for any link</li>
+<li><strong>multicast_default_to</strong> &#8211; The id of the link in the source chip                    such that multicast traffic received on this link will                    default to that link if no routing entry exists, or None
+if there is no such default link</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">destination_x</span></tt></td>
+<td>The x-coordinate of the destination chip of this link</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">destination_y</span></tt></td>
+<td>The y-coordinate of the destination chip of this link</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">multicast_default_from</span></tt></td>
+<td>The id of the link for which this link is the default</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">multicast_default_to</span></tt></td>
+<td>The id of the link to which to send default routed multicast</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">source_link_id</span></tt></td>
+<td>The id of the link on the source chip</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">source_x</span></tt></td>
+<td>The x-coordinate of the source chip of this link</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">source_y</span></tt></td>
+<td>The y-coordinate of the source chip of this link</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.machine.html" title="pacman.model.machine.machine module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.chip.html" title="pacman.model.machine.chip module"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.machine.html" >pacman.model.machine package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

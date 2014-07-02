@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.routing_tables.multicast_routing_table module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.routing_tables package" href="pacman.model.routing_tables.html" />
+    <link rel="next" title="pacman.model.routing_tables.multicast_routing_tables module" href="pacman.model.routing_tables.multicast_routing_tables.html" />
+    <link rel="prev" title="pacman.model.routing_tables.multicast_routing_entry module" href="pacman.model.routing_tables.multicast_routing_entry.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.routing_tables.multicast_routing_tables.html" title="pacman.model.routing_tables.multicast_routing_tables module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.routing_tables.multicast_routing_entry.html" title="pacman.model.routing_tables.multicast_routing_entry module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.routing_tables.html" accesskey="U">pacman.model.routing_tables package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.routing_tables.multicast_routing_entry.html"
+                        title="previous chapter">pacman.model.routing_tables.multicast_routing_entry module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.routing_tables.multicast_routing_tables.html"
+                        title="next chapter">pacman.model.routing_tables.multicast_routing_tables module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.routing_tables.multicast_routing_table.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.routing_tables.multicast_routing_table">
+<span id="pacman-model-routing-tables-multicast-routing-table-module"></span><h1>pacman.model.routing_tables.multicast_routing_table module<a class="headerlink" href="#module-pacman.model.routing_tables.multicast_routing_table" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable">
+<em class="property">class </em><tt class="descclassname">pacman.model.routing_tables.multicast_routing_table.</tt><tt class="descname">MulticastRoutingTable</tt><big>(</big><em>x</em>, <em>y</em>, <em>multicast_routing_entries=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/routing_tables/multicast_routing_table.html#MulticastRoutingTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a routing table for a chip</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>int</em>) &#8211; The x-coordinate of the chip for which this is the routing                    table</li>
+<li><strong>y</strong> (<em>int</em>) &#8211; The y-coordinate of the chip for which this is the routing                    tables</li>
+<li><strong>multicast_routing_entries</strong> (iterable of                    <a class="reference internal" href="pacman.model.routing_tables.multicast_routing_entry.html#pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry" title="pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry</span></tt></a>) &#8211; An iterable of routing entries to add                    to the table</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If any two                    routing entries contain the same key-mask combination</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">multicast_routing_entries</span></tt></td>
+<td>The multicast routing entries in the table</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">x</span></tt></td>
+<td>The x-coordinate of the chip of this table</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">y</span></tt></td>
+<td>The y-coordinate of the chip of this table</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.add_mutlicast_routing_entry" title="pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.add_mutlicast_routing_entry"><tt class="xref py py-obj docutils literal"><span class="pre">add_mutlicast_routing_entry</span></tt></a>(...)</td>
+<td>Adds a routing entry to this table</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.get_multicast_routing_entry_by_key" title="pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.get_multicast_routing_entry_by_key"><tt class="xref py py-obj docutils literal"><span class="pre">get_multicast_routing_entry_by_key</span></tt></a>(key,&nbsp;mask)</td>
+<td>Get the routing entry associated with the specified key-mask            combination or None if the routing table does not match the key</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.add_mutlicast_routing_entry">
+<tt class="descname">add_mutlicast_routing_entry</tt><big>(</big><em>multicast_routing_entry</em><big>)</big><a class="reference internal" href="_modules/pacman/model/routing_tables/multicast_routing_table.html#MulticastRoutingTable.add_mutlicast_routing_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.add_mutlicast_routing_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a routing entry to this table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>multicast_routing_entry</strong> (<a class="reference internal" href="pacman.model.routing_tables.multicast_routing_entry.html#pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry" title="pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry</span></tt></a>) &#8211; The route to add</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If a routing                    entry with the same key-mask combination already exists</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.get_multicast_routing_entry_by_key">
+<tt class="descname">get_multicast_routing_entry_by_key</tt><big>(</big><em>key</em>, <em>mask</em><big>)</big><a class="reference internal" href="_modules/pacman/model/routing_tables/multicast_routing_table.html#MulticastRoutingTable.get_multicast_routing_entry_by_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable.get_multicast_routing_entry_by_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the routing entry associated with the specified key-mask            combination or None if the routing table does not match the key</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<em>int</em>) &#8211; the routing key to be searched</li>
+<li><strong>mask</strong> (<em>int</em>) &#8211; the routing mask to be searched</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the routing entry associated with the routing key or None if                    no such entry exists</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="pacman.model.routing_tables.multicast_routing_entry.html#pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry" title="pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry</span></tt></a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body"><p class="first last">does not raise any known exceptions</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.routing_tables.multicast_routing_tables.html" title="pacman.model.routing_tables.multicast_routing_tables module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.routing_tables.multicast_routing_entry.html" title="pacman.model.routing_tables.multicast_routing_entry module"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.routing_tables.html" >pacman.model.routing_tables package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

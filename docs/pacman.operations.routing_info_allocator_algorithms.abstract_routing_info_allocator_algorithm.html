@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.operations.routing_info_allocator_algorithms package" href="pacman.operations.routing_info_allocator_algorithms.html" />
+    <link rel="next" title="pacman.operations.partitioner module" href="pacman.operations.partitioner.html" />
+    <link rel="prev" title="pacman.operations.routing_info_allocator_algorithms package" href="pacman.operations.routing_info_allocator_algorithms.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.operations.partitioner.html" title="pacman.operations.partitioner module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.operations.routing_info_allocator_algorithms.html" title="pacman.operations.routing_info_allocator_algorithms package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.operations.html" >pacman.operations package</a> &raquo;</li>
+          <li><a href="pacman.operations.routing_info_allocator_algorithms.html" accesskey="U">pacman.operations.routing_info_allocator_algorithms package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.operations.routing_info_allocator_algorithms.html"
+                        title="previous chapter">pacman.operations.routing_info_allocator_algorithms package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.operations.partitioner.html"
+                        title="next chapter">pacman.operations.partitioner module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm">
+<span id="pacman-operations-routing-info-allocator-algorithms-abstract-routing-info-allocator-algorithm-module"></span><h1>pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm module<a class="headerlink" href="#module-pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm">
+<em class="property">class </em><tt class="descclassname">pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.</tt><tt class="descname">AbstractRoutingInfoAllocatorAlgorithm</tt><a class="reference internal" href="_modules/pacman/operations/routing_info_allocator_algorithms/abstract_routing_info_allocator_algorithm.html#AbstractRoutingInfoAllocatorAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An abstract algorithm that can produce routing keys and masks for        subedges in a subgraph</p>
+<p class="rubric">Abstract Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm.allocate_routing_info" title="pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm.allocate_routing_info"><tt class="xref py py-obj docutils literal"><span class="pre">allocate_routing_info</span></tt></a>(subgraph,&nbsp;placements)</td>
+<td>Allocates routing information to the subedges in a subgraph</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm.allocate_routing_info">
+<tt class="descname">allocate_routing_info</tt><big>(</big><em>subgraph</em>, <em>placements</em><big>)</big><a class="reference internal" href="_modules/pacman/operations/routing_info_allocator_algorithms/abstract_routing_info_allocator_algorithm.html#AbstractRoutingInfoAllocatorAlgorithm.allocate_routing_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm.allocate_routing_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocates routing information to the subedges in a subgraph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>subgraph</strong> (<a class="reference internal" href="pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph" title="pacman.model.subgraph.subgraph.Subgraph"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subgraph.Subgraph</span></tt></a>) &#8211; The subgraph to allocate the routing info for</li>
+<li><strong>placements</strong> (<a class="reference internal" href="pacman.model.placements.placements.html#pacman.model.placements.placements.Placements" title="pacman.model.placements.placements.Placements"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.placements.placements.Placements</span></tt></a>) &#8211; The placements of the subvertices</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The routing information</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="pacman.model.routing_info.routing_info.html#pacman.model.routing_info.routing_info.RoutingInfo" title="pacman.model.routing_info.routing_info.RoutingInfo"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.routing_info.routing_info.RoutingInfo</span></tt></a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanRouteInfoAllocationException" title="pacman.exceptions.PacmanRouteInfoAllocationException">pacman.exceptions.PacmanRouteInfoAllocationException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If                   something goes wrong with the allocation</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.operations.partitioner.html" title="pacman.operations.partitioner module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.operations.routing_info_allocator_algorithms.html" title="pacman.operations.routing_info_allocator_algorithms package"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.operations.html" >pacman.operations package</a> &raquo;</li>
+          <li><a href="pacman.operations.routing_info_allocator_algorithms.html" >pacman.operations.routing_info_allocator_algorithms package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

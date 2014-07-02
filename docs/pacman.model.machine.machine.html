@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.machine.machine module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.machine package" href="pacman.model.machine.html" />
+    <link rel="next" title="pacman.model.machine.processor module" href="pacman.model.machine.processor.html" />
+    <link rel="prev" title="pacman.model.machine.link module" href="pacman.model.machine.link.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.processor.html" title="pacman.model.machine.processor module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.link.html" title="pacman.model.machine.link module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.machine.html" accesskey="U">pacman.model.machine package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.machine.link.html"
+                        title="previous chapter">pacman.model.machine.link module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.machine.processor.html"
+                        title="next chapter">pacman.model.machine.processor module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.machine.machine.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.machine.machine">
+<span id="pacman-model-machine-machine-module"></span><h1>pacman.model.machine.machine module<a class="headerlink" href="#module-pacman.model.machine.machine" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.machine.machine.Machine">
+<em class="property">class </em><tt class="descclassname">pacman.model.machine.machine.</tt><tt class="descname">Machine</tt><big>(</big><em>chips</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/machine.html#Machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.machine.Machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A Representation of a Machine with a number of Chips</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>chips</strong> (iterable of <a class="reference internal" href="pacman.model.machine.chip.html#pacman.model.machine.chip.Chip" title="pacman.model.machine.chip.Chip"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.chip.Chip</span></tt></a>) &#8211; An iterable of chips in the machine</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If any two                    chips have the same x and y coordinates</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">chips</span></tt></td>
+<td>An iterable of chips in the machine</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">max_chip_x</span></tt></td>
+<td>The maximum x-coordinate of any chip in the board</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">max_chip_y</span></tt></td>
+<td>The maximum y-coordinate of any chip in the board</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.machine.machine.Machine.add_chip" title="pacman.model.machine.machine.Machine.add_chip"><tt class="xref py py-obj docutils literal"><span class="pre">add_chip</span></tt></a>(chip)</td>
+<td>Add a chip to the machine</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.machine.machine.Machine.add_chips" title="pacman.model.machine.machine.Machine.add_chips"><tt class="xref py py-obj docutils literal"><span class="pre">add_chips</span></tt></a>(chips)</td>
+<td>Add some chips to the machine</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.machine.machine.Machine.get_chip_at" title="pacman.model.machine.machine.Machine.get_chip_at"><tt class="xref py py-obj docutils literal"><span class="pre">get_chip_at</span></tt></a>(x,&nbsp;y)</td>
+<td>Get the chip at a specific (x, y) location</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.machine.machine.Machine.is_chip_at" title="pacman.model.machine.machine.Machine.is_chip_at"><tt class="xref py py-obj docutils literal"><span class="pre">is_chip_at</span></tt></a>(x,&nbsp;y)</td>
+<td>Determines if a chip exists at the given coordinates</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.machine.machine.Machine.add_chip">
+<tt class="descname">add_chip</tt><big>(</big><em>chip</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/machine.html#Machine.add_chip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.machine.Machine.add_chip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a chip to the machine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>chip</strong> (<a class="reference internal" href="pacman.model.machine.chip.html#pacman.model.machine.chip.Chip" title="pacman.model.machine.chip.Chip"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.chip.Chip</span></tt></a>) &#8211; The chip to add to the machine</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing is returned</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If a chip with                    the same x and y coordinates already exists</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.machine.machine.Machine.add_chips">
+<tt class="descname">add_chips</tt><big>(</big><em>chips</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/machine.html#Machine.add_chips"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.machine.Machine.add_chips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add some chips to the machine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>chips</strong> (iterable of <a class="reference internal" href="pacman.model.machine.chip.html#pacman.model.machine.chip.Chip" title="pacman.model.machine.chip.Chip"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.chip.Chip</span></tt></a>) &#8211; an iterable of chips</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing is returned</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If a chip with                    the same x and y coordinates already exists</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.machine.machine.Machine.get_chip_at">
+<tt class="descname">get_chip_at</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/machine.html#Machine.get_chip_at"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.machine.Machine.get_chip_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the chip at a specific (x, y) location</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>int</em>) &#8211; the x-coordinate of the requested chip</li>
+<li><strong>y</strong> (<em>int</em>) &#8211; the y-coordinate of the requested chip</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the chip at the specified location, or None if no such chip</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="pacman.model.machine.chip.html#pacman.model.machine.chip.Chip" title="pacman.model.machine.chip.Chip"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.chip.Chip</span></tt></a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body"><p class="first last">does not raise any known exceptions</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.machine.machine.Machine.is_chip_at">
+<tt class="descname">is_chip_at</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/machine.html#Machine.is_chip_at"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.machine.Machine.is_chip_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if a chip exists at the given coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>int</em>) &#8211; x location of the chip to test for existence</li>
+<li><strong>y</strong> (<em>int</em>) &#8211; y location of the chip to test for existence</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the chip exists, False otherwise</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">bool</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body"><p class="first last">does not raise any known exceptions</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.processor.html" title="pacman.model.machine.processor module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.link.html" title="pacman.model.machine.link module"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.machine.html" >pacman.model.machine package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

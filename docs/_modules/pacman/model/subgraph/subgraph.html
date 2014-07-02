@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.subgraph.subgraph &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pacman.model.subgraph.subgraph</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">pacman.model.subgraph.subvertex</span> <span class="kn">import</span> <span class="n">Subvertex</span>
+<span class="kn">from</span> <span class="nn">pacman.model.subgraph.subedge</span> <span class="kn">import</span> <span class="n">Subedge</span>
+<span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanInvalidParameterException</span>
+
+
+<div class="viewcode-block" id="Subgraph"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph">[docs]</a><span class="k">class</span> <span class="nc">Subgraph</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a partitioning of a graph</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">subvertices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">subedges</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param graph: the graph of which this is a subgraph</span>
+<span class="sd">        :type graph: :py:class:`pacman.model.graph.graph.Graph`</span>
+<span class="sd">        :param label: an identifier for the subgraph</span>
+<span class="sd">        :type label: str</span>
+<span class="sd">        :param subvertices: an iterable of vertices in the graph</span>
+<span class="sd">        :type subvertices: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`</span>
+<span class="sd">        :param subedges: an iterable of subedges in the graph</span>
+<span class="sd">        :type subedges: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException:</span>
+<span class="sd">                    * If one of the subedges is not valid</span>
+<span class="sd">                    * If one of the subvertices is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span> <span class="o">=</span> <span class="n">graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subvertices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subedges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subvertices</span><span class="p">(</span><span class="n">subvertices</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subedges</span><span class="p">(</span><span class="n">subedges</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Subgraph.add_subvertex"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.add_subvertex">[docs]</a>    <span class="k">def</span> <span class="nf">add_subvertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subvertex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a subvertex to this subgraph</span>
+
+<span class="sd">        :param subvertex: a subvertex to be added to the graph</span>
+<span class="sd">        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If the\</span>
+<span class="sd">                    subvertex is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">subvertex</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subvertex</span><span class="p">,</span> <span class="n">Subvertex</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PacmanInvalidParameterException</span><span class="p">(</span>
+                    <span class="s">&quot;subvertex&quot;</span><span class="p">,</span> <span class="n">subvertex</span><span class="p">,</span>
+                    <span class="s">&quot;Must be an instance of&quot;</span> 
+                    <span class="s">&quot; pacman.model.subgraph.subvertex.SubVertex&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subvertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subvertex</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Subgraph.add_subvertices"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.add_subvertices">[docs]</a>    <span class="k">def</span> <span class="nf">add_subvertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subvertices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add some subvertices to this subgraph</span>
+
+<span class="sd">        :param subvertices: an iterable of subvertices to add to this subgraph</span>
+<span class="sd">        :type subvertices: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If the\</span>
+<span class="sd">                    subvertex is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">subvertices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">next_subvertex</span> <span class="ow">in</span> <span class="n">subvertices</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_subvertex</span><span class="p">(</span><span class="n">next_subvertex</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Subgraph.add_subedge"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.add_subedge">[docs]</a>    <span class="k">def</span> <span class="nf">add_subedge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subedge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a subedge to this subgraph</span>
+
+<span class="sd">        :param subedge: a subedge to be added to the subgraph</span>
+<span class="sd">        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If the\</span>
+<span class="sd">                    subedge is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">subedge</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subedge</span><span class="p">,</span> <span class="n">Subedge</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PacmanInvalidParameterException</span><span class="p">(</span>
+                    <span class="s">&quot;subedge&quot;</span><span class="p">,</span> <span class="n">subedge</span><span class="p">,</span>
+                    <span class="s">&quot;Must be an instance of&quot;</span>
+                    <span class="s">&quot; pacman.model.subgraph.subedge.Subedge&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subedges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subedge</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Subgraph.add_subedges"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.add_subedges">[docs]</a>    <span class="k">def</span> <span class="nf">add_subedges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subedges</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add some subedges to this subgraph</span>
+
+<span class="sd">        :param subedges: an iterable of subedges to add to this subgraph</span>
+<span class="sd">        :type subedges: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If the\</span>
+<span class="sd">                    subedge is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">subedges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">next_subedge</span> <span class="ow">in</span> <span class="n">subedges</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_subedge</span><span class="p">(</span><span class="n">next_subedge</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Subgraph.outgoing_subedges_from_subvertex"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex">[docs]</a>    <span class="k">def</span> <span class="nf">outgoing_subedges_from_subvertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subvertex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Locate the subedges for which subvertex is the pre_subvertex.\</span>
+<span class="sd">            Can return an empty collection</span>
+
+<span class="sd">        :param subvertex: the subvertex for which to find the outgoing subedges</span>
+<span class="sd">        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`</span>
+<span class="sd">        :return: an iterable of subedges which have subvertex as their\</span>
+<span class="sd">                    pre_subvertex</span>
+<span class="sd">        :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">outgoing_subedges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">subedge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subedges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">subedge</span><span class="o">.</span><span class="n">pre_subvertex</span> <span class="o">==</span> <span class="n">subvertex</span><span class="p">:</span>
+                <span class="n">outgoing_subedges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subedge</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outgoing_subedges</span>
+</div>
+<div class="viewcode-block" id="Subgraph.incoming_subedges_from_subvertex"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.incoming_subedges_from_subvertex">[docs]</a>    <span class="k">def</span> <span class="nf">incoming_subedges_from_subvertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subvertex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Locate the subedges for which subvertex is the post_subvertex.\</span>
+<span class="sd">            Can return an empty collection.</span>
+
+<span class="sd">        :param subvertex: the subvertex for which to find the incoming subedges</span>
+<span class="sd">        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`</span>
+<span class="sd">        :return: an iterable of subedges which have subvertex as their\</span>
+<span class="sd">                    post_subvertex</span>
+<span class="sd">        :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
+<span class="sd">        :raise None: does not raise any known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">return_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">temp_subedge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subedges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">temp_subedge</span><span class="o">.</span><span class="n">post_subvertex</span> <span class="o">==</span> <span class="n">subvertex</span><span class="p">:</span>
+                <span class="n">return_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_subedge</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">return_list</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The graph of which this is a subgraph</span>
+<span class="sd">        </span>
+<span class="sd">        :return: a graph object</span>
+<span class="sd">        :rtype: :py:class:`pacman.model.graph.graph.Graph`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">subvertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The subvertices of the subgraph</span>
+
+<span class="sd">        :return: an iterable of subvertices</span>
+<span class="sd">        :rtype: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subvertices</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">subedges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The subedges of the subgraph</span>
+
+<span class="sd">        :return: an iterable of subedges</span>
+<span class="sd">        :rtype: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subedges</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The label of the subgraph</span>
+
+<span class="sd">        :return: The label or None if there is no lable</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        :raise None: Raises no known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

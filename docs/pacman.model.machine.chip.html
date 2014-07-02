@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.machine.chip module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.machine package" href="pacman.model.machine.html" />
+    <link rel="next" title="pacman.model.machine.link module" href="pacman.model.machine.link.html" />
+    <link rel="prev" title="pacman.model.machine package" href="pacman.model.machine.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.link.html" title="pacman.model.machine.link module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.html" title="pacman.model.machine package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.machine.html" accesskey="U">pacman.model.machine package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.machine.html"
+                        title="previous chapter">pacman.model.machine package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.machine.link.html"
+                        title="next chapter">pacman.model.machine.link module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.machine.chip.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.machine.chip">
+<span id="pacman-model-machine-chip-module"></span><h1>pacman.model.machine.chip module<a class="headerlink" href="#module-pacman.model.machine.chip" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.machine.chip.Chip">
+<em class="property">class </em><tt class="descclassname">pacman.model.machine.chip.</tt><tt class="descname">Chip</tt><big>(</big><em>x</em>, <em>y</em>, <em>processors</em>, <em>router</em>, <em>sdram</em>, <em>ip_address=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/chip.html#Chip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.chip.Chip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a chip with a number of cores, an amount of SDRAM shared
+between the cores, and a router</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>int</em>) &#8211; the x-coordinate of the chip&#8217;s position in the                    two-dimentional grid of chips</li>
+<li><strong>y</strong> (<em>int</em>) &#8211; the y-coordinate of the chip&#8217;s position in the                    two-dimentional grid of chips</li>
+<li><strong>processors</strong> (iterable of                    <a class="reference internal" href="pacman.model.machine.processor.html#pacman.model.machine.processor.Processor" title="pacman.model.machine.processor.Processor"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.processor.Processor</span></tt></a>) &#8211; an iterable of processor objects</li>
+<li><strong>router</strong> (<a class="reference internal" href="pacman.model.machine.router.html#pacman.model.machine.router.Router" title="pacman.model.machine.router.Router"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.router.Router</span></tt></a>) &#8211; a router for the chip</li>
+<li><strong>sdram</strong> (<a class="reference internal" href="pacman.model.machine.sdram.html#pacman.model.machine.sdram.SDRAM" title="pacman.model.machine.sdram.SDRAM"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.sdram.SDRAM</span></tt></a>) &#8211; an SDRAM for the chip</li>
+<li><strong>ip_address</strong> (<em>str</em>) &#8211; the IP address of the chip or None if no ethernet                    attached</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If processors                      contains any two processors with the same processor_id</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">ip_address</span></tt></td>
+<td>The IP address of the chip</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">processors</span></tt></td>
+<td>An iterable of available processors</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">router</span></tt></td>
+<td>The router object associated with the chip</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">sdram</span></tt></td>
+<td>The sdram associated with the chip</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">x</span></tt></td>
+<td>The x-coordinate of the chip in the two-dimensional grid of chips</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">y</span></tt></td>
+<td>The y-coordinate of the chip in the two-dimensional grid of chips</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.machine.chip.Chip.get_processor_with_id" title="pacman.model.machine.chip.Chip.get_processor_with_id"><tt class="xref py py-obj docutils literal"><span class="pre">get_processor_with_id</span></tt></a>(processor_id)</td>
+<td>Return the processor with the specified id or None if the processor            does not exist</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.machine.chip.Chip.is_processor_with_id" title="pacman.model.machine.chip.Chip.is_processor_with_id"><tt class="xref py py-obj docutils literal"><span class="pre">is_processor_with_id</span></tt></a>(processor_id)</td>
+<td>Determines if a processor with the given id exists in the chip</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.machine.chip.Chip.get_processor_with_id">
+<tt class="descname">get_processor_with_id</tt><big>(</big><em>processor_id</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/chip.html#Chip.get_processor_with_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.chip.Chip.get_processor_with_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the processor with the specified id or None if the processor            does not exist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>processor_id</strong> (<em>int</em>) &#8211; the id of the processor to return</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the processor with the specified id or None if no such                    processor</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="pacman.model.machine.processor.html#pacman.model.machine.processor.Processor" title="pacman.model.machine.processor.Processor"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.machine.processor.Processor</span></tt></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.machine.chip.Chip.is_processor_with_id">
+<tt class="descname">is_processor_with_id</tt><big>(</big><em>processor_id</em><big>)</big><a class="reference internal" href="_modules/pacman/model/machine/chip.html#Chip.is_processor_with_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.machine.chip.Chip.is_processor_with_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if a processor with the given id exists in the chip</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>processor_id</strong> (<em>int</em>) &#8211; the processor id to check for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True or False based on the existence of the processor</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.link.html" title="pacman.model.machine.link module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.machine.html" title="pacman.model.machine package"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.machine.html" >pacman.model.machine package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

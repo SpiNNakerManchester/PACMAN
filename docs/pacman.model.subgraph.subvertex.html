@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.subgraph.subvertex module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.subgraph package" href="pacman.model.subgraph.html" />
+    <link rel="next" title="pacman.operations package" href="pacman.operations.html" />
+    <link rel="prev" title="pacman.model.subgraph.subgraph module" href="pacman.model.subgraph.subgraph.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.operations.html" title="pacman.operations package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.subgraph.subgraph.html" title="pacman.model.subgraph.subgraph module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.subgraph.html" accesskey="U">pacman.model.subgraph package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.subgraph.subgraph.html"
+                        title="previous chapter">pacman.model.subgraph.subgraph module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.operations.html"
+                        title="next chapter">pacman.operations package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.subgraph.subvertex.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.subgraph.subvertex">
+<span id="pacman-model-subgraph-subvertex-module"></span><h1>pacman.model.subgraph.subvertex module<a class="headerlink" href="#module-pacman.model.subgraph.subvertex" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.subgraph.subvertex.Subvertex">
+<em class="property">class </em><tt class="descclassname">pacman.model.subgraph.subvertex.</tt><tt class="descname">Subvertex</tt><big>(</big><em>vertex</em>, <em>lo_atom</em>, <em>hi_atom</em>, <em>label=None</em>, <em>constraints=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subvertex.html#Subvertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subvertex.Subvertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a sub-set of atoms from a Vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>vertex</strong> (<a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; The vertex which this is a subvertex of</li>
+<li><strong>lo_atom</strong> (<em>int</em>) &#8211; The id of the first atom in the subvertex with                        reference to the atoms in the vertex</li>
+<li><strong>hi_atom</strong> (<em>int</em>) &#8211; The id of the last atom in the subvertex with                        reference to the atoms in the vertex</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The name of the subvertex, or None if no name</li>
+<li><strong>constraints</strong> (iterable of                    <a class="reference internal" href="pacman.model.constraints.abstract_constraint.html#pacman.model.constraints.abstract_constraint.AbstractConstraint" title="pacman.model.constraints.abstract_constraint.AbstractConstraint"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.constraints.abstract_constraint.AbstractConstraint</span></tt></a>) &#8211; The constraints of the subvertex</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last"><ul class="simple">
+<li>If one of the constraints is not valid</li>
+<li>If lo_atom is less than 0</li>
+<li>If hi_atom is less than lo_atom</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constraints</span></tt></td>
+<td>An iterable constraints for the subvertex</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">hi_atom</span></tt></td>
+<td>The id of the last atom in the subvertex</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">label</span></tt></td>
+<td>The label of the subvertex</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">lo_atom</span></tt></td>
+<td>The id of the first atom in the subvertex</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">n_atoms</span></tt></td>
+<td>The number of atoms in the subvertex</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">vertex</span></tt></td>
+<td>The vertex object to which the subvertex refers</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.subgraph.subvertex.Subvertex.add_constraint" title="pacman.model.subgraph.subvertex.Subvertex.add_constraint"><tt class="xref py py-obj docutils literal"><span class="pre">add_constraint</span></tt></a>(constraint)</td>
+<td>Add a new constraint to the collection of constraints for the            subvertex</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.subgraph.subvertex.Subvertex.add_constraints" title="pacman.model.subgraph.subvertex.Subvertex.add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">add_constraints</span></tt></a>(constraints)</td>
+<td>Add an iterable of constraints to the collection of constraints for            the subvertex</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.subgraph.subvertex.Subvertex.set_constraints" title="pacman.model.subgraph.subvertex.Subvertex.set_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">set_constraints</span></tt></a>(constraints)</td>
+<td>Set the constraints of the subvertex to be exactly the given            iterable of constraints, overwriting any previously added            constraints</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.subgraph.subvertex.Subvertex.add_constraint">
+<tt class="descname">add_constraint</tt><big>(</big><em>constraint</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subvertex.html#Subvertex.add_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subvertex.Subvertex.add_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new constraint to the collection of constraints for the            subvertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>constraint</strong> (<a class="reference internal" href="pacman.model.constraints.abstract_constraint.html#pacman.model.constraints.abstract_constraint.AbstractConstraint" title="pacman.model.constraints.abstract_constraint.AbstractConstraint"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.constraints.abstract_constraint.AbstractConstraint</span></tt></a>) &#8211; constraint to add</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the                    constraint is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subvertex.Subvertex.add_constraints">
+<tt class="descname">add_constraints</tt><big>(</big><em>constraints</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subvertex.html#Subvertex.add_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subvertex.Subvertex.add_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an iterable of constraints to the collection of constraints for            the subvertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>constraints</strong> (iterable of                    <a class="reference internal" href="pacman.model.constraints.abstract_constraint.html#pacman.model.constraints.abstract_constraint.AbstractConstraint" title="pacman.model.constraints.abstract_constraint.AbstractConstraint"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.constraints.abstract_constraint.AbstractConstraint</span></tt></a>) &#8211; iterable of constraints to add</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If one of the                    constraints is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subvertex.Subvertex.set_constraints">
+<tt class="descname">set_constraints</tt><big>(</big><em>constraints</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subvertex.html#Subvertex.set_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subvertex.Subvertex.set_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the constraints of the subvertex to be exactly the given            iterable of constraints, overwriting any previously added            constraints</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>constraints</strong> (iterable of                    <a class="reference internal" href="pacman.model.constraints.abstract_constraint.html#pacman.model.constraints.abstract_constraint.AbstractConstraint" title="pacman.model.constraints.abstract_constraint.AbstractConstraint"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.constraints.abstract_constraint.AbstractConstraint</span></tt></a>) &#8211; iterable of constraints to set</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If one of the                    constraints is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.operations.html" title="pacman.operations package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.subgraph.subgraph.html" title="pacman.model.subgraph.subgraph module"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.subgraph.html" >pacman.model.subgraph package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

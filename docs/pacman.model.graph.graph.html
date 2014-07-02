@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.graph.graph module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.graph package" href="pacman.model.graph.html" />
+    <link rel="next" title="pacman.model.graph.vertex module" href="pacman.model.graph.vertex.html" />
+    <link rel="prev" title="pacman.model.graph.edge module" href="pacman.model.graph.edge.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.vertex.html" title="pacman.model.graph.vertex module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.edge.html" title="pacman.model.graph.edge module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.graph.html" accesskey="U">pacman.model.graph package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.graph.edge.html"
+                        title="previous chapter">pacman.model.graph.edge module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.graph.vertex.html"
+                        title="next chapter">pacman.model.graph.vertex module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.graph.graph.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.graph.graph">
+<span id="pacman-model-graph-graph-module"></span><h1>pacman.model.graph.graph module<a class="headerlink" href="#module-pacman.model.graph.graph" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.graph.graph.Graph">
+<em class="property">class </em><tt class="descclassname">pacman.model.graph.graph.</tt><tt class="descname">Graph</tt><big>(</big><em>label=None</em>, <em>vertices=None</em>, <em>edges=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/graph.html#Graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.graph.Graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a collection of vertices and edges between vertices that
+make up a graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; An identifier for the graph</li>
+<li><strong>vertices</strong> (iterable of <a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; An iterable of initial vertices in the graph</li>
+<li><strong>edges</strong> (iterable of <a class="reference internal" href="pacman.model.graph.edge.html#pacman.model.graph.edge.Edge" title="pacman.model.graph.edge.Edge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.edge.Edge</span></tt></a>) &#8211; An iterable of initial edges in the graph</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last"><ul class="simple">
+<li>If one of the edges is not valid</li>
+<li>If one of the vertices in not valid</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">edges</span></tt></td>
+<td>The edges of the graph</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">label</span></tt></td>
+<td>The label of the graph</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">vertices</span></tt></td>
+<td>The vertices of the graph</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.graph.graph.Graph.add_edge" title="pacman.model.graph.graph.Graph.add_edge"><tt class="xref py py-obj docutils literal"><span class="pre">add_edge</span></tt></a>(edge)</td>
+<td>Add an edge to this graph</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.graph.graph.Graph.add_edges" title="pacman.model.graph.graph.Graph.add_edges"><tt class="xref py py-obj docutils literal"><span class="pre">add_edges</span></tt></a>(edges)</td>
+<td>Add an iterable of edges to this graph</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.graph.graph.Graph.add_vertex" title="pacman.model.graph.graph.Graph.add_vertex"><tt class="xref py py-obj docutils literal"><span class="pre">add_vertex</span></tt></a>(vertex)</td>
+<td>Add a vertex to this graph</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.graph.graph.Graph.add_vertices" title="pacman.model.graph.graph.Graph.add_vertices"><tt class="xref py py-obj docutils literal"><span class="pre">add_vertices</span></tt></a>(vertices)</td>
+<td>Add an iterable of vertices to this graph</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.graph.graph.Graph.incoming_edges_to_vertex" title="pacman.model.graph.graph.Graph.incoming_edges_to_vertex"><tt class="xref py py-obj docutils literal"><span class="pre">incoming_edges_to_vertex</span></tt></a>(vertex)</td>
+<td>Locate a collection of edges for which vertex is the post_vertex.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.graph.graph.Graph.outgoing_edges_from_vertex" title="pacman.model.graph.graph.Graph.outgoing_edges_from_vertex"><tt class="xref py py-obj docutils literal"><span class="pre">outgoing_edges_from_vertex</span></tt></a>(vertex)</td>
+<td>Locate a collection of edges for which vertex is the pre_vertex.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.graph.graph.Graph.add_edge">
+<tt class="descname">add_edge</tt><big>(</big><em>edge</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/graph.html#Graph.add_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.graph.Graph.add_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an edge to this graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>edge</strong> (<a class="reference internal" href="pacman.model.graph.edge.html#pacman.model.graph.edge.Edge" title="pacman.model.graph.edge.Edge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.edge.Edge</span></tt></a>) &#8211; an edge to be added to the graph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the edge                    is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.graph.graph.Graph.add_edges">
+<tt class="descname">add_edges</tt><big>(</big><em>edges</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/graph.html#Graph.add_edges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.graph.Graph.add_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an iterable of edges to this graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>edges</strong> (iterable of <a class="reference internal" href="pacman.model.graph.edge.html#pacman.model.graph.edge.Edge" title="pacman.model.graph.edge.Edge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.edge.Edge</span></tt></a>) &#8211; an iterable of edges to be added to the graph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If any edge                    in the iterable is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.graph.graph.Graph.add_vertex">
+<tt class="descname">add_vertex</tt><big>(</big><em>vertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/graph.html#Graph.add_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.graph.Graph.add_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a vertex to this graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex</strong> (<a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; a vertex to be added to the graph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the vertex                    is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.graph.graph.Graph.add_vertices">
+<tt class="descname">add_vertices</tt><big>(</big><em>vertices</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/graph.html#Graph.add_vertices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.graph.Graph.add_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an iterable of vertices to this graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertices</strong> (iterable of <a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; an iterable of vertices to be added to the graph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If any vertex                    in the iterable is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.graph.graph.Graph.incoming_edges_to_vertex">
+<tt class="descname">incoming_edges_to_vertex</tt><big>(</big><em>vertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/graph.html#Graph.incoming_edges_to_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.graph.Graph.incoming_edges_to_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locate a collection of edges for which vertex is the post_vertex.            Can return an empty collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex</strong> (<a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; the vertex for which to find the incoming edges</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an iterable of edges which have vertex as their post_vertex</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="pacman.model.graph.edge.html#pacman.model.graph.edge.Edge" title="pacman.model.graph.edge.Edge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.edge.Edge</span></tt></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.graph.graph.Graph.outgoing_edges_from_vertex">
+<tt class="descname">outgoing_edges_from_vertex</tt><big>(</big><em>vertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/graph.html#Graph.outgoing_edges_from_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.graph.Graph.outgoing_edges_from_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locate a collection of edges for which vertex is the pre_vertex.            Can return an empty collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex</strong> (<a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; the vertex for which to find the outgoing edges</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an iterable of edges which have vertex as their pre_vertex</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="pacman.model.graph.edge.html#pacman.model.graph.edge.Edge" title="pacman.model.graph.edge.Edge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.edge.Edge</span></tt></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.vertex.html" title="pacman.model.graph.vertex module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.edge.html" title="pacman.model.graph.edge module"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.graph.html" >pacman.model.graph package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.exceptions &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pacman.exceptions</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="PacmanException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanException">[docs]</a><span class="k">class</span> <span class="nc">PacmanException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Indicates a general exception from Pacman</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="PacmanInvalidParameterException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException">[docs]</a><span class="k">class</span> <span class="nc">PacmanInvalidParameterException</span><span class="p">(</span><span class="n">PacmanException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An exception which indicates that a parameter has an invalid value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">problem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        :param parameter: The name of the parameter</span>
+<span class="sd">        :type parameter: str</span>
+<span class="sd">        :param value: The value of the parameter</span>
+<span class="sd">        :type value: str</span>
+<span class="sd">        :param problem: The problem with the value of the parameter</span>
+<span class="sd">        :type problem: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="PacmanAlreadyExistsException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException">[docs]</a><span class="k">class</span> <span class="nc">PacmanAlreadyExistsException</span><span class="p">(</span><span class="n">PacmanException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An exception that indicates that something already exists and that</span>
+<span class="sd">        adding another would be a conflict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_type</span><span class="p">,</span> <span class="n">item_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        :param item_type: The type of the item that already exists</span>
+<span class="sd">        :type item_type: str</span>
+<span class="sd">        :param item_id: The id of the item which is in conflict</span>
+<span class="sd">        :type item_id: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="PacmanPartitionException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanPartitionException">[docs]</a><span class="k">class</span> <span class="nc">PacmanPartitionException</span><span class="p">(</span><span class="n">PacmanException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An exception that indicates that something went wrong with paritioning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param problem: The problem with the partitioning</span>
+<span class="sd">        :type problem: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="PacmanPlaceException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanPlaceException">[docs]</a><span class="k">class</span> <span class="nc">PacmanPlaceException</span><span class="p">(</span><span class="n">PacmanException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An exception that indicates that something went wrong with placement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param problem: The problem with the placement</span>
+<span class="sd">        :type problem: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="PacmanPruneException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanPruneException">[docs]</a><span class="k">class</span> <span class="nc">PacmanPruneException</span><span class="p">(</span><span class="n">PacmanException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An exception that indicates that something went wrong with pruning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param problem: The problem with the pruning</span>
+<span class="sd">        :type problem: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="PacmanRouteInfoAllocationException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanRouteInfoAllocationException">[docs]</a><span class="k">class</span> <span class="nc">PacmanRouteInfoAllocationException</span><span class="p">(</span><span class="n">PacmanException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An exception that indicates that something went wrong with route info\</span>
+<span class="sd">        allocation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param problem: The problem with the allocation</span>
+<span class="sd">        :type problem: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="PacmanRoutingException"><a class="viewcode-back" href="../../pacman.exceptions.html#pacman.exceptions.PacmanRoutingException">[docs]</a><span class="k">class</span> <span class="nc">PacmanRoutingException</span><span class="p">(</span><span class="n">PacmanException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An exception that indicates that something went wrong with routing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param problem: The problem with the routing</span>
+<span class="sd">        :type problem: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

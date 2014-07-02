@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.graph.vertex &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pacman.model.graph.vertex</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+
+<span class="kn">from</span> <span class="nn">pacman.model.constraints.abstract_constraint</span> <span class="kn">import</span> <span class="n">AbstractConstraint</span>
+<span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanInvalidParameterException</span>
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="Vertex"><a class="viewcode-back" href="../../../../pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex">[docs]</a><span class="k">class</span> <span class="nc">Vertex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a Vertex of a graph, which contains a number of atoms, and\</span>
+<span class="sd">        which can be partitioned into a number of subvertices, such that the\</span>
+<span class="sd">        total number of atoms in the subvertices adds up to the number of atoms\</span>
+<span class="sd">        in the vertex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param n_atoms: The number of atoms that the vertex can be split into</span>
+<span class="sd">        :type n_atoms: int</span>
+<span class="sd">        :param label: The name of the vertex</span>
+<span class="sd">        :type label: str</span>
+<span class="sd">        :param constraints: The constraints of the vertex</span>
+<span class="sd">        :type constraints: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException:</span>
+<span class="sd">                    * If one of the constraints is not valid</span>
+<span class="sd">                    * If the number of atoms is less than 1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">n_atoms</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PacmanInvalidParameterException</span><span class="p">(</span>
+                    <span class="s">&quot;n_atoms&quot;</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> 
+                    <span class="s">&quot;Must be at least one atom in the vertex&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_atoms</span> <span class="o">=</span> <span class="n">n_atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_constraints</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
+        
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__subclasshook__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">othercls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Checks if all the abstract methods are present on the subclass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">__mro__</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">C</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s">&quot;__isabstractmethod__&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">B</span><span class="o">.</span><span class="n">__dict__</span> <span class="k">for</span> <span class="n">B</span> <span class="ow">in</span> <span class="n">othercls</span><span class="o">.</span><span class="n">__mro__</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="Vertex.add_constraint"><a class="viewcode-back" href="../../../../pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex.add_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">add_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a new constraint to the collection of constraints for the vertex</span>
+
+<span class="sd">        :param constraint: constraint to add</span>
+<span class="sd">        :type constraint:\</span>
+<span class="sd">                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If the\</span>
+<span class="sd">                    constraint is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">constraint</span> <span class="ow">is</span> <span class="bp">None</span> 
+                <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="n">AbstractConstraint</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">PacmanInvalidParameterException</span><span class="p">(</span>
+                    <span class="s">&quot;constraint&quot;</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="s">&quot;Must be a pacman.model&quot;</span>
+                        <span class="s">&quot;.constraints.abstract_contsraint.AbstractConstraint&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Vertex.add_constraints"><a class="viewcode-back" href="../../../../pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex.add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add an iterable of constraints to the collection of constraints for\</span>
+<span class="sd">            the vertex</span>
+
+<span class="sd">        :param constraints: iterable of constraints to add</span>
+<span class="sd">        :type constraints: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\</span>
+<span class="sd">                    constraints is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">next_constraint</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">next_constraint</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Vertex.set_constraints"><a class="viewcode-back" href="../../../../pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex.set_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">set_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the constraints of the vertex to be exactly the given iterable\</span>
+<span class="sd">            of constraints, overwriting any previously added constraints</span>
+
+<span class="sd">        :param constraints: iterable of constraints to set</span>
+<span class="sd">        :type constraints: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\</span>
+<span class="sd">                    constraints is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_constraints</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
+        </div>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="Vertex.get_maximum_resources_used_by_atoms"><a class="viewcode-back" href="../../../../pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex.get_maximum_resources_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_resources_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lo_atom</span><span class="p">,</span> <span class="n">hi_atom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the maximum resources that are used by a range of atoms</span>
+<span class="sd">        </span>
+<span class="sd">        :param lo_atom: The first atom in the range</span>
+<span class="sd">        :type lo_atom: int</span>
+<span class="sd">        :param hi_atom: The last atom in the range</span>
+<span class="sd">        :type hi_atom: int</span>
+<span class="sd">        :return: An iterable of the various resource types used</span>
+<span class="sd">        :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource.AbstractResource`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="Vertex.create_subvertex"><a class="viewcode-back" href="../../../../pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex.create_subvertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_subvertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lo_atom</span><span class="p">,</span> <span class="n">hi_atom</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">additional_constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates a subvertex of this vertex.  Can be overridden in vertex\</span>
+<span class="sd">            subclasses to create an subvertex instance that contains detailed\</span>
+<span class="sd">            information</span>
+<span class="sd">            </span>
+<span class="sd">        :param lo_atom: The first atom in the subvertex</span>
+<span class="sd">        :type lo_atom: int</span>
+<span class="sd">        :param hi_atom: The last atom in the subvertex</span>
+<span class="sd">        :type hi_atom: int</span>
+<span class="sd">        :param label: The label to give the subvertex.  If not given, and the\</span>
+<span class="sd">                    vertex has no label, no label will be given to the\</span>
+<span class="sd">                    subvertex.  If not given and the vertex has a label, a\</span>
+<span class="sd">                    default label will be given to the subvertex</span>
+<span class="sd">        :type label: str</span>
+<span class="sd">        :param additional_constraints: An iterable of constraints from the\</span>
+<span class="sd">                    subvertex over-and-above those of the vertex</span>
+<span class="sd">        :type additional_constraints: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException:</span>
+<span class="sd">                    * If lo_atom or hi_atom are out of range</span>
+<span class="sd">                    * If one of the constraints is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The label of the vertex</span>
+
+<span class="sd">        :return: The label</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        :raise None: Raises no known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The number of atoms in the vertex</span>
+
+<span class="sd">        :return: The number of atoms</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :raise None: Raises no known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_atoms</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; An iterable constraints for the vertex</span>
+
+<span class="sd">        :return: iterable of constraints</span>
+<span class="sd">        :rtype: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`</span>
+<span class="sd">        :raise None: Raises no known exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.subgraph.subgraph module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.subgraph package" href="pacman.model.subgraph.html" />
+    <link rel="next" title="pacman.model.subgraph.subvertex module" href="pacman.model.subgraph.subvertex.html" />
+    <link rel="prev" title="pacman.model.subgraph.subedge module" href="pacman.model.subgraph.subedge.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.subgraph.subvertex.html" title="pacman.model.subgraph.subvertex module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.subgraph.subedge.html" title="pacman.model.subgraph.subedge module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.subgraph.html" accesskey="U">pacman.model.subgraph package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.subgraph.subedge.html"
+                        title="previous chapter">pacman.model.subgraph.subedge module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.subgraph.subvertex.html"
+                        title="next chapter">pacman.model.subgraph.subvertex module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.subgraph.subgraph.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.subgraph.subgraph">
+<span id="pacman-model-subgraph-subgraph-module"></span><h1>pacman.model.subgraph.subgraph module<a class="headerlink" href="#module-pacman.model.subgraph.subgraph" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.subgraph.subgraph.Subgraph">
+<em class="property">class </em><tt class="descclassname">pacman.model.subgraph.subgraph.</tt><tt class="descname">Subgraph</tt><big>(</big><em>graph</em>, <em>label=None</em>, <em>subvertices=None</em>, <em>subedges=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a partitioning of a graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>graph</strong> (<a class="reference internal" href="pacman.model.graph.graph.html#pacman.model.graph.graph.Graph" title="pacman.model.graph.graph.Graph"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.graph.Graph</span></tt></a>) &#8211; the graph of which this is a subgraph</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; an identifier for the subgraph</li>
+<li><strong>subvertices</strong> (iterable of                    <a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; an iterable of vertices in the graph</li>
+<li><strong>subedges</strong> (iterable of                    <a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a>) &#8211; an iterable of subedges in the graph</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last"><ul class="simple">
+<li>If one of the subedges is not valid</li>
+<li>If one of the subvertices is not valid</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">graph</span></tt></td>
+<td>The graph of which this is a subgraph</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">label</span></tt></td>
+<td>The label of the subgraph</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">subedges</span></tt></td>
+<td>The subedges of the subgraph</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">subvertices</span></tt></td>
+<td>The subvertices of the subgraph</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.add_subedge" title="pacman.model.subgraph.subgraph.Subgraph.add_subedge"><tt class="xref py py-obj docutils literal"><span class="pre">add_subedge</span></tt></a>(subedge)</td>
+<td>Add a subedge to this subgraph</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.add_subedges" title="pacman.model.subgraph.subgraph.Subgraph.add_subedges"><tt class="xref py py-obj docutils literal"><span class="pre">add_subedges</span></tt></a>(subedges)</td>
+<td>Add some subedges to this subgraph</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.add_subvertex" title="pacman.model.subgraph.subgraph.Subgraph.add_subvertex"><tt class="xref py py-obj docutils literal"><span class="pre">add_subvertex</span></tt></a>(subvertex)</td>
+<td>Add a subvertex to this subgraph</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.add_subvertices" title="pacman.model.subgraph.subgraph.Subgraph.add_subvertices"><tt class="xref py py-obj docutils literal"><span class="pre">add_subvertices</span></tt></a>(subvertices)</td>
+<td>Add some subvertices to this subgraph</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.incoming_subedges_from_subvertex" title="pacman.model.subgraph.subgraph.Subgraph.incoming_subedges_from_subvertex"><tt class="xref py py-obj docutils literal"><span class="pre">incoming_subedges_from_subvertex</span></tt></a>(subvertex)</td>
+<td>Locate the subedges for which subvertex is the post_subvertex.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex" title="pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex"><tt class="xref py py-obj docutils literal"><span class="pre">outgoing_subedges_from_subvertex</span></tt></a>(subvertex)</td>
+<td>Locate the subedges for which subvertex is the pre_subvertex.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.subgraph.subgraph.Subgraph.add_subedge">
+<tt class="descname">add_subedge</tt><big>(</big><em>subedge</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph.add_subedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph.add_subedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a subedge to this subgraph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subedge</strong> (<a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a>) &#8211; a subedge to be added to the subgraph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the                    subedge is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subgraph.Subgraph.add_subedges">
+<tt class="descname">add_subedges</tt><big>(</big><em>subedges</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph.add_subedges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph.add_subedges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add some subedges to this subgraph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subedges</strong> (iterable of                    <a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a>) &#8211; an iterable of subedges to add to this subgraph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the                    subedge is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subgraph.Subgraph.add_subvertex">
+<tt class="descname">add_subvertex</tt><big>(</big><em>subvertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph.add_subvertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph.add_subvertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a subvertex to this subgraph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subvertex</strong> (<a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; a subvertex to be added to the graph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the                    subvertex is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subgraph.Subgraph.add_subvertices">
+<tt class="descname">add_subvertices</tt><big>(</big><em>subvertices</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph.add_subvertices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph.add_subvertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add some subvertices to this subgraph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subvertices</strong> (iterable of                    <a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; an iterable of subvertices to add to this subgraph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the                    subvertex is not valid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subgraph.Subgraph.incoming_subedges_from_subvertex">
+<tt class="descname">incoming_subedges_from_subvertex</tt><big>(</big><em>subvertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph.incoming_subedges_from_subvertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph.incoming_subedges_from_subvertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locate the subedges for which subvertex is the post_subvertex.            Can return an empty collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subvertex</strong> (<a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; the subvertex for which to find the incoming subedges</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an iterable of subedges which have subvertex as their                    post_subvertex</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex">
+<tt class="descname">outgoing_subedges_from_subvertex</tt><big>(</big><em>subvertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph.outgoing_subedges_from_subvertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locate the subedges for which subvertex is the pre_subvertex.            Can return an empty collection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subvertex</strong> (<a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; the subvertex for which to find the outgoing subedges</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an iterable of subedges which have subvertex as their                    pre_subvertex</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.subgraph.subvertex.html" title="pacman.model.subgraph.subvertex module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.subgraph.subedge.html" title="pacman.model.subgraph.subedge module"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.subgraph.html" >pacman.model.subgraph package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

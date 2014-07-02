@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.graph.edge module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.graph package" href="pacman.model.graph.html" />
+    <link rel="next" title="pacman.model.graph.graph module" href="pacman.model.graph.graph.html" />
+    <link rel="prev" title="pacman.model.graph package" href="pacman.model.graph.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.graph.html" title="pacman.model.graph.graph module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.html" title="pacman.model.graph package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.graph.html" accesskey="U">pacman.model.graph package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.graph.html"
+                        title="previous chapter">pacman.model.graph package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.graph.graph.html"
+                        title="next chapter">pacman.model.graph.graph module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.graph.edge.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.graph.edge">
+<span id="pacman-model-graph-edge-module"></span><h1>pacman.model.graph.edge module<a class="headerlink" href="#module-pacman.model.graph.edge" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.graph.edge.Edge">
+<em class="property">class </em><tt class="descclassname">pacman.model.graph.edge.</tt><tt class="descname">Edge</tt><big>(</big><em>pre_vertex</em>, <em>post_vertex</em>, <em>label=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/edge.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.edge.Edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a directional edge in a graph between two vertices</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pre_vertex</strong> (<a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; the vertex at the start of the edge</li>
+<li><strong>post_vertex</strong> (<a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; the vertex at the end of the edge</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The name of the edge</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body"><p class="first last">Raises no known exceptions</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">label</span></tt></td>
+<td>The label of the edge</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">post_vertex</span></tt></td>
+<td>The vertex at the end of the edge</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pre_vertex</span></tt></td>
+<td>The vertex at the start of the edge</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.graph.edge.Edge.create_subedge" title="pacman.model.graph.edge.Edge.create_subedge"><tt class="xref py py-obj docutils literal"><span class="pre">create_subedge</span></tt></a>(pre_subvertex,&nbsp;post_subvertex)</td>
+<td>Create a subedge between the pre_subvertex and the post_subvertex</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.graph.edge.Edge.create_subedge">
+<tt class="descname">create_subedge</tt><big>(</big><em>pre_subvertex</em>, <em>post_subvertex</em>, <em>label=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/graph/edge.html#Edge.create_subedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.graph.edge.Edge.create_subedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a subedge between the pre_subvertex and the post_subvertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pre_subvertex</strong> (<a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; The subvertex at the start of the subedge</li>
+<li><strong>post_subvertex</strong> (<a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; The subvertex at the end of the subedge</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label to give the edge.  If not specified, and the                    edge has no label, the subedge will have no label.  If not                    specified and the edge has a label, a label will be provided</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The created subedge</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If the                    pre_subvertex is not a subvertex of the edge pre_vertex                    or post_subvertex is not a subvertex of the edge post_vertex</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.graph.html" title="pacman.model.graph.graph module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.graph.html" title="pacman.model.graph package"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.graph.html" >pacman.model.graph package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

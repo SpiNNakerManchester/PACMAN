@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.operations.router_algorithms.abstract_router_algorithm &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pacman.operations.router_algorithms.abstract_router_algorithm</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractRouterAlgorithm"><a class="viewcode-back" href="../../../../pacman.operations.router_algorithms.abstract_router_algorithm.html#pacman.operations.router_algorithms.abstract_router_algorithm.AbstractRouterAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">AbstractRouterAlgorithm</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An abstract algorithm that can find routes for subedges between\</span>
+<span class="sd">        subvertices in a subgraph that have been placed on a machine</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractRouterAlgorithm.route"><a class="viewcode-back" href="../../../../pacman.operations.router_algorithms.abstract_router_algorithm.html#pacman.operations.router_algorithms.abstract_router_algorithm.AbstractRouterAlgorithm.route">[docs]</a>    <span class="k">def</span> <span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_info_allocation</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">machine</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Find routes between the subedges with the allocated information,</span>
+<span class="sd">            placed in the given places</span>
+<span class="sd">            </span>
+<span class="sd">        :param routing_info_allocation: The allocated routing information</span>
+<span class="sd">        :type routing_info_allocation:\</span>
+<span class="sd">                    :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`</span>
+<span class="sd">        :param placements: The placements of the subedges</span>
+<span class="sd">        :type placements:\</span>
+<span class="sd">                    :py:class:`pacman.model.placements.placements.Placements`</span>
+<span class="sd">        :param machine: The machine through which the routes are to be found</span>
+<span class="sd">        :type machine: :py:class:`pacman.model.machine.machine.Machine`</span>
+<span class="sd">        :return: The discovered routes </span>
+<span class="sd">        :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`</span>
+<span class="sd">        :raise pacman.exceptions.PacmanRoutingException: If something\</span>
+<span class="sd">                   goes wrong with the routing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

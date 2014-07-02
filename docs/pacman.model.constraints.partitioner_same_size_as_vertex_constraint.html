@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pacman.model.constraints.partitioner_same_size_as_vertex_constraint module &mdash; PACMAN  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PACMAN  documentation" href="index.html" />
+    <link rel="up" title="pacman.model.constraints package" href="pacman.model.constraints.html" />
+    <link rel="next" title="pacman.model.constraints.placer_chip_and_core_constraint module" href="pacman.model.constraints.placer_chip_and_core_constraint.html" />
+    <link rel="prev" title="pacman.model.constraints.partitioner_maximum_size_constraint module" href="pacman.model.constraints.partitioner_maximum_size_constraint.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.constraints.placer_chip_and_core_constraint.html" title="pacman.model.constraints.placer_chip_and_core_constraint module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.constraints.partitioner_maximum_size_constraint.html" title="pacman.model.constraints.partitioner_maximum_size_constraint module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.constraints.html" accesskey="U">pacman.model.constraints package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pacman.model.constraints.partitioner_maximum_size_constraint.html"
+                        title="previous chapter">pacman.model.constraints.partitioner_maximum_size_constraint module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pacman.model.constraints.placer_chip_and_core_constraint.html"
+                        title="next chapter">pacman.model.constraints.placer_chip_and_core_constraint module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pacman.model.constraints.partitioner_same_size_as_vertex_constraint.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pacman.model.constraints.partitioner_same_size_as_vertex_constraint">
+<span id="pacman-model-constraints-partitioner-same-size-as-vertex-constraint-module"></span><h1>pacman.model.constraints.partitioner_same_size_as_vertex_constraint module<a class="headerlink" href="#module-pacman.model.constraints.partitioner_same_size_as_vertex_constraint" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pacman.model.constraints.partitioner_same_size_as_vertex_constraint.PartitionerSameSizeAsVertexConstraint">
+<em class="property">class </em><tt class="descclassname">pacman.model.constraints.partitioner_same_size_as_vertex_constraint.</tt><tt class="descname">PartitionerSameSizeAsVertexConstraint</tt><big>(</big><em>vertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/constraints/partitioner_same_size_as_vertex_constraint.html#PartitionerSameSizeAsVertexConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.constraints.partitioner_same_size_as_vertex_constraint.PartitionerSameSizeAsVertexConstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pacman.model.constraints.abstract_partitioner_constraint.html#pacman.model.constraints.abstract_partitioner_constraint.AbstractPartitionerConstraint" title="pacman.model.constraints.abstract_partitioner_constraint.AbstractPartitionerConstraint"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.constraints.abstract_partitioner_constraint.AbstractPartitionerConstraint</span></tt></a></p>
+<p>A constraint which indicates that a vertex must be partitioned so that        there are the same number of subvertices and the same number of atoms        in each subvertex as those created for another vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex</strong> (<a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.graph.vertex.Vertex</span></tt></a>) &#8211; The vertex to which the constraint refers</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">vertex</span></tt></td>
+<td>The vertex to partition with</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.constraints.partitioner_same_size_as_vertex_constraint.PartitionerSameSizeAsVertexConstraint.is_partitioner_constraint" title="pacman.model.constraints.partitioner_same_size_as_vertex_constraint.PartitionerSameSizeAsVertexConstraint.is_partitioner_constraint"><tt class="xref py py-obj docutils literal"><span class="pre">is_partitioner_constraint</span></tt></a>()</td>
+<td>Overridden method to indicate that this is a partitioner constraint</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
+<dl class="method">
+<dt id="pacman.model.constraints.partitioner_same_size_as_vertex_constraint.PartitionerSameSizeAsVertexConstraint.is_partitioner_constraint">
+<tt class="descname">is_partitioner_constraint</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pacman/model/constraints/partitioner_same_size_as_vertex_constraint.html#PartitionerSameSizeAsVertexConstraint.is_partitioner_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.constraints.partitioner_same_size_as_vertex_constraint.PartitionerSameSizeAsVertexConstraint.is_partitioner_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overridden method to indicate that this is a partitioner constraint</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.constraints.placer_chip_and_core_constraint.html" title="pacman.model.constraints.placer_chip_and_core_constraint module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pacman.model.constraints.partitioner_maximum_size_constraint.html" title="pacman.model.constraints.partitioner_maximum_size_constraint module"
+             >previous</a> |</li>
+        <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
+          <li><a href="pacman.html" >pacman package</a> &raquo;</li>
+          <li><a href="pacman.model.html" >pacman.model package</a> &raquo;</li>
+          <li><a href="pacman.model.constraints.html" >pacman.model.constraints package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
