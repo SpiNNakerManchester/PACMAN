@@ -20,7 +20,7 @@ class Partitioner:
         :param graph: The graph to partition
         :type graph: :py:class:`pacman.model.graph.graph.Graph`
         :param machine: The machine with respect to which to partition the graph
-        :type machine: :py:class:`pacman.model.machine.machine.Machine`
+        :type machine: :py:class:`spinn_machine.machine.Machine`
         :return: A subgraph of partitioned vertices and edges from the graph
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\

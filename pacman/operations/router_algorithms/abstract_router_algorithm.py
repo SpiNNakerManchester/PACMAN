@@ -20,7 +20,7 @@ class AbstractRouterAlgorithm(object):
         :type placements:\
                     :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
-        :type machine: :py:class:`pacman.model.machine.machine.Machine`
+        :type machine: :py:class:`spinn_machine.machine.Machine`
         :return: The discovered routes 
         :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\

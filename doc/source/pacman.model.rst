@@ -8,7 +8,6 @@ Subpackages
 
     pacman.model.constraints
     pacman.model.graph
-    pacman.model.machine
     pacman.model.placements
     pacman.model.prunables
     pacman.model.resources

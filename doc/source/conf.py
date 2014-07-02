@@ -32,7 +32,10 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
+    'sphinx.ext.intersphinx'
 ]
+
+intersphinx_mapping = {'spinn_machine': ('http://spinnakermanchester.github.io/SpiNNMachine/docs/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

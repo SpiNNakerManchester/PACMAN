@@ -14,7 +14,7 @@ class AbstractPlacerAlgorithm(object):
         :param subgraph: The subgraph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :param machine: The machine on which to place the graph
-        :type machine: :py:class:`pacman.model.machine.machine.Machine`
+        :type machine: :py:class:`spinn_machine.machine.Machine`
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: If something\
