@@ -83,7 +83,7 @@
 <span class="sd">        :type link_ids: iterable of int</span>
 <span class="sd">        :param subedges: The subedges to which this route applies</span>
 <span class="sd">        :type subedges: iterable of\</span>
-<span class="sd">                    :py:class:`pacman.model.subgraph.subedge.SubEdge`</span>
+<span class="sd">                    :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
 <span class="sd">        :raise None: does not raise any known exceptions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
@@ -93,7 +93,7 @@
         <span class="sd">&quot;&quot;&quot; The subedges to which this routing entry applies</span>
 
 <span class="sd">        :return: An iterable of subedges</span>
-<span class="sd">        :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.SubEdge`</span>
+<span class="sd">        :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
 <span class="sd">        :raise None: does not raise any known exceptions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
@@ -104,7 +104,7 @@
 <span class="sd">            subedge must be the same as that for the current subedges.</span>
 <span class="sd">        </span>
 <span class="sd">        :param subedge: The subedge to add</span>
-<span class="sd">        :type subedge: :py:class:`pacman.model.subgraph.subedge.SubEdge`</span>
+<span class="sd">        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
 <span class="sd">        :param processor_ids: The processor ids that are the destination for\</span>
 <span class="sd">                    the given subedge</span>
 <span class="sd">        :type processor_ids: iterable of int</span>
