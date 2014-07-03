@@ -76,7 +76,8 @@
 <span class="sd">        :type subedge_info_items: iterable of\</span>
 <span class="sd">                    :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`</span>
 <span class="sd">        :raise pacman.exceptions.PacmanAlreadyExistsException: If there are any\</span>
-<span class="sd">                    two items with the same key once the mask is applied</span>
+<span class="sd">                    two items with the same key once the mask is applied\</span>
+<span class="sd">                    which do not have the same source subvertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
@@ -89,12 +90,13 @@
 <span class="sd">        :return: None</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        :raise pacman.exceptions.PacmanAlreadyExistsException: If there is\</span>
-<span class="sd">                    already an item with the same key once the mask is applied</span>
+<span class="sd">                    already an item with the same key once the mask is applied\</span>
+<span class="sd">                    which does not have the same source subvertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">subedge_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">all_subedge_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The subedge information for all subedges</span>
 
 <span class="sd">        :return: iterable of subedge information</span>
@@ -112,9 +114,10 @@
 <span class="sd">        :type key: int</span>
 <span class="sd">        :param mask: The routing mask</span>
 <span class="sd">        :type mask: int</span>
-<span class="sd">        :return: the routing information associated with the specified routing\</span>
-<span class="sd">                    key or None if no such key exists</span>
-<span class="sd">        :rtype: :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`</span>
+<span class="sd">        :return: an iterable of routing information associated with the\</span>
+<span class="sd">                    specified routing key or None if no such key exists</span>
+<span class="sd">        :rtype: iterable of\</span>
+<span class="sd">                    :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`</span>
 <span class="sd">        :raise None: does not raise any known exceptions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>

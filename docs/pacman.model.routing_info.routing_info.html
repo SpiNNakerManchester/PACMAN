@@ -98,7 +98,7 @@
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subedge_info_items</strong> (iterable of                    <a class="reference internal" href="pacman.model.routing_info.subedge_routing_info.html#pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo" title="pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo</span></tt></a>) &#8211; The subedge information items to add</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If there are any                    two items with the same key once the mask is applied</td>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If there are any                    two items with the same key once the mask is applied                    which do not have the same source subvertex</td>
 </tr>
 </tbody>
 </table>
@@ -109,7 +109,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">subedge_info</span></tt></td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">all_subedge_info</span></tt></td>
 <td>The subedge information for all subedges</td>
 </tr>
 </tbody>
@@ -145,7 +145,7 @@
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanAlreadyExistsException" title="pacman.exceptions.PacmanAlreadyExistsException">pacman.exceptions.PacmanAlreadyExistsException</a>:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If there is                    already an item with the same key once the mask is applied</td>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If there is                    already an item with the same key once the mask is applied                    which does not have the same source subvertex</td>
 </tr>
 </tbody>
 </table>
@@ -165,10 +165,10 @@
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the routing information associated with the specified routing                    key or None if no such key exists</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">an iterable of routing information associated with the                    specified routing key or None if no such key exists</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="pacman.model.routing_info.subedge_routing_info.html#pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo" title="pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">iterable of                    <a class="reference internal" href="pacman.model.routing_info.subedge_routing_info.html#pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo" title="pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo</span></tt></a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body"><p class="first last">does not raise any known exceptions</p>

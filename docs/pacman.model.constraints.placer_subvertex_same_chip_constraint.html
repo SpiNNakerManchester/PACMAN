@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pacman.model.constraints.placer_chip_and_core_constraint module &mdash; PACMAN  documentation</title>
+    <title>pacman.model.constraints.placer_subvertex_same_chip_constraint module &mdash; PACMAN  documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="PACMAN  documentation" href="index.html" />
     <link rel="up" title="pacman.model.constraints package" href="pacman.model.constraints.html" />
-    <link rel="next" title="pacman.model.constraints.placer_subvertex_same_chip_constraint module" href="pacman.model.constraints.placer_subvertex_same_chip_constraint.html" />
-    <link rel="prev" title="pacman.model.constraints.partitioner_same_size_as_vertex_constraint module" href="pacman.model.constraints.partitioner_same_size_as_vertex_constraint.html" /> 
+    <link rel="next" title="pacman.model.graph package" href="pacman.model.graph.html" />
+    <link rel="prev" title="pacman.model.constraints.placer_chip_and_core_constraint module" href="pacman.model.constraints.placer_chip_and_core_constraint.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,10 +39,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pacman.model.constraints.placer_subvertex_same_chip_constraint.html" title="pacman.model.constraints.placer_subvertex_same_chip_constraint module"
+          <a href="pacman.model.graph.html" title="pacman.model.graph package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="pacman.model.constraints.partitioner_same_size_as_vertex_constraint.html" title="pacman.model.constraints.partitioner_same_size_as_vertex_constraint module"
+          <a href="pacman.model.constraints.placer_chip_and_core_constraint.html" title="pacman.model.constraints.placer_chip_and_core_constraint module"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
           <li><a href="pacman.html" >pacman package</a> &raquo;</li>
@@ -53,14 +53,14 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="pacman.model.constraints.partitioner_same_size_as_vertex_constraint.html"
-                        title="previous chapter">pacman.model.constraints.partitioner_same_size_as_vertex_constraint module</a></p>
+  <p class="topless"><a href="pacman.model.constraints.placer_chip_and_core_constraint.html"
+                        title="previous chapter">pacman.model.constraints.placer_chip_and_core_constraint module</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="pacman.model.constraints.placer_subvertex_same_chip_constraint.html"
-                        title="next chapter">pacman.model.constraints.placer_subvertex_same_chip_constraint module</a></p>
+  <p class="topless"><a href="pacman.model.graph.html"
+                        title="next chapter">pacman.model.graph package</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/pacman.model.constraints.placer_chip_and_core_constraint.txt"
+    <li><a href="_sources/pacman.model.constraints.placer_subvertex_same_chip_constraint.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -84,26 +84,20 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-pacman.model.constraints.placer_chip_and_core_constraint">
-<span id="pacman-model-constraints-placer-chip-and-core-constraint-module"></span><h1>pacman.model.constraints.placer_chip_and_core_constraint module<a class="headerlink" href="#module-pacman.model.constraints.placer_chip_and_core_constraint" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pacman.model.constraints.placer_subvertex_same_chip_constraint">
+<span id="pacman-model-constraints-placer-subvertex-same-chip-constraint-module"></span><h1>pacman.model.constraints.placer_subvertex_same_chip_constraint module<a class="headerlink" href="#module-pacman.model.constraints.placer_subvertex_same_chip_constraint" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="pacman.model.constraints.placer_chip_and_core_constraint.PlacerChipAndCoreConstraint">
-<em class="property">class </em><tt class="descclassname">pacman.model.constraints.placer_chip_and_core_constraint.</tt><tt class="descname">PlacerChipAndCoreConstraint</tt><big>(</big><em>x</em>, <em>y</em>, <em>p=None</em><big>)</big><a class="reference internal" href="_modules/pacman/model/constraints/placer_chip_and_core_constraint.html#PlacerChipAndCoreConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.constraints.placer_chip_and_core_constraint.PlacerChipAndCoreConstraint" title="Permalink to this definition">¶</a></dt>
+<dt id="pacman.model.constraints.placer_subvertex_same_chip_constraint.PlacerSubvertexSameChipConstraint">
+<em class="property">class </em><tt class="descclassname">pacman.model.constraints.placer_subvertex_same_chip_constraint.</tt><tt class="descname">PlacerSubvertexSameChipConstraint</tt><big>(</big><em>subvertex</em><big>)</big><a class="reference internal" href="_modules/pacman/model/constraints/placer_subvertex_same_chip_constraint.html#PlacerSubvertexSameChipConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.constraints.placer_subvertex_same_chip_constraint.PlacerSubvertexSameChipConstraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pacman.model.constraints.abstract_placer_constraint.html#pacman.model.constraints.abstract_placer_constraint.AbstractPlacerConstraint" title="pacman.model.constraints.abstract_placer_constraint.AbstractPlacerConstraint"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.constraints.abstract_placer_constraint.AbstractPlacerConstraint</span></tt></a></p>
-<p>Creates a constraint object to place a vertex or a subvertex on a        specific chip, and optionally a specific core on that chip</p>
+<p>A constraint that indicates that a subvertex should be placed on the        same chip as the given subvertex</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>int</em>) &#8211; the x-coordinate of the chip</li>
-<li><strong>y</strong> (<em>int</em>) &#8211; the y-coordinate of the chip</li>
-<li><strong>p</strong> (<em>int</em>) &#8211; the processor (if any) of the chip</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subvertex</strong> (<a class="reference internal" href="pacman.model.subgraph.subvertex.html#pacman.model.subgraph.subvertex.Subvertex" title="pacman.model.subgraph.subvertex.Subvertex"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subvertex.Subvertex</span></tt></a>) &#8211; The subvertex to place on the same chip</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body"><p class="first last">does not raise any known exceptions</p>
-</td>
+<tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
 </tr>
 </tbody>
 </table>
@@ -114,17 +108,8 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">location</span></tt></td>
-<td>The location as a dictionary with three keys: &#8220;x&#8221;, &#8220;y&#8221; and &#8220;p&#8221;</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">p</span></tt></td>
-<td>The processor on the chip</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">x</span></tt></td>
-<td>The x-coordinate of the chip</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">y</span></tt></td>
-<td>The y-coordinate of the chip</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">subvertex</span></tt></td>
+<td>The subvertex to place on the same chip</td>
 </tr>
 </tbody>
 </table>
@@ -135,15 +120,15 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.constraints.placer_chip_and_core_constraint.PlacerChipAndCoreConstraint.is_placer_constraint" title="pacman.model.constraints.placer_chip_and_core_constraint.PlacerChipAndCoreConstraint.is_placer_constraint"><tt class="xref py py-obj docutils literal"><span class="pre">is_placer_constraint</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.constraints.placer_subvertex_same_chip_constraint.PlacerSubvertexSameChipConstraint.is_placer_constraint" title="pacman.model.constraints.placer_subvertex_same_chip_constraint.PlacerSubvertexSameChipConstraint.is_placer_constraint"><tt class="xref py py-obj docutils literal"><span class="pre">is_placer_constraint</span></tt></a>()</td>
 <td>Overridden method to indicate that this is a placer constraint</td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Detailed Methods</p>
 <dl class="method">
-<dt id="pacman.model.constraints.placer_chip_and_core_constraint.PlacerChipAndCoreConstraint.is_placer_constraint">
-<tt class="descname">is_placer_constraint</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pacman/model/constraints/placer_chip_and_core_constraint.html#PlacerChipAndCoreConstraint.is_placer_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.constraints.placer_chip_and_core_constraint.PlacerChipAndCoreConstraint.is_placer_constraint" title="Permalink to this definition">¶</a></dt>
+<dt id="pacman.model.constraints.placer_subvertex_same_chip_constraint.PlacerSubvertexSameChipConstraint.is_placer_constraint">
+<tt class="descname">is_placer_constraint</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pacman/model/constraints/placer_subvertex_same_chip_constraint.html#PlacerSubvertexSameChipConstraint.is_placer_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.constraints.placer_subvertex_same_chip_constraint.PlacerSubvertexSameChipConstraint.is_placer_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overridden method to indicate that this is a placer constraint</p>
 </dd></dl>
 
@@ -167,10 +152,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pacman.model.constraints.placer_subvertex_same_chip_constraint.html" title="pacman.model.constraints.placer_subvertex_same_chip_constraint module"
+          <a href="pacman.model.graph.html" title="pacman.model.graph package"
              >next</a> |</li>
         <li class="right" >
-          <a href="pacman.model.constraints.partitioner_same_size_as_vertex_constraint.html" title="pacman.model.constraints.partitioner_same_size_as_vertex_constraint module"
+          <a href="pacman.model.constraints.placer_chip_and_core_constraint.html" title="pacman.model.constraints.placer_chip_and_core_constraint module"
              >previous</a> |</li>
         <li><a href="index.html">PACMAN  documentation</a> &raquo;</li>
           <li><a href="pacman.html" >pacman package</a> &raquo;</li>
