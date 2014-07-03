@@ -1,5 +1,5 @@
 class RoutingInfoAllocator:
-    """ Used to prune the subgraph, removing unused edges
+    """ Used to obtain routing information from a placed subgraph
     """
 
     def __init__(self, routing_info_allocator_algorithm=None):
