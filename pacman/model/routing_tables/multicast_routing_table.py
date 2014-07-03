@@ -14,7 +14,7 @@ class MulticastRoutingTable(object):
         :param multicast_routing_entries: An iterable of routing entries to add\
                     to the table
         :type multicast_routing_entries: iterable of\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
                     routing entries contain the same key-mask combination
         """
@@ -25,7 +25,7 @@ class MulticastRoutingTable(object):
 
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
@@ -57,7 +57,7 @@ class MulticastRoutingTable(object):
 
         :return: an iterable of multicast routing entries
         :rtype: iterable of\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
         pass
@@ -72,7 +72,7 @@ class MulticastRoutingTable(object):
         :type mask: int
         :return: the routing entry associated with the routing key or None if\
                     no such entry exists
-        :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_entry.MulticastRoutingEntry`
+        :rtype: :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
         pass

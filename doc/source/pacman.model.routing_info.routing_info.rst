@@ -11,7 +11,7 @@ pacman.model.routing_info.routing_info module
     .. rubric:: Attributes
 
     .. autosummary::
-        subedge_info
+        all_subedge_info
 
     .. rubric:: Methods
 

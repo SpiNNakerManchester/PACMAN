@@ -1,51 +1,54 @@
-class SubedgeMulticastRoutingEntry(object):
-    """ Represents a routing entry for a specific subedge of a subgraph.  Note\
-        that multiple entries may be merged to create single\
-        MulticastRoutingEntry
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+
+class SubedgeMulticastRoutingEntry(MulticastRoutingEntry):
+    """ A Multicast Routing Entry that additionally stores the subedges
+        associated with the entry
     """
 
-    def __init__(self, subedge_info, destination_route, source_link_id):
+    def __init__(self, key, mask, processor_ids, link_ids, subedges):
         """
-
-        :param subedge_info: the routing information for a specific subedge
-        :type subedge_info:\
-                    :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
-        :param destination_route: the destination route for the subedge
-        :type destination_route:\
-                    :py:class:`pacman.model.routing_tables.multicast_route.MulticastRoute`
-        :param source_link_id: The id of the link on the source chip from which\
-                    the traffic will be received
-        :type source_link_id: int
+        :param key: The routing key
+        :type key: int
+        :param mask: The route key mask
+        :type mask: int
+        :param processor_ids: The destination processor ids
+        :type processor_ids: iterable of int
+        :param link_ids: The destination link ids
+        :type link_ids: iterable of int
+        :param subedges: The subedges to which this route applies
+        :type subedges: iterable of\
+                    :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
         pass
 
     @property
-    def subedge_info(self):
-        """ The key and mask in the routing entry
+    def subedges(self):
+        """ The subedges to which this routing entry applies
 
-        :return: the subedge information
-        :rtype: :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
+        :return: An iterable of subedges
+        :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
         pass
-
-    @property
-    def destination_route(self):
-        """ The route to send received packets down
-
-        :return: the route
-        :rtype: :py:class:`pacman.model.routing_tables.multicast_route.MulticastRoute`
-        :raise None: does not raise any known exceptions
-        """
-        pass
-
-    @property
-    def source_link_id(self):
-        """ The link on the source chip down which the packet was sent
-
-        :return: The link id
-        :rtype: int
-        :raise None: does not raise any known exceptions
+    
+    def add_subedge(self, subedge, processor_ids, link_ids):
+        """ Adds a subedge to the entry adding in the processor_ids and link_ids\
+            that are the destination of that subedge.  The pre_subvertex of the\
+            subedge must be the same as that for the current subedges.
+        
+        :param subedge: The subedge to add
+        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`
+        :param processor_ids: The processor ids that are the destination for\
+                    the given subedge
+        :type processor_ids: iterable of int
+        :param link_ids: The link ids that are the destination for\
+                    the given subedge
+        :type link_ids: iterable of int
+        :return: Nothing is returned
+        :rtype: None
+        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
+                    subedge does not have the same pre_subvertex as the\
+                    existing subedges
         """
         pass

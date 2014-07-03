@@ -10,7 +10,8 @@ class RoutingInfo(object):
         :type subedge_info_items: iterable of\
                     :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
         :raise pacman.exceptions.PacmanAlreadyExistsException: If there are any\
-                    two items with the same key once the mask is applied
+                    two items with the same key once the mask is applied\
+                    which do not have the same source subvertex
         """
         pass
 
@@ -23,12 +24,13 @@ class RoutingInfo(object):
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If there is\
-                    already an item with the same key once the mask is applied
+                    already an item with the same key once the mask is applied\
+                    which does not have the same source subvertex
         """
         pass
 
     @property
-    def subedge_info(self):
+    def all_subedge_info(self):
         """ The subedge information for all subedges
 
         :return: iterable of subedge information
@@ -46,9 +48,10 @@ class RoutingInfo(object):
         :type key: int
         :param mask: The routing mask
         :type mask: int
-        :return: the routing information associated with the specified routing\
-                    key or None if no such key exists
-        :rtype: :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
+        :return: an iterable of routing information associated with the\
+                    specified routing key or None if no such key exists
+        :rtype: iterable of\
+                    :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
         :raise None: does not raise any known exceptions
         """
         pass

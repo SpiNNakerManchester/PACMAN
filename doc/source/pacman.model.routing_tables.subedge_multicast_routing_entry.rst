@@ -11,7 +11,18 @@ pacman.model.routing_tables.subedge_multicast_routing_entry module
     .. rubric:: Attributes
 
     .. autosummary::
-        destination_route
-        source_link_id
-        subedge_info
+        key
+        link_ids
+        mask
+        processor_ids
+        subedges
+
+    .. rubric:: Methods
+
+    .. autosummary::
+        add_subedge
+
+    .. rubric:: Detailed Methods
+
+    .. automethod:: add_subedge
 
