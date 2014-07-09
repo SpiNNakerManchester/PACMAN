@@ -95,6 +95,18 @@ class Subgraph(object):
         if subedges is not None:
             for next_subedge in subedges:
                 self.add_subedge(next_subedge)
+                
+    def remove_subedge(self, subedge):
+        """ Remove a sub-edge from the subgraph
+        
+        :param subedge: The subedge to be removed
+        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`
+        :return: Nothing is returned
+        :rtype: None
+        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
+                    subedge is not in the subgraph
+        """
+        pass
 
     def outgoing_subedges_from_subvertex(self, subvertex):
         """ Locate the subedges for which subvertex is the pre_subvertex.\
