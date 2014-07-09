@@ -9,7 +9,6 @@ Subpackages
     pacman.model.constraints
     pacman.model.graph
     pacman.model.placements
-    pacman.model.prunables
     pacman.model.resources
     pacman.model.routing_info
     pacman.model.routing_tables

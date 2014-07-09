@@ -25,6 +25,7 @@ pacman.model.subgraph.subgraph module
         add_subvertices
         incoming_subedges_from_subvertex
         outgoing_subedges_from_subvertex
+        remove_subedge
 
     .. rubric:: Detailed Methods
 
@@ -34,4 +35,5 @@ pacman.model.subgraph.subgraph module
     .. automethod:: add_subvertices
     .. automethod:: incoming_subedges_from_subvertex
     .. automethod:: outgoing_subedges_from_subvertex
+    .. automethod:: remove_subedge
 

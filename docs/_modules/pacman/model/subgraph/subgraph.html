@@ -161,6 +161,18 @@
         <span class="k">if</span> <span class="n">subedges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">next_subedge</span> <span class="ow">in</span> <span class="n">subedges</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_subedge</span><span class="p">(</span><span class="n">next_subedge</span><span class="p">)</span>
+                </div>
+<div class="viewcode-block" id="Subgraph.remove_subedge"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.remove_subedge">[docs]</a>    <span class="k">def</span> <span class="nf">remove_subedge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subedge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Remove a sub-edge from the subgraph</span>
+<span class="sd">        </span>
+<span class="sd">        :param subedge: The subedge to be removed</span>
+<span class="sd">        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`</span>
+<span class="sd">        :return: Nothing is returned</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise pacman.exceptions.PacmanInvalidParameterException: If the\</span>
+<span class="sd">                    subedge is not in the subgraph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="Subgraph.outgoing_subedges_from_subvertex"><a class="viewcode-back" href="../../../../pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex">[docs]</a>    <span class="k">def</span> <span class="nf">outgoing_subedges_from_subvertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subvertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Locate the subedges for which subvertex is the pre_subvertex.\</span>

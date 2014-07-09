@@ -159,6 +159,9 @@
 <tr class="row-even"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex" title="pacman.model.subgraph.subgraph.Subgraph.outgoing_subedges_from_subvertex"><tt class="xref py py-obj docutils literal"><span class="pre">outgoing_subedges_from_subvertex</span></tt></a>(subvertex)</td>
 <td>Locate the subedges for which subvertex is the pre_subvertex.</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pacman.model.subgraph.subgraph.Subgraph.remove_subedge" title="pacman.model.subgraph.subgraph.Subgraph.remove_subedge"><tt class="xref py py-obj docutils literal"><span class="pre">remove_subedge</span></tt></a>(subedge)</td>
+<td>Remove a sub-edge from the subgraph</td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Detailed Methods</p>
@@ -281,6 +284,27 @@
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a></td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises None:</th><td class="field-body">does not raise any known exceptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacman.model.subgraph.subgraph.Subgraph.remove_subedge">
+<tt class="descname">remove_subedge</tt><big>(</big><em>subedge</em><big>)</big><a class="reference internal" href="_modules/pacman/model/subgraph/subgraph.html#Subgraph.remove_subedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pacman.model.subgraph.subgraph.Subgraph.remove_subedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a sub-edge from the subgraph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subedge</strong> (<a class="reference internal" href="pacman.model.subgraph.subedge.html#pacman.model.subgraph.subedge.Subedge" title="pacman.model.subgraph.subedge.Subedge"><tt class="xref py py-class docutils literal"><span class="pre">pacman.model.subgraph.subedge.Subedge</span></tt></a>) &#8211; The subedge to be removed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing is returned</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="pacman.exceptions.html#pacman.exceptions.PacmanInvalidParameterException" title="pacman.exceptions.PacmanInvalidParameterException">pacman.exceptions.PacmanInvalidParameterException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the                    subedge is not in the subgraph</td>
 </tr>
 </tbody>
 </table>

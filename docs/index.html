@@ -46,7 +46,11 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">PACMAN</a></li>
+<li><a class="reference internal" href="#">PACMAN</a><ul>
+<li><a class="reference internal" href="#functional-requirements">Functional Requirements</a></li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
@@ -82,13 +86,129 @@
   <div class="section" id="module-pacman">
 <span id="pacman"></span><h1>PACMAN<a class="headerlink" href="#module-pacman" title="Permalink to this headline">¶</a></h1>
 <p>Provides various functions which together can be used to take a graph and    split it into pieces that can be loaded on to a machine, along with    routes between the pieces.    The main items provided are:</p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><a class="reference internal" href="pacman.operations.partitioner.html#pacman.operations.partitioner.Partitioner" title="pacman.operations.partitioner.Partitioner"><tt class="xref py py-class docutils literal"><span class="pre">pacman.operations.partitioner.Partitioner</span></tt></a></li>
 <li><a class="reference internal" href="pacman.operations.placer.html#pacman.operations.placer.Placer" title="pacman.operations.placer.Placer"><tt class="xref py py-class docutils literal"><span class="pre">pacman.operations.placer.Placer</span></tt></a></li>
-<li><a class="reference internal" href="pacman.operations.pruner.html#pacman.operations.pruner.Pruner" title="pacman.operations.pruner.Pruner"><tt class="xref py py-class docutils literal"><span class="pre">pacman.operations.pruner.Pruner</span></tt></a></li>
 <li><a class="reference internal" href="pacman.operations.routing_info_allocator.html#pacman.operations.routing_info_allocator.RoutingInfoAllocator" title="pacman.operations.routing_info_allocator.RoutingInfoAllocator"><tt class="xref py py-class docutils literal"><span class="pre">pacman.operations.routing_info_allocator.RoutingInfoAllocator</span></tt></a></li>
 <li><a class="reference internal" href="pacman.operations.router.html#pacman.operations.router.Router" title="pacman.operations.router.Router"><tt class="xref py py-class docutils literal"><span class="pre">pacman.operations.router.Router</span></tt></a></li>
 </ul>
+</div></blockquote>
+<div class="section" id="functional-requirements">
+<h2>Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p class="first">Creation of a graph of vertices to be partitioned, and edges          between the vertices indicating a directional communication between          the vertices.</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Vertices will have a number of <em>atoms</em> - an atom cannot be              broken down in to anything smaller, and so each partitioned              vertex (sub-vertex) must contain at least 1 atom.</p>
+</li>
+<li><p class="first">Vertices must be able to indicate what resources are required by              any given subset of the atoms.</p>
+</li>
+<li><p class="first">A vertex can have a number of constraints which must be respected              by any algorithm which uses the graph.  Initially, these will              include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The maximum number of atoms which any sub-vertex can                    contain.</li>
+<li>The chip and/or processor on to which the vertex should                    be placed.</li>
+<li>A set of vertices which should contain the same number of                    atoms after partitioning.</li>
+<li>A set of vertices whose sub-vertices should be placed on                    the same chip if they contain the same atom.</li>
+<li>A exact number of equal sized sub-vertices into which a                    vertex should be partitioned.</li>
+<li>The range of processors on a specific chip on to which the                    sub-vertices of the vertex should be placed.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">It should be possible to create new constraints as the need              arises</p>
+</li>
+<li><p class="first">An edge should provide functionality to create sub-edges of the              edge, to allow extensions of an edge and/or a sub-edge to              contain additional information about the edge and/or sub-edge</p>
+</li>
+<li><p class="first">Multiple edges can exist between the same two vertices.</p>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Creation of a subgraph of sub-vertices to be placed and/or routed,          with sub-edges between the sub-vertices.</p>
+<blockquote>
+<div><ul class="simple">
+<li>It must be possible to build this subgraph directly without              requiring that it is created by one of the other modules.</li>
+<li>It is <em>not</em> required that there is a sub-edge between every pair              of sub-vertices with the same vertex.</li>
+<li>Where a subgraph is created from a graph, it should be possible              to find the sub-vertices of a given vertex, and the sub-edges of              a given edge.</li>
+<li>The subgraph does not have to reference a graph if it was not              created from a graph, and similarly the sub-vertices do not have              to reference a vertex, nor do the sub-edges have to reference an              edge.</li>
+<li>A sub-vertex can have a number of constraints which must be              respected by any algorithm which uses the subgraph.</li>
+<li>It should be possible to remove a sub-edge from a subgraph, to              allow later pruning of a subgraph that has been created              automatically from a graph.</li>
+<li>Multiple sub-edges can exist between any two sub-vertices.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Creation of multicast routing info consisting of key/mask          combinations assigned to sub-edges of a given subgraph.</p>
+<blockquote>
+<div><ul class="simple">
+<li>It must be possible to build this information directly without              requiring that it is created by one of the other modules.</li>
+<li>There should be exactly one key/mask combination for each              sub-edge in the subgraph, which will represent all the keys              which will be sent in all packets from the sub-vertex at the              start of the sub-edge down that sub-edge.</li>
+<li>It is possible for a sub-vertex to send several different keys              down several different sub-edges, but only one per sub-edge (but              note that it is acceptable for different keys to be assigned to              different sub-edges between the same two sub-vertices).</li>
+<li>There should be no overlap between the key/mask combinations              of sub-edges which come from different sub-vertices i.e. no              two sub-edges which start at different sub-vertices should have              the same key/mask combination.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Partitioning of a graph with respect to a machine, such that the          resources consumed by each sub-vertex does not exceed those          provided by each processor on the machine.  This results in a          subgraph.</p>
+<blockquote>
+<div><ul class="simple">
+<li>It should be possible to select from a range of partitioning              algorithms or provide one, although a default should be provided              in the absence of such a choice .</li>
+<li>Any partitioning constraints should be met; if there are any              that cannot, or that are not understood by the algorithm in use              an exception should be thrown.  Non-partitioning constraints can              be ignored, although these can be used if it makes sense for              the given algorithm.</li>
+<li>It should be possible to create at least one grouping of the              generated sub-vertices so that each group fits within the              resources provided by a single chip on the machine.</li>
+<li>It should not be assumed that a given grouping of sub-vertices              will be the final grouping on the machine, although it is              acceptable to make hints through additional constraints about              what is likely to work.</li>
+<li>The machine itself should not be altered by the partitioning, so              that it can be used in further processing.</li>
+<li>The graph itself should not be altered by the partitioning, so              that it can be used in further processing.</li>
+<li>No two sub-vertices created from a single vertex should contain              the same atom.</li>
+<li>Any edges in the graph should be split with the vertices to              create a number of sub-edges, such that where there was a vertex              <em>v</em> connected to a vertex <em>w</em> by a single edge, there should be              a sub-edge between every sub-vertex of vertex <em>v</em> and every              sub-vertex of vertex <em>w</em>; for example, if there are 2              sub-vertices of <em>v</em> and <em>w</em>, and one edge between them, then              there will be 4 new sub-edges for this edge.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Placement of a subgraph on a given machine, such that the resources          required by any combination of sub-vertices placed on any chip in the          machine does not exceed the resources provided by that chip.  This          results in placements.</p>
+<blockquote>
+<div><ul class="simple">
+<li>It should be possible to choose from a range of placement              algorithms or provide one, although a default should be provided              in the absence of such a choice.</li>
+<li>Any placement constraints should be met; if there are any that              cannot, or that are not understood by placement algorithm, an              exception should be thrown.  Non-placement constraints can be              ignored, although these can be used if it makes sense for the              given algorithm.</li>
+<li>The machine itself should not be altered by placement so that              it can be used in further processing.</li>
+<li>The subgraph itself should not be altered by placement so that              it can be used in further processing.</li>
+<li>The returned placements should only contain a single placement              for each sub-vertex.</li>
+<li>The placements should be such that the sub-vertices with              sub-edges between them must be able to communicate with each              other.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Allocation of multicast routing keys and masks to a subgraph such          that each sub-vertex sends out packets with a different key/mask          combination.  This results in multicast routing info.</p>
+<blockquote>
+<div><ul class="simple">
+<li>This can use the placement information if required.  If an              algorithm requires placement information but none is provided              an exception is thrown.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Routing of sub-edges between sub-vertices with a given allocation of          routing keys and masks with respect to a given machine.  This results          in multicast routing tables.</p>
+<blockquote>
+<div><ul class="simple">
+<li>It should be possible to choose from a range of routing              algorithms, or provide one, although a default should be provided              in the absence of such a choice</li>
+<li>For any sub-vertex, following the routes from the placement of              the sub-vertex should result exactly in the set of placements of              the destination sub-vertices described by all the sub-edges which              start at that sub-vertex. No additional destination should be              reached, and no fewer than this set of destinations should be              reached.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">It should be possible to call each of the modules independently.          There should be no assumption that one of the other modules has          produced the data input for any other module.</p>
+</li>
+<li><p class="first">There should be no assumption about how the inputs and outputs          are stored.</p>
+</li>
+<li><p class="first">Any utility functions that provide access to internal structures          within a data structure should operate in approximately O(1) time;          for example, where an object of type <em>obj</em> holds a number of objects          of type <em>subobj</em> with property <em>prop</em>, requesting a list of <em>subobj</em>          objects contained within <em>obj</em> with property value <em>prop</em> = <em>value</em>          should not iterate through a list of such objects, but should instead          maintain a mapping that allows access to such objects in O(1) time.          If this is not possible, <em>obj</em> should only provide access to a list          of <em>subobj</em> objects, allowing the caller to filter these themselves.          This will ensure that no misunderstanding can be made about the          speed of operation of a function.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>All the algorithms are used to take a simulation specified as a          <a class="reference internal" href="pacman.model.graph.graph.html#pacman.model.graph.graph.Graph" title="pacman.model.graph.graph.Graph"><tt class="xref py py-class docutils literal"><span class="pre">Graph</span></tt></a> and ensure that each          <a class="reference internal" href="pacman.model.graph.vertex.html#pacman.model.graph.vertex.Vertex" title="pacman.model.graph.vertex.Vertex"><tt class="xref py py-class docutils literal"><span class="pre">Vertex</span></tt></a> can be divided so that
+it can fit within the resources provided by a given machine, and          create routing tables to ensure that data is sent along each          specified <a class="reference internal" href="pacman.model.graph.edge.html#pacman.model.graph.edge.Edge" title="pacman.model.graph.edge.Edge"><tt class="xref py py-class docutils literal"><span class="pre">Edge</span></tt></a> as requested, and          that no stray traffic should be received.   This is used to generate          data for a simulation which is then run on the machine.</li>
+<li>A subset of the algorithms are used to take a pre-defined          <a class="reference internal" href="pacman.model.subgraph.subgraph.html#pacman.model.subgraph.subgraph.Subgraph" title="pacman.model.subgraph.subgraph.Subgraph"><tt class="xref py py-class docutils literal"><span class="pre">Subgraph</span></tt></a> and pre-defined          <a class="reference internal" href="pacman.model.routing_info.routing_info.html#pacman.model.routing_info.routing_info.RoutingInfo" title="pacman.model.routing_info.routing_info.RoutingInfo"><tt class="xref py py-class docutils literal"><span class="pre">RoutingInfo</span></tt></a>, and          generate <a class="reference internal" href="pacman.model.placements.placements.html#pacman.model.placements.placements.Placements" title="pacman.model.placements.placements.Placements"><tt class="xref py py-class docutils literal"><span class="pre">Placements</span></tt></a>          and          <a class="reference internal" href="pacman.model.routing_tables.multicast_routing_tables.html#pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables" title="pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables"><tt class="xref py py-class docutils literal"><span class="pre">MulticastRoutingTables</span></tt></a></li>
+</ul>
+</div></blockquote>
+</div>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
