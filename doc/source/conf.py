@@ -35,7 +35,7 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 
-intersphinx_mapping = {'spinn_machine': ('http://spinnakermanchester.github.io/SpiNNMachine/docs/', None)}
+intersphinx_mapping = {'spinn_machine': ('http://spinnmachine.readthedocs.org/en/latest/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
