@@ -12,7 +12,7 @@ class Vertex(object):
         total number of atoms in the subvertices adds up to the number of atoms\
         in the vertex
     """
-    
+
     def __init__(self, n_atoms, label=None, constraints=None):
         """
 
@@ -29,15 +29,15 @@ class Vertex(object):
         """
         if n_atoms < 1:
             raise PacmanInvalidParameterException(
-                    "n_atoms", n_atoms, 
+                    "n_atoms", n_atoms,
                     "Must be at least one atom in the vertex")
-        
+
         self._label = label
         self._n_atoms = n_atoms
         self._constraints = list()
 
         self.add_constraints(constraints)
-        
+
     @classmethod
     def __subclasshook__(cls, othercls):
         """ Checks if all the abstract methods are present on the subclass
@@ -61,7 +61,7 @@ class Vertex(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     constraint is not valid
         """
-        if (constraint is None 
+        if (constraint is None
                 or not isinstance(constraint, AbstractConstraint)):
             raise PacmanInvalidParameterException(
                     "constraint", constraint, "Must be a pacman.model"
@@ -98,26 +98,27 @@ class Vertex(object):
         """
         self._constraints = list()
         self.add_constraints(constraints)
-        
+
     @abstractmethod
     def get_maximum_resources_used_by_atoms(self, lo_atom, hi_atom):
         """ Get the maximum resources that are used by a range of atoms
-        
+
         :param lo_atom: The first atom in the range
         :type lo_atom: int
         :param hi_atom: The last atom in the range
         :type hi_atom: int
-        :return: An iterable of the various resource types used
+        :return: An iterable of the various resource types used.  There should\
+                    only be one of each resource type.
         :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource.AbstractResource`
         """
         pass
-    
-    def create_subvertex(self, lo_atom, hi_atom, label=None, 
+
+    def create_subvertex(self, lo_atom, hi_atom, label=None,
             additional_constraints=None):
         """ Creates a subvertex of this vertex.  Can be overridden in vertex\
             subclasses to create an subvertex instance that contains detailed\
             information
-            
+
         :param lo_atom: The first atom in the subvertex
         :type lo_atom: int
         :param hi_atom: The last atom in the subvertex
@@ -146,7 +147,7 @@ class Vertex(object):
         :raise None: Raises no known exceptions
         """
         return self._label
-    
+
     @property
     def n_atoms(self):
         """ The number of atoms in the vertex
@@ -156,7 +157,7 @@ class Vertex(object):
         :raise None: Raises no known exceptions
         """
         return self._n_atoms
-    
+
     @property
     def constraints(self):
         """ An iterable constraints for the vertex
