@@ -184,3 +184,15 @@ class Subgraph(object):
         :raise None: Raises no known exceptions
         """
         return self._label
+
+
+    def get_subvertices_from_vertex(self, vertex):
+        """ supporting method to get all subverts for a given vertex
+
+        :param vertex: the vertex for which to find the associated subvertexes
+        :type vertex: pacman.model.graph.vertex.Vertex
+        :return: a list of subvertices
+        :rtype: iterable list
+        :raise None: Raises no known exceptions
+        """
+        pass
