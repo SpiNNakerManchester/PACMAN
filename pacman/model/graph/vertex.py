@@ -1,9 +1,9 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
-
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.exceptions import PacmanInvalidParameterException
+
 
 @add_metaclass(ABCMeta)
 class Vertex(object):
@@ -13,7 +13,8 @@ class Vertex(object):
         in the vertex
     """
     
-    def __init__(self, n_atoms, label=None, constraints=None):
+    def __init__(self, n_atoms, label, constraints=None):
+
         """
 
         :param n_atoms: The number of atoms that the vertex can be split into
@@ -29,8 +30,8 @@ class Vertex(object):
         """
         if n_atoms < 1:
             raise PacmanInvalidParameterException(
-                    "n_atoms", n_atoms, 
-                    "Must be at least one atom in the vertex")
+                "n_atoms", str(n_atoms),
+                "Must be at least one atom in the vertex")
         
         self._label = label
         self._n_atoms = n_atoms
@@ -55,7 +56,8 @@ class Vertex(object):
 
         :param constraint: constraint to add
         :type constraint:\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint
+                    \.AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -64,8 +66,9 @@ class Vertex(object):
         if (constraint is None 
                 or not isinstance(constraint, AbstractConstraint)):
             raise PacmanInvalidParameterException(
-                    "constraint", constraint, "Must be a pacman.model"
-                        ".constraints.abstract_contsraint.AbstractConstraint")
+                "constraint", constraint, "Must be a pacman.model."
+                                          "constraints.abstract_contsraint."
+                                          "AbstractConstraint")
         self._constraints.append(constraint)
 
     def add_constraints(self, constraints):
@@ -100,17 +103,21 @@ class Vertex(object):
         self.add_constraints(constraints)
         
     @abstractmethod
-    def get_maximum_resources_used_by_atoms(self, lo_atom, hi_atom):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
+                                    number_of_machine_time_steps):
         """ Get the maximum resources that are used by a range of atoms
         
         :param lo_atom: The first atom in the range
         :type lo_atom: int
         :param hi_atom: The last atom in the range
         :type hi_atom: int
+        :param number_of_machine_time_steps: the number of time steps the \
+               machine will run through during this execution
+        :type number_of_machine_time_steps: long
         :return: An iterable of the various resource types used
         :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource.AbstractResource`
         """
-        pass
+
     
     def create_subvertex(self, lo_atom, hi_atom, label=None, 
             additional_constraints=None):
