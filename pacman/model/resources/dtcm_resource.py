@@ -12,9 +12,9 @@ class DTCMResource(AbstractResource):
         :type dtcm: int
         :raise None: No known exceptions are raised
         """
-        pass
+        self._dtcm = dtcm
     
     def get_value(self):
         """ See :py:meth:`pacman.model.resources.abstract_resource.AbstractResource.get_value`
         """
-        pass
+        return self._dtcm
