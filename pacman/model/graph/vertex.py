@@ -66,7 +66,7 @@ class Vertex(object):
                 or not isinstance(constraint, AbstractConstraint)):
             raise PacmanInvalidParameterException(
                 "constraint", constraint, "Must be a pacman.model."
-                                          "constraints.abstract_contsraint."
+                                          "constraints.abstract_constraint."
                                           "AbstractConstraint")
         self._constraints.append(constraint)
 
