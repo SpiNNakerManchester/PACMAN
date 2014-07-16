@@ -33,6 +33,16 @@ class Placements(object):
         self._subvertices = dict()
         self.add_placements(placements)
 
+    def add_placements(self,placements):
+        """
+        :param placements: The list of placements
+        :type placements: Iterable of :py:class:`pacman.model.placements.placement.Placement`
+        :return: None
+        :rtype: None
+        """
+        for placement in placements:
+            self.add_placement(placement)
+
     def add_placement(self, placement):
         """ Add a placement
 
@@ -45,11 +55,11 @@ class Placements(object):
                   the given chip
                 * If the subvertex has been placed elsewhere
         """
-        placement_id = _get_dict_id_for_placement(placement.x, placement.y, 
+        placement_id_string_representation = _get_dict_id_for_placement(placement.x, placement.y,
                 placement.p)
-
+        placement_id = (placement.x, placement.y, placement.p)
         if placement_id in self._placements:
-            raise PacmanAlreadyExistsException("placement", placement_id)
+            raise PacmanAlreadyExistsException("placement", placement_id_string_representation)
         if placement.subvertex in self._subvertices:
             raise PacmanAlreadyExistsException("subvertex", placement.subvertex)
         self._placements[placement_id] = placement
@@ -70,7 +80,7 @@ class Placements(object):
         :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: does not raise any known exceptions
         """
-        placement_id = _get_dict_id_for_placement(x, y, p)
+        placement_id = (x, y, p)
         if placement_id in self._placements:
             return self._placements[placement_id]
         return None
