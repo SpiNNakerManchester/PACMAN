@@ -25,6 +25,9 @@ class Graph(object):
         self._vertices = list()
         self._edges = list()
 
+        self._outgoing_edges = dict()
+        self._incoming_edges = dict()
+
         self.add_vertices(vertices)
         self.add_edges(edges)
 
@@ -40,6 +43,8 @@ class Graph(object):
         """
         if vertex is not None and isinstance(vertex, Vertex):
             self._vertices.append(vertex)
+            self._outgoing_edges[vertex] = list()
+            self._incoming_edges[vertex] = list()
         else:
             raise PacmanInvalidParameterException(
                     "vertex", vertex, 
@@ -72,6 +77,8 @@ class Graph(object):
         """
         if edge is not None and isinstance(edge, Edge):
             self._edges.append(edge)
+            self._outgoing_edges[edge.pre_vertex].append(edge)
+            self._incoming_edges[edge.post_vertex].append(edge)
         else:
             raise PacmanInvalidParameterException(
                     "edge", edge,
@@ -101,13 +108,9 @@ class Graph(object):
         :rtype: iterable of :py:class:`pacman.model.graph.edge.Edge`
         :raise None: does not raise any known exceptions
         """
-        outgoing_edges = list()
 
-        for edge in self._edges:
-            if edge.pre_vertex == vertex:
-                outgoing_edges.append(edge)
+        return self._outgoing_edges[vertex]
 
-        return outgoing_edges
 
     def incoming_edges_to_vertex(self, vertex):
         """ Locate a collection of edges for which vertex is the post_vertex.\
@@ -119,13 +122,8 @@ class Graph(object):
         :rtype: iterable of :py:class:`pacman.model.graph.edge.Edge`
         :raise None: does not raise any known exceptions
         """
-        incoming_edges = list()
 
-        for edge in self._edges:
-            if edge.post_vertex == vertex:
-                incoming_edges.append(edge)
-
-        return incoming_edges
+        return self._incoming_edges[vertex]
 
     @property
     def label(self):
