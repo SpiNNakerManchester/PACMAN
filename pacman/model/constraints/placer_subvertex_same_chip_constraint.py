@@ -13,7 +13,7 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
         :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._subvertex = subvertex
         
     def is_placer_constraint(self):
         """ Overridden method to indicate that this is a placer constraint
@@ -28,5 +28,5 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
         :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: does not raise any known exceptions
         """
-        return self._x
+        return self._subvertex
 
