@@ -16,7 +16,9 @@ class SubedgeRoutingInfo(object):
         :type mask: int
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._subedge = subedge
+        self._key = key
+        self._mask = mask
 
     @property
     def subedge(self):
@@ -26,7 +28,7 @@ class SubedgeRoutingInfo(object):
         :rtype: :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._subedge
 
     @property
     def key(self):
@@ -36,7 +38,7 @@ class SubedgeRoutingInfo(object):
         :rtype: int
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._key
 
     @property
     def mask(self):
@@ -46,4 +48,4 @@ class SubedgeRoutingInfo(object):
         :rtype: int
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._mask
