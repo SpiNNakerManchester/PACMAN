@@ -235,20 +235,53 @@ class Subgraph(object):
 
 
     def get_subvertices_from_vertex(self, vertex):
-        """ supporting method to get all subverts for a given vertex
+        """ supporting method to get all subvertices for a given vertex
 
-        :param vertex: the vertex for which to find the associated subvertexes
+        :param vertex: the vertex for which to find the associated subvertices
         :type vertex: pacman.model.graph.vertex.Vertex
-        :return: a list of subvertices
-        :rtype: iterable list
+        :return: a set of subvertices
+        :rtype: iterable set
         :raise None: Raises no known exceptions
         """
-        return self._subvertices_of_vertex[vertex]
+        if vertex in self._subvertices_of_vertex.keys():
+            return self._subvertices_of_vertex[vertex]
+        return None
     
     def get_subedges_from_edge(self, edge):
+        """ supporting method to get all subedges for a given edge
+
+        :param edge: the edge for which to find the associated subedges
+        :type edge: `pacman.model.graph.edge.Edge`
+        :return: a set of subedges
+        :rtype: iterable set
+        :raise None: Raises no known exceptions
         """
-        
-        :param edge: 
-        :return:
+        if edge in self._subedges_of_edge.keys():
+            return self._subedges_of_edge[edge]
+        return None
+
+    def get_vertex_from_subvertex(self, subvertex):
+        """ supporting method to get the vertex for a given subvertex
+
+        :param subvertex: the edge for which to find the associated subedges
+        :type subvertex: `pacman.model.subgraph.subvertex.Subvertex`
+        :return: a vertex
+        :rtype: `pacman.model.graph.vertex.Vertex`
+        :raise None: Raises no known exceptions
         """
-        return self._
+        if subvertex in self._vertex_of_subvertex.keys():
+            return self._vertex_of_subvertex[subvertex]
+        return None
+
+    def get_edge_from_subedge(self, subedge):
+        """ supporting method to get the edge for a given subedge
+
+        :param subedge: the subedge for which to find the associated edge
+        :type subedge: `pacman.model.subgraph.subedge.Subedge`
+        :return: an edge
+        :rtype: `pacman.model.graph.edge.Edge`
+        :raise None: Raises no known exceptions
+        """
+        if subedge in self._edge_of_subedge.keys():
+            return self._edge_of_subedge[subedge]
+        return None
