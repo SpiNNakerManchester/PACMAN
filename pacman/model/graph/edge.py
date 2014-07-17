@@ -35,9 +35,7 @@ class Edge(object):
         :type label: str
         :return: The created subedge
         :rtype: :py:class:`pacman.model.subgraph.subedge.Subedge`
-        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
-                    pre_subvertex is not a subvertex of the edge pre_vertex\
-                    or post_subvertex is not a subvertex of the edge post_vertex
+        :raise None: does not raise any known exceptions
         """
         if not isinstance(pre_subvertex, Subvertex):
             raise PacmanInvalidParameterException("pre_subvertex",pre_subvertex,"Must be a pacman.model"

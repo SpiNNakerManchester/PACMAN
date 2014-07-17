@@ -10,8 +10,6 @@ class Subgraph(object):
     def __init__(self, label=None, subvertices=None, subedges=None):
         """
 
-        :param graph: the graph of which this is a subgraph
-        :type graph: :py:class:`pacman.model.graph.graph.Graph`
         :param label: an identifier for the subgraph
         :type label: str
         :param subvertices: an iterable of vertices in the graph
@@ -65,11 +63,13 @@ class Subgraph(object):
             if subvertex.hi_atom >= vertex.n_atoms:
                 raise  PacmanInvalidParameterException("hi_atom ", subvertex.hi_atom, "Cannot be greater than"
                                                                              " the total number of atoms")
-        if subvertex in  self._subvertices_of_vertex[vertex]:
-            raise PacmanInvalidParameterException("Subvertex", subvertex, "Cannot have duplicate subvertices in the subgraph")
+            if subvertex in  self._subvertices_of_vertex[vertex]:
+                raise PacmanInvalidParameterException("Subvertex", subvertex,
+                                                            "Cannot have duplicate subvertices in the subgraph")
+            self._vertex_of_subvertex[subvertex] = vertex
 
-        self._subvertices_of_vertex[vertex].add(subvertex)
-        self._vertex_of_subvertex[subvertex] = vertex
+            self._subvertices_of_vertex[vertex].add(subvertex)
+
         self._subvertices.append(subvertex)
 
         self._outgoing_subedges[subvertex] = list()
@@ -106,18 +106,14 @@ class Subgraph(object):
                     "Must be an instance of"
                     " pacman.model.subgraph.subedge.Subedge")
 
-        # if self.pre_vertex not in pre_subvertex.:
-        #     raise PacmanInvalidParameterException("pre_subvertex",pre_subvertex,"Must be a subvertex of this vertex")
-        # if post_subvertex.vertex is not self.post_vertex:
-        #     raise PacmanInvalidParameterException("post_subvertex",post_subvertex,"Must be a subvertex of this vertex")
         if edge is not None and edge not in self._subedges_of_edge.keys():
             self._subedges_of_edge[edge] = set()
 
-        if subedge in  self._subedges_of_edge[edge]:
-            raise PacmanInvalidParameterException("Subedge", subedge, "Cannot have duplicate subedges in the subgraph")
-
-        self._subedges_of_edge[edge].add(subedge)
-        self._edge_of_subedge[subedge] = edge
+            if subedge in  self._subedges_of_edge[edge]:
+                raise PacmanInvalidParameterException("Subedge", subedge,
+                                                      "Cannot have duplicate subedges in the subgraph")
+            self._subedges_of_edge[edge].add(subedge)
+            self._edge_of_subedge[subedge] = edge
         self._subedges.append(subedge)
         
         self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
