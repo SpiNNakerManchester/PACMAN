@@ -14,7 +14,7 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         :type vertex: :py:class:`pacman.model.graph.vertex.Vertex`
         :raise None: does not raise any known exceptions
         """
-        pass
+        self._vertex = vertex
     
     def is_partitioner_constraint(self):
         """ Overridden method to indicate that this is a partitioner constraint
@@ -29,4 +29,4 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         :rtype: :py:class:`pacman.model.graph.vertex.Vertex`
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._vertex
