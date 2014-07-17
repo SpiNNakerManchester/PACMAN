@@ -30,8 +30,8 @@ class Vertex(object):
         """
         if n_atoms < 1:
             raise PacmanInvalidParameterException(
-                    "n_atoms", n_atoms,
-                    "Must be at least one atom in the vertex")
+                "n_atoms", str(n_atoms),
+                "Must be at least one atom in the vertex")
 
         self._label = label
         self._n_atoms = n_atoms
@@ -117,6 +117,8 @@ class Vertex(object):
                     only be one of each resource type.
         :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource.AbstractResource`
         """
+
+
 
     
     def create_subvertex(self, lo_atom, hi_atom, label=None, 
