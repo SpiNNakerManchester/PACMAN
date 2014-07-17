@@ -51,7 +51,7 @@ class Edge(object):
         if label is None and self.label is not None:
             label = self.label
 
-        return Subedge(self,pre_subvertex,post_subvertex,label)
+        return Subedge(pre_subvertex,post_subvertex,label)
 
     @property
     def pre_vertex(self):
