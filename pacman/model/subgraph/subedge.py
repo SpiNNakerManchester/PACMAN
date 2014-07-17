@@ -17,7 +17,10 @@ class Subedge(object):
         :type label: str
         :raise None: Raises no known exceptions
         """
-        pass
+        self._edge = edge
+        self._pre_subvertex = pre_subvertex
+        self._post_subvertex = post_subvertex
+        self._label = label
 
     @property
     def pre_subvertex(self):
@@ -27,7 +30,7 @@ class Subedge(object):
         :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: Raises no known exceptions
         """
-        pass
+        return  self._pre_subvertex
 
     @property
     def post_subvertex(self):
@@ -37,7 +40,7 @@ class Subedge(object):
         :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._post_subvertex
 
     @property
     def edge(self):
@@ -47,7 +50,7 @@ class Subedge(object):
         :rtype: :py:class:`pacman.model.graph.edge.Edge`
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._edge
 
     @property
     def label(self):
@@ -57,4 +60,4 @@ class Subedge(object):
         :rtype: str
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._label

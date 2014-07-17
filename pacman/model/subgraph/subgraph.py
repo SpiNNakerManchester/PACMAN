@@ -29,6 +29,10 @@ class Subgraph(object):
         self._subvertices = list()
         self._subedges = list()
 
+        self._outgoing_subedges = dict()
+        self._incoming_subedges = dict()
+        self._all_subvertices_of_a_vertex = dict()
+
         self.add_subvertices(subvertices)
         self.add_subedges(subedges)
 
@@ -48,6 +52,16 @@ class Subgraph(object):
                     "Must be an instance of" 
                     " pacman.model.subgraph.subvertex.SubVertex")
         self._subvertices.append(subvertex)
+        self._outgoing_subedges[subvertex] = list()
+        self._incoming_subedges[subvertex] = list()
+
+        if subvertex.vertex not in self._all_subvertices_of_a_vertex.keys():
+            self._all_subvertices_of_a_vertex[subvertex.vertex] = list()
+
+        self._all_subvertices_of_a_vertex[subvertex.vertex].append(subvertex)
+
+
+
 
     def add_subvertices(self, subvertices):
         """ Add some subvertices to this subgraph
@@ -80,6 +94,8 @@ class Subgraph(object):
                     "Must be an instance of"
                     " pacman.model.subgraph.subedge.Subedge")
         self._subedges.append(subedge)
+        self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
+        self._incoming_subedges[subedge.post_subvertex].append(subedge)
 
     def add_subedges(self, subedges):
         """ Add some subedges to this subgraph
@@ -106,7 +122,31 @@ class Subgraph(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subedge is not in the subgraph
         """
-        pass
+        is_subedge_in_subgraph = False
+        subedge_position_in_list = -1
+        for current_subedge_index in range(len(self.subedges)):
+            if subedge is self.subedges[current_subedge_index]:
+                is_subedge_in_subgraph = True
+                subedge_position_in_list = current_subedge_index
+                break
+
+        if subedge.post_subvertex not in self._incoming_subedges.keys() \
+                    or subedge.pre_subvertex not in self._outgoing_subedges.keys() or not is_subedge_in_subgraph:
+            raise PacmanInvalidParameterException("Subedge", subedge.label ," does not exist in the current subgraph")
+
+        #Delete subedge entry in list of subedges
+        del self.subedges[subedge_position_in_list]
+
+        #Delete subedge from list in dictionary of outgoing subedges
+        for current_subedge_index in range(len(self._outgoing_subedges[subedge])):
+            if subedge is self._outgoing_subedges[subedge][current_subedge_index]:
+                del self._outgoing_subedges[subedge][current_subedge_index]
+                break
+        #Delete subedge from list in dictionary of incoming subedges
+        for current_subedge_index in range(len(self._incoming_subedges[subedge])):
+            if subedge is self._incoming_subedges[subedge][current_subedge_index]:
+                del self._incoming_subedges[subedge][current_subedge_index]
+                break
 
     def outgoing_subedges_from_subvertex(self, subvertex):
         """ Locate the subedges for which subvertex is the pre_subvertex.\
@@ -119,13 +159,7 @@ class Subgraph(object):
         :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
-        outgoing_subedges = list()
-
-        for subedge in self._subedges:
-            if subedge.pre_subvertex == subvertex:
-                outgoing_subedges.append(subedge)
-
-        return outgoing_subedges
+        return self._outgoing_subedges[subvertex]
 
     def incoming_subedges_from_subvertex(self, subvertex):
         """ Locate the subedges for which subvertex is the post_subvertex.\
@@ -138,13 +172,7 @@ class Subgraph(object):
         :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
-        return_list = list()
-
-        for temp_subedge in self._subedges:
-            if temp_subedge.post_subvertex == subvertex:
-                return_list.append(temp_subedge)
-
-        return return_list
+        return self._incoming_subedges[subvertex]
 
     @property
     def graph(self):
@@ -195,4 +223,4 @@ class Subgraph(object):
         :rtype: iterable list
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._all_subvertices_of_a_vertex[vertex]
