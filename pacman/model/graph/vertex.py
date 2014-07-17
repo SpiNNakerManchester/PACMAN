@@ -142,18 +142,11 @@ class Vertex(object):
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
-        if lo_atom < 0:
-            raise  PacmanInvalidParameterException("lo_atom ", str(lo_atom), "Cannot be less than 0")
-        if  hi_atom >= self._n_atoms:
-            raise  PacmanInvalidParameterException("hi_atom ", str(hi_atom), "Cannot be greater than"
-                                                                             " the total number of atoms")
-        if lo_atom > hi_atom:
-            raise  PacmanInvalidParameterException("hi_atom ", str(hi_atom), "Cannot be less than lo_atom")
         if additional_constraints is None and self.constraints is not None:
             additional_constraints = list()
             additional_constraints.extend(self.constraints)
 
-        return Subvertex(self,lo_atom,hi_atom,label,additional_constraints)
+        return Subvertex(lo_atom,hi_atom,label,additional_constraints)
 
     @property
     def label(self):

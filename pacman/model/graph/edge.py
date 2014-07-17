@@ -45,10 +45,8 @@ class Edge(object):
         if not isinstance(post_subvertex, Subvertex):
             raise PacmanInvalidParameterException("post_subvertex",post_subvertex,"Must be a pacman.model"
                                                      ".subgraph.subvertex.Subvertex")
-        if pre_subvertex.vertex is not self.pre_vertex:
-            raise PacmanInvalidParameterException("pre_subvertex",pre_subvertex,"Must be a subvertex of this vertex")
-        if post_subvertex.vertex is not self.post_vertex:
-            raise PacmanInvalidParameterException("post_subvertex",post_subvertex,"Must be a subvertex of this vertex")
+
+
 
         if label is None and self.label is not None:
             label = self.label

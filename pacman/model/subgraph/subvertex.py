@@ -5,12 +5,9 @@ from pacman.exceptions import PacmanInvalidParameterException
 class Subvertex(object):
     """ Represents a sub-set of atoms from a Vertex
     """
-
-    def __init__(self, vertex, lo_atom, hi_atom, label=None, constraints=None):
+    def __init__(self, lo_atom, hi_atom, label=None, constraints=None):
         """
 
-        :param vertex: The vertex which this is a subvertex of
-        :type vertex: :py:class:`pacman.model.graph.vertex.Vertex`
         :param lo_atom: The id of the first atom in the subvertex with\
                         reference to the atoms in the vertex
         :type lo_atom: int
@@ -35,7 +32,6 @@ class Subvertex(object):
                     "hi_atom", hi_atom, "Cannot be less than lo_atom")
         
         self._label = label
-        self._vertex = vertex
         self._lo_atom = lo_atom
         self._hi_atom = hi_atom
         self._constraints = list()
@@ -143,13 +139,3 @@ class Subvertex(object):
         :raise None: Raises no known exceptions
         """
         return self._hi_atom
-    
-    @property
-    def vertex(self):
-        """ The vertex object to which the subvertex refers
-
-        :return: The vertex object
-        :rtype: :py:class:`pacman.model.graph.vertex.Vertex`
-        :raise None: Raises no known exceptions
-        """
-        return self._vertex
