@@ -51,15 +51,12 @@ class TestGraphModel(unittest.TestCase):
         self.assertEqual(subv_from_vert.constraints[0],constraint1)
         self.assertEqual(subv_from_vert.lo_atom,0)
         self.assertEqual(subv_from_vert.hi_atom,9)
-        self.assertEqual(subv_from_vert.vertex, vert)
 
     def test_create_new_vertex_create_subvertex_no_constraints(self):
-        constraint1 = PartitionerMaximumSizeConstraint(2)
         vert = MyVertex(10,"New Vertex")
         subv_from_vert = vert.create_subvertex(0,9)
         self.assertEqual(subv_from_vert.lo_atom,0)
         self.assertEqual(subv_from_vert.hi_atom,9)
-        self.assertEqual(subv_from_vert.vertex, vert)
 
     def test_create_new_edge(self):
         vert1 = MyVertex(10,"New Vertex 1")
