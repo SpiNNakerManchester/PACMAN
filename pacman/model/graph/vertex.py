@@ -12,6 +12,7 @@ class Vertex(object):
         total number of atoms in the subvertices adds up to the number of atoms\
         in the vertex
     """
+    _non_labelled_vertex_count = 0
     
     def __init__(self, n_atoms, label, constraints=None):
 
@@ -33,7 +34,11 @@ class Vertex(object):
                 "n_atoms", str(n_atoms),
                 "Must be at least one atom in the vertex")
 
-        self._label = label
+        if label is None:
+            self._label = "Population {}".format(self._vertex_count)
+            Vertex._non_labelled_vertex_count += 1
+        else:
+            self._label = label
         self._n_atoms = n_atoms
         self._constraints = list()
 
