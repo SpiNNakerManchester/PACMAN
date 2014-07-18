@@ -107,17 +107,13 @@ class Vertex(object):
         self.add_constraints(constraints)
         
     @abstractmethod
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
-                                    number_of_machine_time_steps):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
         """ Get the maximum resources that are used by a range of atoms
         
         :param lo_atom: The first atom in the range
         :type lo_atom: int
         :param hi_atom: The last atom in the range
         :type hi_atom: int
-        :param number_of_machine_time_steps: the number of time steps the \
-               machine will run through during this execution
-        :type number_of_machine_time_steps: long
         :return: An iterable of the various resource types used.  There should\
                     only be one of each resource type.
         :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource.AbstractResource`
