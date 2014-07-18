@@ -1,3 +1,6 @@
+from pacman.model.subgraph.subedge import Subedge
+from pacman.model.subgraph.subvertex import Subvertex
+from pacman.exceptions import PacmanInvalidParameterException
 class Edge(object):
     """ Represents a directional edge in a graph between two vertices
     """
@@ -32,11 +35,21 @@ class Edge(object):
         :type label: str
         :return: The created subedge
         :rtype: :py:class:`pacman.model.subgraph.subedge.Subedge`
-        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
-                    pre_subvertex is not a subvertex of the edge pre_vertex\
-                    or post_subvertex is not a subvertex of the edge post_vertex
+        :raise None: does not raise any known exceptions
         """
-        pass
+        if not isinstance(pre_subvertex, Subvertex):
+            raise PacmanInvalidParameterException("pre_subvertex",pre_subvertex,"Must be a pacman.model"
+                                                     ".subgraph.subvertex.Subvertex")
+        if not isinstance(post_subvertex, Subvertex):
+            raise PacmanInvalidParameterException("post_subvertex",post_subvertex,"Must be a pacman.model"
+                                                     ".subgraph.subvertex.Subvertex")
+
+
+
+        if label is None and self.label is not None:
+            label = self.label
+
+        return Subedge(pre_subvertex,post_subvertex,label)
 
     @property
     def pre_vertex(self):

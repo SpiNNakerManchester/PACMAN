@@ -3,10 +3,9 @@ class Subedge(object):
         vertices on either side of the edge
     """
 
-    def __init__(self, edge, pre_subvertex, post_subvertex, label=None):
+    def __init__(self, pre_subvertex, post_subvertex, label=None):
         """
-        :param edge: The edge which this is a subedge of
-        :type edge: :py:class:`pacman.model.graph.edge.Edge`
+
         :param pre_subvertex: the subvertex at the start of the subedge
         :type pre_subvertex:\
                     :py:class:`pacman.model.subgraph.subvertex.Subvertex`
@@ -17,7 +16,9 @@ class Subedge(object):
         :type label: str
         :raise None: Raises no known exceptions
         """
-        pass
+        self._pre_subvertex = pre_subvertex
+        self._post_subvertex = post_subvertex
+        self._label = label
 
     @property
     def pre_subvertex(self):
@@ -27,7 +28,7 @@ class Subedge(object):
         :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: Raises no known exceptions
         """
-        pass
+        return  self._pre_subvertex
 
     @property
     def post_subvertex(self):
@@ -37,17 +38,7 @@ class Subedge(object):
         :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: Raises no known exceptions
         """
-        pass
-
-    @property
-    def edge(self):
-        """ The edge to which this subedge refers
-
-        :return: the edge
-        :rtype: :py:class:`pacman.model.graph.edge.Edge`
-        :raise None: Raises no known exceptions
-        """
-        pass
+        return self._post_subvertex
 
     @property
     def label(self):
@@ -57,4 +48,4 @@ class Subedge(object):
         :rtype: str
         :raise None: Raises no known exceptions
         """
-        pass
+        return self._label
