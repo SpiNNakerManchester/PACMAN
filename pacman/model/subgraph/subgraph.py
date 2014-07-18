@@ -1,12 +1,12 @@
 from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.subgraph.subedge import Subedge
 from pacman.exceptions import PacmanInvalidParameterException
-
+from pacman.exceptions import PacmanAlreadyExistsException
 
 class Subgraph(object):
     """ Represents a partitioning of a graph
     """
-
+    #TODO 18/07 -> Update docs
     def __init__(self, label=None, subvertices=None, subedges=None):
         """
 
@@ -23,8 +23,8 @@ class Subgraph(object):
                     * If one of the subvertices is not valid
         """
         self._label = label
-        self._subvertices = list()
-        self._subedges = list()
+        self._subvertices = set()
+        self._subedges = set()
 
         self._vertex_of_subvertex = dict()
         self._edge_of_subedge = dict()
@@ -63,14 +63,15 @@ class Subgraph(object):
             if subvertex.hi_atom >= vertex.n_atoms:
                 raise  PacmanInvalidParameterException("hi_atom ", subvertex.hi_atom, "Cannot be greater than"
                                                                              " the total number of atoms")
-            if subvertex in  self._subvertices_of_vertex[vertex]:
-                raise PacmanInvalidParameterException("Subvertex", subvertex,
-                                                            "Cannot have duplicate subvertices in the subgraph")
-            self._vertex_of_subvertex[subvertex] = vertex
 
+            self._vertex_of_subvertex[subvertex] = vertex
             self._subvertices_of_vertex[vertex].add(subvertex)
 
-        self._subvertices.append(subvertex)
+        if subvertex not in self._subvertices:
+            self._subvertices.add(subvertex)
+        else:
+            raise PacmanAlreadyExistsException("Subvertex",subvertex)
+
 
         self._outgoing_subedges[subvertex] = list()
         self._incoming_subedges[subvertex] = list()
@@ -108,16 +109,27 @@ class Subgraph(object):
 
         if edge is not None and edge not in self._subedges_of_edge.keys():
             self._subedges_of_edge[edge] = set()
-
-            if subedge in  self._subedges_of_edge[edge]:
-                raise PacmanInvalidParameterException("Subedge", subedge,
-                                                      "Cannot have duplicate subedges in the subgraph")
             self._subedges_of_edge[edge].add(subedge)
             self._edge_of_subedge[subedge] = edge
-        self._subedges.append(subedge)
-        
-        self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
-        self._incoming_subedges[subedge.post_subvertex].append(subedge)
+
+        if subedge not in self._subedges:
+            self._subedges.add(subedge)
+        else:
+
+            raise PacmanAlreadyExistsException("Subedge", subedge)
+
+        if subedge.pre_subvertex in self._outgoing_subedges.keys():
+            self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
+        else:
+            raise PacmanInvalidParameterException(
+                "Subedge pre_subvertex",subedge.pre_subvertex,
+                " Must exist in the subgraph" )
+        if subedge.post_subvertex in self._incoming_subedges.keys():
+            self._incoming_subedges[subedge.post_subvertex].append(subedge)
+        else:
+            raise PacmanInvalidParameterException(
+                "Subedge post_subvertex",subedge.post_subvertex,
+                " Must exist in the subgraph" )
 
     def add_subedges(self, subedges, edge = None):
         """ Add some subedges to this subgraph
@@ -144,32 +156,26 @@ class Subgraph(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subedge is not in the subgraph
         """
-        subedge_position_in_list = -1
-        for current_subedge_index in range(len(self.subedges)):
-            if subedge is self.subedges[current_subedge_index]:
-                subedge_position_in_list = current_subedge_index
-                break
 
-        if subedge.post_subvertex not in self._incoming_subedges.keys() \
-                    or subedge.pre_subvertex not in self._outgoing_subedges.keys() or not subedge in self.subedges:
+
+        if subedge not in self._subedges:
             raise PacmanInvalidParameterException("Subedge", subedge.label ," does not exist in the current subgraph")
 
         #Delete subedge entry in list of subedges
-        del self.subedges[subedge_position_in_list]
+        self._subedges.remove(subedge)
 
         #Delete subedge from list in dictionary of outgoing subedges
-        for current_subedge_index in range(len(self._outgoing_subedges[subedge])):
-            if subedge is self._outgoing_subedges[subedge][current_subedge_index]:
-                del self._outgoing_subedges[subedge][current_subedge_index]
-                break
+        self._outgoing_subedges[subedge.pre_subvertex] = \
+                    [sub for sub in self._outgoing_subedges[subedge.pre_subvertex] if subedge is not sub]
+
         #Delete subedge from list in dictionary of incoming subedges
-        for current_subedge_index in range(len(self._incoming_subedges[subedge])):
-            if subedge is self._incoming_subedges[subedge][current_subedge_index]:
-                del self._incoming_subedges[subedge][current_subedge_index]
-                break
+        self._incoming_subedges[subedge.post_subvertex] = \
+                    [sub for sub in self._incoming_subedges[subedge.post_subvertex] if subedge is not sub]
 
         #Delete subedge from dictionary mapping from subedge to corresponding edge
-        del self._edge_of_subedge[subedge]
+        if subedge in  self._edge_of_subedge.keys():
+            self._subedges_of_edge[self._edge_of_subedge[subedge]].discard(subedge)
+            del self._edge_of_subedge[subedge]
 
 
 
