@@ -1,4 +1,6 @@
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from pacman.exceptions import PacmanInvalidParameterException
+
 
 class SubedgeMulticastRoutingEntry(MulticastRoutingEntry):
     """ A Multicast Routing Entry that additionally stores the subedges
@@ -20,7 +22,28 @@ class SubedgeMulticastRoutingEntry(MulticastRoutingEntry):
                     :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
-        pass
+        super(SubedgeMulticastRoutingEntry, self).__init__(key, mask, processor_ids, link_ids)
+        self._subedges = set()
+
+        if processor_ids is None:
+            raise PacmanInvalidParameterException("processor_ids", str(processor_ids), "Must not be None")
+
+        if link_ids is None:
+            raise PacmanInvalidParameterException("link_ids", str(link_ids), "Must not be None")
+
+        if subedges is not None and len(subedges) > 0:
+            self._subedges.update(subedges)
+            self._common_pre_subvertex = subedges[0].pre_subvertex
+            self._common_post_subvertex = subedges[0].post_subvertex
+            for subedge in subedges:
+                if subedge.pre_subvertex is not self._common_pre_subvertex:
+                    raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same pre_subvertex"
+                                                                                   " as the other subedges")
+                if subedge.post_subvertex is not self._common_post_subvertex:
+                    raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same post_subvertex"
+                                                                                   " as the other subedges")
+        else:
+            raise PacmanInvalidParameterException("subedges", str(subedges), "Must not be None or empty")
 
     @property
     def subedges(self):
@@ -30,7 +53,7 @@ class SubedgeMulticastRoutingEntry(MulticastRoutingEntry):
         :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._subedges
     
     def add_subedge(self, subedge, processor_ids, link_ids):
         """ Adds a subedge to the entry adding in the processor_ids and link_ids\
@@ -51,4 +74,12 @@ class SubedgeMulticastRoutingEntry(MulticastRoutingEntry):
                     subedge does not have the same pre_subvertex as the\
                     existing subedges
         """
-        pass
+        if subedge.pre_subvertex is not self._common_pre_subvertex:
+                    raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same pre_subvertex"
+                                                                                   " as the other subedges")
+        if subedge.post_subvertex is not self._common_post_subvertex:
+            raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same post_subvertex"
+                                                                           " as the other subedges")
+        self._subedges.add(subedge)
+        self._processor_ids.update(processor_ids)
+        self._link_ids.update(link_ids)

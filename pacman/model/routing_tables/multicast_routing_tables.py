@@ -1,3 +1,6 @@
+from pacman.exceptions import PacmanAlreadyExistsException
+
+
 class MulticastRoutingTables(object):
     """ Represents the multicast routing tables for a number of chips
     """
@@ -10,7 +13,12 @@ class MulticastRoutingTables(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
                     routing tables are for the same chip
         """
-        pass
+        self._routing_tables = set()
+        self._routing_tables_by_chip = dict()
+
+        if routing_tables is not None:
+            for routing_table in routing_tables:
+                self.add_routing_table(routing_table)
 
     def add_routing_table(self, routing_table):
         """ Add a routing table
@@ -23,7 +31,13 @@ class MulticastRoutingTables(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     table already exists for the chip
         """
-        pass
+        if routing_table in self._routing_tables:
+            raise PacmanAlreadyExistsException("Routing table", str(routing_table))
+
+        if (routing_table.x, routing_table.y) in self._routing_tables_by_chip.keys():
+            raise PacmanAlreadyExistsException("Routing table", str(routing_table))
+        self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = routing_table
+        self._routing_tables.add(routing_table)
 
     @property
     def routing_tables(self):
@@ -34,7 +48,7 @@ class MulticastRoutingTables(object):
                     :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._routing_tables
     
     def get_routing_table_for_chip(self, x, y):
         """ Get a routing table for a paricular chip
@@ -47,4 +61,4 @@ class MulticastRoutingTables(object):
         :rtype:  :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
         :raise None: No known exceptions are raised
         """
-        pass
+        return self._routing_tables_by_chip[(x, y)]

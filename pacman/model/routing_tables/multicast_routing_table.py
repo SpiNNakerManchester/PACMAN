@@ -1,3 +1,6 @@
+from pacman.exceptions import PacmanAlreadyExistsException
+
+
 class MulticastRoutingTable(object):
     """ Represents a routing table for a chip
     """
@@ -18,7 +21,14 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
                     routing entries contain the same key-mask combination
         """
-        pass
+        self._x = x
+        self._y = y
+        self._multicast_routing_entries = set()
+        self._multicast_routing_entries_by_key = dict()
+
+        if multicast_routing_entries is not None:
+            for multicast_routing_entry in multicast_routing_entries:
+                self.add_mutlicast_routing_entry(multicast_routing_entry)
 
     def add_mutlicast_routing_entry(self, multicast_routing_entry):
         """ Adds a routing entry to this table
@@ -31,7 +41,17 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
         """
-        pass
+        if (multicast_routing_entry.key, multicast_routing_entry.mask) not in\
+                self._multicast_routing_entries_by_key.keys():
+            self._multicast_routing_entries_by_key[(multicast_routing_entry.key, multicast_routing_entry.mask)] = set()
+
+        if (multicast_routing_entry.key, multicast_routing_entry.mask) in\
+                self._multicast_routing_entries_by_key[(multicast_routing_entry.key, multicast_routing_entry.mask)]:
+            raise PacmanAlreadyExistsException("Multicast_routing_entry", str(multicast_routing_entry))
+
+        self._multicast_routing_entries_by_key[(multicast_routing_entry.key, multicast_routing_entry.mask)].add(
+            multicast_routing_entry)
+        self._multicast_routing_entries.add(multicast_routing_entry)
     
     @property
     def x(self):
@@ -40,7 +60,7 @@ class MulticastRoutingTable(object):
         :return: The x-coordinate
         :rtype: int
         """
-        pass
+        return self._x
     
     @property
     def y(self):
@@ -49,7 +69,7 @@ class MulticastRoutingTable(object):
         :return: The y-coordinate
         :rtype: int
         """
-        pass
+        return self._y
 
     @property
     def multicast_routing_entries(self):
@@ -60,7 +80,7 @@ class MulticastRoutingTable(object):
                     :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._multicast_routing_entries
     
     def get_multicast_routing_entry_by_key(self, key, mask):
         """ Get the routing entry associated with the specified key-mask\
@@ -75,4 +95,4 @@ class MulticastRoutingTable(object):
         :rtype: :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
-        pass
+        return self._multicast_routing_entries_by_key[(key, mask)]
