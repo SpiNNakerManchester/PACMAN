@@ -26,10 +26,10 @@ class Subvertex(object):
         """
         if lo_atom < 0:
             raise PacmanInvalidParameterException(
-                    "lo_atom", lo_atom, "Cannot be less than 0")
+                "lo_atom", str(lo_atom), "Cannot be less than 0")
         if hi_atom < lo_atom:
             raise PacmanInvalidParameterException(
-                    "hi_atom", hi_atom, "Cannot be less than lo_atom")
+                "hi_atom", str(hi_atom), "Cannot be less than lo_atom")
         
         self._label = label
         self._lo_atom = lo_atom
@@ -52,9 +52,8 @@ class Subvertex(object):
         """
         if (constraint is None 
                 or not isinstance(constraint, AbstractConstraint)):
-            raise PacmanInvalidParameterException(
-                    "constraint", constraint, "Must be a pacman.model"
-                        ".constraints.abstract_constraint.AbstractConstraint")
+            raise PacmanInvalidParameterException("constraint", constraint, "Must be a pacman.model"
+                                                  ".constraints.abstract_constraint.AbstractConstraint")
         self._constraints.append(constraint)
 
     def add_constraints(self, constraints):

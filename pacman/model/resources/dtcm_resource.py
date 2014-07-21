@@ -1,5 +1,6 @@
 from pacman.model.resources.abstract_resource import AbstractResource
 
+
 class DTCMResource(AbstractResource):
     """ Represents the amount of local core memory available or used on a core\
         on a chip of the machine

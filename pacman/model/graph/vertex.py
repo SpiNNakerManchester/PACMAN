@@ -5,6 +5,7 @@ from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.subgraph.subvertex import Subvertex
 
+
 @add_metaclass(ABCMeta)
 class Vertex(object):
     """ Represents a Vertex of a graph, which contains a number of atoms, and\
@@ -119,9 +120,6 @@ class Vertex(object):
         :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource.AbstractResource`
         """
 
-
-
-    
     def create_subvertex(self, lo_atom, hi_atom, label=None, 
                          additional_constraints=None):
         """ Creates a subvertex of this vertex.  Can be overridden in vertex\
@@ -149,7 +147,7 @@ class Vertex(object):
             additional_constraints = list()
             additional_constraints.extend(self.constraints)
 
-        return Subvertex(lo_atom,hi_atom,label,additional_constraints)
+        return Subvertex(lo_atom, hi_atom, label, additional_constraints)
 
     @property
     def label(self):

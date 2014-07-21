@@ -28,7 +28,7 @@ class Subedge(object):
         :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: Raises no known exceptions
         """
-        return  self._pre_subvertex
+        return self._pre_subvertex
 
     @property
     def post_subvertex(self):

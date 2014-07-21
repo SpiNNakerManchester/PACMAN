@@ -1,4 +1,6 @@
 from pacman.exceptions import PacmanAlreadyExistsException
+
+
 class RoutingInfo(object):
     """ An association of a set of subedges to a non-overlapping set of keys\
         and masks
@@ -22,7 +24,6 @@ class RoutingInfo(object):
         for subedge_info_item in subedge_info_items:
             self.add_subedge_info(subedge_info_item)
 
-
     def add_subedge_info(self, subedge_info):
         """ Add a subedge information item
         
@@ -36,8 +37,8 @@ class RoutingInfo(object):
                     which does not have the same source subvertex
         """
         if subedge_info.key in self._subedge_info_by_key.keys():
-            raise PacmanAlreadyExistsException("The key already exists in the routing information",\
-                                                   str(subedge_info.key))
+            raise PacmanAlreadyExistsException("The key already exists in the routing information",
+                                               str(subedge_info.key))
         else:
             self._subedge_info_by_key[subedge_info.key] = subedge_info
 

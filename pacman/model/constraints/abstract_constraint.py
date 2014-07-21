@@ -2,6 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
+
 @add_metaclass(ABCMeta)
 class AbstractConstraint(object):
     """ This represents a general constraint in PACMAN, which tells the various\
@@ -28,4 +29,3 @@ class AbstractConstraint(object):
                     if not any(key in B.__dict__ for B in othercls.__mro__):
                         return NotImplemented
         return True
-    

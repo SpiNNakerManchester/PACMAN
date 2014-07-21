@@ -47,8 +47,7 @@ class Graph(object):
             self._incoming_edges[vertex] = list()
         else:
             raise PacmanInvalidParameterException(
-                    "vertex", vertex, 
-                    "Must be an instance of pacman.model.graph.vertex.Vertex")
+                "vertex", str(vertex), "Must be an instance of pacman.model.graph.vertex.Vertex")
 
     def add_vertices(self, vertices):
         """ Add an iterable of vertices to this graph
@@ -63,7 +62,6 @@ class Graph(object):
         if vertices is not None:
             for next_vertex in vertices:
                 self.add_vertex(next_vertex)
-
 
     def add_edge(self, edge):
         """ Add an edge to this graph
@@ -81,8 +79,7 @@ class Graph(object):
             self._incoming_edges[edge.post_vertex].append(edge)
         else:
             raise PacmanInvalidParameterException(
-                    "edge", edge,
-                    "Must be an instance of pacman.model.graph.edge.Edge")
+                "edge", str(edge), "Must be an instance of pacman.model.graph.edge.Edge")
 
     def add_edges(self, edges):
         """ Add an iterable of edges to this graph
@@ -111,7 +108,6 @@ class Graph(object):
 
         return self._outgoing_edges[vertex]
 
-
     def incoming_edges_to_vertex(self, vertex):
         """ Locate a collection of edges for which vertex is the post_vertex.\
             Can return an empty collection.
@@ -122,7 +118,6 @@ class Graph(object):
         :rtype: iterable of :py:class:`pacman.model.graph.edge.Edge`
         :raise None: does not raise any known exceptions
         """
-
         return self._incoming_edges[vertex]
 
     @property

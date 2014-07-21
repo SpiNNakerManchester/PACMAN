@@ -1,5 +1,6 @@
 from pacman.exceptions import PacmanAlreadyExistsException
 
+
 def _get_dict_id_for_placement(x, y, p):
     """ Get an id that can be used in a dictionary of placements
     
@@ -13,6 +14,7 @@ def _get_dict_id_for_placement(x, y, p):
     :rtype: str
     """
     return "{}.{}.{}".format(x, y, p)
+
 
 class Placements(object):
     """ Represents a list of placements
@@ -33,7 +35,7 @@ class Placements(object):
         self._subvertices = dict()
         self.add_placements(placements)
 
-    def add_placements(self,placements):
+    def add_placements(self, placements):
         """
         :param placements: The list of placements
         :type placements: iterable of :py:class:`pacman.model.placements.placement.Placement`
@@ -55,13 +57,12 @@ class Placements(object):
                   the given chip
                 * If the subvertex has been placed elsewhere
         """
-        placement_id_string_representation = _get_dict_id_for_placement(placement.x, placement.y,
-                placement.p)
+        placement_id_string_representation = _get_dict_id_for_placement(placement.x, placement.y, placement.p)
         placement_id = (placement.x, placement.y, placement.p)
         if placement_id in self._placements:
             raise PacmanAlreadyExistsException("placement", placement_id_string_representation)
         if placement.subvertex in self._subvertices:
-            raise PacmanAlreadyExistsException("subvertex", placement.subvertex)
+            raise PacmanAlreadyExistsException("subvertex", str(placement.subvertex))
         self._placements[placement_id] = placement
         self._subvertices[placement.subvertex] = placement
 

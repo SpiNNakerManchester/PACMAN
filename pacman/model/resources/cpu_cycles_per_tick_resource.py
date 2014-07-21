@@ -1,5 +1,6 @@
 from pacman.model.resources.abstract_resource import AbstractResource
 
+
 class CPUCyclesPerTickResource(AbstractResource):
     """ Represents the number of CPU clock cycles per tick used or available\
         on a core of a chip in the machine

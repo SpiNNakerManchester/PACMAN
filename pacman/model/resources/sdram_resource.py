@@ -1,5 +1,6 @@
 from pacman.model.resources.abstract_resource import AbstractResource
 
+
 class SDRAMResource(AbstractResource):
     """ Represents an amount of SDRAM used or available on a chip in the machine
     """
