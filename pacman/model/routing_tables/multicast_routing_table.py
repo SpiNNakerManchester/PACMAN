@@ -41,16 +41,16 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
         """
-        if (multicast_routing_entry.key, multicast_routing_entry.mask) not in\
+        key_mask_combo = multicast_routing_entry.key & multicast_routing_entry.mask
+        if key_mask_combo not in\
                 self._multicast_routing_entries_by_key.keys():
-            self._multicast_routing_entries_by_key[(multicast_routing_entry.key, multicast_routing_entry.mask)] = set()
+            self._multicast_routing_entries_by_key[key_mask_combo] = set()
 
-        if (multicast_routing_entry.key, multicast_routing_entry.mask) in\
-                self._multicast_routing_entries_by_key[(multicast_routing_entry.key, multicast_routing_entry.mask)]:
+        if key_mask_combo in\
+                self._multicast_routing_entries_by_key[key_mask_combo]:
             raise PacmanAlreadyExistsException("Multicast_routing_entry", str(multicast_routing_entry))
 
-        self._multicast_routing_entries_by_key[(multicast_routing_entry.key, multicast_routing_entry.mask)].add(
-            multicast_routing_entry)
+        self._multicast_routing_entries_by_key[key_mask_combo].add(multicast_routing_entry)
         self._multicast_routing_entries.add(multicast_routing_entry)
     
     @property
@@ -95,4 +95,6 @@ class MulticastRoutingTable(object):
         :rtype: :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
-        return self._multicast_routing_entries_by_key[(key, mask)]
+        if key & mask in self._multicast_routing_entries_by_key.keys():
+            return self._multicast_routing_entries_by_key[key & mask]
+        return None
