@@ -49,3 +49,13 @@ class SubedgeRoutingInfo(object):
         :raise None: does not raise any known exceptions
         """
         return self._mask
+
+    @property
+    def key_mask_combo(self):
+        """ The combination of the key and the mask
+
+        :return: the key mask combo
+        :rtype: int
+        :raise None: does not raise any known exceptions
+        """
+        return self._key & self._mask
