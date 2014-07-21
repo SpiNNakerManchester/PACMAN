@@ -1,21 +1,6 @@
 from pacman.exceptions import PacmanAlreadyExistsException
 
 
-def _get_dict_id_for_placement(x, y, p):
-    """ Get an id that can be used in a dictionary of placements
-    
-    :param x: The x-coordinate of the placement
-    :type x: int
-    :param y: The y-coordinate of the placement
-    :type y: int
-    :param p: The processor of the placement
-    :type p: int
-    :return: A string to use as the dictionary id
-    :rtype: str
-    """
-    return "{}.{}.{}".format(x, y, p)
-
-
 class Placements(object):
     """ Represents a list of placements
     """
@@ -42,8 +27,9 @@ class Placements(object):
         :return: None
         :rtype: None
         """
-        for placement in placements:
-            self.add_placement(placement)
+        if placements is not None:
+            for placement in placements:
+                self.add_placement(placement)
 
     def add_placement(self, placement):
         """ Add a placement
@@ -57,12 +43,12 @@ class Placements(object):
                   the given chip
                 * If the subvertex has been placed elsewhere
         """
-        placement_id_string_representation = _get_dict_id_for_placement(placement.x, placement.y, placement.p)
         placement_id = (placement.x, placement.y, placement.p)
-        if placement_id in self._placements:
-            raise PacmanAlreadyExistsException("placement", placement_id_string_representation)
-        if placement.subvertex in self._subvertices:
+        if placement_id in self._placements.keys():
+            raise PacmanAlreadyExistsException("placement", str(placement_id))
+        if placement.subvertex in self._subvertices.keys():
             raise PacmanAlreadyExistsException("subvertex", str(placement.subvertex))
+
         self._placements[placement_id] = placement
         self._subvertices[placement.subvertex] = placement
 
@@ -83,7 +69,7 @@ class Placements(object):
         """
         placement_id = (x, y, p)
         if placement_id in self._placements:
-            return self._placements[placement_id]
+            return self._placements[placement_id].subvertex
         return None
     
     def get_placement_of_subvertex(self, subvertex):
