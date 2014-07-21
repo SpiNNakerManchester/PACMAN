@@ -65,6 +65,7 @@ class Subgraph(object):
                 raise PacmanInvalidParameterException("hi_atom ", str(subvertex.hi_atom), "Cannot be greater than"
                                                       " the total number of atoms")
 
+        if vertex is not None:
             self._vertex_of_subvertex[subvertex] = vertex
             self._subvertices_of_vertex[vertex].add(subvertex)
 
@@ -109,13 +110,14 @@ class Subgraph(object):
 
         if edge is not None and edge not in self._subedges_of_edge.keys():
             self._subedges_of_edge[edge] = set()
+
+        if edge is not None:
             self._subedges_of_edge[edge].add(subedge)
             self._edge_of_subedge[subedge] = edge
 
         if subedge not in self._subedges:
             self._subedges.add(subedge)
         else:
-
             raise PacmanAlreadyExistsException("Subedge", str(subedge))
 
         if subedge.pre_subvertex in self._outgoing_subedges.keys():

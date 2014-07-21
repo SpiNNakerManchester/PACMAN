@@ -6,8 +6,10 @@ from pacman.model.graph.graph import Graph, Vertex, Edge
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 class MyVertex(Vertex):
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
-                                    number_of_machine_time_steps):
+    def __init__(self,n_atoms, label, constraints=None):
+        super(MyVertex, self).__init__(n_atoms, label, constraints)
+
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom, number_of_machine_time_steps):
         pass
 
 class TestSubgraphModel(unittest.TestCase):
@@ -101,7 +103,7 @@ class TestSubgraphModel(unittest.TestCase):
             subgraph = Subgraph(None, subvertices, subedges)
 
 
-    def test_get_subvertices_from_vertex(self):
+    def test_remove_inexistent_subedge(self):
         with self.assertRaises(PacmanInvalidParameterException):
             subvertices = list()
             subedges = list()
@@ -137,13 +139,75 @@ class TestSubgraphModel(unittest.TestCase):
             graph.add_subedge(sube, edge)
 
     def test_get_subedges_from_edge(self):
-        pass
+        subvertices = list()
+        subedges = list()
+        subvertices.append(Subvertex(0,4))
+        subvertices.append(Subvertex(5,9))
+        subedges.append(Subedge(subvertices[0],subvertices[(1)]))
+        subedges.append(Subedge(subvertices[1],subvertices[(1)]))
+        sube= Subedge(subvertices[1],subvertices[(0)])
+        subedges.append(sube)
+        graph = Subgraph(None, subvertices, [subedges[1]])
+        edge = Edge(MyVertex(10,"pre"),MyVertex(5,"post"))
+        graph.add_subedge(sube, edge)
+        graph.add_subedge(subedges[0],edge)
+        subedges_from_edge = graph.get_subedges_from_edge(edge)
+        self.assertIn(sube,subedges_from_edge)
+        self.assertIn(subedges[0],subedges_from_edge)
+        self.assertNotIn(subedges[1],subedges_from_edge)
+
+    def test_get_subvertices_from_vertex(self):
+        subvertices = list()
+        subedges = list()
+        subvertices.append(Subvertex(0,4))
+        subvertices.append(Subvertex(5,9))
+        subedges.append(Subedge(subvertices[0], subvertices[(1)]))
+        subedges.append(Subedge(subvertices[1], subvertices[(1)]))
+        subvert1 = Subvertex(1,2)
+        subvert2 = Subvertex(3,4)
+        graph = Subgraph(None, subvertices, subedges)
+        vert = MyVertex(4, "Some testing vertex")
+        graph.add_subvertices([subvert1,subvert2],vert)
+        returned_subverts = graph.get_subvertices_from_vertex(vert)
+        self.assertIn(subvert1,returned_subverts)
+        self.assertIn(subvert2,returned_subverts)
+        for sub in subvertices:
+            self.assertNotIn(sub, returned_subverts)
 
     def test_get_vertex_from_subvertex(self):
-        pass
+        subvertices = list()
+        subedges = list()
+        subvertices.append(Subvertex(0,4))
+        subvertices.append(Subvertex(5,9))
+        subedges.append(Subedge(subvertices[0], subvertices[(1)]))
+        subedges.append(Subedge(subvertices[1], subvertices[(1)]))
+        subvert1 = Subvertex(1,2)
+        subvert2 = Subvertex(3,4)
+        graph = Subgraph(None, subvertices, subedges)
+        vert = MyVertex(4, "Some testing vertex")
+        graph.add_subvertices([subvert1,subvert2],vert)
+        self.assertEqual(vert, graph.get_vertex_from_subvertex(subvert1))
+        self.assertEqual(vert, graph.get_vertex_from_subvertex(subvert2))
+        self.assertEqual(None, graph.get_vertex_from_subvertex(subvertices[0]))
+        self.assertEqual(None, graph.get_vertex_from_subvertex(subvertices[1]))
 
     def test_get_edge_from_subedge(self):
-        pass
+        subvertices = list()
+        subedges = list()
+        subvertices.append(Subvertex(0,4))
+        subvertices.append(Subvertex(5,9))
+        subedges.append(Subedge(subvertices[0],subvertices[(1)]))
+        subedges.append(Subedge(subvertices[1],subvertices[(1)]))
+        sube= Subedge(subvertices[1],subvertices[(0)])
+        subedges.append(sube)
+        graph = Subgraph(None, subvertices, [subedges[1]])
+        edge = Edge(MyVertex(10,"pre"),MyVertex(5,"post"))
+        graph.add_subedge(sube, edge)
+        graph.add_subedge(subedges[0],edge)
+        edge_from_subedge = graph.get_edge_from_subedge(sube)
+        self.assertEqual(edge_from_subedge, edge)
+        self.assertEqual(graph.get_edge_from_subedge(subedges[0]), edge)
+        self.assertEqual(graph.get_edge_from_subedge(subedges[1]), None)
 
     def test_delete_inexistent_subedge(self):
         with self.assertRaises(PacmanInvalidParameterException):
