@@ -1,4 +1,5 @@
-from pacman.model.constraints.abstract_partitioner_constraint import AbstractPartitionerConstraint
+from pacman.model.constraints.abstract_partitioner_constraint \
+    import AbstractPartitionerConstraint
 
 
 class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):

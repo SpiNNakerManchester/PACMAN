@@ -45,9 +45,11 @@ class Placements(object):
         """
         placement_id = (placement.x, placement.y, placement.p)
         if placement_id in self._placements.keys():
-            raise PacmanAlreadyExistsException("placement", str(placement_id))
+            raise PacmanAlreadyExistsException("placement",
+                                               str(placement_id))
         if placement.subvertex in self._subvertices.keys():
-            raise PacmanAlreadyExistsException("subvertex", str(placement.subvertex))
+            raise PacmanAlreadyExistsException("subvertex",
+                                               str(placement.subvertex))
 
         self._placements[placement_id] = placement
         self._subvertices[placement.subvertex] = placement

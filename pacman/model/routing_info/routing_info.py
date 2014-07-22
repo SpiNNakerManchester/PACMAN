@@ -36,9 +36,11 @@ class RoutingInfo(object):
         """
         if subedge_info.key_mask_combo in self._subedge_info_by_key.keys()\
                 and subedge_info.subedge.pre_subvertex is not\
-                self._subedge_info_by_key[subedge_info.key_mask_combo].subedge.pre_subvertex:
-            raise PacmanAlreadyExistsException("The key already exists in the routing information",
-                                               str(subedge_info.key_mask_combo))
+                self._subedge_info_by_key[subedge_info.key_mask_combo]\
+                .subedge.pre_subvertex:
+            raise PacmanAlreadyExistsException(
+                "The key already exists in the routing information",
+                str(subedge_info.key_mask_combo))
 
         self._subedge_info_by_key[subedge_info.key_mask_combo] = subedge_info
         self._subedge_info.append(subedge_info)

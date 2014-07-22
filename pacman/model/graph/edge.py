@@ -40,11 +40,15 @@ class Edge(object):
         :raise None: does not raise any known exceptions
         """
         if not isinstance(pre_subvertex, Subvertex):
-            raise PacmanInvalidParameterException("pre_subvertex", str(pre_subvertex), "Must be a pacman.model"
-                                                  ".subgraph.subvertex.Subvertex")
+            raise PacmanInvalidParameterException(
+                "pre_subvertex", str(pre_subvertex),
+                "Must be a pacman.model"
+                ".subgraph.subvertex.Subvertex")
         if not isinstance(post_subvertex, Subvertex):
-            raise PacmanInvalidParameterException("post_subvertex", str(post_subvertex), "Must be a pacman.model"
-                                                  ".subgraph.subvertex.Subvertex")
+            raise PacmanInvalidParameterException(
+                "post_subvertex",
+                str(post_subvertex),
+                "Must be a pacman.model.subgraph.subvertex.Subvertex")
 
         if label is None and self.label is not None:
             label = self.label
