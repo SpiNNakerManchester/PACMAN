@@ -55,15 +55,24 @@ class Subgraph(object):
                 "Must be an instance of"
                 " pacman.model.subgraph.subvertex.SubVertex")
         if subvertex.lo_atom < 0:
-            raise PacmanInvalidParameterException("lo_atom ", str(subvertex.lo_atom), "Cannot be less than 0")
+            raise PacmanInvalidParameterException(
+                "lo_atom ",
+                str(subvertex.lo_atom),
+                "Cannot be less than 0")
         if subvertex.lo_atom > subvertex.hi_atom:
-            raise PacmanInvalidParameterException("hi_atom ", str(subvertex.hi_atom), "Cannot be less than lo_atom")
+            raise PacmanInvalidParameterException(
+                "hi_atom ",
+                str(subvertex.hi_atom),
+                "Cannot be less than lo_atom")
 
-        if vertex is not None and vertex not in self._subvertices_of_vertex.keys():
+        if vertex is not None\
+                and vertex not in self._subvertices_of_vertex.keys():
             self._subvertices_of_vertex[vertex] = set()
             if subvertex.hi_atom >= vertex.n_atoms:
-                raise PacmanInvalidParameterException("hi_atom ", str(subvertex.hi_atom), "Cannot be greater than"
-                                                      " the total number of atoms")
+                raise PacmanInvalidParameterException(
+                    "hi_atom ",
+                    str(subvertex.hi_atom),
+                    "Cannot be greater than the total number of atoms")
 
         if vertex is not None:
             self._vertex_of_subvertex[subvertex] = vertex
@@ -159,22 +168,29 @@ class Subgraph(object):
                     subedge is not in the subgraph
         """
         if subedge not in self._subedges:
-            raise PacmanInvalidParameterException("Subedge", subedge.label, " does not exist in the current subgraph")
+            raise PacmanInvalidParameterException(
+                "Subedge",
+                subedge.label,
+                " does not exist in the current subgraph")
 
         #Delete subedge entry in list of subedges
         self._subedges.remove(subedge)
 
         #Delete subedge from list in dictionary of outgoing subedges
         self._outgoing_subedges[subedge.pre_subvertex] = \
-            [sub for sub in self._outgoing_subedges[subedge.pre_subvertex] if subedge is not sub]
+            [sub for sub in self._outgoing_subedges[subedge.pre_subvertex]
+             if subedge is not sub]
 
         #Delete subedge from list in dictionary of incoming subedges
         self._incoming_subedges[subedge.post_subvertex] = \
-            [sub for sub in self._incoming_subedges[subedge.post_subvertex] if subedge is not sub]
+            [sub for sub in self._incoming_subedges[subedge.post_subvertex]
+             if subedge is not sub]
 
-        #Delete subedge from dictionary mapping from subedge to corresponding edge
+        #Delete subedge from dictionary mapping from subedge to
+        # corresponding edge
         if subedge in self._edge_of_subedge.keys():
-            self._subedges_of_edge[self._edge_of_subedge[subedge]].discard(subedge)
+            self._subedges_of_edge[self._edge_of_subedge[subedge]]\
+                .discard(subedge)
             del self._edge_of_subedge[subedge]
 
     def outgoing_subedges_from_subvertex(self, subvertex):

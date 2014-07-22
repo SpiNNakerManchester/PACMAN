@@ -23,7 +23,8 @@ class Placements(object):
     def add_placements(self, placements):
         """
         :param placements: The list of placements
-        :type placements: iterable of :py:class:`pacman.model.placements.placement.Placement`
+        :type placements: iterable of :py:class:`pacman.model.placements\
+        .placement.Placement`
         :return: None
         :rtype: None
         """
@@ -47,7 +48,8 @@ class Placements(object):
         if placement_id in self._placements.keys():
             raise PacmanAlreadyExistsException("placement", str(placement_id))
         if placement.subvertex in self._subvertices.keys():
-            raise PacmanAlreadyExistsException("subvertex", str(placement.subvertex))
+            raise PacmanAlreadyExistsException("subvertex",
+                                               str(placement.subvertex))
 
         self._placements[placement_id] = placement
         self._subvertices[placement.subvertex] = placement

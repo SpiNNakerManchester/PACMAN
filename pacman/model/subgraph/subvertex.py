@@ -18,7 +18,8 @@ class Subvertex(object):
         :type label: str
         :param constraints: The constraints of the subvertex
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
                     * If lo_atom is less than 0
@@ -44,7 +45,8 @@ class Subvertex(object):
 
         :param constraint: constraint to add
         :type constraint:\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -52,8 +54,11 @@ class Subvertex(object):
         """
         if (constraint is None 
                 or not isinstance(constraint, AbstractConstraint)):
-            raise PacmanInvalidParameterException("constraint", constraint, "Must be a pacman.model"
-                                                  ".constraints.abstract_constraint.AbstractConstraint")
+            raise PacmanInvalidParameterException(
+                "constraint",
+                constraint,
+                "Must be a pacman.model"
+                ".constraints.abstract_constraint.AbstractConstraint")
         self._constraints.append(constraint)
 
     def add_constraints(self, constraints):
@@ -62,7 +67,8 @@ class Subvertex(object):
 
         :param constraints: iterable of constraints to add
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\
@@ -79,7 +85,8 @@ class Subvertex(object):
 
         :param constraints: iterable of constraints to set
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\
@@ -114,7 +121,8 @@ class Subvertex(object):
 
         :return: iterable of constraints
         :rtype: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :raise None: Raises no known exceptions
         """
         return self._constraints

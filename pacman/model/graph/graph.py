@@ -47,7 +47,8 @@ class Graph(object):
             self._incoming_edges[vertex] = list()
         else:
             raise PacmanInvalidParameterException(
-                "vertex", str(vertex), "Must be an instance of pacman.model.graph.vertex.Vertex")
+                "vertex", str(vertex),
+                "Must be an instance of pacman.model.graph.vertex.Vertex")
 
     def add_vertices(self, vertices):
         """ Add an iterable of vertices to this graph
@@ -79,7 +80,8 @@ class Graph(object):
             self._incoming_edges[edge.post_vertex].append(edge)
         else:
             raise PacmanInvalidParameterException(
-                "edge", str(edge), "Must be an instance of pacman.model.graph.edge.Edge")
+                "edge", str(edge),
+                "Must be an instance of pacman.model.graph.edge.Edge")
 
     def add_edges(self, edges):
         """ Add an iterable of edges to this graph

@@ -17,7 +17,8 @@ class MulticastRoutingTable(object):
         :param multicast_routing_entries: An iterable of routing entries to add\
                     to the table
         :type multicast_routing_entries: iterable of\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.multicast_routing_entry\
+                    .MulticastRoutingEntry`
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
                     routing entries contain the same key-mask combination
         """
@@ -35,18 +36,22 @@ class MulticastRoutingTable(object):
 
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.multicast_routing_entry\
+                    .MulticastRoutingEntry`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
         """
-        key_mask_combo = multicast_routing_entry.key & multicast_routing_entry.mask
+        key_mask_combo = multicast_routing_entry.key &\
+            multicast_routing_entry.mask
         if key_mask_combo in\
                 self._multicast_routing_entries_by_key.keys():
-            raise PacmanAlreadyExistsException("Multicast_routing_entry", str(multicast_routing_entry))
+            raise PacmanAlreadyExistsException("Multicast_routing_entry",
+                                               str(multicast_routing_entry))
 
-        self._multicast_routing_entries_by_key[key_mask_combo] = multicast_routing_entry
+        self._multicast_routing_entries_by_key[key_mask_combo] = \
+            multicast_routing_entry
         self._multicast_routing_entries.add(multicast_routing_entry)
     
     @property
@@ -73,7 +78,8 @@ class MulticastRoutingTable(object):
 
         :return: an iterable of multicast routing entries
         :rtype: iterable of\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.multicast_routing_entry\
+                    .MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
         return self._multicast_routing_entries
@@ -88,7 +94,8 @@ class MulticastRoutingTable(object):
         :type mask: int
         :return: the routing entry associated with the routing key or None if\
                     no such entry exists
-        :rtype: :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+        :rtype: :py:class:`spinn_machine.multicast_routing_entry\
+        .MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
         if key & mask in self._multicast_routing_entries_by_key.keys():
