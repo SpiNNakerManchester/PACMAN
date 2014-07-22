@@ -82,6 +82,13 @@ class TestRoutingTables(unittest.TestCase):
         ri = RoutingInfo([sri])
         self.assertEqual(ri.get_subedge_info_by_key(0xff12,0x000f),None)
 
+    def test_get_key_from_subedge_info(self):
+        subv1 = Subvertex(0,1)
+        subv2 = Subvertex(2,3)
+        sube = Subedge(subv1,subv2)
+        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
+        ri = RoutingInfo([sri])
+        self.assertEqual(ri.get_key_from_subedge(sri),0x0012)
 
 if __name__ == '__main__':
     unittest.main()
