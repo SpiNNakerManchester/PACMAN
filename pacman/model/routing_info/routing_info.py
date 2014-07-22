@@ -18,6 +18,7 @@ class RoutingInfo(object):
         """
         self._subedge_info_by_key = dict()
         self._subedge_info = list()
+        self._key_from_subedge = dict()
         if subedge_info_items is not None:
             for subedge_info_item in subedge_info_items:
                 self.add_subedge_info(subedge_info_item)
@@ -44,6 +45,7 @@ class RoutingInfo(object):
 
         self._subedge_info_by_key[subedge_info.key_mask_combo] = subedge_info
         self._subedge_info.append(subedge_info)
+        self._key_from_subedge[subedge_info] = subedge_info.key
 
     @property
     def all_subedge_info(self):
@@ -74,3 +76,16 @@ class RoutingInfo(object):
             return self._subedge_info_by_key[key_mask_combo]
         return None
 
+    def get_key_from_subedge(self, subedge):
+        """ Get the key  associated with a particular routing information
+
+        :param subedge: The routing information
+        :type subedge:
+            :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
+        :return: The routing key or None if the subedge does not exist
+        :rtype:
+        :raise None: does not raise any known exceptions
+        """
+        if subedge in self._subedge_info:
+            return self._key_from_subedge[subedge]
+        return None
