@@ -32,16 +32,10 @@ class SubedgeMulticastRoutingEntry(MulticastRoutingEntry):
             raise PacmanInvalidParameterException("link_ids", str(link_ids), "Must not be None")
 
         if subedges is not None and len(subedges) > 0:
-            self._subedges.update(subedges)
+            # self._subedges.update(subedges)
             self._common_pre_subvertex = subedges[0].pre_subvertex
-            self._common_post_subvertex = subedges[0].post_subvertex
             for subedge in subedges:
-                if subedge.pre_subvertex is not self._common_pre_subvertex:
-                    raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same pre_subvertex"
-                                                                                   " as the other subedges")
-                if subedge.post_subvertex is not self._common_post_subvertex:
-                    raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same post_subvertex"
-                                                                                   " as the other subedges")
+                self.add_subedge(subedge, processor_ids, link_ids)
         else:
             raise PacmanInvalidParameterException("subedges", str(subedges), "Must not be None or empty")
 
@@ -77,9 +71,6 @@ class SubedgeMulticastRoutingEntry(MulticastRoutingEntry):
         if subedge.pre_subvertex is not self._common_pre_subvertex:
                     raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same pre_subvertex"
                                                                                    " as the other subedges")
-        if subedge.post_subvertex is not self._common_post_subvertex:
-            raise PacmanInvalidParameterException("subedge", str(subedge), "Must have the same post_subvertex"
-                                                                           " as the other subedges")
         self._subedges.add(subedge)
         self._processor_ids.update(processor_ids)
         self._link_ids.update(link_ids)

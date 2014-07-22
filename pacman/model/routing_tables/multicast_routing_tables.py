@@ -61,4 +61,6 @@ class MulticastRoutingTables(object):
         :rtype:  :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
         :raise None: No known exceptions are raised
         """
-        return self._routing_tables_by_chip[(x, y)]
+        if (x, y) in self._routing_tables_by_chip.keys():
+            return self._routing_tables_by_chip[(x, y)]
+        return None
