@@ -1,86 +1,168 @@
 import unittest
-from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.model.subgraph.subedge import Subedge
+from pacman.model.routing_tables.subedge_multicast_routing_entry import SubedgeMulticastRoutingEntry
+from pacman.model.routing_tables.multicast_routing_table import MulticastRoutingTable
+from pacman.model.routing_tables.multicast_routing_tables import MulticastRoutingTables
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 from pacman.model.subgraph.subvertex import Subvertex
+from pacman.model.subgraph.subedge import Subedge
+from pacman.exceptions import PacmanAlreadyExistsException, PacmanInvalidParameterException
 
-class TestRoutingTables(unittest.TestCase):
-    def test_create_new_subedge_routing_info(self):
-        subv1 = Subvertex(0,1)
-        subv2 = Subvertex(2,3)
-        sube = Subedge(subv1,subv2)
-        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
-        self.assertEqual(sri.subedge,sube)
-        self.assertEqual(sri.key,0x0012)
-        self.assertEqual(sri.mask,0x00ff)
 
-    def test_create_new_routing_info(self):
-        subv1 = Subvertex(0,1)
-        subv2 = Subvertex(2,3)
-        sube = Subedge(subv1,subv2)
-        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
-        ri = RoutingInfo([sri])
-
-    def test_create_new_routing_info_with_duplicate_key_and_mask_from_different_vertices(self):
-        with self.assertRaises(PacmanAlreadyExistsException):
-            subv1 = Subvertex(0,1)
-            subv2 = Subvertex(2,3)
-            sube1 = Subedge(subv1,subv2)
-            sube2 = Subedge(subv2,subv1)
-            sri1 = SubedgeRoutingInfo(sube1, 0x0012, 0x00ff)
-            sri2 = SubedgeRoutingInfo(sube2, 0x0012, 0x00ff)
-            ri = RoutingInfo([sri1,sri2])
-
-    def test_create_new_routing_info_with_duplicate_key_and_mask_from_the_same_vertex(self):
-        subv1 = Subvertex(0,1)
-        subv2 = Subvertex(2,3)
-        sube1 = Subedge(subv1,subv2)
-        sube2 = Subedge(subv1,subv1)
-        sri1 = SubedgeRoutingInfo(sube1, 0x0012, 0x00ff)
-        sri2 = SubedgeRoutingInfo(sube2, 0x0012, 0x00ff)
-        ri = RoutingInfo([sri1,sri2])
-
-    def test_all_subedge_info(self):
-        subv1 = Subvertex(0,1)
-        subv2 = Subvertex(2,3)
-        sube = Subedge(subv1,subv2)
-        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
-        ri = RoutingInfo([sri])
-        all_info = ri.all_subedge_info
-        self.assertEqual(all_info[0], sri)
-
-    def test_all_subedge_info_multiple_entries(self):
-        subv1 = Subvertex(0,1)
-        subv2 = Subvertex(2,3)
+class TestRoutingInfo(unittest.TestCase):
+    def test_new_subedge_multicast_routing_entry(self):
+        key = 0xff35
+        mask = 0x00ff
+        proc_ids = list()
+        link_ids = list()
+        for i in range(18):
+            proc_ids.append(i)
+        for i in range(6):
+            link_ids.append(i)
         subedges = list()
-        subedges.append(Subedge(subv1,subv2))
-        subedges.append(Subedge(subv1,subv1))
-        subedges.append(Subedge(subv2,subv2))
-        subedges.append(Subedge(subv2,subv1))
-        sri = list()
-        for i in range(4):
-            sri.append(SubedgeRoutingInfo(subedges[i], 0x0012+i, 0x00ff))
-        ri = RoutingInfo(sri)
-        all_info = ri.all_subedge_info
-        for i in range(4):
-            self.assertEqual(all_info[i], sri[i])
+        subvertices = list()
+        subvertices.append(Subvertex(0,50))
+        subvertices.append(Subvertex(51,100))
+        subvertices.append(Subvertex(101,150))
+        subedges.append(Subedge(subvertices[0],subvertices[0]))
+        subedges.append(Subedge(subvertices[0],subvertices[1]))
+        subedges.append(Subedge(subvertices[0],subvertices[2]))
+        smre = SubedgeMulticastRoutingEntry(key, mask, proc_ids, link_ids, subedges)
 
-    def test_get_subedge_info_by_key_matching(self):
-        subv1 = Subvertex(0,1)
-        subv2 = Subvertex(2,3)
-        sube = Subedge(subv1,subv2)
-        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
-        ri = RoutingInfo([sri])
-        self.assertEqual(ri.get_subedge_info_by_key(0xff12,0x00ff),sri)
+    def test_new_subedge_multicast_routing_entry_subedges_with_different_pre_subvertices(self):
+        with self.assertRaises(PacmanInvalidParameterException):
+            key = 0xff35
+            mask = 0x00ff
+            proc_ids = list()
+            link_ids = list()
+            for i in range(18):
+                proc_ids.append(i)
+            for i in range(6):
+                link_ids.append(i)
+            subedges = list()
+            subvertices = list()
+            subvertices.append(Subvertex(0,50))
+            subvertices.append(Subvertex(51,100))
+            subvertices.append(Subvertex(101,150))
+            subedges.append(Subedge(subvertices[0],subvertices[1]))
+            subedges.append(Subedge(subvertices[1],subvertices[2]))
+            smre = SubedgeMulticastRoutingEntry(key, mask, proc_ids, link_ids, subedges)
 
-    def test_get_subedge_info_by_key_not_matching(self):
-        subv1 = Subvertex(0,1)
-        subv2 = Subvertex(2,3)
-        sube = Subedge(subv1,subv2)
-        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
-        ri = RoutingInfo([sri])
-        self.assertEqual(ri.get_subedge_info_by_key(0xff12,0x000f),None)
+    def test_getting_subedges(self):
+        key = 0xff35
+        mask = 0x00ff
+        proc_ids = list()
+        link_ids = list()
+        for i in range(18):
+            proc_ids.append(i)
+        for i in range(6):
+            link_ids.append(i)
+        subedges = list()
+        subvertices = list()
+        subvertices.append(Subvertex(0,50))
+        subvertices.append(Subvertex(51,100))
+        subvertices.append(Subvertex(101,150))
+        subedges.append(Subedge(subvertices[0],subvertices[0]))
+        subedges.append(Subedge(subvertices[0],subvertices[1]))
+        subedges.append(Subedge(subvertices[0],subvertices[2]))
+        smre = SubedgeMulticastRoutingEntry(key, mask, proc_ids, link_ids, subedges)
+        retrieved_subedges = smre.subedges
+        for subedge in retrieved_subedges:
+            self.assertIn(subedge, subedges)
+        self.assertEqual(len(retrieved_subedges),len(subedges))
+
+    def test_new_multicast_routing_table(self):
+        key = 0xff35
+        mask = 0x00ff
+        proc_ids = list()
+        link_ids = list()
+        for i in range(18):
+            proc_ids.append(i)
+        for i in range(6):
+            link_ids.append(i)
+        multicast_entries = list()
+        for i in range(5):
+            multicast_entries.append(MulticastRoutingEntry(key + i,mask,proc_ids,link_ids))
+        mrt = MulticastRoutingTable(0,0,multicast_entries)
+        self.assertEqual(mrt.x, 0)
+        self.assertEqual(mrt.y,0)
+
+        mre = mrt.multicast_routing_entries
+        for entry in mre:
+            self.assertIn(entry, multicast_entries)
+        self.assertEqual(len(mre),len(multicast_entries))
+        for i in range(5):
+            self.assertEqual(mrt.get_multicast_routing_entry_by_key(key + i, mask),multicast_entries[i])
+        self.assertEqual(mrt.get_multicast_routing_entry_by_key(key + 5, mask),None)
+        self.assertEqual(mrt.get_multicast_routing_entry_by_key(key -1, mask),None)
+
+    def test_new_multicast_routing_table_empty(self):
+         MulticastRoutingTable(0,0)
+
+    def test_new_multicast_routing_table_duplicate_entry(self):
+        with self.assertRaises(PacmanAlreadyExistsException):
+            key = 0xff35
+            mask = 0x00ff
+            proc_ids = list()
+            link_ids = list()
+            for i in range(18):
+                proc_ids.append(i)
+            for i in range(6):
+                link_ids.append(i)
+            multicast_entries = list()
+            for i in range(5):
+                multicast_entries.append(MulticastRoutingEntry(key,mask,proc_ids,link_ids))
+            mrt = MulticastRoutingTable(0,0,multicast_entries)
+            mrt.add_mutlicast_routing_entry(multicast_entries[0])
+
+    def test_new_multicast_routing_tables(self):
+        key = 0xff35
+        mask = 0x00ff
+        proc_ids = list()
+        link_ids = list()
+        for i in range(18):
+            proc_ids.append(i)
+        for i in range(6):
+            link_ids.append(i)
+        multicast_entries1 = MulticastRoutingEntry(key,mask,proc_ids,link_ids)
+        multicast_entries2 = MulticastRoutingEntry(key- 1,mask,proc_ids,link_ids)
+        mrt = list()
+
+        t1 = MulticastRoutingTable(0,0,[multicast_entries1])
+        t2 = MulticastRoutingTable(1,0,[multicast_entries2])
+        mrt.append(t1)
+        mrt.append(t2)
+        tables = MulticastRoutingTables(mrt)
+        retrieved_tables = tables.routing_tables
+        self.assertEqual(len(retrieved_tables),len(mrt))
+        for tab in retrieved_tables:
+            self.assertIn(tab, mrt)
+
+        self.assertEqual(tables.get_routing_table_for_chip(0,0),t1)
+        self.assertEqual(tables.get_routing_table_for_chip(1,0),t2)
+        self.assertEqual(tables.get_routing_table_for_chip(2,0),None)
+
+    def test_new_multicast_routing_tables_empty(self):
+        MulticastRoutingTables()
+
+    def test_add_routing_table_for_duplicate_chip(self):
+        with self.assertRaises(PacmanAlreadyExistsException):
+            key = 0xff35
+            mask = 0x00ff
+            proc_ids = list()
+            link_ids = list()
+            for i in range(18):
+                proc_ids.append(i)
+            for i in range(6):
+                link_ids.append(i)
+            multicast_entries1 = MulticastRoutingEntry(key,mask,proc_ids,link_ids)
+
+            multicast_entries2 = MulticastRoutingEntry(key- 1,mask,proc_ids,link_ids)
+            mrt = list()
+            mrt.append(MulticastRoutingTable(3,0,[multicast_entries1]))
+            mrt.append(MulticastRoutingTable(3,0,[multicast_entries2]))
+            MulticastRoutingTables(mrt)
+
+
 
 
 if __name__ == '__main__':
