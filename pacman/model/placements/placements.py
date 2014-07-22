@@ -23,7 +23,8 @@ class Placements(object):
     def add_placements(self, placements):
         """
         :param placements: The list of placements
-        :type placements: iterable of :py:class:`pacman.model.placements.placement.Placement`
+        :type placements: iterable of :py:class:`pacman.model.placements\
+        .placement.Placement`
         :return: None
         :rtype: None
         """

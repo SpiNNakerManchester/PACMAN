@@ -15,6 +15,7 @@ class SDRAMResource(AbstractResource):
         self._sdram = sdram
     
     def get_value(self):
-        """ See :py:meth:`pacman.model.resources.abstract_resource.AbstractResource.get_value`
+        """ See :py:meth:`pacman.model.resources.abstract_resource\
+        .AbstractResource.get_value`
         """
         return self._sdram

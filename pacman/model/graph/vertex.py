@@ -25,7 +25,8 @@ class Vertex(object):
         :type label: str
         :param constraints: The constraints of the vertex
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
                     * If the number of atoms is less than 1
@@ -62,7 +63,8 @@ class Vertex(object):
 
         :param constraint: constraint to add
         :type constraint:\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -82,7 +84,8 @@ class Vertex(object):
 
         :param constraints: iterable of constraints to add
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\
@@ -98,7 +101,8 @@ class Vertex(object):
 
         :param constraints: iterable of constraints to set
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\
@@ -117,7 +121,8 @@ class Vertex(object):
         :type hi_atom: int
         :return: An iterable of the various resource types used.  There should\
                     only be one of each resource type.
-        :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource.AbstractResource`
+        :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource\
+        .AbstractResource`
         """
 
     def create_subvertex(self, lo_atom, hi_atom, label=None, 
@@ -138,7 +143,8 @@ class Vertex(object):
         :param additional_constraints: An iterable of constraints from the\
                     subvertex over-and-above those of the vertex
         :type additional_constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
@@ -175,7 +181,8 @@ class Vertex(object):
 
         :return: iterable of constraints
         :rtype: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
         :raise None: Raises no known exceptions
         """
         return self._constraints
