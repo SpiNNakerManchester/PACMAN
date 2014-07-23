@@ -88,7 +88,7 @@ class TestRoutingTables(unittest.TestCase):
         sube = Subedge(subv1,subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
-        self.assertEqual(ri.get_key_from_subedge(sri),0x0012)
+        self.assertEqual(ri.get_key_from_subedge(sri.subedge),0x0012)
 
     def test_get_key_from_subedge_info_not_matching(self):
         subv1 = Subvertex(0,1)
@@ -96,7 +96,23 @@ class TestRoutingTables(unittest.TestCase):
         sube = Subedge(subv1,subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
-        self.assertEqual(ri.get_key_from_subedge(SubedgeRoutingInfo(sube, 0x0012, 0x00ff)),None)
+        self.assertEqual(ri.get_key_from_subedge(Subedge(subv1,subv1)),None)
+
+    def test_get_subedge_information_from_subedge(self):
+        subv1 = Subvertex(0,1)
+        subv2 = Subvertex(2,3)
+        sube = Subedge(subv1,subv2)
+        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
+        ri = RoutingInfo([sri])
+        self.assertEqual(ri.get_subedge_information_from_subedge(sri.subedge),sri)
+
+    def test_get_subedge_information_from_subedge_not_matching(self):
+        subv1 = Subvertex(0,1)
+        subv2 = Subvertex(2,3)
+        sube = Subedge(subv1,subv2)
+        sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
+        ri = RoutingInfo([sri])
+        self.assertEqual(ri.get_subedge_information_from_subedge(Subedge(subv1,subv1)),None)
 
 if __name__ == '__main__':
     unittest.main()
