@@ -107,24 +107,6 @@ class GraphSubgraphMapper(object):
             for next_subedge in subedges:
                 self.add_subedge(next_subedge, edge)
 
-    def remove_subedge(self, subedge):
-        """ Remove a sub-edge from the subgraph
-
-        :param subedge: The subedge to be removed
-        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`
-        :return: Nothing is returned
-        :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
-                    subedge is not in the subgraph
-        """
-
-        #Delete subedge from dictionary mapping from subedge to
-        # corresponding edge
-        if subedge in self._edge_from_subedge.keys():
-            self._subedges_from_edge[self._edge_from_subedge[subedge]]\
-                .discard(subedge)
-            del self._edge_from_subedge[subedge]
-
     def get_subvertices_from_vertex(self, vertex):
         """ supporting method to get all subvertices for a given vertex
 
