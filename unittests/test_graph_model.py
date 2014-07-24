@@ -4,8 +4,7 @@ from pacman.model.graph.edge import Edge
 from pacman.model.graph.graph import Graph
 from pacman.model.constraints.partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
 class MyVertex(Vertex):
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
-                                    number_of_machine_time_steps):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
         pass
 class TestGraphModel(unittest.TestCase):
     def test_create_new_vertex(self):
