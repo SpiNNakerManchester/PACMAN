@@ -98,7 +98,6 @@ class Subgraph(object):
 
         self._graph_subgraph_mapper.add_subedge(subedge, edge)
 
-
     def add_subedges(self, subedges, edge=None):
         """ Add some subedges to this subgraph
 
