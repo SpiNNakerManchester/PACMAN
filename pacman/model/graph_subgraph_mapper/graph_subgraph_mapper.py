@@ -1,8 +1,6 @@
 from pacman.model.subgraph.subedge import Subedge
 from pacman.model.subgraph.subvertex import Subvertex
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.model.graph.graph import Edge, Vertex
 
 
 class GraphSubgraphMapper(object):
@@ -56,8 +54,6 @@ class GraphSubgraphMapper(object):
             self._vertex_from_subvertex[subvertex] = vertex
             self._subvertices_from_vertex[vertex].add(subvertex)
 
-
-
     def add_subvertices(self, subvertices, vertex=None):
         """ Add some subvertices to this subgraph
 
@@ -96,8 +92,6 @@ class GraphSubgraphMapper(object):
             self._subedges_from_edge[edge].add(subedge)
             self._edge_from_subedge[subedge] = edge
 
-
-
     def add_subedges(self, subedges, edge=None):
         """ Add some subedges to this subgraph
 
@@ -112,7 +106,6 @@ class GraphSubgraphMapper(object):
         if subedges is not None:
             for next_subedge in subedges:
                 self.add_subedge(next_subedge, edge)
-
 
     def remove_subedge(self, subedge):
         """ Remove a sub-edge from the subgraph
@@ -131,7 +124,6 @@ class GraphSubgraphMapper(object):
             self._subedges_from_edge[self._edge_from_subedge[subedge]]\
                 .discard(subedge)
             del self._edge_from_subedge[subedge]
-
 
     def get_subvertices_from_vertex(self, vertex):
         """ supporting method to get all subvertices for a given vertex

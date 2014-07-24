@@ -1,7 +1,7 @@
-from pacman.model.subgraph.subvertex import Subvertex
-from pacman.model.subgraph.subedge import Subedge
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
+from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper\
+    import GraphSubgraphMapper
 
 
 class Subgraph(object):
@@ -24,14 +24,9 @@ class Subgraph(object):
                     * If one of the subvertices is not valid
         """
         self._label = label
+        self._graph_subgraph_mapper = GraphSubgraphMapper()
         self._subvertices = set()
         self._subedges = set()
-
-        self._vertex_of_subvertex = dict()
-        self._edge_of_subedge = dict()
-
-        self._subvertices_of_vertex = dict()
-        self._subedges_of_edge = dict()
 
         self._outgoing_subedges = dict()
         self._incoming_subedges = dict()
@@ -49,40 +44,11 @@ class Subgraph(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subvertex is not valid
         """
-        if subvertex is None or not isinstance(subvertex, Subvertex):
-            raise PacmanInvalidParameterException(
-                "subvertex", str(subvertex),
-                "Must be an instance of"
-                " pacman.model.subgraph.subvertex.SubVertex")
-        if subvertex.lo_atom < 0:
-            raise PacmanInvalidParameterException("lo_atom ",
-                                                  str(subvertex.lo_atom),
-                                                  "Cannot be less than 0")
-        if subvertex.lo_atom > subvertex.hi_atom:
-            raise PacmanInvalidParameterException(
-                "hi_atom ",
-                str(subvertex.hi_atom),
-                "Cannot be less than lo_atom")
-
-        if vertex is not None \
-                and vertex not in self._subvertices_of_vertex.keys():
-            self._subvertices_of_vertex[vertex] = set()
-            if subvertex.hi_atom >= vertex.n_atoms:
-                raise PacmanInvalidParameterException(
-                    "hi_atom ",
-                    str(subvertex.hi_atom),
-                    "Cannot be greater than"
-                    " the total number of atoms")
-
-        if vertex is not None:
-            self._vertex_of_subvertex[subvertex] = vertex
-            self._subvertices_of_vertex[vertex].add(subvertex)
-
         if subvertex not in self._subvertices:
             self._subvertices.add(subvertex)
         else:
             raise PacmanAlreadyExistsException("Subvertex", str(subvertex))
-
+        self._graph_subgraph_mapper.add_subvertex(subvertex, vertex)
         self._outgoing_subedges[subvertex] = list()
         self._incoming_subedges[subvertex] = list()
 
@@ -111,23 +77,10 @@ class Subgraph(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subedge is not valid
         """
-        if subedge is None or not isinstance(subedge, Subedge):
-            raise PacmanInvalidParameterException(
-                "subedge", str(subedge),
-                "Must be an instance of"
-                " pacman.model.subgraph.subedge.Subedge")
-
-        if edge is not None and edge not in self._subedges_of_edge.keys():
-            self._subedges_of_edge[edge] = set()
-
-        if edge is not None:
-            self._subedges_of_edge[edge].add(subedge)
-            self._edge_of_subedge[subedge] = edge
-
-        if subedge not in self._subedges:
-            self._subedges.add(subedge)
-        else:
+        if subedge in self._subedges:
             raise PacmanAlreadyExistsException("Subedge", str(subedge))
+
+        self._subedges.add(subedge)
 
         if subedge.pre_subvertex in self._outgoing_subedges.keys():
             self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
@@ -135,12 +88,16 @@ class Subgraph(object):
             raise PacmanInvalidParameterException(
                 "Subedge pre_subvertex", str(subedge.pre_subvertex),
                 " Must exist in the subgraph")
+
         if subedge.post_subvertex in self._incoming_subedges.keys():
             self._incoming_subedges[subedge.post_subvertex].append(subedge)
         else:
             raise PacmanInvalidParameterException(
                 "Subedge post_subvertex", str(subedge.post_subvertex),
                 " Must exist in the subgraph")
+
+        self._graph_subgraph_mapper.add_subedge(subedge, edge)
+
 
     def add_subedges(self, subedges, edge=None):
         """ Add some subedges to this subgraph
@@ -186,12 +143,7 @@ class Subgraph(object):
             [sub for sub in self._incoming_subedges[subedge.post_subvertex]
              if subedge is not sub]
 
-        #Delete subedge from dictionary mapping from subedge to
-        # corresponding edge
-        if subedge in self._edge_of_subedge.keys():
-            self._subedges_of_edge[self._edge_of_subedge[subedge]]\
-                .discard(subedge)
-            del self._edge_of_subedge[subedge]
+        self._graph_subgraph_mapper.remove_subedge(subedge)
 
     def outgoing_subedges_from_subvertex(self, subvertex):
         """ Locate the subedges for which subvertex is the pre_subvertex.\
@@ -258,10 +210,8 @@ class Subgraph(object):
         :rtype: iterable set
         :raise None: Raises no known exceptions
         """
-        if vertex in self._subvertices_of_vertex.keys():
-            return self._subvertices_of_vertex[vertex]
-        return None
-    
+        return self._graph_subgraph_mapper.get_subvertices_from_vertex(vertex)
+
     def get_subedges_from_edge(self, edge):
         """ supporting method to get all subedges for a given edge
 
@@ -271,9 +221,7 @@ class Subgraph(object):
         :rtype: iterable set
         :raise None: Raises no known exceptions
         """
-        if edge in self._subedges_of_edge.keys():
-            return self._subedges_of_edge[edge]
-        return None
+        return self._graph_subgraph_mapper.get_subedges_from_edge(edge)
 
     def get_vertex_from_subvertex(self, subvertex):
         """ supporting method to get the vertex for a given subvertex
@@ -284,9 +232,7 @@ class Subgraph(object):
         :rtype: `pacman.model.graph.vertex.Vertex`
         :raise None: Raises no known exceptions
         """
-        if subvertex in self._vertex_of_subvertex.keys():
-            return self._vertex_of_subvertex[subvertex]
-        return None
+        return self._graph_subgraph_mapper.get_vertex_from_subvertex(subvertex)
 
     def get_edge_from_subedge(self, subedge):
         """ supporting method to get the edge for a given subedge
@@ -297,6 +243,4 @@ class Subgraph(object):
         :rtype: `pacman.model.graph.edge.Edge`
         :raise None: Raises no known exceptions
         """
-        if subedge in self._edge_of_subedge.keys():
-            return self._edge_of_subedge[subedge]
-        return None
+        return self._graph_subgraph_mapper.get_edge_from_subedge(subedge)
