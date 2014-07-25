@@ -1,0 +1,2 @@
+from pacman.operations.routing_info_allocator_algorithms.\
+    basic_routing_info_allocator import BasicRoutingInfoAllocator

@@ -1,0 +1,3 @@
+from pacman.operations.router_algorithms.dijkstra_routing import DijkstraRouting
+from pacman.operations.router_algorithms.steiner_tree_weighted_routing \
+    import SteinerTreeWeightedRouting
