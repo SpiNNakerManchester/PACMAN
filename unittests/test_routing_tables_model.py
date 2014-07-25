@@ -1,5 +1,4 @@
 import unittest
-from pacman.model.routing_tables.subedge_multicast_routing_entry import SubedgeMulticastRoutingEntry
 from pacman.model.routing_tables.multicast_routing_table import MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables import MulticastRoutingTables
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
@@ -9,67 +8,6 @@ from pacman.exceptions import PacmanAlreadyExistsException, PacmanInvalidParamet
 
 
 class TestRoutingInfo(unittest.TestCase):
-    def test_new_subedge_multicast_routing_entry(self):
-        key = 0xff35
-        mask = 0x00ff
-        proc_ids = list()
-        link_ids = list()
-        for i in range(18):
-            proc_ids.append(i)
-        for i in range(6):
-            link_ids.append(i)
-        subedges = list()
-        subvertices = list()
-        subvertices.append(Subvertex(0,50))
-        subvertices.append(Subvertex(51,100))
-        subvertices.append(Subvertex(101,150))
-        subedges.append(Subedge(subvertices[0],subvertices[0]))
-        subedges.append(Subedge(subvertices[0],subvertices[1]))
-        subedges.append(Subedge(subvertices[0],subvertices[2]))
-        smre = SubedgeMulticastRoutingEntry(key, mask, proc_ids, link_ids, subedges)
-
-    def test_new_subedge_multicast_routing_entry_subedges_with_different_pre_subvertices(self):
-        with self.assertRaises(PacmanInvalidParameterException):
-            key = 0xff35
-            mask = 0x00ff
-            proc_ids = list()
-            link_ids = list()
-            for i in range(18):
-                proc_ids.append(i)
-            for i in range(6):
-                link_ids.append(i)
-            subedges = list()
-            subvertices = list()
-            subvertices.append(Subvertex(0,50))
-            subvertices.append(Subvertex(51,100))
-            subvertices.append(Subvertex(101,150))
-            subedges.append(Subedge(subvertices[0],subvertices[1]))
-            subedges.append(Subedge(subvertices[1],subvertices[2]))
-            smre = SubedgeMulticastRoutingEntry(key, mask, proc_ids, link_ids, subedges)
-
-    def test_getting_subedges(self):
-        key = 0xff35
-        mask = 0x00ff
-        proc_ids = list()
-        link_ids = list()
-        for i in range(18):
-            proc_ids.append(i)
-        for i in range(6):
-            link_ids.append(i)
-        subedges = list()
-        subvertices = list()
-        subvertices.append(Subvertex(0,50))
-        subvertices.append(Subvertex(51,100))
-        subvertices.append(Subvertex(101,150))
-        subedges.append(Subedge(subvertices[0],subvertices[0]))
-        subedges.append(Subedge(subvertices[0],subvertices[1]))
-        subedges.append(Subedge(subvertices[0],subvertices[2]))
-        smre = SubedgeMulticastRoutingEntry(key, mask, proc_ids, link_ids, subedges)
-        retrieved_subedges = smre.subedges
-        for subedge in retrieved_subedges:
-            self.assertIn(subedge, subedges)
-        self.assertEqual(len(retrieved_subedges),len(subedges))
-
     def test_new_multicast_routing_table(self):
         key = 0xff35
         mask = 0x00ff
