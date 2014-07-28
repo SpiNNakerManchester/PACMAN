@@ -15,6 +15,8 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         :type vertex: :py:class:`pacman.model.graph.vertex.Vertex`
         :raise None: does not raise any known exceptions
         """
+        AbstractPartitionerConstraint.__init__(self, "partitioner same size as"
+                                                     "other vertex constraint")
         self._vertex = vertex
     
     def is_partitioner_constraint(self):

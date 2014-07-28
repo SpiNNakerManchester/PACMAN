@@ -18,6 +18,8 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         :type p: int
         :raise None: does not raise any known exceptions
         """
+        AbstractPlacerConstraint.__init__(self, label="placer chip and core "
+                                                      "constraint")
         self._x = x
         self._y = y
         self._p = p

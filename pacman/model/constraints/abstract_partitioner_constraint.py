@@ -9,6 +9,9 @@ from pacman.model.constraints.abstract_constraint import AbstractConstraint
 class AbstractPartitionerConstraint(AbstractConstraint):
     """ A constraint that will be used by the partitioner
     """
+
+    def __init__(self, label):
+        AbstractConstraint.__init__(self, label)
     
     def is_constraint(self):
         """ Overridden method indicating that this is a constraint

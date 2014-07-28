@@ -14,6 +14,8 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
         :type size: int
         :raise None: does not raise any known exceptions
         """
+        AbstractPartitionerConstraint.__init__(self, "partitioner max atom per "
+                                                     "core constraint")
         self._size = size
         
     def is_partitioner_constraint(self):

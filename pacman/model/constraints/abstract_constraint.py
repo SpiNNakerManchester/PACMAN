@@ -8,7 +8,10 @@ class AbstractConstraint(object):
     """ This represents a general constraint in PACMAN, which tells the various\
         modules what they can and can't do
     """
-    
+
+    def __init__(self, label):
+        self._label = label
+
     @abstractmethod
     def is_constraint(self):
         """ Method required to ensure that this is a constraint
