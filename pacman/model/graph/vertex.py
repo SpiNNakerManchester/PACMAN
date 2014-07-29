@@ -112,13 +112,15 @@ class Vertex(object):
         self.add_constraints(constraints)
         
     @abstractmethod
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         """ Get the maximum resources that are used by a range of atoms
         
         :param lo_atom: The first atom in the range
         :type lo_atom: int
         :param hi_atom: The last atom in the range
         :type hi_atom: int
+        :param vertex_in_edges: the imconing edges to this vertex
+        :type vertex_in_edges: iterable object
         :return: An iterable of the various resource types used.  There should\
                     only be one of each resource type.
         :rtype: iterable of :py:class:`pacman.model.resources.abstract_resource\

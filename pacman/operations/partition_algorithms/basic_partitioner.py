@@ -44,7 +44,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
-        self._check_can_support_constraints(graph)
+        self._check_can_support_partitioner_constraints(graph)
         #start progress bar
         progress_bar = ProgressBar(len(graph.vertices))
         vertices = graph.vertices
@@ -53,11 +53,9 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         # Partition one vertex at a time
         for vertex in vertices:
             # Compute atoms per core from resource availability
-            partition_object = vertex.get_partition_data_object()
-            requirements, partition_object = \
-                vertex.get_resources_for_atoms(
-                    0, 1, self._runtime_in_machine_time_steps,
-                    self._machine_time_step, partition_object)
+            imcoming_edges = graph.incoming_edges_to_vertex(vertex)
+            requirements = \
+                vertex.get_resources_used_by_atoms(0, 1, imcoming_edges)
 
             #locate max sdram avilable. SDRAM is the only one thats changeable
             #during partitioning, as dtcm and cpu cycles are bespoke to a
@@ -66,9 +64,25 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             max_sdram_usage = \
                 self._get_maximum_resources_per_processor(vertex.constraints,
                                                           machine)
-            apc_sd = max_sdram_usage / requirements.sdram
-            apc_dt = pacman_constants.DTCM_AVAILABLE / requirements.dtcm
-            apc_cp = pacman_constants.CPU_AVAILABLE / requirements.cpu
+            if requirements.sdram.get_value() == 0:
+                apc_sd = max_sdram_usage
+            else:
+                apc_sd = max_sdram_usage / requirements.sdram.get_value()
+
+            if requirements.dtcm.get_value() == 0:
+                apc_dt = pacman_constants.DTCM_AVAILABLE
+            else:
+                apc_dt =\
+                    pacman_constants.DTCM_AVAILABLE \
+                    / requirements.dtcm.get_value()
+
+            if requirements.cpu.get_value() == 0:
+                apc_cp = pacman_constants.CPU_AVAILABLE
+            else:
+                apc_cp = \
+                    pacman_constants.CPU_AVAILABLE \
+                    / requirements.cpu.get_value()
+
             max_atom_values = [apc_sd, apc_dt, apc_cp]
 
             # Check for any model-specific constraint on atoms per core and use
@@ -110,18 +124,18 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         # Partition edges according to vertex partitioning
         for src_sv in subgraph.subvertices:
             # For each out edge of the parent vertex...
-            vertex = graph_to_subgraph_mapper._vertex_from_subvertex(src_sv)
-            for edge in vertex.out_edges:
+            vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(src_sv)
+            out_edges = graph.outgoing_edges_from_vertex(vertex)
+            for edge in out_edges:
                 # ... and create and store a new subedge for each postsubvertex
                 post_vertex = edge.post_vertex
                 post_subverts = \
                     graph_to_subgraph_mapper\
-                    ._subvertices_from_vertex(post_vertex)
+                    .get_subvertices_from_vertex(post_vertex)
                 for dst_sv in post_subverts:
                     subedge = edge.create_subedge(src_sv, dst_sv)
                     subgraph.add_subedge(subedge)
             progress_bar.update()
         progress_bar.end()
 
-
-        return subgraph
+        return subgraph, graph_to_subgraph_mapper

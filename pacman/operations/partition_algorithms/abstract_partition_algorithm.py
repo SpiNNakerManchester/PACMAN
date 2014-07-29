@@ -1,6 +1,8 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+from pacman.model.constraints.abstract_partitioner_constraint import \
+    AbstractPartitionerConstraint
 from pacman.model.constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
@@ -59,16 +61,17 @@ class AbstractPartitionAlgorithm(object):
         """
         for vertex in graph.vertices:
             for constraint in vertex.constraints:
-                located = False
-                for type_of_supported_constraint in self._supported_constrants:
-                    if isinstance(constraint, type_of_supported_constraint):
-                        located = True
-                if not located:
-                    raise exceptions.PacmanPartitionException(
-                        "the partitioning algorithum selected cannot support "
-                        "the partitioning constraint '{}', which has been "
-                        "placed on vertex labelled {}"
-                        .format(constraint, vertex.label))
+                if isinstance(constraint, AbstractPartitionerConstraint):
+                    located = False
+                    for supported_constraint in self._supported_constrants:
+                        if isinstance(constraint, supported_constraint):
+                            located = True
+                    if not located:
+                        raise exceptions.PacmanPartitionException(
+                            "the partitioning algorithum selected cannot support "
+                            "the partitioning constraint '{}', which has been "
+                            "placed on vertex labelled {}"
+                            .format(constraint, vertex.label))
 
     @staticmethod
     def _locate_max_atom_constrants(constraints):
