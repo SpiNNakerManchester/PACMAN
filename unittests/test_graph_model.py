@@ -12,6 +12,11 @@ class TestGraphModel(unittest.TestCase):
         self.assertEqual(vert.n_atoms,10)
         self.assertEqual(vert.label,"New Vertex")
 
+    def test_create_new_vertex_without_label(self):
+        vert = MyVertex(10,None)
+        self.assertEqual(vert.n_atoms,10)
+        self.assertEqual(vert.label,"Population 10")
+
     def test_create_new_vertex_with_constraint_list(self):
         constraint = PartitionerMaximumSizeConstraint(2)
         vert = MyVertex(10,"New Vertex", [constraint])
