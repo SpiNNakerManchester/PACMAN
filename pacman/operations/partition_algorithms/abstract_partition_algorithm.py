@@ -9,7 +9,7 @@ from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.resources.sdram_tracker import SDRAMTracker
 from pacman import exceptions
-from spinn_machine import sdram
+from spinn_machine.sdram import SDRAM
 
 
 @add_metaclass(ABCMeta)
@@ -119,5 +119,5 @@ class AbstractPartitionAlgorithm(object):
                 maximum_sdram = sdram_avilable
             #if a chip has been returned with sdram usage as the hard coded
             # max supported, then stop searching and return max.
-            if sdram_avilable == sdram.DEFAULT_SDRAM_BYTES:
+            if sdram_avilable == SDRAM.DEFAULT_SDRAM_BYTES:
                 return maximum_sdram

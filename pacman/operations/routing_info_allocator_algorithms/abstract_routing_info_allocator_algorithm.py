@@ -2,6 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
+
 @add_metaclass(ABCMeta)
 class AbstractRoutingInfoAllocatorAlgorithm(object):
     """ An abstract algorithm that can produce routing keys and masks for\

@@ -2,6 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
+
 @add_metaclass(ABCMeta)
 class AbstractRouterAlgorithm(object):
     """ An abstract algorithm that can find routes for subedges between\

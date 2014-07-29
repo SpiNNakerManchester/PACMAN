@@ -1,8 +1,13 @@
+from pacman import reports
+
+
 class Partitioner:
     """ Used to partition a graph into a subgraph
     """
 
-    def __init__(self, partition_algorithm=None):
+    def __init__(self, machine_time_step, no_machine_time_steps,
+                 report_states, report_folder=None, partition_algorithm=None,
+                 hostname=None):
         """
         :param partition_algorithm: A partitioning algorithm.  If not specified\
                     a default algorithm will be used
@@ -11,7 +16,14 @@ class Partitioner:
         :raise pacman.exceptions.PacmanInvalidParameterException: If\
                     partition_algorithm is not valid
         """
-        pass
+        self._report_folder = report_folder
+        self.report_states = report_states
+        self._hostname = hostname
+        if partition_algorithm is None:
+            pass
+        else:
+            self._partitoner_algorithum = \
+                partition_algorithm(machine_time_step, no_machine_time_steps)
 
     def run(self, graph, machine):
         """ Execute the algorithm on the graph, and partition it to fit on\
@@ -26,4 +38,14 @@ class Partitioner:
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
-        pass
+        subgraph, graph_to_subgraph_mapper = \
+            self._partitoner_algorithum.partition(graph, machine)
+
+        if (self.report_states is not None and
+                self.report_states.partitioner_report):
+            reports.partitioner_report(self._report_folder, subgraph, graph,
+                                       graph_to_subgraph_mapper, self._hostname)
+
+        return subgraph, graph_to_subgraph_mapper
+
+

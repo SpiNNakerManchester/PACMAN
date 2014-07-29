@@ -6,7 +6,7 @@ from pacman.model.subgraph.subgraph import Subgraph
 from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from spinn_machine import sdram
+from spinn_machine.sdram import SDRAM
 
 
 class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):

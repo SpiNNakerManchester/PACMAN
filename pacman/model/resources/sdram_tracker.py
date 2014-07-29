@@ -1,4 +1,4 @@
-from spinn_machine import sdram
+from spinn_machine.sdram import SDRAM
 
 
 class SDRAMTracker(object):
@@ -16,6 +16,6 @@ class SDRAMTracker(object):
     def get_usage(self, chip_x, chip_y):
         key = "{}:{}".format(chip_x, chip_y)
         if key in self._mapper.keys():
-            return sdram.DEFAULT_SDRAM_BYTES - self._mapper[key]
+            return SDRAM.DEFAULT_SDRAM_BYTES - self._mapper[key]
         else:
-            return sdram.DEFAULT_SDRAM_BYTES
+            return SDRAM.DEFAULT_SDRAM_BYTES

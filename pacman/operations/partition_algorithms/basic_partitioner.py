@@ -6,7 +6,7 @@ from pacman.model.subgraph.subgraph import Subgraph
 from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from spinn_machine import processor
+from spinn_machine.processor import Processor
 from pacman.progress_bar import ProgressBar
 
 
@@ -70,24 +70,20 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 apc_sd = max_sdram_usage / requirements.sdram.get_value()
 
             if requirements.dtcm.get_value() == 0:
-                apc_dt = processor.DTCM_AVAILABLE
+                apc_dt = Processor.DTCM_AVAILABLE
             else:
                 apc_dt =\
-                    processor.DTCM_AVAILABLE \
+                    Processor.DTCM_AVAILABLE \
                     / requirements.dtcm.get_value()
 
             if requirements.cpu.get_value() == 0:
-                apc_cp = processor.CPU_AVAILABLE
+                apc_cp = Processor.CPU_AVAILABLE
             else:
                 apc_cp = \
-                    processor.CPU_AVAILABLE \
+                    Processor.CPU_AVAILABLE \
                     / requirements.cpu.get_value()
 
             max_atom_values = [apc_sd, apc_dt, apc_cp]
-
-            # Check for any model-specific constraint on atoms per core and use
-            # it, if it's more constraining than the current apc value:
-            model_name = vertex.model_name
 
             max_atoms_constraints = \
                 self._locate_max_atom_constrants(vertex.constraints)
