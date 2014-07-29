@@ -6,7 +6,7 @@ from pacman.model.subgraph.subgraph import Subgraph
 from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from pacman import constants as pacman_constants
+from spinn_machine import processor
 from pacman.progress_bar import ProgressBar
 
 
@@ -70,17 +70,17 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 apc_sd = max_sdram_usage / requirements.sdram.get_value()
 
             if requirements.dtcm.get_value() == 0:
-                apc_dt = pacman_constants.DTCM_AVAILABLE
+                apc_dt = processor.DTCM_AVAILABLE
             else:
                 apc_dt =\
-                    pacman_constants.DTCM_AVAILABLE \
+                    processor.DTCM_AVAILABLE \
                     / requirements.dtcm.get_value()
 
             if requirements.cpu.get_value() == 0:
-                apc_cp = pacman_constants.CPU_AVAILABLE
+                apc_cp = processor.CPU_AVAILABLE
             else:
                 apc_cp = \
-                    pacman_constants.CPU_AVAILABLE \
+                    processor.CPU_AVAILABLE \
                     / requirements.cpu.get_value()
 
             max_atom_values = [apc_sd, apc_dt, apc_cp]

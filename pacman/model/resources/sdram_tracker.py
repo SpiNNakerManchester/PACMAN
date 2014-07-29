@@ -1,4 +1,4 @@
-from pacman import constants as pacman_constants
+from spinn_machine import sdram
 
 
 class SDRAMTracker(object):
@@ -16,6 +16,6 @@ class SDRAMTracker(object):
     def get_usage(self, chip_x, chip_y):
         key = "{}:{}".format(chip_x, chip_y)
         if key in self._mapper.keys():
-            return pacman_constants.SDRAM_AVILABLE_BYTES - self._mapper[key]
+            return sdram.DEFAULT_SDRAM_BYTES - self._mapper[key]
         else:
-            return pacman_constants.SDRAM_AVILABLE_BYTES
+            return sdram.DEFAULT_SDRAM_BYTES

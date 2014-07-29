@@ -37,7 +37,8 @@ class Vertex(object):
                 "Must be at least one atom in the vertex")
 
         if label is None:
-            self._label = "Population {}".format(n_atoms)
+            self._label = \
+                "Population {}".format(Vertex._non_labelled_vertex_count)
             Vertex._non_labelled_vertex_count += 1
         else:
             self._label = label
