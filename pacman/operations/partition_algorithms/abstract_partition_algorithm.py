@@ -1,20 +1,18 @@
+from abc import ABCMeta
+from abc import abstractmethod
+
+from six import add_metaclass
+
 from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from pacman.model.resources.sdram_tracker import SDRAMTracker
+from pacman.utilities.sdram_tracker import SDRAMTracker
 from pacman import exceptions
-from pacman.progress_bar import ProgressBar
-
-
+from pacman.utilities.progress_bar import ProgressBar
 from spinn_machine.sdram import SDRAM
-
-
-from abc import ABCMeta
-from abc import abstractmethod
-from six import add_metaclass
 
 
 @add_metaclass(ABCMeta)

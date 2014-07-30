@@ -1,3 +1,5 @@
+import logging
+
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
@@ -10,11 +12,9 @@ from pacman.model.subgraph.subgraph import Subgraph
 from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from pacman.progress_bar import ProgressBar
+from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -296,6 +296,3 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         dtcm_ratio = (float(resources.dtcm) / float(max_resources.dtcm))
         sdram_ratio = (float(resources.sdram) / float(max_resources.sdram))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
-
-
-

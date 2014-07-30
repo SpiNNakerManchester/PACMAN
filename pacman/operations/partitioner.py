@@ -1,7 +1,6 @@
-from pacman import reports
-
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
+from pacman.utilities import reports
 
 
 class Partitioner:

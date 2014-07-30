@@ -6,6 +6,8 @@ from six import add_metaclass
 class AbstractPlacerAlgorithm(object):
     """ An abstract algorithm that can place a subgraph
     """
+
+
     
     @abstractmethod
     def place(self, subgraph, machine):

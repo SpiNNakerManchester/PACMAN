@@ -7,7 +7,7 @@ from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from spinn_machine.processor import Processor
-from pacman.progress_bar import ProgressBar
+from pacman.utilities.progress_bar import ProgressBar
 
 
 class BasicPartitioner(AbstractPartitionAlgorithm):
