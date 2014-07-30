@@ -1,3 +1,7 @@
+from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
+from pacman.model.constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper import \
     GraphSubgraphMapper
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
@@ -7,7 +11,9 @@ from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.progress_bar import ProgressBar
-from spinn_machine.sdram import SDRAM
+from pacman import exceptions
+
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -31,7 +37,12 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         """
         AbstractPartitionAlgorithm.__init__(self, machine_time_step,
                                             runtime_in_machine_time_steps)
+        #add supported constraints
+        self._supported_constrants.append(PartitionerMaximumSizeConstraint)
+        self._supported_constrants.append(PartitionerSameSizeAsVertexConstraint)
+
         self._placer_algorithum = None
+        self._placement_to_subvert_mapper = dict()
 
     def set_placer_algorithum(self, placer_algorithum):
         self._placer_algorithum = placer_algorithum
@@ -75,39 +86,47 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             progress_bar.update()
         progress_bar.end()
 
+        #update constraints for subverts
+        for subvert in subgraph.subvertices:
+            if subvert in self._placement_to_subvert_mapper.keys():
+                subvert.add_constraint(
+                    self._placement_to_subvert_mapper[subvert])
+
         self.generate_sub_edges(subgraph, graph_to_sub_graph_mapper, graph)
 
         return subgraph, graph_to_sub_graph_mapper
 
     def partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper):
-
-        vertices = list()
-        vertices.append(vertex)
+        partiton_together_vertices = list()
+        partiton_together_vertices.append(vertex)
         extra_vertices = vertex.get_partition_dependent_vertices()
         if extra_vertices is not None:
             for v in extra_vertices:
+                partiton_together_vertices.append(v)
                 if v.atoms != vertex.atoms:
-                    raise Exception("A vertex and its partition-dependent"
-                            + " vertices must have the same number of atoms")
-                vertices.append(v)
-
+                    raise exceptions.PacmanPartitionException(
+                        "A vertex and its partition-dependent vertices must "
+                        "have the same number of atoms")
 
         # Prepare for partitioning, getting information
         partition_data_objects = [v.get_partition_data_object()
-                for v in vertices]
-        max_atoms_per_core = self.get_max_atoms_per_core(vertices)
+                                  for v in partiton_together_vertices]
 
-        self.partition_by_atoms(vertices, placer, vertex.atoms,
-                max_atoms_per_core, no_machine_time_steps, machine_time_step_us,
-                partition_data_objects, subvertices, placements)
+        #locate max atoms for these vertexes (non machine)
+        max_atoms_per_core = \
+            self.get_max_atoms_per_core(partiton_together_vertices)
 
-    def partition_by_atoms(self, vertices, placer, n_atoms,
-            max_atoms_per_core, no_machine_time_steps, machine_time_step_us,
-            partition_data_objects, subvertices, placements):
-        '''
+        self.partition_by_atoms(partiton_together_vertices, vertex.atoms,
+                                max_atoms_per_core, partition_data_objects,
+                                subgraph, graph_to_subgraph_mapper)
+
+    def partition_by_atoms(self, vertices, n_atoms, max_atoms_per_core,
+                           partition_data_objects, subgraph,
+                           graph_to_subgraph_mapper):
+        """
         tries to partition subvertexes on how many atoms it can fit on
         each subvert
-        '''
+        """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
 
@@ -121,48 +140,47 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
             # Scale down the number of atoms to fit the available resources
             used_placements, hi_atom = self.scale_down_resources(
-                    lo_atom, hi_atom, vertices,
-                    no_machine_time_steps, machine_time_step_us,
-                    partition_data_objects, placer,
-                    max_atoms_per_core)
+                lo_atom, hi_atom, vertices, partition_data_objects,
+                max_atoms_per_core)
 
             # Update where we are
             n_atoms_placed = hi_atom + 1
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-
-                subvertex = graph.Subvertex(vertex, lo_atom, hi_atom,
-                        used_resources)
-                processor = self.dao.machine.get_processor(x, y, p)
-                placement = lib_map.Placement(subvertex, processor)
-
-                subvertices.append(subvertex)
-                placements.append(placement)
+                subvertex = Subvertex(vertex, lo_atom, hi_atom, used_resources)
+                self._placement_to_subvert_mapper[subvertex] = \
+                    PlacerChipAndCoreConstraint(x, y, p)
+                #update objects
+                subgraph.add_subvertex(subvertex)
+                graph_to_subgraph_mapper.add_subvertex(subvertex, vertex)
 
             no_atoms_this_placement = (hi_atom - lo_atom) + 1
             self.progress.update(no_atoms_this_placement)
 
     def scale_down_resources(self, lo_atom, hi_atom, vertices,
-            no_machine_time_steps, machine_time_step_us,
-            partition_data_objects, placer, max_atoms_per_core):
-        '''
+                             partition_data_objects, max_atoms_per_core):
+        """
         reduces the number of atoms on a core so that it fits within the
         resoruces avilable
-        '''
+        """
 
         # Find the number of atoms that will fit in each vertex given the
         # resources available
-        used_placements = list()
         min_hi_atom = hi_atom
         for i in range(len(vertices)):
             vertex = vertices[i]
             partition_data_object = partition_data_objects[i]
-
-            resources = placer.get_maximum_resources(vertex.constraints)
-            used_resources = vertex.get_resources_for_atoms(lo_atom, hi_atom,
-                no_machine_time_steps, machine_time_step_us,
-                partition_data_object)
+            #get max resoruces avilable on machine
+            resources = \
+                self._placer_algorithum.get_maximum_resources(
+                    vertex.constraints)
+            #get resources for vertexes
+            used_resources = vertex.get_resources_for_atoms(
+                lo_atom, hi_atom, self._runtime_in_machine_time_steps,
+                self._machine_time_step, partition_data_object)
+            
+            #figure max ratio
             ratio = self.find_max_ratio(used_resources, resources)
 
             while ratio > 1.0 and hi_atom >= lo_atom:
@@ -182,39 +200,36 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
                 used_resources = \
-                    vertex.get_resources_for_atoms(lo_atom, hi_atom,
-                                                   no_machine_time_steps,
-                                                   machine_time_step_us,
-                                                   partition_data_object)
+                    vertex.get_resources_for_atoms(
+                        lo_atom, hi_atom, self._runtime_in_machine_time_steps,
+                        self._machine_time_step, partition_data_object)
                 ratio = self.find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise and exception
             if hi_atom < lo_atom:
-                raise Exception("Vertex {} could not be partitioned".format(
-                        vertex.label))
+                raise exceptions.PacmanPartitionException(
+                    "Vertex {} could not be partitioned".format(vertex.label))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self.scale_up_resource_usage(
-                    used_resources, hi_atom, lo_atom,
-                    max_atoms_per_core, vertex, no_machine_time_steps,
-                    machine_time_step_us, partition_data_object, resources,
-                    ratio)
+                used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
+                partition_data_object, resources, ratio)
 
             # If this hi_atom is smaller than the current, minimum update the
             # other placements to use (hopefully) less resources
             if hi_atom < min_hi_atom:
                 min_hi_atom = hi_atom
-                new_used_placements = list()
                 for (v, part_obj, x, y, p, v_resources, resources) in used_placements:
+                    self._placement_to_subvert_mapper[subver]
                     placer.unplace_subvertex(x, y, p, v_resources)
                     new_resources = v.get_resources_for_atoms(lo_atom,
                             min_hi_atom, no_machine_time_steps,
                             machine_time_step_us, part_obj)
-                    (new_x, new_y, new_p) = placer.place_subvertex(
-                            new_resources, v.constraints)
-                    new_used_placements.append(v, part_obj, new_x, new_y, new_p,
+                    (new_x, new_y, new_p) =\
+                        self._placer_algorithum.place_subvertex(new_resources,
+                                                                v.constraints)
+                    self._placement_to_subvert_mapper[subver].append(v, part_obj, new_x, new_y, new_p,
                             new_resources, resources)
-                used_placements = new_used_placements
 
             # Place the vertex
             x, y, p = placer.place_subvertex(used_resources,
@@ -224,15 +239,13 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
         return used_placements, min_hi_atom
 
-
-    def scale_up_resource_usage(self, used_resources, hi_atom, lo_atom,
-                        max_atoms_per_core, vertex, no_machine_time_steps,
-                        machine_time_step_us, partition_data_object, resources,
-                        ratio):
-        '''
+    def scale_up_resource_usage(
+            self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
+            partition_data_object, resources, ratio):
+        """
         tries to psuh the number of atoms into a subvertex as it can
          with the estimates
-        '''
+        """
 
         previous_used_resources = used_resources
         previous_hi_atom = hi_atom
@@ -249,14 +262,14 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             # Find the new resource usage
             previous_used_resources = used_resources
             used_resources = \
-                vertex.get_resources_for_atoms(lo_atom, hi_atom,
-                                               no_machine_time_steps,
-                                               machine_time_step_us,
-                                               partition_data_object)
+                vertex.get_resources_for_atoms(
+                    lo_atom, hi_atom, self._runtime_in_machine_time_steps,
+                    self._machine_time_step, partition_data_object)
             ratio = self.find_max_ratio(used_resources, resources)
         return previous_used_resources, previous_hi_atom
 
-    def get_max_atoms_per_core(self, vertices):
+    @staticmethod
+    def get_max_atoms_per_core(vertices):
 
         max_atoms_per_core = 0
         for v in vertices:
@@ -273,12 +286,13 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             max_atoms_per_core = max(max_atoms_per_core, max_for_vertex)
         return max_atoms_per_core
 
-    def find_max_ratio(self, resources, max_resources):
-        '''
+    @staticmethod
+    def find_max_ratio(resources, max_resources):
+        """
         helper method for finding the max ratio for a resoruces
-        '''
-        cpu_ratio = (float(resources.clock_ticks)
-                / float(max_resources.clock_ticks))
+        """
+        cpu_ratio = \
+            (float(resources.clock_ticks) / float(max_resources.clock_ticks))
         dtcm_ratio = (float(resources.dtcm) / float(max_resources.dtcm))
         sdram_ratio = (float(resources.sdram) / float(max_resources.sdram))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
