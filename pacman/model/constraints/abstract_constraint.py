@@ -20,7 +20,17 @@ class AbstractConstraint(object):
         :rtype: bool
         """
         pass
-    
+
+    @property
+    def label(self):
+        """getter for label
+
+        :return: string rep of the constraint
+        :rtype: str
+        :raise None: this does not raise any known exception
+        """
+        return self._label
+
     @classmethod
     def __subclasshook__(cls, othercls):
         """ Checks if all the abstract methods are present on the subclass

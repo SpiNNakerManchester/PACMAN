@@ -14,8 +14,9 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
         :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
         :raise None: does not raise any known exceptions
         """
-        AbstractPlacerConstraint.__init__(self, label="placer same chip "
-                                                      "constraint")
+        AbstractPlacerConstraint.__init__(
+            self, label="placer same chip constraint with subvertex {}"
+                        .format(subvertex))
         self._subvertex = subvertex
         
     def is_placer_constraint(self):

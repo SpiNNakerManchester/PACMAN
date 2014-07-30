@@ -46,7 +46,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         """
         self._check_can_support_partitioner_constraints(graph)
         #start progress bar
-        progress_bar = ProgressBar(len(graph.vertices))
+        progress_bar = ProgressBar(len(graph.vertices),
+                                   "on partitioning the graph's vertices")
         vertices = graph.vertices
         subgraph = Subgraph(label="subgraph for graph {}".format(graph.label))
         graph_to_subgraph_mapper = GraphSubgraphMapper()
@@ -110,28 +111,18 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(subvert, vertex)
                 counted = counted + alloc
+                #update sdram calc
+                subvertex_usage = \
+                    vertex.get_resources_used_by_atoms(
+                        counted, counted + alloc, imcoming_edges)\
+                    .sdram.get_value()
+                self._update_sdram_allocator(vertex, subvertex_usage, machine)
+                self._add_vertex_constraints_to_subvertex(subvert, vertex)
             #update and end progress bars as needed
             progress_bar.update()
         progress_bar.end()
 
-        #start progress bar
-        progress_bar = ProgressBar(len(subgraph.subvertices))
-
-        # Partition edges according to vertex partitioning
-        for src_sv in subgraph.subvertices:
-            # For each out edge of the parent vertex...
-            vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(src_sv)
-            out_edges = graph.outgoing_edges_from_vertex(vertex)
-            for edge in out_edges:
-                # ... and create and store a new subedge for each postsubvertex
-                post_vertex = edge.post_vertex
-                post_subverts = \
-                    graph_to_subgraph_mapper\
-                    .get_subvertices_from_vertex(post_vertex)
-                for dst_sv in post_subverts:
-                    subedge = edge.create_subedge(src_sv, dst_sv)
-                    subgraph.add_subedge(subedge)
-            progress_bar.update()
-        progress_bar.end()
+        self.generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph)
 
         return subgraph, graph_to_subgraph_mapper
+

@@ -8,26 +8,29 @@ logger = logging.getLogger(__name__)
 class ProgressBar(object):
     MAX_LENGTH_IN_CHARS = 60
 
-    def __init__(self, total_number_of_things_to_do):
+    def __init__(self, total_number_of_things_to_do,
+                 string_describing_what_being_progressed):
         self.total_number_of_things_to_do = total_number_of_things_to_do
         self.currently_completed = 0
         self.chars_per_thing = None
         self.last_update = 0
         self.chars_done = 0
 
-        self.create_initial_progress_bar()
+        self.create_initial_progress_bar(string_describing_what_being_progressed)
 
     def update(self, amount_to_add=1):
         self.currently_completed += amount_to_add
         self.check_differences()
 
-    def create_initial_progress_bar(self):
+    def create_initial_progress_bar(self,
+                                    string_describing_what_being_progressed):
         if self.total_number_of_things_to_do == 0:
             self.chars_per_thing = ProgressBar.MAX_LENGTH_IN_CHARS
         else:
             self.chars_per_thing = (float(ProgressBar.MAX_LENGTH_IN_CHARS) /
                                     float(self.total_number_of_things_to_do))
-        print("Progress", file=sys.stderr)
+        print("Progress {}".format(string_describing_what_being_progressed),
+              file=sys.stderr)
         print("|0                           50%                         100%|",
               file=sys.stderr)
         print(" ", end="", file=sys.stderr)

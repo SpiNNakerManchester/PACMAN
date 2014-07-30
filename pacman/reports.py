@@ -53,7 +53,7 @@ def partitioner_report(report_folder, hostname, graph,
     for v in graph._vertices:
         vertex_name = v.label
         vertex_model = v.model_name
-        num_atoms = v.atoms
+        num_atoms = v.n_atoms
         f_place_by_vertex.write("**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
