@@ -1,5 +1,5 @@
 import unittest
-from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper\
+from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper \
     import GraphSubgraphMapper
 from pacman.model.graph.vertex import Vertex
 from pacman.model.graph.edge import Edge
@@ -11,58 +11,59 @@ class MyVertex(Vertex):
     def get_resources_used_by_atoms(self, lo_atom, hi_atom):
         pass
 
+
 class TestGraphSubgraphMapper(unittest.TestCase):
     def test_create_new_mapper(self):
-        mapper = GraphSubgraphMapper()
+        GraphSubgraphMapper()
 
     def test_get_subedges_from_edge(self):
         subvertices = list()
         subedges = list()
-        subvertices.append(Subvertex(0,4))
-        subvertices.append(Subvertex(5,9))
-        subedges.append(Subedge(subvertices[0],subvertices[(1)]))
-        subedges.append(Subedge(subvertices[1],subvertices[(1)]))
-        sube= Subedge(subvertices[1],subvertices[(0)])
+        subvertices.append(Subvertex(0, 4))
+        subvertices.append(Subvertex(5, 9))
+        subedges.append(Subedge(subvertices[0], subvertices[1]))
+        subedges.append(Subedge(subvertices[1], subvertices[1]))
+        sube = Subedge(subvertices[1], subvertices[0])
         subedges.append(sube)
         graph = GraphSubgraphMapper()
-        edge = Edge(MyVertex(10,"pre"),MyVertex(5,"post"))
+        edge = Edge(MyVertex(10, "pre"), MyVertex(5, "post"))
         graph.add_subedge(sube, edge)
-        graph.add_subedge(subedges[0],edge)
+        graph.add_subedge(subedges[0], edge)
         subedges_from_edge = graph.get_subedges_from_edge(edge)
-        self.assertIn(sube,subedges_from_edge)
-        self.assertIn(subedges[0],subedges_from_edge)
-        self.assertNotIn(subedges[1],subedges_from_edge)
+        self.assertIn(sube, subedges_from_edge)
+        self.assertIn(subedges[0], subedges_from_edge)
+        self.assertNotIn(subedges[1], subedges_from_edge)
 
     def test_get_subvertices_from_vertex(self):
         subvertices = list()
         subedges = list()
-        subvertices.append(Subvertex(0,4))
-        subvertices.append(Subvertex(5,9))
-        subedges.append(Subedge(subvertices[0], subvertices[(1)]))
-        subedges.append(Subedge(subvertices[1], subvertices[(1)]))
-        subvert1 = Subvertex(1,2)
-        subvert2 = Subvertex(3,4)
+        subvertices.append(Subvertex(0, 4))
+        subvertices.append(Subvertex(5, 9))
+        subedges.append(Subedge(subvertices[0], subvertices[1]))
+        subedges.append(Subedge(subvertices[1], subvertices[1]))
+        subvert1 = Subvertex(1, 2)
+        subvert2 = Subvertex(3, 4)
         graph = GraphSubgraphMapper()
         vert = MyVertex(4, "Some testing vertex")
-        graph.add_subvertices([subvert1,subvert2],vert)
+        graph.add_subvertices([subvert1, subvert2], vert)
         returned_subverts = graph.get_subvertices_from_vertex(vert)
-        self.assertIn(subvert1,returned_subverts)
-        self.assertIn(subvert2,returned_subverts)
+        self.assertIn(subvert1, returned_subverts)
+        self.assertIn(subvert2, returned_subverts)
         for sub in subvertices:
             self.assertNotIn(sub, returned_subverts)
 
     def test_get_vertex_from_subvertex(self):
         subvertices = list()
         subedges = list()
-        subvertices.append(Subvertex(0,4))
-        subvertices.append(Subvertex(5,9))
-        subedges.append(Subedge(subvertices[0], subvertices[(1)]))
-        subedges.append(Subedge(subvertices[1], subvertices[(1)]))
-        subvert1 = Subvertex(1,2)
-        subvert2 = Subvertex(3,4)
+        subvertices.append(Subvertex(0, 4))
+        subvertices.append(Subvertex(5, 9))
+        subedges.append(Subedge(subvertices[0], subvertices[1]))
+        subedges.append(Subedge(subvertices[1], subvertices[1]))
+        subvert1 = Subvertex(1, 2)
+        subvert2 = Subvertex(3, 4)
         graph = GraphSubgraphMapper()
         vert = MyVertex(4, "Some testing vertex")
-        graph.add_subvertices([subvert1,subvert2],vert)
+        graph.add_subvertices([subvert1, subvert2], vert)
         self.assertEqual(vert, graph.get_vertex_from_subvertex(subvert1))
         self.assertEqual(vert, graph.get_vertex_from_subvertex(subvert2))
         self.assertEqual(None, graph.get_vertex_from_subvertex(subvertices[0]))
@@ -71,20 +72,21 @@ class TestGraphSubgraphMapper(unittest.TestCase):
     def test_get_edge_from_subedge(self):
         subvertices = list()
         subedges = list()
-        subvertices.append(Subvertex(0,4))
-        subvertices.append(Subvertex(5,9))
-        subedges.append(Subedge(subvertices[0],subvertices[(1)]))
-        subedges.append(Subedge(subvertices[1],subvertices[(1)]))
-        sube= Subedge(subvertices[1],subvertices[(0)])
+        subvertices.append(Subvertex(0, 4))
+        subvertices.append(Subvertex(5, 9))
+        subedges.append(Subedge(subvertices[0], subvertices[1]))
+        subedges.append(Subedge(subvertices[1], subvertices[1]))
+        sube = Subedge(subvertices[1], subvertices[0])
         subedges.append(sube)
         graph = GraphSubgraphMapper()
-        edge = Edge(MyVertex(10,"pre"),MyVertex(5,"post"))
+        edge = Edge(MyVertex(10, "pre"), MyVertex(5, "post"))
         graph.add_subedge(sube, edge)
-        graph.add_subedge(subedges[0],edge)
+        graph.add_subedge(subedges[0], edge)
         edge_from_subedge = graph.get_edge_from_subedge(sube)
         self.assertEqual(edge_from_subedge, edge)
         self.assertEqual(graph.get_edge_from_subedge(subedges[0]), edge)
         self.assertEqual(graph.get_edge_from_subedge(subedges[1]), None)
+
 
 if __name__ == '__main__':
     unittest.main()
