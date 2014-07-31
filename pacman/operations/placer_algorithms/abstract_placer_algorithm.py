@@ -1,11 +1,12 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+
 from pacman.model.constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
-
 from pacman.utilities.placement_tracker import PlacementTracker
 from pacman.utilities.sdram_tracker import SDRAMTracker
+from pacman import exceptions
 
 
 import logging
@@ -16,13 +17,15 @@ logger = logging.getLogger(__name__)
 class AbstractPlacerAlgorithm(object):
     """ An abstract algorithm that can place a subgraph
     """
-    def __init__(self, machine):
+    def __init__(self, machine, graph):
         """constrcutor for the abstract placer algorithum
         :param machine: The machine on which to place the graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         self._placement_tracker = PlacementTracker(machine)
         self._sdram_tracker = SDRAMTracker()
+        self._graph = graph
+        self._supported_constrants = list()
 
     @abstractmethod
     def place(self, subgraph, graph_to_subgraph_mapper):
@@ -71,3 +74,27 @@ class AbstractPlacerAlgorithm(object):
             for subvert in subvert_list:
                 ordered_subverts.append(subvert)
         return ordered_subverts
+
+    def _check_can_support_constraints(self, subgraph):
+        """checks that the constraints on the vertices in the graph are all
+        supported by the given implimentation of the partitioner.
+
+        :param subgraph: The subgraph to place from
+        :type subgraph: :py:class:`pacman.model.subgraph.subgraph.SubGraph`
+        :raise pacman.exceptions.PacmanPartitionException: if theres a
+        constraint in the vertices in the graph to which this implemntation
+        of the partitioner cannot handle
+        """
+        for subvert in subgraph.subvertices:
+            for constraint in subvert.constraints:
+                if isinstance(constraint, AbstractPlacerConstraint):
+                    located = False
+                    for supported_constraint in self._supported_constrants:
+                        if isinstance(constraint, supported_constraint):
+                            located = True
+                    if not located:
+                        raise exceptions.PacmanPartitionException(
+                            "the placing algorithum selected cannot support "
+                            "the placment constraint '{}', which has been "
+                            "placed on subvert labelled {}"
+                            .format(constraint, subvert.label))
