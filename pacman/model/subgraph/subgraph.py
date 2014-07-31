@@ -5,7 +5,6 @@ from pacman.exceptions import PacmanAlreadyExistsException
 class Subgraph(object):
     """ Represents a partitioning of a graph
     """
-    #TODO 18/07 -> Update docs
     def __init__(self, label=None, subvertices=None, subedges=None):
         """
 
@@ -118,7 +117,9 @@ class Subgraph(object):
         :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
-        return self._outgoing_subedges[subvertex]
+        if subvertex in self._outgoing_subedges.keys():
+            return self._outgoing_subedges[subvertex]
+        return None
 
     def incoming_subedges_from_subvertex(self, subvertex):
         """ Locate the subedges for which subvertex is the post_subvertex.\
@@ -131,7 +132,9 @@ class Subgraph(object):
         :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
         :raise None: does not raise any known exceptions
         """
-        return self._incoming_subedges[subvertex]
+        if subvertex in self._incoming_subedges.keys():
+            return self._incoming_subedges[subvertex]
+        return None
 
     @property
     def subvertices(self):
