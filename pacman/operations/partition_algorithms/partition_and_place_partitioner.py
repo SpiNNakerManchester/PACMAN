@@ -82,7 +82,13 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
         # Partition one vertex at a time
         for vertex in vertices:
-            self._partition_vertex(vertex, subgraph, graph_to_sub_graph_mapper)
+            #check that the vertex hasnt already been partitioned
+            subverts_from_vertex = \
+                graph_to_sub_graph_mapper.get_subvertices_from_vertex(vertex)
+            #if not, partition
+            if subverts_from_vertex is None:
+                self._partition_vertex(vertex, subgraph,
+                                       graph_to_sub_graph_mapper)
             progress_bar.update()
         progress_bar.end()
 
@@ -97,26 +103,42 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         return subgraph, graph_to_sub_graph_mapper
 
     def _partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper):
+        """private method (do not call from front ends) to partition a single \
+        vertex.
 
-        partiton_together_vertices = list()
-        partiton_together_vertices.append(vertex)
-        extra_vertices = vertex.get_partition_dependent_vertices()
-        if extra_vertices is not None:
-            for v in extra_vertices:
-                partiton_together_vertices.append(v)
-                if v.atoms != vertex.atoms:
-                    raise exceptions.PacmanPartitionException(
-                        "A vertex and its partition-dependent vertices must "
-                        "have the same number of atoms")
+        :param vertex: the vertex to partition
+        :param subgraph: the subgraph to add subverts to
+        :param graph_to_subgraph_mapper: the mappings object from graph to \
+        subgraph which needs to be update with new subverts
+        :type vertex: py:class:`pacman.model.graph.vertex.Vertex`
+        :type subgraph: py:class:`pacman.model.subgraph.subgraph.Subgraph`
+        :type graph_to_subgraph_mapper:
+        py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper'
+        :return: None
+        :rtype: None
+        :raise pacman.exceptions.PacmanPartitionException: if the extra vertex\
+         for partitioning identically has a different number of atoms than its
+         \counterpart.
+        """
+
+        partiton_together_vertices = \
+            self._locate_vertexes_to_partition_now(vertex)
 
         # Prepare for partitioning, getting information
         partition_data_objects = [v.get_partition_data_object()
                                   for v in partiton_together_vertices]
 
-        #locate max atoms for these vertexes (non machine)
-        max_atoms_per_core = \
-            self._get_max_atoms_per_core(partiton_together_vertices)
+        #locate max atoms per core
+        possible_max_atoms = list()
+        for vertex in partiton_together_vertices:
+            max_atom_constraints =\
+                self._locate_constrants_of_type(vertex.constraints,
+                                                PartitionerMaximumSizeConstraint)
+            for constraint in max_atom_constraints:
+                possible_max_atoms.append(constraint.size)
+        max_atoms_per_core = min(possible_max_atoms)
 
+        #partition by atoms
         self._partition_by_atoms(partiton_together_vertices, vertex.atoms,
                                  max_atoms_per_core, partition_data_objects,
                                  subgraph, graph_to_subgraph_mapper)
@@ -124,9 +146,27 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
     def _partition_by_atoms(self, vertices, n_atoms, max_atoms_per_core,
                             partition_data_objects, subgraph,
                             graph_to_subgraph_mapper):
-        """
-        tries to partition subvertexes on how many atoms it can fit on
+        """(private method, do not call from outside partitioner) \
+        tries to partition subvertexes on how many atoms it can fit on\
         each subvert
+        
+        :param vertices: the vertexes that need to be partitoned at the same \
+        time
+        :param n_atoms: the atoms of the first vertex
+        :param max_atoms_per_core: the min max atoms from all the vertexes \
+        considered that have max_atom constraints
+        :param partition_data_objects: the parittion objects for memory \
+        estiamtes
+        :param subgraph: the subgraph of the propblem space to put subverts in
+        :param graph_to_subgraph_mapper: the mapper from graph to subgraph
+        
+        :type vertices: iterable list of pacman.model.graph.vertex.Vertex
+        :type n_atoms: int
+        :type max_atoms_per_core: int
+        :type partition_data_objects: iterable lsit of partitionable obejcts
+        :type subgraph: pacman.model.subgraph.subgraph.Subgraph
+        :type graph_to_subgraph_mapper:
+         py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper'
         """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
@@ -288,3 +328,18 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         dtcm_ratio = (float(resources.dtcm) / float(max_resources.dtcm))
         sdram_ratio = (float(resources.sdram) / float(max_resources.sdram))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
+
+    def _locate_vertexes_to_partition_now(self, vertex):
+        partiton_together_vertices = list()
+        partiton_together_vertices.append(vertex)
+        same_size_vertex_constrants = \
+            self._locate_constrants_of_type(
+                vertex.constraints, PartitionerSameSizeAsVertexConstraint)
+        for constraint in same_size_vertex_constrants:
+            if constraint.vertex.n_atoms != vertex.n_atoms:
+                raise exceptions.PacmanPartitionException(
+                    "A vertex and its partition-dependent vertices must "
+                    "have the same number of atoms")
+            else:
+                partiton_together_vertices.append(constraint.vertex)
+        return partiton_together_vertices

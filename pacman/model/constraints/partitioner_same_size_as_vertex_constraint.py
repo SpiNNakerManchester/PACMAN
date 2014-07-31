@@ -19,11 +19,6 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
             self, "partitioner same size as other vertex constraint with vertex"
                   "{}".format(vertex))
         self._vertex = vertex
-    
-    def is_partitioner_constraint(self):
-        """ Overridden method to indicate that this is a partitioner constraint
-        """
-        return True
 
     @property
     def vertex(self):

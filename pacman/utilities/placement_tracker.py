@@ -1,45 +1,51 @@
+from pacman import exceptions
+
+
 class PlacementTracker():
 
-    def __init__(self, board_id, x, y, processors, sdram_size, cpu_speed,
-                 dtcm_per_proc):
-        self.board_id = board_id
-        self.x = x
-        self.y = y
-        self.sdram_size = sdram_size
-        self.cpu_speed = cpu_speed
-        self.dtcm_per_proc = dtcm_per_proc
+    def __init__(self, machine):
+        self._placements_avilable = dict()
+        self._free_cores = 0
+        for chip in machine.chips:
+            key = "{}:{}".format(chip.x, chip.y)
+            self._placements_avilable[key] = list()
+            for processor in chip.processors:
+                self._placements_avilable[key]\
+                    .append(processor.processor_id)
+                self._free_cores += 1
+        placements_assigned = dict()
 
-        self.core_available = list()
-        next_id = 0
-        self.free_cores = 0
-        for prcoessor in sorted(processors,
-                                key=lambda processor: processor.idx):
-            if next_id is not None:
-                for _ in range(next_id, prcoessor.idx):
-                    self.core_available.append(False)
-            self.core_available.append(True)
-            self.free_cores += 1
-            next_id = prcoessor.idx + 1
-        self.free_sdram = sdram_size
+    def assign_core(self, x, y, p):
+        key = "{}:{}".format(x, y)
+        #check key exists
+        if not key in self._placements_avilable.keys():
+            raise exceptions.PacmanPlaceException(
+                "cannot assign to chip {}:{} as there are no more avilable "
+                "processors".format(x, y))
+        #locate processor list
+        processors_avilable = self._placements_avilable[key]
+        #check that theres a processor avialble
+        if not p in processors_avilable:
+            raise exceptions.PacmanPlaceException(
+                "cannot assign to processor {} in chip {}:{} as the processor "
+                "has already been assigned")
+        #remove processor
+        processors_avilable.remove(p)
+        self._free_cores -= 1
+        #remove key if chip filled
+        if len(processors_avilable) == 0:
+            del self._placements_avilable[key]
 
-    def assign_core(self, sdram, core=None):
-        chosen_core = None
-        if core is not None:
-            self.core_available[core] = False
-            chosen_core = core
+    def unassign_core(self, x, y, p):
+        key = "{}:{}".format(x, y)
+        if not key in self._placements_avilable.keys():
+            self._placements_avilable[key] = list(p)
         else:
-            for i in range(0, len(self.core_available)):
-                if self.core_available[i]:
-                    self.core_available[i] = False
-                    chosen_core = i
-                    break
-
-        self.free_cores -= 1
-        self.free_sdram -= sdram
-
-        return chosen_core
-
-    def unassign_core(self, sdram, core):
-        self.core_available[core] = True
-        self.free_cores += 1
-        self.free_sdram -= sdram
+            processor_list = self._placements_avilable[key]
+            if not p in processor_list:
+                self._placements_avilable[key].append(p)
+            else:
+                raise exceptions.PacmanPlaceException(
+                    "cannot unassign processor {} in chip {}:{} as the "
+                    "processor has already been unassigned")
+        self._free_cores += 1

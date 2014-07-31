@@ -20,11 +20,6 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
             self, label="placer same chip constraint with subvertex {}"
                         .format(subvertex))
         self._subvertex = subvertex
-        
-    def is_placer_constraint(self):
-        """ Overridden method to indicate that this is a placer constraint
-        """
-        return True
 
     @property
     def rank(self):

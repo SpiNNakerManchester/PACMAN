@@ -1,5 +1,4 @@
 from abc import ABCMeta
-from abc import abstractmethod
 from six import add_metaclass
 
 
@@ -11,15 +10,6 @@ class AbstractConstraint(object):
 
     def __init__(self, label):
         self._label = label
-
-    @abstractmethod
-    def is_constraint(self):
-        """ Method required to ensure that this is a constraint
-        
-        :return: True if this is a constraint
-        :rtype: bool
-        """
-        pass
 
     @property
     def label(self):

@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 class RoutingInfoAllocator:
     """ Used to obtain routing information from a placed subgraph
     """
