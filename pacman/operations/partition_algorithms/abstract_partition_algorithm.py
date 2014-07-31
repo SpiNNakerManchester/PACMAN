@@ -114,7 +114,7 @@ class AbstractPartitionAlgorithm(object):
                 return sdram_avilable
 
         # no PlacerChipAndCoreConstraint was found, search till max value
-        # returned
+        # returned or highest avilable
         maximum_sdram = 0
         for chip in machine.chips:
             sdram_avilable = self._sdram_tracker.get_usage(chip.x, chip.y)
@@ -126,7 +126,21 @@ class AbstractPartitionAlgorithm(object):
                 return maximum_sdram
 
     @staticmethod
-    def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
+    def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
+        '''generates the sub edges for the subvertices in the subgraph.
+
+        :param subgraph: the subgraph to work with
+        :param graph_to_subgraph_mapper: the mapper between graph and subgraph
+        :param graph: the graph to work with
+        :type subgraph: pacman.model.subgraph.subgraph.Subgraph
+        :type graph_to_subgraph_mapper:
+        pacman.model.graph_subgraph_mapper.GraphSubgraphMapper
+        :type graph: pacman.model.graph.graph.Graph
+        :return: None
+        :rtype: None
+        :raise None: this method does not raise any known exceptions
+
+        '''
          #start progress bar
         progress_bar = ProgressBar(len(subgraph.subvertices),
                                    "on partitioning the graph's edges")
@@ -149,15 +163,30 @@ class AbstractPartitionAlgorithm(object):
             progress_bar.update()
         progress_bar.end()
 
-    def _update_sdram_allocator(self, vertex, vertex_requirement,
+    def _update_sdram_allocator(self, subvertex, sub_vertex_requirement,
                                 machine):
+        """private method for partitioners. Not to be called by front ends. \
+        Updates the interal sdram tracker to account for a node being
+        partitioned and "placed"
+
+        :param subvertex: the subvertex thats been generated and placed
+        :param sub_vertex_requirement: the sdram usage of the subvertex
+        :param machine: the machine object
+        :type subvertex: pacman.model.subgraph.subvertex.Subvertex
+        :type sub_vertex_requirement: int
+        :type machine: spinnMachine.machine.Machine
+        :return None
+        :rtype: None
+        :raise PacmanPartitionException: when theres no space to put the \
+        subvertex on the machine via the sdram tracker.
+        """
         allocated = False
-        for constraint in vertex.constraints:
+        for constraint in subvertex.constraints:
             if isinstance(constraint, PlacerChipAndCoreConstraint):
                 usage = self._sdram_tracker.get_usage(constraint._x,
                                                       constraint.y)
                 self._sdram_tracker.add_usage(constraint.x, constraint.y,
-                                              usage + vertex_requirement)
+                                              usage + sub_vertex_requirement)
                 allocated = True
 
         chip_index = 0
@@ -167,22 +196,27 @@ class AbstractPartitionAlgorithm(object):
             key = self._sdram_tracker.key_from_chip_coords(chip.x, chip.y)
             if not key in self._sdram_tracker.keys:
                 self._sdram_tracker.add_usage(chip.x, chip.y,
-                                              vertex_requirement)
+                                              sub_vertex_requirement)
                 allocated = True
             else:
                 usage = self._sdram_tracker.get_usage(chip.x, chip.y)
-                if (SDRAM.DEFAULT_SDRAM_BYTES - usage) >= vertex_requirement:
+                if (SDRAM.DEFAULT_SDRAM_BYTES - usage) >= sub_vertex_requirement:
                     self._sdram_tracker.add_usage(chip.x, chip.y,
-                                                  vertex_requirement + usage)
+                                                  sub_vertex_requirement + usage)
                     allocated = True
 
         if not allocated:
             raise exceptions.PacmanPartitionException(
-                "no space to put a subvertex of vertex {}".format(vertex.label))
+                "no space to put subvertex {}".format(subvertex.label))
 
 
     @staticmethod
     def _add_vertex_constraints_to_subvertex(subvert, vertex):
+        """private method for partitioners, not to be used by front end
+        updates subvertices with their assocaited vertex's constraints that are
+        not partitioner based. As future algorithums only use the subgraph,
+        and partitionable constraints should not be needed from now on.
+        """
         for constraint in vertex.constraints:
             if not isinstance(constraint, AbstractPartitionerConstraint):
                 subvert.add_constraint(constraint)

@@ -122,7 +122,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             progress_bar.update()
         progress_bar.end()
 
-        self.generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph)
+        self._generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph)
 
         return subgraph, graph_to_subgraph_mapper
 
