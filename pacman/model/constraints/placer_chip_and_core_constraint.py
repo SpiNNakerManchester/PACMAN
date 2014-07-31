@@ -1,5 +1,6 @@
 from pacman.model.constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
+import sys
 
 
 class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
@@ -19,16 +20,26 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         :raise None: does not raise any known exceptions
         """
         AbstractPlacerConstraint.__init__(
-            self, label="placer chip and core constraint at coords {},{},{}"
-                        .format(x, y, p))
+            self, label="placer chip and core constraint at coords "
+                        "{},{},{}".format(x, y, p))
         self._x = x
         self._y = y
         self._p = p
+
+
         
     def is_placer_constraint(self):
         """ Overridden method to indicate that this is a placer constraint
         """
         return True
+
+    @property
+    def rank(self):
+        rank = None
+        if self.p is not None:
+            return sys.maxint
+        else:
+            return sys.maxint - 1
 
     @property
     def x(self):

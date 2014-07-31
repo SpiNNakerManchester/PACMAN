@@ -1,6 +1,8 @@
 from pacman.model.constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
 
+import sys
+
 
 class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
     """ A constraint that indicates that a subvertex should be placed on the\
@@ -23,6 +25,10 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
         """ Overridden method to indicate that this is a placer constraint
         """
         return True
+
+    @property
+    def rank(self):
+        return sys.maxint - 2
 
     @property
     def subvertex(self):
