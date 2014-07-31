@@ -18,7 +18,7 @@ def placer_report(report_folder, hostname, graph, graph_to_subgraph_mapper,
 def router_report(report_folder, hostname, graph, graph_to_sub_graph_mapper,
                   placements, include_dat_based=False):
     router_report_from_router_tables(report_folder)
-    rotuer_edge_information(report_folder, hostname, graph,
+    router_edge_information(report_folder, hostname, graph,
                             graph_to_sub_graph_mapper, placements)
     if include_dat_based:
         router_report_from_dat_file(report_folder)
@@ -100,7 +100,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
     for v in graph._vertices:
         vertex_name = v.label
         vertex_model = v.model_name
-        num_atoms = v.atoms
+        num_atoms = v.n_atoms
         f_place_by_vertex.write("**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
@@ -237,14 +237,16 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine):
     f_mem_used_by_core.close()
 
 
-
 def router_report_from_router_tables(report_folder):
     pass
+
 
 def router_report_from_dat_file(report_folder):
     pass
 
-def rotuer_edge_information(report_folder, hostname, graph,
+
+#ToDO NOT CHECKED YET
+def router_edge_information(report_folder, hostname, graph,
                             graph_to_subgraph_mapper, placements):
     """
     Generate report on the routing of sub-edges across the machine.
