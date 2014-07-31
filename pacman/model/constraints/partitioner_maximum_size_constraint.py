@@ -18,11 +18,6 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
             self, "partitioner max atom per core constraint with size {}"
                   .format(size))
         self._size = size
-        
-    def is_partitioner_constraint(self):
-        """ Overridden method to indicate that this is a partitioner constraint
-        """
-        return True
 
     @property
     def size(self):

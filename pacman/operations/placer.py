@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 class Placer:
     """ Used to place the subvertices of a subgraph on to specific cores of\
         a machine

@@ -26,13 +26,6 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         self._y = y
         self._p = p
 
-
-        
-    def is_placer_constraint(self):
-        """ Overridden method to indicate that this is a placer constraint
-        """
-        return True
-
     @property
     def rank(self):
         rank = None

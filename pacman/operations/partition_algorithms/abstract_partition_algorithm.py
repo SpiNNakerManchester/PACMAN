@@ -14,6 +14,9 @@ from pacman import exceptions
 from pacman.utilities.progress_bar import ProgressBar
 from spinn_machine.sdram import SDRAM
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractPartitionAlgorithm(object):
@@ -75,25 +78,6 @@ class AbstractPartitionAlgorithm(object):
                             "the partitioning constraint '{}', which has been "
                             "placed on vertex labelled {}"
                             .format(constraint, vertex.label))
-
-    @staticmethod
-    def _locate_max_atom_constrants(constraints):
-        """locates all max_atom constraints in a given collection of constraints
-
-        :param constraints: a iterable of
-         pacman.model.constraints.AbstractConstraint.AbstractConstraint
-        :type constraints: a iterable object
-        :return: a list containing only
-        pacman.model.constraints.partitioner_maximum_size_constraint constraints
-        or a empty list if none exist
-        :rtype: iterable object
-        :raises None: no known exceptions
-        """
-        max_atom_constraints = list()
-        for constrant in constraints:
-            if isinstance(constrant, PartitionerMaximumSizeConstraint):
-                max_atom_constraints.append(constrant)
-        return max_atom_constraints
 
     def _get_maximum_resources_per_processor(self, vertex_constriants, machine):
         """locates the maximum rsources avilable given the subverts already
@@ -218,7 +202,6 @@ class AbstractPartitionAlgorithm(object):
         and partitionable constraints should not be needed from now on.
         """
         for constraint in vertex.constraints:
-            if not isinstance(constraint, AbstractPartitionerConstraint):
+            if not (issubclass(type(constraint),
+                               type(AbstractPartitionerConstraint))):
                 subvert.add_constraint(constraint)
-
-

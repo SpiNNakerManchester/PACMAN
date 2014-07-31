@@ -1,13 +1,11 @@
-from pacman.model.constraints.abstract_partitioner_constraint \
-    import AbstractPartitionerConstraint
+from pacman.model.constraints.abstract_constraint import AbstractConstraint
 
 
-class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
-    """ A constraint which indicates that a vertex must be partitioned so that\
-        there are the same number of subvertices and the same number of atoms\
-        in each subvertex as those created for another vertex
+class VertexHasDependentConstraint(AbstractConstraint):
+    """ A constraint which indicates that a vertex A must have a edge to another
+    vertex B, where B only exists becuase A uses it.
     """
-    
+
     def __init__(self, vertex):
         """
 
@@ -15,14 +13,14 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         :type vertex: :py:class:`pacman.model.graph.vertex.Vertex`
         :raise None: does not raise any known exceptions
         """
-        AbstractPartitionerConstraint.__init__(
+        AbstractConstraint.__init__(
             self, "partitioner same size as other vertex constraint with vertex"
                   "{}".format(vertex))
         self._vertex = vertex
 
     @property
     def vertex(self):
-        """ The vertex to partition with
+        """ The vertex to link with
 
         :return: the vertex
         :rtype: :py:class:`pacman.model.graph.vertex.Vertex`

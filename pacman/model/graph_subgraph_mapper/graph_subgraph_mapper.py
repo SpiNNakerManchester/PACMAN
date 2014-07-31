@@ -112,8 +112,8 @@ class GraphSubgraphMapper(object):
 
         :param vertex: the vertex for which to find the associated subvertices
         :type vertex: pacman.model.graph.vertex.Vertex
-        :return: a set of subvertices
-        :rtype: iterable set
+        :return: a set of subvertices or None if no vertex exists in the mappings
+        :rtype: iterable set or None
         :raise None: Raises no known exceptions
         """
         if vertex in self._subvertices_from_vertex.keys():

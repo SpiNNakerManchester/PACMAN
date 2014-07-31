@@ -12,20 +12,3 @@ class AbstractPartitionerConstraint(AbstractConstraint):
 
     def __init__(self, label):
         AbstractConstraint.__init__(self, label)
-    
-    def is_constraint(self):
-        """ Overridden method indicating that this is a constraint
-        
-        :return: True
-        :rtype: bool
-        """
-        return True
-    
-    @abstractmethod
-    def is_partitioner_constraint(self):
-        """ Ensures that this is a partitioner constraint
-        
-        :return: True if this is a partitioner constraint
-        :rtype: bool
-        """
-        pass

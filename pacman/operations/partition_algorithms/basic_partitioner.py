@@ -8,6 +8,11 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from spinn_machine.processor import Processor
 from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities import utility_calls
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class BasicPartitioner(AbstractPartitionAlgorithm):
@@ -87,7 +92,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             max_atom_values = [apc_sd, apc_dt, apc_cp]
 
             max_atoms_constraints = \
-                self._locate_max_atom_constrants(vertex.constraints)
+                utility_calls.locate_constrants_of_type(
+                    vertex.constraints, PartitionerMaximumSizeConstraint)
             for max_atom_constrant in max_atoms_constraints:
                 max_atom_values.append(max_atom_constrant.size)
 
