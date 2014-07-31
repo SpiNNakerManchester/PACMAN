@@ -14,7 +14,7 @@ class VertexHasDependentConstraint(AbstractConstraint):
         :raise None: does not raise any known exceptions
         """
         AbstractConstraint.__init__(
-            self, "partitioner same size as other vertex constraint with vertex"
+            self, "vertex {} requires vertex {} to oeprate correctly"
                   "{}".format(vertex))
         self._vertex = vertex
 
