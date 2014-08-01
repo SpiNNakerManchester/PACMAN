@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+from pacman.utilities.sdram_tracker import SDRAMTracker
 
 from spinn_machine.sdram import SDRAM
 
@@ -11,8 +12,10 @@ def placer_report(report_folder, hostname, graph, graph_to_subgraph_mapper,
                   placements, machine):
     placement_report_by_vertex(report_folder, hostname, graph,
                                graph_to_subgraph_mapper, placements)
-    placement_by_core(report_folder, hostname, placements, machine)
-    sdram_usage_per_chip(report_folder, hostname, placements, machine)
+    placement_by_core(report_folder, hostname, placements, machine,
+                      graph_to_subgraph_mapper)
+    sdram_usage_per_chip(report_folder, hostname, placements, machine,
+                         graph_to_subgraph_mapper, graph)
 
 
 def router_report(report_folder, hostname, graph, graph_to_sub_graph_mapper,
@@ -97,7 +100,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
     used_sdram_by_chip = dict()
     subvertex_by_processor = dict()
 
-    for v in graph._vertices:
+    for v in graph.vertices:
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
@@ -130,7 +133,8 @@ def placement_report_by_vertex(report_folder, hostname, graph,
     f_place_by_vertex.close()
 
 
-def placement_by_core(report_folder, hostname, placements, machine):
+def placement_by_core(report_folder, hostname, placements, machine,
+                      graph_to_subgraph_mapper):
 
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
@@ -160,15 +164,18 @@ def placement_by_core(report_folder, hostname, placements, machine):
                     f_place_by_core.write("**** Chip: ({}, {})\n"
                                           .format(chip.x, chip.y))
                     f_place_by_core.write("Application cores: {}\n"
-                                          .format(len(chip.processors)))
+                                          .format(len(list(chip.processors))))
                     written_header = True
-                proc_id = processor[processor.processor_id]
+                proc_id = processor.processor_id
                 subvertex = \
                     placements.get_subvertex_on_processor(
                         chip.x, chip.y, processor.processor_id)
-                vertex_label = subvertex.vertex.label
-                vertex_model = subvertex.vertex.model_name
-                vertex_atoms = subvertex.vertex.n_atoms
+                vertex = \
+                    graph_to_subgraph_mapper\
+                    .get_vertex_from_subvertex(subvertex)
+                vertex_label = vertex.label
+                vertex_model = vertex.model_name
+                vertex_atoms = vertex.n_atoms
                 lo_atom = subvertex.lo_atom
                 hi_atom = subvertex.hi_atom
                 num_atoms = hi_atom - lo_atom + 1
@@ -185,7 +192,8 @@ def placement_by_core(report_folder, hostname, placements, machine):
     f_place_by_core.close()
 
 
-def sdram_usage_per_chip(report_folder, hostname, placements, machine):
+def sdram_usage_per_chip(report_folder, hostname, placements, machine,
+                         graph_to_subgraph_mapper, graph):
     file_name = report_folder + os.sep + "chip_sdram_usage_by_core.rpt"
     f_mem_used_by_core = None
     try:
@@ -200,34 +208,30 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine):
     f_mem_used_by_core.write("Generated: %s" % time_date_string)
     f_mem_used_by_core.write(" for target machine '{}'".format(hostname))
     f_mem_used_by_core.write("\n\n")
-    used_sdram_by_chip = dict()
+    used_sdram_by_chip = SDRAMTracker()
 
-    for placement in placements:
+    for placement in placements.placements:
         subvert = placement.subvertex
-        requirements = subvert.get_resources()
+        vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(subvert)
+        vertex_in_edges = graph.incoming_edges_to_vertex(vertex)
+        requirements = \
+            vertex.get_resources_used_by_atoms(subvert.lo_atom, subvert.hi_atom,
+                                               vertex_in_edges)
+
         x, y, p = placement.x, placement.y, placement.p
-        if subvert.vertex.virtual:
-            f_mem_used_by_core.write(
-                "SDRAM requirements for core ({},{},{}) is 0 KB\n".format(
-                x, y, p))
-        else:
-            f_mem_used_by_core.write(
-                "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
-                x, y, p, int(requirements.sdram / 1024.0)))
-        key = "{},{}".format(x, y)
-        if not subvert.vertex.virtual:
-            used_sdram_by_chip[key] += requirements.sdram
+        f_mem_used_by_core.write(
+            "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
+            x, y, p, int(requirements.sdram.get_value() / 1024.0)))
+        used_sdram_by_chip.add_usage(x, y, requirements.sdram.get_value())
 
     for chip in machine.chips:
-        x, y = chip.x, chip.y
-        key = "{},{}".format(chip.x, chip.y)
         try:
-            used_sdram = used_sdram_by_chip[key]
+            used_sdram = used_sdram_by_chip.get_usage(chip.x, chip.y)
             if used_sdram != 0:
                 f_mem_used_by_core.write(
                     "**** Chip: ({}, {}) has total memory usage of"
                     " {} KB out of a max of "
-                    "{} MB \n\n".format(x, y, int(used_sdram / 1024.0),
+                    "{} MB \n\n".format(chip.x, chip.y, int(used_sdram / 1024.0),
                                         int(SDRAM.DEFAULT_SDRAM_BYTES /
                                             (1024.0 * 1024.0))))
         except KeyError:
