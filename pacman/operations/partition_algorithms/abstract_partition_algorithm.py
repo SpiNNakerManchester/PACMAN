@@ -101,7 +101,8 @@ class AbstractPartitionAlgorithm(object):
         # returned or highest avilable
         maximum_sdram = 0
         for chip in machine.chips:
-            sdram_avilable = self._sdram_tracker.get_usage(chip.x, chip.y)
+            sdram_used = self._sdram_tracker.get_usage(chip.x, chip.y)
+            sdram_avilable = chip.sdram.size - sdram_used
             if sdram_avilable >= maximum_sdram:
                 maximum_sdram = sdram_avilable
             #if a chip has been returned with sdram usage as the hard coded
@@ -201,7 +202,7 @@ class AbstractPartitionAlgorithm(object):
         not partitioner based. As future algorithums only use the subgraph,
         and partitionable constraints should not be needed from now on.
         """
+        subclasses = AbstractPartitionerConstraint.__subclasses__()
         for constraint in vertex.constraints:
-            if not (issubclass(type(constraint),
-                               type(AbstractPartitionerConstraint))):
+            if not type(constraint) in subclasses:
                 subvert.add_constraint(constraint)
