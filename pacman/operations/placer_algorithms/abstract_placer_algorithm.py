@@ -4,6 +4,10 @@ from six import add_metaclass
 
 from pacman.model.constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
+from pacman.model.constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_subvertex_same_chip_constraint import \
+    PlacerSubvertexSameChipConstraint
 from pacman.utilities.placement_tracker import PlacementTracker
 from pacman.utilities.sdram_tracker import SDRAMTracker
 from pacman import exceptions
@@ -23,6 +27,7 @@ class AbstractPlacerAlgorithm(object):
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         self._placement_tracker = PlacementTracker(machine)
+        self._machine = machine
         self._sdram_tracker = SDRAMTracker()
         self._graph = graph
         self._supported_constrants = list()
@@ -35,7 +40,7 @@ class AbstractPlacerAlgorithm(object):
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :param graph_to_subgraph_mapper: the mappings between graph and subgraph
         :type graph_to_subgraph_mapper:
-        pacman.model.graph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
+    pacman.model.graph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: If something\
@@ -98,3 +103,39 @@ class AbstractPlacerAlgorithm(object):
                             "the placment constraint '{}', which has been "
                             "placed on subvert labelled {}"
                             .format(constraint, subvert.label))
+
+    def _reduce_constraints(self, constraints, subvertex_label, placements):
+        x = None
+        y = None
+        p = None
+        for constraint in constraints:
+            if type(constraint) == type(PlacerChipAndCoreConstraint):
+                x = self._check_param(constraint.x, x, subvertex_label)
+                y = self._check_param(constraint.y, y, subvertex_label)
+                p = self._check_param(constraint.p, p, subvertex_label)
+            elif type(constraint) == type(PlacerSubvertexSameChipConstraint):
+                other_subvertex = constraint.subvertex
+                other_placement = \
+                    placements.get_placement_of_subvertex(other_subvertex)
+                if other_placement is not None:
+                    x = self._check_param(constraint.x, other_placement.x,
+                                          subvertex_label)
+                    y = self._check_param(constraint.y, other_placement.y,
+                                          subvertex_label)
+                    p = self._check_param(constraint.p, other_placement.p,
+                                          subvertex_label)
+                x = self._check_param(constraint.x, x, subvertex_label)
+                y = self._check_param(constraint.y, y, subvertex_label)
+                p = self._check_param(constraint.p, p, subvertex_label)
+
+    @staticmethod
+    def _check_param(param_to_check, param_to_update, subvertex_label):
+        if param_to_check is not None:
+            if param_to_update is None:
+                param_to_update = param_to_check
+            elif param_to_update != param_to_check:
+                raise exceptions.PacmanPlaceException(
+                    "there are conflicting placement constraints which "
+                    "together cannot be satifisied for subvertex {}"
+                    .format(subvertex_label))
+        return param_to_update
