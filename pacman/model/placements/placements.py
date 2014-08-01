@@ -98,3 +98,5 @@ class Placements(object):
         :raise None: does not raise any known exceptions
         """
         return self._placements.itervalues()
+
+
