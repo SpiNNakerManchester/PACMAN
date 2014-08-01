@@ -16,9 +16,9 @@ class SDRAMTracker(object):
     def get_usage(self, chip_x, chip_y):
         key = self.key_from_chip_coords(chip_x, chip_y)
         if key in self._mapper.keys():
-            return SDRAM.DEFAULT_SDRAM_BYTES - self._mapper[key]
+            return self._mapper[key]
         else:
-            return SDRAM.DEFAULT_SDRAM_BYTES
+            return 0
 
     @property
     def keys(self):
