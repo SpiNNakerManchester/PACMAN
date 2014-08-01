@@ -19,15 +19,16 @@ def placer_report(report_folder, hostname, graph, graph_to_subgraph_mapper,
 
 
 def router_report(report_folder, hostname, graph, graph_to_sub_graph_mapper,
-                  placements, include_dat_based=False):
-    router_report_from_router_tables(report_folder)
+                  placements, routing_tables, include_dat_based=False):
+    router_report_from_router_tables(report_folder, routing_tables)
     router_edge_information(report_folder, hostname, graph,
                             graph_to_sub_graph_mapper, placements)
     if include_dat_based:
         router_report_from_dat_file(report_folder)
 
 
-def routing_info_report(report_folder):
+def routing_info_report(report_folder, hostname, subgraph, placements,
+                        routing_infos):
     pass
 
 
@@ -241,7 +242,7 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     f_mem_used_by_core.close()
 
 
-def router_report_from_router_tables(report_folder):
+def router_report_from_router_tables(report_folder, routing_tables):
     pass
 
 
