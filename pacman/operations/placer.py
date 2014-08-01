@@ -32,9 +32,10 @@ class Placer:
 
         #set up a default placer algorithum if none are specified
         if self._placer_alogrithum is None:
-            self._placer_alogrithum = BasicPlacer(self._machine)
+            self._placer_alogrithum = BasicPlacer(self._machine, self._graph)
         else:
-            self._placer_alogrithum = placer_algorithm(self._machine)
+            self._placer_alogrithum = placer_algorithm(self._machine,
+                                                       self._graph)
 
     def run(self, subgraph, graph_to_subgraph_mapper):
         """ Execute the algorithm on the subgraph and place it on the machine
