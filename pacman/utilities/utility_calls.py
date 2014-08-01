@@ -16,8 +16,9 @@ def locate_constrants_of_type(constraints, constraint_type):
     :raises None: no known exceptions
     """
     passed_constraints = list()
+    subclasses = constraint_type.__subclasses__()
+    subclasses.append(constraint_type)
     for constrant in constraints:
-        if issubclass(type(constrant) , type(constraint_type)):
+        if type(constrant) in subclasses:
             passed_constraints.append(constrant)
-
     return passed_constraints
