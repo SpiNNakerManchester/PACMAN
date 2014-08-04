@@ -37,7 +37,7 @@ class AbstractPartitionAlgorithm(object):
         """
         self._machine_time_step = machine_time_step
         self._runtime_in_machine_time_steps = runtime_in_machine_time_steps
-        self._supported_constrants = list()
+        self._supported_constraints = list()
         self._sdram_tracker = SDRAMTracker()
     
     @abstractmethod

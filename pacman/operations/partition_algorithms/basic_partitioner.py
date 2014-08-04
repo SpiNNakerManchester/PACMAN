@@ -35,7 +35,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         """
         AbstractPartitionAlgorithm.__init__(self, machine_time_step,
                                             runtime_in_machine_time_steps)
-        self._supported_constrants.append(PartitionerMaximumSizeConstraint)
+        self._supported_constraints.append(PartitionerMaximumSizeConstraint)
 
     #inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
@@ -54,7 +54,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         utility_calls.check_algorithum_can_support_constraints(
             object_list=graph.vertices,
             constraint_check_level=AbstractPartitionerConstraint,
-            supported_constraints=self._supported_constrants)
+            supported_constraints=self._supported_constraints)
         #start progress bar
         progress_bar = ProgressBar(len(graph.vertices),
                                    "on partitioning the graph's vertices")
