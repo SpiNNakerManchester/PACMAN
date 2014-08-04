@@ -8,6 +8,9 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
     """ An abstract algorithm that can produce routing keys and masks for\
         subedges in a subgraph
     """
+
+    def __init__(self):
+        self._supported_constrants = list()
     
     @abstractmethod
     def allocate_routing_info(self, subgraph, placements):
@@ -22,4 +25,4 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
-        pass
+

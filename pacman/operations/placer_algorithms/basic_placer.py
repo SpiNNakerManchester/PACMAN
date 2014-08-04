@@ -47,11 +47,15 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                    goes wrong with the placement
         """
         #check that the algorithum can handle the constraints
-        self._check_can_support_constraints(subgraph)
+        utility_calls.check_algorithum_can_support_constraints(
+            object_list=subgraph.subvertices,
+            supported_constraints=self._supported_constrants,
+            constraint_check_level=AbstractPlacerConstraint)
 
         placements = Placements()
         ordered_subverts = \
-            self._sort_subverts_by_constraint_authority(subgraph.subvertices)
+            utility_calls.sort_objects_by_constraint_authority(
+                subgraph.subvertices)
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
@@ -184,9 +188,6 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         free_sdram_met = False
         cpu_speed_met = False
         dtcm_per_proc_met = False
-        x = None
-        y = None
-        p = None
         for chip in chips_in_a_ordering:
             for processor in chip.processors:
                 if (processor.processor_id != 0 and

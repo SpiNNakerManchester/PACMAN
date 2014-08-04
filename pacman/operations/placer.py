@@ -16,9 +16,12 @@ class Placer:
         """
         :param placer_algorithm: The placer algorithm.  If not specified, a\
                     default algorithm will be used
+        :param machine: the machine object
+        :param report_folder:
+        :param report_states:
+
         :type placer_algorithm:\
                     :py:class:`pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm`
-        :param machine: the machine object
         :type machine: a spinnmachine.machine.Machine object
         :raise pacman.exceptions.PacmanInvalidParameterException: If\
                     placer_algorithm is not valid

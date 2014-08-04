@@ -1,6 +1,9 @@
+from pacman.operations.partition_algorithms.abstract_partition_algorithm import \
+    AbstractPartitionAlgorithm
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 from pacman.utilities import reports
+from pacman import exceptions
 
 import logging
 
@@ -17,8 +20,26 @@ class Partitioner:
         """
         :param partition_algorithm: A partitioning algorithm.  If not specified\
                     a default algorithm will be used
+        :param machine_time_step: the time step fo the amchien to which this \
+        application is being compiled to
+        :param no_machine_time_steps: The number of machine time steps that \
+        this application will run for
+        :param report_states: a holder class for what reports are needed to be \
+        enabled
+        :param placer_alogrithm: which placer algorithum is going to be used by\
+        algorithums which reuqire a placement alogirtuhm during parititoning
+        :param report_folder: the file path to which where reports are to be \
+        placed
+        :param hostname: the hostname of the machien to which this application\
+         is being compiled
         :type partition_algorithm:\
                     :py:class:`pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm`
+        :type machine_time_step: int
+        :type no_machine_time_steps: int
+        :type report_states: pacman.utilities.report_states.ReportStates
+        :type placer_alogrithm: implimentation of pacman.operations.placer_algorithms.AbstractPlacementAlgorithum
+        :type report_folder: str
+        :type hostname: str
         :raise pacman.exceptions.PacmanInvalidParameterException: If\
                     partition_algorithm is not valid
         """
@@ -32,6 +53,13 @@ class Partitioner:
             self._partitoner_algorithum = \
                 BasicPartitioner(machine_time_step, no_machine_time_steps)
         else:
+            if not partition_algorithm in \
+                    AbstractPartitionAlgorithm.__subclasses__():
+                raise exceptions.PacmanInvalidParameterException(
+                    "The given partitioning algorithum object is not a "
+                    "recongised partitioning algorithum", partition_algorithm,
+                    partition_algorithm)
+
             self._partitoner_algorithum = \
                 partition_algorithm(machine_time_step, no_machine_time_steps)
 

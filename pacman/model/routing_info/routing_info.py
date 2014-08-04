@@ -6,12 +6,13 @@ class RoutingInfo(object):
         and masks
     """
 
-    def __init__(self, subedge_info_items):
+    def __init__(self, subedge_info_items=None):
         """
         
         :param subedge_info_items: The subedge information items to add
         :type subedge_info_items: iterable of\
                     :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
+                    or none
         :raise pacman.exceptions.PacmanAlreadyExistsException: If there are any\
                     two items with the same key once the mask is applied\
                     which do not have the same source subvertex

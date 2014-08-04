@@ -55,30 +55,6 @@ class AbstractPartitionAlgorithm(object):
                    goes wrong with the partitioning
         """
 
-    def _check_can_support_partitioner_constraints(self, graph):
-        """checks that the constraints on the vertices in the graph are all
-        supported by the given implimentation of the partitioner.
-
-        :param graph: The graph to partition
-        :type graph: :py:class:`pacman.model.graph.graph.Graph`
-        :raise pacman.exceptions.PacmanPartitionException: if theres a
-        constraint in the vertices in the graph to which this implemntation
-        of the partitioner cannot handle
-        """
-        for vertex in graph.vertices:
-            for constraint in vertex.constraints:
-                if isinstance(constraint, AbstractPartitionerConstraint):
-                    located = False
-                    for supported_constraint in self._supported_constrants:
-                        if isinstance(constraint, supported_constraint):
-                            located = True
-                    if not located:
-                        raise exceptions.PacmanPartitionException(
-                            "the partitioning algorithum selected cannot support "
-                            "the partitioning constraint '{}', which has been "
-                            "placed on vertex labelled {}"
-                            .format(constraint, vertex.label))
-
     def _get_maximum_resources_per_processor(self, vertex_constriants, machine):
         """locates the maximum rsources avilable given the subverts already
         produced

@@ -1,3 +1,4 @@
+from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.operations.routing_info_allocator_algorithms.\
     abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
@@ -20,7 +21,8 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :raise None: this method does not raise any known exception
 
         """
-
+        AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
+        self._graph_to_sub_graph_mapper = graph_to_sub_graph_mapper
 
     def allocate_routing_info(self, subgraph, placements):
         """ Allocates routing information to the subedges in a subgraph
@@ -34,4 +36,18 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
-        pass
+        routing_infos = RoutingInfo()
+        for subvert in subgraph.subvertices:
+            out_going_subedges = \
+                subgraph.outgoing_subedges_from_subvertex(subvert)
+            for out_going_subedge in out_going_subedges:
+                routing_infos.add_subedge_info(
+                    self._allocate_subedge_key_mask(out_going_subedge))
+        return routing_infos
+
+    def _allocate_subedge_key_mask(self, out_going_subedge):
+
+
+
+
+

@@ -1,3 +1,5 @@
+from pacman.model.constraints.abstract_partitioner_constraint import \
+    AbstractPartitionerConstraint
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper import \
     GraphSubgraphMapper
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
@@ -49,7 +51,10 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
-        self._check_can_support_partitioner_constraints(graph)
+        utility_calls.check_algorithum_can_support_constraints(
+            object_list=graph.vertices,
+            constraint_check_level=AbstractPartitionerConstraint,
+            supported_constraints=self._supported_constrants)
         #start progress bar
         progress_bar = ProgressBar(len(graph.vertices),
                                    "on partitioning the graph's vertices")
@@ -120,7 +125,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 #update sdram calc
                 subvertex_usage = \
                     vertex.get_resources_used_by_atoms(
-                        counted, counted + alloc, imcoming_edges)\
+                        counted, counted + alloc - 1, imcoming_edges)\
                     .sdram.get_value()
                 self._update_sdram_allocator(vertex, subvertex_usage, machine)
                 self._add_vertex_constraints_to_subvertex(subvert, vertex)

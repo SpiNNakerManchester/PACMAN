@@ -17,6 +17,7 @@ class RoutingInfoAllocator:
         :param routing_info_allocator_algorithm: The routing info allocator\
                     algorithm.  If not specified, a default algorithm will be\
                     used
+
         :type routing_info_allocator_algorithm:\
 :py:class:`pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm`
         :raise pacman.exceptions.PacmanInvalidParameterException: If\
