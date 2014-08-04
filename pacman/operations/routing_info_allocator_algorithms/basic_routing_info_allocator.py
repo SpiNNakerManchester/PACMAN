@@ -7,6 +7,7 @@ from pacman.operations.routing_info_allocator_algorithms.\
     AbstractRoutingInfoAllocatorAlgorithm
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
+from pacman import exceptions
 
 
 class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
@@ -29,6 +30,7 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
         self._graph_to_sub_graph_mapper = graph_to_sub_graph_mapper
         self._used_masks = dict()
+        self._subvert_to_key_mapper = dict()
 
     def allocate_routing_info(self, subgraph, placements):
         """ Allocates routing information to the subedges in a subgraph
@@ -71,35 +73,64 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         :type placement: pacman.model.placements.placement.Placement
         :return: a subedge_routing_info which contains the key, and mask of the\
          subvert
-         :rtype:
+         :rtype: pacman.model.routing_info.subegde_rotuing_info.SubedgeRoutingInfo
+         :raise None: does not raise any known exceptions
         """
         key = self._get_key_from_placement(placement)
         subedge_routing_info = SubedgeRoutingInfo(
             key=key, mask=constants.DEFAULT_MASK, subedge=out_going_subedge)
         #check for storage of masks
-        self.check_masks(constants.DEFAULT_MASK, key)
+        self.check_masks(constants.DEFAULT_MASK, key, placement.subvertex)
         return subedge_routing_info
 
     @staticmethod
     def _get_key_from_placement(placement):
-        """
-
+        """returns a key given a placement
+        :param placement: the associated placement
+        :type placement: pacman.model.placements.placement.Placement
+        :return a int reperenstation of the key
+        :rtype: int
+        :raise None: does not raise any known expcetions
         """
         return placement.x << 24 | placement.y << 16 | placement.p << 11
 
-    def check_masks(self, new_mask, key):
-        """
+    def check_masks(self, mask, key, subvert):
+        """checks that the mask and key together havent been used before by\
+        another subvertex
 
+        :param mask: the mask used by the subvertex
+        :param key: the key used by the subvert
+        :param subvert: the subvert the key and mask are used by
+        :type mask: int
+        :type key: int
+        :type subvert: pacman.model.subgraph.subvertex.Subvertex
+        :return: None
+        :rtype: None
+        :raise PacmanRouteInfoAllocationException: when 2 or more subvertices \
+        are using the same key and mask
         """
-        if new_mask not in self._used_masks:
-            self._used_masks[new_mask] = list()
+        if mask not in self._used_masks:
+            self._used_masks[mask] = list()
         #add to list (newly created or otherwise)
-        self._used_masks[new_mask].append(key)
+        if key in self._used_masks[mask] \
+                and self._subvert_to_key_mapper[key] != subvert:
+            raise exceptions.PacmanRouteInfoAllocationException(
+                "this key and mask have been used by another subvertex already"
+                "and therefore cannot be used again. Please fix and try again")
+        self._used_masks[mask].append(key)
+        self._subvert_to_key_mapper[self.get_key_mask_combo(key, mask)] = subvert
 
     @staticmethod
     def get_key_mask_combo(key, mask):
-        """
+        """return the key mask combo
 
+        :param key: the key used by this subedge
+        :param mask: the mask used by this subedge
+        :type key: int
+        :type mask: int
+        :return: the key mask combo in int form
+        :rtype: int
+        :raise None: this method does not raise any known exceptions
         """
         combo = key & mask
         return combo

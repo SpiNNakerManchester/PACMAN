@@ -17,6 +17,14 @@ class RoutingInfoAllocator:
         :param routing_info_allocator_algorithm: The routing info allocator\
                     algorithm.  If not specified, a default algorithm will be\
                     used
+        :param hostname:
+        :param machine:
+        :param graph_to_sub_graph_mapper:
+        :param report_folder:
+        :param report_states:
+        :type hostname:
+        :type machine:
+        :type report_states
 
         :type routing_info_allocator_algorithm:\
 :py:class:`pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm`

@@ -17,9 +17,14 @@ class Placer:
         :param placer_algorithm: The placer algorithm.  If not specified, a\
                     default algorithm will be used
         :param machine: the machine object
-        :param report_folder:
-        :param report_states:
-
+        :param report_folder: the folder where reprots are stored
+        :param report_states: the states of pacman based report vlaues
+        :param hostname: the hostname of the machine
+        :param graph: the graph object of the application problem
+        :type report_states: pacman.utility.report_states.ReportStates
+        :type report_folder: str
+        :type hostname: int
+        :type graph: pacman.model.graph.graph.Graph object
         :type placer_algorithm:\
                     :py:class:`pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm`
         :type machine: a spinnmachine.machine.Machine object

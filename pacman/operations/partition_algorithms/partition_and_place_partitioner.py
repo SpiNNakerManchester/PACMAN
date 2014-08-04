@@ -150,8 +150,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             self._locate_vertexes_to_partition_now(vertex)
 
         # Prepare for partitioning, getting information
-        partition_data_objects = [v.get_partition_data_object()
-                                  for v in partiton_together_vertices]
+        #todo not needed till we get to random distrubtions
+        partition_data_objects = None
 
         #locate max atoms per core
         possible_max_atoms = list()
@@ -307,7 +307,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
             # Place the vertex
             x, y, p = \
                 self._placer_algorithm.place_subvertex(used_resources,
-                                                        vertex.constraints)
+                                                       vertex.constraints)
             used_placements.append((vertex, partition_data_object, x, y, p,
                                     used_resources, resources))
 
@@ -418,7 +418,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
 
         :param vertex: the vertex thats currently being parittioned
         :type vertex: pacman.model.graph.vertex.Vertex
-        :return: iterable of vertexes that need to be partitioned in the same way
+        :return: iterable of vertexes that need to be partitioned in the same \
+        way
         :rtype: iterable of pacman.model.graph.vertex.Vertex
         :raise PacmanPartitionException: if the vertexes that need to be \
         partitioned in the same way have different numbers of atoms
