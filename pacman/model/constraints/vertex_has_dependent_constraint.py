@@ -1,7 +1,8 @@
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
+from pacman.model.constraints.abstract_utility_constraint import \
+    AbstractUtilityConstraint
 
 
-class VertexHasDependentConstraint(AbstractConstraint):
+class VertexHasDependentConstraint(AbstractUtilityConstraint):
     """ A constraint which indicates that a vertex A must have a edge to another
     vertex B, where B only exists becuase A uses it.
     """
@@ -13,7 +14,7 @@ class VertexHasDependentConstraint(AbstractConstraint):
         :type vertex: :py:class:`pacman.model.graph.vertex.Vertex`
         :raise None: does not raise any known exceptions
         """
-        AbstractConstraint.__init__(
+        AbstractUtilityConstraint.__init__(
             self, "vertex {} requires vertex {} to oeprate correctly"
                   "{}".format(vertex))
         self._vertex = vertex
