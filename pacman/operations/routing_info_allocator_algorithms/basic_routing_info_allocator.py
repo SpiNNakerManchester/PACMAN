@@ -2,6 +2,7 @@ from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.operations.routing_info_allocator_algorithms.\
     abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
+from pacman.utilities import utility_calls
 
 
 class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
@@ -36,16 +37,30 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
+        utility_calls.check_algorithum_can_support_constraints(object_list=subgraph.subvertices)
         routing_infos = RoutingInfo()
         for subvert in subgraph.subvertices:
             out_going_subedges = \
                 subgraph.outgoing_subedges_from_subvertex(subvert)
             for out_going_subedge in out_going_subedges:
+
                 routing_infos.add_subedge_info(
                     self._allocate_subedge_key_mask(out_going_subedge))
         return routing_infos
 
     def _allocate_subedge_key_mask(self, out_going_subedge):
+        key = self._get_key_from_placement()
+        key_mask_combo = self.get_key_mask_combo(key, mask)
+        subedge.key_mask_combo = key_mask_combo
+        subedge.key = key
+        subedge.mask = mask
+        # store the inverse for future use
+        self.dao.inverseMap[key_mask_combo] = list()
+        self.dao.inverseMap[key_mask_combo].append(subedge)
+        #check for storage of masks
+        self.check_masks(subedge.mask, key)
+
+
 
 
 

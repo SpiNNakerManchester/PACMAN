@@ -67,8 +67,8 @@ def sort_objects_by_constraint_authority(objects):
             for constraint in current_object.constraints:
                 #only store ranks for placer contraints and ones that are better
                 #than already seen
-                if (constraint.rank >= max_rank_so_far
-                        and isinstance(constraint, AbstractPlacerConstraint)):
+                if (isinstance(constraint, AbstractPlacerConstraint) and
+                        constraint.rank >= max_rank_so_far):
                     max_rank_so_far = constraint.rank
             if not max_rank_so_far in rank_to_object_mapping.keys():
                 rank_to_object_mapping[max_rank_so_far] = list()
