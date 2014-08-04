@@ -99,7 +99,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
             graph.incoming_edges_to_vertex(vertex))
 
         placement_constraints = \
-            utility_calls.locate_constrants_of_type(subvertex.constraints,
+            utility_calls.locate_constraints_of_type(subvertex.constraints,
                                                     AbstractPlacerConstraint)
         placement_constraint = None
         if len(placement_constraints) > 1:

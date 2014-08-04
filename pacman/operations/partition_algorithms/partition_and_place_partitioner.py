@@ -411,7 +411,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         sdram_ratio = (float(resources.sdram) / float(max_resources.sdram))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
 
-    def _locate_vertexes_to_partition_now(self, vertex):
+    @staticmethod
+    def _locate_vertices_to_partition_now(vertex):
         """ loctaes any other vertexes that need to be partitioned in the same\
          way SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
 
@@ -425,7 +426,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         partiton_together_vertices = list()
         partiton_together_vertices.append(vertex)
         same_size_vertex_constrants = \
-            self._locate_constrants_of_type(
+            utility_calls.locate_constraints_of_type(
                 vertex.constraints, PartitionerSameSizeAsVertexConstraint)
         for constraint in same_size_vertex_constrants:
             if constraint.vertex.n_atoms != vertex.n_atoms:

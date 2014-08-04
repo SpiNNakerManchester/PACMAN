@@ -3,7 +3,7 @@ from pacman.model.constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
 
 
-def locate_constrants_of_type(constraints, constraint_type):
+def locate_constraints_of_type(constraints, constraint_type):
     """locates all constraints of a given type out of a list
 
     :param constraints: a iterable of

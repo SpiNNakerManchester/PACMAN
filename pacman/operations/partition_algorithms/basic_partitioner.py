@@ -97,7 +97,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             max_atom_values = [apc_sd, apc_dt, apc_cp]
 
             max_atoms_constraints = \
-                utility_calls.locate_constrants_of_type(
+                utility_calls.locate_constraints_of_type(
                     vertex.constraints, PartitionerMaximumSizeConstraint)
             for max_atom_constrant in max_atoms_constraints:
                 max_atom_values.append(max_atom_constrant.size)
