@@ -1,4 +1,6 @@
 import logging
+from pacman.model.constraints.abstract_partitioner_constraint import \
+    AbstractPartitionerConstraint
 
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -16,6 +18,7 @@ from pacman.operations.placer_algorithms.abstract_placer_algorithm import \
     AbstractPlacerAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
+from pacman.utilities import utility_calls
 
 
 logger = logging.getLogger(__name__)
@@ -81,7 +84,10 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
-        self._check_can_support_partitioner_constraints(graph)
+        utility_calls.check_algorithum_can_support_constraints(
+            object_list=graph.vertices,
+            constraint_check_level=AbstractPartitionerConstraint,
+            supported_constraints=self._supported_constrants)
         logger.info("* Running Partitioner and Placer as one *")
 
         # Load the machine and vertices objects from the dao
@@ -90,8 +96,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         graph_to_sub_graph_mapper = GraphSubgraphMapper()
 
         #sort out vertex's by constraints
-        sort = lambda each_vertex: each_vertex.constraints.placement_cardinality
-        vertices = sorted(vertices, key=sort, reverse=True)
+        vertices = utility_calls.sort_objects_by_constraint_authority(vertices)
 
         n_atoms = 0
         for vertex in vertices:
