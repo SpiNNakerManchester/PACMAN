@@ -12,6 +12,8 @@ from pacman.model.subgraph.subgraph import Subgraph
 from pacman.model.subgraph.subvertex import Subvertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.operations.placer_algorithms.abstract_placer_algorithm import \
+    AbstractPlacerAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 
@@ -45,7 +47,25 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         self._placement_to_subvert_mapper = dict()
 
     def set_placer_algorithum(self, placer_algorithum):
-        self._placer_algorithum = placer_algorithum
+        """ setter method for setting the placer algorithum
+
+        :param placer_algorithum: the new placer algorithum
+        :type placer_algorithum: implentation of \
+        pacman.operations.placer_algorithms.abstract_placer_algorithum.AbstractPlacerAlgorithum
+
+        :return: None
+        :rtype: None
+        :raise PacmanConfigurationException: if the placer_algorithum is not a\
+        implentation of \
+        pacman.operations.placer_algorithms.abstract_placer_algorithum.AbstractPlacerAlgorithum
+
+        """
+        if placer_algorithum in AbstractPlacerAlgorithm.__subclasses__():
+            self._placer_algorithum = placer_algorithum
+        else:
+            raise exceptions.PacmanConfigurationException(
+                "The placer algorithum submitted is not a recongised placer "
+                "algorthum")
 
     #inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
@@ -104,7 +124,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
     def _partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper):
         """private method (do not call from front ends) to partition a single \
-        vertex.
+        vertex. SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
 
         :param vertex: the vertex to partition
         :param subgraph: the subgraph to add subverts to
@@ -132,8 +152,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         possible_max_atoms = list()
         for vertex in partiton_together_vertices:
             max_atom_constraints =\
-                self._locate_constrants_of_type(vertex.constraints,
-                                                PartitionerMaximumSizeConstraint)
+                self._locate_constrants_of_type(
+                    vertex.constraints, PartitionerMaximumSizeConstraint)
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
         max_atoms_per_core = min(possible_max_atoms)
@@ -148,7 +168,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                             graph_to_subgraph_mapper):
         """(private method, do not call from outside partitioner) \
         tries to partition subvertexes on how many atoms it can fit on\
-        each subvert
+        each subvert SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
         
         :param vertices: the vertexes that need to be partitoned at the same \
         time
@@ -166,7 +186,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :type partition_data_objects: iterable lsit of partitionable obejcts
         :type subgraph: pacman.model.subgraph.subgraph.Subgraph
         :type graph_to_subgraph_mapper:
-         py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper'
+py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper'
         """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
@@ -201,9 +221,26 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
     def _scale_down_resources(self, lo_atom, hi_atom, vertices,
                               partition_data_objects, max_atoms_per_core):
-        """
-        reduces the number of atoms on a core so that it fits within the
-        resoruces avilable
+        """reduces the number of atoms on a core so that it fits within the
+        resoruces avilable   SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
+
+        :param lo_atom: the number of atoms already partitioned
+        :param hi_atom: the total number of atoms to place for this vertex
+        :param vertices: the vertexes that need to be partitoned at the same \
+        time
+        :param partition_data_objects: the parittion objects for memory \
+        estiamtes
+        :param max_atoms_per_core: the min max atoms from all the vertexes \
+        considered that have max_atom constraints
+        :type lo_atom: int
+        :type hi_atom: int
+        :type vertices: iterable list of pacman.model.graph.vertex.Vertex
+        :type partition_data_objects: iterable lsit of partitionable obejcts
+        :type max_atoms_per_core: int
+        :return: the list of placements made by this method and the new amount \
+        of atoms parittioned
+        :rtype: iterbale of tuples and a int
+        :raise PacmanPartitionException: when the vertex cannot be partitioned
         """
         used_placements = list()
         # Find the number of atoms that will fit in each vertex given the
@@ -274,9 +311,32 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
             partition_data_object, resources, ratio):
-        """
-        tries to psuh the number of atoms into a subvertex as it can
-         with the estimates
+        """tries to psuh the number of atoms into a subvertex as it can
+         with the estimates SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
+
+        :param lo_atom: the number of atoms already partitioned
+        :param hi_atom: the total number of atoms to place for this vertex
+        :param vertex: the vertexes to scale up the num atoms per core for
+        :param partition_data_object: the parittion object for memory \
+        estiamtes
+        :param max_atoms_per_core: the min max atoms from all the vertexes \
+        considered that have max_atom constraints
+        :param used_resources: the resouerces used by the machine so far
+        :param resources: the resource estiamte for the vertex for a given\
+        number of atoms
+        :param ratio: the ratio between max atoms and avilable resources
+        :type lo_atom: int
+        :type hi_atom: int
+        :type vertex: pacman.model.graph.vertex.Vertex
+        :type partition_data_object: partitionable obejct
+        :type max_atoms_per_core: int
+        :type used_resources: pacman.model.resources.resoruce.Resoruce
+        :type resources: pacman.model.resources.resoruce.Resoruce
+        :type ratio: int
+        :return: the list of placements made by this method and the new amount \
+        of atoms parittioned
+        :rtype: iterbale of tuples and a int
+        :raise PacmanPartitionException: when the vertex cannot be partitioned
         """
 
         previous_used_resources = used_resources
@@ -302,7 +362,15 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
     @staticmethod
     def _get_max_atoms_per_core(vertices):
+        """ helper method for finding the max atoms per core for a collection \
+        of vertices SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
 
+        :param vertices: a iterable list of vertex
+        :type vertices: iterable of pacman.model.graph.vertex.Vertex
+        :return: the minimum level of max atoms from all constraints
+        :rtype: int
+        :raise None: this method does not raise any known exceptions
+        """
         max_atoms_per_core = 0
         for v in vertices:
             max_for_vertex = v.get_maximum_atoms_per_core()
@@ -320,8 +388,17 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
     @staticmethod
     def _find_max_ratio(resources, max_resources):
-        """
-        helper method for finding the max ratio for a resoruces
+        """ helper method for finding the max ratio for a resoruces \
+        SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
+
+        :param resources: the reosurces used by the vertex
+        :param max_resources: the max resources avilable from the machine
+        :type max_resources: pacman.model.resources.resource.Resource
+        :type resources:pacman.model.resources.resource.Resource
+        :return: the best avilable ratio of resources
+        :rtype: int
+        :raise None: this method does not raise any known exceptions
+
         """
         cpu_ratio = \
             (float(resources.clock_ticks) / float(max_resources.clock_ticks))
@@ -330,6 +407,16 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
 
     def _locate_vertexes_to_partition_now(self, vertex):
+        """ loctaes any other vertexes that need to be partitioned in the same\
+         way SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
+
+        :param vertex: the vertex thats currently being parittioned
+        :type vertex: pacman.model.graph.vertex.Vertex
+        :return: iterable of vertexes that need to be partitioned in the same way
+        :rtype: iterable of pacman.model.graph.vertex.Vertex
+        :raise PacmanPartitionException: if the vertexes that need to be \
+        partitioned in the same way have different numbers of atoms
+        """
         partiton_together_vertices = list()
         partiton_together_vertices.append(vertex)
         same_size_vertex_constrants = \

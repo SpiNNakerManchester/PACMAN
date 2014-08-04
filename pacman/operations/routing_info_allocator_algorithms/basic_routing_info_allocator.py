@@ -8,14 +8,19 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         subedges in a subgraph based on the x,y,p of their placement
     """
 
-    def __init__(self):
+    def __init__(self, graph_to_sub_graph_mapper):
         """constructor that build a
         pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
 
-        <params to be filled in when implimented>
+        :param graph_to_sub_graph_mapper: the mappings betweeen graph and \
+        subgraph
+        :type graph_to_sub_graph_mapper: pacman.model.graoh_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
+        :return: a new basic routing key info allocator
+        :rtype: pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator.BasicRoutingInfoAllocator
+        :raise None: this method does not raise any known exception
 
         """
-        pass
+
 
     def allocate_routing_info(self, subgraph, placements):
         """ Allocates routing information to the subedges in a subgraph

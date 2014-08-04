@@ -48,10 +48,11 @@ class AbstractPlacerAlgorithm(object):
         """
 
     @staticmethod
-    def sort_subverts_by_constraint_authority(subvertices):
+    def _sort_subverts_by_constraint_authority(subvertices):
         """helper method for all placers. \
-        It takes the subverts of a subgraph and orders them into a list with a
-        order based off rank on the constraint
+        It takes the subverts of a subgraph and orders them into a list with a\
+        order based off rank on the constraint \
+        NOT TO BE CALLED OUTSIDE IMPLEMTATIONS OF THIS CLASS
         :param subvertices: The subvertices of the subgraph
         :type subvertices: iterable of pacman.model.subgraph.subvertex.SubVertex
         :return: A list of ordered subverts
@@ -82,7 +83,9 @@ class AbstractPlacerAlgorithm(object):
 
     def _check_can_support_constraints(self, subgraph):
         """checks that the constraints on the vertices in the graph are all
-        supported by the given implimentation of the partitioner.
+        supported by the given implimentation of the partitioner. \
+        SHOULD NOT BE CALLED FROM OUTSIDE ANY CLASS THAT DOESNT INHIRRIT FROM\
+         THIS ONE
 
         :param subgraph: The subgraph to place from
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.SubGraph`
@@ -105,6 +108,20 @@ class AbstractPlacerAlgorithm(object):
                             .format(constraint, subvert.label))
 
     def _reduce_constraints(self, constraints, subvertex_label, placements):
+        """ tries to reduce the placement constraints into one manageable one.\
+        NOT CALLABLE OUTSIDE CLASSES TAHT INHIRRIT FROM THIS ONE
+
+        :param constraints: the constraints placed on a vertex
+        :param subvertex_label: the label from a given subvertex
+        :param placements: the current list of placements
+        :type constraints: iterable list of pacman.model.constraints.AbstractConstraints
+        :type subvertex_label: str
+        :type placements: iterable of pacman.model.placements.placement.Placement
+        :return a reduced placement constraint
+        :rtype: pacman.model.constraints.PlacerChipAndCoreConstraint
+        :raise None: does not raise any known exception
+        """
+
         x = None
         y = None
         p = None
@@ -127,9 +144,26 @@ class AbstractPlacerAlgorithm(object):
                 x = self._check_param(constraint.x, x, subvertex_label)
                 y = self._check_param(constraint.y, y, subvertex_label)
                 p = self._check_param(constraint.p, p, subvertex_label)
+        return PlacerChipAndCoreConstraint(x, y, p)
 
     @staticmethod
     def _check_param(param_to_check, param_to_update, subvertex_label):
+        """ checks if constraints with overlapping requirements are satisifable\
+        NOT CALLABLE OUTSIDE CLASSES TAHT INHIRRIT FROM THIS ONE
+
+        :param param_to_check: a param to verify
+        :param param_to_update: a second param to verify
+        :param subvertex_label: the label fo the subvertex
+        :type param_to_check: int
+        :type param_to_update: int
+        :type subvertex_label: str
+        :return: the updated value of the param
+        :rtype: int
+        :raise PacmanPlaceException: when the param has been set and to a \
+        different value. This is becuase being set to a different value makes \
+        both constraints insatisifable
+
+        """
         if param_to_check is not None:
             if param_to_update is None:
                 param_to_update = param_to_check

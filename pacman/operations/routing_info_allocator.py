@@ -33,10 +33,11 @@ class RoutingInfoAllocator:
 
         #set up a default placer algorithum if none are specified
         if self._routing_info_allocator_algorithm is None:
-            self._routing_info_allocator_algorithm = BasicRoutingInfoAllocator()
+            self._routing_info_allocator_algorithm = \
+                BasicRoutingInfoAllocator(self._graph_to_subgraph_mapper)
         else:
             self._routing_info_allocator_algorithm = \
-                routing_info_allocator_algorithm()
+                routing_info_allocator_algorithm(self._graph_to_subgraph_mapper)
 
     def run(self, subgraph, placements):
         """ Execute the algorithm on the subgraph

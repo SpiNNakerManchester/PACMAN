@@ -19,7 +19,8 @@ class PacmanInvalidParameterException(PacmanException):
         :type problem: str
         """
         pass
-    
+
+
 class PacmanAlreadyExistsException(PacmanException):
     """ An exception that indicates that something already exists and that
         adding another would be a conflict
@@ -34,7 +35,8 @@ class PacmanAlreadyExistsException(PacmanException):
         :type item_id: str
         """
         pass
-    
+
+
 class PacmanPartitionException(PacmanException):
     """ An exception that indicates that something went wrong with paritioning
     """
@@ -45,7 +47,8 @@ class PacmanPartitionException(PacmanException):
         :type problem: str
         """
         pass
-    
+
+
 class PacmanPlaceException(PacmanException):
     """ An exception that indicates that something went wrong with placement
     """
@@ -56,7 +59,8 @@ class PacmanPlaceException(PacmanException):
         :type problem: str
         """
         pass
-    
+
+
 class PacmanPruneException(PacmanException):
     """ An exception that indicates that something went wrong with pruning
     """
@@ -67,7 +71,8 @@ class PacmanPruneException(PacmanException):
         :type problem: str
         """
         pass
-    
+
+
 class PacmanRouteInfoAllocationException(PacmanException):
     """ An exception that indicates that something went wrong with route info\
         allocation
@@ -79,11 +84,25 @@ class PacmanRouteInfoAllocationException(PacmanException):
         :type problem: str
         """
         pass
-    
+
+
 class PacmanRoutingException(PacmanException):
     """ An exception that indicates that something went wrong with routing
     """
     
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the routing
+        :type problem: str
+        """
+        pass
+
+
+class PacmanConfigurationException(PacmanException):
+    """ An exception that indicates that something went wrong with \
+    configuring some part of pacman
+    """
+
     def __init__(self, problem):
         """
         :param problem: The problem with the routing

@@ -51,7 +51,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
         placements = Placements()
         ordered_subverts = \
-            self.sort_subverts_by_constraint_authority(subgraph.subvertices)
+            self._sort_subverts_by_constraint_authority(subgraph.subvertices)
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
@@ -69,6 +69,25 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
     def _place_subvertex(self, subvertex, graph, graph_to_subgraph_mapper,
                          placements):
+        """ place a subvertex on some processor to be determined. \
+        SHOULD NOT BE CALLED OUTSIDE THIS CLASS
+
+        :param subvertex: the subvertex to be placed
+        :param graph: the graph obejct of the application
+        :param graph_to_subgraph_mapper: the graph to subgraph mapper
+        :param placements: the current placements
+        :type subvertex: pacman.models.subgraph.subvertex.Subvertex
+        :type graph: pacman.models.graph.graph.Graph
+        :type graph_to_subgraph_mapper: pacamn.models.graph_subgraph_mapper.graphSubgraphMapper
+        :type placements: pacman.model.placements.placements.Placements
+        :return: placement object for this subvertex
+        :rtype: pacman.model.placements.placement.Placement
+        :raise PacmanPlaceException: when either a core has already been \
+        assigned the subvertex's required core or there are no more cores \
+        avilable to be assigned or theres not enough memory of the avilable \
+        cores to assign this subvertex.
+        """
+
         #get resources of a subvertex
         vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(subvertex)
         resources = vertex.get_resources_used_by_atoms(
@@ -81,8 +100,8 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         placement_constraint = None
         if len(placement_constraints) > 1:
             placement_constraint = \
-                self.reduce_constraints(placement_constraints, subvertex.label,
-                                        placements)
+                self._reduce_constraints(placement_constraints, subvertex.label,
+                                         placements)
         #if theres a placement constraint, then check out the chip and only that
         #chip
         if placement_constraint is not None:
@@ -96,6 +115,22 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
     def _deal_with_constraint_placement(self, placement_constraint, subvertex,
                                         subvertex_resources):
+        """ place a subvertex on some processor to be determined. \
+        SHOULD NOT BE CALLED OUTSIDE THIS CLASS
+
+        :param subvertex: the subvertex to be placed
+        :param placement_constraint: the palcmeent constraint of this subvertex
+        :param subvertex_resources: the reosurces required by this subvertex
+        :type subvertex: pacman.models.subgraph.subvertex.Subvertex
+        :type placement_constraint: pacman.constraints.placer_chip_and_core_constraint
+        :type subvertex_resources: pacman.model.resoruces.resourceConstainer.ResourceContrainer
+        :return: placement object for this subvertex
+        :rtype: pacman.model.placements.placement.Placement
+        :raise PacmanPlaceException: when either a core has already been \
+        assigned the subvertex's required core or there are no more cores \
+        avilable to be assigned or theres not enough memory of the avilable \
+        cores to assign this subvertex.
+        """
         x = placement_constraint.x
         y = placement_constraint.y
         p = placement_constraint.p
@@ -128,6 +163,21 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
     def _deal_with_non_constrainted_placement(self, subvertex, resources,
                                               chips_in_a_ordering):
+        """ place a subvertex which doesnt have a constraint
+
+        :param subvertex: the subvert to place
+        :param resources: the reosruces used by this subvertex
+        :param chips_in_a_ordering: the chips avilable from the machien in some\
+         predetermined ordering.
+        :type subvertex: pacan.model.subgraph.subvertex.Subvertex
+        :type resources: pacman.model.resources.resource_container.ResourceContainer
+        :type chips_in_a_ordering: iterbale of spinnMachine.chip,Chip
+        :return a placement object for this subvertex
+        :rtype: pacman.model.placements.placement.Placement
+        :raise PacmanPlaceException: when it is not possible to place the \
+        subvertex for either: 1. not enough sdram, 2. no more aviable cores,
+         3. not enough cpu or 4. not enough clock cycles avilable
+        """
         # Record when a constraint is met at least somewhere to produce a richer
         # error message.
         free_cores_met = False
