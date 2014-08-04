@@ -43,28 +43,28 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         self._supported_constrants.append(PartitionerMaximumSizeConstraint)
         self._supported_constrants.append(PartitionerSameSizeAsVertexConstraint)
 
-        self._placer_algorithum = None
+        self._placer_algorithm = None
         self._placement_to_subvert_mapper = dict()
 
-    def set_placer_algorithum(self, placer_algorithum):
-        """ setter method for setting the placer algorithum
+    def set_placer_algorithm(self, placer_algorithm):
+        """ setter method for setting the placer algorithm
 
-        :param placer_algorithum: the new placer algorithum
-        :type placer_algorithum: implentation of \
-        pacman.operations.placer_algorithms.abstract_placer_algorithum.AbstractPlacerAlgorithum
+        :param placer_algorithm: the new placer algorithm
+        :type placer_algorithm: implentation of \
+        pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgorithm
 
         :return: None
         :rtype: None
-        :raise PacmanConfigurationException: if the placer_algorithum is not a\
+        :raise PacmanConfigurationException: if the placer_algorithm is not a\
         implentation of \
-        pacman.operations.placer_algorithms.abstract_placer_algorithum.AbstractPlacerAlgorithum
+        pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgorithm
 
         """
-        if placer_algorithum in AbstractPlacerAlgorithm.__subclasses__():
-            self._placer_algorithum = placer_algorithum
+        if placer_algorithm in AbstractPlacerAlgorithm.__subclasses__():
+            self._placer_algorithm = placer_algorithm
         else:
             raise exceptions.PacmanConfigurationException(
-                "The placer algorithum submitted is not a recongised placer "
+                "The placer algorithm submitted is not a recongised placer "
                 "algorthum")
 
     #inherited from AbstractPartitionAlgorithm
@@ -251,7 +251,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
             partition_data_object = partition_data_objects[i]
             #get max resoruces avilable on machine
             resources = \
-                self._placer_algorithum.get_maximum_resources(
+                self._placer_algorithm.get_maximum_resources(
                     vertex.constraints)
             #get resources for vertexes
             used_resources = vertex.get_resources_for_atoms(
@@ -301,7 +301,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
 
             # Place the vertex
             x, y, p = \
-                self._placer_algorithum.place_subvertex(used_resources,
+                self._placer_algorithm.place_subvertex(used_resources,
                                                         vertex.constraints)
             used_placements.append((vertex, partition_data_object, x, y, p,
                                     used_resources, resources))
