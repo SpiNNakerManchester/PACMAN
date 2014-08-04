@@ -17,15 +17,16 @@ class RoutingInfoAllocator:
         :param routing_info_allocator_algorithm: The routing info allocator\
                     algorithm.  If not specified, a default algorithm will be\
                     used
-        :param hostname:
-        :param machine:
-        :param graph_to_sub_graph_mapper:
-        :param report_folder:
-        :param report_states:
-        :type hostname:
-        :type machine:
-        :type report_states
-
+        :param hostname: the hostname of the machine
+        :param machine: the machien object used to represnet tyhe spinnaker\
+         machine
+        :param graph_to_sub_graph_mapper: the graph to subgraph mapper object
+        :param report_folder: the folder used to store reports
+        :param report_states: the pacman states for different reports
+        :type hostname: str
+        :type machine: spinnmachine.machine.Machine
+        :type report_states: pacman.utility.reposrt_states.ReportStates
+        :type report_folder: str
         :type routing_info_allocator_algorithm:\
 :py:class:`pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm`
         :raise pacman.exceptions.PacmanInvalidParameterException: If\

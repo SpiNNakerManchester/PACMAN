@@ -27,10 +27,8 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         :raise None: this method does not raise any known exception
 
         """
-        AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
-        self._graph_to_sub_graph_mapper = graph_to_sub_graph_mapper
-        self._used_masks = dict()
-        self._subvert_to_key_mapper = dict()
+        AbstractRoutingInfoAllocatorAlgorithm.__init__(
+            self, graph_to_sub_graph_mapper)
 
     def allocate_routing_info(self, subgraph, placements):
         """ Allocates routing information to the subedges in a subgraph
@@ -118,7 +116,8 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
                 "this key and mask have been used by another subvertex already"
                 "and therefore cannot be used again. Please fix and try again")
         self._used_masks[mask].append(key)
-        self._subvert_to_key_mapper[self.get_key_mask_combo(key, mask)] = subvert
+        self._subvert_to_key_mapper[self.get_key_mask_combo(key, mask)] = \
+            subvert
 
     @staticmethod
     def get_key_mask_combo(key, mask):

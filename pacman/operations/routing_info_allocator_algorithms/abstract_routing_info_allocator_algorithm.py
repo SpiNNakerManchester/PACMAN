@@ -9,8 +9,17 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         subedges in a subgraph
     """
 
-    def __init__(self):
+    def __init__(self, graph_to_sub_graph_mapper):
+        """constructor for a abstract routing info allocator\
+         CANNOT BE INSTANITAED DIRECTLY
+
+        :param graph_to_sub_graph_mapper: the mapper between graph and subgrah
+        :type graph_to_sub_graph_mapper: pacman.model.graph_to_subgraph_mapper.graph_to_subgraph_mapper.graph_to_subgraph_mapper
+        """
         self._supported_constrants = list()
+        self._graph_to_sub_graph_mapper = graph_to_sub_graph_mapper
+        self._used_masks = dict()
+        self._subvert_to_key_mapper = dict()
     
     @abstractmethod
     def allocate_routing_info(self, subgraph, placements):
