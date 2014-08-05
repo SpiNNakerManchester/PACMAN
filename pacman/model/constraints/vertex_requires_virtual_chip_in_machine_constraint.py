@@ -55,7 +55,7 @@ class VertexRequiresVirtualChipInMachineConstraint(AbstractUtilityConstraint):
 
 
     @property
-    def connected_to_chip_coords(self):
+    def connected_to_chip_link_id(self):
         """ the link on the chip to which the virutal chip connects to
 
         :return: the link on the chip to which the virutal chip connects to
