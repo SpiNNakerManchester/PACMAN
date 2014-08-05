@@ -1,6 +1,10 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+from pacman.model.routing_tables.multicast_routing_table import \
+    MulticastRoutingTable
+from pacman.model.routing_tables.multicast_routing_tables import \
+    MulticastRoutingTables
 
 
 @add_metaclass(ABCMeta)
@@ -8,9 +12,13 @@ class AbstractRouterAlgorithm(object):
     """ An abstract algorithm that can find routes for subedges between\
         subvertices in a subgraph that have been placed on a machine
     """
+
+    def __init__(self):
+        """consturcotr for abstract routing algorithums"""
+        self._routing_tables = MulticastRoutingTables()
     
     @abstractmethod
-    def route(self, routing_info_allocation, placements, machine):
+    def route(self, routing_info_allocation, placements, machine, sub_graph):
         """ Find routes between the subedges with the allocated information,
             placed in the given places
             
@@ -22,9 +30,16 @@ class AbstractRouterAlgorithm(object):
                     :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param subgraph: the subgraph object
+        :type subgraph: pacman.subgraph.subgraph.Subgraph
         :return: The discovered routes 
         :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
                    goes wrong with the routing
         """
         pass
+
+    def set_up_routing_tables(self, machine):
+        for chip in machine.chips:
+            chip_routing_table = MulticastRoutingTable(chip.x, chip.y)
+            self._routing_tables.add_routing_table(chip_routing_table)

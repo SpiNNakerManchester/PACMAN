@@ -1,6 +1,6 @@
 import logging
 from pacman.utilities import reports
-from pacman.operations.router_algorithms.dijkstra_routing import DijkstraRouting
+from pacman.operations.router_algorithms.basic_dijkstra_routing import BasicDijkstraRouting
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class Router:
 
         #set up a default placer algorithm if none are specified
         if self._router_algorithm is None:
-            self._router_algorithm = DijkstraRouting()
+            self._router_algorithm = BasicDijkstraRouting()
         else:
             self._router_algorithm = router_algorithm()
 
