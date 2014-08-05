@@ -138,8 +138,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                 graph_to_sub_graph_mapper.get_subvertices_from_vertex(vertex)
             #if not, partition
             if subverts_from_vertex is None:
-                self._partition_vertex(vertex, subgraph,
-                                       graph_to_sub_graph_mapper)
+                self._partition_vertex(
+                    vertex, subgraph, graph_to_sub_graph_mapper, machine)
             progress_bar.update()
         progress_bar.end()
 
@@ -153,7 +153,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
         return subgraph, graph_to_sub_graph_mapper
 
-    def _partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper):
+    def _partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper,
+                          machine):
         """private method (do not call from front ends) to partition a single \
         vertex. SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
 
@@ -161,6 +162,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :param subgraph: the subgraph to add subverts to
         :param graph_to_subgraph_mapper: the mappings object from graph to \
         subgraph which needs to be update with new subverts
+        :param machine: the machien object
+        :type machine: spinnmachine.machine.Machine object
         :type vertex: py:class:`pacman.model.graph.vertex.Vertex`
         :type subgraph: py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :type graph_to_subgraph_mapper:
@@ -192,11 +195,11 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         #partition by atoms
         self._partition_by_atoms(partiton_together_vertices, vertex.n_atoms,
                                  max_atoms_per_core, partition_data_objects,
-                                 subgraph, graph_to_subgraph_mapper)
+                                 subgraph, graph_to_subgraph_mapper, machine)
 
     def _partition_by_atoms(self, vertices, n_atoms, max_atoms_per_core,
                             partition_data_objects, subgraph,
-                            graph_to_subgraph_mapper):
+                            graph_to_subgraph_mapper, machine):
         """(private method, do not call from outside partitioner) \
         tries to partition subvertices on how many atoms it can fit on\
         each subvert SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
@@ -210,7 +213,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         estiamtes
         :param subgraph: the subgraph of the propblem space to put subverts in
         :param graph_to_subgraph_mapper: the mapper from graph to subgraph
-        
+        :param machine: the machien object
+        :type machine: spinnmachine.machine.Machine object
         :type vertices: iterable list of pacman.model.graph.vertex.Vertex
         :type n_atoms: int
         :type max_atoms_per_core: int
@@ -232,7 +236,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
 
             # Scale down the number of atoms to fit the available resources
             used_placements, hi_atom = self._scale_down_resources(
-                lo_atom, hi_atom, vertices, partition_data_objects,
+                lo_atom, hi_atom, vertices, machine, partition_data_objects,
                 max_atoms_per_core)
 
             # Update where we are
@@ -250,7 +254,9 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
             no_atoms_this_placement = (hi_atom - lo_atom) + 1
             self.progress.update(no_atoms_this_placement)
 
-    def _scale_down_resources(self, lo_atom, hi_atom, vertices,
+    #todo need to fix for rnadom distrubtions
+    # noinspection PyUnusedLocal
+    def _scale_down_resources(self, lo_atom, hi_atom, vertices, machine,
                               partition_data_objects, max_atoms_per_core):
         """reduces the number of atoms on a core so that it fits within the
         resources available   SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS
@@ -263,6 +269,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         estimates
         :param max_atoms_per_core: the min max atoms from all the vertexes \
         considered that have max_atom constraints
+        :param machine: the machien object
+        :type machine: spinnmachine.machine.Machine object
         :type lo_atom: int
         :type hi_atom: int
         :type vertices: iterable list of pacman.model.graph.vertex.Vertex
@@ -282,9 +290,9 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
             # TODO -> Needs to be updated for random distributions
             partition_data_object = None
             #get max resoruces avilable on machine
-            resources = \
-                self._placer_algorithm.get_maximum_resources(
-                    vertex.constraints)
+            resources =
+            self._get_maximum_resources_per_processor(
+                vertex_constriants=vertex.constraints, machine=machine)
             #get resources for vertexes
             used_resources = vertex.get_resources_for_atoms(
                 lo_atom, hi_atom, self._runtime_in_machine_time_steps,
