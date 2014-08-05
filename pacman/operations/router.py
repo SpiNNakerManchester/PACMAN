@@ -56,7 +56,7 @@ class Router:
         """
         routing_tables = \
             self._router_algorithm.route(routing_info_allocation, placements,
-                                         machine)
+                                         machine, self._subgraph)
 
         #execute reports if needed
         if (self.report_states is not None and

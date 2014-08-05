@@ -111,7 +111,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             # dictionaries of 'x' and 'y' values
             nodes_info["{}:{}".format(x, y)] = dict()
             nodes_info["{}:{}".format(x, y)]["neighbours"] = \
-                machine.get_chip(x, y).router.get_neighbouring_chips_coords()
+                machine.get_chip_at(x, y).router.get_neighbouring_chips_coords()
 
             nodes_info["{}:{}".format(x, y)]["bws"] = []
 
@@ -131,3 +131,14 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         return nodes_info
 
     def _initiate_dijkstra_tables(self, machine):
+        dijkstra_tables = dict()  # Holds all the information about nodes within
+                                  #  one full run of Dijkstra's algorithm
+
+        for chip in machine.chips:
+            x, y = chip.x, chip.y
+            dijkstra_tables["{}:{}".format(x, y)] = dict()  # Each node has a
+                                                      # dictionary, or 'table'
+
+            dijkstra_tables["{}:{}".format(x, y)]["lowest cost"] = None
+            dijkstra_tables["{}:{}".format(x, y)]["activated?"] = False
+        return dijkstra_tables
