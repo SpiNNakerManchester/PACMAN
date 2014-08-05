@@ -1,8 +1,8 @@
 
 
 class MultiCastCommand(object):
-    """command object used in conjunction with multicast soruce and
-    vertex_requires_multi_cast_source_constrant
+    """command object used in conjunction with multicast source and
+    vertex_requires_multi_cast_source_constriant
     """
 
     def __init__(self, time, key, payload=None, repeat=5, delay=100):

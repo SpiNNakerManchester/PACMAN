@@ -36,13 +36,13 @@ class Placer:
         self._hostname = hostname
         self._machine = machine
         self._graph = graph
-        self._placer_alogrithum = placer_algorithm
+        self._placer_alogrithm = placer_algorithm
 
-        #set up a default placer algorithum if none are specified
-        if self._placer_alogrithum is None:
-            self._placer_alogrithum = BasicPlacer(self._machine, self._graph)
+        #set up a default placer algorithm if none are specified
+        if self._placer_alogrithm is None:
+            self._placer_alogrithm = BasicPlacer(self._machine, self._graph)
         else:
-            self._placer_alogrithum = placer_algorithm(self._machine,
+            self._placer_alogrithm = placer_algorithm(self._machine,
                                                        self._graph)
 
     def run(self, subgraph, graph_to_subgraph_mapper):
@@ -56,7 +56,7 @@ class Placer:
                    goes wrong with the placement
         """
         placements = \
-            self._placer_alogrithum.place(subgraph, graph_to_subgraph_mapper)
+            self._placer_alogrithm.place(subgraph, graph_to_subgraph_mapper)
 
         #execute reports if needed
         if (self.report_states is not None and

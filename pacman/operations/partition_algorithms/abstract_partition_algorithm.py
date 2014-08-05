@@ -37,7 +37,7 @@ class AbstractPartitionAlgorithm(object):
         """
         self._machine_time_step = machine_time_step
         self._runtime_in_machine_time_steps = runtime_in_machine_time_steps
-        self._supported_constrants = list()
+        self._supported_constraints = list()
         self._sdram_tracker = SDRAMTracker()
     
     @abstractmethod
@@ -175,7 +175,7 @@ class AbstractPartitionAlgorithm(object):
     def _add_vertex_constraints_to_subvertex(subvert, vertex):
         """private method for partitioners, not to be used by front end
         updates subvertices with their assocaited vertex's constraints that are
-        not partitioner based. As future algorithums only use the subgraph,
+        not partitioner based. As future algorithms only use the subgraph,
         and partitionable constraints should not be needed from now on.
         """
         subclasses = AbstractPartitionerConstraint.__subclasses__()

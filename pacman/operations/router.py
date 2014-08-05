@@ -31,7 +31,7 @@ class Router:
         self._router_algorithm = router_algorithm
         self._graph_to_subgraph_mappings = graph_to_subgraph_mappings
 
-        #set up a default placer algorithum if none are specified
+        #set up a default placer algorithm if none are specified
         if self._router_algorithm is None:
             self._router_algorithm = DijkstraRouting()
         else:

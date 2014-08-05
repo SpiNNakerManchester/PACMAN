@@ -9,10 +9,10 @@ def locate_constraints_of_type(constraints, constraint_type):
     :param constraints: a iterable of
      pacman.model.constraints.AbstractConstraint.AbstractConstraint
     :type constraints: a iterable object
-    :param constraint_type: a impliemntation of a
-    pacman.model.constraint.abstract_partitioner_constrant.AbstractpartitionConstraint
+    :param constraint_type: a implementation of a
+    pacman.model.constraint.abstract_partitioner_constraint.AbstractPartitionConstraint
     :type constraint_type: a impliemntation of a
-    pacman.model.constraint.abstract_partitioner_constrant.AbstractpartitionConstraint
+    pacman.model.constraint.abstract_partitioner_constraint.AbstractPartitionConstraint
     :return: a list containing only
     pacman.model.constraints.partitioner_maximum_size_constraint constraints
     or a empty list if none exist
@@ -22,13 +22,13 @@ def locate_constraints_of_type(constraints, constraint_type):
     passed_constraints = list()
     subclasses = constraint_type.__subclasses__()
     subclasses.append(constraint_type)
-    for constrant in constraints:
-        if type(constrant) in subclasses:
-            passed_constraints.append(constrant)
+    for constraint in constraints:
+        if type(constraint) in subclasses:
+            passed_constraints.append(constraint)
     return passed_constraints
 
 
-def check_algorithum_can_support_constraints(
+def check_algorithm_can_support_constraints(
         object_list, supported_constraints, constraint_check_level):
     for individual_object in object_list:
         for constraint in individual_object.constraints:
@@ -39,7 +39,7 @@ def check_algorithum_can_support_constraints(
                         located = True
                 if not located:
                     raise exceptions.PacmanPartitionException(
-                        "the algorithum selected cannot support "
+                        "the algorithm selected cannot support "
                         "the constraint '{}', which has been "
                         "placed on vertex labelled {}"
                         .format(constraint, individual_object.label))

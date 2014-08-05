@@ -18,14 +18,14 @@ class RoutingInfoAllocator:
                     algorithm.  If not specified, a default algorithm will be\
                     used
         :param hostname: the hostname of the machine
-        :param machine: the machien object used to represnet tyhe spinnaker\
+        :param machine: the machine object used to represent the spinnaker\
          machine
         :param graph_to_sub_graph_mapper: the graph to subgraph mapper object
         :param report_folder: the folder used to store reports
         :param report_states: the pacman states for different reports
         :type hostname: str
         :type machine: spinnmachine.machine.Machine
-        :type report_states: pacman.utility.reposrt_states.ReportStates
+        :type report_states: pacman.utility.report_states.ReportStates
         :type report_folder: str
         :type routing_info_allocator_algorithm:\
 :py:class:`pacman.operations.routing_info_allocator_algorithms.abstract_routing_info_allocator_algorithm.AbstractRoutingInfoAllocatorAlgorithm`
@@ -41,7 +41,7 @@ class RoutingInfoAllocator:
         self._routing_info_allocator_algorithm = \
             routing_info_allocator_algorithm
 
-        #set up a default placer algorithum if none are specified
+        #set up a default placer algorithm if none are specified
         if self._routing_info_allocator_algorithm is None:
             self._routing_info_allocator_algorithm = \
                 BasicRoutingInfoAllocator(self._graph_to_subgraph_mapper)

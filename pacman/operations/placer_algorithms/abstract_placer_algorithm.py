@@ -22,7 +22,7 @@ class AbstractPlacerAlgorithm(object):
     """ An abstract algorithm that can place a subgraph
     """
     def __init__(self, machine, graph):
-        """constrcutor for the abstract placer algorithum
+        """constrcutor for the abstract placer algorithm
         :param machine: The machine on which to place the graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
@@ -30,7 +30,7 @@ class AbstractPlacerAlgorithm(object):
         self._machine = machine
         self._sdram_tracker = SDRAMTracker()
         self._graph = graph
-        self._supported_constrants = list()
+        self._supported_constraints = list()
 
     @abstractmethod
     def place(self, subgraph, graph_to_subgraph_mapper):
