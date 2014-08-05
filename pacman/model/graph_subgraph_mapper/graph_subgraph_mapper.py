@@ -126,7 +126,7 @@ class GraphSubgraphMapper(object):
         :param edge: the edge for which to find the associated subedges
         :type edge: `pacman.model.graph.edge.Edge`
         :return: a set of subedges
-        :rtype: iterable set
+        :rtype: iterable set or none
         :raise None: Raises no known exceptions
         """
         if edge in self._subedges_from_edge.keys():

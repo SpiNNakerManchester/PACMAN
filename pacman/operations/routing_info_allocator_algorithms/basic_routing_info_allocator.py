@@ -8,6 +8,7 @@ from pacman.operations.routing_info_allocator_algorithms.\
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
 from pacman import exceptions
+from pacman.utilities.progress_bar import ProgressBar
 
 
 class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
@@ -50,6 +51,9 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
             constraint_check_level=AbstractRouterConstraint)
 
         #take each subedge and create keys from its placement
+        progress_bar = \
+            ProgressBar(len(subgraph.subvertices),
+                        "on allocating the key's and masks for each subedge")
         routing_infos = RoutingInfo()
         for subvert in subgraph.subvertices:
             out_going_subedges = \
@@ -59,6 +63,8 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
                 routing_infos.add_subedge_info(
                     self._allocate_subedge_key_mask(out_going_subedge,
                                                     placement))
+            progress_bar.update()
+        progress_bar.end()
         return routing_infos
 
     def _allocate_subedge_key_mask(self, out_going_subedge, placement):
