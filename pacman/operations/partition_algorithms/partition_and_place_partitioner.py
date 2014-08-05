@@ -57,7 +57,6 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             PartitionAndPlacePartitioner._detect_subclass_hierarchy(
                 subclass.__subclasses__(), final_subclass_hierarchy)
 
-
     def set_placer_algorithm(self, placer_algorithm):
         """ setter method for setting the placer algorithm
 
