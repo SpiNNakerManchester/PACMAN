@@ -16,7 +16,7 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         :param graph_to_sub_graph_mapper: the mapper between graph and subgrah
         :type graph_to_sub_graph_mapper: pacman.model.graph_to_subgraph_mapper.graph_to_subgraph_mapper.graph_to_subgraph_mapper
         """
-        self._supported_constrants = list()
+        self._supported_constraints = list()
         self._graph_to_sub_graph_mapper = graph_to_sub_graph_mapper
         self._used_masks = dict()
         self._subvert_to_key_mapper = dict()

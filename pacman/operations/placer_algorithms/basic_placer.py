@@ -30,8 +30,8 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         AbstractPlacerAlgorithm.__init__(self, machine, graph)
-        self._supported_constrants.append(PlacerChipAndCoreConstraint)
-        self._supported_constrants.append(PlacerSubvertexSameChipConstraint)
+        self._supported_constraints.append(PlacerChipAndCoreConstraint)
+        self._supported_constraints.append(PlacerSubvertexSameChipConstraint)
 
     def place(self, subgraph, graph_to_subgraph_mapper):
         """ Place a subgraph so that each subvertex is placed on a core
@@ -47,9 +47,9 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                    goes wrong with the placement
         """
         #check that the algorithum can handle the constraints
-        utility_calls.check_algorithum_can_support_constraints(
+        utility_calls.check_algorithm_can_support_constraints(
             object_list=subgraph.subvertices,
-            supported_constraints=self._supported_constrants,
+            supported_constraints=self._supported_constraints,
             constraint_check_level=AbstractPlacerConstraint)
 
         placements = Placements()

@@ -51,7 +51,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
-        utility_calls.check_algorithum_can_support_constraints(
+        utility_calls.check_algorithm_can_support_constraints(
             object_list=graph.vertices,
             constraint_check_level=AbstractPartitionerConstraint,
             supported_constraints=self._supported_constraints)
@@ -99,8 +99,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             max_atoms_constraints = \
                 utility_calls.locate_constraints_of_type(
                     vertex.constraints, PartitionerMaximumSizeConstraint)
-            for max_atom_constrant in max_atoms_constraints:
-                max_atom_values.append(max_atom_constrant.size)
+            for max_atom_constraint in max_atoms_constraints:
+                max_atom_values.append(max_atom_constraint.size)
 
             apc = min(max_atom_values)
 

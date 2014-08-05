@@ -19,7 +19,7 @@ from pacman.operations.placer_algorithms.abstract_placer_algorithm import \
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities import utility_calls
-
+import inspect as inspect
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +49,15 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         self._placer_algorithm = None
         self._placement_to_subvert_mapper = dict()
 
+    @staticmethod
+    def _detect_subclass_hierarchy(subclass_list, final_subclass_hierarchy):
+        for subclass in subclass_list:
+            # if subclass not in final_subclass_hierarchy:
+            final_subclass_hierarchy.append(subclass)
+            PartitionAndPlacePartitioner._detect_subclass_hierarchy(
+                subclass.__subclasses__(), final_subclass_hierarchy)
+
+
     def set_placer_algorithm(self, placer_algorithm):
         """ setter method for setting the placer algorithm
 
@@ -63,12 +72,29 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgorithm
 
         """
-        if placer_algorithm in AbstractPlacerAlgorithm.__subclasses__():
+        # if placer_algorithm in AbstractPlacerAlgorithm.__subclasses__():
+
+        #find all placer algorithms!
+        subclass_list = list()
+        current_subclass_list = AbstractPlacerAlgorithm.__subclasses__()
+        PartitionAndPlacePartitioner._detect_subclass_hierarchy(
+            current_subclass_list, subclass_list)
+
+        # while len(current_subclass_list) != 0:
+        #     current_class = current_subclass_list[0]
+        #     #todo make this work so it doesnt just return false all the bloody time!!!!
+        #     if not inspect.isabstract(current_class):
+        #         subclass_list.append(current_class)
+        #     current_subclass_list.remove(current_class)
+        #     for new_found_class in current_class.__subclasses__():
+        #         current_subclass_list.append(new_found_class)
+
+        if placer_algorithm in subclass_list:
             self._placer_algorithm = placer_algorithm
         else:
             raise exceptions.PacmanConfigurationException(
                 "The placer algorithm submitted is not a recongised placer "
-                "algorthum")
+                "algorthm")
 
     #inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
@@ -84,7 +110,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
-        utility_calls.check_algorithum_can_support_constraints(
+        utility_calls.check_algorithm_can_support_constraints(
             object_list=graph.vertices,
             constraint_check_level=AbstractPartitionerConstraint,
             supported_constraints=self._supported_constraints)
@@ -253,7 +279,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         min_hi_atom = hi_atom
         for i in range(len(vertices)):
             vertex = vertices[i]
-            partition_data_object = partition_data_objects[i]
+            # TODO -> Needs to be updated for random distributions
+            partition_data_object = None
             #get max resoruces avilable on machine
             resources = \
                 self._placer_algorithm.get_maximum_resources(
@@ -426,10 +453,10 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         """
         partiton_together_vertices = list()
         partiton_together_vertices.append(vertex)
-        same_size_vertex_constrants = \
+        same_size_vertex_constraints = \
             utility_calls.locate_constraints_of_type(
                 vertex.constraints, PartitionerSameSizeAsVertexConstraint)
-        for constraint in same_size_vertex_constrants:
+        for constraint in same_size_vertex_constraints:
             if constraint.vertex.n_atoms != vertex.n_atoms:
                 raise exceptions.PacmanPartitionException(
                     "A vertex and its partition-dependent vertices must "

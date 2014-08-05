@@ -42,11 +42,11 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
-        #check that this algorithum supports the constraints put onto the
+        #check that this algorithm supports the constraints put onto the
         #subvertexes
-        utility_calls.check_algorithum_can_support_constraints(
+        utility_calls.check_algorithm_can_support_constraints(
             object_list=subgraph.subvertices,
-            supported_constraints=self._supported_constrants,
+            supported_constraints=self._supported_constraints,
             constraint_check_level=AbstractRouterConstraint)
 
         #take each subedge and create keys from its placement

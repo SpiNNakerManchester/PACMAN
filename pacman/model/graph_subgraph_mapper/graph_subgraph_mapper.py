@@ -45,10 +45,8 @@ class GraphSubgraphMapper(object):
             self._subvertices_from_vertex[vertex] = set()
             if subvertex.hi_atom >= vertex.n_atoms:
                 raise PacmanInvalidParameterException(
-                    "hi_atom ",
-                    str(subvertex.hi_atom),
-                    "Cannot be greater than"
-                    " the total number of atoms")
+                    "hi_atom ", str(subvertex.hi_atom),
+                    "Cannot be greater than the total number of atoms")
 
         if vertex is not None:
             self._vertex_from_subvertex[subvertex] = vertex

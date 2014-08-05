@@ -34,7 +34,7 @@ class AbstractPartitionableVertex(Vertex):
         :param max_atoms_per_core: the max atoms that cna be supported by a\
          core. Note that this is trnaslated into a partitioner max size
          constraint
-         :param constraints: any extra constrants to be added to this vertex.
+         :param constraints: any extra constranits to be added to this vertex.
          :type n_atoms: int
          :type label: str
          :type max_atoms_per_core: int
@@ -127,12 +127,12 @@ class AbstractPartitionableVertex(Vertex):
         """
         cpu_cycles = self.get_cpu_usage_for_atoms(lo_atom, hi_atom)
         dtcm_requirement = self.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
-        sdram_requirment = \
+        sdram_requirement = \
             self.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
         # noinspection PyTypeChecker
         resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                       dtcm=DTCMResource(dtcm_requirement),
-                                      sdram=SDRAMResource(sdram_requirment))
+                                      sdram=SDRAMResource(sdram_requirement))
         return resources
 
     def get_max_atoms_per_core(self):
