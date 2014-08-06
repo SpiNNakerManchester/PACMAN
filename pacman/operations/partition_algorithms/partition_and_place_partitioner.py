@@ -259,7 +259,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
             no_atoms_this_placement = (hi_atom - lo_atom) + 1
             self.progress.update(no_atoms_this_placement)
 
-    #todo need to fix for rnadom distrubtions
+    #todo need to fix for random distributions
     # noinspection PyUnusedLocal
     def _scale_down_resources(self, lo_atom, hi_atom, vertices, machine,
                               partition_data_objects, max_atoms_per_core,
@@ -297,12 +297,12 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
             vertex = vertices[i]
             # TODO -> Needs to be updated for random distributions
             partition_data_object = None
-            #get max resoruces avilable on machine
+            #get max resources available on machine
             resources = self._get_maximum_resources_per_processor(
                 vertex_constriants=vertex.constraints, machine=machine)
             #get resources for vertexes
             used_resources = vertex.get_resources_used_by_atoms(
-                lo_atom, hi_atom, )
+                lo_atom, hi_atom, vertex)
             
             #figure max ratio
             ratio = self._find_max_ratio(used_resources, resources)
