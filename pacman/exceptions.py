@@ -109,3 +109,17 @@ class PacmanConfigurationException(PacmanException):
         :type problem: str
         """
         pass
+
+
+class PacmanNotExistException(PacmanException):
+    """An exception that indicates that a routing table entry was attemtpted to\
+    be removed from a routing table which didnt have such an entry
+
+    """
+
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the routing
+        :type problem: str
+        """
+        pass

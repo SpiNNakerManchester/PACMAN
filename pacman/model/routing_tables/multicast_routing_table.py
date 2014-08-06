@@ -1,4 +1,5 @@
-from pacman.exceptions import PacmanAlreadyExistsException
+from pacman.exceptions import PacmanAlreadyExistsException, \
+    PacmanNotExistException
 
 
 class MulticastRoutingTable(object):
@@ -41,17 +42,38 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
         """
-        key_mask_combo = multicast_routing_entry.key & \
-            multicast_routing_entry.mask
-        if key_mask_combo in\
-                self._multicast_routing_entries_by_key.keys():
+        key_mask_combo = \
+            multicast_routing_entry.key & multicast_routing_entry.mask
+        if key_mask_combo in self._multicast_routing_entries_by_key.keys():
             raise PacmanAlreadyExistsException("Multicast_routing_entry",
                                                str(multicast_routing_entry))
 
         self._multicast_routing_entries_by_key[key_mask_combo] =\
             multicast_routing_entry
         self._multicast_routing_entries.add(multicast_routing_entry)
-    
+
+    def remove_multicast_routing_entry(self, multicast_routing_entry):
+        """removes a multicast entry from this table
+
+        :param multicast_routing_entry: The route to remove
+        :type multicast_routing_entry:\
+                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+        :return: None
+        :rtype: None
+        :raise pacman.exceptions.PacmanNotExistException: If a routing\
+                    entry with the same key-mask combination already exists
+        """
+        key_mask_combo = \
+            multicast_routing_entry.key & multicast_routing_entry.mask
+        if key_mask_combo in self._multicast_routing_entries_by_key.keys():
+            del self._multicast_routing_entries_by_key[key_mask_combo]
+            self._multicast_routing_entries.remove(multicast_routing_entry)
+        else:
+            raise PacmanNotExistException(
+                "Multicast_routing_entry {} does not exist, and therfore cannot "
+                "be removed from routing table {}"
+                .format(multicast_routing_entry, self))
+
     @property
     def x(self):
         """ The x-coordinate of the chip of this table
