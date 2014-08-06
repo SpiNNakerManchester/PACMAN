@@ -144,7 +144,7 @@ class AbstractPartitionAlgorithm(object):
         allocated = False
         for constraint in subvertex.constraints:
             if isinstance(constraint, PlacerChipAndCoreConstraint):
-                usage = self._sdram_tracker.get_usage(constraint._x,
+                usage = self._sdram_tracker.get_usage(constraint.x,
                                                       constraint.y)
                 self._sdram_tracker.add_usage(constraint.x, constraint.y,
                                               usage + sub_vertex_requirement)
