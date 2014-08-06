@@ -80,6 +80,10 @@ class MulticastRoutingTable(object):
         :raise None: does not raise any known exceptions
         """
         return self._multicast_routing_entries
+
+    @property
+    def number_of_entries(self):
+        return len(self._multicast_routing_entries)
     
     def get_multicast_routing_entry_by_key(self, key, mask):
         """ Get the routing entry associated with the specified key-mask\

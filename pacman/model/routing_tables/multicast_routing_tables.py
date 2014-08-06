@@ -62,7 +62,7 @@ class MulticastRoutingTables(object):
         :param y: The y-coordinate of the chip
         :type y: int
         :return: The routing table, or None if no such table exists
-        :rtype:  :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
+        :rtype:  :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable` or None
         :raise None: No known exceptions are raised
         """
         if (x, y) in self._routing_tables_by_chip.keys():
