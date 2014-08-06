@@ -112,8 +112,8 @@ class Vertex(object):
         self._constraints = list()
         self.add_constraints(constraints)
 
-    def create_subvertex(self, lo_atom, hi_atom, label=None, 
-                         additional_constraints=None):
+    def create_subvertex(self, lo_atom, hi_atom, label=None,
+                         additional_constraints=list()):
         """ Creates a subvertex of this vertex.  Can be overridden in vertex\
             subclasses to create an subvertex instance that contains detailed\
             information
@@ -136,9 +136,8 @@ class Vertex(object):
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
-        if additional_constraints is None and self.constraints is not None:
-            additional_constraints = list()
-            additional_constraints.extend(self.constraints)
+        # Combine the Vertex and Subvertex constraints
+        additional_constraints.extend(self.constraints)
 
         return Subvertex(lo_atom, hi_atom, label, additional_constraints)
 
