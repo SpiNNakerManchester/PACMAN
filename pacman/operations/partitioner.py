@@ -16,7 +16,7 @@ class Partitioner:
 
     def __init__(self, machine_time_step, no_machine_time_steps,
                  report_states, partition_algorithm, placer_algorithm=None,
-                 report_folder=None, hostname=None):
+                 report_folder=None, hostname=None, machine=None, graph=None):
         """
         :param partition_algorithm: A partitioning algorithm.  If not specified\
                     a default algorithm will be used
@@ -66,7 +66,7 @@ class Partitioner:
         #if the algortihum requires a placer, set up tis placer param
         if hasattr(self._partitioner_algorithm, "set_placer_algorithm"):
             self._partitioner_algorithm.set_placer_algorithm(
-                self._optimal_placer_alogrithm)
+                self._optimal_placer_alogrithm, machine, graph)
 
     def run(self, graph, machine):
         """ Execute the algorithm on the graph, and partition it to fit on\

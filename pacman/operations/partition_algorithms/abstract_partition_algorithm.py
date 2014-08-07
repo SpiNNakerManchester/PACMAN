@@ -146,7 +146,8 @@ class AbstractPartitionAlgorithm(object):
         :param sub_vertex_requirement: the sdram usage of the subvertex
         :param machine: the machine object
         :type subvertex: pacman.model.subgraph.subvertex.Subvertex
-        :type sub_vertex_requirement: int
+        :type sub_vertex_requirement:
+         pacman.model.resources.resource_container.ResoruceContainer
         :type machine: spinnMachine.machine.Machine
         :return None
         :rtype: None
@@ -158,8 +159,9 @@ class AbstractPartitionAlgorithm(object):
             if isinstance(constraint, PlacerChipAndCoreConstraint):
                 usage = self._sdram_tracker.get_usage(constraint.x,
                                                       constraint.y)
-                self._sdram_tracker.add_usage(constraint.x, constraint.y,
-                                              usage + sub_vertex_requirement)
+                self._sdram_tracker.add_usage(
+                    constraint.x, constraint.y,
+                    usage + sub_vertex_requirement.sdram.get_value())
                 allocated = True
 
         chip_index = 0
@@ -177,6 +179,7 @@ class AbstractPartitionAlgorithm(object):
                     self._sdram_tracker.add_usage(chip.x, chip.y,
                                                   sub_vertex_requirement + usage)
                     allocated = True
+            chip_index += 1
 
         if not allocated:
             raise exceptions.PacmanPartitionException(

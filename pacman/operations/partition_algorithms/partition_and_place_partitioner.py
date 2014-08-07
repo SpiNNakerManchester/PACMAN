@@ -1,6 +1,8 @@
 import logging
 from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
+from pacman.model.constraints.abstract_placer_constraint import \
+    AbstractPlacerConstraint
 
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -8,6 +10,8 @@ from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper import \
     GraphSubgraphMapper
+from pacman.model.placements.placement import Placement
+from pacman.model.placements.placements import Placements
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.subgraph.subgraph import Subgraph
@@ -49,6 +53,7 @@ pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPart
 
         self._placer_algorithm = None
         self._placement_to_subvert_mapper = dict()
+        self._complete_placements = Placements()
 
     @staticmethod
     def _detect_subclass_hierarchy(subclass_list, final_subclass_hierarchy):
@@ -58,7 +63,7 @@ pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPart
             PartitionAndPlacePartitioner._detect_subclass_hierarchy(
                 subclass.__subclasses__(), final_subclass_hierarchy)
 
-    def set_placer_algorithm(self, placer_algorithm):
+    def set_placer_algorithm(self, placer_algorithm, machine, graph):
         """ setter method for setting the placer algorithm
 
         :param placer_algorithm: the new placer algorithm
@@ -80,17 +85,9 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgo
         PartitionAndPlacePartitioner._detect_subclass_hierarchy(
             current_subclass_list, subclass_list)
 
-        # while len(current_subclass_list) != 0:
-        #     current_class = current_subclass_list[0]
-        #     #todo make this work so it doesnt just return false all the bloody time!!!!
-        #     if not inspect.isabstract(current_class):
-        #         subclass_list.append(current_class)
-        #     current_subclass_list.remove(current_class)
-        #     for new_found_class in current_class.__subclasses__():
-        #         current_subclass_list.append(new_found_class)
-
         if placer_algorithm in subclass_list:
-            self._placer_algorithm = placer_algorithm
+            self._placer_algorithm = placer_algorithm(machine, graph)
+
         else:
             raise exceptions.PacmanConfigurationException(
                 "The placer algorithm submitted is not a recongised placer "
@@ -152,6 +149,17 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgo
         self._generate_sub_edges(subgraph, graph_to_sub_graph_mapper, graph)
 
         return subgraph, graph_to_sub_graph_mapper
+
+    @property
+    def compelte_placements(self):
+        """ property which returns the complete placements made by the
+        parittioner
+
+        :return: placements object
+        :rtype: pacman.model.placements.placements.Placements
+        :raise None: this method does not raise any known exceptions
+        """
+        return self._complete_placements
 
     def _partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper,
                           machine, graph):
@@ -249,15 +257,15 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-                subvertex = Subvertex(vertex, lo_atom, hi_atom, used_resources)
+                subvertex = Subvertex(lo_atom, hi_atom, used_resources)
                 self._placement_to_subvert_mapper[subvertex] = \
                     PlacerChipAndCoreConstraint(x, y, p)
                 #update objects
                 subgraph.add_subvertex(subvertex)
                 graph_to_subgraph_mapper.add_subvertex(subvertex, vertex)
-
-            no_atoms_this_placement = (hi_atom - lo_atom) + 1
-            self.progress.update(no_atoms_this_placement)
+                self._update_sdram_allocator(vertex, used_resources, machine)
+                self._complete_placements.add_placement(
+                    Placement(x=x, y=y, p=p, subvertex=subvertex))
 
     #todo need to fix for random distributions
     # noinspection PyUnusedLocal
@@ -302,7 +310,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
                 vertex_constriants=vertex.constraints, machine=machine)
             #get resources for vertexes
             used_resources = vertex.get_resources_used_by_atoms(
-                lo_atom, hi_atom, vertex)
+                lo_atom, hi_atom, graph.incoming_edges_to_vertex(vertex))
             
             #figure max ratio
             ratio = self._find_max_ratio(used_resources, resources)
@@ -346,9 +354,14 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
                 #TODO needs to be tied in (old code resulted in no loops, so new code has omitted the code for future look ats
 
             # Place the vertex
+            # noinspection PyProtectedMember
+            placement_constraints = \
+                utility_calls.locate_constraints_of_type(
+                    vertex.constraints, AbstractPlacerConstraint)
             x, y, p = \
-                self._placer_algorithm.place_subvertex(used_resources,
-                                                       vertex.constraints)
+                self._placer_algorithm._try_to_place(placement_constraints,
+                                                     resources, "",
+                                                     self._complete_placements)
             used_placements.append((vertex, partition_data_object, x, y, p,
                                     used_resources, resources))
 
@@ -387,7 +400,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
 
         previous_used_resources = used_resources
         previous_hi_atom = hi_atom
-        while ((ratio < 1.0) and ((hi_atom + 1) < vertex.atoms)
+        while ((ratio < 1.0) and ((hi_atom + 1) < vertex.n_atoms)
                 and ((hi_atom - lo_atom + 2) < max_atoms_per_core)):
 
             #logger.debug("Scaling up - Current subvertex from"
@@ -446,13 +459,24 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         :raise None: this method does not raise any known exceptions
 
         """
-        cpu_ratio = \
-            (float(resources.cpu.get_value()) /
-             float(max_resources.cpu.get_value()))
-        dtcm_ratio = (float(resources.dtcm.get_value()) /
-                      float(max_resources.dtcm.get_value()))
-        sdram_ratio = (float(resources.sdram.get_value()) /
-                       float(max_resources.sdram.get_value()))
+        if resources.cpu.get_value() == 0 or max_resources.cpu.get_value() == 0:
+            cpu_ratio = 0
+        else:
+            cpu_ratio = \
+                (float(resources.cpu.get_value()) /
+                 float(max_resources.cpu.get_value()))
+        if (resources.dtcm.get_value() == 0
+           or max_resources.dtcm.get_value() == 0):
+            dtcm_ratio = 0
+        else:
+            dtcm_ratio = (float(resources.dtcm.get_value()) /
+                          float(max_resources.dtcm.get_value()))
+        if (resources.sdram.get_value() == 0
+           or max_resources.sdram.get_value() == 0):
+            sdram_ratio = 0
+        else:
+            sdram_ratio = (float(resources.sdram.get_value()) /
+                           float(max_resources.sdram.get_value()))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
 
     @staticmethod
