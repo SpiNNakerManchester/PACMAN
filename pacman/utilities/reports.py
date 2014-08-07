@@ -45,7 +45,7 @@ def partitioner_report(report_folder, hostname, graph,
     """
     # Cycle through all vertices, and foreach cycle through its sub-vertices.
     # For each sub-vertex, describe its core mapping.
-    file_name = report_folder + os.sep + "placement_by_vertex.rpt"
+    file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
     f_place_by_vertex = None
     try:
         f_place_by_vertex = open(file_name, "w")
@@ -88,7 +88,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
     """
     # Cycle through all vertices, and foreach cycle through its sub-vertices.
     # For each sub-vertex, describe its core mapping.
-    file_name = os.path.joinreport_folder + os.sep + "placement_by_vertex.rpt"
+    file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
     f_place_by_vertex = None
     try:
         f_place_by_vertex = open(file_name, "w")
@@ -314,7 +314,7 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
     """
     Generate report on the routing of sub-edges across the machine.
     """
-    file_name = report_folder + os.sep + "edge_routing_info.rpt"
+    file_name = os.path.join(report_folder, "edge_routing_info.rpt")
     f_routing = None
     try:
         f_routing = open(file_name, "w")
