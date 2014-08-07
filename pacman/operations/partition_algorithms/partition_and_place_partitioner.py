@@ -447,9 +447,12 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
 
         """
         cpu_ratio = \
-            (float(resources.cpu) / float(max_resources.cpu))
-        dtcm_ratio = (float(resources.dtcm) / float(max_resources.dtcm))
-        sdram_ratio = (float(resources.sdram) / float(max_resources.sdram))
+            (float(resources.cpu.get_value()) /
+             float(max_resources.cpu.get_value()))
+        dtcm_ratio = (float(resources.dtcm.get_value()) /
+                      float(max_resources.dtcm.get_value()))
+        sdram_ratio = (float(resources.sdram.get_value()) /
+                       float(max_resources.sdram.get_value()))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
 
     @staticmethod

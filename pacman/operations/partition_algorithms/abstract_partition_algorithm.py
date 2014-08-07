@@ -9,9 +9,11 @@ from pacman.model.constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
+from pacman.model.resources.resource_container import ResourceContainer
 from pacman.utilities.sdram_tracker import SDRAMTracker
 from pacman import exceptions
 from pacman.utilities.progress_bar import ProgressBar
+from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
 
 import logging
@@ -69,22 +71,26 @@ class AbstractPartitionAlgorithm(object):
         #locate any instances of PlacerChipAndCoreConstraint
         for constraint in vertex_constriants:
             if isinstance(constraint, PlacerChipAndCoreConstraint):
-                sdram_avilable = self._sdram_tracker.get_usage(constraint.x,
-                                                               constraint.y)
-                return sdram_avilable
+                sdram_available = self._sdram_tracker.get_usage(constraint.x,
+                                                                constraint.y)
+                return ResourceContainer(cpu=Processor.CPU_AVAILABLE,
+                                         dtcm=Processor.DTCM_AVAILABLE,
+                                         sdram=sdram_available)
 
         # no PlacerChipAndCoreConstraint was found, search till max value
         # returned or highest avilable
         maximum_sdram = 0
         for chip in machine.chips:
             sdram_used = self._sdram_tracker.get_usage(chip.x, chip.y)
-            sdram_avilable = chip.sdram.size - sdram_used
-            if sdram_avilable >= maximum_sdram:
-                maximum_sdram = sdram_avilable
+            sdram_available = chip.sdram.size - sdram_used
+            if sdram_available >= maximum_sdram:
+                maximum_sdram = sdram_available
             #if a chip has been returned with sdram usage as the hard coded
             # max supported, then stop searching and return max.
-            if sdram_avilable == SDRAM.DEFAULT_SDRAM_BYTES:
-                return maximum_sdram
+            if sdram_available == SDRAM.DEFAULT_SDRAM_BYTES:
+                return ResourceContainer(cpu=Processor.CPU_AVAILABLE,
+                                         dtcm=Processor.DTCM_AVAILABLE,
+                                         sdram=maximum_sdram)
 
     @staticmethod
     def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
