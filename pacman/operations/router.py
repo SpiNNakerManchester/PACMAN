@@ -61,7 +61,7 @@ class Router:
         #execute reports if needed
         if (self.report_states is not None and
                 self.report_states.router_report):
-            reports.router_report(
+            reports.router_reports(
                 graph=self._graph, hostname=self._hostname,
                 graph_to_sub_graph_mapper=self._graph_to_subgraph_mappings,
                 placements=placements, report_folder=self._report_folder,

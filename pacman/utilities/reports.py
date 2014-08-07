@@ -8,8 +8,8 @@ from spinn_machine.sdram import SDRAM
 logger = logging.getLogger(__name__)
 
 
-def placer_report(report_folder, hostname, graph, graph_to_subgraph_mapper,
-                  placements, machine):
+def placer_reports(report_folder, hostname, graph, graph_to_subgraph_mapper,
+                   placements, machine):
     placement_report_by_vertex(report_folder, hostname, graph,
                                graph_to_subgraph_mapper, placements)
     placement_by_core(report_folder, hostname, placements, machine,
@@ -18,18 +18,24 @@ def placer_report(report_folder, hostname, graph, graph_to_subgraph_mapper,
                          graph_to_subgraph_mapper, graph)
 
 
-def router_report(report_folder, hostname, graph, graph_to_sub_graph_mapper,
-                  placements, routing_tables, include_dat_based=False):
+def router_reports(report_folder, hostname, graph, graph_to_sub_graph_mapper,
+                   placements, routing_tables, include_dat_based=False):
     router_report_from_router_tables(report_folder, routing_tables)
-    router_edge_information(report_folder, hostname, graph,
+    router_edge_information(report_folder, hostname, graph, routing_tables,
                             graph_to_sub_graph_mapper, placements)
     if include_dat_based:
         router_report_from_dat_file(report_folder)
 
 
-def routing_info_report(report_folder, hostname, subgraph, placements,
-                        routing_infos):
-    pass
+def routing_info_reports(report_folder, hostname, subgraph, placements,
+                         routing_infos):
+    routing_indo_report(report_folder, hostname, subgraph, placements,
+                        routing_infos)
+
+
+def partitioner_reports(report_folder, hostname, graph,
+                        graph_to_subgraph_mapper):
+    partitioner_report(report_folder, hostname, graph, graph_to_subgraph_mapper)
 
 
 def partitioner_report(report_folder, hostname, graph,
@@ -54,7 +60,7 @@ def partitioner_report(report_folder, hostname, graph,
     f_place_by_vertex.write(" for target machine '{}'".format(hostname))
     f_place_by_vertex.write("\n\n")
 
-    for v in graph._vertices:
+    for v in graph.vertices:
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
@@ -82,7 +88,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
     """
     # Cycle through all vertices, and foreach cycle through its sub-vertices.
     # For each sub-vertex, describe its core mapping.
-    file_name = report_folder + os.sep + "placement_by_vertex.rpt"
+    file_name = os.path.joinreport_folder + os.sep + "placement_by_vertex.rpt"
     f_place_by_vertex = None
     try:
         f_place_by_vertex = open(file_name, "w")
@@ -140,7 +146,7 @@ def placement_by_core(report_folder, hostname, placements, machine,
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
     # For each core, display what is held on it.
-    file_name = report_folder + os.sep + "placement_by_core.rpt"
+    file_name = os.path.join(report_folder, "placement_by_core.rpt")
     f_place_by_core = None
     try:
         f_place_by_core = open(file_name, "w")
@@ -195,7 +201,7 @@ def placement_by_core(report_folder, hostname, placements, machine,
 
 def sdram_usage_per_chip(report_folder, hostname, placements, machine,
                          graph_to_subgraph_mapper, graph):
-    file_name = report_folder + os.sep + "chip_sdram_usage_by_core.rpt"
+    file_name = os.path.join(report_folder, "chip_sdram_usage_by_core.rpt")
     f_mem_used_by_core = None
     try:
         f_mem_used_by_core = open(file_name, "w")
@@ -241,6 +247,17 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     # Close file:
     f_mem_used_by_core.close()
 
+def routing_indo_report(report_folder, hostname, subgraph, placements,
+                        routing_infos):
+    file_name = os.path.join(report_folder,
+                             "virtual_key_space_information_report.rpt")
+    f_mem_used_by_core = None
+    try:
+        f_mem_used_by_core = open(file_name, "w")
+    except IOError:
+        logger.error("Generate_placement_reports: Can't open file {} for "
+                     "writing.".format(file_name))
+
 
 def router_report_from_router_tables(report_folder, routing_tables):
     top_level_folder = os.path.join(report_folder, "routing_tables_generated")
@@ -285,6 +302,86 @@ def router_report_from_router_tables(report_folder, routing_tables):
                 output.write(entry_str)
             output.flush()
             output.close()
+
+
+def router_report_from_dat_file(report_folder):
+    pass
+
+
+#ToDO NOT CHECKED YET
+def router_edge_information(report_folder, hostname, graph, routing_tables,
+                            graph_to_subgraph_mapper, placements):
+    """
+    Generate report on the routing of sub-edges across the machine.
+    """
+    file_name = report_folder + os.sep + "edge_routing_info.rpt"
+    f_routing = None
+    try:
+        f_routing = open(file_name, "w")
+    except IOError:
+        logger.error("Generate_routing_reports: Can't open file {} for "
+                     "writing.".format(file_name))
+
+    f_routing.write("        Edge Routing Report\n")
+    f_routing.write("        ===================\n\n")
+    time_date_string = time.strftime("%c")
+    f_routing.write("Generated: {}".format(time_date_string))
+    f_routing.write(" for target machine '{}'".format(hostname))
+    f_routing.write("\n\n")
+
+    for e in graph.edges:
+        from_v, to_v = e.pre_vertex, e.post_vertex
+        from_v_sz, to_v_sz = from_v.n_atoms, to_v.n_atoms
+        fr_v_name, to_v_name = from_v.label, to_v.label
+        string = "**** Edge '{}', from vertex: '{}' (size: {})"\
+                 .format(e.label, fr_v_name, from_v_sz)
+        string = "{}, to vertex: '{}' (size: {})\n"\
+                 .format(string, to_v_name, to_v_sz)
+        f_routing.write(string)
+        subedges = graph_to_subgraph_mapper.get_subedges_from_edge(e)
+        f_routing.write("Sub-edges: {}\n".format(len(subedges)))
+
+        for se in subedges:
+            fr_sv, to_sv = se.pre_subvertex, se.post_subvertex
+            fr_placement = placements.get_placement_of_subvertex(fr_sv)
+            to_placement = placements.get_placement_of_subvertex(to_sv)
+            get_associated_routing_entries_from(fr_placement, to_placement, )
+            if se.routing is not None:
+                route_steps = se.routing.routing_entries
+                route_len = len(route_steps)
+                fr_core = "(%d, %d, %d)" % (fr_proc.get_coordinates())
+                to_core = "(%d, %d, %d)" % (to_proc.get_coordinates())
+                fr_atoms = "%d:%d" % (fr_sv.lo_atom, fr_sv.hi_atom)
+                to_atoms = "%d:%d" % (to_sv.lo_atom, to_sv.hi_atom)
+                string = "Sub-edge from core %s, atoms %s," % (fr_core, fr_atoms)
+                string = "%s to core %s, atoms %s has route length: %d\n" % \
+                          (string, to_core, to_atoms, route_len)
+                f_routing.write(string)
+                # Print route info:
+                count_on_this_line = 0
+                total_step_count = 0
+                for step in route_steps:
+                    if total_step_count == 0:
+                       entry_str = "((%d, %d, %d)) -> " % (fr_proc.get_coordinates())
+                       f_routing.write(entry_str)
+                    chip_id = step.router.chip
+                    entry_str = "(%d, %d) -> " % (chip_id.x, chip_id.y)
+                    f_routing.write(entry_str)
+                    if total_step_count == (route_len-1):
+                       entry_str = "((%d, %d, %d))" % (to_proc.get_coordinates())
+                       f_routing.write(entry_str)
+
+                    total_step_count   += 1
+                    count_on_this_line += 1
+                    if count_on_this_line == 5:
+                        f_routing.write("\n")
+                        count_on_this_line = 0
+                f_routing.write("\n")
+
+        # End one entry:
+        f_routing.write("\n")
+    f_routing.flush()
+    f_routing.close()
 
 
 def _reduce_route_value(processors_ids, link_ids):
@@ -334,82 +431,3 @@ def _expand_route_value(processors_ids, link_ids):
             route_string += ", {}".format(link_labels[link])
     route_string += "]"
     return route_string
-
-
-def router_report_from_dat_file(report_folder):
-    pass
-
-
-#ToDO NOT CHECKED YET
-def router_edge_information(report_folder, hostname, graph,
-                            graph_to_subgraph_mapper, placements):
-    """
-    Generate report on the routing of sub-edges across the machine.
-    """
-    file_name = report_folder + os.sep + "edge_routing_info.rpt"
-    f_routing = None
-    try:
-        f_routing = open(file_name, "w")
-    except IOError:
-        logger.error("Generate_routing_reports: Can't open file {} for "
-                     "writing.".format(file_name))
-
-    f_routing.write("        Edge Routing Report\n")
-    f_routing.write("        ===================\n\n")
-    time_date_string = time.strftime("%c")
-    f_routing.write("Generated: {}".format(time_date_string))
-    f_routing.write(" for target machine '{}'".format(hostname))
-    f_routing.write("\n\n")
-
-    for e in graph.edges:
-        from_v, to_v = e.pre_vertex, e.post_vertex
-        from_v_sz, to_v_sz = from_v.n_atoms, to_v.n_atoms
-        fr_v_name, to_v_name = from_v.label, to_v.label
-        string = "**** Edge '{}', from vertex: '{}' (size: {})"\
-                 .format(e.label, fr_v_name, from_v_sz)
-        string = "{}, to vertex: '{}' (size: {})\n"\
-                 .format(string, to_v_name, to_v_sz)
-        f_routing.write(string)
-        subedges = graph_to_subgraph_mapper.get_subedges_from_edge(e)
-        f_routing.write("Sub-edges: {}\n".format(len(subedges)))
-
-        for se in subedges:
-            fr_sv, to_sv = se.pre_subvertex, se.post_subvertex
-            fr_placement = placements.get_placement_of_subvertex(fr_sv)
-            to_placement = placements.get_placement_of_subvertex(to_sv)
-            if se.routing is not None:
-                route_steps = se.routing.routing_entries
-                route_len = len(route_steps)
-                fr_core = "(%d, %d, %d)" % (fr_proc.get_coordinates())
-                to_core = "(%d, %d, %d)" % (to_proc.get_coordinates())
-                fr_atoms = "%d:%d" % (fr_sv.lo_atom, fr_sv.hi_atom)
-                to_atoms = "%d:%d" % (to_sv.lo_atom, to_sv.hi_atom)
-                string = "Sub-edge from core %s, atoms %s," % (fr_core, fr_atoms)
-                string = "%s to core %s, atoms %s has route length: %d\n" % \
-                          (string, to_core, to_atoms, route_len)
-                f_routing.write(string)
-                # Print route info:
-                count_on_this_line = 0
-                total_step_count = 0
-                for step in route_steps:
-                    if total_step_count == 0:
-                       entry_str = "((%d, %d, %d)) -> " % (fr_proc.get_coordinates())
-                       f_routing.write(entry_str)
-                    chip_id = step.router.chip
-                    entry_str = "(%d, %d) -> " % (chip_id.x, chip_id.y)
-                    f_routing.write(entry_str)
-                    if total_step_count == (route_len-1):
-                       entry_str = "((%d, %d, %d))" % (to_proc.get_coordinates())
-                       f_routing.write(entry_str)
-
-                    total_step_count   += 1
-                    count_on_this_line += 1
-                    if count_on_this_line == 5:
-                        f_routing.write("\n")
-                        count_on_this_line = 0
-                f_routing.write("\n")
-
-        # End one entry:
-        f_routing.write("\n")
-    f_routing.flush()
-    f_routing.close()

@@ -61,7 +61,7 @@ class Placer:
         #execute reports if needed
         if (self.report_states is not None and
                 self.report_states.placer_report):
-            reports.placer_report(
+            reports.placer_reports(
                 graph=self._graph, hostname=self._hostname,
                 graph_to_subgraph_mapper=graph_to_subgraph_mapper,
                 machine=self._machine, placements=placements,

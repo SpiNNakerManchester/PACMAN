@@ -69,7 +69,7 @@ class RoutingInfoAllocator:
         #generate reports
         if (self.report_states is not None and
                 self.report_states.routing_info_report):
-            reports.routing_info_report(self._report_folder, self._hostname,
+            reports.routing_info_reports(self._report_folder, self._hostname,
                                         subgraph, placements, routing_infos)
 
         return routing_infos

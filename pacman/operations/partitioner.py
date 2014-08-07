@@ -88,7 +88,7 @@ class Partitioner:
 
         if (self.report_states is not None and
                 self.report_states.partitioner_report):
-            reports.partitioner_report(self._report_folder, self._hostname,
+            reports.partitioner_reports(self._report_folder, self._hostname,
                                        graph, graph_to_subgraph_mapper)
 
         return subgraph, graph_to_subgraph_mapper
