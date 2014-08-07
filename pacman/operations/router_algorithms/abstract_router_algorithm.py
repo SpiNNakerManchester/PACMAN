@@ -38,8 +38,3 @@ class AbstractRouterAlgorithm(object):
                    goes wrong with the routing
         """
         pass
-
-    def set_up_routing_tables(self, machine):
-        for chip in machine.chips:
-            chip_routing_table = MulticastRoutingTable(chip.x, chip.y)
-            self._routing_tables.add_routing_table(chip_routing_table)
