@@ -1,10 +1,31 @@
 import unittest
 from pacman.utilities.sdram_tracker import SDRAMTracker
+from pacman.utilities.sdram_tracker import SDRAM
 
 
-class MyTestCase(unittest.TestCase):
-    def test_something(self):
-        self.assertEqual(True, False)
+class TestSDRAMTracker(unittest.TestCase):
+    def test_new_sdram_tracker(self):
+        sdram = SDRAM(128*(2**20))
+        sdram2 = SDRAM(104*(2**20))
+        sdram_tracker = SDRAMTracker()
+        # Add new values to tracker
+        sdram_tracker.add_usage(0, 0, sdram.size)
+        sdram_tracker.add_usage(1, 0, sdram2.size)
+        sdram_tracker.add_usage(0, 1, sdram.size)
+        sdram_tracker.add_usage(1, 1, sdram2.size)
+        for i in range(2):
+            for j in range(2):
+                self.assertEqual(sdram_tracker.key_from_chip_coords(i, j),
+                                 str(i) + ":" + str(j))
+                if i == 0:
+                    self.assertEqual(sdram_tracker.get_usage(i, j), sdram.size)
+                else:
+                    self.assertEqual(sdram_tracker.get_usage(i, j), sdram2.size)
+
+        # Add value to existing key
+        sdram_tracker.add_usage(0, 0, sdram2.size)
+        self.assertEqual(sdram_tracker.get_usage(0, 0),
+                         sdram.size + sdram2.size)
 
 
 if __name__ == '__main__':
