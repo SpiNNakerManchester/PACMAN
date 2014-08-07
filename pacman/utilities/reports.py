@@ -243,7 +243,97 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
 
 
 def router_report_from_router_tables(report_folder, routing_tables):
-    pass
+    top_level_folder = os.path.join(report_folder, "routing_tables_generated")
+    if not os.path.exists(top_level_folder):
+        os.mkdir(top_level_folder)
+    for routing_table in routing_tables.routing_tables:
+        if routing_table.number_of_entries > 0:
+            file_sub_name = "routing_table_{}_{}.rpt"\
+                .format(routing_table.x, routing_table.y)
+            file_name = os.path.join(top_level_folder, file_sub_name)
+            try:
+                output = open(file_name, "w")
+            except IOError:
+                logger.error("Generate_placement_reports: Can't open file"
+                             " {} for writing.".format(file_name))
+
+            output.write("router contains {} entries \n "
+                         "\n".format(routing_table.number_of_entries))
+            output.write("  Index   Key(hex)    Mask(hex)    Route(hex)"
+                         "    Src. Core -> [Cores][Links]\n")
+            output.write("----------------------------------------------------"
+                         "--------------------------\n")
+
+            entry_count = 0
+            for entry in routing_table.multicast_routing_entries:
+                index = entry_count & 0xFFFF
+                key = entry.key
+                mask = entry.mask
+                hex_route = _reduce_route_value(entry.processor_ids,
+                                                entry.link_ids)
+                hex_key = _uint_32_to_hex_string(key)
+                hex_mask = _uint_32_to_hex_string(mask)
+                route_txt = _expand_route_value(entry.processor_ids,
+                                                entry.link_ids)
+                core_id = "({}, {}, {})"\
+                    .format((key >> 24 & 0xFF), (key >> 16 & 0xFF),
+                            (key >> 11 & 0xF))
+                entry_str = "    {}     {}       {}      {}         {}     " \
+                            " {}\n".format(index, hex_key, hex_mask, hex_route,
+                                           core_id, route_txt)
+                entry_count += 1
+                output.write(entry_str)
+            output.flush()
+            output.close()
+
+
+def _reduce_route_value(processors_ids, link_ids):
+    value = 0
+    for link in link_ids:
+        value += 1 << link
+    for processor in processors_ids:
+        value += 1 << (processor + 6)
+    return _uint_32_to_hex_string(value)
+
+
+def _uint_32_to_hex_string(number):
+    """
+    Convert a 32-bit unsigned number into a hex string.
+    """
+    bottom = number & 0xFFFF
+    top = (number >> 16) & 0xFFFF
+    hex_string = "{:x}{:x}".format(top, bottom)
+    return hex_string
+
+
+def _expand_route_value(processors_ids, link_ids):
+    """
+    Convert a 32-bit route word into a string which lists the target cores and
+    links.
+    """
+    # Convert processor targets to readable values:
+    route_string = "["
+    first = True
+    for processor in processors_ids:
+        if first:
+            route_string += "{}".format(processor)
+            first = False
+        else:
+            route_string += ", {}".format(processor)
+
+    route_string += "] ["
+    # Convert link targets to readable values:
+    link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
+
+    first = True
+    for link in link_ids:
+        if first:
+            route_string += "{}".format(link_labels[link])
+            first = False
+        else:
+            route_string += ", {}".format(link_labels[link])
+    route_string += "]"
+    return route_string
 
 
 def router_report_from_dat_file(report_folder):
