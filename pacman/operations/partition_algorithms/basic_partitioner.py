@@ -68,8 +68,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             requirements = \
                 vertex.get_resources_used_by_atoms(0, 1, imcoming_edges)
 
-            #locate max sdram avilable. SDRAM is the only one thats changeable
-            #during partitioning, as dtcm and cpu cycles are bespoke to a
+            #locate max SDRAM available. SDRAM is the only one that's changeable
+            #during partitioning, as DTCM and cpu cycles are bespoke to a
             #processor.
 
             max_resources_available_on_processor = \

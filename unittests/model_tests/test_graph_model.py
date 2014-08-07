@@ -53,7 +53,7 @@ class TestGraphModel(unittest.TestCase):
         self.assertEqual(vert.constraints[1], constraint1)
         self.assertEqual(vert.constraints[2], constraint2)
 
-    def test_create_new_vertex_create_subvertex_previous_constraints(self):
+    def test_create_subvertex_from_vertex_with_previous_constraints(self):
         constraint1 = PartitionerMaximumSizeConstraint(2)
         vert = MyVertex(10, "New Vertex", [constraint1])
         subv_from_vert = vert.create_subvertex(0, 9)
@@ -61,9 +61,21 @@ class TestGraphModel(unittest.TestCase):
         self.assertEqual(subv_from_vert.lo_atom, 0)
         self.assertEqual(subv_from_vert.hi_atom, 9)
 
-    def test_create_new_vertex_create_subvertex_no_constraints(self):
+    def test_new_create_subvertex_from_vertex_no_constraints(self):
         vert = MyVertex(10, "New Vertex")
         subv_from_vert = vert.create_subvertex(0, 9)
+        self.assertEqual(subv_from_vert.lo_atom, 0)
+        self.assertEqual(subv_from_vert.hi_atom, 9)
+
+
+    def test_create_new_subvertex_from_vertex_with_additional_constraints(self):
+        constraint1 = PartitionerMaximumSizeConstraint(2)
+        constraint2 = PartitionerMaximumSizeConstraint(3)
+        vert = MyVertex(10, "New Vertex", [constraint1])
+        subv_from_vert = vert.create_subvertex(0, 9, None, [constraint2])
+        self.assertEqual(len(subv_from_vert.constraints), 2)
+        self.assertEqual(subv_from_vert.constraints[1], constraint1)
+        self.assertEqual(subv_from_vert.constraints[0], constraint2)
         self.assertEqual(subv_from_vert.lo_atom, 0)
         self.assertEqual(subv_from_vert.hi_atom, 9)
 

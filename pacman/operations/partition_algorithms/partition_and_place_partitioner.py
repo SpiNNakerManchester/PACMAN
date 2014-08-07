@@ -307,7 +307,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
             partition_data_object = None
             #get max resources available on machine
             resources = self._get_maximum_resources_per_processor(
-                vertex_constriants=vertex.constraints, machine=machine)
+                vertex_constraints=vertex.constraints, machine=machine)
             #get resources for vertexes
             used_resources = vertex.get_resources_used_by_atoms(
                 lo_atom, hi_atom, graph.incoming_edges_to_vertex(vertex))

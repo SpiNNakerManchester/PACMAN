@@ -61,19 +61,19 @@ class AbstractPartitionAlgorithm(object):
                    goes wrong with the partitioning
         """
 
-    def _get_maximum_resources_per_processor(self, vertex_constriants, machine):
+    def _get_maximum_resources_per_processor(self, vertex_constraints, machine):
         """locates the maximum rsources avilable given the subverts already
         produced
 
-        :param vertex_constriants: the constraints of a given vertex
+        :param vertex_constraints: the constraints of a given vertex
         :param machine: the imutable machine object
-        :type vertex_constriants: list of pacman.model.constraints.abstract_constraint
+        :type vertex_constraints: list of pacman.model.constraints.abstract_constraint
         :type machine: a spinnmachine.machine.machine object
         :return: the max sdram usage avilable given sdram allocations
         :rtype: pacman.model.resources.resource_container.ResourceContainer
         """
         #locate any instances of PlacerChipAndCoreConstraint
-        for constraint in vertex_constriants:
+        for constraint in vertex_constraints:
             if isinstance(constraint, PlacerChipAndCoreConstraint):
                 sdram_available = self._sdram_tracker.get_usage(constraint.x,
                                                                 constraint.y)
@@ -97,6 +97,11 @@ class AbstractPartitionAlgorithm(object):
                     cpu=CPUCyclesPerTickResource(Processor.CPU_AVAILABLE),
                     dtcm=DTCMResource(Processor.DTCM_AVAILABLE),
                     sdram=SDRAMResource(maximum_sdram))
+
+        return ResourceContainer(
+            cpu=CPUCyclesPerTickResource(Processor.CPU_AVAILABLE),
+            dtcm=DTCMResource(Processor.DTCM_AVAILABLE),
+            sdram=SDRAMResource(maximum_sdram))
 
     @staticmethod
     def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
