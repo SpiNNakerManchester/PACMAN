@@ -83,8 +83,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 self._update_all_weights(nodes_info, machine)
                 self._reset_tables(dijkstra_tables)
                 xa, ya = xs, ys
-                dijkstra_tables["{}:{}".format(xa, ya)]["activated?"] = True
-                dijkstra_tables["{}:{}".format(xa, ya)]["lowest cost"] = 0
+                dijkstra_tables[(xa, ya)]["activated?"] = True
+                dijkstra_tables[(xa, ya)]["lowest cost"] = 0
                 self._properate_costs_till_reached_destinations(
                     dijkstra_tables, nodes_info, xa, ya, dest_processors, xs,
                     ys)
@@ -119,25 +119,25 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             x, y = chip.x, chip.y
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
-            nodes_info["{}:{}".format(x, y)] = dict()
-            nodes_info["{}:{}".format(x, y)]["neighbours"] = \
+            nodes_info[(x, y)] = dict()
+            nodes_info[(x, y)]["neighbours"] = \
                 machine.get_chip_at(x, y).router.get_neighbouring_chips_coords()
 
-            nodes_info["{}:{}".format(x, y)]["bws"] = []
+            nodes_info[(x, y)]["bws"] = []
 
-            nodes_info["{}:{}".format(x, y)]["weights"] = []
+            nodes_info[(x, y)]["weights"] = []
 
-            for i in range(len(nodes_info["{}:{}".format(x, y)]["neighbours"])):
+            for i in range(len(nodes_info[(x, y)]["neighbours"])):
 
-                nodes_info["{}:{}".format(x, y)]["weights"].append(None)
+                nodes_info[(x, y)]["weights"].append(None)
 
-                if nodes_info["{}:{}".format(x, y)]["neighbours"][i] is None:
+                if nodes_info[(x, y)]["neighbours"][i] is None:
 
-                    nodes_info["{}:{}".format(x, y)]["bws"].append(None)
+                    nodes_info[(x, y)]["bws"].append(None)
 
                 else:
 
-                    nodes_info["{}:{}".format(x, y)]["bws"].append(self._max_bw)
+                    nodes_info[(x, y)]["bws"].append(self._max_bw)
         return nodes_info
 
     @staticmethod
@@ -158,11 +158,11 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
         for chip in machine.chips:
             x, y = chip.x, chip.y
-            dijkstra_tables["{}:{}".format(x, y)] = dict()  # Each node has a
+            dijkstra_tables[(x, y)] = dict()  # Each node has a
                                                       # dictionary, or 'table'
 
-            dijkstra_tables["{}:{}".format(x, y)]["lowest cost"] = None
-            dijkstra_tables["{}:{}".format(x, y)]["activated?"] = False
+            dijkstra_tables[(x, y)]["lowest cost"] = None
+            dijkstra_tables[(x, y)]["activated?"] = False
         return dijkstra_tables
 
     def _update_all_weights(self, nodes_info, machine):
@@ -295,9 +295,9 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         while not (len(destination_processors_left_to_find) == 0):
             # PROPAGATE!
             for i in range(
-                    len(nodes_info["{}:{}".format(xa, ya)]["neighbours"])):
-                neighbour = nodes_info["{}:{}".format(xa, ya)]["neighbours"][i]
-                weight = nodes_info["{}:{}".format(xa, ya)]["weights"][i]
+                    len(nodes_info[(xa, ya)]["neighbours"])):
+                neighbour = nodes_info[(xa, ya)]["neighbours"][i]
+                weight = nodes_info[(xa, ya)]["weights"][i]
                 # "neighbours" is a list of 6 dictionaries or None objects.
                 # There is a None object where there is no connection to
                 # that neighbour.
@@ -330,7 +330,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
     # Set the next activated node as the unactivated node with the
     #  lowest current cost
 
-            dijkstra_tables["{}:{}".format(xa, ya)]["activated?"] = True
+            dijkstra_tables[(xa, ya)]["activated?"] = True
 
             # If there were no unactivated nodes with costs,
             # but the destination was not reached this iteration,
@@ -343,7 +343,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             for dest_processor in dest_processors:
                 xd = dest_processor['chip'].x
                 yd = dest_processor['chip'].y
-                if dijkstra_tables["{}:{}".format(xd, yd)]["activated?"]:
+                if dijkstra_tables[(xd, yd)]["activated?"]:
                     destination_processors_left_to_find.remove(dest_processor)
 
     @staticmethod
@@ -375,21 +375,21 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         #  and the cost if the node hasn't already been activated
         # and the lowest cost if the new cost is less, or if
         # there is no current cost
-        if ("{}:{}".format(xn, yn) in dijkstra_tables.keys() and
-            not dijkstra_tables["{}:{}".format(xn, yn)]["activated?"] and
-            ((dijkstra_tables["{}:{}".format(xa, ya)]["lowest cost"] + weight)
-             < dijkstra_tables["{}:{}".format(xn, yn)]["lowest cost"]
-             or (dijkstra_tables["{}:{}".format(xn, yn)]["lowest cost"] is None))):
+        if ((xn, yn) in dijkstra_tables.keys() and
+            not dijkstra_tables[(xn, yn)]["activated?"] and
+            ((dijkstra_tables[(xa, ya)]["lowest cost"] + weight)
+             < dijkstra_tables[(xn, yn)]["lowest cost"]
+             or (dijkstra_tables[(xn, yn)]["lowest cost"] is None))):
                 #update dijkstra table
-                dijkstra_tables["{}:{}".format(xn, yn)]["lowest cost"] = \
-                    float(dijkstra_tables["{}:{}".format(xa, ya)]["lowest cost"]
+                dijkstra_tables[(xn, yn)]["lowest cost"] = \
+                    float(dijkstra_tables[(xa, ya)]["lowest cost"]
                           + weight)
         else:
             raise Exception("Tried to propagate to ({}, {}), which is not in "
                             "the graph: remove non-existent neighbours"
                             .format(xn, yn))
 
-        if (dijkstra_tables["{}:{}".format(xn, yn)]["lowest cost"] == 0) \
+        if (dijkstra_tables[(xn, yn)]["lowest cost"] == 0) \
                 and (xn != xs or yn != ys):
             raise exceptions.PacmanRoutingException(
                 "!!!Cost of non-source node ({}, {}) was set to zero!!!"
@@ -426,11 +426,11 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             routing_table.add_mutlicast_routing_entry(entry)
             previous_routing_entry = entry
 
-        while dijkstra_tables["{}:{}".format(xt, yt)]["lowest cost"] != 0:
+        while dijkstra_tables[(xt, yt)]["lowest cost"] != 0:
 
             xcheck, ycheck = xt, yt
 
-            neighbours = nodes_info["{}:{}".format(xt, yt)]["neighbours"]
+            neighbours = nodes_info[(xt, yt)]["neighbours"]
             neighbour_index = 0
             added_an_entry = False
             while not added_an_entry and neighbour_index < len(neighbours):
@@ -446,8 +446,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                         self._get_routing_table_for_chip(xnr, ynr)
                     # Only check if it can be a preceding node if it actually
                     # exists
-                    if "{}:{}".format(xnr, ynr) in dijkstra_tables.keys():
-                        dijkstra_table_key = "{}:{}".format(xnr, ynr)
+                    if (xnr, ynr) in dijkstra_tables.keys():
+                        dijkstra_table_key = (xnr, ynr)
                         lowest_cost = \
                             dijkstra_tables[dijkstra_table_key]["lowest cost"]
                         if lowest_cost is not None:
@@ -508,14 +508,14 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             entry_is_defaultable = True
 
         weight = \
-            nodes_info["{}:{}".format(xnr, ynr)]["weights"][dec_direction]
+            nodes_info[(xnr, ynr)]["weights"][dec_direction]
         sought_cost = \
-            dijkstra_tables["{}:{}".format(xt, yt)]["lowest cost"] \
+            dijkstra_tables[(xt, yt)]["lowest cost"] \
             - weight
         #print ("Checking node (%d, %d) with sought cost %s and actual
         # cost %s") % (xnr, ynr, sought_cost,
         # dijkstra_tables[xnr][ynr]["lowest cost"])
-        if abs(dijkstra_tables["{}:{}".format(xnr, ynr)]["lowest cost"]
+        if abs(dijkstra_tables[(xnr, ynr)]["lowest cost"]
                 - sought_cost) < 0.00000000001:
             #get other routing table and entry
             other_routing_table = \
@@ -545,12 +545,12 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             # Finally move the tracking node
             xt, yt = xnr, ynr
 
-            nodes_info["{}:{}".format(xnr, ynr)]["bws"][dec_direction] -= \
+            nodes_info[(xnr, ynr)]["bws"][dec_direction] -= \
                 self._bw_per_route_entry  # TODO arbitrary
 
             dec_direction = \
-                nodes_info["{}:{}".format(xnr, ynr)]["bws"][dec_direction]
-            if nodes_info["{}:{}".format(xnr, ynr)]["bws"][dec_direction] < 0:
+                nodes_info[(xnr, ynr)]["bws"][dec_direction]
+            if nodes_info[(xnr, ynr)]["bws"][dec_direction] < 0:
                 print ("Bandwidth overused from ({}, {}) in direction {}! to "
                        "({}, {})".format(xnr, ynr, bin_direction, xt, yt))
 
