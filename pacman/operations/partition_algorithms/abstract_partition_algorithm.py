@@ -98,6 +98,11 @@ class AbstractPartitionAlgorithm(object):
                     dtcm=DTCMResource(Processor.DTCM_AVAILABLE),
                     sdram=SDRAMResource(maximum_sdram))
 
+        return ResourceContainer(
+            cpu=CPUCyclesPerTickResource(Processor.CPU_AVAILABLE),
+            dtcm=DTCMResource(Processor.DTCM_AVAILABLE),
+            sdram=SDRAMResource(maximum_sdram))
+
     @staticmethod
     def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
         '''generates the sub edges for the subvertices in the subgraph.
