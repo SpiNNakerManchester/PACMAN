@@ -1,4 +1,3 @@
-from spinn_machine.sdram import SDRAM
 
 
 class SDRAMTracker(object):
