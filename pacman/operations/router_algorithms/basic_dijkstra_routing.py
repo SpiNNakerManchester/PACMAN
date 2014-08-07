@@ -325,8 +325,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                          or (graph_lowest_cost is None))):
                             graph_lowest_cost = \
                                 dijkstra_tables[key]["lowest cost"]
-                            bits = key.split(":")
-                            xa, ya = int(bits[0]), int(bits[1])
+                            xa, ya = int(key[0]), int(key[1])
     # Set the next activated node as the unactivated node with the
     #  lowest current cost
 
