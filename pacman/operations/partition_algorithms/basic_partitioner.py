@@ -11,6 +11,7 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
 from spinn_machine.processor import Processor
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
+from pacman.exceptions import PacmanPartitionException
 
 import logging
 
@@ -64,9 +65,9 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         # Partition one vertex at a time
         for vertex in vertices:
             # Compute atoms per core from resource availability
-            imcoming_edges = graph.incoming_edges_to_vertex(vertex)
+            incoming_edges = graph.incoming_edges_to_vertex(vertex)
             requirements = \
-                vertex.get_resources_used_by_atoms(0, 1, imcoming_edges)
+                vertex.get_resources_used_by_atoms(0, 1, incoming_edges)
 
             #locate max SDRAM available. SDRAM is the only one that's changeable
             #during partitioning, as DTCM and cpu cycles are bespoke to a
@@ -118,6 +119,10 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 #  counted
                 label = "subvert with atoms {} to {} for vertex {}"\
                     .format(counted, counted + alloc - 1, vertex.label)
+                if counted < 0 or counted + alloc - 1 < 0:
+                    raise PacmanPartitionException("Not enough resources"
+                                                   " available to create"
+                                                   " subvertex")
                 subvert = Subvertex(counted, counted + alloc - 1,
                                     label=label)
                 subgraph.add_subvertex(subvert)
@@ -126,7 +131,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 #update sdram calc
                 subvertex_usage = \
                     vertex.get_resources_used_by_atoms(
-                        counted, counted + alloc - 1, imcoming_edges)\
+                        counted, counted + alloc - 1, incoming_edges)\
                     .sdram.get_value()
                 self._update_sdram_allocator(vertex, subvertex_usage, machine)
                 self._add_vertex_constraints_to_subvertex(subvert, vertex)
