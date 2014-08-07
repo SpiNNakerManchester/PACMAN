@@ -72,13 +72,14 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             #during partitioning, as dtcm and cpu cycles are bespoke to a
             #processor.
 
-            max_sdram_usage = \
+            max_resources_available_on_processor = \
                 self._get_maximum_resources_per_processor(vertex.constraints,
                                                           machine)
             if requirements.sdram.get_value() == 0:
-                apc_sd = max_sdram_usage
+                apc_sd = max_resources_available_on_processor
             else:
-                apc_sd = max_sdram_usage / requirements.sdram.get_value()
+                apc_sd = max_resources_available_on_processor.sdram.get_value()\
+                    / requirements.sdram.get_value()
 
             if requirements.dtcm.get_value() == 0:
                 apc_dt = Processor.DTCM_AVAILABLE

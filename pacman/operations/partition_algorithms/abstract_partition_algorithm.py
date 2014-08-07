@@ -9,7 +9,11 @@ from pacman.model.constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.utilities.sdram_tracker import SDRAMTracker
 from pacman import exceptions
 from pacman.utilities.progress_bar import ProgressBar
@@ -66,16 +70,17 @@ class AbstractPartitionAlgorithm(object):
         :type vertex_constriants: list of pacman.model.constraints.abstract_constraint
         :type machine: a spinnmachine.machine.machine object
         :return: the max sdram usage avilable given sdram allocations
-        :rtype: int
+        :rtype: pacman.model.resources.resource_container.ResourceContainer
         """
         #locate any instances of PlacerChipAndCoreConstraint
         for constraint in vertex_constriants:
             if isinstance(constraint, PlacerChipAndCoreConstraint):
                 sdram_available = self._sdram_tracker.get_usage(constraint.x,
                                                                 constraint.y)
-                return ResourceContainer(cpu=Processor.CPU_AVAILABLE,
-                                         dtcm=Processor.DTCM_AVAILABLE,
-                                         sdram=sdram_available)
+                return ResourceContainer(
+                    cpu=CPUCyclesPerTickResource(Processor.CPU_AVAILABLE),
+                    dtcm=DTCMResource(Processor.DTCM_AVAILABLE),
+                    sdram=SDRAMResource(sdram_available))
 
         # no PlacerChipAndCoreConstraint was found, search till max value
         # returned or highest avilable
@@ -88,9 +93,10 @@ class AbstractPartitionAlgorithm(object):
             #if a chip has been returned with sdram usage as the hard coded
             # max supported, then stop searching and return max.
             if sdram_available == SDRAM.DEFAULT_SDRAM_BYTES:
-                return ResourceContainer(cpu=Processor.CPU_AVAILABLE,
-                                         dtcm=Processor.DTCM_AVAILABLE,
-                                         sdram=maximum_sdram)
+                return ResourceContainer(
+                    cpu=CPUCyclesPerTickResource(Processor.CPU_AVAILABLE),
+                    dtcm=DTCMResource(Processor.DTCM_AVAILABLE),
+                    sdram=SDRAMResource(maximum_sdram))
 
     @staticmethod
     def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
