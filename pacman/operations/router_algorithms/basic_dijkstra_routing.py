@@ -434,35 +434,31 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             added_an_entry = False
             while not added_an_entry and neighbour_index < len(neighbours):
                 neighbour = neighbours[neighbour_index]
-                # "neighbours" is a list of 6 dictionaries or None objects.
-                # There is a None object where there is no connection to
-                #  that neighbour.
-                if neighbour is not None:
-                    # xnr and ynr for 'x neighbour retrace',
-                    # 'y neighbour retrace'.
-                    xnr, ynr = neighbour["x"], neighbour["y"]
-                    neighbour_routing_table = \
-                        self._get_routing_table_for_chip(xnr, ynr)
-                    # Only check if it can be a preceding node if it actually
-                    # exists
-                    if (xnr, ynr) in dijkstra_tables.keys():
-                        dijkstra_table_key = (xnr, ynr)
-                        lowest_cost = \
-                            dijkstra_tables[dijkstra_table_key]["lowest cost"]
-                        if lowest_cost is not None:
-                            xt, yt, previous_routing_entry = \
-                                self._create_routing_entry(
-                                    xnr, ynr, dijkstra_tables,
-                                    neighbour_index, nodes_info,
-                                    neighbour_routing_table, xt, yt,
-                                    subedge_routing_info,
-                                    previous_routing_entry)
-                            added_an_entry = True
-                        else:
-                            print xnr, ynr
-                            raise exceptions.PacmanRoutingException(
-                                "Tried to trace back to node not in graph: "
-                                "remove non-existent neighbours")
+                # "neighbours" is a list of up to 6 dictionaries.
+                # xnr and ynr for 'x neighbour retrace',
+                # 'y neighbour retrace'.
+                xnr, ynr = neighbour["x"], neighbour["y"]
+                neighbour_routing_table = \
+                    self._get_routing_table_for_chip(xnr, ynr)
+                # Only check if it can be a preceding node if it actually
+                # exists
+                if (xnr, ynr) in dijkstra_tables.keys():
+                    dijkstra_table_key = (xnr, ynr)
+                    lowest_cost = \
+                        dijkstra_tables[dijkstra_table_key]["lowest cost"]
+                    if lowest_cost is not None:
+                        xt, yt, previous_routing_entry, added_an_entry = \
+                            self._create_routing_entry(
+                                xnr, ynr, dijkstra_tables,
+                                neighbour_index, nodes_info,
+                                neighbour_routing_table, xt, yt,
+                                subedge_routing_info,
+                                previous_routing_entry)
+                else:
+                    print xnr, ynr
+                    raise exceptions.PacmanRoutingException(
+                        "Tried to trace back to node not in graph: "
+                        "remove non-existent neighbours")
                 neighbour_index += 1
 
             if xt == xcheck and yt == ycheck:
@@ -500,29 +496,28 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         # preceding node. xt and yt are the 'new' coordinates since
         # they are where the router should send the packet to
         bin_direction, dec_direction = self._get_direction(n)
-
+        made_an_entry = False
         #determine if this entry is going to be defaultable
         entry_is_defaultable = False
         if bin_direction in previous_routing_entry.link_ids:
             entry_is_defaultable = True
 
-        weight = \
-            nodes_info[(xnr, ynr)]["weights"][dec_direction]
-        sought_cost = \
-            dijkstra_tables[(xt, yt)]["lowest cost"] \
-            - weight
+        neighbour_weight = nodes_info[(xnr, ynr)]["weights"][dec_direction]
+        chip_sought_cost = \
+            dijkstra_tables[(xt, yt)]["lowest cost"] - neighbour_weight
+        neighbours_lowest_cost = dijkstra_tables[(xnr, ynr)]["lowest cost"]
         #print ("Checking node (%d, %d) with sought cost %s and actual
-        # cost %s") % (xnr, ynr, sought_cost,
+        # cost %s") % (xnr, ynr, chip_sought_cost,
         # dijkstra_tables[xnr][ynr]["lowest cost"])
-        if abs(dijkstra_tables[(xnr, ynr)]["lowest cost"]
-                - sought_cost) < 0.00000000001:
+
+        if neighbours_lowest_cost is not None and \
+           abs(neighbours_lowest_cost - chip_sought_cost) < 0.00000000001:
             #get other routing table and entry
             other_routing_table = \
                 self._get_routing_table_for_chip(xnr, ynr)
             edge_key, edge_mask = edge_info.key, edge_info.mask
-            other_routing_table_entry = \
-                other_routing_table.get_multicast_routing_entry_by_key(edge_key,
-                                                                       edge_mask)
+            other_routing_table_entry = other_routing_table.\
+                get_multicast_routing_entry_by_key(edge_key, edge_mask)
             if other_routing_table_entry is not None:
                 #already has an other_entry, check if mergable,
                 #  if not then throw error, therefore should only ever
@@ -530,16 +525,17 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 if other_routing_table_entry.key == edge_key:
                     #merge routes
                     merged_entry = self._merge_entries(
-                        other_routing_table_entry, list(), entry_is_defaultable,
+                        other_routing_table_entry, (), entry_is_defaultable,
                         edge_key, edge_mask, list().append(bin_direction),
                         router_table)
                     previous_routing_entry = merged_entry
             else:
                 entry = MulticastRoutingEntry(
-                    edge_key, edge_mask, list(), list().append(bin_direction),
+                    edge_key, edge_mask, (), [bin_direction],
                     entry_is_defaultable)
                 router_table.add_mutlicast_routing_entry(entry)
                 previous_routing_entry = entry
+            made_an_entry = True
 
             # Finally move the tracking node
             xt, yt = xnr, ynr
@@ -547,21 +543,27 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             nodes_info[(xnr, ynr)]["bws"][dec_direction] -= \
                 self._bw_per_route_entry  # TODO arbitrary
 
-            dec_direction = \
-                nodes_info[(xnr, ynr)]["bws"][dec_direction]
             if nodes_info[(xnr, ynr)]["bws"][dec_direction] < 0:
                 print ("Bandwidth overused from ({}, {}) in direction {}! to "
                        "({}, {})".format(xnr, ynr, bin_direction, xt, yt))
 
                 raise exceptions.PacmanRoutingException(
                     "Bandwidth overused as described above! Terminating...")
-            return xt, yt, previous_routing_entry
+        return xt, yt, previous_routing_entry, made_an_entry
 
     @staticmethod
     def _get_direction(neighbour_position):
+        """private method, do not call from outside dijskra routing\
+
+        used to detmerine the direction of a link to go down
+
+        :param neighbour_position: the position the neighbour is at
+        :type neighbour_position: int
+        :return the binary position and the integer verison of the route
+        :rtype: int int
+        :raise None: this method does not raise any known exceptions
         """
 
-        """
         bin_direction = None
         dec_direction = None
         if neighbour_position == 0:
@@ -586,6 +588,21 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
     @staticmethod
     def _has_same_route(processors, links, entry):
+        """ private method, not to be called outside dijskra routing
+
+        :param processors: the list of processors that a routing entry has gone\
+         down
+        :param links: the list of links to which a routing entry has gone down
+        :param entry: the other entry to compare against
+        :type processors: list of ints
+        :type links: list of ints
+        :type entry: spinnmachine.multicast_routing_entry.MultcastRoutingEntry
+        :return true if the links and processors are the same \
+        (same outgoing route)
+        :rtype: bool
+        :raise None: this method does not raise any known exception
+
+        """
         if entry.processors_ids == processors and entry.link_ids == links:
             return True
         else:
