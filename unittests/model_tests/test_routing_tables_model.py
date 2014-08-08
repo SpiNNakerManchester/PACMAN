@@ -20,7 +20,7 @@ class TestRoutingInfo(unittest.TestCase):
         multicast_entries = list()
         for i in range(5):
             multicast_entries.append(
-                MulticastRoutingEntry(key + i, mask, proc_ids, link_ids))
+                MulticastRoutingEntry(key + i, mask, proc_ids, link_ids, True))
         mrt = MulticastRoutingTable(0, 0, multicast_entries)
         self.assertEqual(mrt.x, 0)
         self.assertEqual(mrt.y, 0)
@@ -54,7 +54,7 @@ class TestRoutingInfo(unittest.TestCase):
             multicast_entries = list()
             for i in range(5):
                 multicast_entries.append(
-                    MulticastRoutingEntry(key, mask, proc_ids, link_ids))
+                    MulticastRoutingEntry(key, mask, proc_ids, link_ids, True))
             mrt = MulticastRoutingTable(0, 0, multicast_entries)
             mrt.add_mutlicast_routing_entry(multicast_entries[0])
 
@@ -68,9 +68,9 @@ class TestRoutingInfo(unittest.TestCase):
         for i in range(6):
             link_ids.append(i)
         multicast_entries1 = MulticastRoutingEntry(key, mask, proc_ids,
-                                                   link_ids)
+                                                   link_ids, True)
         multicast_entries2 = MulticastRoutingEntry(key - 1, mask, proc_ids,
-                                                   link_ids)
+                                                   link_ids, True)
         mrt = list()
 
         t1 = MulticastRoutingTable(0, 0, [multicast_entries1])
@@ -101,10 +101,10 @@ class TestRoutingInfo(unittest.TestCase):
             for i in range(6):
                 link_ids.append(i)
             multicast_entries1 = MulticastRoutingEntry(key, mask, proc_ids,
-                                                       link_ids)
+                                                       link_ids, True)
 
             multicast_entries2 = MulticastRoutingEntry(key - 1, mask, proc_ids,
-                                                       link_ids)
+                                                       link_ids, True)
             mrt = list()
             mrt.append(MulticastRoutingTable(3, 0, [multicast_entries1]))
             mrt.append(MulticastRoutingTable(3, 0, [multicast_entries2]))
