@@ -10,7 +10,7 @@ class PlacementTracker():
             key = "{}:{}".format(chip.x, chip.y)
             self._placements_avilable[key] = list()
             for processor in chip.processors:
-                if processor.processor_id == 0:
+                if processor.processor_id == 0 and not chip.virtual:
                     self._placements_avilable[key]\
                         .append(False)
                 else:
@@ -80,7 +80,7 @@ class PlacementTracker():
             raise exceptions.PacmanPlaceException(
                 "cannot assign to chip {}:{} as the chip does not exist for "
                 "placement".format(x, y))
-        index = 1
+        index = 0
         processors_avilable = self._placements_avilable[key]
         for processor in processors_avilable:
             if processor:

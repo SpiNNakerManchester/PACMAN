@@ -21,8 +21,8 @@ def placer_reports(report_folder, hostname, graph, graph_to_subgraph_mapper,
 def router_reports(report_folder, hostname, graph, graph_to_sub_graph_mapper,
                    placements, routing_tables, include_dat_based=False):
     router_report_from_router_tables(report_folder, routing_tables)
-    router_edge_information(report_folder, hostname, graph, routing_tables,
-                            graph_to_sub_graph_mapper, placements)
+    #router_edge_information(report_folder, hostname, graph, routing_tables,
+     #                       graph_to_sub_graph_mapper, placements)
     if include_dat_based:
         router_report_from_dat_file(report_folder)
 
@@ -251,12 +251,20 @@ def routing_indo_report(report_folder, hostname, subgraph, placements,
                         routing_infos):
     file_name = os.path.join(report_folder,
                              "virtual_key_space_information_report.rpt")
-    f_mem_used_by_core = None
     try:
-        f_mem_used_by_core = open(file_name, "w")
+        output = open(file_name, "w")
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file {} for "
-                     "writing.".format(file_name))
+        logger.error("generate virtual key space information report: "
+                     "Can't open file {} for writing.".format(file_name))
+
+    for subvert in subgraph.subvertices:
+        outgoing_subedges = subgraph.outgoing_subedges_from_subvertex(subvert)
+        for outgoing_subedge in outgoing_subedges:
+            subedge_routing_info = routing_infos.\
+                get_subedge_information_from_subedge(outgoing_subedge)
+
+
+
 
 
 def router_report_from_router_tables(report_folder, routing_tables):
@@ -345,39 +353,47 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
             fr_sv, to_sv = se.pre_subvertex, se.post_subvertex
             fr_placement = placements.get_placement_of_subvertex(fr_sv)
             to_placement = placements.get_placement_of_subvertex(to_sv)
-            get_associated_routing_entries_from(fr_placement, to_placement, )
-            if se.routing is not None:
-                route_steps = se.routing.routing_entries
-                route_len = len(route_steps)
-                fr_core = "(%d, %d, %d)" % (fr_proc.get_coordinates())
-                to_core = "(%d, %d, %d)" % (to_proc.get_coordinates())
-                fr_atoms = "%d:%d" % (fr_sv.lo_atom, fr_sv.hi_atom)
-                to_atoms = "%d:%d" % (to_sv.lo_atom, to_sv.hi_atom)
-                string = "Sub-edge from core %s, atoms %s," % (fr_core, fr_atoms)
-                string = "%s to core %s, atoms %s has route length: %d\n" % \
-                          (string, to_core, to_atoms, route_len)
-                f_routing.write(string)
-                # Print route info:
-                count_on_this_line = 0
-                total_step_count = 0
-                for step in route_steps:
-                    if total_step_count == 0:
-                       entry_str = "((%d, %d, %d)) -> " % (fr_proc.get_coordinates())
-                       f_routing.write(entry_str)
-                    chip_id = step.router.chip
-                    entry_str = "(%d, %d) -> " % (chip_id.x, chip_id.y)
+            associated_chips = \
+                _get_associated_routing_entries_from(fr_placement, to_placement,
+                                                     routing_tables)
+
+            route_len = len(associated_chips)
+            fr_core = "({}, {}, {})"\
+                .format(fr_placement.x, fr_placement.y, fr_placement.p)
+            to_core = "({}, {}, {})"\
+                .format(to_placement.x, to_placement.y, to_placement.p)
+            fr_atoms = "{}:{}"\
+                .format(fr_placement.subvertex.lo_atom,
+                        fr_placement.subvertex.hi_atom)
+            to_atoms = "{}:{}"\
+                .format(to_placement.subvertex.lo_atom,
+                        to_placement.subvertex.hi_atom)
+            string = "Sub-edge from core {}, atoms {},"\
+                .format(fr_core, fr_atoms)
+            string = "{} to core {}, atoms {} has route length: {}\n"\
+                .format(string, to_core, to_atoms, route_len)
+            f_routing.write(string)
+            # Print route info:
+            count_on_this_line = 0
+            total_step_count = 0
+            for step in associated_chips:
+                if total_step_count == 0:
+                    entry_str = "(({}, {}, {})) -> "\
+                        .format(fr_placement.x, fr_placement.y, fr_placement.p)
                     f_routing.write(entry_str)
-                    if total_step_count == (route_len-1):
-                       entry_str = "((%d, %d, %d))" % (to_proc.get_coordinates())
-                       f_routing.write(entry_str)
-
-                    total_step_count   += 1
-                    count_on_this_line += 1
-                    if count_on_this_line == 5:
-                        f_routing.write("\n")
-                        count_on_this_line = 0
-                f_routing.write("\n")
-
+                entry_str = "({}, {}) -> ".format(step['x'],
+                                                  step['y'])
+                f_routing.write(entry_str)
+                if total_step_count == (route_len - 1):
+                    entry_str = "(({}, {}, {}))"\
+                        .format(to_placement.x, to_placement.y, to_placement.p)
+                    f_routing.write(entry_str)
+                total_step_count += 1
+                count_on_this_line += 1
+                if count_on_this_line == 5:
+                    f_routing.write("\n")
+                    count_on_this_line = 0
+            f_routing.write("\n")
         # End one entry:
         f_routing.write("\n")
     f_routing.flush()
@@ -431,3 +447,8 @@ def _expand_route_value(processors_ids, link_ids):
             route_string += ", {}".format(link_labels[link])
     route_string += "]"
     return route_string
+
+def _get_associated_routing_entries_from(fr_placement, to_placement,
+                                         routing_tables):
+    associated_chips = list()
+

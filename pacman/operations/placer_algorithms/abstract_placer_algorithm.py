@@ -66,11 +66,11 @@ class AbstractPlacerAlgorithm(object):
         y = None
         p = None
         for constraint in constraints:
-            if type(constraint) == type(PlacerChipAndCoreConstraint):
+            if type(constraint) == type(PlacerChipAndCoreConstraint(0, 0)):
                 x = self._check_param(constraint.x, x, subvertex_label)
                 y = self._check_param(constraint.y, y, subvertex_label)
                 p = self._check_param(constraint.p, p, subvertex_label)
-            elif type(constraint) == type(PlacerSubvertexSameChipConstraint):
+            elif type(constraint) == type(PlacerSubvertexSameChipConstraint(None)):
                 other_subvertex = constraint.subvertex
                 other_placement = \
                     placements.get_placement_of_subvertex(other_subvertex)
@@ -84,7 +84,10 @@ class AbstractPlacerAlgorithm(object):
                 x = self._check_param(constraint.x, x, subvertex_label)
                 y = self._check_param(constraint.y, y, subvertex_label)
                 p = self._check_param(constraint.p, p, subvertex_label)
-        return PlacerChipAndCoreConstraint(x, y, p)
+        if x is not None and y is not None:
+            return PlacerChipAndCoreConstraint(x, y, p)
+        else:
+            return None
 
     @staticmethod
     def _check_param(param_to_check, param_to_update, subvertex_label):

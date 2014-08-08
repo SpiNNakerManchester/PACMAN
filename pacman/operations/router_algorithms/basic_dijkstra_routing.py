@@ -374,19 +374,20 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         #  and the cost if the node hasn't already been activated
         # and the lowest cost if the new cost is less, or if
         # there is no current cost
-        if ((xn, yn) in dijkstra_tables.keys() and
-            not dijkstra_tables[(xn, yn)]["activated?"] and
-            ((dijkstra_tables[(xa, ya)]["lowest cost"] + weight)
-             < dijkstra_tables[(xn, yn)]["lowest cost"]
-             or (dijkstra_tables[(xn, yn)]["lowest cost"] is None))):
+        neighbour_exists = (xn, yn) in dijkstra_tables.keys()
+        neighbour_activated = dijkstra_tables[(xn, yn)]["activated?"]
+        chip_lowest_cost = dijkstra_tables[(xa, ya)]["lowest cost"]
+        neighbour_lowest_cost = dijkstra_tables[(xn, yn)]["lowest cost"]
+        if (neighbour_exists and not neighbour_activated and
+            ((chip_lowest_cost + weight) < neighbour_lowest_cost
+             or (neighbour_lowest_cost is None))):
                 #update dijkstra table
                 dijkstra_tables[(xn, yn)]["lowest cost"] = \
-                    float(dijkstra_tables[(xa, ya)]["lowest cost"]
-                          + weight)
-        else:
-            raise Exception("Tried to propagate to ({}, {}), which is not in "
-                            "the graph: remove non-existent neighbours"
-                            .format(xn, yn))
+                    float(chip_lowest_cost + weight)
+        elif not neighbour_exists:
+            raise exceptions.PacmanRoutingException(
+                "Tried to propagate to ({}, {}), which is not in the graph:"
+                " remove non-existent neighbours".format(xn, yn))
 
         if (dijkstra_tables[(xn, yn)]["lowest cost"] == 0) \
                 and (xn != xs or yn != ys):

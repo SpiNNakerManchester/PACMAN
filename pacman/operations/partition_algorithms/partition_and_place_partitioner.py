@@ -137,7 +137,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgo
             if subverts_from_vertex is None:
                 self._partition_vertex(
                     vertex, subgraph, graph_to_sub_graph_mapper, machine, graph)
-            progress_bar.update()
+            progress_bar.update(vertex.n_atoms)
         progress_bar.end()
 
         #update constraints for subverts
@@ -332,9 +332,9 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
                 used_resources = \
-                    vertex.get_resources_for_atoms(
-                        lo_atom, hi_atom, self._runtime_in_machine_time_steps,
-                        self._machine_time_step, partition_data_object)
+                    vertex.get_resources_used_by_atoms(
+                        lo_atom, hi_atom,
+                        graph.incoming_edges_to_vertex(vertex))
                 ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise and exception
@@ -354,10 +354,11 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
                 #TODO needs to be tied in (old code resulted in no loops, so new code has omitted the code for future look ats
 
             # Place the vertex
-            # noinspection PyProtectedMember
             placement_constraints = \
                 utility_calls.locate_constraints_of_type(
                     vertex.constraints, AbstractPlacerConstraint)
+
+            # noinspection PyProtectedMember
             x, y, p = \
                 self._placer_algorithm._try_to_place(placement_constraints,
                                                      resources, "",

@@ -121,11 +121,9 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :rtype: int, int, int
         :raise None: this method does not raise any knwon exceptions
         """
-        placement_constraint = None
-        if len(placement_constraints) > 1:
-            placement_constraint = \
-                self._reduce_constraints(placement_constraints, subvert_label,
-                                         placements)
+        placement_constraint = \
+            self._reduce_constraints(placement_constraints, subvert_label,
+                                     placements)
 
         #if theres a placement constraint, then check out the chip and only that
         #chip
