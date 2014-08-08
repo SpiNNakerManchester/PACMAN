@@ -66,6 +66,7 @@ class Router:
                 graph_to_sub_graph_mapper=self._graph_to_subgraph_mappings,
                 placements=placements, report_folder=self._report_folder,
                 include_dat_based=self.report_states.router_dat_based_report,
-                routing_tables=routing_tables)
+                routing_tables=routing_tables, routing_info=self._routing_infos,
+                machine=machine)
 
         return routing_tables
