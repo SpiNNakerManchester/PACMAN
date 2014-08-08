@@ -294,8 +294,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         # Iterate only if the destination node hasn't been activated
         while not (len(destination_processors_left_to_find) == 0):
             # PROPAGATE!
-            for i in range(
-                    len(nodes_info[(xa, ya)]["neighbours"])):
+            for i in range(len(nodes_info[(xa, ya)]["neighbours"])):
                 neighbour = nodes_info[(xa, ya)]["neighbours"][i]
                 weight = nodes_info[(xa, ya)]["weights"][i]
                 # "neighbours" is a list of 6 dictionaries or None objects.
