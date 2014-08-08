@@ -166,7 +166,7 @@ class AbstractPartitionAlgorithm(object):
                                                       constraint.y)
                 self._sdram_tracker.add_usage(
                     constraint.x, constraint.y,
-                    usage + sub_vertex_requirement.sdram.get_value())
+                    usage + sub_vertex_requirement)
                 allocated = True
 
         chip_index = 0
@@ -181,8 +181,8 @@ class AbstractPartitionAlgorithm(object):
             else:
                 usage = self._sdram_tracker.get_usage(chip.x, chip.y)
                 if (SDRAM.DEFAULT_SDRAM_BYTES - usage) >= \
-                        sub_vertex_requirement.sdram.get_value():
-                    sub_vert_usage = sub_vertex_requirement.sdram.get_value()
+                        sub_vertex_requirement:
+                    sub_vert_usage = sub_vertex_requirement
                     self._sdram_tracker.add_usage(chip.x, chip.y,
                                                   sub_vert_usage + usage)
                     allocated = True
