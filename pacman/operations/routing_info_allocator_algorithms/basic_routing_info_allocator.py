@@ -60,9 +60,10 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
                 subgraph.outgoing_subedges_from_subvertex(subvert)
             for out_going_subedge in out_going_subedges:
                 placement = placements.get_placement_of_subvertex(subvert)
-                routing_infos.add_subedge_info(
-                    self._allocate_subedge_key_mask(out_going_subedge,
-                                                    placement))
+                if placement is not None:
+                    routing_infos.add_subedge_info(
+                        self._allocate_subedge_key_mask(out_going_subedge,
+                                                        placement))
             progress_bar.update()
         progress_bar.end()
         return routing_infos
