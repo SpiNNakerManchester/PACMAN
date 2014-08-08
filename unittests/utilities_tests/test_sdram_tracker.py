@@ -1,6 +1,6 @@
 import unittest
 from pacman.utilities.sdram_tracker import SDRAMTracker
-from pacman.utilities.sdram_tracker import SDRAM
+from spinn_machine.sdram import SDRAM
 
 
 class TestSDRAMTracker(unittest.TestCase):
