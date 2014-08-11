@@ -2,8 +2,9 @@ import os
 import time
 import logging
 from pacman.utilities.sdram_tracker import SDRAMTracker
-
+from pacman.model.placements import placement
 from spinn_machine.sdram import SDRAM
+from pacman import exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -19,17 +20,19 @@ def placer_reports(report_folder, hostname, graph, graph_to_subgraph_mapper,
 
 
 def router_reports(report_folder, hostname, graph, graph_to_sub_graph_mapper,
-                   placements, routing_tables, include_dat_based=False):
+                   placements, routing_tables, routing_info, machine,
+                   include_dat_based=False):
     router_report_from_router_tables(report_folder, routing_tables)
     #router_edge_information(report_folder, hostname, graph, routing_tables,
-     #                       graph_to_sub_graph_mapper, placements)
+     #                       graph_to_sub_graph_mapper, placements,
+     #                       routing_info, machine)
     if include_dat_based:
         router_report_from_dat_file(report_folder)
 
 
 def routing_info_reports(report_folder, hostname, subgraph, placements,
                          routing_infos):
-    routing_indo_report(report_folder, hostname, subgraph, placements,
+    routing_info_report(report_folder, hostname, subgraph, placements,
                         routing_infos)
 
 
@@ -247,7 +250,7 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     # Close file:
     f_mem_used_by_core.close()
 
-def routing_indo_report(report_folder, hostname, subgraph, placements,
+def routing_info_report(report_folder, hostname, subgraph, placements,
                         routing_infos):
     file_name = os.path.join(report_folder,
                              "virtual_key_space_information_report.rpt")
@@ -318,7 +321,8 @@ def router_report_from_dat_file(report_folder):
 
 #ToDO NOT CHECKED YET
 def router_edge_information(report_folder, hostname, graph, routing_tables,
-                            graph_to_subgraph_mapper, placements):
+                            graph_to_subgraph_mapper, placements, routing_info,
+                            machine):
     """
     Generate report on the routing of sub-edges across the machine.
     """
@@ -353,9 +357,10 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
             fr_sv, to_sv = se.pre_subvertex, se.post_subvertex
             fr_placement = placements.get_placement_of_subvertex(fr_sv)
             to_placement = placements.get_placement_of_subvertex(to_sv)
-            associated_chips = \
-                _get_associated_routing_entries_from(fr_placement, to_placement,
-                                                     routing_tables)
+            routing_data = routing_info.get_subedge_information_from_subedge(se)
+            associated_chips = _get_associated_routing_entries_from(
+                fr_placement, to_placement, routing_tables, routing_data,
+                machine)
 
             route_len = len(associated_chips)
             fr_core = "({}, {}, {})"\
@@ -448,7 +453,53 @@ def _expand_route_value(processors_ids, link_ids):
     route_string += "]"
     return route_string
 
-def _get_associated_routing_entries_from(fr_placement, to_placement,
-                                         routing_tables):
-    associated_chips = list()
+def _get_associated_routing_entries_from(
+        fr_placement, to_placement, routing_tables, routing_data, machine):
 
+    routing_table = routing_tables.get_routing_table_for_chip(
+        to_placement.x, to_placement.y)
+    key = routing_data.key
+    mask = routing_data.mask
+    destinations = routing_table.get_multicast_routing_entry_by_key(
+            key, mask)
+
+    if fr_placement.x == to_placement.x and fr_placement.y == to_placement.y:
+        #check that the last route matches the destination core in the
+        #to_placement add the destination core to the associated chips list
+        #and return the associated chip list
+        processors = destinations.processor_ids()
+        if to_placement.p in processors:
+            associated_chips = list()
+            step = dict()
+            step['x'] = fr_placement.x
+            step['y'] = fr_placement.y
+            associated_chips.append(step)
+            return associated_chips
+        else:
+            raise exceptions.PacmanRoutingException(
+                "Although routing path with key {0:X} reaches chip ({1:d}, "
+                "{2:d}), it does not reach processor {3:d} as requested by "
+                "the destination placement".format(
+                    key, to_placement.x, to_placement.y, to_placement.p))
+    else:
+        links = destinations.link_ids()
+        current_x = fr_placement.x
+        current_y = fr_placement.y
+        current_chip = machine.get_chip_at(current_x, current_y)
+        current_router = current_chip.router
+        for i in links:
+            next_link = current_router.get_link(i)
+            next_x = next_link.destination_x
+            next_y = next_link.destination_y
+            next_placement = placement.Placement(None, next_x, next_y, None)
+            associated_chips = _get_associated_routing_entries_from(
+                next_placement, to_placement, routing_tables, routing_data,
+                machine)
+            if associated_chips is not None:
+                step = dict()
+                step['x'] = current_x
+                step['y'] = current_y
+                associated_chips.insert(0, step)
+                return associated_chips
+            else:
+                return None

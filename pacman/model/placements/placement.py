@@ -8,7 +8,7 @@ class Placement(object):
 
         :param subvertex: The subvertex that has been placed
         :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
-        :param x: the x-oordinate of the chip on which the subvertex is placed
+        :param x: the x-coordinate of the chip on which the subvertex is placed
         :type x: int
         :param y: the y-coordinate of the chip on which the subvertex is placed
         :type y: int
