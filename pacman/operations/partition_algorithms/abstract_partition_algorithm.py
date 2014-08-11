@@ -173,7 +173,7 @@ class AbstractPartitionAlgorithm(object):
         chips = list(machine.chips)
         while not allocated and chip_index < len(chips):
             chip = chips[chip_index]
-            key = self._sdram_tracker.key_from_chip_coords(chip.x, chip.y)
+            key = (chip.x, chip.y)
             if not key in self._sdram_tracker.keys:
                 self._sdram_tracker.add_usage(chip.x, chip.y,
                                               sub_vertex_requirement.

@@ -15,8 +15,6 @@ class TestSDRAMTracker(unittest.TestCase):
         sdram_tracker.add_usage(1, 1, sdram2.size)
         for i in range(2):
             for j in range(2):
-                self.assertEqual(sdram_tracker.key_from_chip_coords(i, j),
-                                 str(i) + ":" + str(j))
                 if i == 0:
                     self.assertEqual(sdram_tracker.get_usage(i, j), sdram.size)
                 else:
