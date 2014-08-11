@@ -23,6 +23,7 @@ from pacman.operations.placer_algorithms.abstract_placer_algorithm import \
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities import utility_calls
+from pacman.exceptions import PacmanPlaceException
 
 logger = logging.getLogger(__name__)
 
@@ -68,30 +69,30 @@ pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPart
 
         :param placer_algorithm: the new placer algorithm
         :type placer_algorithm: implementation of \
-pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgorithm
+pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm
 
         :return: None
         :rtype: None
         :raise PacmanConfigurationException: if the placer_algorithm is not a\
-        implentation of \
-pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgorithm
+        implementation of \
+pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm
 
         """
         # if placer_algorithm in AbstractPlacerAlgorithm.__subclasses__():
 
         #find all placer algorithms!
         subclass_list = list()
-        current_subclass_list = AbstractPlacerAlgorithm.__subclasses__()
+        initial_subclass_list = AbstractPlacerAlgorithm.__subclasses__()
         PartitionAndPlacePartitioner._detect_subclass_hierarchy(
-            current_subclass_list, subclass_list)
+            initial_subclass_list, subclass_list)
 
         if placer_algorithm in subclass_list:
             self._placer_algorithm = placer_algorithm(machine, graph)
 
         else:
             raise exceptions.PacmanConfigurationException(
-                "The placer algorithm submitted is not a recongised placer "
-                "algorthm")
+                "The placer algorithm submitted is not a recognised placer "
+                "algorithm")
 
     #inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
@@ -151,7 +152,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlaceralgo
         return subgraph, graph_to_sub_graph_mapper
 
     @property
-    def compelte_placements(self):
+    def complete_placements(self):
         """ property which returns the complete placements made by the
         parittioner
 
@@ -287,7 +288,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         :param max_atoms_per_core: the min max atoms from all the vertexes \
         considered that have max_atom constraints
         :param graph: the graph object
-        :param machine: the machien object
+        :param machine: the machine object
         :type graph: pacman.model.graph.graph.Graph
         :type machine: spinnmachine.machine.Machine object
         :type lo_atom: int
@@ -361,13 +362,16 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
                 utility_calls.locate_constraints_of_type(
                     vertex.constraints, AbstractPlacerConstraint)
 
-            # noinspection PyProtectedMember
-            x, y, p = \
-                self._placer_algorithm._try_to_place(placement_constraints,
-                                                     resources, "",
-                                                     self._complete_placements)
-            used_placements.append((vertex, partition_data_object, x, y, p,
-                                    used_resources, resources))
+            if self._placer_algorithm is not None:
+                # noinspection PyProtectedMember
+                x, y, p = \
+                    self._placer_algorithm._try_to_place(placement_constraints,
+                                                         resources, "",
+                                                         self._complete_placements)
+                used_placements.append((vertex, partition_data_object, x, y, p,
+                                        used_resources, resources))
+            else:
+                raise PacmanPlaceException("No placer algorithm selected")
 
         return used_placements, min_hi_atom
 
@@ -380,25 +384,25 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphM
         :param lo_atom: the number of atoms already partitioned
         :param hi_atom: the total number of atoms to place for this vertex
         :param vertex: the vertexes to scale up the num atoms per core for
-        :param partition_data_object: the parittion object for memory \
-        estiamtes
+        :param partition_data_object: the partition object for memory \
+        estimates
         :param max_atoms_per_core: the min max atoms from all the vertexes \
         considered that have max_atom constraints
-        :param used_resources: the resouerces used by the machine so far
-        :param resources: the resource estiamte for the vertex for a given\
+        :param used_resources: the resources used by the machine so far
+        :param resources: the resource estimate for the vertex for a given\
         number of atoms
-        :param ratio: the ratio between max atoms and avilable resources
+        :param ratio: the ratio between max atoms and availalbe resources
         :type lo_atom: int
         :type hi_atom: int
         :type vertex: pacman.model.graph.vertex.Vertex
-        :type partition_data_object: partitionable obejct
+        :type partition_data_object: partitionable object
         :type max_atoms_per_core: int
-        :type used_resources: pacman.model.resources.resoruce.Resoruce
-        :type resources: pacman.model.resources.resoruce.Resoruce
+        :type used_resources: pacman.model.resources.resource.Resource
+        :type resources: pacman.model.resources.resource.Resource
         :type ratio: int
         :return: the list of placements made by this method and the new amount \
-        of atoms parittioned
-        :rtype: iterbale of tuples and a int
+        of atoms partitioned
+        :rtype: iterable of tuples and a int
         :raise PacmanPartitionException: when the vertex cannot be partitioned
         """
 
