@@ -131,8 +131,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 #update sdram calc
                 subvertex_usage = \
                     vertex.get_resources_used_by_atoms(
-                        counted, counted + alloc - 1, incoming_edges)\
-                    .sdram.get_value()
+                        counted, counted + alloc - 1, incoming_edges)
                 self._update_sdram_allocator(vertex, subvertex_usage, machine)
                 self._add_vertex_constraints_to_subvertex(subvert, vertex)
             #update and end progress bars as needed
