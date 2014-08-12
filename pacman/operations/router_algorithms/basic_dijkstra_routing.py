@@ -72,11 +72,13 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             xs, ys, ps = placement.x, placement.y, placement.p
 
             for subedge in out_going_sub_edges:
-                chip = machine.get_chip_at(placement.x, placement.y)
-                processor = \
-                    machine.get_chip_at(placement.x,
-                                        placement.y)\
-                    .get_processor_with_id(placement.p)
+                destination_subvetex = subedge.post_subvertex
+                destination_placement = \
+                    placements.get_placement_of_subvertex(destination_subvetex)
+
+                chip = machine.get_chip_at(destination_placement.x,
+                                           destination_placement.y)
+                processor = chip.get_processor_with_id(destination_placement.p)
                 dest_processors.append({'processor': processor, 'chip': chip})
                 subedges_to_route.append(subedge)
 

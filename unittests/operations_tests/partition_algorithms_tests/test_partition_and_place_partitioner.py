@@ -7,7 +7,7 @@ from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
-from unittests.model_tests.test_vertex import TestVertex as Vertex
+from unittests.test_vertex import TestVertex as Vertex
 from pacman.model.partitionable_graph.partitionable_edge import \
     PartitionableEdge as Edge
 from spinn_machine.machine import Machine
