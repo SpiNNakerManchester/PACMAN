@@ -20,6 +20,9 @@ class VertexRequiresMultiCastSourceConstraint(AbstractUtilityConstraint):
                   "{}".format(commands))
         self._commands = commands
 
+    def is_utility_constraint(self):
+        return True
+
     @property
     def commands(self):
         """ The commands to transmit

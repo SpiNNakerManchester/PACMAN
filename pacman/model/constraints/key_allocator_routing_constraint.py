@@ -20,6 +20,9 @@ class KeyAllocatorRoutingConstraint(AbstractRouterConstraint):
                   "from the function call {}".format(function_call))
         self._function_call = function_call
 
+    def is_router_constraint(self):
+        return True
+
     @property
     def function_call(self):
         return self._function_call

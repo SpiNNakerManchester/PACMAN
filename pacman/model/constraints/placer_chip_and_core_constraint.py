@@ -7,7 +7,7 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
     """ Creates a constraint object to place a vertex or a subvertex on a\
         specific chip, and optionally a specific core on that chip
     """
-    
+
     def __init__(self, x, y, p=None):
         """
 
@@ -26,9 +26,11 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         self._y = y
         self._p = p
 
+    def is_placer_constraint(self):
+        return True
+
     @property
     def rank(self):
-        rank = None
         if self.p is not None:
             return sys.maxint
         else:

@@ -13,6 +13,15 @@ class AbstractPlacerConstraint(AbstractConstraint):
     def __init__(self, label):
         AbstractConstraint.__init__(self, label)
 
+    def is_constraint(self):
+        return True
+
+    @abstractmethod
+    def is_placer_constraint(self):
+        """ Determine if this is a placer constraint
+        """
+        pass
+
     @abstractmethod
     def rank(self):
         """property method for all placer constraints to have for sorting
