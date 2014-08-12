@@ -11,9 +11,9 @@ class PartitionableEdge(object):
         """
 
         :param pre_vertex: the vertex at the start of the edge
-        :type pre_vertex: :py:class:`pacman.model.graph.vertex.Vertex`
+        :type pre_vertex: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
         :param post_vertex: the vertex at the end of the edge
-        :type post_vertex: :py:class:`pacman.model.graph.vertex.Vertex`
+        :type post_vertex: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
         :param label: The name of the edge
         :type label: str
         :raise None: Raises no known exceptions
@@ -60,7 +60,7 @@ class PartitionableEdge(object):
         """ The vertex at the start of the edge
 
         :return: A vertex
-        :rtype: :py:class:`pacman.model.graph.vertex.Vertex`
+        :rtype: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise None: Raises no known exceptions
         """
         return self._pre_vertex
@@ -70,7 +70,7 @@ class PartitionableEdge(object):
         """ The vertex at the end of the edge
 
         :return: A vertex
-        :rtype: :py:class:`pacman.model.graph.vertex.Vertex`
+        :rtype: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise None: Raises no known exceptions
         """
         return self._post_vertex

@@ -34,7 +34,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         self._bw_per_route_entry = bw_per_route_entry
         self._max_bw = max_bw
 
-    def route(self, routing_info_allocation, placements, machine, subgraph):
+    def route(self, routing_info_allocation, placements, machine,
+              partitioned_graph):
         """ Find routes between the subedges with the allocated information,
             placed in the given places
 
@@ -46,8 +47,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                     :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param subgraph: the partitioned_graph object
-        :type subgraph: pacman.partitioned_graph.partitioned_graph.Subgraph
+        :param partitioned_graph: the partitioned_graph object
+        :type partitioned_graph: pacman.partitioned_graph.partitioned_graph.Subgraph
         :return: The discovered routes
         :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
@@ -64,7 +65,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         for placement in placements.placements:
             subvert = placement.subvertex
             out_going_sub_edges = \
-                subgraph.outgoing_subedges_from_subvertex(subvert)
+                partitioned_graph.outgoing_subedges_from_subvertex(subvert)
 
             dest_processors = []
             subedges_to_route = list()

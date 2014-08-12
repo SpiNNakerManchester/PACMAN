@@ -1,12 +1,13 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.partitionable_graph.vertex import Vertex
+from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.resources.resource_container import ResourceContainer
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPartitionableVertex(Vertex):
+class AbstractPartitionableVertex(AbstractConstrainedVertex):
     """the abstract partitionable vertex is a type of vertex that is recongised
     by the pacman partitioners. Due to this, it is recommended that front end
     developers inhirrit from this class when creating new neural models.
@@ -51,7 +52,7 @@ class AbstractPartitionableVertex(Vertex):
 
 
         """
-        Vertex.__init__(self, n_atoms, label, constraints)
+        AbstractConstrainedVertex.__init__(self, n_atoms, label, constraints)
         #add the max atom per core constraint
         max_atom_per_core_constraint = \
             PartitionerMaximumSizeConstraint(max_atoms_per_core)
@@ -152,3 +153,32 @@ class AbstractPartitionableVertex(Vertex):
                     constraint.size <= current_found_max_atoms_per_core):
                 current_found_max_atoms_per_core = constraint.size
         return current_found_max_atoms_per_core
+
+    def create_subvertex(self, lo_atom, hi_atom, label=None,
+                         additional_constraints=list()):
+        """ Creates a subvertex of this vertex.  Can be overridden in vertex\
+            subclasses to create an subvertex instance that contains detailed\
+            information
+
+        :param lo_atom: The first atom in the subvertex
+        :type lo_atom: int
+        :param hi_atom: The last atom in the subvertex
+        :type hi_atom: int
+        :param label: The label to give the subvertex.  If not given, and the\
+                    vertex has no label, no label will be given to the\
+                    subvertex.  If not given and the vertex has a label, a\
+                    default label will be given to the subvertex
+        :type label: str
+        :param additional_constraints: An iterable of constraints from the\
+                    subvertex over-and-above those of the vertex
+        :type additional_constraints: iterable of\
+                    :py:class:`pacman.model.constraints.abstract_constraint\
+                    .AbstractConstraint`
+        :raise pacman.exceptions.PacmanInvalidParameterException:
+                    * If lo_atom or hi_atom are out of range
+                    * If one of the constraints is invalid
+        """
+        # Combine the AbstractConstrainedVertex and PartitionedVertex constraints
+        additional_constraints.extend(self.constraints)
+
+        return PartitionedVertex(lo_atom, hi_atom, label, additional_constraints)

@@ -48,7 +48,7 @@ class Placer:
             self._placer_alogrithm = placer_algorithm(self._machine,
                                                       self._partitonable_graph)
 
-    def run(self, subgraph, graph_to_subgraph_mapper):
+    def run(self, subgraph, graph_mapper):
         """ Execute the algorithm on the partitioned_graph and place it on the machine
         
         :param subgraph: The partitioned_graph to place
@@ -59,16 +59,15 @@ class Placer:
                    goes wrong with the placement
         """
         placements = \
-            self._placer_alogrithm.place(subgraph, graph_to_subgraph_mapper)
+            self._placer_alogrithm.place(subgraph, graph_mapper)
 
         #execute reports if needed
         if (self.report_states is not None and
                 self.report_states.placer_report):
             reports.placer_reports(
                 graph=self._partitonable_graph, hostname=self._hostname,
-                graph_to_subgraph_mapper=graph_to_subgraph_mapper,
-                machine=self._machine, placements=placements,
-                report_folder=self._report_folder)
+                graph_mapper=graph_mapper, machine=self._machine,
+                placements=placements, report_folder=self._report_folder)
 
         return placements
 

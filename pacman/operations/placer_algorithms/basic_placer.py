@@ -33,14 +33,14 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         self._supported_constraints.append(PlacerChipAndCoreConstraint)
         self._supported_constraints.append(PlacerSubvertexSameChipConstraint)
 
-    def place(self, subgraph, graph_to_subgraph_mapper):
+    def place(self, subgraph, graph_mapper):
         """ Place a partitioned_graph so that each subvertex is placed on a core
 
         :param subgraph: The partitioned_graph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
-        :param graph_to_subgraph_mapper: the mappings between partitionable_graph and partitioned_graph
-        :type graph_to_subgraph_mapper:
-    pacman.model.graph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
+        :param graph_mapper: the mappings between partitionable_graph and partitioned_graph
+        :type graph_mapper:
+    pacman.model.graph_mapper.graph_mapper.GraphMapper
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: If something\
@@ -59,12 +59,13 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
-                                   "for placing the partitioned_graph's subvertices")
+                                   "for placing the partitioned_graph's "
+                                   "subvertices")
         for subvertex in ordered_subverts:
 
             # Create and store a new placement
             placement = self._place_subvertex(subvertex, self._graph,
-                                              graph_to_subgraph_mapper,
+                                              graph_mapper,
                                               placements)
             placements.add_placement(placement)
             progress_bar.update()
@@ -82,7 +83,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :param placements: the current placements
         :type subvertex: pacman.models.partitioned_graph.subvertex.PartitionedVertex
         :type graph: pacman.models.partitionable_graph.partitionable_graph.Graph
-        :type graph_to_subgraph_mapper: pacamn.models.graph_subgraph_mapper.graphSubgraphMapper
+        :type graph_to_subgraph_mapper: pacamn.models.graph_mapper.graphSubgraphMapper
         :type placements: pacman.model.placements.placements.Placements
         :return: placement object for this subvertex
         :rtype: pacman.model.placements.placement.Placement

@@ -16,9 +16,9 @@ from spinn_machine.chip import Chip
 
 class TestBasicPartitioner(unittest.TestCase):
     def setUp(self):
-        self.vert1 = Vertex(10, "New Vertex 1")
-        self.vert2 = Vertex(5, "New Vertex 2")
-        self.vert3 = Vertex(3, "New Vertex 3")
+        self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
+        self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
+        self.vert3 = Vertex(3, "New AbstractConstrainedVertex 3")
         self.edge1 = PartitionableEdge(self.vert1, self.vert2, "First edge")
         self.edge2 = PartitionableEdge(self.vert2, self.vert1, "Second edge")
         self.edge3 = PartitionableEdge(self.vert1, self.vert3, "Third edge")

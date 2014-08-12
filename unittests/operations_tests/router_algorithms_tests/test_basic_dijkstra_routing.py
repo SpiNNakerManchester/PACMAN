@@ -30,8 +30,8 @@ class MyTestCase(unittest.TestCase):
 
     def setUp(self):
         #sort out graph
-        self.vert1 = Vertex(10, "New Vertex 1")
-        self.vert2 = Vertex(5, "New Vertex 2")
+        self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
+        self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
         self.edge1 = PartitionableEdge(self.vert1, self.vert2, "First edge")
         self.verts = [self.vert1, self.vert2]
         self.edges = [self.edge1]

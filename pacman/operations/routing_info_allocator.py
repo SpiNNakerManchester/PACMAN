@@ -10,7 +10,7 @@ class RoutingInfoAllocator:
     """ Used to obtain routing information from a placed partitioned_graph
     """
 
-    def __init__(self, machine, report_states, graph_to_sub_graph_mapper,
+    def __init__(self, machine, report_states, graph_mapper,
                  report_folder=None, hostname=None,
                  routing_info_allocator_algorithm=None):
         """
@@ -20,7 +20,7 @@ class RoutingInfoAllocator:
         :param hostname: the hostname of the machine
         :param machine: the machine object used to represent the spinnaker\
          machine
-        :param graph_to_sub_graph_mapper: the partitionable_graph to partitioned_graph mapper object
+        :param graph_mapper: the partitionable_graph to partitioned_graph mapper object
         :param report_folder: the folder used to store reports
         :param report_states: the pacman states for different reports
         :type hostname: str
@@ -37,17 +37,17 @@ class RoutingInfoAllocator:
         self.report_states = report_states
         self._hostname = hostname
         self._machine = machine
-        self._graph_to_subgraph_mapper = graph_to_sub_graph_mapper
+        self._graph_mapper = graph_mapper
         self._routing_info_allocator_algorithm = \
             routing_info_allocator_algorithm
 
         #set up a default placer algorithm if none are specified
         if self._routing_info_allocator_algorithm is None:
             self._routing_info_allocator_algorithm = \
-                BasicRoutingInfoAllocator(self._graph_to_subgraph_mapper)
+                BasicRoutingInfoAllocator(self._graph_mapper)
         else:
             self._routing_info_allocator_algorithm = \
-                routing_info_allocator_algorithm(self._graph_to_subgraph_mapper)
+                routing_info_allocator_algorithm(self._graph_mapper)
 
     def run(self, partitioned_graph, placements):
         """ Execute the algorithm on the partitioned_graph

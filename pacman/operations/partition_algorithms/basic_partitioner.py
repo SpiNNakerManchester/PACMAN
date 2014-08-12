@@ -1,7 +1,7 @@
 from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
-from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper import \
-    GraphSubgraphMapper
+from pacman.model.graph_mapper.graph_mapper import \
+    GraphMapper
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
@@ -61,7 +61,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                                    "on partitioning the partitionable_graph's vertices")
         vertices = graph.vertices
         subgraph = PartitionedGraph(label="partitioned_graph for partitionable_graph {}".format(graph.label))
-        graph_to_subgraph_mapper = GraphSubgraphMapper()
+        graph_to_subgraph_mapper = GraphMapper()
         # Partition one vertex at a time
         for vertex in vertices:
             # Compute atoms per core from resource availability

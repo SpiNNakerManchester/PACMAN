@@ -31,14 +31,15 @@ class AbstractPlacerAlgorithm(object):
         self._supported_constraints = list()
 
     @abstractmethod
-    def place(self, subgraph, graph_to_subgraph_mapper):
+    def place(self, subgraph, graph_mapper):
         """ Place a partitioned_graph so that each subvertex is placed on a core
             
         :param subgraph: The partitioned_graph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
-        :param graph_to_subgraph_mapper: the mappings between partitionable_graph and partitioned_graph
-        :type graph_to_subgraph_mapper:
-    pacman.model.graph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
+        :param graph_mapper: the mappings between partitionable_graph and \
+        partitioned_graph
+        :type graph_mapper:
+    pacman.model.graph_mapper.graph_mapper.GraphMapper
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: If something\

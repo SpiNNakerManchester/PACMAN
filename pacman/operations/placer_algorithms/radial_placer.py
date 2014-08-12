@@ -9,13 +9,13 @@ class RadialPlacer(BasicPlacer):
     circle out behaviour from a ethernet at 0 0
     """
 
-    def __init__(self, machine, graph):
+    def __init__(self, machine, partitionable_graph):
         """constructor to build a
         pacman.operations.placer_algorithms.RadialPlacer.RadialPlacer
         :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
-        BasicPlacer.__init__(self, machine, graph)
+        BasicPlacer.__init__(self, machine, partitionable_graph)
 
     #overloaded method from basicPlacer
     def _deal_with_non_constrainted_placement(self, subvertex, resources,

@@ -16,7 +16,7 @@ class VertexRequiresMultiCastSourceConstraint(AbstractUtilityConstraint):
         :raise None: does not raise any known exceptions
         """
         AbstractUtilityConstraint.__init__(
-            self, "Vertex Requires Multi Cast Source Constraint with commands"
+            self, "AbstractConstrainedVertex Requires Multi Cast Source Constraint with commands"
                   "{}".format(commands))
         self._commands = commands
 

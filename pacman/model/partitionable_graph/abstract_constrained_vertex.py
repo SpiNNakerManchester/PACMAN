@@ -1,14 +1,13 @@
 from abc import ABCMeta
-from abc import abstractmethod
 from six import add_metaclass
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 
 @add_metaclass(ABCMeta)
-class Vertex(object):
-    """ Represents a Vertex of a partitionable_graph, which contains a number of atoms, and\
+class AbstractConstrainedVertex(object):
+    """ Represents a AbstractConstrainedVertex of a partitionable_graph, \
+    which contains a number of atoms, and\
         which can be partitioned into a number of subvertices, such that the\
         total number of atoms in the subvertices adds up to the number of atoms\
         in the vertex
@@ -38,8 +37,9 @@ class Vertex(object):
 
         if label is None:
             self._label = \
-                "Population {}".format(Vertex._non_labelled_vertex_count)
-            Vertex._non_labelled_vertex_count += 1
+                "Population {}"\
+                .format(AbstractConstrainedVertex._non_labelled_vertex_count)
+            AbstractConstrainedVertex._non_labelled_vertex_count += 1
         else:
             self._label = label
         self._n_atoms = n_atoms
@@ -111,35 +111,6 @@ class Vertex(object):
         """
         self._constraints = list()
         self.add_constraints(constraints)
-
-    def create_subvertex(self, lo_atom, hi_atom, label=None,
-                         additional_constraints=list()):
-        """ Creates a subvertex of this vertex.  Can be overridden in vertex\
-            subclasses to create an subvertex instance that contains detailed\
-            information
-
-        :param lo_atom: The first atom in the subvertex
-        :type lo_atom: int
-        :param hi_atom: The last atom in the subvertex
-        :type hi_atom: int
-        :param label: The label to give the subvertex.  If not given, and the\
-                    vertex has no label, no label will be given to the\
-                    subvertex.  If not given and the vertex has a label, a\
-                    default label will be given to the subvertex
-        :type label: str
-        :param additional_constraints: An iterable of constraints from the\
-                    subvertex over-and-above those of the vertex
-        :type additional_constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint\
-                    .AbstractConstraint`
-        :raise pacman.exceptions.PacmanInvalidParameterException:
-                    * If lo_atom or hi_atom are out of range
-                    * If one of the constraints is invalid
-        """
-        # Combine the Vertex and PartitionedVertex constraints
-        additional_constraints.extend(self.constraints)
-
-        return PartitionedVertex(lo_atom, hi_atom, label, additional_constraints)
 
     @property
     def label(self):

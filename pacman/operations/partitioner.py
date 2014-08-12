@@ -87,7 +87,7 @@ class Partitioner:
                 self._optimal_placer_alogrithm, self._machine,
                 partitionable_graph)
 
-        subgraph, graph_to_subgraph_mapper = \
+        subgraph, graph_mapper = \
             self._partitioner_algorithm.partition(partitionable_graph,
                                                   self._machine)
 
@@ -95,6 +95,6 @@ class Partitioner:
                 self.report_states.partitioner_report):
             reports.partitioner_reports(
                 self._report_folder, self._hostname, partitionable_graph,
-                graph_to_subgraph_mapper)
+                graph_mapper)
 
-        return subgraph, graph_to_subgraph_mapper
+        return subgraph, graph_mapper

@@ -3,7 +3,7 @@ from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import PacmanInvalidParameterException
 
 
-class GraphSubgraphMapper(object):
+class GraphMapper(object):
 
     def __init__(self):
         """
@@ -109,7 +109,7 @@ class GraphSubgraphMapper(object):
         """ supporting method to get all subvertices for a given vertex
 
         :param vertex: the vertex for which to find the associated subvertices
-        :type vertex: pacman.model.graph.vertex.Vertex
+        :type vertex: pacman.model.graph.vertex.AbstractConstrainedVertex
         :return: a set of subvertices or None if no vertex exists in the mappings
         :rtype: iterable set or None
         :raise None: Raises no known exceptions
@@ -137,7 +137,7 @@ class GraphSubgraphMapper(object):
         :param subvertex: the edge for which to find the associated subedges
         :type subvertex: `pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: a vertex
-        :rtype: `pacman.model.graph.vertex.Vertex`
+        :rtype: `pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise None: Raises no known exceptions
         """
         if subvertex in self._vertex_from_subvertex.keys():

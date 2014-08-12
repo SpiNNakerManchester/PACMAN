@@ -21,9 +21,9 @@ from pacman.exceptions import PacmanPlaceException
 
 class TestPartitioAndPlacePartitioner(unittest.TestCase):
     def setUp(self):
-        self.vert1 = Vertex(10, "New Vertex 1")
-        self.vert2 = Vertex(5, "New Vertex 2")
-        self.vert3 = Vertex(3, "New Vertex 3")
+        self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
+        self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
+        self.vert3 = Vertex(3, "New AbstractConstrainedVertex 3")
         self.edge1 = Edge(self.vert1, self.vert2, "First edge")
         self.edge2 = Edge(self.vert2, self.vert1, "Second edge")
         self.edge3 = Edge(self.vert1, self.vert3, "Third edge")

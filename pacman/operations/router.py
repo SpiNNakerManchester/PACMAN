@@ -11,7 +11,7 @@ class Router:
 
     def __init__(self, report_states, partitionable_graph=None,
                  report_folder=None, hostname=None, router_algorithm=None,
-                 graph_to_subgraph_mappings=None):
+                 graph_mappings=None):
         """
         :param router_algorithm: The router algorithm.  If not specified, a\
                     default algorithm will be used
@@ -22,12 +22,12 @@ class Router:
         :param report_states: the data objects for what reports are needed
         :param partitionable_graph: the partitionable graph object (descirbes\
          the applciation problem in a high level)
-        :param graph_to_subgraph_mappings:
+        :param graph_mappings:
         :param hostname:
         :type report_folder:
         :type report_states:
         :type partitionable_graph:
-        :type graph_to_subgraph_mappings:
+        :type graph_mappings:
         :type hostname:
         :return: None
         :rtype: None
@@ -39,7 +39,7 @@ class Router:
         self._hostname = hostname
         self._graph = partitionable_graph
         self._router_algorithm = router_algorithm
-        self._graph_to_subgraph_mappings = graph_to_subgraph_mappings
+        self._graph_to_subgraph_mappings = graph_mappings
 
         #set up a default placer algorithm if none are specified
         if self._router_algorithm is None:
