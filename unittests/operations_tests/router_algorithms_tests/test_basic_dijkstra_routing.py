@@ -1,4 +1,5 @@
 #pacman model imports
+from pacman.exceptions import PacmanRoutingException
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.placements.placement import Placement
@@ -43,6 +44,7 @@ class MyTestCase(unittest.TestCase):
         self.subedge = PartitionedEdge(self.subvert1, self.subvert2)
         self.subgraph.add_subvertex(self.subvert1)
         self.subgraph.add_subvertex(self.subvert2)
+        self.subgraph.add_subedge(self.subedge)
         #sort out placements
         self.placements = Placements()
         self.placement1 = Placement(x=0, y=0, p=2, subvertex=self.subvert1)
@@ -83,12 +85,26 @@ class MyTestCase(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
         self.machine = Machine(chips)
 
+
+
     def test_new_basic_routing_over_chip(self):
+        #build a machine object
+
+
+
         self.routing = pacman_router(report_states=None)
         self.routing.run(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
+
+    def test_bad_machine_setup(self):
+        self.routing = pacman_router(report_states=None)
+        with self.assertRaises(PacmanRoutingException):
+            self.routing.run(
+                machine=self.machine, placements=self.placements,
+                partitioned_graph=self.subgraph,
+                routing_info_allocation=self.routing_info)
 
 if __name__ == '__main__':
     unittest.main()
