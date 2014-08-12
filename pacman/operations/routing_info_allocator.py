@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class RoutingInfoAllocator:
-    """ Used to obtain routing information from a placed subgraph
+    """ Used to obtain routing information from a placed partitioned_graph
     """
 
     def __init__(self, machine, report_states, graph_to_sub_graph_mapper,
@@ -20,7 +20,7 @@ class RoutingInfoAllocator:
         :param hostname: the hostname of the machine
         :param machine: the machine object used to represent the spinnaker\
          machine
-        :param graph_to_sub_graph_mapper: the graph to subgraph mapper object
+        :param graph_to_sub_graph_mapper: the partitionable_graph to partitioned_graph mapper object
         :param report_folder: the folder used to store reports
         :param report_states: the pacman states for different reports
         :type hostname: str
@@ -50,9 +50,9 @@ class RoutingInfoAllocator:
                 routing_info_allocator_algorithm(self._graph_to_subgraph_mapper)
 
     def run(self, subgraph, placements):
-        """ Execute the algorithm on the subgraph
+        """ Execute the algorithm on the partitioned_graph
         
-        :param subgraph: The subgraph to allocate the routing info for
+        :param subgraph: The partitioned_graph to allocate the routing info for
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :param placements: The placements of the subvertices
         :type placements: :py:class:`pacman.model.placements.placements.Placements`

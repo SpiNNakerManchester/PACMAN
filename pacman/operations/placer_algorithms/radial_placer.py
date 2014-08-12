@@ -5,14 +5,14 @@ logger = logging.getLogger(__name__)
 
 
 class RadialPlacer(BasicPlacer):
-    """ An radial algorithm that can place a subgraph onto a machine based off a
+    """ An radial algorithm that can place a partitioned_graph onto a machine based off a
     circle out behaviour from a ethernet at 0 0
     """
 
     def __init__(self, machine, graph):
         """constructor to build a
         pacman.operations.placer_algorithms.RadialPlacer.RadialPlacer
-        :param machine: The machine on which to place the graph
+        :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         BasicPlacer.__init__(self, machine, graph)
@@ -26,7 +26,7 @@ class RadialPlacer(BasicPlacer):
         :param subvertex: the subvert to place
         :param resources: the resources reuqired by the subvertex
         :param chips: the machines chips.
-        :type subvertex: py:class'pacman.model.subgraph.subvertex.SubVertex'
+        :type subvertex: py:class'pacman.model.partitioned_graph.subvertex.SubVertex'
     :type resources: py:class'pacman.model.resource_container.ResourceContainer'
         :type chips: iterable of spinmachine.machine.Machine
         :return: a placement object

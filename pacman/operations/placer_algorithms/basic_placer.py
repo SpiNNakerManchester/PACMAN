@@ -19,14 +19,14 @@ logger = logging.getLogger(__name__)
 
 
 class BasicPlacer(AbstractPlacerAlgorithm):
-    """ An basic algorithm that can place a subgraph onto a machine based off a
+    """ An basic algorithm that can place a partitioned_graph onto a machine based off a
     raster behaviour
     """
 
     def __init__(self, machine, graph):
         """constructor to build a \
         pacman.operations.placer_algorithms.BasicPlacer.BasicPlacer
-        :param machine: The machine on which to place the graph
+        :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         AbstractPlacerAlgorithm.__init__(self, machine, graph)
@@ -34,11 +34,11 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         self._supported_constraints.append(PlacerSubvertexSameChipConstraint)
 
     def place(self, subgraph, graph_to_subgraph_mapper):
-        """ Place a subgraph so that each subvertex is placed on a core
+        """ Place a partitioned_graph so that each subvertex is placed on a core
 
-        :param subgraph: The subgraph to place
+        :param subgraph: The partitioned_graph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
-        :param graph_to_subgraph_mapper: the mappings between graph and subgraph
+        :param graph_to_subgraph_mapper: the mappings between partitionable_graph and partitioned_graph
         :type graph_to_subgraph_mapper:
     pacman.model.graph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
         :return: A set of placements
@@ -59,7 +59,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
-                                   "for placing the subgraph's subvertices")
+                                   "for placing the partitioned_graph's subvertices")
         for subvertex in ordered_subverts:
 
             # Create and store a new placement
@@ -77,11 +77,11 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         SHOULD NOT BE CALLED OUTSIDE THIS CLASS
 
         :param subvertex: the subvertex to be placed
-        :param graph: the graph obejct of the application
-        :param graph_to_subgraph_mapper: the graph to subgraph mapper
+        :param graph: the partitionable_graph obejct of the application
+        :param graph_to_subgraph_mapper: the partitionable_graph to partitioned_graph mapper
         :param placements: the current placements
-        :type subvertex: pacman.models.subgraph.subvertex.Subvertex
-        :type graph: pacman.models.graph.graph.Graph
+        :type subvertex: pacman.models.partitioned_graph.subvertex.PartitionedVertex
+        :type graph: pacman.models.partitionable_graph.partitionable_graph.Graph
         :type graph_to_subgraph_mapper: pacamn.models.graph_subgraph_mapper.graphSubgraphMapper
         :type placements: pacman.model.placements.placements.Placements
         :return: placement object for this subvertex

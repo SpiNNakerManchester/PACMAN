@@ -2,8 +2,6 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
-from pacman.model.constraints.abstract_placer_constraint import \
-    AbstractPlacerConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_subvertex_same_chip_constraint import \
@@ -19,11 +17,11 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractPlacerAlgorithm(object):
-    """ An abstract algorithm that can place a subgraph
+    """ An abstract algorithm that can place a partitioned_graph
     """
     def __init__(self, machine, graph):
         """constrcutor for the abstract placer algorithm
-        :param machine: The machine on which to place the graph
+        :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         self._placement_tracker = PlacementTracker(machine)
@@ -34,11 +32,11 @@ class AbstractPlacerAlgorithm(object):
 
     @abstractmethod
     def place(self, subgraph, graph_to_subgraph_mapper):
-        """ Place a subgraph so that each subvertex is placed on a core
+        """ Place a partitioned_graph so that each subvertex is placed on a core
             
-        :param subgraph: The subgraph to place
+        :param subgraph: The partitioned_graph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
-        :param graph_to_subgraph_mapper: the mappings between graph and subgraph
+        :param graph_to_subgraph_mapper: the mappings between partitionable_graph and partitioned_graph
         :type graph_to_subgraph_mapper:
     pacman.model.graph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
         :return: A set of placements

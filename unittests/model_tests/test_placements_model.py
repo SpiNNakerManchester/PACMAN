@@ -1,13 +1,13 @@
 import unittest
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.model.subgraph.subvertex import Subvertex
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import PacmanAlreadyExistsException
 
 
 class TestPlacements(unittest.TestCase):
     def test_create_new_placement(self):
-        subv = Subvertex(0, 100)
+        subv = PartitionedVertex(0, 100)
         pl = Placement(subv, 0, 0, 1)
         self.assertEqual(pl.x, 0)
         self.assertEqual(pl.y, 0)
@@ -16,7 +16,7 @@ class TestPlacements(unittest.TestCase):
 
     def test_create_new_placements_duplicate_subvertex(self):
         with self.assertRaises(PacmanAlreadyExistsException):
-            subv = Subvertex(0, 100)
+            subv = PartitionedVertex(0, 100)
             pl = list()
             for i in range(4):
                 pl.append(Placement(subv, 0, 0, i))
@@ -24,7 +24,7 @@ class TestPlacements(unittest.TestCase):
             Placements(pl)
 
     def test_create_new_placements(self):
-        subv = Subvertex(0, 100)
+        subv = PartitionedVertex(0, 100)
         pl = Placement(subv, 0, 0, 1)
         Placements([pl])
 
@@ -36,7 +36,7 @@ class TestPlacements(unittest.TestCase):
     def test_get_placement_of_subvertex(self):
         subv = list()
         for i in range(5):
-            subv.append(Subvertex(i, 2 * i))
+            subv.append(PartitionedVertex(i, 2 * i))
 
         pl = list()
         for i in range(4):
@@ -49,7 +49,7 @@ class TestPlacements(unittest.TestCase):
     def test_get_subvertex_on_processor(self):
         subv = list()
         for i in range(5):
-            subv.append(Subvertex(i, 2 * i))
+            subv.append(PartitionedVertex(i, 2 * i))
 
         pl = list()
         for i in range(4):
@@ -64,7 +64,7 @@ class TestPlacements(unittest.TestCase):
     def test_get_placements(self):
         subv = list()
         for i in range(5):
-            subv.append(Subvertex(i, 2 * i))
+            subv.append(PartitionedVertex(i, 2 * i))
 
         pl = list()
         for i in range(4):

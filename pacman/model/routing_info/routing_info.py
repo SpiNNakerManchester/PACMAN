@@ -84,7 +84,7 @@ class RoutingInfo(object):
 
         :param subedge: The subedge
         :type subedge:
-            :py:class:`pacman.model.subgraph.subedge.Subedge`
+            :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :return: The routing key or None if the subedge does not exist
         :rtype: int
         :raise None: does not raise any known exceptions
@@ -98,7 +98,7 @@ class RoutingInfo(object):
 
         :param subedge: The subedge
         :type subedge:
-            :py:class:`pacman.model.subgraph.subedge.Subedge`
+            :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :return: The subedge information or None if the subedge does not exist
         :rtype:
             :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`

@@ -3,12 +3,12 @@ from abc import abstractmethod
 from six import add_metaclass
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.subgraph.subvertex import Subvertex
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 
 @add_metaclass(ABCMeta)
 class Vertex(object):
-    """ Represents a Vertex of a graph, which contains a number of atoms, and\
+    """ Represents a Vertex of a partitionable_graph, which contains a number of atoms, and\
         which can be partitioned into a number of subvertices, such that the\
         total number of atoms in the subvertices adds up to the number of atoms\
         in the vertex
@@ -136,10 +136,10 @@ class Vertex(object):
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
-        # Combine the Vertex and Subvertex constraints
+        # Combine the Vertex and PartitionedVertex constraints
         additional_constraints.extend(self.constraints)
 
-        return Subvertex(lo_atom, hi_atom, label, additional_constraints)
+        return PartitionedVertex(lo_atom, hi_atom, label, additional_constraints)
 
     @property
     def label(self):

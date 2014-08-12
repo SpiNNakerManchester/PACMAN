@@ -23,7 +23,7 @@ def router_reports(report_folder, hostname, graph, graph_to_sub_graph_mapper,
                    placements, routing_tables, routing_info, machine,
                    include_dat_based=False):
     router_report_from_router_tables(report_folder, routing_tables)
-    #router_edge_information(report_folder, hostname, graph, routing_tables,
+    #router_edge_information(report_folder, hostname, partitionable_graph, routing_tables,
      #                       graph_to_sub_graph_mapper, placements,
      #                       routing_info, machine)
     if include_dat_based:

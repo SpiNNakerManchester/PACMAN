@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class BasicDijkstraRouting(AbstractRouterAlgorithm):
     """ An routing algorithm that can find routes for subedges between\
-        subvertices in a subgraph that have been placed on a machine by the use
+        subvertices in a partitioned_graph that have been placed on a machine by the use
         of a dijkstra shortest path algorithm
     """
 
@@ -46,8 +46,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                     :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param subgraph: the subgraph object
-        :type subgraph: pacman.subgraph.subgraph.Subgraph
+        :param subgraph: the partitioned_graph object
+        :type subgraph: pacman.partitioned_graph.partitioned_graph.Subgraph
         :return: The discovered routes
         :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
@@ -210,7 +210,15 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                         self._get_routing_table_for_chip(xn, yn))
 
     def _get_routing_table_for_chip(self, chip_x, chip_y):
-        """
+        """helper method to retrieve a routing table
+        
+        :param chip_x: the x coord for a chip
+        :param chip_y: the y coord for a chip
+        :type chip_x: int
+        :type chip_y: int
+        :return a routing table
+        :rtype: pacman.routing_tables.RoutingTable
+        :raise None: this method does not raise any known exception
 
         """
         table = self._routing_tables.get_routing_table_for_chip(chip_x, chip_y)
@@ -271,8 +279,9 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         used to propergate the weights till the destination nodes of the soruce\
          node arte reahced 
          
-         :param dijkstra_tables:
-         :param nodes_info:
+         :param dijkstra_tables: the dictory object for the dijkstra-tables
+         :param nodes_info: the dictonary object for the nodes inside a route \
+         scope
          :param xa:
          :param ya:
          :param dest_processors:
@@ -285,9 +294,10 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
          :type dest_processors:
          :type xs:
          :type ys:
-         :return:
-         :rtype:
-         :raise None:
+         :return: None
+         :rtype: None
+         :raise PacmanRoutingException: when the destination node could not be\
+         reached from this soruce node.
         """
 
         destination_processors_left_to_find = dest_processors
@@ -310,9 +320,9 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
             # This cannot be done in the above loop, since when a node
             # becomes activated the rest of the costs cannot be retrieved, and
-            #  a new graph lowest cost cannot be found
+            #  a new partitionable_graph lowest cost cannot be found
             graph_lowest_cost = None  # This is the lowest cost across ALL
-                                      # unactivated nodes in the graph.
+                                      # unactivated nodes in the partitionable_graph.
 
             # Find the next node to be activated
             for key in dijkstra_tables.keys():
@@ -367,9 +377,10 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :type weight:
         :return:
         :rtype:
-        :raise None:
+        :raise PacmanRoutingException: when the algoerithum goes to a node that\
+        doesnt exist in the machine or the node's cost was set too low.
         """
-        # Only try to update if the neighbour is within the graph
+        # Only try to update if the neighbour is within the partitionable_graph
         #  and the cost if the node hasn't already been activated
         # and the lowest cost if the new cost is less, or if
         # there is no current cost
@@ -385,7 +396,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                     float(chip_lowest_cost + weight)
         elif not neighbour_exists:
             raise exceptions.PacmanRoutingException(
-                "Tried to propagate to ({}, {}), which is not in the graph:"
+                "Tried to propagate to ({}, {}), which is not in the partitionable_graph:"
                 " remove non-existent neighbours".format(xn, yn))
 
         if (dijkstra_tables[(xn, yn)]["lowest cost"] == 0) \
@@ -398,6 +409,25 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                                 dijkstra_tables, subedge_routing_info, pd):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
         
+        :param xd:
+        :param yd:
+        :param nodes_info:
+        :param dijkstra_tables:
+        :param subedge_routing_info:
+        :param pd:
+        :type xd:
+        :type yd:
+        :type nodes_info:
+        :type dijkstra_tables:
+        :type subedge_routing_info:
+        :type pd:
+        :return: the next coords to look into
+        :rtype: int int
+        :raise PacmanRoutingException: when the algorithum doesnt find a next\
+         point to search from. AKA, the neighbours of a chip do not have a \
+         cheaper cost than the node itslef, but the node is not the destination\
+         or when the algorithum goes to a node thats not cosndiered in the \
+         weighted search
         """
         # Set the tracking node to the destination to begin with
         xt, yt = xd, yd
@@ -457,7 +487,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 else:
                     print xnr, ynr
                     raise exceptions.PacmanRoutingException(
-                        "Tried to trace back to node not in graph: "
+                        "Tried to trace back to node not in partitionable_graph: "
                         "remove non-existent neighbours")
                 neighbour_index += 1
 
@@ -474,6 +504,23 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                        key, mask, routing_entry_route_links, routing_table):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
 
+        :param other_entry:
+        :param routing_entry_route_processors:
+        :param routing_entry_route_links:
+        :param routing_table:
+        :param defaultable:
+        :param key:
+        :param mask:
+        :type other_entry:
+        :type routing_entry_route_processors:
+        :type routing_entry_route_links:
+        :type routing_table:
+        :type defaultable:
+        :type key:
+        :type mask:
+        :return a new entry which is the merged result of two entries
+        :rtype: spinnmachine.multicast_routing_entry
+        :raise None: this method does not raise any known exception
         """
         multi_cast_routing_entry = \
             MulticastRoutingEntry(key, mask, routing_entry_route_processors,
@@ -487,7 +534,31 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                               nodes_info, router_table, xt, yt, edge_info,
                               previous_routing_entry):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-
+        
+        :param xnr:
+        :param ynr:
+        :param dijkstra_tables:
+        :param n
+        :param nodes_info:
+        :param router_table:
+        :param xt:
+        :param yt:
+        :param edge_info:
+        :param previous_routing_entry:
+        :type xnr:
+        :type ynr:
+        :type dijkstra_tables:
+        :type n
+        :type nodes_info:
+        :type router_table:
+        :type xt:
+        :type yt:
+        :type edge_info:
+        :type previous_routing_entry:
+        :return xt, yt, previous_routing_entry, made_an_entry
+        :rtype: int, int, spinnmachine.multicast_routing_entry, bool
+        :raise PacmanRoutingException: when the bandwidth of a router is beyond\
+        respectable parameters
         """
 
         # Set the direction of the routing other_entry as that which

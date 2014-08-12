@@ -6,7 +6,7 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.graph.vertex import Vertex
+from pacman.model.partitionable_graph.vertex import Vertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.resources.resource_container import ResourceContainer
@@ -41,11 +41,11 @@ class AbstractPartitionableVertex(Vertex):
          :type constraints: iterable list
 
          :return: a new \
-         pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex\
+         pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex\
          object
 
          :rtype:
-         pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex
+         pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex
 
          :raise None: this method does not raise any exceptions
 

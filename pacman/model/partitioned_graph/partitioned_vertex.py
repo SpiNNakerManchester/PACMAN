@@ -2,7 +2,7 @@ from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.exceptions import PacmanInvalidParameterException
 
 
-class Subvertex(object):
+class PartitionedVertex(object):
     """ Represents a sub-set of atoms from a Vertex
     """
     def __init__(self, lo_atom, hi_atom, label=None, constraints=None):

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class Partitioner:
-    """ Used to partition a graph into a subgraph
+    """ Used to partition a partitionable_graph into a partitioned_graph
     """
 
     def __init__(self, machine_time_step, no_machine_time_steps,
@@ -69,16 +69,16 @@ class Partitioner:
                 self._optimal_placer_alogrithm, machine, graph)
 
     def run(self, graph, machine):
-        """ Execute the algorithm on the graph, and partition it to fit on\
+        """ Execute the algorithm on the partitionable_graph, and partition it to fit on\
             the cores of the machine
             
-        :param graph: The graph to partition
-        :type graph: :py:class:`pacman.model.graph.graph.Graph`
-        :param machine: The machine with respect to which to partition the graph
+        :param graph: The partitionable_graph to partition
+        :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :param machine: The machine with respect to which to partition the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A subgraph of partitioned vertices and edges from the graph
-        and a graph to subgraph mapper object which links the graph to the
-        subgraph objects
+        :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
+        and a partitionable_graph to partitioned_graph mapper object which links the partitionable_graph to the
+        partitioned_graph objects
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning

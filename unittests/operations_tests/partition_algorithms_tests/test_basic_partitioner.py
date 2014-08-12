@@ -2,10 +2,10 @@ import unittest
 from pacman.exceptions import PacmanPartitionException
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
-from pacman.model.graph.graph import Graph
+from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
 from spynnaker.pyNN.models.neural_models.if_curr_exp \
     import IFCurrentExponentialPopulation as Vertex
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.edge import Edge
 from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
@@ -24,7 +24,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.edge3 = Edge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
-        self.graph = Graph("Graph", self.verts, self.edges)
+        self.graph = PartitionableGraph("Graph", self.verts, self.edges)
 
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -79,7 +79,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_on_large_vertex_than_has_to_be_split(self):
         large_vertex = Vertex(300, None, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.graph = Graph("Graph with large vertex",
+        self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
                            [])
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
@@ -91,7 +91,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
         large_vertex = Vertex(500, None, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.graph = Graph("Graph with large vertex",
+        self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
                            [])
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
@@ -103,7 +103,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
         large_vertex = Vertex(1000, None, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.graph = Graph("Graph with large vertex",
+        self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
                            [])
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
@@ -149,7 +149,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips)
         large_vertex = Vertex(300, None, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.graph = Graph("Graph with large vertex",
+        self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
                            [])
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
@@ -188,7 +188,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips)
         large_vertex = Vertex(300, None, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.graph = Graph("Graph with large vertex",
+        self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
                            [])
         with self.assertRaises(PacmanPartitionException):
@@ -258,7 +258,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.assertEqual(True, False)
 
     def test_partition_with_empty_graph(self):
-        self.graph = Graph()
+        self.graph = PartitionableGraph()
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
         self.assertEqual(len(subgraph.subvertices), 0)
 

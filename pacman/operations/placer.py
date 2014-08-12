@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class Placer:
-    """ Used to place the subvertices of a subgraph on to specific cores of\
+    """ Used to place the subvertices of a partitioned_graph on to specific cores of\
         a machine
     """
 
@@ -20,11 +20,11 @@ class Placer:
         :param report_folder: the folder where reprots are stored
         :param report_states: the states of pacman based report vlaues
         :param hostname: the hostname of the machine
-        :param graph: the graph object of the application problem
+        :param graph: the partitionable_graph object of the application problem
         :type report_states: pacman.utility.report_states.ReportStates
         :type report_folder: str
         :type hostname: int
-        :type graph: pacman.model.graph.graph.Graph object
+        :type graph: pacman.model.partitionable_graph.partitionable_graph.Graph object
         :type placer_algorithm:\
                     :py:class:`pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm`
         :type machine: a spinnmachine.machine.Machine object
@@ -46,9 +46,9 @@ class Placer:
                                                        self._graph)
 
     def run(self, subgraph, graph_to_subgraph_mapper):
-        """ Execute the algorithm on the subgraph and place it on the machine
+        """ Execute the algorithm on the partitioned_graph and place it on the machine
         
-        :param subgraph: The subgraph to place
+        :param subgraph: The partitioned_graph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`

@@ -2,6 +2,9 @@ from pacman import exceptions
 
 
 class PlacementTracker():
+    """
+
+    """
 
     def __init__(self, machine):
         self._placements_avilable = dict()

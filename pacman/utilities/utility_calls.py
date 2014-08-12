@@ -66,7 +66,7 @@ def check_algorithm_can_support_constraints(
 
 def sort_objects_by_constraint_authority(objects):
         """helper method for all placers. \
-        It takes the subverts of a subgraph and orders them into a list with a\
+        It takes the subverts of a partitioned_graph and orders them into a list with a\
         order based off rank on the constraint \
         NOT TO BE CALLED OUTSIDE IMPLEMTATIONS OF THIS CLASS
         :param objects: The objects to be sorted. need to have a constraints

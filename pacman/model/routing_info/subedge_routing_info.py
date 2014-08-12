@@ -7,7 +7,7 @@ class SubedgeRoutingInfo(object):
 
         :param subedge: the subedge down which the routing key and mask will be\
                     used
-        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`
+        :type subedge: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
         :param key: the key which will be sent by the subvertex at the start\
                     of the subedge
         :type key: int
@@ -25,7 +25,7 @@ class SubedgeRoutingInfo(object):
         """ The subedge which the information is about
 
         :return: the subedge
-        :rtype: :py:class:`pacman.model.subgraph.subedge.Subedge`
+        :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
         """
         return self._subedge

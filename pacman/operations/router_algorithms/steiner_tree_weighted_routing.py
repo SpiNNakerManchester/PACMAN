@@ -4,7 +4,7 @@ from pacman.operations.router_algorithms.abstract_router_algorithm \
 
 class SteinerTreeWeightedRouting(AbstractRouterAlgorithm):
     """ An routing algorithm that can find routes for subedges between\
-        subvertices in a subgraph that have been placed on a machine by the use
+        subvertices in a partitioned_graph that have been placed on a machine by the use
         of a dijkstra shortest path algorithm
     """
 

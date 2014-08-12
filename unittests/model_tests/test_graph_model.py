@@ -1,7 +1,7 @@
 import unittest
-from pacman.model.graph.vertex import Vertex
-from pacman.model.graph.edge import Edge
-from pacman.model.graph.graph import Graph
+from pacman.model.partitionable_graph.vertex import Vertex
+from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
 from pacman.model.constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 
@@ -96,7 +96,7 @@ class TestGraphModel(unittest.TestCase):
         self.assertEqual(subedge1.label, "First edge")
 
     def test_create_new_empty_graph(self):
-        Graph()
+        PartitionableGraph()
 
     def test_create_new_graph(self):
         vert1 = MyVertex(10, "New Vertex 1")
@@ -107,7 +107,7 @@ class TestGraphModel(unittest.TestCase):
         edge3 = Edge(vert1, vert3, "First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
-        graph = Graph("Graph", verts, edges)
+        graph = PartitionableGraph("Graph", verts, edges)
         for i in range(3):
             self.assertEqual(graph.vertices[i], verts[i])
             self.assertEqual(graph.edges[i], edges[i])
