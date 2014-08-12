@@ -2,7 +2,7 @@ import unittest
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper \
     import GraphSubgraphMapper
 from pacman.model.partitionable_graph.vertex import Vertex
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 
@@ -26,7 +26,7 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         sube = PartitionedEdge(subvertices[1], subvertices[0])
         subedges.append(sube)
         graph = GraphSubgraphMapper()
-        edge = Edge(MyVertex(10, "pre"), MyVertex(5, "post"))
+        edge = PartitionableEdge(MyVertex(10, "pre"), MyVertex(5, "post"))
         graph.add_subedge(sube, edge)
         graph.add_subedge(subedges[0], edge)
         subedges_from_edge = graph.get_subedges_from_edge(edge)
@@ -79,7 +79,7 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         sube = PartitionedEdge(subvertices[1], subvertices[0])
         subedges.append(sube)
         graph = GraphSubgraphMapper()
-        edge = Edge(MyVertex(10, "pre"), MyVertex(5, "post"))
+        edge = PartitionableEdge(MyVertex(10, "pre"), MyVertex(5, "post"))
         graph.add_subedge(sube, edge)
         graph.add_subedge(subedges[0], edge)
         edge_from_subedge = graph.get_edge_from_subedge(sube)

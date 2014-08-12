@@ -3,7 +3,7 @@ from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import PacmanInvalidParameterException
 
 
-class Edge(object):
+class PartitionableEdge(object):
     """ Represents a directional edge in a partitionable_graph between two vertices
     """
 

@@ -4,7 +4,7 @@ from pacman.operations.router_algorithms.basic_dijkstra_routing \
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from unittests.model_tests.test_vertex import TestVertex as Vertex
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from spinn_machine.processor import Processor
@@ -19,12 +19,13 @@ class MyTestCase(unittest.TestCase):
  def setUp(self):
         self.vert1 = Vertex(10, "New Vertex 1")
         self.vert2 = Vertex(5, "New Vertex 2")
-        self.edge1 = Edge(self.vert1, self.vert2, "First edge")
+        self.edge1 = PartitionableEdge(self.vert1, self.vert2, "First edge")
         self.verts = [self.vert1, self.vert2]
         self.edges = [self.edge1]
         self.graph = PartitionableGraph("Graph", self.verts, self.edges)
 
         self.subgraph = PartitionedGraph()
+        subvert1 = P
 
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)

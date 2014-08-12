@@ -122,7 +122,7 @@ class GraphSubgraphMapper(object):
         """ supporting method to get all subedges for a given edge
 
         :param edge: the edge for which to find the associated subedges
-        :type edge: `pacman.model.graph.edge.Edge`
+        :type edge: `pacman.model.graph.edge.PartitionableEdge`
         :return: a set of subedges
         :rtype: iterable set or none
         :raise None: Raises no known exceptions
@@ -150,7 +150,7 @@ class GraphSubgraphMapper(object):
         :param subedge: the subedge for which to find the associated edge
         :type subedge: `pacman.model.subgraph.subedge.PartitionedEdge`
         :return: an edge
-        :rtype: `pacman.model.graph.edge.Edge`
+        :rtype: `pacman.model.graph.edge.PartitionableEdge`
         :raise None: Raises no known exceptions
         """
         if subedge in self._edge_from_subedge.keys():

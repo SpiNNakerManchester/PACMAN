@@ -5,7 +5,7 @@ from pacman.operations.partition_algorithms.basic_partitioner \
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
 from spynnaker.pyNN.models.neural_models.if_curr_exp \
     import IFCurrentExponentialPopulation as Vertex
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
@@ -19,9 +19,9 @@ class TestBasicPartitioner(unittest.TestCase):
         self.vert1 = Vertex(10, "New Vertex 1")
         self.vert2 = Vertex(5, "New Vertex 2")
         self.vert3 = Vertex(3, "New Vertex 3")
-        self.edge1 = Edge(self.vert1, self.vert2, "First edge")
-        self.edge2 = Edge(self.vert2, self.vert1, "Second edge")
-        self.edge3 = Edge(self.vert1, self.vert3, "Third edge")
+        self.edge1 = PartitionableEdge(self.vert1, self.vert2, "First edge")
+        self.edge2 = PartitionableEdge(self.vert2, self.vert1, "Second edge")
+        self.edge3 = PartitionableEdge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = PartitionableGraph("Graph", self.verts, self.edges)
@@ -71,7 +71,7 @@ class TestBasicPartitioner(unittest.TestCase):
             self.assertIn(subvert.n_atoms, vert_sizes)
 
     def test_partition_with_no_additional_constraints_extra_edge(self):
-        self.graph.add_edge(Edge(self.vert3, self.vert1, "Extra edge"))
+        self.graph.add_edge(PartitionableEdge(self.vert3, self.vert1, "Extra edge"))
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
         self.assertEqual(len(subgraph.subvertices), 3)
         self.assertEqual(len(subgraph.subedges), 4)
