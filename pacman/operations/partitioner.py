@@ -15,8 +15,8 @@ class Partitioner:
     """
 
     def __init__(self, machine_time_step, no_machine_time_steps,
-                 report_states, partition_algorithm, placer_algorithm=None,
-                 report_folder=None, hostname=None, machine=None, graph=None):
+                 report_states, partition_algorithm, machine,
+                 placer_algorithm=None, report_folder=None, hostname=None):
         """
         :param partition_algorithm: A partitioning algorithm.  If not specified\
                     a default algorithm will be used
@@ -40,6 +40,8 @@ class Partitioner:
         :type placer_algorithm: implementation of pacman.operations.placer_algorithms.AbstractPlacementAlgorithum
         :type report_folder: str
         :type hostname: str
+        :return: None
+        :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If\
                     partition_algorithm is not valid
         """
@@ -47,6 +49,7 @@ class Partitioner:
         self.report_states = report_states
         self._hostname = hostname
         self._optimal_placer_alogrithm = placer_algorithm
+        self._machine = machine
 
         #set up partitioner algorithm
         if partition_algorithm is None:
@@ -63,32 +66,35 @@ class Partitioner:
             self._partitioner_algorithm = \
                 partition_algorithm(machine_time_step, no_machine_time_steps)
 
-        #if the algortihum requires a placer, set up tis placer param
-        if hasattr(self._partitioner_algorithm, "set_placer_algorithm"):
-            self._partitioner_algorithm.set_placer_algorithm(
-                self._optimal_placer_alogrithm, machine, graph)
-
-    def run(self, graph, machine):
-        """ Execute the algorithm on the partitionable_graph, and partition it to fit on\
-            the cores of the machine
+    def run(self, partitionable_graph):
+        """ Execute the algorithm on the partitionable_graph, and partition \
+        it to fit on the cores of the machine
             
-        :param graph: The partitionable_graph to partition
-        :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
-        :param machine: The machine with respect to which to partition the partitionable_graph
-        :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
-        and a partitionable_graph to partitioned_graph mapper object which links the partitionable_graph to the
-        partitioned_graph objects
+        :param partitionable_graph: The partitionable_graph to partition
+        :type partitionable_graph:
+        :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :return: A partitioned_graph of partitioned vertices and edges from \
+        the partitionable_graph
+        and a partitionable_graph to partitioned_graph mapper object which \
+        links the partitionable_graph to the partitioned_graph objects
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
+        #if the algortihum requires a placer, set up tis placer param
+        if hasattr(self._partitioner_algorithm, "set_placer_algorithm"):
+            self._partitioner_algorithm.set_placer_algorithm(
+                self._optimal_placer_alogrithm, self._machine,
+                partitionable_graph)
+
         subgraph, graph_to_subgraph_mapper = \
-            self._partitioner_algorithm.partition(graph, machine)
+            self._partitioner_algorithm.partition(partitionable_graph,
+                                                  self._machine)
 
         if (self.report_states is not None and
                 self.report_states.partitioner_report):
-            reports.partitioner_reports(self._report_folder, self._hostname,
-                                       graph, graph_to_subgraph_mapper)
+            reports.partitioner_reports(
+                self._report_folder, self._hostname, partitionable_graph,
+                graph_to_subgraph_mapper)
 
         return subgraph, graph_to_subgraph_mapper

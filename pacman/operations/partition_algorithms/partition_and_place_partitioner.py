@@ -64,12 +64,17 @@ pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPart
             PartitionAndPlacePartitioner._detect_subclass_hierarchy(
                 subclass.__subclasses__(), final_subclass_hierarchy)
 
-    def set_placer_algorithm(self, placer_algorithm, machine, graph):
+    def set_placer_algorithm(self, placer_algorithm, machine,
+                             partitionable_graph):
         """ setter method for setting the placer algorithm
 
         :param placer_algorithm: the new placer algorithm
         :type placer_algorithm: implementation of \
 pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm
+        :param machine: the machine object
+        :param partitionable_graph: the partitionable graph object
+        :type machine: spinnmachine.machine.Machine object
+        :type partitionable_graph: pacman.model.parit
 
         :return: None
         :rtype: None
@@ -87,7 +92,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
             initial_subclass_list, subclass_list)
 
         if placer_algorithm in subclass_list:
-            self._placer_algorithm = placer_algorithm(machine, graph)
+            self._placer_algorithm = placer_algorithm(machine, partitionable_graph)
 
         else:
             raise exceptions.PacmanConfigurationException(

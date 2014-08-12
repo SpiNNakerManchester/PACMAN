@@ -49,11 +49,13 @@ class RoutingInfoAllocator:
             self._routing_info_allocator_algorithm = \
                 routing_info_allocator_algorithm(self._graph_to_subgraph_mapper)
 
-    def run(self, subgraph, placements):
+    def run(self, partitioned_graph, placements):
         """ Execute the algorithm on the partitioned_graph
         
-        :param subgraph: The partitioned_graph to allocate the routing info for
-        :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
+        :param partitioned_graph: The partitioned_graph to allocate the routing\
+         info for
+        :type partitioned_graph:
+ :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
         :param placements: The placements of the subvertices
         :type placements: :py:class:`pacman.model.placements.placements.Placements`
         :return: The routing information
@@ -64,12 +66,13 @@ class RoutingInfoAllocator:
         #execute routing info generator
         routing_infos = \
             self._routing_info_allocator_algorithm.allocate_routing_info(
-                subgraph, placements)
+                partitioned_graph, placements)
 
         #generate reports
         if (self.report_states is not None and
                 self.report_states.routing_info_report):
             reports.routing_info_reports(self._report_folder, self._hostname,
-                                        subgraph, placements, routing_infos)
+                                         partitioned_graph, placements,
+                                         routing_infos)
 
         return routing_infos

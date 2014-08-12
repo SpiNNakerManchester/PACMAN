@@ -5,10 +5,11 @@ from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 from pacman.exceptions import PacmanPartitionException
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
-from pacman.model.graph.graph import Graph
-from spynnaker.pyNN.models.neural_models.if_curr_exp \
-    import IFCurrentExponentialPopulation as Vertex
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_graph \
+    import PartitionableGraph
+from unittests.model_tests.test_vertex import TestVertex as Vertex
+from pacman.model.partitionable_graph.partitionable_edge import \
+    PartitionableEdge as Edge
 from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
@@ -16,6 +17,7 @@ from spinn_machine.link import Link
 from spinn_machine.router import Router
 from spinn_machine.chip import Chip
 from pacman.exceptions import PacmanPlaceException
+
 
 class TestPartitioAndPlacePartitioner(unittest.TestCase):
     def setUp(self):
@@ -27,7 +29,7 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         self.edge3 = Edge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
-        self.graph = Graph("Graph", self.verts, self.edges)
+        self.graph = PartitionableGraph("Graph", self.verts, self.edges)
 
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
