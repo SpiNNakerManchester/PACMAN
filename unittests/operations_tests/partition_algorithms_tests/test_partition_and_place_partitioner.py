@@ -7,7 +7,6 @@ from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
-from unittests.model_tests.test_vertex import TestVertex as Vertex
 from pacman.model.partitionable_graph.partitionable_edge import \
     PartitionableEdge as Edge
 from spinn_machine.machine import Machine
@@ -17,6 +16,27 @@ from spinn_machine.link import Link
 from spinn_machine.router import Router
 from spinn_machine.chip import Chip
 from pacman.exceptions import PacmanPlaceException
+from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+    AbstractPartitionableVertex
+
+
+class Vertex(AbstractPartitionableVertex):
+
+    def __init__(self, n_atoms, label):
+        AbstractPartitionableVertex.__init__(self, label=label, n_atoms=n_atoms,
+                                             max_atoms_per_core=256)
+
+    def model_name(self):
+        return "test vertex"
+
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+        return 10 * (hi_atom - lo_atom)
+
+    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+        return 200 * (hi_atom - lo_atom)
+
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+        return 4000 + (50 * (hi_atom - lo_atom))
 
 
 class TestPartitioAndPlacePartitioner(unittest.TestCase):
@@ -84,10 +104,16 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
     def test_get_maximum_resources_per_processor(self):
         self.assertEqual(True, False)
 
-    def test_partition(self):
+    def test_partition_without_setting_placer_algorithm(self):
         with self.assertRaises(PacmanPlaceException):
             partitioner = PartitionAndPlacePartitioner(1, 1000)
             subgraph, graph_to_sub_graph_mapper = \
+                partitioner.partition(self.graph, self.machine)
+
+    def test_partition(self):
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+        subgraph, graph_to_sub_graph_mapper = \
                 partitioner.partition(self.graph, self.machine)
 
     def test_detect_subclass_hierarchy(self):

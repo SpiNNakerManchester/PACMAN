@@ -60,7 +60,7 @@ class PlacementTracker():
                 "processor has already been unassigned")
         self._free_cores += 1
 
-    def has_avilable_cores_left(self, x, y, p):
+    def has_available_cores_left(self, x, y, p):
         key = "{}:{}".format(x, y)
         if not key in self._placements_avilable.keys():
             raise exceptions.PacmanPlaceException(

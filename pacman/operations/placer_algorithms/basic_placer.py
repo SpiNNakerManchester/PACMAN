@@ -160,7 +160,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         x = placement_constraint.x
         y = placement_constraint.y
         p = placement_constraint.p
-        if not self._placement_tracker.has_avilable_cores_left(x, y, p):
+        if not self._placement_tracker.has_available_cores_left(x, y, p):
             if p is None:
                 raise exceptions.PacmanPlaceException(
                     "cannot place subvertex {} in chip {}:{} as there is no"
@@ -211,24 +211,24 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         for chip in chips_in_a_ordering:
             for processor in chip.processors:
                 if (processor.processor_id != 0 and
-                        self._placement_tracker.has_avilable_cores_left(
+                        self._placement_tracker.has_available_cores_left(
                         chip.x, chip.y, processor.processor_id)):
                     #locate avilable sdram
-                    avilable_sdram = \
+                    available_sdram = \
                         chip.sdram.size - \
                         (self._sdram_tracker.get_usage(chip.x, chip.y))
                     free_cores_met = True
                     free_sdram_met |= \
-                        avilable_sdram >= resources.sdram.get_value()
+                        available_sdram >= resources.sdram.get_value()
                     cpu_speed_met |= (processor.clock_speed >=
                                       resources.cpu.get_value())
                     dtcm_per_proc_met |= (processor.dtcm_avilable >=
                                           resources.dtcm.get_value())
 
-                    if (avilable_sdram >= resources.sdram.get_value()
-                        and (processor.clock_speed >=
+                    if (available_sdram >= resources.sdram.get_value()
+                        and (processor.clock_speed <=
                              resources.cpu.get_value())
-                        and (processor.dtcm_avilable >=
+                        and (processor.dtcm_avilable <=
                              resources.dtcm.get_value())):
                         x, y, p = self._placement_tracker.assign_core(
                             chip.x, chip.y, processor.processor_id)
