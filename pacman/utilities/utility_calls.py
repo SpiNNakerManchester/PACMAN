@@ -29,12 +29,13 @@ def locate_constraints_of_type(constraints, constraint_type):
 
 
 def check_algorithm_can_support_constraints(
-        constraints, supported_constraints, abstract_constraint_type):
+        constrained_vertices, supported_constraints, abstract_constraint_type):
     """ Helper method to find out if an algorithm can support all the\
         constraints given the objects its expected to work on
 
-    :param constraints: The constraints given to the algorithm
-    :type constraints: iterable of\
+    :param constrained_vertices: a list of constrained vertices which each has \
+    constraints given to the algorithm
+    :type constrained_vertices: iterable of\
                 :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
     :param supported_constraints: The constraints supported
     :type supported_constraints: iterable of\
@@ -48,16 +49,17 @@ def check_algorithm_can_support_constraints(
     :raise pacman.exceptions.PacmanInvalidParameterException: when the\
                 algorithm cannot support the constraints demanded of it
     """
-    for constraint in constraints:
-        if isinstance(constraint, abstract_constraint_type):
-            found = False
-            for supported_constraint in supported_constraints:
-                if isinstance(constraint, supported_constraint):
-                    found = True
-                    break
+    for constrained_vertex in constrained_vertices:
+        for constraint in constrained_vertex.constraints:
+            if isinstance(constraint, abstract_constraint_type):
+                found = False
+                for supported_constraint in supported_constraints:
+                    if isinstance(constraint, supported_constraint):
+                        found = True
+                        break
 
-            if not found:
-                raise PacmanInvalidParameterException(
+                if not found:
+                    raise PacmanInvalidParameterException(
                         "constraints", constraint.__class__,
                         "Constraints of this class are not supported by this"
                         " algorithm")

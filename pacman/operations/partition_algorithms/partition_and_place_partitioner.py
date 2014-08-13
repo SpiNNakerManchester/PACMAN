@@ -114,8 +114,8 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
                    goes wrong with the partitioning
         """
         utility_calls.check_algorithm_can_support_constraints(
-            object_list=graph.vertices,
-            constraint_check_level=AbstractPartitionerConstraint,
+            constrained_vertices=graph.vertices,
+            abstract_constraint_type=AbstractPartitionerConstraint,
             supported_constraints=self._supported_constraints)
         logger.info("* Running Partitioner and Placer as one *")
 
