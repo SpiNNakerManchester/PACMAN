@@ -92,7 +92,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
         :param machine: The machine with respect to which to partition the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
-        :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
+        :rtype: :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
@@ -120,7 +120,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
 
         # Partition one vertex at a time
         for vertex in vertices:
-            #check that the vertex hasnt already been partitioned
+            #check that the vertex hasn't already been partitioned
             subverts_from_vertex = \
                 graph_to_sub_graph_mapper.get_subvertices_from_vertex(vertex)
             #if not, partition
@@ -143,7 +143,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
     @property
     def complete_placements(self):
         """ property which returns the complete placements made by the
-        parittioner
+        partitioner
 
         :return: placements object
         :rtype: pacman.model.placements.placements.Placements
@@ -356,7 +356,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                 # noinspection PyProtectedMember
                 x, y, p = \
                     self._placer_algorithm._try_to_place(placement_constraints,
-                                                         resources, "",
+                                                         used_resources, "",
                                                          self._complete_placements)
                 used_placements.append((vertex, partition_data_object, x, y, p,
                                         used_resources, resources))
@@ -411,9 +411,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             # Find the new resource usage
             previous_used_resources = used_resources
             used_resources = \
-                vertex.get_resources_for_atoms(
-                    lo_atom, hi_atom, self._runtime_in_machine_time_steps,
-                    self._machine_time_step, partition_data_object)
+                vertex.get_resources_used_by_atoms(
+                    lo_atom, hi_atom, partition_data_object)
             ratio = self._find_max_ratio(used_resources, resources)
         return previous_used_resources, previous_hi_atom
 

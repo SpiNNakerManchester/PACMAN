@@ -111,20 +111,20 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         """
 
     def get_resources_used_by_atoms(self, lo_atom, hi_atom, vertex_in_edges):
-        """returns the seperate resource requirements for a range of atoms
+        """returns the separate resource requirements for a range of atoms
         in a resource object with a assumption object that tracks any
         assumptions made by the model when estimating resource requirement
 
-        :param lo_atom: the low value of atoms to calculate resoruce from
-        :param hi_atom: the high value of atoms to calcualte resoruces from.
+        :param lo_atom: the low value of atoms to calculate resources from
+        :param hi_atom: the high value of atoms to calculate resources from.
         :param vertex_in_edges: the edges going into this vertex.
         :type lo_atom: int
         :type hi_atom: int
         :type vertex_in_edges: list of edges
-        :return: a Resoruce container that contains a CPUCyclesPerTickResource,
+        :return: a Resource container that contains a CPUCyclesPerTickResource,
         DTCMResource and SDRAMResource
         :rtype: ResourceContainer
-        :raise None: this emthod does not raise any known exception
+        :raise None: this method does not raise any known exception
         """
         cpu_cycles = self.get_cpu_usage_for_atoms(lo_atom, hi_atom)
         dtcm_requirement = self.get_dtcm_usage_for_atoms(lo_atom, hi_atom)

@@ -110,7 +110,7 @@ class AbstractPartitionAlgorithm(object):
         :param subgraph: the partitioned_graph to work with
         :param graph_to_subgraph_mapper: the mapper between partitionable_graph and partitioned_graph
         :param graph: the partitionable_graph to work with
-        :type subgraph: pacman.model.subgraph.subgraph.Subgraph
+        :type subgraph: pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph
         :type graph_to_subgraph_mapper:
         pacman.model.graph_mapper.GraphMapper
         :type graph: pacman.model.graph.partitionable_graph.PartitionableGraph
