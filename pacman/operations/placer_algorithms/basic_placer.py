@@ -185,16 +185,17 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                     "cannot place subvertex {} on chip {}:{} as there is "
                     "not enough avilable memory".format(subvertex_label, x, y))
 
-    def _deal_with_non_constrainted_placement(self, subvertex_label, resources,
+    def _deal_with_non_constrainted_placement(self, subvertex_label,
+                                              used_resources,
                                               chips_in_a_ordering):
         """ place a subvertex which doesnt have a constraint
 
         :param subvertex_label: the of the subvert to place
-        :param resources: the resources used by this subvertex
+        :param used_resources: the used_resources used by this subvertex
         :param chips_in_a_ordering: the chips available from the machine in \
          some predetermined ordering.
         :type subvertex_label: str
-        :type resources: pacman.model.resources.resource_container.ResourceContainer
+        :used_resourcesurces: pacman.model.resources.resource_container.ResourceContainer
         :type chips_in_a_ordering: iterable of spinnMachine.chip,Chip
         :return a placement object for this subvertex
         :rtype: pacman.model.placements.placement.Placement
@@ -219,21 +220,21 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                         (self._sdram_tracker.get_usage(chip.x, chip.y))
                     free_cores_met = True
                     free_sdram_met |= \
-                        available_sdram >= resources.sdram.get_value()
+                        available_sdram >= used_resources.sdram.get_value()
                     cpu_speed_met |= (processor.clock_speed >=
-                                      resources.cpu.get_value())
+                                      used_resources.cpu.get_value())
                     dtcm_per_proc_met |= (processor.dtcm_available >=
-                                          resources.dtcm.get_value())
+                                          used_resources.dtcm.get_value())
 
-                    if (available_sdram >= resources.sdram.get_value()
-                        and (processor.clock_speed >=
-                             resources.cpu.get_value())
+                    if (available_sdram >= used_resources.sdram.get_value()
+                        and (processor.cpu_cycles_available >=
+                             used_resources.cpu.get_value())
                         and (processor.dtcm_available >=
-                             resources.dtcm.get_value())):
+                             used_resources.dtcm.get_value())):
                         x, y, p = self._placement_tracker.assign_core(
                             chip.x, chip.y, processor.processor_id)
                         self._sdram_tracker.add_usage(
-                            x, y, resources.sdram.get_value())
+                            x, y, used_resources.sdram.get_value())
                         return x, y, p
 
         msg = "Failed to place subvertex {}.".format(subvertex_label)
@@ -242,10 +243,10 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         elif not (free_sdram_met and cpu_speed_met and dtcm_per_proc_met):
             msg += " No core available with:"
             if not free_sdram_met:
-                msg += " {} SDRAM;".format(resources.sdram.get_value())
+                msg += " {} SDRAM;".format(used_resources.sdram.get_value())
             if not cpu_speed_met:
-                msg += " {} clock ticks;".format(resources.cpu.get_value())
+                msg += " {} clock ticks;".format(used_resources.cpu.get_value())
             if not dtcm_per_proc_met:
-                msg += " {} DTCM;".format(resources.dtcm.get_value())
+                msg += " {} DTCM;".format(used_resources.dtcm.get_value())
             msg = msg.rstrip(";") + "."
         raise exceptions.PacmanPlaceException(msg)

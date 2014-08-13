@@ -18,16 +18,16 @@ class RadialPlacer(BasicPlacer):
         BasicPlacer.__init__(self, machine, partitionable_graph)
 
     #overloaded method from basicPlacer
-    def _deal_with_non_constrainted_placement(self, subvertex, resources,
+    def _deal_with_non_constrainted_placement(self, subvertex, used_resources,
                                               chips):
         """overlaoded method of basic placer that changs the ordering in which
         chips are handed to the search alorirthm.
 
         :param subvertex: the subvert to place
-        :param resources: the resources reuqired by the subvertex
+        :param used_resources: the used_resources reuqired by the subvertex
         :param chips: the machines chips.
         :type subvertex: py:class'pacman.model.partitioned_graph.subvertex.SubVertex'
-    :type resources: py:class'pacman.model.resource_container.ResourceContainer'
+    :type used_resources: py:class'pacman.model.resource_container.ResourceContainer'
         :type chips: iterable of spinmachine.machine.Machine
         :return: a placement object
         :rtype: a py:class'pacman.model.placements.placements.Placements'
@@ -63,4 +63,4 @@ class RadialPlacer(BasicPlacer):
 
 
         return BasicPlacer._deal_with_non_constrainted_placement(
-            self, subvertex, resources, processors_new_order)
+            self, subvertex, used_resources, processors_new_order)

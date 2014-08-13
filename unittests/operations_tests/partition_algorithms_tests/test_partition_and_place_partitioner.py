@@ -226,7 +226,7 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         subgraph, graph_to_sub_graph_mapper = \
             partitioner.partition(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.assertGreater(len(subgraph.subvertices), 2)
+        self.assertGreater(len(subgraph.subvertices), 1)
         for subv in subgraph.subvertices:
             print subv.n_atoms, subv.label
 
@@ -432,5 +432,9 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         subgraph, graph_to_sub_graph_mapper = \
             partitioner.partition(self.graph, self.machine)
         self.assertEqual(len(subgraph.subvertices), 0)
+
 if __name__ == '__main__':
+    #t1 = TestPartitioAndPlacePartitioner()
+    #t1.setUp()
+    #t1.test_partition_on_large_vertex_than_has_to_be_split()
     unittest.main()
