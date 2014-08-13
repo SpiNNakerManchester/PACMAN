@@ -45,10 +45,11 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         """
         #check that this algorithm supports the constraints put onto the
         #subvertexes
+
         utility_calls.check_algorithm_can_support_constraints(
-            object_list=subgraph.subvertices,
+            constrained_vertices=subgraph.subvertices,
             supported_constraints=self._supported_constraints,
-            constraint_check_level=AbstractRouterConstraint)
+            abstract_constraint_type=AbstractRouterConstraint)
 
         #take each subedge and create keys from its placement
         progress_bar = \

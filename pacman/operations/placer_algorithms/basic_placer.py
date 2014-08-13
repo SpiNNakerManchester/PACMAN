@@ -48,9 +48,9 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         """
         #check that the algorithum can handle the constraints
         utility_calls.check_algorithm_can_support_constraints(
-            object_list=subgraph.subvertices,
+            constrained_vertices=subgraph.subvertices,
             supported_constraints=self._supported_constraints,
-            constraint_check_level=AbstractPlacerConstraint)
+            abstract_constraint_type=AbstractPlacerConstraint)
 
         placements = Placements()
         ordered_subverts = \
