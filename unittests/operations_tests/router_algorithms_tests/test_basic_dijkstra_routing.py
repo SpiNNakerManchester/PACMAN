@@ -16,7 +16,7 @@ from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
 from pacman.operations.router import Router as pacman_router
 #unitests imports
-from unittests.model_tests.test_vertex import TestVertex as Vertex
+from unittests.test_vertex import TestVertex as Vertex
 #spinnmachine imports
 from spinn_machine.processor import Processor
 from spinn_machine.link import Link
@@ -26,6 +26,8 @@ from spinn_machine.chip import Chip
 from spinn_machine.machine import Machine
 
 import unittest
+from spinn_machine.virutal_machine import VirtualMachine
+
 
 class MyTestCase(unittest.TestCase):
 
@@ -88,10 +90,8 @@ class MyTestCase(unittest.TestCase):
 
 
     def test_new_basic_routing_over_chip(self):
-        #build a machine object
-
-
-
+        #build a virutal machine object
+        machine = VirtualMachine(4, 4, False)
         self.routing = pacman_router(report_states=None)
         self.routing.run(
             machine=self.machine, placements=self.placements,
