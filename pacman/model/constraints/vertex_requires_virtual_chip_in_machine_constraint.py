@@ -17,17 +17,17 @@ class VertexRequiresVirtualChipInMachineConstraint(AbstractUtilityConstraint):
         chip connects to
         :param connected_chip_link_id: the link id that the virtual chip \
         connects to the real chip
-        :type virtual_chip_coords: tupe with x and y
-        :type connected_to_chip_coords:  tupe with x and y
+        :type virtual_chip_coords: tuple with x and y
+        :type connected_to_chip_coords:  tuple with x and y
         :type connected_chip_link_id: int
         :raise None: does not raise any known exceptions
         """
         AbstractUtilityConstraint.__init__(
             self, "AbstractConstrainedVertex Requires a virtual chip in the machine with coords "
                   "{}:{} connected to the real chip at coords {}:{} on link {}"
-                  .format(virtual_chip_coords['x'], virtual_chip_coords['y'],
-                          connected_to_chip_coords['x'],
-                          connected_to_chip_coords['y'],
+                  .format(virtual_chip_coords[0], virtual_chip_coords[1],
+                          connected_to_chip_coords[0],
+                          connected_to_chip_coords[1],
                           connected_chip_link_id))
         self._virtual_chip_coords = virtual_chip_coords
         self._connected_to_chip_coords = connected_to_chip_coords
