@@ -1,17 +1,45 @@
 import unittest
-from pacman.exceptions import PacmanPartitionException
+from pacman.model\
+    .constraints.vertex_requires_virtual_chip_in_machine_constraint import \
+    VertexRequiresVirtualChipInMachineConstraint
+from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+    AbstractPartitionableVertex
+from pacman.exceptions import PacmanPartitionException, \
+    PacmanInvalidParameterException
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
-from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
+from pacman.model.partitionable_graph.partitionable_graph \
+    import PartitionableGraph
 from spynnaker.pyNN.models.neural_models.if_curr_exp \
-    import IFCurrentExponentialPopulation as Vertex
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+    import IFCurrentExponentialPopulation as IFCurrVertex
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
 from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
 from spinn_machine.link import Link
 from spinn_machine.router import Router
 from spinn_machine.chip import Chip
+
+
+class Vertex(AbstractPartitionableVertex):
+
+    def __init__(self, n_atoms, label):
+        AbstractPartitionableVertex.__init__(self, label=label, n_atoms=n_atoms,
+                                             max_atoms_per_core=256)
+        self._model_based_max_atoms_per_core = 256
+
+    def model_name(self):
+        return "test vertex"
+
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+        return 10 * (hi_atom - lo_atom)
+
+    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+        return 200 * (hi_atom - lo_atom)
+
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+        return 4000 + (50 * (hi_atom - lo_atom))
 
 
 class TestBasicPartitioner(unittest.TestCase):
@@ -77,7 +105,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.assertEqual(len(subgraph.subedges), 4)
 
     def test_partition_on_large_vertex_than_has_to_be_split(self):
-        large_vertex = Vertex(300, None, "Large vertex")
+        large_vertex = Vertex(300, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
@@ -89,7 +117,7 @@ class TestBasicPartitioner(unittest.TestCase):
             print subv.n_atoms, subv.label
 
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
-        large_vertex = Vertex(500, None, "Large vertex")
+        large_vertex = Vertex(500, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
@@ -101,7 +129,7 @@ class TestBasicPartitioner(unittest.TestCase):
             print subv.n_atoms, subv.label
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
-        large_vertex = Vertex(1000, None, "Large vertex")
+        large_vertex = Vertex(1000, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
@@ -147,14 +175,14 @@ class TestBasicPartitioner(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
 
         self.machine = Machine(chips)
-        large_vertex = Vertex(300, None, "Large vertex")
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        singular_vertex = Vertex(1, "Large vertex")
+        self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 256)
         self.graph = PartitionableGraph("Graph with large vertex",
-                           [large_vertex],
-                           [])
+                           [singular_vertex], [])
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.assertEqual(len(subgraph.subvertices), 300)
+        self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 256)
+        self.assertEqual(len(subgraph.subvertices), 1)
+
         for subv in subgraph.subvertices:
             print subv.n_atoms, subv.label
 
@@ -186,7 +214,7 @@ class TestBasicPartitioner(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
 
         self.machine = Machine(chips)
-        large_vertex = Vertex(300, None, "Large vertex")
+        large_vertex = Vertex(300, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = PartitionableGraph("Graph with large vertex",
                            [large_vertex],
@@ -255,7 +283,14 @@ class TestBasicPartitioner(unittest.TestCase):
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
 
     def test_partition_with_unsupported_constraints(self):
-        self.assertEqual(True, False)
+        with self.assertRaises(PacmanInvalidParameterException):
+            constrained_vertex = Vertex(13, "Constrained")
+            constrained_vertex.add_constraint(
+                VertexRequiresVirtualChipInMachineConstraint((5, 5), (0, 0), 1))
+            self.graph.add_vertex(constrained_vertex)
+            partitioner = BasicPartitioner(1, 1000)
+            subgraph, graph_to_sub_graph_mapper = \
+                    partitioner.partition(self.graph, self.machine)
 
     def test_partition_with_empty_graph(self):
         self.graph = PartitionableGraph()
