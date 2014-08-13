@@ -190,17 +190,17 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         """ place a subvertex which doesnt have a constraint
 
         :param subvertex_label: the of the subvert to place
-        :param resources: the reosruces used by this subvertex
-        :param chips_in_a_ordering: the chips avilable from the machien in some\
-         predetermined ordering.
+        :param resources: the resources used by this subvertex
+        :param chips_in_a_ordering: the chips available from the machine in \
+         some predetermined ordering.
         :type subvertex_label: str
         :type resources: pacman.model.resources.resource_container.ResourceContainer
-        :type chips_in_a_ordering: iterbale of spinnMachine.chip,Chip
+        :type chips_in_a_ordering: iterable of spinnMachine.chip,Chip
         :return a placement object for this subvertex
         :rtype: pacman.model.placements.placement.Placement
         :raise PacmanPlaceException: when it is not possible to place the \
-        subvertex for either: 1. not enough sdram, 2. no more aviable cores,
-         3. not enough cpu or 4. not enough clock cycles avilable
+        subvertex for either: 1. not enough sdram, 2. no more available cores,
+         3. not enough cpu or 4. not enough clock cycles available
         """
         # Record when a constraint is met at least somewhere to produce a richer
         # error message.
@@ -222,13 +222,13 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                         available_sdram >= resources.sdram.get_value()
                     cpu_speed_met |= (processor.clock_speed >=
                                       resources.cpu.get_value())
-                    dtcm_per_proc_met |= (processor.dtcm_avilable >=
+                    dtcm_per_proc_met |= (processor.dtcm_available >=
                                           resources.dtcm.get_value())
 
                     if (available_sdram >= resources.sdram.get_value()
-                        and (processor.clock_speed <=
+                        and (processor.clock_speed >=
                              resources.cpu.get_value())
-                        and (processor.dtcm_avilable <=
+                        and (processor.dtcm_available >=
                              resources.dtcm.get_value())):
                         x, y, p = self._placement_tracker.assign_core(
                             chip.x, chip.y, processor.processor_id)
