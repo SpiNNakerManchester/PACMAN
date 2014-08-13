@@ -226,9 +226,9 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                                           resources.dtcm.get_value())
 
                     if (available_sdram >= resources.sdram.get_value()
-                        and (processor.clock_speed <=
+                        and (processor.clock_speed >=
                              resources.cpu.get_value())
-                        and (processor.dtcm_available <=
+                        and (processor.dtcm_available >=
                              resources.dtcm.get_value())):
                         x, y, p = self._placement_tracker.assign_core(
                             chip.x, chip.y, processor.processor_id)
