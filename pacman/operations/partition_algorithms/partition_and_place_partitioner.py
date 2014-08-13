@@ -56,14 +56,6 @@ pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPart
         self._placement_to_subvert_mapper = dict()
         self._complete_placements = Placements()
 
-    @staticmethod
-    def _detect_subclass_hierarchy(subclass_list, final_subclass_hierarchy):
-        for subclass in subclass_list:
-            # if subclass not in final_subclass_hierarchy:
-            final_subclass_hierarchy.append(subclass)
-            PartitionAndPlacePartitioner._detect_subclass_hierarchy(
-                subclass.__subclasses__(), final_subclass_hierarchy)
-
     def set_placer_algorithm(self, placer_algorithm, machine,
                              partitionable_graph):
         """ setter method for setting the placer algorithm
@@ -83,17 +75,8 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
 pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm
 
         """
-        # if placer_algorithm in AbstractPlacerAlgorithm.__subclasses__():
-
-        #find all placer algorithms!
-        subclass_list = list()
-        initial_subclass_list = AbstractPlacerAlgorithm.__subclasses__()
-        PartitionAndPlacePartitioner._detect_subclass_hierarchy(
-            initial_subclass_list, subclass_list)
-
-        if placer_algorithm in subclass_list:
+        if issubclass(placer_algorithm, AbstractPlacerAlgorithm):
             self._placer_algorithm = placer_algorithm(machine, partitionable_graph)
-
         else:
             raise exceptions.PacmanConfigurationException(
                 "The placer algorithm submitted is not a recognised placer "

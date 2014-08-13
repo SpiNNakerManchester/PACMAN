@@ -53,9 +53,9 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                    goes wrong with the partitioning
         """
         utility_calls.check_algorithm_can_support_constraints(
-            object_list=graph.vertices,
-            constraint_check_level=AbstractPartitionerConstraint,
-            supported_constraints=self._supported_constraints)
+            constrained_vertices=graph.vertices,
+            supported_constraints=self._supported_constraints,
+            abstract_constraint_type=AbstractPartitionerConstraint)
         #start progress bar
         progress_bar = ProgressBar(len(graph.vertices),
                                    "on partitioning the partitionable_graph's vertices")
