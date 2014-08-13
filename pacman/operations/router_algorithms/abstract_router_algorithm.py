@@ -10,7 +10,7 @@ from pacman.model.routing_tables.multicast_routing_tables import \
 @add_metaclass(ABCMeta)
 class AbstractRouterAlgorithm(object):
     """ An abstract algorithm that can find routes for subedges between\
-        subvertices in a subgraph that have been placed on a machine
+        subvertices in a partitioned_graph that have been placed on a machine
     """
 
     def __init__(self):
@@ -30,8 +30,8 @@ class AbstractRouterAlgorithm(object):
                     :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param subgraph: the subgraph object
-        :type subgraph: pacman.subgraph.subgraph.Subgraph
+        :param sub_graph: the partitioned_graph object
+        :type sub_graph: pacman.partitioned_graph.partitioned_graph.Subgraph
         :return: The discovered routes 
         :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\

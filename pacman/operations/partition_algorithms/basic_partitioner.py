@@ -1,11 +1,11 @@
 from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
-from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper import \
-    GraphSubgraphMapper
+from pacman.model.graph_mapper.graph_mapper import \
+    GraphMapper
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
-from pacman.model.subgraph.subgraph import Subgraph
-from pacman.model.subgraph.subvertex import Subvertex
+from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from spinn_machine.processor import Processor
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class BasicPartitioner(AbstractPartitionAlgorithm):
-    """ An basic algorithm that can partition a graph based on atoms
+    """ An basic algorithm that can partition a partitionable_graph based on atoms
     """
 
     def __init__(self, machine_time_step, runtime_in_machine_time_steps):
@@ -40,14 +40,14 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
 
     #inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
-        """ Partition a graph so that each subvertex will fit on a processor\
+        """ Partition a partitionable_graph so that each subvertex will fit on a processor\
             within the machine
 
-        :param graph: The graph to partition
-        :type graph: :py:class:`pacman.model.graph.graph.Graph`
-        :param machine: The machine with respect to which to partition the graph
+        :param graph: The partitionable_graph to partition
+        :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :param machine: The machine with respect to which to partition the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A subgraph of partitioned vertices and edges from the graph
+        :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
@@ -58,10 +58,10 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             supported_constraints=self._supported_constraints)
         #start progress bar
         progress_bar = ProgressBar(len(graph.vertices),
-                                   "on partitioning the graph's vertices")
+                                   "on partitioning the partitionable_graph's vertices")
         vertices = graph.vertices
-        subgraph = Subgraph(label="subgraph for graph {}".format(graph.label))
-        graph_to_subgraph_mapper = GraphSubgraphMapper()
+        subgraph = PartitionedGraph(label="partitioned_graph for partitionable_graph {}".format(graph.label))
+        graph_to_subgraph_mapper = GraphMapper()
         # Partition one vertex at a time
         for vertex in vertices:
             # Compute atoms per core from resource availability
@@ -123,7 +123,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     raise PacmanPartitionException("Not enough resources"
                                                    " available to create"
                                                    " subvertex")
-                subvert = Subvertex(counted, counted + alloc - 1,
+                subvert = PartitionedVertex(counted, counted + alloc - 1,
                                     label=label)
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(subvert, vertex)

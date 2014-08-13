@@ -67,7 +67,7 @@ class Placements(object):
         :type p: int
         :return: the subvertex placed on the given processor or None if no\
                     such placement has been made
-        :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+        :rtype: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :raise None: does not raise any known exceptions
         """
         placement_id = (x, y, p)
@@ -79,7 +79,7 @@ class Placements(object):
         """ Return the placement information for a subvertex
         
         :param subvertex: The subvertex to find the placement of
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: The placement, or None if the subvertex has no placement
         :rtype: :py:class:`pacman.model.placements.placement.Placement`
         :raise None: No known exceptions are raised

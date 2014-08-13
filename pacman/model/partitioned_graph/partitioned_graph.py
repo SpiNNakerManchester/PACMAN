@@ -2,20 +2,20 @@ from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 
 
-class Subgraph(object):
-    """ Represents a partitioning of a graph
+class PartitionedGraph(object):
+    """ Represents a partitioning of a partitionable_graph
     """
     def __init__(self, label=None, subvertices=None, subedges=None):
         """
 
-        :param label: an identifier for the subgraph
+        :param label: an identifier for the partitioned_graph
         :type label: str
-        :param subvertices: an iterable of vertices in the graph
+        :param subvertices: an iterable of vertices in the partitionable_graph
         :type subvertices: iterable of\
-                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`
-        :param subedges: an iterable of subedges in the graph
+                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+        :param subedges: an iterable of subedges in the partitionable_graph
         :type subedges: iterable of\
-                    :py:class:`pacman.model.subgraph.subedge.Subedge`
+                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the subedges is not valid
                     * If one of the subvertices is not valid
@@ -31,10 +31,10 @@ class Subgraph(object):
         self.add_subedges(subedges)
 
     def add_subvertex(self, subvertex):
-        """ Add a subvertex to this subgraph
+        """ Add a subvertex to this partitioned_graph
 
-        :param subvertex: a subvertex to be added to the graph
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+        :param subvertex: a subvertex to be added to the partitionable_graph
+        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -43,16 +43,16 @@ class Subgraph(object):
         if subvertex not in self._subvertices:
             self._subvertices.add(subvertex)
         else:
-            raise PacmanAlreadyExistsException("Subvertex", str(subvertex))
+            raise PacmanAlreadyExistsException("PartitionedVertex", str(subvertex))
         self._outgoing_subedges[subvertex] = list()
         self._incoming_subedges[subvertex] = list()
 
     def add_subvertices(self, subvertices):
-        """ Add some subvertices to this subgraph
+        """ Add some subvertices to this partitioned_graph
 
-        :param subvertices: an iterable of subvertices to add to this subgraph
+        :param subvertices: an iterable of subvertices to add to this partitioned_graph
         :type subvertices: iterable of\
-                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -63,17 +63,17 @@ class Subgraph(object):
                 self.add_subvertex(next_subvertex)
 
     def add_subedge(self, subedge):
-        """ Add a subedge to this subgraph
+        """ Add a subedge to this partitioned_graph
 
-        :param subedge: a subedge to be added to the subgraph
-        :type subedge: :py:class:`pacman.model.subgraph.subedge.Subedge`
+        :param subedge: a subedge to be added to the partitioned_graph
+        :type subedge: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subedge is not valid
         """
         if subedge in self._subedges:
-            raise PacmanAlreadyExistsException("Subedge", str(subedge))
+            raise PacmanAlreadyExistsException("PartitionedEdge", str(subedge))
 
         self._subedges.add(subedge)
 
@@ -81,22 +81,22 @@ class Subgraph(object):
             self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
         else:
             raise PacmanInvalidParameterException(
-                "Subedge pre_subvertex", str(subedge.pre_subvertex),
-                " Must exist in the subgraph")
+                "PartitionedEdge pre_subvertex", str(subedge.pre_subvertex),
+                " Must exist in the partitioned_graph")
 
         if subedge.post_subvertex in self._incoming_subedges.keys():
             self._incoming_subedges[subedge.post_subvertex].append(subedge)
         else:
             raise PacmanInvalidParameterException(
-                "Subedge post_subvertex", str(subedge.post_subvertex),
-                " Must exist in the subgraph")
+                "PartitionedEdge post_subvertex", str(subedge.post_subvertex),
+                " Must exist in the partitioned_graph")
 
     def add_subedges(self, subedges):
-        """ Add some subedges to this subgraph
+        """ Add some subedges to this partitioned_graph
 
-        :param subedges: an iterable of subedges to add to this subgraph
+        :param subedges: an iterable of subedges to add to this partitioned_graph
         :type subedges: iterable of\
-                    :py:class:`pacman.model.subgraph.subedge.Subedge`
+                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -111,10 +111,10 @@ class Subgraph(object):
             Can return an empty collection
 
         :param subvertex: the subvertex for which to find the outgoing subedges
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: an iterable of subedges which have subvertex as their\
                     pre_subvertex
-        :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
+        :rtype: iterable of :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
         """
         if subvertex in self._outgoing_subedges.keys():
@@ -126,10 +126,10 @@ class Subgraph(object):
             Can return an empty collection.
 
         :param subvertex: the subvertex for which to find the incoming subedges
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: an iterable of subedges which have subvertex as their\
                     post_subvertex
-        :rtype: iterable of :py:class:`pacman.model.subgraph.subedge.Subedge`
+        :rtype: iterable of :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
         """
         if subvertex in self._incoming_subedges.keys():
@@ -138,27 +138,27 @@ class Subgraph(object):
 
     @property
     def subvertices(self):
-        """ The subvertices of the subgraph
+        """ The subvertices of the partitioned_graph
 
         :return: an iterable of subvertices
         :rtype: iterable of\
-                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         """
         return self._subvertices
 
     @property
     def subedges(self):
-        """ The subedges of the subgraph
+        """ The subedges of the partitioned_graph
 
         :return: an iterable of subedges
         :rtype: iterable of\
-                    :py:class:`pacman.model.subgraph.subedge.Subedge`
+                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         """
         return self._subedges
 
     @property
     def label(self):
-        """ The label of the subgraph
+        """ The label of the partitioned_graph
 
         :return: The label or None if there is no lable
         :rtype: str

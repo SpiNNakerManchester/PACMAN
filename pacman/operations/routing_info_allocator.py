@@ -7,10 +7,10 @@ logger = logging.getLogger(__name__)
 
 
 class RoutingInfoAllocator:
-    """ Used to obtain routing information from a placed subgraph
+    """ Used to obtain routing information from a placed partitioned_graph
     """
 
-    def __init__(self, machine, report_states, graph_to_sub_graph_mapper,
+    def __init__(self, machine, report_states, graph_mapper,
                  report_folder=None, hostname=None,
                  routing_info_allocator_algorithm=None):
         """
@@ -20,7 +20,7 @@ class RoutingInfoAllocator:
         :param hostname: the hostname of the machine
         :param machine: the machine object used to represent the spinnaker\
          machine
-        :param graph_to_sub_graph_mapper: the graph to subgraph mapper object
+        :param graph_mapper: the partitionable_graph to partitioned_graph mapper object
         :param report_folder: the folder used to store reports
         :param report_states: the pacman states for different reports
         :type hostname: str
@@ -37,23 +37,25 @@ class RoutingInfoAllocator:
         self.report_states = report_states
         self._hostname = hostname
         self._machine = machine
-        self._graph_to_subgraph_mapper = graph_to_sub_graph_mapper
+        self._graph_mapper = graph_mapper
         self._routing_info_allocator_algorithm = \
             routing_info_allocator_algorithm
 
         #set up a default placer algorithm if none are specified
         if self._routing_info_allocator_algorithm is None:
             self._routing_info_allocator_algorithm = \
-                BasicRoutingInfoAllocator(self._graph_to_subgraph_mapper)
+                BasicRoutingInfoAllocator(self._graph_mapper)
         else:
             self._routing_info_allocator_algorithm = \
-                routing_info_allocator_algorithm(self._graph_to_subgraph_mapper)
+                routing_info_allocator_algorithm(self._graph_mapper)
 
-    def run(self, subgraph, placements):
-        """ Execute the algorithm on the subgraph
+    def run(self, partitioned_graph, placements):
+        """ Execute the algorithm on the partitioned_graph
         
-        :param subgraph: The subgraph to allocate the routing info for
-        :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
+        :param partitioned_graph: The partitioned_graph to allocate the routing\
+         info for
+        :type partitioned_graph:
+ :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
         :param placements: The placements of the subvertices
         :type placements: :py:class:`pacman.model.placements.placements.Placements`
         :return: The routing information
@@ -64,12 +66,13 @@ class RoutingInfoAllocator:
         #execute routing info generator
         routing_infos = \
             self._routing_info_allocator_algorithm.allocate_routing_info(
-                subgraph, placements)
+                partitioned_graph, placements)
 
         #generate reports
         if (self.report_states is not None and
                 self.report_states.routing_info_report):
             reports.routing_info_reports(self._report_folder, self._hostname,
-                                        subgraph, placements, routing_infos)
+                                         partitioned_graph, placements,
+                                         routing_infos)
 
         return routing_infos

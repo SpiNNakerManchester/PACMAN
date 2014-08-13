@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractPartitionAlgorithm(object):
-    """ An abstract algorithm that can partition a graph
+    """ An abstract algorithm that can partition a partitionable_graph
     """
 
     def __init__(self, machine_time_step, runtime_in_machine_time_steps):
@@ -48,14 +48,14 @@ class AbstractPartitionAlgorithm(object):
     
     @abstractmethod
     def partition(self, graph, machine):
-        """ Partition a graph so that each subvertex will fit on a processor\
+        """ Partition a partitionable_graph so that each subvertex will fit on a processor\
             within the machine
             
-        :param graph: The graph to partition
-        :type graph: :py:class:`pacman.model.graph.graph.Graph`
-        :param machine: The machine with respect to which to partition the graph
+        :param graph: The partitionable_graph to partition
+        :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :param machine: The machine with respect to which to partition the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A subgraph of partitioned vertices and edges from the graph
+        :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
@@ -105,15 +105,15 @@ class AbstractPartitionAlgorithm(object):
 
     @staticmethod
     def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
-        '''generates the sub edges for the subvertices in the subgraph.
+        '''generates the sub edges for the subvertices in the partitioned_graph.
 
-        :param subgraph: the subgraph to work with
-        :param graph_to_subgraph_mapper: the mapper between graph and subgraph
-        :param graph: the graph to work with
+        :param subgraph: the partitioned_graph to work with
+        :param graph_to_subgraph_mapper: the mapper between partitionable_graph and partitioned_graph
+        :param graph: the partitionable_graph to work with
         :type subgraph: pacman.model.subgraph.subgraph.Subgraph
         :type graph_to_subgraph_mapper:
-        pacman.model.graph_subgraph_mapper.GraphSubgraphMapper
-        :type graph: pacman.model.graph.graph.Graph
+        pacman.model.graph_mapper.GraphMapper
+        :type graph: pacman.model.graph.partitionable_graph.PartitionableGraph
         :return: None
         :rtype: None
         :raise None: this method does not raise any known exceptions
@@ -121,7 +121,7 @@ class AbstractPartitionAlgorithm(object):
         '''
          #start progress bar
         progress_bar = ProgressBar(len(subgraph.subvertices),
-                                   "on partitioning the graph's edges")
+                                   "on partitioning the partitionable_graph's edges")
 
         # Partition edges according to vertex partitioning
         for src_sv in subgraph.subvertices:
@@ -150,7 +150,7 @@ class AbstractPartitionAlgorithm(object):
         :param subvertex: the subvertex thats been generated and placed
         :param sub_vertex_requirement: the sdram usage of the subvertex
         :param machine: the machine object
-        :type subvertex: pacman.model.subgraph.subvertex.Subvertex
+        :type subvertex: pacman.model.subgraph.subvertex.PartitionedVertex
         :type sub_vertex_requirement:
          pacman.model.resources.resource_container.ResoruceContainer
         :type machine: spinnMachine.machine.Machine
@@ -198,7 +198,7 @@ class AbstractPartitionAlgorithm(object):
     def _add_vertex_constraints_to_subvertex(subvert, vertex):
         """private method for partitioners, not to be used by front end
         updates subvertices with their assocaited vertex's constraints that are
-        not partitioner based. As future algorithms only use the subgraph,
+        not partitioner based. As future algorithms only use the partitioned_graph,
         and partitionable constraints should not be needed from now on.
         """
         subclasses = AbstractPartitionerConstraint.__subclasses__()

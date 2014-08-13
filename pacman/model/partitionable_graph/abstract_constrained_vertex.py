@@ -1,47 +1,66 @@
+from abc import ABCMeta
+from six import add_metaclass
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.exceptions import PacmanInvalidParameterException
 
 
-class Subvertex(object):
-    """ Represents a sub-set of atoms from a Vertex
+@add_metaclass(ABCMeta)
+class AbstractConstrainedVertex(object):
+    """ Represents a AbstractConstrainedVertex of a partitionable_graph, \
+    which contains a number of atoms, and\
+        which can be partitioned into a number of subvertices, such that the\
+        total number of atoms in the subvertices adds up to the number of atoms\
+        in the vertex
     """
-    def __init__(self, lo_atom, hi_atom, label=None, constraints=None):
+    _non_labelled_vertex_count = 0
+    
+    def __init__(self, n_atoms, label, constraints=None):
+
         """
 
-        :param lo_atom: The id of the first atom in the subvertex with\
-                        reference to the atoms in the vertex
-        :type lo_atom: int
-        :param hi_atom: The id of the last atom in the subvertex with\
-                        reference to the atoms in the vertex
-        :type hi_atom: int
-        :param label: The name of the subvertex, or None if no name
+        :param n_atoms: The number of atoms that the vertex can be split into
+        :type n_atoms: int
+        :param label: The name of the vertex
         :type label: str
-        :param constraints: The constraints of the subvertex
+        :param constraints: The constraints of the vertex
         :type constraints: iterable of\
                     :py:class:`pacman.model.constraints.abstract_constraint\
                     .AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
-                    * If lo_atom is less than 0
-                    * If hi_atom is less than lo_atom
+                    * If the number of atoms is less than 1
         """
-        if lo_atom < 0:
+        if n_atoms < 1:
             raise PacmanInvalidParameterException(
-                "lo_atom", str(lo_atom), "Cannot be less than 0")
-        if hi_atom < lo_atom:
-            raise PacmanInvalidParameterException(
-                "hi_atom", str(hi_atom), "Cannot be less than lo_atom")
-        
-        self._label = label
-        self._lo_atom = lo_atom
-        self._hi_atom = hi_atom
+                "n_atoms", str(n_atoms),
+                "Must be at least one atom in the vertex")
+
+        if label is None:
+            self._label = \
+                "Population {}"\
+                .format(AbstractConstrainedVertex._non_labelled_vertex_count)
+            AbstractConstrainedVertex._non_labelled_vertex_count += 1
+        else:
+            self._label = label
+        self._n_atoms = n_atoms
         self._constraints = list()
 
         self.add_constraints(constraints)
 
+    @classmethod
+    def __subclasshook__(cls, othercls):
+        """ Checks if all the abstract methods are present on the subclass
+        """
+        for C in cls.__mro__:
+            for key in C.__dict__:
+                item = C.__dict__[key]
+                if hasattr(item, "__isabstractmethod__"):
+                    if not any(key in B.__dict__ for B in othercls.__mro__):
+                        return NotImplemented
+        return True
+
     def add_constraint(self, constraint):
-        """ Add a new constraint to the collection of constraints for the\
-            subvertex
+        """ Add a new constraint to the collection of constraints for the vertex
 
         :param constraint: constraint to add
         :type constraint:\
@@ -52,18 +71,17 @@ class Subvertex(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     constraint is not valid
         """
-        if (constraint is None 
+        if (constraint is None
                 or not isinstance(constraint, AbstractConstraint)):
             raise PacmanInvalidParameterException(
-                "constraint",
-                constraint,
-                "Must be a pacman.model"
-                ".constraints.abstract_constraint.AbstractConstraint")
+                "constraint", constraint, "Must be a pacman.model."
+                                          "constraints.abstract_constraint."
+                                          "AbstractConstraint")
         self._constraints.append(constraint)
 
     def add_constraints(self, constraints):
         """ Add an iterable of constraints to the collection of constraints for\
-            the subvertex
+            the vertex
 
         :param constraints: iterable of constraints to add
         :type constraints: iterable of\
@@ -79,9 +97,8 @@ class Subvertex(object):
                 self.add_constraint(next_constraint)
 
     def set_constraints(self, constraints):
-        """ Set the constraints of the subvertex to be exactly the given\
-            iterable of constraints, overwriting any previously added\
-            constraints
+        """ Set the constraints of the vertex to be exactly the given iterable\
+            of constraints, overwriting any previously added constraints
 
         :param constraints: iterable of constraints to set
         :type constraints: iterable of\
@@ -97,27 +114,27 @@ class Subvertex(object):
 
     @property
     def label(self):
-        """ The label of the subvertex
+        """ The label of the vertex
 
         :return: The label
         :rtype: str
         :raise None: Raises no known exceptions
         """
         return self._label
-    
+
     @property
     def n_atoms(self):
-        """ The number of atoms in the subvertex
+        """ The number of atoms in the vertex
 
         :return: The number of atoms
         :rtype: int
         :raise None: Raises no known exceptions
         """
-        return (self._hi_atom - self._lo_atom) + 1
-    
+        return self._n_atoms
+
     @property
     def constraints(self):
-        """ An iterable constraints for the subvertex
+        """ An iterable constraints for the vertex
 
         :return: iterable of constraints
         :rtype: iterable of\
@@ -126,23 +143,3 @@ class Subvertex(object):
         :raise None: Raises no known exceptions
         """
         return self._constraints
-    
-    @property
-    def lo_atom(self):
-        """ The id of the first atom in the subvertex
-
-        :return: The id of the first atom
-        :rtype: int
-        :raise None: Raises no known exceptions
-        """
-        return self._lo_atom
-
-    @property
-    def hi_atom(self):
-        """ The id of the last atom in the subvertex
-
-        :return: The id of the last atom
-        :rtype: int
-        :raise None: Raises no known exceptions
-        """
-        return self._hi_atom

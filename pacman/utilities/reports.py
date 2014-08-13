@@ -9,21 +9,21 @@ from pacman import exceptions
 logger = logging.getLogger(__name__)
 
 
-def placer_reports(report_folder, hostname, graph, graph_to_subgraph_mapper,
+def placer_reports(report_folder, hostname, graph, graph_mapper,
                    placements, machine):
     placement_report_by_vertex(report_folder, hostname, graph,
-                               graph_to_subgraph_mapper, placements)
+                               graph_mapper, placements)
     placement_by_core(report_folder, hostname, placements, machine,
-                      graph_to_subgraph_mapper)
+                      graph_mapper)
     sdram_usage_per_chip(report_folder, hostname, placements, machine,
-                         graph_to_subgraph_mapper, graph)
+                         graph_mapper, graph)
 
 
 def router_reports(report_folder, hostname, graph, graph_to_sub_graph_mapper,
                    placements, routing_tables, routing_info, machine,
                    include_dat_based=False):
     router_report_from_router_tables(report_folder, routing_tables)
-    #router_edge_information(report_folder, hostname, graph, routing_tables,
+    #router_edge_information(report_folder, hostname, partitionable_graph, routing_tables,
      #                       graph_to_sub_graph_mapper, placements,
      #                       routing_info, machine)
     if include_dat_based:
@@ -56,7 +56,7 @@ def partitioner_report(report_folder, hostname, graph,
         logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.".format(file_name))
 
-    f_place_by_vertex.write("        Placement Information by Vertex\n")
+    f_place_by_vertex.write("        Placement Information by AbstractConstrainedVertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -67,7 +67,7 @@ def partitioner_report(report_folder, hostname, graph,
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
-        f_place_by_vertex.write("**** Vertex: '{}'\n".format(vertex_name))
+        f_place_by_vertex.write("**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
@@ -99,7 +99,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
         logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.".format(file_name))
 
-    f_place_by_vertex.write("        Placement Information by Vertex\n")
+    f_place_by_vertex.write("        Placement Information by AbstractConstrainedVertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -114,7 +114,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
-        f_place_by_vertex.write("**** Vertex: '{}'\n".format(vertex_name))
+        f_place_by_vertex.write("**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
@@ -189,7 +189,7 @@ def placement_by_core(report_folder, hostname, placements, machine,
                 lo_atom = subvertex.lo_atom
                 hi_atom = subvertex.hi_atom
                 num_atoms = hi_atom - lo_atom + 1
-                p_str = "  Processor {}: Vertex: '{}', pop sz: {}\n"\
+                p_str = "  Processor {}: AbstractConstrainedVertex: '{}', pop sz: {}\n"\
                         .format(proc_id, vertex_label, vertex_atoms)
                 f_place_by_core.write(p_str)
                 p_str = "               Slice on this core: {}:{} ({} atoms)\n"\
@@ -334,7 +334,7 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         logger.error("Generate_routing_reports: Can't open file {} for "
                      "writing.".format(file_name))
 
-    f_routing.write("        Edge Routing Report\n")
+    f_routing.write("        PartitionableEdge Routing Report\n")
     f_routing.write("        ===================\n\n")
     time_date_string = time.strftime("%c")
     f_routing.write("Generated: {}".format(time_date_string))
@@ -345,7 +345,7 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         from_v, to_v = e.pre_vertex, e.post_vertex
         from_v_sz, to_v_sz = from_v.n_atoms, to_v.n_atoms
         fr_v_name, to_v_name = from_v.label, to_v.label
-        string = "**** Edge '{}', from vertex: '{}' (size: {})"\
+        string = "**** PartitionableEdge '{}', from vertex: '{}' (size: {})"\
                  .format(e.label, fr_v_name, from_v_sz)
         string = "{}, to vertex: '{}' (size: {})\n"\
                  .format(string, to_v_name, to_v_sz)

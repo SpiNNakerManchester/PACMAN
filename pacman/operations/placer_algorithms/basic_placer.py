@@ -19,28 +19,28 @@ logger = logging.getLogger(__name__)
 
 
 class BasicPlacer(AbstractPlacerAlgorithm):
-    """ An basic algorithm that can place a subgraph onto a machine based off a
+    """ An basic algorithm that can place a partitioned_graph onto a machine based off a
     raster behaviour
     """
 
     def __init__(self, machine, graph):
         """constructor to build a \
         pacman.operations.placer_algorithms.BasicPlacer.BasicPlacer
-        :param machine: The machine on which to place the graph
+        :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         AbstractPlacerAlgorithm.__init__(self, machine, graph)
         self._supported_constraints.append(PlacerChipAndCoreConstraint)
         self._supported_constraints.append(PlacerSubvertexSameChipConstraint)
 
-    def place(self, subgraph, graph_to_subgraph_mapper):
-        """ Place a subgraph so that each subvertex is placed on a core
+    def place(self, subgraph, graph_mapper):
+        """ Place a partitioned_graph so that each subvertex is placed on a core
 
-        :param subgraph: The subgraph to place
+        :param subgraph: The partitioned_graph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
-        :param graph_to_subgraph_mapper: the mappings between graph and subgraph
-        :type graph_to_subgraph_mapper:
-    pacman.model.graph_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
+        :param graph_mapper: the mappings between partitionable_graph and partitioned_graph
+        :type graph_mapper:
+    pacman.model.graph_mapper.graph_mapper.GraphMapper
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: If something\
@@ -59,12 +59,13 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
-                                   "for placing the subgraph's subvertices")
+                                   "for placing the partitioned_graph's "
+                                   "subvertices")
         for subvertex in ordered_subverts:
 
             # Create and store a new placement
             placement = self._place_subvertex(subvertex, self._graph,
-                                              graph_to_subgraph_mapper,
+                                              graph_mapper,
                                               placements)
             placements.add_placement(placement)
             progress_bar.update()
@@ -77,12 +78,12 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         SHOULD NOT BE CALLED OUTSIDE THIS CLASS
 
         :param subvertex: the subvertex to be placed
-        :param graph: the graph obejct of the application
-        :param graph_to_subgraph_mapper: the graph to subgraph mapper
+        :param graph: the partitionable_graph obejct of the application
+        :param graph_to_subgraph_mapper: the partitionable_graph to partitioned_graph mapper
         :param placements: the current placements
-        :type subvertex: pacman.models.subgraph.subvertex.Subvertex
-        :type graph: pacman.models.graph.graph.Graph
-        :type graph_to_subgraph_mapper: pacamn.models.graph_subgraph_mapper.graphSubgraphMapper
+        :type subvertex: pacman.models.partitioned_graph.subvertex.PartitionedVertex
+        :type graph: pacman.models.partitionable_graph.partitionable_graph.Graph
+        :type graph_to_subgraph_mapper: pacamn.models.graph_mapper.graphSubgraphMapper
         :type placements: pacman.model.placements.placements.Placements
         :return: placement object for this subvertex
         :rtype: pacman.model.placements.placement.Placement
@@ -159,7 +160,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         x = placement_constraint.x
         y = placement_constraint.y
         p = placement_constraint.p
-        if not self._placement_tracker.has_avilable_cores_left(x, y, p):
+        if not self._placement_tracker.has_available_cores_left(x, y, p):
             if p is None:
                 raise exceptions.PacmanPlaceException(
                     "cannot place subvertex {} in chip {}:{} as there is no"
@@ -210,24 +211,24 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         for chip in chips_in_a_ordering:
             for processor in chip.processors:
                 if (processor.processor_id != 0 and
-                        self._placement_tracker.has_avilable_cores_left(
+                        self._placement_tracker.has_available_cores_left(
                         chip.x, chip.y, processor.processor_id)):
                     #locate avilable sdram
-                    avilable_sdram = \
+                    available_sdram = \
                         chip.sdram.size - \
                         (self._sdram_tracker.get_usage(chip.x, chip.y))
                     free_cores_met = True
                     free_sdram_met |= \
-                        avilable_sdram >= resources.sdram.get_value()
+                        available_sdram >= resources.sdram.get_value()
                     cpu_speed_met |= (processor.clock_speed >=
                                       resources.cpu.get_value())
                     dtcm_per_proc_met |= (processor.dtcm_avilable >=
                                           resources.dtcm.get_value())
 
-                    if (avilable_sdram >= resources.sdram.get_value()
-                        and (processor.clock_speed >=
+                    if (available_sdram >= resources.sdram.get_value()
+                        and (processor.clock_speed <=
                              resources.cpu.get_value())
-                        and (processor.dtcm_avilable >=
+                        and (processor.dtcm_avilable <=
                              resources.dtcm.get_value())):
                         x, y, p = self._placement_tracker.assign_core(
                             chip.x, chip.y, processor.processor_id)

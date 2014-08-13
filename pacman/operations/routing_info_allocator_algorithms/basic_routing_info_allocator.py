@@ -13,28 +13,28 @@ from pacman.utilities.progress_bar import ProgressBar
 
 class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
     """ An basic algorithm that can produce routing keys and masks for\
-        subedges in a subgraph based on the x,y,p of their placement
+        subedges in a partitioned_graph based on the x,y,p of their placement
     """
 
-    def __init__(self, graph_to_sub_graph_mapper):
+    def __init__(self, graph_mapper):
         """constructor that build a
 pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
 
-        :param graph_to_sub_graph_mapper: the mappings betweeen graph and \
-        subgraph
-        :type graph_to_sub_graph_mapper: pacman.model.graoh_subgraph_mapper.graph_subgraph_mapper.GraphSubgraphMapper
+        :param graph_mapper: the mappings betweeen partitionable_graph and \
+        partitioned_graph
+        :type graph_mapper: pacman.model.graoh_subgraph_mapper.graph_mapper.GraphMapper
         :return: a new basic routing key info allocator
         :rtype: pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator.BasicRoutingInfoAllocator
         :raise None: this method does not raise any known exception
 
         """
         AbstractRoutingInfoAllocatorAlgorithm.__init__(
-            self, graph_to_sub_graph_mapper)
+            self, graph_mapper)
 
     def allocate_routing_info(self, subgraph, placements):
-        """ Allocates routing information to the subedges in a subgraph
+        """ Allocates routing information to the subedges in a partitioned_graph
 
-        :param subgraph: The subgraph to allocate the routing info for
+        :param subgraph: The partitioned_graph to allocate the routing info for
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :param placements: The placements of the subvertices
     :type placements: :py:class:`pacman.model.placements.placements.Placements`
@@ -74,7 +74,7 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
 
         :param out_going_subedge: the outgoing subedge from a given subvert
         :param placement: the placement for the given subvert
-        :type out_going_subedge: pacman.model.subgraph.subegde.Subedge
+        :type out_going_subedge: pacman.model.partitioned_graph.subegde.PartitionedEdge
         :type placement: pacman.model.placements.placement.Placement
         :return: a subedge_routing_info which contains the key, and mask of the\
          subvert
@@ -108,7 +108,7 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         :param subvert: the subvert the key and mask are used by
         :type mask: int
         :type key: int
-        :type subvert: pacman.model.subgraph.subvertex.Subvertex
+        :type subvert: pacman.model.subgraph.subvertex.PartitionedVertex
         :return: None
         :rtype: None
         :raise PacmanRouteInfoAllocationException: when 2 or more subvertices \

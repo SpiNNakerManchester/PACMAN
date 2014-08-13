@@ -12,7 +12,7 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         """
 
         :param vertex: The vertex to which the constraint refers
-        :type vertex: :py:class:`pacman.model.graph.vertex.Vertex`
+        :type vertex: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise None: does not raise any known exceptions
         """
         AbstractPartitionerConstraint.__init__(
@@ -28,7 +28,7 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         """ The vertex to partition with
 
         :return: the vertex
-        :rtype: :py:class:`pacman.model.graph.vertex.Vertex`
+        :rtype: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise None: does not raise any known exceptions
         """
         return self._vertex

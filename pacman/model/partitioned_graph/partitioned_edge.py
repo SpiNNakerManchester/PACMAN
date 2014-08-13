@@ -1,4 +1,4 @@
-class Subedge(object):
+class PartitionedEdge(object):
     """ Represents part of a division of an edge to match the division of the\
         vertices on either side of the edge
     """
@@ -8,10 +8,10 @@ class Subedge(object):
 
         :param pre_subvertex: the subvertex at the start of the subedge
         :type pre_subvertex:\
-                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         :param post_subvertex: the subvertex at the end of the subedge
         :type post_subvertex:\
-                    :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         :param label: The name of the edge
         :type label: str
         :raise None: Raises no known exceptions
@@ -25,7 +25,7 @@ class Subedge(object):
         """ The subvertex at the start of the subedge
 
         :return: the incoming subvertex
-        :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+        :rtype: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :raise None: Raises no known exceptions
         """
         return self._pre_subvertex
@@ -35,7 +35,7 @@ class Subedge(object):
         """ The subvertex at the end of the subedge
 
         :return: the outgoing subvertex
-        :rtype: :py:class:`pacman.model.subgraph.subvertex.Subvertex`
+        :rtype: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :raise None: Raises no known exceptions
         """
         return self._post_subvertex
