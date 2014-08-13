@@ -33,6 +33,9 @@ class VertexRequiresVirtualChipInMachineConstraint(AbstractUtilityConstraint):
         self._connected_to_chip_coords = connected_to_chip_coords
         self._connected_chip_link_id = connected_chip_link_id
 
+    def is_utility_constraint(self):
+        return True
+
     @property
     def virtual_chip_coords(self):
         """ the virtual chip coords

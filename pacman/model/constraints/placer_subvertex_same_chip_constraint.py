@@ -8,7 +8,7 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
     """ A constraint that indicates that a subvertex should be placed on the\
         same chip as the given subvertex
     """
-    
+
     def __init__(self, subvertex):
         """
 
@@ -20,6 +20,9 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
             self, label="placer same chip constraint with subvertex {}"
                         .format(subvertex))
         self._subvertex = subvertex
+
+    def is_placer_constraint(self):
+        return True
 
     @property
     def rank(self):

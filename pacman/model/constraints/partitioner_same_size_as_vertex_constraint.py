@@ -7,7 +7,7 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         there are the same number of subvertices and the same number of atoms\
         in each subvertex as those created for another vertex
     """
-    
+
     def __init__(self, vertex):
         """
 
@@ -19,6 +19,9 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
             self, "partitioner same size as other vertex constraint with vertex"
                   "{}".format(vertex))
         self._vertex = vertex
+
+    def is_partitioner_constraint(self):
+        return True
 
     @property
     def vertex(self):

@@ -19,6 +19,9 @@ class VertexHasDependentConstraint(AbstractUtilityConstraint):
                   "{}".format(vertex))
         self._vertex = vertex
 
+    def is_utility_constraint(self):
+        return True
+
     @property
     def vertex(self):
         """ The vertex to link with

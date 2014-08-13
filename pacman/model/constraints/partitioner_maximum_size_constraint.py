@@ -6,7 +6,7 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
     """ A constraint which limits the number of atoms of a single subvertex\
         during the partitioner process
     """
-    
+
     def __init__(self, size):
         """
 
@@ -18,6 +18,9 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
             self, "partitioner max atom per core constraint with size {}"
                   .format(size))
         self._size = size
+
+    def is_partitioner_constraint(self):
+        return True
 
     @property
     def size(self):

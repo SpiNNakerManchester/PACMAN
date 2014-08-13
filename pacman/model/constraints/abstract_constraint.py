@@ -1,4 +1,5 @@
 from abc import ABCMeta
+from abc import abstractmethod
 from six import add_metaclass
 
 
@@ -20,6 +21,12 @@ class AbstractConstraint(object):
         :raise None: this does not raise any known exception
         """
         return self._label
+
+    @abstractmethod
+    def is_constraint(self):
+        """ Determine if this is a constraint - for abstract to work correctly
+        """
+        pass
 
     @classmethod
     def __subclasshook__(cls, othercls):
