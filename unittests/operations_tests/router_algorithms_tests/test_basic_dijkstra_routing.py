@@ -94,7 +94,7 @@ class MyTestCase(unittest.TestCase):
         machine = VirtualMachine(4, 4, False)
         self.routing = pacman_router(report_states=None)
         self.routing.run(
-            machine=self.machine, placements=self.placements,
+            machine=machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
