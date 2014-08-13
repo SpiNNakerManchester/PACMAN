@@ -73,7 +73,7 @@ def sort_objects_by_constraint_authority(objects):
         :return: A list of ordered objects
         :rtype: list of objects
         :raise None: this method does not raise any known exceptions
-        """
+        """ 
         rank_to_object_mapping = dict()
         for current_object in objects:
             if not hasattr(current_object, "constraints"):
