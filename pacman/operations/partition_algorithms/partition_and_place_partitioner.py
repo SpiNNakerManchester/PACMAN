@@ -184,6 +184,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
 
         #locate max atoms per core
         possible_max_atoms = list()
+        possible_max_atoms.append(vertex.get_max_atoms_per_core())
         for vertex in partiton_together_vertices:
             max_atom_constraints =\
                 utility_calls.locate_constraints_of_type(
