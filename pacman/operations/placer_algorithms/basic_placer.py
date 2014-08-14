@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class BasicPlacer(AbstractPlacerAlgorithm):
-    """ An basic algorithm that can place a partitioned_graph onto a machine based off a
-    raster behaviour
+    """ An basic algorithm that can place a partitioned_graph onto a machine
+    based off a raster behaviour
     """
 
     def __init__(self, machine, graph):
