@@ -1,4 +1,6 @@
 import unittest
+from pacman.model.constraints.abstract_partitioner_constraint import \
+    AbstractPartitionerConstraint
 from pacman.model\
     .constraints.vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
@@ -40,6 +42,20 @@ class Vertex(AbstractPartitionableVertex):
 
     def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         return 4000 + (50 * (hi_atom - lo_atom))
+
+
+class NewPartitionerConstraint(AbstractPartitionerConstraint):
+
+    def __init__(self, label):
+        AbstractPartitionerConstraint.__init__(self, label)
+
+    def is_constraint(self):
+        return True
+
+    def is_partitioner_constraint(self):
+        """ Determine if this is a partitioner constraint
+        """
+        return True
 
 
 class TestBasicPartitioner(unittest.TestCase):
@@ -286,7 +302,7 @@ class TestBasicPartitioner(unittest.TestCase):
         with self.assertRaises(PacmanInvalidParameterException):
             constrained_vertex = Vertex(13, "Constrained")
             constrained_vertex.add_constraint(
-                VertexRequiresVirtualChipInMachineConstraint((5, 5), (0, 0), 1))
+                NewPartitionerConstraint("Mock constraint"))
             self.graph.add_vertex(constrained_vertex)
             partitioner = BasicPartitioner(1, 1000)
             subgraph, graph_to_sub_graph_mapper = \

@@ -1,6 +1,8 @@
 import unittest
 
 #pacman imports
+from pacman.model.constraints.abstract_partitioner_constraint import \
+    AbstractPartitionerConstraint
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
@@ -30,12 +32,33 @@ from spinn_machine.router import Router
 from spinn_machine.chip import Chip
 
 
+class NewPartitionerConstraint(AbstractPartitionerConstraint):
+
+    def __init__(self, label):
+        AbstractPartitionerConstraint.__init__(self, label)
+
+    def is_constraint(self):
+        return True
+
+    def is_partitioner_constraint(self):
+        """ Determine if this is a partitioner constraint
+        """
+        return True
+
+
 class Vertex(AbstractPartitionableVertex):
 
     def __init__(self, n_atoms, label):
         AbstractPartitionableVertex.__init__(self, label=label, n_atoms=n_atoms,
                                              max_atoms_per_core=256)
         self._model_based_max_atoms_per_core = 256
+
+    def get_maximum_atoms_per_core(self):
+        return self._model_based_max_atoms_per_core
+
+    @property
+    def custom_max_atoms_per_core(self):
+        return None
 
     def model_name(self):
         return "test vertex"
@@ -144,7 +167,50 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
         subgraph, graph_to_sub_graph_mapper = \
                 partitioner.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 3)
+        # self.assertEqual(len(subgraph.subvertices), 3)
+        for subv in subgraph.subvertices:
+            print subv.n_atoms, subv.label
+
+    def test_operation_with_same_size_as_vertex_constraint_large_vertices(self):
+        constrained_vertex = Vertex(300, "Constrained")
+        new_large_vertex = Vertex(300, "Non constrained")
+        constrained_vertex.add_constraint(
+            PartitionerSameSizeAsVertexConstraint(new_large_vertex))
+        self.graph = PartitionableGraph("New graph",
+                                        [new_large_vertex, constrained_vertex])
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+        subgraph, graph_to_sub_graph_mapper = \
+                partitioner.partition(self.graph, self.machine)
+        # self.assertEqual(len(subgraph.subvertices), 3)
+        for subv in subgraph.subvertices:
+            print subv.n_atoms, subv.label
+
+    def test_operation_same_size_as_vertex_constraint_different_order(self):
+        constrained_vertex = Vertex(300, "Constrained")
+        new_large_vertex = Vertex(300, "Non constrained")
+        constrained_vertex.add_constraint(
+            PartitionerSameSizeAsVertexConstraint(new_large_vertex))
+        self.graph = PartitionableGraph("New graph",
+                                        [constrained_vertex, new_large_vertex])
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+        subgraph, graph_to_sub_graph_mapper = \
+                partitioner.partition(self.graph, self.machine)
+        # self.assertEqual(len(subgraph.subvertices), 3)
+        for subv in subgraph.subvertices:
+            print subv.n_atoms, subv.label
+
+    def test_operation_with_same_size_as_vertex_constraint_exception(self):
+        with self.assertRaises(PacmanPartitionException):
+            constrained_vertex = Vertex(100, "Constrained")
+            constrained_vertex.add_constraint(
+                PartitionerSameSizeAsVertexConstraint(self.vert2))
+            self.graph.add_vertex(constrained_vertex)
+            partitioner = PartitionAndPlacePartitioner(1, 1000)
+            partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+            subgraph, graph_to_sub_graph_mapper = \
+                    partitioner.partition(self.graph, self.machine)
 
     def test_update_sdram_allocator(self):
         self.assertEqual(True, False)
@@ -177,9 +243,6 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
     def test_partition_by_atoms(self):
         self.assertEqual(True, False)
 
-    def test_partition_vertex(self):
-        self.assertEqual(True, False)
-
     def test_scale_down_resource_usage(self):
         self.assertEqual(True, False)
 
@@ -187,7 +250,9 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         self.assertEqual(True, False)
 
     def test_get_max_atoms_per_core(self):
-        self.assertEqual(True, False)
+        max_atoms_per_core = PartitionAndPlacePartitioner.\
+            _get_max_atoms_per_core(self.verts)
+        self.assertEqual(max_atoms_per_core, 256)
 
     def test_find_max_ratio(self):
         self.assertEqual(True, False)
@@ -417,9 +482,20 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
     def test_partition_with_unsupported_constraints(self):
         with self.assertRaises(PacmanInvalidParameterException):
             constrained_vertex = Vertex(13, "Constrained")
-            constrained_vertex.add_constraint(
-                VertexRequiresVirtualChipInMachineConstraint((5, 5), (0, 0), 1))
+            constrained_vertex.add_constraint(NewPartitionerConstraint(
+                "Custom unsupported constraint"))
             self.graph.add_vertex(constrained_vertex)
+            partitioner = PartitionAndPlacePartitioner(1, 1000)
+            partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+            subgraph, graph_to_sub_graph_mapper = \
+                    partitioner.partition(self.graph, self.machine)
+
+    def test_partition_with_one_vertex_with_unsupported_constraint(self):
+        with self.assertRaises(PacmanInvalidParameterException):
+            constrained_vertex = Vertex(13, "Constrained")
+            constrained_vertex.add_constraint(NewPartitionerConstraint(
+                "Custom unsupported constraint"))
+            self.graph = PartitionableGraph("Solo graph", [constrained_vertex])
             partitioner = PartitionAndPlacePartitioner(1, 1000)
             partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
             subgraph, graph_to_sub_graph_mapper = \
