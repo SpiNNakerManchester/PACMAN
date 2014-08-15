@@ -37,7 +37,8 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         """ Place a partitioned_graph so that each subvertex is placed on a core
 
         :param subgraph: The partitioned_graph to place
-        :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
+        :type subgraph:
+        :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
         :param graph_mapper: the mappings between partitionable_graph and partitioned_graph
         :type graph_mapper:
     pacman.model.graph_mapper.graph_mapper.GraphMapper
@@ -46,7 +47,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :raise pacman.exceptions.PacmanPlaceException: If something\
                    goes wrong with the placement
         """
-        #check that the algorithum can handle the constraints
+        #check that the algorithm can handle the constraints
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subvertices,
             supported_constraints=self._supported_constraints,
@@ -59,7 +60,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
-                                   "for placing the partitioned_graph's "
+                                   "for placing the partitioned_graphs "
                                    "subvertices")
         for subvertex in ordered_subverts:
 
@@ -114,27 +115,27 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :param subvert_label: the label of the subvert
         :param placements: the placement container
         :type placements: pacman.model.placements.placements.Placements
-        :type resources: pacman.model.reosruces.resource_container.ResoruceContainer
-        :type placement_constraints: iterable of implimentations of
+        :type resources: pacman.model.resources.resource_container.ResourceContainer
+        :type placement_constraints: iterable of implementations of
         pacaman.model.constraints.abstractPlacementConstraint
         :type subvert_label: str
         :return: the x,y,p coord of the placement
         :rtype: int, int, int
-        :raise None: this method does not raise any knwon exceptions
+        :raise None: this method does not raise any known exceptions
         """
         placement_constraint = \
             self._reduce_constraints(placement_constraints, subvert_label,
                                      placements)
 
-        #if theres a placement constraint, then check out the chip and only that
-        #chip
+        #if there's a placement constraint, then check out the chip and only
+        # that chip
         if placement_constraint is not None:
             return self._deal_with_constraint_placement(placement_constraint,
                                                         subvert_label,
                                                         resources)
         else:
             chips = self._machine.chips
-            return self._deal_with_non_constrainted_placement(subvert_label,
+            return self._deal_with_non_constrained_placement(subvert_label,
                                                               resources,
                                                               chips)
 
@@ -145,16 +146,16 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         SHOULD NOT BE CALLED OUTSIDE THIS CLASS
 
         :param subvertex_label: the label of the subvertex to be placed
-        :param placement_constraint: the palcmeent constraint of this subvertex
-        :param subvertex_resources: the reosurces required by this subvertex
+        :param placement_constraint: the placement constraint of this subvertex
+        :param subvertex_resources: the resource required by this subvertex
         :type subvertex_label: str
         :type placement_constraint: pacman.constraints.placer_chip_and_core_constraint
-        :type subvertex_resources: pacman.model.resoruces.resourceConstainer.ResourceContrainer
+        :type subvertex_resources: pacman.model.resoruces.resourceContainer.ResourceContainer
         :return: placement object for this subvertex
         :rtype: pacman.model.placements.placement.Placement
         :raise PacmanPlaceException: when either a core has already been \
         assigned the subvertex's required core or there are no more cores \
-        avilable to be assigned or theres not enough memory of the avilable \
+        available to be assigned or theres not enough memory of the available \
         cores to assign this subvertex.
         """
         x = placement_constraint.x
@@ -164,7 +165,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
             if p is None:
                 raise exceptions.PacmanPlaceException(
                     "cannot place subvertex {} in chip {}:{} as there is no"
-                    "avilable cores to place subvertexes on"
+                    "available cores to place subvertices on"
                     .format(subvertex_label, x, y))
             else:
                 raise exceptions.PacmanPlaceException(
@@ -183,9 +184,9 @@ class BasicPlacer(AbstractPlacerAlgorithm):
             else:
                 raise exceptions.PacmanPlaceException(
                     "cannot place subvertex {} on chip {}:{} as there is "
-                    "not enough avilable memory".format(subvertex_label, x, y))
+                    "not enough available memory".format(subvertex_label, x, y))
 
-    def _deal_with_non_constrainted_placement(self, subvertex_label,
+    def _deal_with_non_constrained_placement(self, subvertex_label,
                                               used_resources,
                                               chips_in_a_ordering):
         """ place a subvertex which doesnt have a constraint
@@ -214,7 +215,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                 if (processor.processor_id != 0 and
                         self._placement_tracker.has_available_cores_left(
                         chip.x, chip.y, processor.processor_id)):
-                    #locate avilable sdram
+                    #locate available SDRAM
                     available_sdram = \
                         chip.sdram.size - \
                         (self._sdram_tracker.get_usage(chip.x, chip.y))

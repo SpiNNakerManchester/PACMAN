@@ -18,7 +18,7 @@ class RadialPlacer(BasicPlacer):
         BasicPlacer.__init__(self, machine, partitionable_graph)
 
     #overloaded method from basicPlacer
-    def _deal_with_non_constrainted_placement(self, subvertex, used_resources,
+    def _deal_with_non_constrained_placement(self, subvertex, used_resources,
                                               chips):
         """overlaoded method of basic placer that changs the ordering in which
         chips are handed to the search alorirthm.
@@ -62,5 +62,5 @@ class RadialPlacer(BasicPlacer):
             current_chip_list_to_check = next_chip_list_to_check
 
 
-        return BasicPlacer._deal_with_non_constrainted_placement(
+        return BasicPlacer._deal_with_non_constrained_placement(
             self, subvertex, used_resources, processors_new_order)

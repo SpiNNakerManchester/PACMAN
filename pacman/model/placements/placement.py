@@ -7,7 +7,8 @@ class Placement(object):
         """
 
         :param subvertex: The subvertex that has been placed
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+        :type subvertex:
+        :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :param x: the x-coordinate of the chip on which the subvertex is placed
         :type x: int
         :param y: the y-coordinate of the chip on which the subvertex is placed
@@ -26,7 +27,8 @@ class Placement(object):
         """ The subvertex that was placed
 
         :return: a subvertex
-        :rtype: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+        :rtype:
+        :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :raise None: does not raise any known exceptions
         """
         return self._subvertex

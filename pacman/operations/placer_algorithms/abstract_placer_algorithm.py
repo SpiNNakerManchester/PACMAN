@@ -48,7 +48,7 @@ class AbstractPlacerAlgorithm(object):
 
     def _reduce_constraints(self, constraints, subvertex_label, placements):
         """ tries to reduce the placement constraints into one manageable one.\
-        NOT CALLABLE OUTSIDE CLASSES TAHT INHIRRIT FROM THIS ONE
+        NOT CALLABLE OUTSIDE CLASSES THAT INHERIT FROM THIS ONE
 
         :param constraints: the constraints placed on a vertex
         :param subvertex_label: the label from a given subvertex
@@ -90,8 +90,8 @@ class AbstractPlacerAlgorithm(object):
 
     @staticmethod
     def _check_param(param_to_check, param_to_update, subvertex_label):
-        """ checks if constraints with overlapping requirements are satisifable\
-        NOT CALLABLE OUTSIDE CLASSES TAHT INHIRRIT FROM THIS ONE
+        """ checks if constraints with overlapping requirements are satisfiable\
+        NOT CALLABLE OUTSIDE CLASSES THAT INHERIT FROM THIS ONE
 
         :param param_to_check: a param to verify
         :param param_to_update: a second param to verify
@@ -102,8 +102,8 @@ class AbstractPlacerAlgorithm(object):
         :return: the updated value of the param
         :rtype: int
         :raise PacmanPlaceException: when the param has been set and to a \
-        different value. This is becuase being set to a different value makes \
-        both constraints insatisifable
+        different value. This is because being set to a different value makes \
+        both constraints unsatisfiable
 
         """
         if param_to_check is not None:
@@ -112,6 +112,6 @@ class AbstractPlacerAlgorithm(object):
             elif param_to_update != param_to_check:
                 raise exceptions.PacmanPlaceException(
                     "there are conflicting placement constraints which "
-                    "together cannot be satifisied for subvertex {}"
+                    "together cannot be satisfied for subvertex {}"
                     .format(subvertex_label))
         return param_to_update
