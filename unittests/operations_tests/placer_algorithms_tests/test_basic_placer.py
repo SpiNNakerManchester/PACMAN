@@ -1,4 +1,5 @@
 import unittest
+from pacman.exceptions import PacmanPlaceException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.graph_mapper.graph_mapper import GraphMapper
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
@@ -111,29 +112,21 @@ class TestBasicPlacer(unittest.TestCase):
         self.assertEqual(self.bp._machine, self.machine)
         self.assertEqual(self.bp._graph, self.graph)
 
-    def test_place(self):
+    def test_place_where_subvertices_dont_have_vertex(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
-        print placements.placements
-        print "############################################"
-        for subvertex in self.subvertices:
-            print placements.get_placement_of_subvertex(subvertex).subvertex, \
-                placements.get_placement_of_subvertex(subvertex).x, \
-                placements.get_placement_of_subvertex(subvertex).y, \
-                placements.get_placement_of_subvertex(subvertex).p
+        for placement in placements.placements:
+            print placement.subvertex.label, placement.subvertex.n_atoms, \
+                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     def test_place_where_subvertices_have_vertices(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_subvertices(self.subvertices, self.vert1)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
-        print placements.placements
-        print "############################################"
-        for subvertex in self.subvertices:
-            print placements.get_placement_of_subvertex(subvertex).subvertex, \
-                placements.get_placement_of_subvertex(subvertex).x, \
-                placements.get_placement_of_subvertex(subvertex).y, \
-                placements.get_placement_of_subvertex(subvertex).p
+        for placement in placements.placements:
+            print placement.subvertex.label, placement.subvertex.n_atoms, \
+                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     def test_place_subvertex_too_big_with_vertex(self):
         large_vertex = Vertex(500, "Large vertex 500")
@@ -143,19 +136,9 @@ class TestBasicPlacer(unittest.TestCase):
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_subvertices([large_subvertex], large_vertex)
         self.bp = BasicPlacer(self.machine, self.graph)
-        placements = self.bp.place(self.subgraph, self.graph_mapper)
-        print placements.placements
-        print "############################################"
-        for subvertex in self.subvertices:
-            print placements.get_placement_of_subvertex(subvertex).subvertex, \
-                placements.get_placement_of_subvertex(subvertex).x, \
-                placements.get_placement_of_subvertex(subvertex).y, \
-                placements.get_placement_of_subvertex(subvertex).p
-
-
-
-    def test_place_subvertex(self):
-        self.assertEqual(True, False)
+        self.subgraph = PartitionedGraph(subvertices=[large_subvertex])
+        with self.assertRaises(PacmanPlaceException):
+            placements = self.bp.place(self.subgraph, self.graph_mapper)
 
     def test_try_to_place(self):
         self.assertEqual(True, False)
