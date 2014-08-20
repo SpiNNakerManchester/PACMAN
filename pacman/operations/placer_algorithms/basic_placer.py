@@ -38,10 +38,12 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
         :param subgraph: The partitioned_graph to place
         :type subgraph:
-        :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-        :param graph_mapper: the mappings between partitionable_graph and partitioned_graph
+        :py:class:
+        `pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
+        :param graph_mapper: the mappings between
+        partitionable_graph and partitioned_graph
         :type graph_mapper:
-    pacman.model.graph_mapper.graph_mapper.GraphMapper
+        pacman.model.graph_mapper.graph_mapper.GraphMapper
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: If something\
@@ -66,8 +68,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
             # Create and store a new placement
             placement = self._place_subvertex(subvertex, self._graph,
-                                              graph_mapper,
-                                              placements)
+                                              graph_mapper, placements)
             placements.add_placement(placement)
             progress_bar.update()
         progress_bar.end()
@@ -80,30 +81,40 @@ class BasicPlacer(AbstractPlacerAlgorithm):
 
         :param subvertex: the subvertex to be placed
         :param graph: the partitionable_graph obejct of the application
-        :param graph_to_subgraph_mapper: the partitionable_graph to partitioned_graph mapper
+        :param graph_to_subgraph_mapper: the partitionable_graph to
+        partitioned_graph mapper
         :param placements: the current placements
-        :type subvertex: pacman.models.partitioned_graph.subvertex.PartitionedVertex
-        :type graph: pacman.models.partitionable_graph.partitionable_graph.Graph
-        :type graph_to_subgraph_mapper: pacamn.models.graph_mapper.graphSubgraphMapper
+        :type subvertex:
+        pacman.models.partitioned_graph.partitioned_vertex.PartitionedVertex
+        :type graph:
+        pacman.models.partitionable_graph.partitionable_graph.Graph
+        :type graph_to_subgraph_mapper:
+        pacamn.models.graph_mapper.GraphMapper
         :type placements: pacman.model.placements.placements.Placements
         :return: placement object for this subvertex
         :rtype: pacman.model.placements.placement.Placement
         :raise PacmanPlaceException: when either a core has already been \
         assigned the subvertex's required core or there are no more cores \
-        avilable to be assigned or theres not enough memory of the avilable \
+        available to be assigned or there's not enough memory of the available \
         cores to assign this subvertex.
         """
 
         #get resources of a subvertex
         vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(subvertex)
-        resources = vertex.get_resources_used_by_atoms(
-            subvertex.lo_atom, subvertex.hi_atom,
-            graph.incoming_edges_to_vertex(vertex))
+        if vertex is not None:
+            used_resources = vertex.get_resources_used_by_atoms(
+                subvertex.lo_atom, subvertex.hi_atom,
+                graph.incoming_edges_to_vertex(vertex))
+        else:
+            used_resources = None
+            raise NotImplementedError("Basic Placer doesn't currently deal "
+                                      "with prepartitioned vertices that have "
+                                      "no reference to a vertex in mapper")
 
         placement_constraints = \
             utility_calls.locate_constraints_of_type(subvertex.constraints,
                                                      AbstractPlacerConstraint)
-        x, y, p = self._try_to_place(placement_constraints, resources,
+        x, y, p = self._try_to_place(placement_constraints, used_resources,
                                      subvertex.label, placements)
         return Placement(x=x, y=y, p=p, subvertex=subvertex)
 
@@ -136,8 +147,8 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         else:
             chips = self._machine.chips
             return self._deal_with_non_constrained_placement(subvert_label,
-                                                              resources,
-                                                              chips)
+                                                             resources,
+                                                             chips)
 
     def _deal_with_constraint_placement(self, placement_constraint,
                                         subvertex_label,
@@ -222,7 +233,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                     free_cores_met = True
                     free_sdram_met |= \
                         available_sdram >= used_resources.sdram.get_value()
-                    cpu_speed_met |= (processor.clock_speed >=
+                    cpu_speed_met |= (processor.cpu_cycles_available >=
                                       used_resources.cpu.get_value())
                     dtcm_per_proc_met |= (processor.dtcm_available >=
                                           used_resources.dtcm.get_value())
