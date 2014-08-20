@@ -24,6 +24,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @add_metaclass(ABCMeta)
 class AbstractPartitionAlgorithm(object):
     """ An abstract algorithm that can partition a partitionable_graph
@@ -32,14 +33,16 @@ class AbstractPartitionAlgorithm(object):
     def __init__(self, machine_time_step, runtime_in_machine_time_steps):
         """constructor to build a
         pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
-        :param machine_time_step: the length of tiem in ms for a timer tic
-        :param runtime_in_machine_time_steps: the number of timer tics expected \
+        :param machine_time_step: the length of time in ms for a timer tick
+        :param runtime_in_machine_time_steps: the number of timer ticks expected \
                to occur due to the runtime
         :type machine_time_step: int
         :type runtime_in_machine_time_steps: long
-        :return: a new pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
-        :rtype: pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
-        :raises None: does not raise any known expection
+        :return: a new
+        pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
+        :rtype:
+        pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
+        :raises None: does not raise any known exception
         """
         self._machine_time_step = machine_time_step
         self._runtime_in_machine_time_steps = runtime_in_machine_time_steps
@@ -48,28 +51,32 @@ class AbstractPartitionAlgorithm(object):
     
     @abstractmethod
     def partition(self, graph, machine):
-        """ Partition a partitionable_graph so that each subvertex will fit on a processor\
-            within the machine
+        """ Partition a partitionable_graph so that each subvertex will fit
+        on a processor within the machine
             
         :param graph: The partitionable_graph to partition
-        :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
-        :param machine: The machine with respect to which to partition the partitionable_graph
+        :type graph:
+        :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :param machine: The machine with respect to which to partition the
+        partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
+        :return: A partitioned_graph of partitioned vertices and edges
+        from the partitionable_graph
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
 
     def _get_maximum_resources_per_processor(self, vertex_constraints, machine):
-        """locates the maximum rsources avilable given the subverts already
+        """locates the maximum resources available given the subverts already
         produced
 
         :param vertex_constraints: the constraints of a given vertex
-        :param machine: the imutable machine object
-        :type vertex_constraints: list of pacman.model.constraints.abstract_constraint
-        :type machine: a spinnmachine.machine.machine object
-        :return: the max sdram usage avilable given sdram allocations
+        :param machine: the immutable machine object
+        :type vertex_constraints: list of
+        pacman.model.constraints.abstract_constraint
+        :type machine: a spinn_machine.machine.Machine object
+        :return: the max sdram usage available given sdram allocations
         :rtype: pacman.model.resources.resource_container.ResourceContainer
         """
         #locate any instances of PlacerChipAndCoreConstraint
@@ -83,7 +90,7 @@ class AbstractPartitionAlgorithm(object):
                     sdram=SDRAMResource(sdram_available))
 
         # no PlacerChipAndCoreConstraint was found, search till max value
-        # returned or highest avilable
+        # returned or highest available
         maximum_sdram = 0
         for chip in machine.chips:
             sdram_used = self._sdram_tracker.get_usage(chip.x, chip.y)
@@ -105,12 +112,14 @@ class AbstractPartitionAlgorithm(object):
 
     @staticmethod
     def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
-        '''generates the sub edges for the subvertices in the partitioned_graph.
+        """generates the sub edges for the subvertices in the partitioned_graph.
 
         :param subgraph: the partitioned_graph to work with
-        :param graph_to_subgraph_mapper: the mapper between partitionable_graph and partitioned_graph
+        :param graph_to_subgraph_mapper: the mapper between
+        partitionable_graph and partitioned_graph
         :param graph: the partitionable_graph to work with
-        :type subgraph: pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph
+        :type subgraph:
+        pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph
         :type graph_to_subgraph_mapper:
         pacman.model.graph_mapper.GraphMapper
         :type graph: pacman.model.graph.partitionable_graph.PartitionableGraph
@@ -118,10 +127,11 @@ class AbstractPartitionAlgorithm(object):
         :rtype: None
         :raise None: this method does not raise any known exceptions
 
-        '''
+        """
          #start progress bar
         progress_bar = ProgressBar(len(subgraph.subvertices),
-                                   "on partitioning the partitionable_graph's edges")
+                                   "on partitioning the partitionable_graph's "
+                                   "edges")
 
         # Partition edges according to vertex partitioning
         for src_sv in subgraph.subvertices:
@@ -144,19 +154,20 @@ class AbstractPartitionAlgorithm(object):
     def _update_sdram_allocator(self, subvertex, sub_vertex_requirement,
                                 machine):
         """private method for partitioners. Not to be called by front ends. \
-        Updates the interal sdram tracker to account for a node being
+        Updates the internal sdram tracker to account for a node being
         partitioned and "placed"
 
-        :param subvertex: the subvertex thats been generated and placed
+        :param subvertex: the subvertex that's been generated and placed
         :param sub_vertex_requirement: the sdram usage of the subvertex
         :param machine: the machine object
-        :type subvertex: pacman.model.subgraph.subvertex.PartitionedVertex
+        :type subvertex:
+        pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex
         :type sub_vertex_requirement:
-         pacman.model.resources.resource_container.ResoruceContainer
-        :type machine: spinnMachine.machine.Machine
+         pacman.model.resources.resource_container.ResourceContainer
+        :type machine: spinn_machine.machine.Machine
         :return None
         :rtype: None
-        :raise PacmanPartitionException: when theres no space to put the \
+        :raise PacmanPartitionException: when there's no space to put the \
         subvertex on the machine via the sdram tracker.
         """
         allocated = False
@@ -193,11 +204,10 @@ class AbstractPartitionAlgorithm(object):
             raise exceptions.PacmanPartitionException(
                 "no space to put subvertex {}".format(subvertex.label))
 
-
     @staticmethod
     def _add_vertex_constraints_to_subvertex(subvert, vertex):
         """private method for partitioners, not to be used by front end
-        updates subvertices with their assocaited vertex's constraints that are
+        updates subvertices with their associated vertex's constraints that are
         not partitioner based. As future algorithms only use the partitioned_graph,
         and partitionable constraints should not be needed from now on.
         """

@@ -382,7 +382,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
         :param used_resources: the resources used by the machine so far
         :param resources: the resource estimate for the vertex for a given\
         number of atoms
-        :param ratio: the ratio between max atoms and availalbe resources
+        :param ratio: the ratio between max atoms and available resources
         :type lo_atom: int
         :type hi_atom: int
         :type vertex: pacman.model.graph.vertex.AbstractConstrainedVertex
@@ -450,8 +450,10 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
         :param resources: the resources used by the vertex
         :param max_resources: the max resources available from the machine
-        :type max_resources: pacman.model.resources.resource.Resource
-        :type resources:pacman.model.resources.resource.Resource
+        :type max_resources:
+        pacman.model.resources.resource_container.ResourceContainer
+        :type resources:
+        pacman.model.resources.resource_container.ResourceContainer
         :return: the best available ratio of resources
         :rtype: int
         :raise None: this method does not raise any known exceptions
@@ -490,8 +492,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
         :raise PacmanPartitionException: if the vertices that need to be \
         partitioned in the same way have different numbers of atoms
         """
-        partiton_together_vertices = list()
-        partiton_together_vertices.append(vertex)
+        partition_together_vertices = list()
+        partition_together_vertices.append(vertex)
         same_size_vertex_constraints = \
             utility_calls.locate_constraints_of_type(
                 vertex.constraints, PartitionerSameSizeAsVertexConstraint)
@@ -501,5 +503,5 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                     "A vertex and its partition-dependent vertices must "
                     "have the same number of atoms")
             else:
-                partiton_together_vertices.append(constraint.vertex)
-        return partiton_together_vertices
+                partition_together_vertices.append(constraint.vertex)
+        return partition_together_vertices

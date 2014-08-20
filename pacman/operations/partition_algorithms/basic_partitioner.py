@@ -19,18 +19,21 @@ logger = logging.getLogger(__name__)
 
 
 class BasicPartitioner(AbstractPartitionAlgorithm):
-    """ An basic algorithm that can partition a partitionable_graph based on atoms
+    """ An basic algorithm that can partition a partitionable_graph based
+    on atoms
     """
 
     def __init__(self, machine_time_step, runtime_in_machine_time_steps):
-        """constructor to build a pacman.operations.partition_algorithms.basic_partitioner.BasicPartitioner
+        """constructor to build a
+        pacman.operations.partition_algorithms.basic_partitioner.BasicPartitioner
 
-        :param machine_time_step: the length of tiem in ms for a timer tic
-        :param runtime_in_machine_time_steps: the number of timer tics expected \
-               to occur due to the runtime
+        :param machine_time_step: the length of tiem in ms for a timer tick
+        :param runtime_in_machine_time_steps: the number of timer ticks
+        expected to occur due to the runtime
         :type machine_time_step: int
         :type runtime_in_machine_time_steps: long
-        :return: a new pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
+        :return: a new
+        pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
         :rtype: pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
         :raises None: does not raise any known expection
         """
@@ -40,8 +43,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
 
     #inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
-        """ Partition a partitionable_graph so that each subvertex will fit on a processor\
-            within the machine
+        """ Partition a partitionable_graph so that each
+        subvertex will fit on a processor within the machine
 
         :param graph: The partitionable_graph to partition
         :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
@@ -124,7 +127,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                                                    " available to create"
                                                    " subvertex")
                 subvert = PartitionedVertex(counted, counted + alloc - 1,
-                                    label=label)
+                                            label=label)
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(subvert, vertex)
                 counted = counted + alloc
