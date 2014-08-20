@@ -1,7 +1,11 @@
 class PacmanException(Exception):
     """ Indicates a general exception from Pacman
     """
-    pass
+    def __init__(self, *args, **kwargs):
+
+        # Call the base class constructor with the parameters it needs
+        Exception.__init__(self, *args, **kwargs)
+
 
 
 class PacmanInvalidParameterException(PacmanException):
@@ -18,7 +22,7 @@ class PacmanInvalidParameterException(PacmanException):
         :param problem: The problem with the value of the parameter
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, parameter, value, problem)
 
 
 class PacmanAlreadyExistsException(PacmanException):
@@ -34,7 +38,7 @@ class PacmanAlreadyExistsException(PacmanException):
         :param item_id: The id of the item which is in conflict
         :type item_id: str
         """
-        pass
+        PacmanException.__init__(self, item_type, item_id)
 
 
 class PacmanPartitionException(PacmanException):
@@ -46,7 +50,7 @@ class PacmanPartitionException(PacmanException):
         :param problem: The problem with the partitioning
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, problem)
 
 
 class PacmanPlaceException(PacmanException):
@@ -58,7 +62,7 @@ class PacmanPlaceException(PacmanException):
         :param problem: The problem with the placement
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, problem)
 
 
 class PacmanPruneException(PacmanException):
@@ -70,7 +74,7 @@ class PacmanPruneException(PacmanException):
         :param problem: The problem with the pruning
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, problem)
 
 
 class PacmanRouteInfoAllocationException(PacmanException):
@@ -83,7 +87,7 @@ class PacmanRouteInfoAllocationException(PacmanException):
         :param problem: The problem with the allocation
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, problem)
 
 
 class PacmanRoutingException(PacmanException):
@@ -95,7 +99,7 @@ class PacmanRoutingException(PacmanException):
         :param problem: The problem with the routing
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, problem)
 
 
 class PacmanConfigurationException(PacmanException):
@@ -108,7 +112,7 @@ class PacmanConfigurationException(PacmanException):
         :param problem: The problem with the routing
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, problem)
 
 
 class PacmanNotExistException(PacmanException):
@@ -122,4 +126,4 @@ class PacmanNotExistException(PacmanException):
         :param problem: The problem with the routing
         :type problem: str
         """
-        pass
+        PacmanException.__init__(self, problem)
