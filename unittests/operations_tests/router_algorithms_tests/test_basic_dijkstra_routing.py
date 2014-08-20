@@ -15,8 +15,6 @@ from pacman.utilities import constants
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
 from pacman.operations.router import Router as pacman_router
-#unitests imports
-from unittests.test_vertex import TestVertex as Vertex
 #spinnmachine imports
 from spinn_machine.processor import Processor
 from spinn_machine.link import Link
@@ -27,6 +25,28 @@ from spinn_machine.machine import Machine
 
 import unittest
 from spinn_machine.virutal_machine import VirtualMachine
+
+from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+    AbstractPartitionableVertex
+
+
+class Vertex(AbstractPartitionableVertex):
+
+    def __init__(self, n_atoms, label):
+        AbstractPartitionableVertex.__init__(self, label=label, n_atoms=n_atoms,
+                                             max_atoms_per_core=256)
+
+    def model_name(self):
+        return "test vertex"
+
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+        return 10 * (hi_atom - lo_atom)
+
+    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+        return 200 * (hi_atom - lo_atom)
+
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+        return 4000 + (50 * (hi_atom - lo_atom))
 
 
 class MyTestCase(unittest.TestCase):
@@ -87,10 +107,8 @@ class MyTestCase(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
         self.machine = Machine(chips)
 
-
-
     def test_new_basic_routing_over_chip(self):
-        #build a virutal machine object
+        #build a virtual machine object
         machine = VirtualMachine(4, 4, False)
         self.routing = pacman_router(report_states=None)
         self.routing.run(

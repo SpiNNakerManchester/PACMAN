@@ -156,13 +156,6 @@ class TestBasicPartitioner(unittest.TestCase):
         for subv in subgraph.subvertices:
             print subv.n_atoms, subv.label
 
-    def test_partition_with_supported_constraints_enough_space(self):
-        self.assertEqual(True, False)
-
-    def test_partition_with_supported_constraints_not_enough_space(self):
-        self.assertEqual(True, False)
-
-
     def test_partition_with_barely_sufficient_space(self):
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -268,6 +261,9 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips)
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
 
+        for subv in subgraph.subvertices:
+            print subv.n_atoms, subv.label
+
     def test_partition_with_more_sdram_than_default(self):
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -297,6 +293,9 @@ class TestBasicPartitioner(unittest.TestCase):
 
         self.machine = Machine(chips)
         subgraph, mapper = self.bp.partition(self.graph,self.machine)
+
+        for subv in subgraph.subvertices:
+            print subv.n_atoms, subv.label
 
     def test_partition_with_unsupported_constraints(self):
         with self.assertRaises(PacmanInvalidParameterException):

@@ -63,8 +63,9 @@ class Vertex(AbstractPartitionableVertex):
     def model_name(self):
         return "test vertex"
 
+    #Copied from IF_CURR_EXP
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        return 10 * (hi_atom - lo_atom)
+        return 782 * ((hi_atom - lo_atom) + 1)
 
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         return 200 * (hi_atom - lo_atom)
@@ -248,6 +249,42 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
 
     def test_scale_up_resource_usage(self):
         self.assertEqual(True, False)
+
+    def test_complete_placements(self):
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+        subgraph, graph_to_sub_graph_mapper = \
+                partitioner.partition(self.graph, self.machine)
+        self.assertEqual(len(subgraph.subvertices), 3)
+        for placement in partitioner.complete_placements.placements:
+            print placement.subvertex.label, 'x: ', placement.x, 'y:', \
+                placement.y, 'p:', placement.p
+
+    def test_complete_placements_for_vertex_spanning_multiple_chips(self):
+        monstrous_vertex = Vertex(150 * 25, "Monstrous vertex")
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+        self.graph = PartitionableGraph("Graph with monstrous vertex",
+                           [monstrous_vertex],
+                           [])
+        subgraph, graph_to_sub_graph_mapper = \
+            partitioner.partition(self.graph, self.machine)
+        for placement in partitioner.complete_placements.placements:
+            print placement.subvertex.n_atoms, placement.subvertex.label, 'x: ',\
+                placement.x, 'y:', placement.y, 'p:', placement.p
+
+    def test_complete_placements_for_almost_full_board(self):
+        monstrous_vertex = Vertex(150 * 25 * 17, "Monstrous vertex")
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
+        self.graph = PartitionableGraph("Graph with monstrous vertex",
+                           [monstrous_vertex],
+                           [])
+        subgraph, graph_to_sub_graph_mapper = \
+            partitioner.partition(self.graph, self.machine)
+        for placement in partitioner.complete_placements.placements:
+            print placement.subvertex.n_atoms, placement.subvertex.label, 'x: ',\
+                placement.x, 'y:', placement.y, 'p:', placement.p
 
     def test_get_max_atoms_per_core(self):
         max_atoms_per_core = PartitionAndPlacePartitioner.\
