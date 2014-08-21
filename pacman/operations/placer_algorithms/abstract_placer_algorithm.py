@@ -65,24 +65,24 @@ class AbstractPlacerAlgorithm(object):
         y = None
         p = None
         for constraint in constraints:
-            if type(constraint) == type(PlacerChipAndCoreConstraint(0, 0)):
+            if isinstance(constraint, PlacerChipAndCoreConstraint):
                 x = self._check_param(constraint.x, x, subvertex_label)
                 y = self._check_param(constraint.y, y, subvertex_label)
                 p = self._check_param(constraint.p, p, subvertex_label)
-            elif type(constraint) == type(PlacerSubvertexSameChipConstraint(None)):
+            elif isinstance(constraint, PlacerSubvertexSameChipConstraint):
                 other_subvertex = constraint.subvertex
                 other_placement = \
                     placements.get_placement_of_subvertex(other_subvertex)
                 if other_placement is not None:
-                    x = self._check_param(constraint.x, other_placement.x,
+                    x = self._check_param(other_placement.x, other_placement.x,
                                           subvertex_label)
-                    y = self._check_param(constraint.y, other_placement.y,
+                    y = self._check_param(other_placement.y, other_placement.y,
                                           subvertex_label)
-                    p = self._check_param(constraint.p, other_placement.p,
+                    p = self._check_param(other_placement.p, other_placement.p,
                                           subvertex_label)
-                x = self._check_param(constraint.x, x, subvertex_label)
-                y = self._check_param(constraint.y, y, subvertex_label)
-                p = self._check_param(constraint.p, p, subvertex_label)
+                x = self._check_param(other_placement.x, x, subvertex_label)
+                y = self._check_param(other_placement.y, y, subvertex_label)
+                p = self._check_param(other_placement.p, p, subvertex_label)
         if x is not None and y is not None:
             return PlacerChipAndCoreConstraint(x, y, p)
         else:
