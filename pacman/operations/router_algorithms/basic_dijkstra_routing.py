@@ -59,7 +59,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         dijkstra_tables = self._initiate_dijkstra_tables(machine)
         self._update_all_weights(nodes_info, machine)
 
-        #each subsertex represents a core in the board
+        #each subvertex represents a core in the board
         progress = ProgressBar(len(list(placements.placements)),
                                "on creating routing entries for each subvertex")
         for placement in placements.placements:

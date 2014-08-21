@@ -95,7 +95,7 @@ class AbstractPlacerAlgorithm(object):
 
         :param param_to_check: a param to verify
         :param param_to_update: a second param to verify
-        :param subvertex_label: the label fo the subvertex
+        :param subvertex_label: the label for the subvertex
         :type param_to_check: int
         :type param_to_update: int
         :type subvertex_label: str

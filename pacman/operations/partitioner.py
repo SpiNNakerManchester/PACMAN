@@ -81,7 +81,7 @@ class Partitioner:
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
-        #if the algortihum requires a placer, set up tis placer param
+        #if the algorithm requires a placer, set up this placer param
         if hasattr(self._partitioner_algorithm, "set_placer_algorithm"):
             self._partitioner_algorithm.set_placer_algorithm(
                 self._optimal_placer_alogrithm, self._machine,
