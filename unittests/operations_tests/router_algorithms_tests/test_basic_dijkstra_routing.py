@@ -1,4 +1,9 @@
 #pacman model imports
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
@@ -6,8 +11,10 @@ from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
-from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_graph \
+    import PartitionableGraph
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 #pacman utility imports
 from pacman.utilities import constants
@@ -28,6 +35,18 @@ from spinn_machine.virutal_machine import VirtualMachine
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
+
+def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
+    vertex = Vertex(1, None)
+    cpu_cycles = vertex.get_cpu_usage_for_atoms(lo_atom, hi_atom)
+    dtcm_requirement = vertex.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
+    sdram_requirement = \
+        vertex.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
+    # noinspection PyTypeChecker
+    resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                  dtcm=DTCMResource(dtcm_requirement),
+                                  sdram=SDRAMResource(sdram_requirement))
+    return resources
 
 
 class Vertex(AbstractPartitionableVertex):
@@ -61,8 +80,10 @@ class MyTestCase(unittest.TestCase):
         self.graph = PartitionableGraph("Graph", self.verts, self.edges)
         #sort out subgraph
         self.subgraph = PartitionedGraph()
-        self.subvert1 = PartitionedVertex(0, 10)
-        self.subvert2 = PartitionedVertex(0, 5)
+        self.subvert1 = PartitionedVertex(
+            0, 10, get_resources_used_by_atoms(0, 10, []))
+        self.subvert2 = PartitionedVertex(
+            0, 5, get_resources_used_by_atoms(0, 10, []))
         self.subedge = PartitionedEdge(self.subvert1, self.subvert2)
         self.subgraph.add_subvertex(self.subvert1)
         self.subgraph.add_subvertex(self.subvert2)

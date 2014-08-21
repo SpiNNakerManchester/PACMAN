@@ -8,14 +8,14 @@ from pacman.exceptions import PacmanAlreadyExistsException
 
 class TestSubgraphModel(unittest.TestCase):
     def test_new_vertex(self):
-        PartitionedVertex(0, 9)
+        PartitionedVertex(0, 9, None)
 
     def test_new_vertex_lo_eq_hi(self):
-        PartitionedVertex(5, 5)
+        PartitionedVertex(5, 5, None)
 
     def test_new_vertex_lo_gt_hi(self):
         with self.assertRaises(PacmanInvalidParameterException):
-            PartitionedVertex(9, 0)
+            PartitionedVertex(9, 0, None)
 
     def test_new_empty_subgraph(self):
         PartitionedGraph()
@@ -24,7 +24,7 @@ class TestSubgraphModel(unittest.TestCase):
         subvertices = list()
         subedges = list()
         for i in range(10):
-            subvertices.append(PartitionedVertex(0, 4))
+            subvertices.append(PartitionedVertex(0, 4, None))
         for i in range(5):
             subedges.append(PartitionedEdge(subvertices[0], subvertices[(i + 1)]))
         for i in range(5, 10):
@@ -61,9 +61,9 @@ class TestSubgraphModel(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             subvertices = list()
             subedges = list()
-            subv = PartitionedVertex(0, 4)
+            subv = PartitionedVertex(0, 4, None)
             subvertices.append(subv)
-            subvertices.append(PartitionedVertex(5, 9))
+            subvertices.append(PartitionedVertex(5, 9, None))
             subvertices.append(subv)
             subedges.append(PartitionedEdge(subvertices[0], subvertices[1]))
             subedges.append(PartitionedEdge(subvertices[1], subvertices[0]))
@@ -73,8 +73,8 @@ class TestSubgraphModel(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             subvertices = list()
             subedges = list()
-            subvertices.append(PartitionedVertex(5, 9))
-            subvertices.append(PartitionedVertex(5, 9))
+            subvertices.append(PartitionedVertex(5, 9, None))
+            subvertices.append(PartitionedVertex(5, 9, None))
             sube = PartitionedEdge(subvertices[0], subvertices[1])
             subedges.append(sube)
             subedges.append(sube)
@@ -84,20 +84,20 @@ class TestSubgraphModel(unittest.TestCase):
         with self.assertRaises(PacmanInvalidParameterException):
             subvertices = list()
             subedges = list()
-            subvertices.append(PartitionedVertex(0, 4))
-            subvertices.append(PartitionedVertex(5, 9))
+            subvertices.append(PartitionedVertex(0, 4, None))
+            subvertices.append(PartitionedVertex(5, 9, None))
             subedges.append(PartitionedEdge(subvertices[0], subvertices[1]))
-            subedges.append(PartitionedEdge(PartitionedVertex(0, 100), subvertices[0]))
+            subedges.append(PartitionedEdge(PartitionedVertex(0, 100, None), subvertices[0]))
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 
     def test_add_subedge_with_no_existing_post_subvertex_in_subgraph(self):
         with self.assertRaises(PacmanInvalidParameterException):
             subvertices = list()
             subedges = list()
-            subvertices.append(PartitionedVertex(0, 4))
-            subvertices.append(PartitionedVertex(5, 9))
+            subvertices.append(PartitionedVertex(0, 4, None))
+            subvertices.append(PartitionedVertex(5, 9, None))
             subedges.append(PartitionedEdge(subvertices[0], subvertices[1]))
-            subedges.append(PartitionedEdge(subvertices[0], PartitionedVertex(0, 100)))
+            subedges.append(PartitionedEdge(subvertices[0], PartitionedVertex(0, 100, None)))
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 
 
