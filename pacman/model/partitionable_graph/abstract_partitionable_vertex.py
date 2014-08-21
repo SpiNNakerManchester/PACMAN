@@ -154,7 +154,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                 current_found_max_atoms_per_core = constraint.size
         return current_found_max_atoms_per_core
 
-    def create_subvertex(self, lo_atom, hi_atom, label=None,
+    def create_subvertex(self, lo_atom, hi_atom, resources_required, label=None,
                          additional_constraints=list()):
         """ Creates a subvertex of this vertex.  Can be overridden in vertex\
             subclasses to create an subvertex instance that contains detailed\
@@ -181,4 +181,5 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         # Combine the AbstractConstrainedVertex and PartitionedVertex constraints
         additional_constraints.extend(self.constraints)
 
-        return PartitionedVertex(lo_atom, hi_atom, label, additional_constraints)
+        return PartitionedVertex(lo_atom, hi_atom, label, resources_required,
+                                 additional_constraints)

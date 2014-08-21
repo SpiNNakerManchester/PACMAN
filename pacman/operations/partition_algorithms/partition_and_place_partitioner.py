@@ -248,7 +248,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-                subvertex = PartitionedVertex(lo_atom, hi_atom,
+                subvertex = PartitionedVertex(lo_atom, hi_atom, used_resources,
                                               "subvertex with low atoms {} and "
                                               "hi atoms {} for vertex {}"
                                               .format(lo_atom, hi_atom, 

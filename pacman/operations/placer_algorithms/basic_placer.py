@@ -106,10 +106,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                 subvertex.lo_atom, subvertex.hi_atom,
                 graph.incoming_edges_to_vertex(vertex))
         else:
-            used_resources = None
-            raise NotImplementedError("Basic Placer doesn't currently deal "
-                                      "with prepartitioned vertices that have "
-                                      "no reference to a vertex in mapper")
+            used_resources = subvertex.resources_required
 
         placement_constraints = \
             utility_calls.locate_constraints_of_type(subvertex.constraints,

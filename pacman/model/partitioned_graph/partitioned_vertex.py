@@ -6,7 +6,8 @@ from pacman.model.partitionable_graph.abstract_constrained_vertex import \
 class PartitionedVertex(AbstractConstrainedVertex):
     """ Represents a sub-set of atoms from a AbstractConstrainedVertex
     """
-    def __init__(self, lo_atom, hi_atom, label=None, constraints=None):
+    def __init__(self, lo_atom, hi_atom, resources_required, label=None,
+                 constraints=None):
         """
 
         :param lo_atom: The id of the first atom in the subvertex with\
@@ -15,6 +16,10 @@ class PartitionedVertex(AbstractConstrainedVertex):
         :param hi_atom: The id of the last atom in the subvertex with\
                         reference to the atoms in the vertex
         :type hi_atom: int
+        :param resources_required: The approximate resources needed for
+                                   the vertex
+        :type resources_required:
+        :py:class:`pacman.models.resources.resource_container.ResourceContainer`
         :param label: The name of the subvertex, or None if no name
         :type label: str
         :param constraints: The constraints of the subvertex
@@ -38,6 +43,7 @@ class PartitionedVertex(AbstractConstrainedVertex):
         self._label = label
         self._lo_atom = lo_atom
         self._hi_atom = hi_atom
+        self._resources_required = resources_required
         self._constraints = list()
         self.add_constraints(constraints)
     
@@ -60,3 +66,14 @@ class PartitionedVertex(AbstractConstrainedVertex):
         :raise None: Raises no known exceptions
         """
         return self._hi_atom
+
+    @property
+    def resources_required(self):
+        """The resources that vertex requires
+
+        :return: The resources required by the vertex
+        :rtype:
+        :py:class:`pacman.models.resources.resource_container.ResourceContainer`
+        :raise None: Raises no known exceptions
+        """
+        return self._resources_required

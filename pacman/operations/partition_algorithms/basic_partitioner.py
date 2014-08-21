@@ -126,15 +126,18 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     raise PacmanPartitionException("Not enough resources"
                                                    " available to create"
                                                    " subvertex")
+                subvertex_usage = \
+                    vertex.get_resources_used_by_atoms(
+                        counted, counted + alloc - 1, incoming_edges)
+
                 subvert = PartitionedVertex(counted, counted + alloc - 1,
+                                            resources_required=subvertex_usage,
                                             label=label)
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(subvert, vertex)
                 counted = counted + alloc
+
                 #update sdram calc
-                subvertex_usage = \
-                    vertex.get_resources_used_by_atoms(
-                        counted, counted + alloc - 1, incoming_edges)
                 self._update_sdram_allocator(vertex, subvertex_usage, machine)
                 self._add_vertex_constraints_to_subvertex(subvert, vertex)
             #update and end progress bars as needed
