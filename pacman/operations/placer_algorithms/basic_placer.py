@@ -80,7 +80,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         SHOULD NOT BE CALLED OUTSIDE THIS CLASS
 
         :param subvertex: the subvertex to be placed
-        :param graph: the partitionable_graph obejct of the application
+        :param graph: the partitionable_graph object of the application
         :param graph_to_subgraph_mapper: the partitionable_graph to
         partitioned_graph mapper
         :param placements: the current placements
@@ -89,10 +89,12 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :type graph:
         pacman.models.partitionable_graph.partitionable_graph.Graph
         :type graph_to_subgraph_mapper:
-        pacamn.models.graph_mapper.GraphMapper
-        :type placements: pacman.model.placements.placements.Placements
+        :py:class:`pacman.models.graph_mapper.GraphMapper`
+        :type placements:
+        :py:class:`pacman.model.placements.placements.Placements`
         :return: placement object for this subvertex
-        :rtype: pacman.model.placements.placement.Placement
+        :rtype:
+        :py:class:`pacman.model.placements.placement.Placement`
         :raise PacmanPlaceException: when either a core has already been \
         assigned the subvertex's required core or there are no more cores \
         available to be assigned or there's not enough memory of the available \

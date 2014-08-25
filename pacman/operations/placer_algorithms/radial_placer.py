@@ -5,8 +5,8 @@ logger = logging.getLogger(__name__)
 
 
 class RadialPlacer(BasicPlacer):
-    """ An radial algorithm that can place a partitioned_graph onto a machine based off a
-    circle out behaviour from a ethernet at 0 0
+    """ An radial algorithm that can place a partitioned_graph onto a
+     machine based off a circle out behaviour from a ethernet at 0 0
     """
 
     def __init__(self, machine, partitionable_graph):
@@ -27,7 +27,7 @@ class RadialPlacer(BasicPlacer):
         :param used_resources: the used_resources required by the subvertex
         :param chips: the machines chips.
         :type subvertex:
-        py:class'pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex'
+        :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex'
         :type used_resources:
         py:class'pacman.model.resource_container.ResourceContainer'
         :type chips: iterable of spinn_machine.chip.Chip

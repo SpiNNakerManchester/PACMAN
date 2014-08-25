@@ -20,11 +20,13 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         """constructor that build a
 pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
 
-        :param graph_mapper: the mappings betweeen partitionable_graph and \
+        :param graph_mapper: the mappings between partitionable_graph and \
         partitioned_graph
-        :type graph_mapper: pacman.model.graoh_subgraph_mapper.graph_mapper.GraphMapper
+        :type graph_mapper:
+        :py:class:`pacman.model.graoh_subgraph_mapper.graph_mapper.GraphMapper`
         :return: a new basic routing key info allocator
-        :rtype: pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator.BasicRoutingInfoAllocator
+        :rtype:
+        :py:class:`pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator.BasicRoutingInfoAllocator`
         :raise None: this method does not raise any known exception
 
         """
@@ -70,7 +72,7 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         return routing_infos
 
     def _allocate_subedge_key_mask(self, out_going_subedge, placement):
-        """helper method (can be overlaoded by future impliemntations of key
+        """helper method (can be overloaded by future implementations of key
         alloc
 
         :param out_going_subedge: the outgoing subedge from a given subvert

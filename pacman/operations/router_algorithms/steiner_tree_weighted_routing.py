@@ -4,8 +4,8 @@ from pacman.operations.router_algorithms.abstract_router_algorithm \
 
 class SteinerTreeWeightedRouting(AbstractRouterAlgorithm):
     """ An routing algorithm that can find routes for subedges between\
-        subvertices in a partitioned_graph that have been placed on a machine by the use
-        of a dijkstra shortest path algorithm
+        subvertices in a partitioned_graph that have been placed on a
+        machine by the use of a dijkstra shortest path algorithm
     """
 
     def __init__(self):
@@ -29,7 +29,8 @@ class SteinerTreeWeightedRouting(AbstractRouterAlgorithm):
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
         :return: The discovered routes
-        :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
+        :rtype:
+        :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
                    goes wrong with the routing
         """

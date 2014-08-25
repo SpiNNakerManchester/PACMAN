@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 class BasicDijkstraRouting(AbstractRouterAlgorithm):
     """ An routing algorithm that can find routes for subedges between\
-        subvertices in a partitioned_graph that have been placed on a machine by the use
-        of a dijkstra shortest path algorithm
+        subvertices in a partitioned_graph that have been placed on a
+        machine by the use of a dijkstra shortest path algorithm
     """
 
     BW_PER_ROUTE_ENTRY = 0.01
@@ -25,7 +25,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         """constructor for the
         pacman.operations.router_algorithms.DijkstraRouting.DijkstraRouting
 
-        <params to be impliemnted when done>
+        <params to be implemented when done>
         """
         AbstractRouterAlgorithm.__init__(self)
         self._k = k
@@ -41,16 +41,18 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
         :param routing_info_allocation: The allocated routing information
         :type routing_info_allocation:\
-                    :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
+                :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
         :param placements: The placements of the subedges
         :type placements:\
                     :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
         :param partitioned_graph: the partitioned_graph object
-        :type partitioned_graph: pacman.partitioned_graph.partitioned_graph.Subgraph
+        :type partitioned_graph:
+        pacman.partitioned_graph.partitioned_graph.PartitionedGraph
         :return: The discovered routes
-        :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
+        :rtype:
+        :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
                    goes wrong with the routing
         """
@@ -88,7 +90,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 xa, ya = xs, ys
                 dijkstra_tables[(xa, ya)]["activated?"] = True
                 dijkstra_tables[(xa, ya)]["lowest cost"] = 0
-                self._properate_costs_till_reached_destinations(
+                self._propagate_costs_until_reached_destinations(
                     dijkstra_tables, nodes_info, xa, ya, dest_processors, xs,
                     ys)
 
@@ -108,12 +110,12 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
     def _initiate_node_info(self, machine):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used for setting up a dictonary which contaisn data for each chip in \
+        used for setting up a dictionary which contains data for each chip in \
         the machine
 
         :param machine: the machine object
-        :type machine: spinnmachine.machine.Machine
-        :return nodes_info dictonry
+        :type machine: spinn_machine.machine.Machine
+        :return: nodes_info dictionary
         :rtype: dict
         :raise None: this method does not raise any known exceptions
         """
@@ -146,12 +148,12 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
     @staticmethod
     def _initiate_dijkstra_tables(machine):
         """ private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used to set up the dijkstras table which includes if youve reached a \
+        used to set up the Dijkstra's table which includes if you've reached a \
         given node
 
         :param machine: the machine object
-        :type machine: the spinnmachine.machine.Machine object
-        :return the  dijkstras table dictonary
+        :type machine: the spinn_machine.machine.Machine object
+        :return the  Dijkstra's table dictionary
         :rtype: dict
         :raise None: this method does not raise any known exception
         """
@@ -177,7 +179,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :param machine: the machine python object that represnets the strcuture\
         of the machine
         :type nodes_info: dict
-        :type machine 'py:class':spinnmachine.machine.Machine
+        :type machine 'py:class':spinn_machine.machine.Machine
         :return None
         :rtype: None
         :raise None: this method does not raise any known exception
@@ -188,16 +190,16 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
     def _update_neaubiours_weights(self, nodes_info, machine, key):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used by the routing algorithum to change the weights of the nebourign \
+        used by the routing algorithm to change the weights of the neighbouring\
         nodes
 
-        :param nodes_info: the node info dictonary
-        :param machine: the machine python object that represnets the strcuture\
+        :param nodes_info: the node info dictionary
+        :param machine: the machine python object that represents the structure\
         of the machine
         :param key: the identifier to the object in nodes_info
         :type key: str
         :type nodes_info: dict
-        :type machine 'py:class':spinnmachine.machine.Machine
+        :type machine 'py:class':spinn_machine.machine.Machine
         :return None
         :rtype: None
         :raise None: this method does not raise any known exception
@@ -234,13 +236,13 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
     def _get_weight(self, router, bws, routing_table):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used by the routing algorithum to determine the weight based on basic
+        used by the routing algorithm to determine the weight based on basic
         heuristics
 
         :param router: the router to assess the weight of
         :param bws: the basic weight of the source node
         :param routing_table: the routing table object for this router
-        :type router: spinnmachine.router.Router
+        :type router: spinn_machine.router.Router
         :type bws: int
         :type routing_table:
     pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
@@ -276,27 +278,27 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             dijkstra_tables[key]["lowest cost"] = None
             dijkstra_tables[key]["activated?"] = False
 
-    def _properate_costs_till_reached_destinations(
+    def _propagate_costs_until_reached_destinations(
             self, dijkstra_tables, nodes_info, xa, ya, dest_processors, xs, ys):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used to propergate the weights till the destination nodes of the soruce\
-         node arte reahced 
+        used to propagate the weights till the destination nodes of the source\
+        nodes are reaced
          
-         :param dijkstra_tables: the dictory object for the dijkstra-tables
-         :param nodes_info: the dictonary object for the nodes inside a route \
+         :param dijkstra_tables: the dictionary object for the dijkstra-tables
+         :param nodes_info: the dictionary object for the nodes inside a route \
          scope
          :param xa:
          :param ya:
          :param dest_processors:
          :param xs:
          :param ys:
-         :type dijkstra_tables:
-         :type nodes_info:
-         :type xa:
-         :type ya:
+         :type dijkstra_tables: dict
+         :type nodes_info: dict
+         :type xa: int
+         :type ya: int
          :type dest_processors:
-         :type xs:
-         :type ys:
+         :type xs: int
+         :type ys: int
          :return: None
          :rtype: None
          :raise PacmanRoutingException: when the destination node could not be\
@@ -522,7 +524,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :type key:
         :type mask:
         :return a new entry which is the merged result of two entries
-        :rtype: spinnmachine.multicast_routing_entry
+        :rtype: spinn_machine.multicast_routing_entry
         :raise None: this method does not raise any known exception
         """
         multi_cast_routing_entry = \
@@ -559,7 +561,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :type edge_info:
         :type previous_routing_entry:
         :return xt, yt, previous_routing_entry, made_an_entry
-        :rtype: int, int, spinnmachine.multicast_routing_entry, bool
+        :rtype: int, int, spinn_machine.multicast_routing_entry, bool
         :raise PacmanRoutingException: when the bandwidth of a router is beyond\
         respectable parameters
         """
@@ -670,7 +672,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :param entry: the other entry to compare against
         :type processors: list of ints
         :type links: list of ints
-        :type entry: spinnmachine.multicast_routing_entry.MultcastRoutingEntry
+        :type entry: spinn_machine.multicast_routing_entry.MultcastRoutingEntry
         :return true if the links and processors are the same \
         (same outgoing route)
         :rtype: bool

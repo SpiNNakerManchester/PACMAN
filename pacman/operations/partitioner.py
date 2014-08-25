@@ -1,5 +1,5 @@
-from pacman.operations.partition_algorithms.abstract_partition_algorithm import \
-    AbstractPartitionAlgorithm
+from pacman.operations.partition_algorithms.abstract_partition_algorithm \
+    import AbstractPartitionAlgorithm
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 from pacman.utilities import reports
@@ -37,7 +37,7 @@ class Partitioner:
         :type machine_time_step: int
         :type no_machine_time_steps: int
         :type report_states: pacman.utilities.report_states.ReportStates
-        :type placer_algorithm: implementation of pacman.operations.placer_algorithms.AbstractPlacementAlgorithum
+        :type placer_algorithm: implementation of pacman.operations.placer_algorithms.AbstractPlacementAlgorithm
         :type report_folder: str
         :type hostname: str
         :return: None

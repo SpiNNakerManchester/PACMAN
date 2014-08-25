@@ -20,7 +20,7 @@ class AbstractPlacerAlgorithm(object):
     """ An abstract algorithm that can place a partitioned_graph
     """
     def __init__(self, machine, graph):
-        """constrcutor for the abstract placer algorithm
+        """constructor for the abstract placer algorithm
         :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """

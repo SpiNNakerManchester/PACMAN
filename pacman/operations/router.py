@@ -1,6 +1,7 @@
 import logging
 from pacman.utilities import reports
-from pacman.operations.router_algorithms.basic_dijkstra_routing import BasicDijkstraRouting
+from pacman.operations.router_algorithms.basic_dijkstra_routing \
+    import BasicDijkstraRouting
 
 logger = logging.getLogger(__name__)
 
@@ -16,12 +17,12 @@ class Router:
         :param router_algorithm: The router algorithm.  If not specified, a\
                     default algorithm will be used
         :type router_algorithm:\
-:py:class:`pacman.operations.router_algorithms.abstract_router_algorithm.AbstractRouterAlgorithm`
+        :py:class:`pacman.operations.router_algorithms.abstract_router_algorithm.AbstractRouterAlgorithm`
         :param report_folder: the optimal param for the default location for \
         reports
         :param report_states: the data objects for what reports are needed
-        :param partitionable_graph: the partitionable graph object (descirbes\
-         the applciation problem in a high level)
+        :param partitionable_graph: the partitionable graph object (describes\
+         the application problem in a high level)
         :param graph_mappings:
         :param hostname:
         :type report_folder:
@@ -54,16 +55,16 @@ class Router:
             
         :param routing_info_allocation: The allocated routing information
         :type routing_info_allocation:\
-                    :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
+        :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
         :param placements: The placements of the subedges
         :type placements:\
-                    :py:class:`pacman.model.placements.placements.Placements`
+        :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
         :param partitioned_graph: the partitioned graph object (sub graph in \
         old naming convention)
         :type partitioned_graph:
-    pacman.model.partioned_graph.partitioned_graph.PartitionedGraph
+        :py:class:`pacman.model.partioned_graph.partitioned_graph.PartitionedGraph`
         :return: The discovered routes 
         :rtype: :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\

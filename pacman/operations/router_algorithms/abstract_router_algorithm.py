@@ -14,7 +14,7 @@ class AbstractRouterAlgorithm(object):
     """
 
     def __init__(self):
-        """consturcotr for abstract routing algorithums"""
+        """constructor for abstract routing algorithms"""
         self._routing_tables = MulticastRoutingTables()
     
     @abstractmethod
