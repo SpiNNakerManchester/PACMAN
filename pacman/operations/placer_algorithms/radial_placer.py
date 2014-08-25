@@ -19,16 +19,18 @@ class RadialPlacer(BasicPlacer):
 
     #overloaded method from basicPlacer
     def _deal_with_non_constrained_placement(self, subvertex, used_resources,
-                                              chips):
-        """overlaoded method of basic placer that changs the ordering in which
-        chips are handed to the search alorirthm.
+                                             chips):
+        """overloaded method of basic placer that changes the ordering in which
+        chips are handed to the search algorithm.
 
-        :param subvertex: the subvert to place
-        :param used_resources: the used_resources reuqired by the subvertex
+        :param subvertex: the subvertex to place
+        :param used_resources: the used_resources required by the subvertex
         :param chips: the machines chips.
-        :type subvertex: py:class'pacman.model.partitioned_graph.subvertex.SubVertex'
-    :type used_resources: py:class'pacman.model.resource_container.ResourceContainer'
-        :type chips: iterable of spinmachine.machine.Machine
+        :type subvertex:
+        py:class'pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex'
+        :type used_resources:
+        py:class'pacman.model.resource_container.ResourceContainer'
+        :type chips: iterable of spinn_machine.chip.Chip
         :return: a placement object
         :rtype: a py:class'pacman.model.placements.placements.Placements'
         :raise None: this class does not raise any known exceptions
@@ -49,16 +51,16 @@ class RadialPlacer(BasicPlacer):
                 if chip in chips_to_check:
                     processors_new_order.append(chip)
                     chips_to_check.remove(chip)
-                    neabuoring_chip_coords = \
+                    neighbouring_chip_coordinates = \
                         chip.router.get_neighbouring_chips_coords()
-                    for neabour_data in neabuoring_chip_coords:
-                        if neabour_data is not None:
-                            neaubour_chip = \
-                                self._machine.get_chip_at(neabour_data['x'],
-                                                          neabour_data['y'])
-                            if(neaubour_chip in chips_to_check and
-                               not neaubour_chip in next_chip_list_to_check):
-                                next_chip_list_to_check.append(neaubour_chip)
+                    for neighbour_data in neighbouring_chip_coordinates:
+                        if neighbour_data is not None:
+                            neighbour_chip = \
+                                self._machine.get_chip_at(neighbour_data['x'],
+                                                          neighbour_data['y'])
+                            if(neighbour_chip in chips_to_check and
+                               not neighbour_chip in next_chip_list_to_check):
+                                next_chip_list_to_check.append(neighbour_chip)
             current_chip_list_to_check = next_chip_list_to_check
 
 
