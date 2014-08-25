@@ -92,23 +92,24 @@ class TestBasicPlacer(unittest.TestCase):
         for i in range(18):
             processors.append(Processor(i, flops))
 
-        links = list()
-        links.append(Link(0, 0, 0, 0, 1, s, s))
-
         _sdram = SDRAM(128*(2**20))
 
-        links = list()
 
-        links.append(Link(0, 0, 0, 1, 1, n, n))
-        links.append(Link(0, 1, 1, 1, 0, s, s))
-        links.append(Link(1, 1, 2, 0, 0, e, e))
-        links.append(Link(1, 0, 3, 0, 1, w, w))
-        r = Router(links, False, 100, 1024)
 
         ip = "192.168.240.253"
         chips = list()
         for x in range(10):
             for y in range(10):
+                links = list()
+
+                links.append(Link(x, y, 0, (x + 1)%10, y, n, n))
+                links.append(Link(x, y, 1, (x + 1)%10, (y + 1)%10 , s, s))
+                links.append(Link(x, y, 2, x, (y + 1)%10, n, n))
+                links.append(Link(x, y, 3, (x - 1)%10, y, s, s))
+                links.append(Link(x, y, 4, (x - 1)%10, (y - 1)%10, n, n))
+                links.append(Link(x, y, 5, x, (y - 1)%10, s, s))
+
+                r = Router(links, False, 100, 1024)
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
 
         self.machine = Machine(chips)
@@ -134,7 +135,6 @@ class TestBasicPlacer(unittest.TestCase):
                                          self.subedges)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_subvertices(self.subvertices)
-
 
     def test_new_basic_placer(self):
         self.bp = BasicPlacer(self.machine, self.graph)
@@ -268,6 +268,51 @@ class TestBasicPlacer(unittest.TestCase):
         print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
             'p:', constraint.p
 
+    def test_many_subvertices(self):
+        subvertices = list()
+        for i in range(20 * 17): #50 atoms per each processor on 20 chips
+            subvertices.append(PartitionedVertex(
+                0, 50, get_resources_used_by_atoms(0, 50, []),
+                "Subvertex " + str(i)))
+
+        self.graph = PartitionableGraph("Graph",subvertices)
+        self.graph_mapper = GraphMapper()
+        self.graph_mapper.add_subvertices(subvertices)
+        self.bp = BasicPlacer(self.machine, self.graph)
+        self.subgraph = PartitionedGraph(subvertices=subvertices)
+        placements = self.bp.place(self.subgraph, self.graph_mapper)
+        for placement in placements.placements:
+            print placement.subvertex.label, placement.subvertex.n_atoms, \
+                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+
+    def test_too_many_subvertices(self):
+        subvertices = list()
+        for i in range(100 * 17): #50 atoms per each processor on 20 chips
+            subvertices.append(PartitionedVertex(
+                0, 50, get_resources_used_by_atoms(0, 50, []),
+                "Subvertex " + str(i)))
+
+        self.graph = PartitionableGraph("Graph",subvertices)
+        self.graph_mapper = GraphMapper()
+        self.graph_mapper.add_subvertices(subvertices)
+        self.bp = BasicPlacer(self.machine, self.graph)
+        self.subgraph = PartitionedGraph(subvertices=subvertices)
+        with self.assertRaises(PacmanPlaceException):
+            placements = self.bp.place(self.subgraph, self.graph_mapper)
+
+    def test_fill_machine(self):
+        subvertices = list()
+        for i in range(99 * 17): #50 atoms per each processor on 20 chips
+            subvertices.append(PartitionedVertex(
+                0, 50, get_resources_used_by_atoms(0, 50, []),
+                "Subvertex " + str(i)))
+
+        self.graph = PartitionableGraph("Graph",subvertices)
+        self.graph_mapper = GraphMapper()
+        self.graph_mapper.add_subvertices(subvertices)
+        self.bp = BasicPlacer(self.machine, self.graph)
+        self.subgraph = PartitionedGraph(subvertices=subvertices)
+        placements = self.bp.place(self.subgraph, self.graph_mapper)
 
 if __name__ == '__main__':
     unittest.main()
