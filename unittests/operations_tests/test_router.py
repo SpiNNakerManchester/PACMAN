@@ -1,10 +1,12 @@
 import unittest
-from pacman.model.partitionable_graph.edge import PartitionedEdge, \
-    PartitionedVertex
+from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.operations.router_algorithms import SteinerTreeWeightedRouting
 from pacman.operations.router_algorithms import BasicDijkstraRouting
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
-from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_graph \
+    import PartitionableGraph
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements

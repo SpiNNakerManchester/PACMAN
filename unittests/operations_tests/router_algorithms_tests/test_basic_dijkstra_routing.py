@@ -215,9 +215,10 @@ class MyTestCase(unittest.TestCase):
             for y in range(5):
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
         self.machine = Machine(chips)
-        self.routing = pacman_router(report_states=None)
+        dijkstra_router = BasicDijkstraRouting()
+
         with self.assertRaises(PacmanRoutingException):
-            self.routing.run(
+            dijkstra_router.route(
                 machine=self.machine, placements=self.placements,
                 partitioned_graph=self.subgraph,
                 routing_info_allocation=self.routing_info)
@@ -251,10 +252,59 @@ class MyTestCase(unittest.TestCase):
                     routing_entry.link_ids)
 
     def test_full_machine_routing(self):
-        self.assertEqual(True, False)
+        placements = Placements()
+        self.placement1 = Placement(x=1, y=0, p=2, subvertex=self.subvert1)
+        self.placement2 = Placement(x=1, y=0, p=3, subvertex=self.subvert2)
+        subvertices = list()
+        for i in range(4 * 17): #51 atoms per each processor on 20 chips
+            subvertices.append(PartitionedVertex(
+                0, 50, get_resources_used_by_atoms(0, 50, []),
+                "Subvertex " + str(i)))
+        subedges = list()
+        for i in range(len(subvertices)):
+            subedges.append(PartitionedEdge(
+                subvertices[i], subvertices[(i + 1)%len(subvertices)]))
+        subgraph = PartitionedGraph("Subgraph", subvertices, subedges)
+        p = 1
+        x = 0
+        y = 0
+        for subvert in subvertices:
+            placements.add_placement(Placement(subvert, x, y, p))
+            p = (p + 1) % 18
+            if p == 0:
+                p += 1
+                y += 1
+                if y == 2:
+                    y = 0
+                    x += 1
+
+        routing_info = RoutingInfo()
+        subedge_routing_info = list()
+        for i in range(len(subedges)):
+            subedge_routing_info.append(SubedgeRoutingInfo(
+                subedges[i], i<<11, constants.DEFAULT_MASK))
+
+        for subedge_info in subedge_routing_info:
+            routing_info.add_subedge_info(subedge_info)
+
+
+        self.set_up_4_node_board()
+
+        dijkstra_router = BasicDijkstraRouting()
+        routing_tables = dijkstra_router.route(
+            machine=self.machine, placements=placements,
+            partitioned_graph=subgraph,
+            routing_info_allocation=routing_info)
+
+        for entry in routing_tables.routing_tables:
+            print entry.x, entry.y
+            for routing_entry in entry.multicast_routing_entries:
+                print "\t\tProcessor_ids:{}, Link_ids:{}".format(
+                    routing_entry.processor_ids,
+                    routing_entry.link_ids)
 
     def test_routing_to_other_machine(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
 
 if __name__ == '__main__':
