@@ -298,12 +298,12 @@ class TestBasicPartitioner(unittest.TestCase):
             print subv.n_atoms, subv.label
 
     def test_partition_with_unsupported_constraints(self):
+        constrained_vertex = Vertex(13, "Constrained")
+        constrained_vertex.add_constraint(
+            NewPartitionerConstraint("Mock constraint"))
+        self.graph.add_vertex(constrained_vertex)
+        partitioner = BasicPartitioner(1, 1000)
         with self.assertRaises(PacmanInvalidParameterException):
-            constrained_vertex = Vertex(13, "Constrained")
-            constrained_vertex.add_constraint(
-                NewPartitionerConstraint("Mock constraint"))
-            self.graph.add_vertex(constrained_vertex)
-            partitioner = BasicPartitioner(1, 1000)
             subgraph, graph_to_sub_graph_mapper = \
                     partitioner.partition(self.graph, self.machine)
 

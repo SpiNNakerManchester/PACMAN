@@ -15,12 +15,11 @@ class TestPlacements(unittest.TestCase):
         self.assertEqual(subv, pl.subvertex)
 
     def test_create_new_placements_duplicate_subvertex(self):
+        subv = PartitionedVertex(0, 100, None)
+        pl = list()
+        for i in range(4):
+            pl.append(Placement(subv, 0, 0, i))
         with self.assertRaises(PacmanAlreadyExistsException):
-            subv = PartitionedVertex(0, 100, None)
-            pl = list()
-            for i in range(4):
-                pl.append(Placement(subv, 0, 0, i))
-
             Placements(pl)
 
     def test_create_new_placements(self):

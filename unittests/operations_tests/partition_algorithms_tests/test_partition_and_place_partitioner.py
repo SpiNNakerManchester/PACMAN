@@ -130,13 +130,13 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         self.assertIsInstance(partitioner._placer_algorithm, BasicPlacer)
 
     def test_invalid_constraints(self):
+        constrained_vertex = Vertex(13, "Constrained")
+        constrained_vertex.add_constraint(
+            VertexRequiresVirtualChipInMachineConstraint((5, 5), (0, 0), 1))
+        self.graph.add_vertex(constrained_vertex)
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
         with self.assertRaises(PacmanInvalidParameterException):
-            constrained_vertex = Vertex(13, "Constrained")
-            constrained_vertex.add_constraint(
-                VertexRequiresVirtualChipInMachineConstraint((5, 5), (0, 0), 1))
-            self.graph.add_vertex(constrained_vertex)
-            partitioner = PartitionAndPlacePartitioner(1, 1000)
-            partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
             subgraph, graph_to_sub_graph_mapper = \
                     partitioner.partition(self.graph, self.machine)
 
@@ -203,31 +203,31 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
             print subv.n_atoms, subv.label
 
     def test_operation_with_same_size_as_vertex_constraint_exception(self):
+        constrained_vertex = Vertex(100, "Constrained")
+        constrained_vertex.add_constraint(
+            PartitionerSameSizeAsVertexConstraint(self.vert2))
+        self.graph.add_vertex(constrained_vertex)
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
         with self.assertRaises(PacmanPartitionException):
-            constrained_vertex = Vertex(100, "Constrained")
-            constrained_vertex.add_constraint(
-                PartitionerSameSizeAsVertexConstraint(self.vert2))
-            self.graph.add_vertex(constrained_vertex)
-            partitioner = PartitionAndPlacePartitioner(1, 1000)
-            partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
             subgraph, graph_to_sub_graph_mapper = \
                     partitioner.partition(self.graph, self.machine)
 
     def test_update_sdram_allocator(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_add_vertex_constraints_to_subvertex(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_generate_sub_edges(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_get_maximum_resources_per_processor(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_partition_without_setting_placer_algorithm(self):
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
         with self.assertRaises(PacmanPlaceException):
-            partitioner = PartitionAndPlacePartitioner(1, 1000)
             subgraph, graph_to_sub_graph_mapper = \
                 partitioner.partition(self.graph, self.machine)
 
@@ -239,16 +239,16 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         TestPartitioAndPlacePartitioner._print_subvertices(subgraph)
 
     def test_detect_subclass_hierarchy(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_partition_by_atoms(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_scale_down_resource_usage(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_scale_up_resource_usage(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_complete_placements(self):
         partitioner = PartitionAndPlacePartitioner(1, 1000)
@@ -292,10 +292,10 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         self.assertEqual(max_atoms_per_core, 256)
 
     def test_find_max_ratio(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_locate_vertices_to_partition_now(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_partition_with_no_additional_constraints(self):
         partitioner = PartitionAndPlacePartitioner(1, 1000)
@@ -363,10 +363,10 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
             print subv.n_atoms, subv.label
 
     def test_partition_with_supported_constraints_enough_space(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_partition_with_supported_constraints_not_enough_space(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
 
     def test_partition_with_barely_sufficient_space(self):
@@ -517,24 +517,24 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
             partitioner.partition(self.graph, self.machine)
 
     def test_partition_with_unsupported_constraints(self):
+        constrained_vertex = Vertex(13, "Constrained")
+        constrained_vertex.add_constraint(NewPartitionerConstraint(
+            "Custom unsupported constraint"))
+        self.graph.add_vertex(constrained_vertex)
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
         with self.assertRaises(PacmanInvalidParameterException):
-            constrained_vertex = Vertex(13, "Constrained")
-            constrained_vertex.add_constraint(NewPartitionerConstraint(
-                "Custom unsupported constraint"))
-            self.graph.add_vertex(constrained_vertex)
-            partitioner = PartitionAndPlacePartitioner(1, 1000)
-            partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
             subgraph, graph_to_sub_graph_mapper = \
                     partitioner.partition(self.graph, self.machine)
 
     def test_partition_with_one_vertex_with_unsupported_constraint(self):
+        constrained_vertex = Vertex(13, "Constrained")
+        constrained_vertex.add_constraint(NewPartitionerConstraint(
+            "Custom unsupported constraint"))
+        self.graph = PartitionableGraph("Solo graph", [constrained_vertex])
+        partitioner = PartitionAndPlacePartitioner(1, 1000)
+        partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
         with self.assertRaises(PacmanInvalidParameterException):
-            constrained_vertex = Vertex(13, "Constrained")
-            constrained_vertex.add_constraint(NewPartitionerConstraint(
-                "Custom unsupported constraint"))
-            self.graph = PartitionableGraph("Solo graph", [constrained_vertex])
-            partitioner = PartitionAndPlacePartitioner(1, 1000)
-            partitioner.set_placer_algorithm(BasicPlacer, self.machine, self.graph)
             subgraph, graph_to_sub_graph_mapper = \
                     partitioner.partition(self.graph, self.machine)
 
@@ -547,7 +547,4 @@ class TestPartitioAndPlacePartitioner(unittest.TestCase):
         self.assertEqual(len(subgraph.subvertices), 0)
 
 if __name__ == '__main__':
-    #t1 = TestPartitioAndPlacePartitioner()
-    #t1.setUp()
-    #t1.test_partition_on_large_vertex_than_has_to_be_split()
     unittest.main()

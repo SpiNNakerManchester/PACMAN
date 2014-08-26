@@ -171,7 +171,7 @@ class TestRadialPlacer(unittest.TestCase):
             placements = self.bp.place(self.subgraph, self.graph_mapper)
 
     def test_try_to_place(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_deal_with_constraint_placement_subvertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
@@ -218,13 +218,13 @@ class TestRadialPlacer(unittest.TestCase):
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     def test_unsupported_non_placer_constraint(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_unsupported_placer_constraint(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_unsupported_placer_constraints(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_reduce_constraints(self):
         extra_subvertex = PartitionedVertex(

@@ -42,21 +42,37 @@ class TestRoutingInfo(unittest.TestCase):
         MulticastRoutingTable(0, 0)
 
     def test_new_multicast_routing_table_duplicate_entry(self):
+        key = 0xff35
+        mask = 0x00ff
+        proc_ids = list()
+        link_ids = list()
+        for i in range(18):
+            proc_ids.append(i)
+        for i in range(6):
+            link_ids.append(i)
+        multicast_entries = list()
+        for i in range(5):
+            multicast_entries.append(
+                MulticastRoutingEntry(key + i, mask, proc_ids, link_ids, True))
+        mrt = MulticastRoutingTable(0, 0, multicast_entries)
         with self.assertRaises(PacmanAlreadyExistsException):
-            key = 0xff35
-            mask = 0x00ff
-            proc_ids = list()
-            link_ids = list()
-            for i in range(18):
-                proc_ids.append(i)
-            for i in range(6):
-                link_ids.append(i)
-            multicast_entries = list()
-            for i in range(5):
-                multicast_entries.append(
-                    MulticastRoutingEntry(key, mask, proc_ids, link_ids, True))
-            mrt = MulticastRoutingTable(0, 0, multicast_entries)
             mrt.add_mutlicast_routing_entry(multicast_entries[0])
+
+    def test_new_multicast_routing_table_duplicate_key(self):
+        key = 0xff35
+        mask = 0x00ff
+        proc_ids = list()
+        link_ids = list()
+        for i in range(18):
+            proc_ids.append(i)
+        for i in range(6):
+            link_ids.append(i)
+        multicast_entries = list()
+        for i in range(5):
+            multicast_entries.append(
+                MulticastRoutingEntry(key, mask, proc_ids, link_ids, True))
+        with self.assertRaises(PacmanAlreadyExistsException):
+            MulticastRoutingTable(0, 0, multicast_entries)
 
     def test_new_multicast_routing_tables(self):
         key = 0xff35

@@ -25,13 +25,13 @@ class TestRoutingTables(unittest.TestCase):
 
     def test_create_new_routing_info_with_duplicate_key_mask_different_vertices(
             self):
+        subv1 = PartitionedVertex(0, 1, None)
+        subv2 = PartitionedVertex(2, 3, None)
+        sube1 = PartitionedEdge(subv1, subv2)
+        sube2 = PartitionedEdge(subv2, subv1)
+        sri1 = SubedgeRoutingInfo(sube1, 0x0012, 0x00ff)
+        sri2 = SubedgeRoutingInfo(sube2, 0x0012, 0x00ff)
         with self.assertRaises(PacmanAlreadyExistsException):
-            subv1 = PartitionedVertex(0, 1, None)
-            subv2 = PartitionedVertex(2, 3, None)
-            sube1 = PartitionedEdge(subv1, subv2)
-            sube2 = PartitionedEdge(subv2, subv1)
-            sri1 = SubedgeRoutingInfo(sube1, 0x0012, 0x00ff)
-            sri2 = SubedgeRoutingInfo(sube2, 0x0012, 0x00ff)
             RoutingInfo([sri1, sri2])
 
     def test_create_new_routing_info_with_duplicate_key_mask_the_same_vertex(
