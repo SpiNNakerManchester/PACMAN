@@ -74,12 +74,9 @@ class AbstractPlacerAlgorithm(object):
                 other_placement = \
                     placements.get_placement_of_subvertex(other_subvertex)
                 if other_placement is not None:
-                    x = self._check_param(other_placement.x, other_placement.x,
-                                          subvertex_label)
-                    y = self._check_param(other_placement.y, other_placement.y,
-                                          subvertex_label)
-                    p = self._check_param(other_placement.p, other_placement.p,
-                                          subvertex_label)
+                    x = self._check_param(x, other_placement.x, subvertex_label)
+                    y = self._check_param(y, other_placement.y, subvertex_label)
+                    p = self._check_param(p, other_placement.p, subvertex_label)
                 x = self._check_param(other_placement.x, x, subvertex_label)
                 y = self._check_param(other_placement.y, y, subvertex_label)
                 p = self._check_param(other_placement.p, p, subvertex_label)

@@ -235,14 +235,13 @@ class TestBasicPlacer(unittest.TestCase):
             55, 89, get_resources_used_by_atoms(55, 89, []),
             "Constrained vertex", [chip_and_core, same_chip_as_vertex])
         self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 1, 2, 3)
+        placement = Placement(constrained_subvertex, 2, 3, 3)
         placement2 = Placement(extra_subvertex, 1, 3, 3)
         placements = Placements([placement, placement2])
         placer = BasicPlacer(self.machine, self.graph)
-        constraint = placer._reduce_constraints([chip_and_core,
-                                                 same_chip_as_vertex],
-                                                constrained_subvertex.label,
-                                                placements)
+        constraint = \
+            placer._reduce_constraints([chip_and_core, same_chip_as_vertex],
+                                       constrained_subvertex.label, placements)
 
         print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
             'p:', constraint.p
@@ -256,7 +255,7 @@ class TestBasicPlacer(unittest.TestCase):
             55, 89, get_resources_used_by_atoms(55, 89, []),
             "Constrained vertex", [chip_and_core, same_chip_as_vertex])
         self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 1, 2, 3)
+        placement = Placement(constrained_subvertex, 2, 3, 3)
         placement2 = Placement(extra_subvertex, 1, 3, 3)
         placements = Placements([placement, placement2])
         placer = BasicPlacer(self.machine, self.graph)
@@ -264,6 +263,45 @@ class TestBasicPlacer(unittest.TestCase):
                                                  chip_and_core],
                                                 constrained_subvertex.label,
                                                 placements)
+
+        print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
+            'p:', constraint.p
+
+    def test_reduce_constraints_invalid(self):
+        extra_subvertex = PartitionedVertex(
+            3, 15, get_resources_used_by_atoms(3, 15, []))
+        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
+        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
+        constrained_subvertex = PartitionedVertex(
+            55, 89, get_resources_used_by_atoms(55, 89, []),
+            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
+        self.subgraph.add_subvertex(constrained_subvertex)
+        placement = Placement(constrained_subvertex, 2, 3, 3)
+        placement2 = Placement(extra_subvertex, 1, 3, 2)
+        placements = Placements([placement, placement2])
+        placer = BasicPlacer(self.machine, self.graph)
+        self.assertRaises(PacmanPlaceException,
+                          placer._reduce_constraints(
+                              [chip_and_core, same_chip_as_vertex],
+                              constrained_subvertex.label, placements))
+
+    def test_reduce_constraints_inverted_order_invalid(self):
+        extra_subvertex = PartitionedVertex(
+            3, 15, get_resources_used_by_atoms(3, 15, []))
+        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
+        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
+        constrained_subvertex = PartitionedVertex(
+            55, 89, get_resources_used_by_atoms(55, 89, []),
+            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
+        self.subgraph.add_subvertex(constrained_subvertex)
+        placement = Placement(constrained_subvertex, 2, 3, 3)
+        placement2 = Placement(extra_subvertex, 1, 3, 3)
+        placements = Placements([placement, placement2])
+        placer = BasicPlacer(self.machine, self.graph)
+        self.assertRaises(PacmanPlaceException,
+                          placer._reduce_constraints(
+                              [chip_and_core, same_chip_as_vertex],
+                              constrained_subvertex.label, placements))
 
         print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
             'p:', constraint.p
