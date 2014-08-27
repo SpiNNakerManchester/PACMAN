@@ -125,8 +125,12 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
             nodes_info[(x, y)] = dict()
-            nodes_info[(x, y)]["neighbours"] = \
-                machine.get_chip_at(x, y).router.get_neighbouring_chips_coords()
+            neighbours = list(machine.get_chip_at(x, y).router.links)
+
+            nodes_info[(x, y)]["neighbours"] = list()
+            for source_id in range(6):
+                exist_link = self.locate_link_with_id(source_id, neighbours)
+                nodes_info[(x, y)]["neighbours"].append(exist_link)
 
             nodes_info[(x, y)]["bws"] = []
 
@@ -144,6 +148,13 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
                     nodes_info[(x, y)]["bws"].append(self._max_bw)
         return nodes_info
+
+    @staticmethod
+    def locate_link_with_id(link_id, links):
+        for link in links:
+            if link.source_link_id == link_id:
+                return link
+        return None
 
     @staticmethod
     def _initiate_dijkstra_tables(machine):
@@ -207,7 +218,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         for n in range(len(nodes_info[key]["neighbours"])):
             if nodes_info[key]["neighbours"][n] is not None:
                 neighbour = nodes_info[key]["neighbours"][n]
-                xn, yn = neighbour["x"], neighbour["y"]
+                xn, yn = neighbour.destination_x, neighbour.destination_y
                 nodes_info[key]["weights"][n] = \
                     self._get_weight(
                         machine.get_chip_at(xn, yn).router,
@@ -315,11 +326,11 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 # "neighbours" is a list of 6 dictionaries or None objects.
                 # There is a None object where there is no connection to
                 # that neighbour.
-                if (neighbour is not None) and not (neighbour["x"] == xs
-                                                    and neighbour["y"] == ys):
+                if (neighbour is not None) and not (neighbour.destination_x == xs
+                                                    and neighbour.destination_y == ys):
 
                     # These variables change with every look at a new neighbour
-                    xn, yn = neighbour["x"], neighbour["y"]
+                    xn, yn = neighbour.destination_x, neighbour.destination_y
                     self._update_neighbour(dijkstra_tables, xn, yn, xa, ya,
                                            xs, ys, weight)
 
@@ -467,41 +478,44 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             neighbours = nodes_info[(xt, yt)]["neighbours"]
             neighbour_index = 0
             added_an_entry = False
+            length = len(neighbours)
             while not added_an_entry and neighbour_index < len(neighbours):
                 neighbour = neighbours[neighbour_index]
-                # "neighbours" is a list of up to 6 dictionaries.
-                # xnr and ynr for 'x neighbour retrace',
-                # 'y neighbour retrace'.
-                xnr, ynr = neighbour["x"], neighbour["y"]
-                neighbour_routing_table = \
-                    self._get_routing_table_for_chip(xnr, ynr)
-                # Only check if it can be a preceding node if it actually
-                # exists
-                if (xnr, ynr) in dijkstra_tables.keys():
-                    dijkstra_table_key = (xnr, ynr)
-                    lowest_cost = \
-                        dijkstra_tables[dijkstra_table_key]["lowest cost"]
-                    if lowest_cost is not None:
-                        xt, yt, previous_routing_entry, added_an_entry = \
-                            self._create_routing_entry(
-                                xnr, ynr, dijkstra_tables,
-                                neighbour_index, nodes_info,
-                                neighbour_routing_table, xt, yt,
-                                subedge_routing_info,
-                                previous_routing_entry)
-                else:
-                    print xnr, ynr
-                    raise exceptions.PacmanRoutingException(
-                        "Tried to trace back to node not in partitionable_graph: "
-                        "remove non-existent neighbours")
+                if neighbour is not None:
+                    # "neighbours" is a list of up to 6 dictionaries.
+                    # xnr and ynr for 'x neighbour retrace',
+                    # 'y neighbour retrace'.
+                    xnr, ynr = neighbour.destination_x, neighbour.destination_y
+                    neighbour_routing_table = \
+                        self._get_routing_table_for_chip(xnr, ynr)
+                    # Only check if it can be a preceding node if it actually
+                    # exists
+                    if (xnr, ynr) in dijkstra_tables.keys():
+                        dijkstra_table_key = (xnr, ynr)
+                        lowest_cost = \
+                            dijkstra_tables[dijkstra_table_key]["lowest cost"]
+                        if lowest_cost is not None:
+                            xt, yt, previous_routing_entry, added_an_entry = \
+                                self._create_routing_entry(
+                                    xnr, ynr, dijkstra_tables,
+                                    neighbour_index, nodes_info,
+                                    neighbour_routing_table, xt, yt,
+                                    subedge_routing_info,
+                                    previous_routing_entry)
+                    else:
+                        print xnr, ynr
+                        raise exceptions.PacmanRoutingException(
+                            "Tried to trace back to node not in "
+                            "partitionable_graph: remove non-existent"
+                            " neighbours")
                 neighbour_index += 1
 
             if xt == xcheck and yt == ycheck:
                 raise exceptions.PacmanRoutingException(
-                    "Iterated through all neighbours of tracking node but did "
-                    "not find a preceding node! Consider increasing acceptable "
-                    "discrepancy between sought traceback cost and actual cost"
-                    " at node. Terminating...")
+                    "Iterated through all neighbours of tracking node but"
+                    " did not find a preceding node! Consider increasing "
+                    "acceptable discrepancy between sought traceback cost"
+                    " and actual cost at node. Terminating...")
         return xt, yt
 
     @staticmethod
