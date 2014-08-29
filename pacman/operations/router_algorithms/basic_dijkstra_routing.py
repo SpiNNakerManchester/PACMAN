@@ -461,8 +461,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         if other_entry is not None:
             merged_entry = \
                 self._merge_entries(other_entry, routing_entry_route_processors,
-                                    key, mask, routing_entry_route_links,
-                                    routing_table, False)
+                                    False, key, mask, routing_entry_route_links,
+                                    routing_table)
             previous_routing_entry = merged_entry
         else:
             entry = MulticastRoutingEntry(key, mask,
@@ -541,6 +541,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :rtype: spinn_machine.multicast_routing_entry
         :raise None: this method does not raise any known exception
         """
+
         multi_cast_routing_entry = \
             MulticastRoutingEntry(key, mask, routing_entry_route_processors,
                                   routing_entry_route_links, defaultable)
