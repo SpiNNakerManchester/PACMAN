@@ -23,27 +23,23 @@ class BasicPlacer(AbstractPlacerAlgorithm):
     based off a raster behaviour
     """
 
-    def __init__(self, machine, graph):
+    def __init__(self, machine):
         """constructor to build a \
         pacman.operations.placer_algorithms.BasicPlacer.BasicPlacer
         :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
-        AbstractPlacerAlgorithm.__init__(self, machine, graph)
+        AbstractPlacerAlgorithm.__init__(self, machine)
         self._supported_constraints.append(PlacerChipAndCoreConstraint)
         self._supported_constraints.append(PlacerSubvertexSameChipConstraint)
 
-    def place(self, subgraph, graph_mapper):
+    def place(self, partitioned_graph):
         """ Place a partitioned_graph so that each subvertex is placed on a core
 
-        :param subgraph: The partitioned_graph to place
-        :type subgraph:
+        :param partitioned_graph: The partitioned_graph to place
+        :type partitioned_graph:
         :py:class:
         `pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-        :param graph_mapper: the mappings between
-        partitionable_graph and partitioned_graph
-        :type graph_mapper:
-        pacman.model.graph_mapper.graph_mapper.GraphMapper
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: If something\
@@ -51,14 +47,14 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         """
         #check that the algorithm can handle the constraints
         utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=subgraph.subvertices,
+            constrained_vertices=partitioned_graph.subvertices,
             supported_constraints=self._supported_constraints,
             abstract_constraint_type=AbstractPlacerConstraint)
 
         placements = Placements()
         ordered_subverts = \
             utility_calls.sort_objects_by_constraint_authority(
-                subgraph.subvertices)
+                partitioned_graph.subvertices)
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
@@ -67,29 +63,20 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         for subvertex in ordered_subverts:
 
             # Create and store a new placement
-            placement = self._place_subvertex(subvertex, self._graph,
-                                              graph_mapper, placements)
+            placement = self._place_subvertex(subvertex, placements)
             placements.add_placement(placement)
             progress_bar.update()
         progress_bar.end()
         return placements
 
-    def _place_subvertex(self, subvertex, graph, graph_to_subgraph_mapper,
-                         placements):
+    def _place_subvertex(self, subvertex, placements):
         """ place a subvertex on some processor to be determined. \
         SHOULD NOT BE CALLED OUTSIDE THIS CLASS
 
         :param subvertex: the subvertex to be placed
-        :param graph: the partitionable_graph object of the application
-        :param graph_to_subgraph_mapper: the partitionable_graph to
-        partitioned_graph mapper
         :param placements: the current placements
         :type subvertex:
         pacman.models.partitioned_graph.partitioned_vertex.PartitionedVertex
-        :type graph:
-        pacman.models.partitionable_graph.partitionable_graph.Graph
-        :type graph_to_subgraph_mapper:
-        :py:class:`pacman.models.graph_mapper.GraphMapper`
         :type placements:
         :py:class:`pacman.model.placements.placements.Placements`
         :return: placement object for this subvertex
@@ -102,13 +89,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         """
 
         #get resources of a subvertex
-        vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(subvertex)
-        if vertex is not None:
-            used_resources = vertex.get_resources_used_by_atoms(
-                subvertex.lo_atom, subvertex.hi_atom,
-                graph.incoming_edges_to_vertex(vertex))
-        else:
-            used_resources = subvertex.resources_required
+        used_resources = subvertex.resources_required
 
         placement_constraints = \
             utility_calls.locate_constraints_of_type(subvertex.constraints,

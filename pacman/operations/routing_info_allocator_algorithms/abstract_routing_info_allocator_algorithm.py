@@ -9,15 +9,11 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         subedges in a partitioned_graph
     """
 
-    def __init__(self, graph_mapper):
+    def __init__(self):
         """constructor for a abstract routing info allocator\
          CANNOT BE INSTANITAED DIRECTLY
-
-        :param graph_mapper: the mapper between partitionable_graph and subgrah
-        :type graph_mapper: pacman.model.graph_mapper.graph_mapper.graph_mapper
         """
         self._supported_constraints = list()
-        self._graph_to_sub_graph_mapper = graph_mapper
         self._used_masks = dict()
         self._subvert_to_key_mapper = dict()
     

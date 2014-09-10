@@ -16,22 +16,16 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         subedges in a partitioned_graph based on the x,y,p of their placement
     """
 
-    def __init__(self, graph_mapper):
+    def __init__(self):
         """constructor that build a
 pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
-
-        :param graph_mapper: the mappings between partitionable_graph and \
-        partitioned_graph
-        :type graph_mapper:
-        :py:class:`pacman.model.graoh_subgraph_mapper.graph_mapper.GraphMapper`
         :return: a new basic routing key info allocator
         :rtype:
         :py:class:`pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator.BasicRoutingInfoAllocator`
         :raise None: this method does not raise any known exception
 
         """
-        AbstractRoutingInfoAllocatorAlgorithm.__init__(
-            self, graph_mapper)
+        AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
 
     def allocate_routing_info(self, subgraph, placements):
         """ Allocates routing information to the subedges in a partitioned_graph

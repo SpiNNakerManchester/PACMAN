@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class AbstractPlacerAlgorithm(object):
     """ An abstract algorithm that can place a partitioned_graph
     """
-    def __init__(self, machine, graph):
+    def __init__(self, machine):
         """constructor for the abstract placer algorithm
         :param machine: The machine on which to place the partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
@@ -27,18 +27,14 @@ class AbstractPlacerAlgorithm(object):
         self._placement_tracker = PlacementTracker(machine)
         self._machine = machine
         self._sdram_tracker = SDRAMTracker()
-        self._graph = graph
         self._supported_constraints = list()
 
     @abstractmethod
-    def place(self, subgraph, graph_mapper):
+    def place(self, subgraph):
         """ Place a partitioned_graph so that each subvertex is placed on a core
             
         :param subgraph: The partitioned_graph to place
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
-        :param graph_mapper: the mappings between partitionable_graph and \
-        partitioned_graph
-        :type graph_mapper:
     pacman.model.graph_mapper.graph_mapper.GraphMapper
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`

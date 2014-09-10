@@ -14,7 +14,6 @@ from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from spinn_machine.virutal_machine import VirtualMachine
 from pacman.utilities import constants
-from pacman.operations.router import Router as PacmanRouter
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
@@ -76,8 +75,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -97,8 +96,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -118,8 +117,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -138,8 +137,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -158,8 +157,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -178,8 +177,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -198,8 +197,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -218,8 +217,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -239,8 +238,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
@@ -260,16 +259,15 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
     def test_new_router(self):
         report_folder = "..\reports"
-        self.routing = PacmanRouter(report_folder=report_folder,
-                                    report_states=None)
+        self.routing = BasicDijkstraRouting()
         self.assertEqual(self.routing._report_folder, report_folder)
         self.assertEqual(self.routing._graph, None)
         self.assertEqual(self.routing.report_states, None)
@@ -280,9 +278,7 @@ class TestRouter(unittest.TestCase):
 
     def test_new_router_set_non_default_routing_algorithm(self):
         report_folder = "..\reports"
-        self.routing = PacmanRouter(
-            report_folder=report_folder, report_states=None,
-            router_algorithm=SteinerTreeWeightedRouting)
+        self.routing = BasicDijkstraRouting()
         self.assertEqual(self.routing._report_folder, report_folder)
         self.assertEqual(self.routing._graph, None)
         self.assertEqual(self.routing.report_states, None)
@@ -306,8 +302,8 @@ class TestRouter(unittest.TestCase):
         self.routing_info.add_subedge_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
-        self.routing = PacmanRouter(report_states=None)
-        self.routing.run(
+        self.routing = BasicDijkstraRouting()
+        self.routing.route(
             machine=self.machine, placements=self.placements,
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
