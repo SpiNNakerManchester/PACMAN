@@ -1,6 +1,7 @@
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import PacmanInvalidParameterException
+from pacman.model.graph_mapper.slice import Slice
 
 
 class GraphMapper(object):
@@ -13,9 +14,10 @@ class GraphMapper(object):
         self._edge_from_subedge = dict()
 
         self._subvertices_from_vertex = dict()
+        self._subvertex_to_slice = dict()
         self._subedges_from_edge = dict()
 
-    def add_subvertex(self, subvertex, vertex=None):
+    def add_subvertex(self, subvertex, lo_atom, hi_atom, vertex=None):
         """ Add a subvertex to this partitioned_graph
 
         :param subvertex: a subvertex to be added to the partitionable_graph
@@ -30,11 +32,11 @@ class GraphMapper(object):
                 "subvertex", str(subvertex),
                 "Must be an instance of"
                 " pacman.model.partitioned_graph.subvertex.SubVertex")
-        if subvertex.lo_atom < 0:
+        if lo_atom < 0:
             raise PacmanInvalidParameterException("lo_atom ",
-                                                  str(subvertex.lo_atom),
+                                                  str(lo_atom),
                                                   "Cannot be less than 0")
-        if subvertex.lo_atom > subvertex.hi_atom:
+        if lo_atom > hi_atom:
             raise PacmanInvalidParameterException(
                 "hi_atom ",
                 str(subvertex.hi_atom),
@@ -43,29 +45,24 @@ class GraphMapper(object):
         if vertex is not None \
                 and vertex not in self._subvertices_from_vertex.keys():
             self._subvertices_from_vertex[vertex] = set()
-            if subvertex.hi_atom >= vertex.n_atoms:
+            if hi_atom >= vertex.n_atoms:
                 raise PacmanInvalidParameterException(
-                    "hi_atom ", str(subvertex.hi_atom),
+                    "hi_atom ", str(hi_atom),
                     "Cannot be greater than the total number of atoms")
 
         if vertex is not None:
             self._vertex_from_subvertex[subvertex] = vertex
             self._subvertices_from_vertex[vertex].add(subvertex)
 
-    def add_subvertices(self, subvertices, vertex=None):
-        """ Add some subvertices to this partitioned_graph
-
-        :param subvertices: an iterable of subvertices to add to this partitioned_graph
-        :type subvertices: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
-        :return: None
-        :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
-                    subvertex is not valid
-        """
-        if subvertices is not None:
-            for next_subvertex in subvertices:
-                self.add_subvertex(next_subvertex, vertex)
+        if subvertex is not None:
+            if lo_atom < 0:
+                raise PacmanInvalidParameterException(
+                    "lo_atom", str(lo_atom), "Cannot be less than 0")
+            if hi_atom < lo_atom:
+                raise PacmanInvalidParameterException(
+                    "hi_atom", str(hi_atom), "Cannot be less than lo_atom")
+            self._subvertex_to_slice[subvertex] = Slice(lo_atom=lo_atom,
+                                                        hi_atom=hi_atom)
 
     def add_subedge(self, subedge, edge=None):
         """ Add a subedge to this partitioned_graph
@@ -81,7 +78,8 @@ class GraphMapper(object):
             raise PacmanInvalidParameterException(
                 "subedge", str(subedge),
                 "Must be an instance of"
-                " pacman.model.partitioned_graph.subedge.PartitionedEdge")
+                " pacman.model.partitioned_graph.partitionedEdge"
+                ".PartitionedEdge")
 
         if edge is not None and edge not in self._subedges_from_edge.keys():
             self._subedges_from_edge[edge] = set()
@@ -156,3 +154,21 @@ class GraphMapper(object):
         if subedge in self._edge_from_subedge.keys():
             return self._edge_from_subedge[subedge]
         return None
+
+    def get_subvertex_slice(self, subvertex):
+        """ supporting method for retrieveing the lo and hi atom of a subvertex
+
+        :param subvertex: the subvertex to locate the slice of
+        :return: a slice object containing the lo and hi atom of a subvertex
+        :rtype: pacman.model.graph_mapper.slice.Slice
+        :raise PacmanInvalidParameterException: when the subvertex is none or
+        the subvertex is not contianed within the mapping object
+        """
+        if subvertex is None or subvertex not in self._subvertex_to_slice.keys():
+            raise PacmanInvalidParameterException(
+                "subvertex", str(subvertex),
+                "Must be an instance of"
+                " pacman.model.partitioned_graph.partitioned_vertex."
+                "PartitionedVertex")
+        else:
+            return self._subvertex_to_slice[subvertex]

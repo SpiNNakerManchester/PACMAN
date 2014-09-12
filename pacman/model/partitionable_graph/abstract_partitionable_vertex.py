@@ -1,13 +1,15 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
+from pacman.model.partitionable_graph.abstract_constrained_vertex \
+    import AbstractConstrainedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.resources.resource_container import ResourceContainer
@@ -52,7 +54,13 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
 
 
         """
-        AbstractConstrainedVertex.__init__(self, n_atoms, label, constraints)
+        AbstractConstrainedVertex.__init__(self, label, constraints)
+        if n_atoms < 1:
+            raise PacmanInvalidParameterException(
+                "n_atoms", str(n_atoms),
+                "Must be at least one atom in the vertex")
+
+        self._n_atoms = n_atoms
         #add the max atom per core constraint
         max_atom_per_core_constraint = \
             PartitionerMaximumSizeConstraint(max_atoms_per_core)
@@ -154,16 +162,12 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                 current_found_max_atoms_per_core = constraint.size
         return current_found_max_atoms_per_core
 
-    def create_subvertex(self, lo_atom, hi_atom, resources_required, label=None,
+    def create_subvertex(self, resources_required, label=None,
                          additional_constraints=list()):
         """ Creates a subvertex of this vertex.  Can be overridden in vertex\
             subclasses to create an subvertex instance that contains detailed\
             information
 
-        :param lo_atom: The first atom in the subvertex
-        :type lo_atom: int
-        :param hi_atom: The last atom in the subvertex
-        :type hi_atom: int
         :param label: The label to give the subvertex.  If not given, and the\
                     vertex has no label, no label will be given to the\
                     subvertex.  If not given and the vertex has a label, a\
@@ -181,5 +185,16 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         # Combine the AbstractConstrainedVertex and PartitionedVertex constraints
         additional_constraints.extend(self.constraints)
 
-        return PartitionedVertex(lo_atom, hi_atom, label, resources_required,
-                                 additional_constraints)
+        return PartitionedVertex(label=label,
+                                 resources_required=resources_required,
+                                 constraints=additional_constraints)
+
+    @property
+    def n_atoms(self):
+        """ The number of atoms in the vertex
+
+        :return: The number of atoms
+        :rtype: int
+        :raise None: Raises no known exceptions
+        """
+        return self._n_atoms

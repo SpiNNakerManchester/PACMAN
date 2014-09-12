@@ -14,12 +14,9 @@ class AbstractConstrainedVertex(object):
     """
     _non_labelled_vertex_count = 0
     
-    def __init__(self, n_atoms, label, constraints=None):
+    def __init__(self, label, constraints=None):
 
         """
-
-        :param n_atoms: The number of atoms that the vertex can be split into
-        :type n_atoms: int
         :param label: The name of the vertex
         :type label: str
         :param constraints: The constraints of the vertex
@@ -30,11 +27,6 @@ class AbstractConstrainedVertex(object):
                     * If one of the constraints is not valid
                     * If the number of atoms is less than 1
         """
-        if n_atoms < 1:
-            raise PacmanInvalidParameterException(
-                "n_atoms", str(n_atoms),
-                "Must be at least one atom in the vertex")
-
         if label is None:
             self._label = \
                 "Population {}"\
@@ -42,7 +34,6 @@ class AbstractConstrainedVertex(object):
             AbstractConstrainedVertex._non_labelled_vertex_count += 1
         else:
             self._label = label
-        self._n_atoms = n_atoms
         self._constraints = list()
 
         self.add_constraints(constraints)
@@ -121,16 +112,6 @@ class AbstractConstrainedVertex(object):
         :raise None: Raises no known exceptions
         """
         return self._label
-
-    @property
-    def n_atoms(self):
-        """ The number of atoms in the vertex
-
-        :return: The number of atoms
-        :rtype: int
-        :raise None: Raises no known exceptions
-        """
-        return self._n_atoms
 
     @property
     def constraints(self):
