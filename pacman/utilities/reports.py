@@ -42,7 +42,7 @@ def partitioner_reports(report_folder, hostname, graph,
 
 
 def partitioner_report(report_folder, hostname, graph,
-                       graph_to_subgraph_mapper):
+                       graph_mapper):
     """
     Generate report on the placement of sub-vertices onto cores.
     """
@@ -72,9 +72,9 @@ def partitioner_report(report_folder, hostname, graph,
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
 
-        for sv in graph_to_subgraph_mapper.get_subvertices_from_vertex(v):
-            lo_atom = sv.lo_atom
-            hi_atom = sv.hi_atom
+        for sv in graph_mapper.get_subvertices_from_vertex(v):
+            lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
+            hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
             my_string = "  Slice {}:{} ({} atoms) \n"\
                         .format(lo_atom, hi_atom, num_atoms)
@@ -85,7 +85,7 @@ def partitioner_report(report_folder, hostname, graph,
 
 
 def placement_report_by_vertex(report_folder, hostname, graph,
-                               graph_to_subgraph_mapper, placements):
+                               graph_mapper, placements):
     """
     Generate report on the placement of sub-vertices onto cores.
     """
@@ -119,9 +119,9 @@ def placement_report_by_vertex(report_folder, hostname, graph,
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
 
-        for sv in graph_to_subgraph_mapper.get_subvertices_from_vertex(v):
-            lo_atom = sv.lo_atom
-            hi_atom = sv.hi_atom
+        for sv in graph_mapper.get_subvertices_from_vertex(v):
+            lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
+            hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
             placement = placements.get_placement_of_subvertex(sv)
             x, y, p = placement.x, placement.y, placement.p
@@ -144,7 +144,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
 
 
 def placement_by_core(report_folder, hostname, placements, machine,
-                      graph_to_subgraph_mapper):
+                      graph_mapper):
 
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
@@ -181,13 +181,13 @@ def placement_by_core(report_folder, hostname, placements, machine,
                     placements.get_subvertex_on_processor(
                         chip.x, chip.y, processor.processor_id)
                 vertex = \
-                    graph_to_subgraph_mapper\
+                    graph_mapper\
                     .get_vertex_from_subvertex(subvertex)
                 vertex_label = vertex.label
                 vertex_model = vertex.model_name
                 vertex_atoms = vertex.n_atoms
-                lo_atom = subvertex.lo_atom
-                hi_atom = subvertex.hi_atom
+                lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
+                hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
                 num_atoms = hi_atom - lo_atom + 1
                 p_str = "  Processor {}: AbstractConstrainedVertex: '{}', pop sz: {}\n"\
                         .format(proc_id, vertex_label, vertex_atoms)
@@ -203,7 +203,7 @@ def placement_by_core(report_folder, hostname, placements, machine,
 
 
 def sdram_usage_per_chip(report_folder, hostname, placements, machine,
-                         graph_to_subgraph_mapper, graph):
+                         graph_mapper, graph):
     file_name = os.path.join(report_folder, "chip_sdram_usage_by_core.rpt")
     f_mem_used_by_core = None
     try:
@@ -222,10 +222,13 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
 
     for placement in placements.placements:
         subvert = placement.subvertex
-        vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(subvert)
+        vertex = graph_mapper.get_vertex_from_subvertex(subvert)
         vertex_in_edges = graph.incoming_edges_to_vertex(vertex)
+
+        lo_atom = graph_mapper.get_subvertex_slice(subvert).lo_atom
+        hi_atom = graph_mapper.get_subvertex_slice(subvert).hi_atom
         requirements = \
-            vertex.get_resources_used_by_atoms(subvert.lo_atom, subvert.hi_atom,
+            vertex.get_resources_used_by_atoms(lo_atom, hi_atom,
                                                vertex_in_edges)
 
         x, y, p = placement.x, placement.y, placement.p
@@ -321,7 +324,7 @@ def router_report_from_dat_file(report_folder):
 
 #ToDO NOT CHECKED YET
 def router_edge_information(report_folder, hostname, graph, routing_tables,
-                            graph_to_subgraph_mapper, placements, routing_info,
+                            graph_mapper, placements, routing_info,
                             machine):
     """
     Generate report on the routing of sub-edges across the machine.
@@ -350,7 +353,7 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         string = "{}, to vertex: '{}' (size: {})\n"\
                  .format(string, to_v_name, to_v_sz)
         f_routing.write(string)
-        subedges = graph_to_subgraph_mapper.get_subedges_from_edge(e)
+        subedges = graph_mapper.get_subedges_from_edge(e)
         f_routing.write("Sub-edges: {}\n".format(len(subedges)))
 
         for se in subedges:
@@ -368,8 +371,8 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
             to_core = "({}, {}, {})"\
                 .format(to_placement.x, to_placement.y, to_placement.p)
             fr_atoms = "{}:{}"\
-                .format(fr_placement.subvertex.lo_atom,
-                        fr_placement.subvertex.hi_atom)
+                .format(graph_mapper.get_subvertex_slice(fr_placement.subvertex).lo_atom,
+                        graph_mapper.get_subvertex_slice(fr_placement.subvertex).hi_atom)
             to_atoms = "{}:{}"\
                 .format(to_placement.subvertex.lo_atom,
                         to_placement.subvertex.hi_atom)

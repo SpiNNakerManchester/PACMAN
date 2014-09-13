@@ -77,23 +77,18 @@ class TestGraphModel(unittest.TestCase):
         constraint1 = PartitionerMaximumSizeConstraint(2)
         vert = MyVertex(10, "New AbstractConstrainedVertex", 256, [constraint1])
         subv_from_vert = vert.create_subvertex(
-            0, 9, vert.get_resources_used_by_atoms(0, 9, None))
+            vert.get_resources_used_by_atoms(0, 9, None))
         self.assertIn(constraint1, subv_from_vert.constraints)
-        self.assertEqual(subv_from_vert.lo_atom, 0)
-        self.assertEqual(subv_from_vert.hi_atom, 9)
 
     def test_new_create_subvertex_from_vertex_no_constraints(self):
         vert = MyVertex(10, "New AbstractConstrainedVertex", 256)
         subv_from_vert = vert.create_subvertex(
-            0, 9, vert.get_resources_used_by_atoms(0, 9, None))
-        self.assertEqual(subv_from_vert.lo_atom, 0)
-        self.assertEqual(subv_from_vert.hi_atom, 9)
+            vert.get_resources_used_by_atoms(0, 9, None))
 
     def test_new_create_subvertex_from_vertex_check_resources(self):
         vert = MyVertex(10, "New AbstractConstrainedVertex", 256)
         resources = vert.get_resources_used_by_atoms(0, 9, None)
-        subv_from_vert = vert.create_subvertex(
-            0, 9, resources)
+        subv_from_vert = vert.create_subvertex(resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
 
     def test_create_new_subvertex_from_vertex_with_additional_constraints(self):
@@ -101,13 +96,11 @@ class TestGraphModel(unittest.TestCase):
         constraint2 = PartitionerMaximumSizeConstraint(3)
         vert = MyVertex(10, "New AbstractConstrainedVertex", 256, [constraint1])
         subv_from_vert = vert.create_subvertex(
-            0, 9, vert.get_resources_used_by_atoms(0, 9, None), None,
+            vert.get_resources_used_by_atoms(0, 9, None), "",
             [constraint2])
         self.assertEqual(len(subv_from_vert.constraints), 2 + 1)
         self.assertEqual(subv_from_vert.constraints[1], constraint1)
         self.assertEqual(subv_from_vert.constraints[0], constraint2)
-        self.assertEqual(subv_from_vert.lo_atom, 0)
-        self.assertEqual(subv_from_vert.hi_atom, 9)
 
     def test_create_new_edge(self):
         vert1 = MyVertex(10, "New AbstractConstrainedVertex 1", 256)

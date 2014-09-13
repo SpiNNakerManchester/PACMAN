@@ -521,6 +521,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
     @staticmethod
     def _merge_entries(other_entry, routing_entry_route_processors, defaultable,
                        key, mask, routing_entry_route_links, routing_table):
+
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
 
         :param other_entry:
