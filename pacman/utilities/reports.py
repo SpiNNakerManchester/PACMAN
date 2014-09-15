@@ -225,11 +225,9 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
         vertex = graph_mapper.get_vertex_from_subvertex(subvert)
         vertex_in_edges = graph.incoming_edges_to_vertex(vertex)
 
-        lo_atom = graph_mapper.get_subvertex_slice(subvert).lo_atom
-        hi_atom = graph_mapper.get_subvertex_slice(subvert).hi_atom
+        vertex_slice = graph_mapper.get_subvertex_slice(subvert)
         requirements = \
-            vertex.get_resources_used_by_atoms(lo_atom, hi_atom,
-                                               vertex_in_edges)
+            vertex.get_resources_used_by_atoms(vertex_slice, vertex_in_edges)
 
         x, y, p = placement.x, placement.y, placement.p
         f_mem_used_by_core.write(

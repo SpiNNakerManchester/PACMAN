@@ -28,26 +28,6 @@ class PartitionedVertex(AbstractConstrainedVertex):
         self._resources_required = resources_required
         self._constraints = list()
         self.add_constraints(constraints)
-    
-    @property
-    def lo_atom(self):
-        """ The id of the first atom in the subvertex
-
-        :return: The id of the first atom
-        :rtype: int
-        :raise None: Raises no known exceptions
-        """
-        return self._lo_atom
-
-    @property
-    def hi_atom(self):
-        """ The id of the last atom in the subvertex
-
-        :return: The id of the last atom
-        :rtype: int
-        :raise None: Raises no known exceptions
-        """
-        return self._hi_atom
 
     @property
     def resources_required(self):

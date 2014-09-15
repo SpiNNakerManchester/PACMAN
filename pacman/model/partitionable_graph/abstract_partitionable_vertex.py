@@ -67,15 +67,14 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         self.add_constraint(max_atom_per_core_constraint)
 
     @abstractmethod
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
         """method for calculating sdram usage of a collection of atoms
 
-        :param lo_atom: the low atom value to calcualte sdram usage from
-        :param hi_atom: the high atom value to calculate sdram usage from
+        :param vertex_slice: the vertex vertex_slice which determines\
+         which atoms are being represented by this vertex
         :param vertex_in_edges: the incomign edges of this vertex for
         calcualting sdram usage
-        :type lo_atom: int
-        :type hi_atom: int
+        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :type vertex_in_edges: iterable of edges
         :return a int value for sdram usage
         :rtype: int
@@ -83,26 +82,24 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         """
 
     @abstractmethod
-    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_dtcm_usage_for_atoms(self, vertex_slice):
         """method for caulculating dtcm usage for a coltection of atoms
 
-        :param lo_atom: the low atom value to calcualte sdram usage from
-        :param hi_atom: the high atom value to calculate sdram usage from
-        :type lo_atom: int
-        :type hi_atom: int
+        :param vertex_slice: the vertex vertex_slice which determines\
+         which atoms are being represented by this vertex
+        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return a int value for sdram usage
         :rtype: int
         :raise None: this emthod raises no known exception
         """
 
     @abstractmethod
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_cpu_usage_for_atoms(self, vertex_slice):
         """Gets the CPU requirements for a range of atoms
 
-        :param lo_atom: the low atom value to calcualte sdram usage from
-        :param hi_atom: the high atom value to calculate sdram usage from
-        :type lo_atom: int
-        :type hi_atom: int
+        :param vertex_slice: the vertex vertex_slice which determines\
+         which atoms are being represented by this vertex
+        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return a int value for sdram usage
         :rtype: int
         :raise None: this emthod raises no known exception
@@ -118,26 +115,24 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :raise None: does not raise any knwon exception
         """
 
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+    def get_resources_used_by_atoms(self, vertex_slice, vertex_in_edges):
         """returns the separate resource requirements for a range of atoms
         in a resource object with a assumption object that tracks any
         assumptions made by the model when estimating resource requirement
 
-        :param lo_atom: the low value of atoms to calculate resources from
-        :param hi_atom: the high value of atoms to calculate resources from.
+        :param vertex_slice: the low value of atoms to calculate resources from
         :param vertex_in_edges: the edges going into this vertex.
-        :type lo_atom: int
-        :type hi_atom: int
+        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :type vertex_in_edges: list of edges
         :return: a Resource container that contains a CPUCyclesPerTickResource,
         DTCMResource and SDRAMResource
         :rtype: ResourceContainer
         :raise None: this method does not raise any known exception
         """
-        cpu_cycles = self.get_cpu_usage_for_atoms(lo_atom, hi_atom)
-        dtcm_requirement = self.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
-        sdram_requirement = \
-            self.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
+        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice)
+        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice)
+        sdram_requirement = self.get_sdram_usage_for_atoms(vertex_slice,
+                                                           vertex_in_edges)
         # noinspection PyTypeChecker
         resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                       dtcm=DTCMResource(dtcm_requirement),

@@ -18,6 +18,7 @@ from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.model.graph_mapper.slice import Slice
 from pacman.operations.placer_algorithms.abstract_placer_algorithm import \
     AbstractPlacerAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
@@ -247,7 +248,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-                subvertex = PartitionedVertex(lo_atom, hi_atom, used_resources,
+                subvertex = PartitionedVertex(used_resources,
                                               "subvertex with low atoms {} and "
                                               "hi atoms {} for vertex {}"
                                               .format(lo_atom, hi_atom, 
@@ -256,7 +257,9 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                     PlacerChipAndCoreConstraint(x, y, p)
                 #update objects
                 subgraph.add_subvertex(subvertex)
-                graph_to_subgraph_mapper.add_subvertex(subvertex, vertex)
+                graph_to_subgraph_mapper.add_subvertex(
+                    subvertex=subvertex, lo_atom=lo_atom, hi_atom=hi_atom,
+                    vertex=vertex)
                 self._update_sdram_allocator(vertex, used_resources, machine)
                 self._complete_placements.add_placement(
                     Placement(x=x, y=y, p=p, subvertex=subvertex))
@@ -303,8 +306,9 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             resources = self._get_maximum_resources_per_processor(
                 vertex_constraints=vertex.constraints, machine=machine)
             #get resources for vertexes
+            vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(
-                lo_atom, hi_atom, graph.incoming_edges_to_vertex(vertex))
+                vertex_slice, graph.incoming_edges_to_vertex(vertex))
             
             #figure max ratio
             ratio = self._find_max_ratio(used_resources, resources)
