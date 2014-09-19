@@ -59,3 +59,11 @@ class Placement(object):
         :rtype: int
         """
         return self._p
+
+    def __repr__(self):
+        """ generates a human readable description of the placement object
+
+        :return: string representation of the placement object
+        """
+        return "placement object for core {}:{}:{}".format(self._x, self._y,
+                                                           self._p)

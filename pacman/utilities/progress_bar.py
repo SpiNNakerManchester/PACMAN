@@ -15,6 +15,7 @@ class ProgressBar(object):
         self.chars_per_thing = None
         self.last_update = 0
         self.chars_done = 0
+        self.string = string_describing_what_being_progressed
 
         self.create_initial_progress_bar(string_describing_what_being_progressed)
 
@@ -48,3 +49,6 @@ class ProgressBar(object):
     @staticmethod
     def end():
         print("", file=sys.stderr)
+
+    def __repr__(self):
+        return "progress bar for {}".format(self.string)

@@ -99,4 +99,10 @@ class Placements(object):
         """
         return self._placements.itervalues()
 
+    def __repr__(self):
+        output = ""
+        for placement in self._placements:
+            output += placement.__repr__()
+        return output
+
 

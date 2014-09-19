@@ -64,7 +64,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                                    "on partitioning the partitionable_graph's vertices")
         vertices = graph.vertices
         subgraph = PartitionedGraph(label="partitioned_graph for partitionable_graph {}".format(graph.label))
-        graph_to_subgraph_mapper = GraphMapper()
+        graph_to_subgraph_mapper = GraphMapper(graph.label, subgraph.label)
         # Partition one vertex at a time
         for vertex in vertices:
             # Compute atoms per core from resource availability

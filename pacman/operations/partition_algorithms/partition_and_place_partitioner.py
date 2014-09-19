@@ -102,8 +102,10 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
 
         # Load the machine and vertices objects from the dao
         vertices = graph.vertices
-        subgraph = PartitionedGraph()
-        graph_to_sub_graph_mapper = GraphMapper()
+        subgraph = PartitionedGraph(
+            label="partitioned graph for {}".format(graph.label))
+
+        graph_to_sub_graph_mapper = GraphMapper(graph.label, subgraph.label)
 
         #sort out vertex's by constraints
         vertices = utility_calls.sort_objects_by_constraint_authority(vertices)
