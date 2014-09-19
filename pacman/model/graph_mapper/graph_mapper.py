@@ -6,7 +6,7 @@ from pacman.model.graph_mapper.slice import Slice
 
 class GraphMapper(object):
 
-    def __init__(self, label1="", label2=""):
+    def __init__(self, first_graph_label="", second_graph_label=""):
         """
         :return:
         """
@@ -16,12 +16,12 @@ class GraphMapper(object):
         self._subvertices_from_vertex = dict()
         self._subvertex_to_slice = dict()
         self._subedges_from_edge = dict()
-        self._label1 = label1
-        self._label2 = label2
+        self._first_graph_label = first_graph_label
+        self._second_graph_label = second_graph_label
 
     @property
-    def label1(self):
-        return self._label1
+    def first_graph_label(self):
+        return self._first_graph_label
 
     def add_subvertex(self, subvertex, lo_atom, hi_atom, vertex=None):
         """ Add a subvertex to this partitioned_graph
@@ -181,4 +181,4 @@ class GraphMapper(object):
 
     def __repr__(self):
         return "graph_mapper object for between graphs \"{}\" and \"{}\""\
-            .format(self._label1, self._label2)
+            .format(self._first_graph_label, self._second_graph_label)
