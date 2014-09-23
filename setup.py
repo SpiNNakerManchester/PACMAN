@@ -21,6 +21,7 @@ setup(
             'pacman.operations.partition_algorithms',
             'pacman.operations.placer_algorithms',
             'pacman.operations.router_algorithms',
-            'pacman.operations.routing_info_allocator_algorithms'],
+            'pacman.operations.routing_info_allocator_algorithms',
+            'pacman.utilities'],
     install_requires=['six', 'enum34', 'SpiNNMachine']
 )
