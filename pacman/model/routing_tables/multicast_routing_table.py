@@ -8,7 +8,7 @@ class MulticastRoutingTable(object):
 
     def __init__(self, x, y, multicast_routing_entries=None):
         """
-        
+
         :param x: The x-coordinate of the chip for which this is the routing\
                     table
         :type x: int
@@ -44,7 +44,7 @@ class MulticastRoutingTable(object):
         """
         key_mask_combo = \
             multicast_routing_entry.key & multicast_routing_entry.mask
-        if key_mask_combo in self._multicast_routing_entries_by_key.keys():
+        if key_mask_combo in self._multicast_routing_entries_by_key:
             raise PacmanAlreadyExistsException("Multicast_routing_entry",
                                                str(multicast_routing_entry))
 
@@ -77,16 +77,16 @@ class MulticastRoutingTable(object):
     @property
     def x(self):
         """ The x-coordinate of the chip of this table
-        
+
         :return: The x-coordinate
         :rtype: int
         """
         return self._x
-    
+
     @property
     def y(self):
         """ The y-coordinate of the chip of this table
-        
+
         :return: The y-coordinate
         :rtype: int
         """
@@ -106,7 +106,7 @@ class MulticastRoutingTable(object):
     @property
     def number_of_entries(self):
         return len(self._multicast_routing_entries)
-    
+
     def get_multicast_routing_entry_by_key(self, key, mask):
         """ Get the routing entry associated with the specified key-mask\
             combination or None if the routing table does not match the key
