@@ -11,7 +11,7 @@ setup(
     packages=['pacman',
             'pacman.model',
             'pacman.model.constraints',
-            'pacman.model.graph_mapper'
+            'pacman.model.graph_mapper',
             'pacman.model.partitionable_graph',
             'pacman.model.partitioned_graph',
             'pacman.model.placements',
