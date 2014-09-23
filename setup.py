@@ -8,6 +8,7 @@ setup(
     version="0.1-SNAPSHOT",
     description="Partition and Configuration Manager",
     url="https://github.com/SpiNNakerManchester/PACMAN",
+    license="GNU GPLv3.0",
     packages=['pacman',
             'pacman.model',
             'pacman.model.constraints',

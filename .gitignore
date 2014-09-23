@@ -4,3 +4,6 @@
 /doc/build
 /.settings
 *.pyc
+build/
+dist/
+PACMAN.egg-info
