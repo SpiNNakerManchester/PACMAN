@@ -45,6 +45,7 @@ class ProgressBar(object):
         while self.chars_done < expected_chars_done:
             print("=", end='', file=sys.stderr)
             self.chars_done += 1
+        sys.stderr.flush()
 
     @staticmethod
     def end():
