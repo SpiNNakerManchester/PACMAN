@@ -11,3 +11,7 @@ class Slice(object):
     @property
     def hi_atom(self):
         return self._hi_atom
+
+    @property
+    def n_atoms(self):
+        return (self._hi_atom - self.lo_atom) + 1
