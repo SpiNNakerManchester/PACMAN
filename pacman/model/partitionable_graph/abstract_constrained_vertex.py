@@ -12,8 +12,7 @@ class AbstractConstrainedVertex(object):
         total number of atoms in the subvertices adds up to the number of atoms\
         in the vertex
     """
-    _non_labelled_vertex_count = 0
-    
+
     def __init__(self, label, constraints=None):
 
         """
@@ -27,13 +26,7 @@ class AbstractConstrainedVertex(object):
                     * If one of the constraints is not valid
                     * If the number of atoms is less than 1
         """
-        if label is None:
-            self._label = \
-                "Population {}"\
-                .format(AbstractConstrainedVertex._non_labelled_vertex_count)
-            AbstractConstrainedVertex._non_labelled_vertex_count += 1
-        else:
-            self._label = label
+        self._label = label
         self._constraints = list()
 
         self.add_constraints(constraints)
