@@ -333,8 +333,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                 hi_atom = lo_atom + new_n_atoms - 1
                 used_resources = \
                     vertex.get_resources_used_by_atoms(
-                        lo_atom, hi_atom,
-                        graph.incoming_edges_to_vertex(vertex))
+                        vertex_slice, graph.incoming_edges_to_vertex(vertex))
                 ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise and exception
