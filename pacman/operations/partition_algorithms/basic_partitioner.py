@@ -70,7 +70,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             # Compute atoms per core from resource availability
             incoming_edges = graph.incoming_edges_to_vertex(vertex)
             requirements = \
-                vertex.get_resources_used_by_atoms(0, 1, incoming_edges)
+                vertex.get_resources_used_by_atoms(0, 1, graph)
 
             #locate max SDRAM available. SDRAM is the only one that's changeable
             #during partitioning, as DTCM and cpu cycles are bespoke to a
@@ -128,7 +128,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                                                    " subvertex")
                 subvertex_usage = \
                     vertex.get_resources_used_by_atoms(
-                        counted, counted + alloc - 1, incoming_edges)
+                        counted, counted + alloc - 1, graph)
 
                 subvert = PartitionedVertex(counted, counted + alloc - 1,
                                             resources_required=subvertex_usage,

@@ -309,8 +309,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                 vertex_constraints=vertex.constraints, machine=machine)
             #get resources for vertexes
             vertex_slice = Slice(lo_atom, hi_atom)
-            used_resources = vertex.get_resources_used_by_atoms(
-                vertex_slice, graph.incoming_edges_to_vertex(vertex))
+            used_resources = vertex.get_resources_used_by_atoms(vertex_slice,
+                                                                graph)
             
             #figure max ratio
             ratio = self._find_max_ratio(used_resources, resources)
@@ -332,8 +332,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
                 used_resources = \
-                    vertex.get_resources_used_by_atoms(
-                        vertex_slice, graph.incoming_edges_to_vertex(vertex))
+                    vertex.get_resources_used_by_atoms(vertex_slice, graph)
                 ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise and exception
@@ -370,6 +369,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
         return used_placements, min_hi_atom
 
+    # ***TODO*** This method is completely out of date?
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
             partition_data_object, resources, ratio):
