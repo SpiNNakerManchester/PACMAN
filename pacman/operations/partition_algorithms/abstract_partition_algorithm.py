@@ -147,7 +147,7 @@ class AbstractPartitionAlgorithm(object):
                 for dst_sv in post_subverts:
                     subedge = edge.create_subedge(src_sv, dst_sv)
                     subgraph.add_subedge(subedge)
-                    graph_to_subgraph_mapper.add_subedge(subedge, edge)
+                    graph_to_subgraph_mapper.add_partitioned_edge(subedge, edge)
             progress_bar.update()
         progress_bar.end()
 
