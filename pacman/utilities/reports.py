@@ -351,7 +351,7 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         string = "{}, to vertex: '{}' (size: {})\n"\
                  .format(string, to_v_name, to_v_sz)
         f_routing.write(string)
-        subedges = graph_mapper.get_subedges_from_edge(e)
+        subedges = graph_mapper.get_partitioned_edges_from_partitionable_edge(e)
         f_routing.write("Sub-edges: {}\n".format(len(subedges)))
 
         for se in subedges:

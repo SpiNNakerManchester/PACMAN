@@ -130,11 +130,14 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     vertex.get_resources_used_by_atoms(
                         counted, counted + alloc - 1, graph)
 
-                subvert = PartitionedVertex(counted, counted + alloc - 1,
-                                            resources_required=subvertex_usage,
-                                            label=label)
+                subvert = \
+                    PartitionedVertex(
+                        label="subvertex with lo atom {} and hi atom {}"
+                              .format(counted, alloc - 1),
+                        resources_required=subvertex_usage)
                 subgraph.add_subvertex(subvert)
-                graph_to_subgraph_mapper.add_subvertex(subvert, vertex)
+                graph_to_subgraph_mapper.add_subvertex(
+                    subvert, counted, counted + alloc - 1, vertex)
                 counted = counted + alloc
 
                 #update sdram calc
