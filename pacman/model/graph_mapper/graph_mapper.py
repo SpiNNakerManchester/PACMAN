@@ -50,32 +50,37 @@ class GraphMapper(object):
         self._subvertex_to_slice[subvertex] = Slice(lo_atom=lo_atom,
                                                     hi_atom=hi_atom)
 
-    def add_subedge(self, subedge, edge=None):
-        """ Add a subedge to this partitioned_graph
+    def add_partitioned_edge(self, partitioned_edge, partitionable_edge):
+        """ Add a partitioned_edge to this partitioned_graph
 
-        :param subedge: a subedge to be added to the partitioned_graph
-        :type subedge:
-            :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
+        :param partitioned_edge: a partitioned_edge to be added to the
+            partitioned_graph
+        :type partitioned_edge:
+            :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
+        :param partitionable_edge: the partitionable_edge associated with this
+            partitioned_edge
+        :type partitionable_edge:
+        :py:class:`pacman.model.partitionable_graph.partitionable_edge.PartitionableEdge`
         :return: None
         :rtype: None
-        :raise None: No known errors.
+        :raise None: No known exceptions.
         """
-        self._subedges_from_edge[edge].add(subedge)
-        self._edge_from_subedge[subedge] = edge
+        self._subedges_from_edge[partitionable_edge].add(partitioned_edge)
+        self._edge_from_subedge[partitioned_edge] = partitionable_edge
 
-    def add_subedges(self, subedges, edge=None):
-        """ Add some subedges to this partitioned_graph
+    def add_partitioned_edges(self, partitioned_edges, partitionable_edge):
+        """ Add some partitioned_edges to this partitioned_graph
 
-        :param subedges: an iterable of subedges to add to this
-            partitioned graph
-        :type subedges: iterable of\
+        :param partitioned_edges: an iterable of partitioned_edges to add to
+            this partitioned_graph
+        :param partitioned_edges : partitioned_edges iterable of\
             :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :return: None
         :rtype: None
         :raise None: No known errors.
         """
-        for subedge in subedges:
-            self.add_subedge(subedge, edge)
+        for subedge in partitioned_edges:
+            self.add_partitioned_edge(subedge, partitionable_edge)
 
     def get_subvertices_from_vertex(self, vertex):
         """ supporting method to get all subvertices for a given vertex
@@ -90,7 +95,7 @@ class GraphMapper(object):
             raise KeyError(vertex)
         return self._subvertices_from_vertex[vertex]
 
-    def get_subedges_from_edge(self, edge):
+    def get_partitioned_edges_from_partitionable_edge(self, edge):
         """ supporting method to get all subedges for a given edge
 
         :param edge: the edge for which to find the associated subedges
@@ -116,7 +121,7 @@ class GraphMapper(object):
             raise KeyError(subvertex)
         return self._vertex_from_subvertex[subvertex]
 
-    def get_edge_from_subedge(self, subedge):
+    def get_partitionable_edge_from_partitioned_edge(self, subedge):
         """ supporting method to get the edge for a given subedge
 
         :param subedge: the subedge for which to find the associated edge
