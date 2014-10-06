@@ -2,6 +2,10 @@ class SubvertexAlreadyPlacedError(ValueError):
     pass
 
 
+class SubvertexNotPlacedError(KeyError):
+    pass
+
+
 class ProcessorAlreadyOccupiedError(ValueError):
     pass
 
@@ -74,9 +78,9 @@ class Placements(object):
         :raise None: does not raise any known exceptions
         """
         placement_id = (x, y, p)
-        if placement_id not in self._placements:
-            return None  # Nothing placed here
-        return self._placements[placement_id].subvertex
+        if placement_id in self._placements:
+            return self._placements[placement_id].subvertex
+        return None
 
     def get_placement_of_subvertex(self, subvertex):
         """ Return the placement information for a subvertex
@@ -86,9 +90,12 @@ class Placements(object):
             :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: The placement
         :rtype: :py:class:`pacman.model.placements.placement.Placement`
-        :raise KeyError: If the subvertex has not been placed.
+        :raise SubvertexNotPlacedError: If the subvertex has not been placed.
         """
-        return self._subvertices[subvertex]
+        try:
+            return self._subvertices[subvertex]
+        except KeyError:
+            raise SubvertexNotPlacedError(subvertex)
 
     @property
     def placements(self):
