@@ -140,6 +140,20 @@ class GraphMapper(object):
             return self._subedges_from_edge[edge]
         return None
 
+    def get_partitioned_edges_from_pre_partitioned_vertex(self,
+                                                          partitioned_vertex):
+        """Return an iterable of all partitioned edges originating from a given
+        partitioned vertex.
+
+        :param partitioned_vertex: The partitioned vertex for which to find all
+            outgoing partitioned edges.
+        :returns iterable: An iterable of partitioned edges.
+        """
+        for e in self._subedges_from_edge.itervalues():
+            for e in partitioned_edges:
+                if e.pre_subvertex is partitioned_vertex:
+                    yield e
+
     def get_vertex_from_subvertex(self, subvertex):
         """ supporting method to get the vertex for a given subvertex
 

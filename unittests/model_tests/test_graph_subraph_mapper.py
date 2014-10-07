@@ -89,6 +89,40 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         self.assertEqual(graph.get_partitionable_edge_from_partitioned_edge(subedges[0]), edge)
         self.assertEqual(graph.get_partitionable_edge_from_partitioned_edge(subedges[1]), None)
 
+    def test_get_subedges_from_pre_subvertex(self):
+        """Tests that subedges may be queried from the subgraph mapper based on
+        pre-subvertex.
+        """
+        # Create subvertices and subedges
+        vertices = [MyVertex(l) for l in ['A', 'B']]
+        subvertices = [PartitionedVertex(None, 'A'), PartitionedVertex(None, 'B')]
+        subedges = [PartitionedEdge(subvertices[0], subvertices[1]),
+                    PartitionedEdge(subvertices[1], subvertices[0])]
+        edges = [PartitionableEdge(vertices[0], vertices[1]),
+                 PartitionableEdge(vertices[1], vertices[0])]
+
+
+        # Construct the graph mapping
+        gm = GraphMapper()
+        for sv in subvertices:
+            gm.add_subvertex(sv, 0, 1)
+
+        for se, e in zip(subedges, edges):
+            gm.add_partitioned_edge(se, e)
+
+        # Get subedges from pre-subvertex
+        subedges0 = gm.get_partitioned_edges_from_pre_partitioned_vertex(
+            subvertices[0]
+        )
+        subedges1 = gm.get_partitioned_edges_from_pre_partitioned_vertex(
+            subvertices[1]
+        )
+
+        # Assert these were returned correctly
+        self.assertIn(subedges[0], subedges0)
+        self.assertNotIn(subedges[1], subedges0)
+        self.assertIn(subedges[1], subedges1)
+        self.assertNotIn(subedges[0], subedges1)
 
 if __name__ == '__main__':
     unittest.main()
