@@ -1,4 +1,7 @@
-from pacman.exceptions import PacmanAlreadyExistsException
+from pacman.exceptions import (PacmanSubvertexAlreadyPlacedError,
+                               PacmanSubvertexNotPlacedError,
+                               PacmanProcessorAlreadyOccupiedError,
+                               PacmanProcessorNotOccupiedError)
 
 
 class Placements(object):
@@ -11,10 +14,10 @@ class Placements(object):
         :param placements: The initial list of placements
         :type placements: iterable of\
                     :py:class:`pacman.model.placements.placement.Placement`
-        :raise pacman.exceptions.PacmanAlreadyExistsException:
-                * If there are any two placements to the same processor on the\
-                  same chip
-                * If there is any subvertex with more than one placement
+        :raise PacmanSubvertexAlreadyPlacedError:
+                If there is any subvertex with more than one placement.
+        :raise PacmanProcessorAlreadyOccupiedError:
+                If two placements are made to the same processor.
         """
         self._placements = dict()
         self._subvertices = dict()
@@ -28,29 +31,27 @@ class Placements(object):
         :return: None
         :rtype: None
         """
-        if placements is not None:
-            for placement in placements:
-                self.add_placement(placement)
+        for placement in placements:
+            self.add_placement(placement)
 
     def add_placement(self, placement):
         """ Add a placement
 
         :param placement: The placement to add
-        :type placement: :py:class:`pacman.model.placements.placement.Placement`
+        :type placement:
+            :py:class:`pacman.model.placements.placement.Placement`
         :return: None
         :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: 
-                * If there is already a placement for the given processor on\
-                  the given chip
-                * If the subvertex has been placed elsewhere
+        :raise PacmanSubvertexAlreadyPlacedError:
+                If there is any subvertex with more than one placement.
+        :raise PacmanProcessorAlreadyOccupiedError:
+                If two placements are made to the same processor.
         """
         placement_id = (placement.x, placement.y, placement.p)
-        if placement_id in self._placements.keys():
-            raise PacmanAlreadyExistsException("placement",
-                                               str(placement_id))
-        if placement.subvertex in self._subvertices.keys():
-            raise PacmanAlreadyExistsException("subvertex",
-                                               str(placement.subvertex))
+        if placement_id in self._placements:
+            raise PacmanProcessorAlreadyOccupiedError(placement_id)
+        if placement.subvertex in self._subvertices:
+            raise PacmanSubvertexAlreadyPlacedError(placement.subvertex)
 
         self._placements[placement_id] = placement
         self._subvertices[placement.subvertex] = placement
@@ -71,22 +72,45 @@ class Placements(object):
         :raise None: does not raise any known exceptions
         """
         placement_id = (x, y, p)
-        if placement_id in self._placements:
+        try:
             return self._placements[placement_id].subvertex
-        return None
-    
+        except KeyError:
+            raise PacmanProcessorNotOccupiedError(placement_id)
+
     def get_placement_of_subvertex(self, subvertex):
         """ Return the placement information for a subvertex
-        
+
         :param subvertex: The subvertex to find the placement of
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
-        :return: The placement, or None if the subvertex has no placement
+        :type subvertex:
+            :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+        :return: The placement
         :rtype: :py:class:`pacman.model.placements.placement.Placement`
-        :raise None: No known exceptions are raised
+        :raise PacmanSubvertexNotPlacedError: If the subvertex has not been
+            placed.
         """
-        if subvertex in self._subvertices:
+        try:
             return self._subvertices[subvertex]
-        return None
+        except KeyError:
+            raise PacmanSubvertexNotPlacedError(subvertex)
+
+    def get_placed_processors(self):
+        """Returns an iterable of processors with assigned subvertices.
+
+        :return: Iterable of (x, y, p) tuples indicating processors with
+                 assigned subvertices.
+        :rtype: iterable
+        """
+        return self._placements.iterkeys()
+
+    def is_subvertex_on_processor(self, x, y, p):
+        """Returns whether a subvertex is assigned to a processor.
+
+        :param int x: x co-ordinate of processor.
+        :param int y: y co-ordinate of processor.
+        :param int p: Index of processor.
+        :return bool: Whether the processor has an assigned subvertex.
+        """
+        return (x, y, p) in self._placements
 
     @property
     def placements(self):
@@ -104,5 +128,3 @@ class Placements(object):
         for placement in self._placements:
             output += placement.__repr__()
         return output
-
-
