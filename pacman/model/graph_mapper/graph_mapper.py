@@ -117,7 +117,7 @@ class GraphMapper(object):
         :rtype: `pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise KeyError: If subvertex is not known.
         """
-        if subvertex in self._vertex_from_subvertex:
+        if subvertex not in self._vertex_from_subvertex:
             raise KeyError(subvertex)
         return self._vertex_from_subvertex[subvertex]
 
@@ -130,7 +130,7 @@ class GraphMapper(object):
         :rtype: `pacman.model.graph.edge.PartitionableEdge`
         :raise KeyError: if subedge is not known.
         """
-        if subedge in self._edge_from_subedge:
+        if subedge not in self._edge_from_subedge:
             raise KeyError(subedge)
         return self._edge_from_subedge[subedge]
 
