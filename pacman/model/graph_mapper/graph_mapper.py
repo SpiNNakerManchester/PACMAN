@@ -92,7 +92,8 @@ class GraphMapper(object):
         :raise KeyError: If the vertex is not known.
         """
         partitioned_vertices = list(self.get_matching_partitioned_vertices(
-            lambda pv, pv_attrs: pv_attrs.vertex is vertex))
+            lambda pv: self.get_vertex_from_subvertex(pv) is vertex)
+        )
         if len(partitioned_vertices) == 0:
             raise KeyError(vertex)
         return partitioned_vertices
@@ -107,7 +108,10 @@ class GraphMapper(object):
         :raise KeyError: If the edge is not known.
         """
         partitioned_edges = list(self.get_matching_partitioned_edges(
-            lambda pe, pe_attrs: pe_attrs.edge is edge))
+            lambda pe: (self.get_partitionable_edge_from_partitioned_edge(pe)
+                        is edge)
+        ))
+
         if len(partitioned_edges) == 0:
             raise KeyError(edge)
         return partitioned_edges
@@ -153,21 +157,21 @@ class GraphMapper(object):
     def get_matching_partitioned_vertices(self, predicate):
         """A generator of partitioned vertices which match the predicate.
 
-        The predicate is expected to receive two arguments, a partitioned
-        vertex and a namedtuple of data about that partitioned vertex.
+        The predicate is expected to receive a partitioned vertex as its only
+        argument.
         """
-        for (pv, attrs) in self.partitioned_vertices.iteritems():
-            if predicate(pv, attrs):
+        for pv in self.partitioned_vertices.iterkeys():
+            if predicate(pv):
                 yield pv
 
     def get_matching_partitioned_edges(self, predicate):
         """A generator of partitioned edges which match the predicate.
 
-        The predicate is expected to receive two arguments, a partitioned edge
-        and a namedtuple of data about that partitioned edge.
+        The predicate is expected to receive a partitioned edge as its only
+        argument.
         """
-        for (pe, attrs) in self.partitioned_edges.iteritems():
-            if predicate(pe, attrs):
+        for pe in self.partitioned_edges.iterkeys():
+            if predicate(pe):
                 yield pe
 
     def __repr__(self):
