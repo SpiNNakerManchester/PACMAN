@@ -3,18 +3,21 @@ import collections
 from pacman.model.graph_mapper.slice import Slice
 
 
+PartitionedVertexAttributes = collections.namedtuple(
+    'PartitionedVertexAttributes', 'vertex slice')
+PartitionedEdgeAttributes = collections.namedtuple(
+    'PartitionedEdgeAttributes', 'edge')
+
+
 class GraphMapper(object):
 
     def __init__(self, first_graph_label="", second_graph_label=""):
         """
         :return:
         """
-        self._vertex_from_subvertex = dict()
-        self._edge_from_subedge = dict()
+        self.partitioned_vertices = dict()
+        self.partitioned_edges = dict()
 
-        self._subvertices_from_vertex = collections.defaultdict(set)
-        self._subvertex_to_slice = dict()
-        self._subedges_from_edge = collections.defaultdict(set)
         self._first_graph_label = first_graph_label
         self._second_graph_label = second_graph_label
 
@@ -44,13 +47,10 @@ class GraphMapper(object):
                 raise ValueError(
                     "hi_atom {:d} > max {:d}".format(hi_atom, vertex.n_atoms))
 
-            self._vertex_from_subvertex[subvertex] = vertex
-            self._subvertices_from_vertex[vertex].add(subvertex)
+        self.partitioned_vertices[subvertex] = PartitionedVertexAttributes(
+            vertex, Slice(lo_atom=lo_atom, hi_atom=hi_atom))
 
-        self._subvertex_to_slice[subvertex] = Slice(lo_atom=lo_atom,
-                                                    hi_atom=hi_atom)
-
-    def add_partitioned_edge(self, partitioned_edge, partitionable_edge):
+    def add_partitioned_edge(self, partitioned_edge, partitionable_edge=None):
         """ Add a partitioned_edge to this partitioned_graph
 
         :param partitioned_edge: a partitioned_edge to be added to the
@@ -65,8 +65,8 @@ class GraphMapper(object):
         :rtype: None
         :raise None: No known exceptions.
         """
-        self._subedges_from_edge[partitionable_edge].add(partitioned_edge)
-        self._edge_from_subedge[partitioned_edge] = partitionable_edge
+        self.partitioned_edges[partitioned_edge] = PartitionedEdgeAttributes(
+            partitionable_edge)
 
     def add_partitioned_edges(self, partitioned_edges, partitionable_edge):
         """ Add some partitioned_edges to this partitioned_graph
@@ -91,9 +91,11 @@ class GraphMapper(object):
         :rtype: set
         :raise KeyError: If the vertex is not known.
         """
-        if vertex not in self._subvertices_from_vertex:
+        partitioned_vertices = list(self.get_matching_partitioned_vertices(
+            lambda pv, pv_attrs: pv_attrs.vertex is vertex))
+        if len(partitioned_vertices) == 0:
             raise KeyError(vertex)
-        return self._subvertices_from_vertex[vertex]
+        return partitioned_vertices
 
     def get_partitioned_edges_from_partitionable_edge(self, edge):
         """ supporting method to get all subedges for a given edge
@@ -104,9 +106,11 @@ class GraphMapper(object):
         :rtype: set
         :raise KeyError: If the edge is not known.
         """
-        if edge not in self._subedges_from_edge:
+        partitioned_edges = list(self.get_matching_partitioned_edges(
+            lambda pe, pe_attrs: pe_attrs.edge is edge))
+        if len(partitioned_edges) == 0:
             raise KeyError(edge)
-        return self._subedges_from_edge[edge]
+        return partitioned_edges
 
     def get_vertex_from_subvertex(self, subvertex):
         """ supporting method to get the vertex for a given subvertex
@@ -117,9 +121,9 @@ class GraphMapper(object):
         :rtype: `pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise KeyError: If subvertex is not known.
         """
-        if subvertex not in self._vertex_from_subvertex:
+        if subvertex not in self.partitioned_vertices:
             raise KeyError(subvertex)
-        return self._vertex_from_subvertex[subvertex]
+        return self.partitioned_vertices[subvertex].vertex
 
     def get_partitionable_edge_from_partitioned_edge(self, subedge):
         """ supporting method to get the edge for a given subedge
@@ -130,9 +134,9 @@ class GraphMapper(object):
         :rtype: `pacman.model.graph.edge.PartitionableEdge`
         :raise KeyError: if subedge is not known.
         """
-        if subedge not in self._edge_from_subedge:
+        if subedge not in self.partitioned_edges:
             raise KeyError(subedge)
-        return self._edge_from_subedge[subedge]
+        return self.partitioned_edges[subedge].edge
 
     def get_subvertex_slice(self, subvertex):
         """ supporting method for retrieveing the lo and hi atom of a subvertex
@@ -142,9 +146,29 @@ class GraphMapper(object):
         :rtype: pacman.model.graph_mapper.slice.Slice
         :raise KeyError: If the subvertex is not known.
         """
-        if subvertex not in self._subvertex_to_slice:
+        if subvertex not in self.partitioned_vertices:
             raise KeyError(subvertex)
-        return self._subvertex_to_slice[subvertex]
+        return self.partitioned_vertices[subvertex].slice
+
+    def get_matching_partitioned_vertices(self, predicate):
+        """A generator of partitioned vertices which match the predicate.
+
+        The predicate is expected to receive two arguments, a partitioned
+        vertex and a namedtuple of data about that partitioned vertex.
+        """
+        for (pv, attrs) in self.partitioned_vertices.iteritems():
+            if predicate(pv, attrs):
+                yield pv
+
+    def get_matching_partitioned_edges(self, predicate):
+        """A generator of partitioned edges which match the predicate.
+
+        The predicate is expected to receive two arguments, a partitioned edge
+        and a namedtuple of data about that partitioned edge.
+        """
+        for (pe, attrs) in self.partitioned_edges.iteritems():
+            if predicate(pe, attrs):
+                yield pe
 
     def __repr__(self):
         return "graph_mapper object for between graphs \"{}\" and \"{}\""\
