@@ -127,3 +127,23 @@ class PacmanNotExistException(PacmanException):
         :type problem: str
         """
         PacmanException.__init__(self, problem)
+
+
+class PacmanSubvertexAlreadyPlacedError(ValueError):
+    """Indicates multiple placements are being made for a subvertex."""
+    pass
+
+
+class PacmanSubvertexNotPlacedError(KeyError):
+    """Indicates no placements are made for a subvertex."""
+    pass
+
+
+class PacmanProcessorAlreadyOccupiedError(ValueError):
+    """Indicates multiple placements are being made to a processor."""
+    pass
+
+
+class PacmanProcessorNotOccupiedError(KeyError):
+    """Indicates that no placement has been made to a processor."""
+    pass
