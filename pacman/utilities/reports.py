@@ -167,9 +167,8 @@ def placement_by_core(report_folder, hostname, placements, machine,
     for chip in machine.chips:
         written_header = False
         for processor in chip.processors:
-            if placements.get_subvertex_on_processor(chip.x, chip.y,
-                                                     processor.processor_id) \
-               is not None:
+            if placements.is_subvertex_on_processor(chip.x, chip.y,
+                                                   processor.processor_id):
                 if not written_header:
                     f_place_by_core.write("**** Chip: ({}, {})\n"
                                           .format(chip.x, chip.y))
