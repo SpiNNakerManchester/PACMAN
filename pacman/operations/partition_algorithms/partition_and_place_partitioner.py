@@ -105,7 +105,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
         subgraph = PartitionedGraph(
             label="partitioned graph for {}".format(graph.label))
 
-        graph_to_sub_graph_mapper = GraphMapper(graph.label, subgraph.label)
+        graph_mapper = GraphMapper(graph.label, subgraph.label)
 
         #sort out vertex's by constraints
         vertices = utility_calls.sort_objects_by_constraint_authority(vertices)
@@ -122,11 +122,11 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
         for vertex in vertices:
             #check that the vertex hasn't already been partitioned
             subverts_from_vertex = \
-                graph_to_sub_graph_mapper.get_subvertices_from_vertex(vertex)
+                graph_mapper.get_subvertices_from_vertex(vertex)
             #if not, partition
             if subverts_from_vertex is None:
                 self._partition_vertex(
-                    vertex, subgraph, graph_to_sub_graph_mapper, machine, graph)
+                    vertex, subgraph, graph_mapper, machine, graph)
             progress_bar.update(vertex.n_atoms)
         progress_bar.end()
 
@@ -135,10 +135,17 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
             if subvert in self._placement_to_subvert_mapper.keys():
                 subvert.add_constraint(
                     self._placement_to_subvert_mapper[subvert])
+                associated_vertex = \
+                    graph_mapper.get_vertex_from_subvertex(subvert)
+                for constraint in associated_vertex.constraints:
+                    if not isinstance(constraint, AbstractPartitionerConstraint):
+                        subvert.add_constraint(constraint)
 
-        self._generate_sub_edges(subgraph, graph_to_sub_graph_mapper, graph)
 
-        return subgraph, graph_to_sub_graph_mapper
+
+        self._generate_sub_edges(subgraph, graph_mapper, graph)
+
+        return subgraph, graph_mapper
 
     @property
     def complete_placements(self):
