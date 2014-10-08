@@ -18,7 +18,8 @@ class Placements(object):
         """
         self._placements = dict()
         self._subvertices = dict()
-        self.add_placements(placements)
+        if placements is not None:
+            self.add_placements(placements)
 
     def add_placements(self, placements):
         """
