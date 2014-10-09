@@ -147,3 +147,16 @@ class PacmanProcessorAlreadyOccupiedError(ValueError):
 class PacmanProcessorNotOccupiedError(KeyError):
     """Indicates that no placement has been made to a processor."""
     pass
+
+
+class PacmanValueError(ValueError, PacmanException):
+    """Indicates that a value is invalid for some reason."""
+    pass
+
+class PacmanNotFoundError(KeyError, PacmanException):
+    """Indicates that some object has not been found when requested."""
+    pass
+
+class PacmanTypeError(TypeError, PacmanException):
+    """Indicates that an object is of incorrect type."""
+    pass

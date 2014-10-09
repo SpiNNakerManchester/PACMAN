@@ -8,6 +8,8 @@ from pacman.model.partitionable_graph.partitionable_edge import \
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 
+from pacman.exceptions import (PacmanValueError, PacmanNotFoundError)
+
 
 class MyVertex(AbstractPartitionableVertex):
     def __init__(self, n_atoms, label):
@@ -94,10 +96,12 @@ class TestGraphSubgraphMapper(unittest.TestCase):
             vert, graph_mapper.get_vertex_from_subvertex(subvert1))
         self.assertEqual(
             vert, graph_mapper.get_vertex_from_subvertex(subvert2))
-        self.assertRaises(KeyError, graph_mapper.get_vertex_from_subvertex,
-                          subvertices[0])
-        self.assertRaises(KeyError, graph_mapper.get_vertex_from_subvertex,
-                          subvertices[1])
+        self.assertRaises(
+            PacmanNotFoundError, graph_mapper.get_vertex_from_subvertex,
+            subvertices[0])
+        self.assertRaises(
+            PacmanNotFoundError, graph_mapper.get_vertex_from_subvertex,
+            subvertices[1])
 
     def test_get_edge_from_subedge(self):
         subvertices = list()
@@ -127,7 +131,8 @@ class TestGraphSubgraphMapper(unittest.TestCase):
             edge
         )
         self.assertRaises(
-            KeyError, graph.get_partitionable_edge_from_partitioned_edge,
+            PacmanNotFoundError,
+            graph.get_partitionable_edge_from_partitioned_edge,
             subedges[1]
         )
 
