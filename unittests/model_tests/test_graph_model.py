@@ -9,6 +9,7 @@ from pacman.model.constraints.partitioner_maximum_size_constraint import \
 
 
 class MyVertex(AbstractPartitionableVertex):
+
     def get_resources_used_by_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         pass
 
