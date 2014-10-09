@@ -23,7 +23,7 @@ class GraphMapper(object):
     def first_graph_label(self):
         return self._first_graph_label
 
-    def add_subvertex(self, subvertex, lo_atom, hi_atom, vertex=None):
+    def add_subvertex(self, subvertex, lo_atom, hi_atom, vertex):
         """ Add a subvertex to this partitioned_graph
 
         :param subvertex: a subvertex to be added to the partitionable_graph
@@ -48,27 +48,18 @@ class GraphMapper(object):
                 str(subvertex.hi_atom),
                 "Cannot be less than lo_atom")
 
-        if vertex is not None \
-                and vertex not in self._subvertices_from_vertex.keys():
+        if vertex not in self._subvertices_from_vertex:
             self._subvertices_from_vertex[vertex] = set()
-            if hi_atom >= vertex.n_atoms:
-                raise PacmanInvalidParameterException(
-                    "hi_atom ", str(hi_atom),
-                    "Cannot be greater than the total number of atoms")
 
-        if vertex is not None:
-            self._vertex_from_subvertex[subvertex] = vertex
-            self._subvertices_from_vertex[vertex].add(subvertex)
+        if hi_atom >= vertex.n_atoms:
+            raise PacmanInvalidParameterException(
+                "hi_atom ", str(hi_atom),
+                "Cannot be greater than the total number of atoms")
 
-        if subvertex is not None:
-            if lo_atom < 0:
-                raise PacmanInvalidParameterException(
-                    "lo_atom", str(lo_atom), "Cannot be less than 0")
-            if hi_atom < lo_atom:
-                raise PacmanInvalidParameterException(
-                    "hi_atom", str(hi_atom), "Cannot be less than lo_atom")
-            self._subvertex_to_slice[subvertex] = Slice(lo_atom=lo_atom,
-                                                        hi_atom=hi_atom)
+        self._vertex_from_subvertex[subvertex] = vertex
+        self._subvertices_from_vertex[vertex].add(subvertex)
+        self._subvertex_to_slice[subvertex] = Slice(lo_atom=lo_atom,
+                                                    hi_atom=hi_atom)
 
     def add_partitioned_edge(self, partitioned_edge, partitionable_edge):
         """ Add a partitioned_edge to this partitioned_graph
