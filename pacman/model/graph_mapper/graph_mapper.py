@@ -1,6 +1,8 @@
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (PacmanValueError,
+                               PacmanNotFoundError,
+                               PacmanTypeError)
 from pacman.model.graph_mapper.slice import Slice
 
 
@@ -27,34 +29,32 @@ class GraphMapper(object):
         """ Add a subvertex to this partitioned_graph
 
         :param subvertex: a subvertex to be added to the partitionable_graph
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+        :type subvertex:
+            :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: None
         :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
-                    subvertex is not valid
+        :raise pacman.exceptions.PacmanValueError: Atom selection is out of
+            bounds.
+        :raise pacman.exceptions.PacmanTypeError: If the subvertex is of an
+            inappropriate type.
         """
-        if subvertex is None or not isinstance(subvertex, PartitionedVertex):
-            raise PacmanInvalidParameterException(
+        if not isinstance(subvertex, PartitionedVertex):
+            raise PacmanTypeError(
                 "subvertex", str(subvertex),
                 "Must be an instance of"
                 " pacman.model.partitioned_graph.subvertex.SubVertex")
         if lo_atom < 0:
-            raise PacmanInvalidParameterException("lo_atom ",
-                                                  str(lo_atom),
-                                                  "Cannot be less than 0")
+            raise PacmanValueError("lo_atom {:d} < 0".format(lo_atom))
         if lo_atom > hi_atom:
-            raise PacmanInvalidParameterException(
-                "hi_atom ",
-                str(subvertex.hi_atom),
-                "Cannot be less than lo_atom")
+            raise PacmanValueError(
+                "hi_atom {:d} < lo_atom {:d}".format(hi_atom, lo_atom))
 
         if vertex not in self._subvertices_from_vertex:
             self._subvertices_from_vertex[vertex] = set()
 
         if hi_atom >= vertex.n_atoms:
-            raise PacmanInvalidParameterException(
-                "hi_atom ", str(hi_atom),
-                "Cannot be greater than the total number of atoms")
+            raise PacmanValueError(
+                "hi_atom {:d} >= maximum {:d}".format(hi_atom, vertex.n_atoms))
 
         self._vertex_from_subvertex[subvertex] = vertex
         self._subvertices_from_vertex[vertex].add(subvertex)
@@ -64,19 +64,22 @@ class GraphMapper(object):
     def add_partitioned_edge(self, partitioned_edge, partitionable_edge):
         """ Add a partitioned_edge to this partitioned_graph
 
-        :param partitioned_edge: a partitioned_edge to be added to the partitioned_graph
-        :type partitioned_edge: :py:class:`pacman.model.partitioned_graph.partitionedEdge.PartitionedEdge`
-        :param partitionable_edge: the partitionable_edge associated with this partitioned_edge
+        :param partitioned_edge: a partitioned_edge to be added to the
+            partitioned_graph
+        :type partitioned_edge:
+            :py:class:`pacman.model.partitioned_graph.partitionedEdge.PartitionedEdge`
+        :param partitionable_edge: the partitionable_edge associated with this
+            partitioned_edge
         :type partitionable_edge:
         :py:class:`pacman.model.partitionable_graph.partitionable_edge.PartitionableEdge`
         :return: None
         :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
-                    partitioned_edge is not valid
+        :raise pacman.exceptions.PacmanTypeError: If the partitioned_edge is
+            of an inappropriate type.
         """
         if (partitioned_edge is None or
                 not isinstance(partitioned_edge, PartitionedEdge)):
-            raise PacmanInvalidParameterException(
+            raise PacmanTypeError(
                 "partitioned_edge", str(partitioned_edge),
                 "Must be an instance of"
                 " pacman.model.partitioned_graph.partitionedEdge"
@@ -93,7 +96,8 @@ class GraphMapper(object):
     def add_partitioned_edges(self, partitioned_edges, partitionable_edge):
         """ Add some partitioned_edges to this partitioned_graph
 
-        :param partitioned_edges: an iterable of partitioned_edges to add to this partitioned_graph
+        :param partitioned_edges: an iterable of partitioned_edges to add to
+            this partitioned_graph
         :param partitioned_edges : partitioned_edges iterable of\
                     :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :return: None
@@ -110,7 +114,8 @@ class GraphMapper(object):
 
         :param vertex: the vertex for which to find the associated subvertices
         :type vertex: pacman.model.graph.vertex.AbstractConstrainedVertex
-        :return: a set of subvertices or None if no vertex exists in the mappings
+        :return: a set of subvertices or None if no vertex exists in the
+            mappings
         :rtype: iterable set or None
         :raise None: Raises no known exceptions
         """
@@ -125,11 +130,11 @@ class GraphMapper(object):
         :type edge: `pacman.model.graph.edge.PartitionableEdge`
         :return: a set of subedges
         :rtype: iterable set or none
-        :raise None: Raises no known exceptions
+        :raise pacman.exceptions.PacmanNotFoundError: If the edge is not known.
         """
         if edge in self._subedges_from_edge.keys():
             return self._subedges_from_edge[edge]
-        return None
+        raise PacmanNotFoundError('{} not in graph mapper.'.format(edge))
 
     def get_vertex_from_subvertex(self, subvertex):
         """ supporting method to get the vertex for a given subvertex
@@ -138,11 +143,12 @@ class GraphMapper(object):
         :type subvertex: `pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: a vertex
         :rtype: `pacman.model.graph.vertex.AbstractConstrainedVertex`
-        :raise None: Raises no known exceptions
+        :raise pacman.exceptions.PacmanNotFoundError: If the subvertex is not
+            known.
         """
         if subvertex in self._vertex_from_subvertex.keys():
             return self._vertex_from_subvertex[subvertex]
-        return None
+        raise PacmanNotFoundError('{} not in graph mapper'.format(subvertex))
 
     def get_partitionable_edge_from_partitioned_edge(self, subedge):
         """ supporting method to get the edge for a given subedge
@@ -151,11 +157,12 @@ class GraphMapper(object):
         :type subedge: `pacman.model.subgraph.subedge.PartitionedEdge`
         :return: an edge
         :rtype: `pacman.model.graph.edge.PartitionableEdge`
-        :raise None: Raises no known exceptions
+        :raise pacman.exceptions.PacmanNotFoundError: If the subedge is not
+            known.
         """
         if subedge in self._edge_from_subedge.keys():
             return self._edge_from_subedge[subedge]
-        return None
+        raise PacmanNotFoundError('{} not in graph mapper'.format(subedge))
 
     def get_subvertex_slice(self, subvertex):
         """ supporting method for retrieveing the lo and hi atom of a subvertex
@@ -163,15 +170,12 @@ class GraphMapper(object):
         :param subvertex: the subvertex to locate the slice of
         :return: a slice object containing the lo and hi atom of a subvertex
         :rtype: pacman.model.graph_mapper.slice.Slice
-        :raise PacmanInvalidParameterException: when the subvertex is none or
-        the subvertex is not contianed within the mapping object
+        :raise PacmanNotFoundError: when the subvertex is none or
+            the subvertex is not contianed within the mapping object
         """
-        if subvertex is None or subvertex not in self._subvertex_to_slice.keys():
-            raise PacmanInvalidParameterException(
-                "subvertex", str(subvertex),
-                "Must be an instance of"
-                " pacman.model.partitioned_graph.partitioned_vertex."
-                "PartitionedVertex")
+        if subvertex not in self._subvertex_to_slice.keys():
+            raise PacmanNotFoundError(
+                "{} not in graph mapper".format(subvertex))
         else:
             return self._subvertex_to_slice[subvertex]
 
