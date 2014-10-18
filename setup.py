@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(
-    name="PACMAN",
+    name="SpiNNaker_PACMAN",
     version="0.1-SNAPSHOT",
     description="Partition and Configuration Manager",
     url="https://github.com/SpiNNakerManchester/PACMAN",
