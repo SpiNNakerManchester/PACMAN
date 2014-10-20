@@ -338,6 +338,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
+                vertex_slice = Slice(lo_atom, hi_atom)
                 used_resources = \
                     vertex.get_resources_used_by_atoms(vertex_slice, graph)
                 ratio = self._find_max_ratio(used_resources, resources)
