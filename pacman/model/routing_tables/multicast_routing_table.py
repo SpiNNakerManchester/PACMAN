@@ -43,7 +43,7 @@ class MulticastRoutingTable(object):
                     entry with the same key-mask combination already exists
         """
         key_mask_combo = \
-            multicast_routing_entry.key & multicast_routing_entry.mask
+            multicast_routing_entry.key_combo & multicast_routing_entry.mask
         if key_mask_combo in self._multicast_routing_entries_by_key:
             raise PacmanAlreadyExistsException("Multicast_routing_entry",
                                                str(multicast_routing_entry))
@@ -64,7 +64,7 @@ class MulticastRoutingTable(object):
                     entry with the same key-mask combination already exists
         """
         key_mask_combo = \
-            multicast_routing_entry.key & multicast_routing_entry.mask
+            multicast_routing_entry.key_combo & multicast_routing_entry.mask
         if key_mask_combo in self._multicast_routing_entries_by_key.keys():
             del self._multicast_routing_entries_by_key[key_mask_combo]
             self._multicast_routing_entries.remove(multicast_routing_entry)

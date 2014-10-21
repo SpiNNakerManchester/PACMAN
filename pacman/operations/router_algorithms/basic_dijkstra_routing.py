@@ -62,7 +62,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
         # each subvertex represents a core in the board
         progress = ProgressBar(len(list(placements.placements)),
-            "on creating routing entries for each subvertex")
+                               "on creating routing entries for each subvertex")
 
         for placement in placements.placements:
             subvert = placement.subvertex
@@ -85,8 +85,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             if len(dest_chips) != 0:
                 self._update_all_weights(nodes_info, machine)
                 self._reset_tables(dijkstra_tables)
-                dijkstra_tables[(placement.x, placement.y)][
-                        "activated?"] = True
+                dijkstra_tables[(placement.x, placement.y)]["activated?"] = True
                 dijkstra_tables[(placement.x, placement.y)]["lowest cost"] = 0
                 self._propagate_costs_until_reached_destinations(
                     dijkstra_tables, nodes_info, dest_chips, placement.x,
@@ -125,9 +124,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
             nodes_info[(x, y)]["neighbours"] = list()
             for source_id in range(6):
-                link = chip.router.get_link(source_id)
                 nodes_info[(x, y)]["neighbours"].append(
-                        chip.router.get_link(source_id))
+                    chip.router.get_link(source_id))
 
             nodes_info[(x, y)]["bws"] = []
 
@@ -259,8 +257,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         q = 0
         if self._l > 0:
             q = float(self._l *
-                  (1 / float(free_entries) - 1 /
-                   float(router.ROUTER_DEFAULT_AVAILABLE_ENTRIES)))
+                      (1 / float(free_entries) - 1 /
+                       float(router.ROUTER_DEFAULT_AVAILABLE_ENTRIES)))
 
         t = 0
         if self._m > 0:
@@ -294,12 +292,12 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
          :param dijkstra_tables: the dictionary object for the dijkstra-tables
          :param nodes_info: the dictionary object for the nodes inside a route \
          scope
-         :param dest_processors:
+         :param dest_chips:
          :param x_source:
          :param y_source:
          :type dijkstra_tables: dict
          :type nodes_info: dict
-         :type dest_processors:
+         :type dest_chips:
          :type x_source: int
          :type y_source: int
          :return: None
@@ -334,9 +332,10 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                                  and neighbour.destination_y == y_source)):
 
                     # These variables change with every look at a new neighbour
-                    self._update_neighbour(dijkstra_tables,
-                        neighbour.destination_x, neighbour.destination_y,
-                        x_current, y_current, x_source, y_source, weight)
+                    self._update_neighbour(
+                        dijkstra_tables, neighbour.destination_x,
+                        neighbour.destination_y, x_current, y_current, x_source,
+                        y_source, weight)
 
             # This cannot be done in the above loop, since when a node
             # becomes activated the rest of the costs cannot be retrieved, and
@@ -353,8 +352,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 if (dijkstra_tables[key]["lowest cost"] is not None
                     and not dijkstra_tables[key]["activated?"]
                     and (graph_lowest_cost is not None
-                             and dijkstra_tables[key]["lowest cost"]
-                                < graph_lowest_cost
+                    and dijkstra_tables[key]["lowest cost"] < graph_lowest_cost
                          or graph_lowest_cost is None)):
                             graph_lowest_cost = \
                                 dijkstra_tables[key]["lowest cost"]
@@ -377,8 +375,9 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 pass
 
     @staticmethod
-    def _update_neighbour(dijkstra_tables, x_neighbour, y_neighbour, x_current,
-            y_current, x_source, y_source, weight):
+    def _update_neighbour(
+            dijkstra_tables, x_neighbour, y_neighbour, x_current, y_current,
+            x_source, y_source, weight):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
         used to update the lowest cost for each neigbhour of a node
 
@@ -407,8 +406,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         if not neighbour_exists:
             raise exceptions.PacmanRoutingException(
                 "Tried to propagate to ({}, {}), which is not in the"
-                " partitionable_graph: remove non-existent neighbours".format(
-                        x_neighbour, y_neighbour))
+                " partitionable_graph: remove non-existent neighbours"
+                .format(x_neighbour, y_neighbour))
 
         neighbour_activated =\
             dijkstra_tables[(x_neighbour, y_neighbour)]["activated?"]
@@ -423,8 +422,8 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         # there is no current cost
         new_weight = float(chip_lowest_cost + weight)
         if (not neighbour_activated
-                 and (neighbour_lowest_cost is None
-                       or new_weight < neighbour_lowest_cost)):
+                and (neighbour_lowest_cost is None
+                     or new_weight < neighbour_lowest_cost)):
 
                 #update dijkstra table
                 dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] =\
@@ -467,14 +466,13 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         routing_entry_route_links = list()
 
         #check that the key hasnt already been used
-        key = subedge_routing_info.key
+        key = subedge_routing_info.key_combo
         mask = subedge_routing_info.mask
         routing_table = self._get_routing_table_for_chip(x_destination,
-                y_destination)
+                                                         y_destination)
         #check if an other_entry with the same key mask combo exists
         other_entry = routing_table.get_multicast_routing_entry_by_key(key,
                                                                        mask)
-        previous_routing_entry = None
         if other_entry is not None:
             merged_entry = \
                 self._merge_entries(other_entry, routing_entry_route_processors,
@@ -500,9 +498,9 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 if neighbour is not None:
 
                     x_neighbour, y_neighbour = (neighbour.destination_x,
-                            neighbour.destination_y)
+                                                neighbour.destination_y)
                     neighbour_routing_table = self._get_routing_table_for_chip(
-                            x_neighbour, y_neighbour)
+                        x_neighbour, y_neighbour)
 
                     # Only check if it can be a preceding node if it actually
                     # exists
@@ -621,13 +619,13 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         # dijkstra_tables[x_neighbour][y_neighbour]["lowest cost"])
 
         if (neighbours_lowest_cost is not None
-               and abs(neighbours_lowest_cost - chip_sought_cost)
-                       < 0.00000000001):
+                and abs(neighbours_lowest_cost - chip_sought_cost) <
+                0.00000000001):
 
             #get other routing table and entry
             other_routing_table = \
                 self._get_routing_table_for_chip(x_neighbour, y_neighbour)
-            edge_key, edge_mask = edge_info.key, edge_info.mask
+            edge_key, edge_mask = edge_info.key_combo, edge_info.mask
             other_routing_table_entry = other_routing_table.\
                 get_multicast_routing_entry_by_key(edge_key, edge_mask)
             if other_routing_table_entry is not None:
@@ -635,7 +633,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
                 #already has an other_entry, check if mergable,
                 #  if not then throw error, therefore should only ever
                 # have 1 other_entry
-                if other_routing_table_entry.key == edge_key:
+                if other_routing_table_entry.key_combo == edge_key:
 
                     #merge routes
                     merged_entry = self._merge_entries(
@@ -660,7 +658,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             if nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] < 0:
                 print ("Bandwidth overused from ({}, {}) in direction {}! to "
                        "({}, {})".format(x_neighbour, y_neighbour,
-                               dec_direction, x_current, y_current))
+                                         dec_direction, x_current, y_current))
 
                 raise exceptions.PacmanRoutingException(
                     "Bandwidth overused as described above! Terminating...")

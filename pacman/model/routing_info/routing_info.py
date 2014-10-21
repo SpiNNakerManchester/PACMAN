@@ -47,7 +47,7 @@ class RoutingInfo(object):
 
         self._subedge_info_by_key[subedge_info.key_mask_combo] = subedge_info
         self._subedge_info.append(subedge_info)
-        self._key_from_subedge[subedge_info.subedge] = subedge_info.key
+        self._key_from_subedge[subedge_info.subedge] = subedge_info.key_combo
         self._subedge_info_from_subedge[subedge_info.subedge] = subedge_info
 
     @property
