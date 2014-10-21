@@ -66,7 +66,6 @@ class ValidRouteChecker(object):
         still destinations not visited
         """
         key = self._check_keys(outgoing_edges)
-        output_string = ""
         for dest in dest_placements:
             logger.debug("[{}:{}:{}]".format(dest.x, dest.y, dest.p))
 
@@ -109,7 +108,7 @@ class ValidRouteChecker(object):
         #get src router
         entry = self._locate_routing_entry(current_router, key)
         self._recursive_trace_to_dests(entry, dest_placements, current_router,
-                             key, visited_routers)
+                                       key, visited_routers)
 
     # locates the next dest pos to check
     def _recursive_trace_to_dests(self, entry, dest_placements, current_router,
