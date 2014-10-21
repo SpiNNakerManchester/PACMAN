@@ -466,7 +466,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         routing_entry_route_links = list()
 
         #check that the key hasnt already been used
-        key = subedge_routing_info.key_combo
+        key = subedge_routing_info.key_mask_combo
         mask = subedge_routing_info.mask
         routing_table = self._get_routing_table_for_chip(x_destination,
                                                          y_destination)

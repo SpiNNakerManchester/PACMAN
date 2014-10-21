@@ -4,9 +4,10 @@ class SubedgeRoutingInfo(object):
     """ Associates a subedge to its routing information (key and mask)
     """
 
-    def __init__(self, key, mask):
+    def __init__(self, key, mask, subedge):
         self._key = key
         self._mask = mask
+        self._subedge = subedge
         if self._key & self._mask != self._key:
             raise exceptions.PacmanConfigurationException(
                 "This routing info is invalid as the mask and key together "
@@ -32,4 +33,8 @@ class SubedgeRoutingInfo(object):
     @property
     def mask(self):
         return self._mask
+
+    @property
+    def subedge(self):
+        return self._subedge
 

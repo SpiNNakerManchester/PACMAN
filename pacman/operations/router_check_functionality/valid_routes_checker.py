@@ -13,7 +13,7 @@ class ValidRouteChecker(object):
         self._routing_tables = routing_tables
 
     def validate_routes(self):
-        for placement in self._placements:
+        for placement in self._placements.placements:
             outgoing_edges_for_partitioned_vertex = \
                 self._partitioned_graph.outgoing_subedges_from_subvertex(
                     placement.subvertex)
@@ -52,15 +52,15 @@ class ValidRouteChecker(object):
             raise Exception(
                 "failed to locate all dstinations with subvertex {} on "
                 "processor {} with key {} as it didnt reach dests {}"
-                .format(source_placement.vertex.label, source_processor, key,
+                .format(source_placement.subvertex.label, source_processor, key,
                         output_string))
         else:
             logger.debug("successful test between {} and {}"
-                         .format(source_placement.vertex.label,
+                         .format(source_placement.subvertex.label,
                                  dest_placements))
 
-    def _retrace_via_routing_tables(self, source_placement,
-                                    dest_placements, key):
+    def _retrace_via_routing_tables(self, source_placement, dest_placements,
+                                    key):
         """
         tries to retrace from the source to all dests and sees if one of them
         is the dest subvert
@@ -72,35 +72,35 @@ class ValidRouteChecker(object):
         visited_routers.add(current_router)
         #get src router
         entry = self._locate_routing_entry(current_router, key)
-        route_value = entry[0].route
-        self._trace_to_dests(route_value, dest_placements, current_router,
+        self._trace_to_dests(entry, dest_placements, current_router,
                              key, visited_routers)
 
     # locates the next dest pos to check
-    def _trace_to_dests(self, route_value, dest_sub_verts, current_router, key,
+    def _trace_to_dests(self, entry, dest_placements, current_router, key,
                         visited_routers):
         #determine where the route takes us
-        chip_links = self._in_chip_scope(route_value)
-        processor_values = self._processor_value(route_value)
-        if chip_links is not None:  # if goes downa chip link
-            if processor_values is not None:  # also goes to a processor
-                self._check_processor(dest_sub_verts, processor_values,
+        chip_links = entry.link_ids
+        processor_values = entry.processor_ids
+        if len(chip_links) > 0:  # if goes downa chip link
+            if len(processor_values) > 0:  # also goes to a processor
+                self._check_processor(dest_placements, processor_values,
                                       current_router)
             # only goes to new chip
             for link_id in chip_links:
                 #locate next chips router
+                link = current_router.get_link(link_id)
                 next_router = \
-                    current_router.neighbourlist[link_id]['object']
+                    self._routing_tables.get_routing_table_for_chip(
+                        link.destination_x, link.destination_y)
                 #check that we've not visited this router before
                 self._check_visited_routers(next_router, visited_routers)
                 #locate next entry
                 entry = self._locate_routing_entry(next_router, key)
                 # get next route value from the new router
-                route_value = entry[0].route
-                self._trace_to_dests(route_value, dest_sub_verts,
+                self._trace_to_dests(entry, dest_placements,
                                      next_router, key, visited_routers)
-        elif processor_values is not None:  # only goes to a processor
-            self._check_processor(dest_sub_verts, processor_values,
+        elif len(processor_values) > 0:  # only goes to a processor
+            self._check_processor(dest_placements, processor_values,
                                   current_router)
 
     @staticmethod
@@ -132,70 +132,25 @@ class ValidRouteChecker(object):
         return key
 
     @staticmethod
-    def _check_processor(dest_sub_verts, processor_ids, current_router):
+    def _check_processor(dest_placements, processor_ids, current_router):
         to_delete = list()
-        for dest_sub_vert in dest_sub_verts:
-            dest_x = dest_sub_vert.placement.processor.chip.x
-            dest_y = dest_sub_vert.placement.processor.chip.y
-
-            if current_router.x == dest_x and current_router.y == dest_y:
+        for dest_placement in dest_placements:
+            if (current_router.x == dest_placement.x
+                    and current_router.y == dest_placement.y):
                 #in correct chip
                 for processor_id in processor_ids:
-                    if processor_id == dest_sub_vert.placement.processor.idx:
-                        to_delete.append(dest_sub_vert)
+                    if processor_id == dest_placement.p:
+                        to_delete.append(dest_placement)
         #delete dests
         for deleted_dest in to_delete:
-            dest_sub_verts.remove(deleted_dest)
-
-    @staticmethod
-    def _in_chip_scope(route_value):
-        """
-        returns a chip link or none based on if the route value travels
-        down a spinn link
-        """
-        link_ids = list()
-        masked_off_values = route_value & 0x3F
-        if masked_off_values == 0:
-            return None
-        else:
-            masks = [0x1, 0x2, 0x4, 0x8, 0x10, 0x20]
-            link_id = 0
-            for mask in masks:
-                final_mask_value = (masked_off_values & mask) >> link_id
-                if final_mask_value == 1:
-                    link_ids.append(link_id)
-                link_id += 1
-            return link_ids
-
-    #
-    @staticmethod
-    def _processor_value(route_value):
-        """
-        returns a processor vlaue or None based on if the route value contains
-         a processor point
-        """
-        processor_ids = list()
-        masked_off_values = route_value & 0x7FFFC0
-        if masked_off_values == 0:
-            return None
-        else:
-            masks = [0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000,
-                     0x4000, 0x8000, 0x10000, 0x20000, 0x40000, 0x80000,
-                     0x100000, 0x200000, 0x400000, 0x800000]
-            processor_id = 0
-            for mask in masks:
-                final_mask_value = masked_off_values & mask
-                if final_mask_value != 0:
-                    processor_ids.append(processor_id)
-                processor_id += 1
-            return processor_ids
+            dest_placements.remove(deleted_dest)
 
     @staticmethod
     def _locate_routing_entry(current_router, key):
         """
         loate the entry from the router based off the subedge
         """
-        for entry in current_router.multicast_routing_entries():
+        for entry in current_router.multicast_routing_entries:
             key_combo = entry.mask & key
             if key_combo == entry.key_combo:
                 return entry
