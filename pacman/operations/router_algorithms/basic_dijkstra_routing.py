@@ -625,7 +625,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             #get other routing table and entry
             other_routing_table = \
                 self._get_routing_table_for_chip(x_neighbour, y_neighbour)
-            edge_key, edge_mask = edge_info.key_combo, edge_info.mask
+            edge_key, edge_mask = edge_info.key_mask_combo, edge_info.mask
             other_routing_table_entry = other_routing_table.\
                 get_multicast_routing_entry_by_key(edge_key, edge_mask)
             if other_routing_table_entry is not None:
