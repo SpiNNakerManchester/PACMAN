@@ -52,10 +52,13 @@ class ValidRouteChecker(object):
                 destination_placements.add(
                     placement_tuple(dest_placement.x, dest_placement.y,
                                     dest_placement.p))
-            #check that the routing elements for this placement work as expected
-            self._search_route(placement, destination_placements,
-                               outgoing_edges_for_partitioned_vertex,
-                               placement_tuple)
+            #only check placements that have outgoing edges
+            if len(outgoing_edges_for_partitioned_vertex) > 0:
+                #check that the routing elements for this placement work
+                # as expected
+                self._search_route(placement, destination_placements,
+                                   outgoing_edges_for_partitioned_vertex,
+                                   placement_tuple)
 
     def _search_route(self, source_placement, dest_placements, outgoing_edges,
                       placement_tuple):
