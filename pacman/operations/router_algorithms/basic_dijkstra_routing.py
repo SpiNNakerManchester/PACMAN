@@ -465,22 +465,23 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         routing_entry_route_processors = [processor_dest]
         routing_entry_route_links = list()
 
-        #check that the key hasnt already been used
-        key = subedge_routing_info.key_mask_combo
+        #check that the key_combo hasnt already been used
+        key_combo = subedge_routing_info.key_mask_combo
         mask = subedge_routing_info.mask
         routing_table = self._get_routing_table_for_chip(x_destination,
                                                          y_destination)
-        #check if an other_entry with the same key mask combo exists
-        other_entry = routing_table.get_multicast_routing_entry_by_key(key,
-                                                                       mask)
+        #check if an other_entry with the same key_combo mask combo exists
+        other_entry = \
+            routing_table.get_multicast_routing_entry_by_key_combo(key_combo,
+                                                                   mask)
         if other_entry is not None:
             merged_entry = \
                 self._merge_entries(other_entry, routing_entry_route_processors,
-                                    False, key, mask, routing_entry_route_links,
-                                    routing_table)
+                                    False, key_combo, mask,
+                                    routing_entry_route_links, routing_table)
             previous_routing_entry = merged_entry
         else:
-            entry = MulticastRoutingEntry(key, mask,
+            entry = MulticastRoutingEntry(key_combo, mask,
                                           routing_entry_route_processors,
                                           routing_entry_route_links, False)
             routing_table.add_mutlicast_routing_entry(entry)
@@ -625,25 +626,26 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             #get other routing table and entry
             other_routing_table = \
                 self._get_routing_table_for_chip(x_neighbour, y_neighbour)
-            edge_key, edge_mask = edge_info.key_mask_combo, edge_info.mask
+            edge_key_combo, edge_mask = edge_info.key_mask_combo, edge_info.mask
             other_routing_table_entry = other_routing_table.\
-                get_multicast_routing_entry_by_key(edge_key, edge_mask)
+                get_multicast_routing_entry_by_key_combo(edge_key_combo,
+                                                         edge_mask)
             if other_routing_table_entry is not None:
 
                 #already has an other_entry, check if mergable,
                 #  if not then throw error, therefore should only ever
                 # have 1 other_entry
-                if other_routing_table_entry.key_combo == edge_key:
+                if other_routing_table_entry.key_combo == edge_key_combo:
 
                     #merge routes
                     merged_entry = self._merge_entries(
                         other_routing_table_entry, (), entry_is_defaultable,
-                        edge_key, edge_mask, [dec_direction],
+                        edge_key_combo, edge_mask, [dec_direction],
                         router_table)
                     previous_routing_entry = merged_entry
             else:
                 entry = MulticastRoutingEntry(
-                    edge_key, edge_mask, (), [dec_direction],
+                    edge_key_combo, edge_mask, (), [dec_direction],
                     entry_is_defaultable)
                 router_table.add_mutlicast_routing_entry(entry)
                 previous_routing_entry = entry

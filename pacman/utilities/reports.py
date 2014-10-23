@@ -453,15 +453,16 @@ def _expand_route_value(processors_ids, link_ids):
     route_string += "]"
     return route_string
 
+
 def _get_associated_routing_entries_from(
         fr_placement, to_placement, routing_tables, routing_data, machine):
 
     routing_table = routing_tables.get_routing_table_for_chip(
         to_placement.x, to_placement.y)
-    key = routing_data.key_combo
+    key_combo = routing_data.key_combo
     mask = routing_data.mask
-    destinations = routing_table.get_multicast_routing_entry_by_key(
-            key, mask)
+    destinations = \
+        routing_table.get_multicast_routing_entry_by_key_combo(key_combo, mask)
 
     if fr_placement.x == to_placement.x and fr_placement.y == to_placement.y:
         #check that the last route matches the destination core in the
@@ -477,10 +478,10 @@ def _get_associated_routing_entries_from(
             return associated_chips
         else:
             raise exceptions.PacmanRoutingException(
-                "Although routing path with key {0:X} reaches chip ({1:d}, "
-                "{2:d}), it does not reach processor {3:d} as requested by "
+                "Although routing path with key_combo {0:X} reaches chip ({1:d}"
+                ", {2:d}), it does not reach processor {3:d} as requested by "
                 "the destination placement".format(
-                    key, to_placement.x, to_placement.y, to_placement.p))
+                    key_combo, to_placement.x, to_placement.y, to_placement.p))
     else:
         links = destinations.link_ids()
         current_x = fr_placement.x

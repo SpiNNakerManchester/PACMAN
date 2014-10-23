@@ -9,7 +9,7 @@ from pacman.exceptions import PacmanAlreadyExistsException
 
 class TestRoutingInfo(unittest.TestCase):
     def test_new_multicast_routing_table(self):
-        key = 0xff35
+        key_combo = 0xff35
         mask = 0x00ff
         proc_ids = list()
         link_ids = list()
@@ -20,7 +20,8 @@ class TestRoutingInfo(unittest.TestCase):
         multicast_entries = list()
         for i in range(5):
             multicast_entries.append(
-                MulticastRoutingEntry(key + i, mask, proc_ids, link_ids, True))
+                MulticastRoutingEntry(key_combo + i, mask, proc_ids, link_ids,
+                                      True))
         mrt = MulticastRoutingTable(0, 0, multicast_entries)
         self.assertEqual(mrt.x, 0)
         self.assertEqual(mrt.y, 0)
@@ -31,12 +32,12 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(len(mre), len(multicast_entries))
         for i in range(5):
             self.assertEqual(
-                mrt.get_multicast_routing_entry_by_key(key + i, mask),
+                mrt.get_multicast_routing_entry_by_key_combo(key_combo + i, mask),
                 multicast_entries[i])
-        self.assertEqual(mrt.get_multicast_routing_entry_by_key(key + 5, mask),
-                         None)
-        self.assertEqual(mrt.get_multicast_routing_entry_by_key(key - 1, mask),
-                         None)
+        self.assertEqual(mrt.get_multicast_routing_entry_by_key_combo(
+            key_combo + 5, mask), None)
+        self.assertEqual(mrt.get_multicast_routing_entry_by_key_combo(
+            key_combo - 1, mask), None)
 
     def test_new_multicast_routing_table_empty(self):
         MulticastRoutingTable(0, 0)
