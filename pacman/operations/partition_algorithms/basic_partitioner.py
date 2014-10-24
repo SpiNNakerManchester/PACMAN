@@ -2,6 +2,7 @@ from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
+from pacman.model.graph_mapper.slice import Slice
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
@@ -69,8 +70,9 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         for vertex in vertices:
             # Compute atoms per core from resource availability
             incoming_edges = graph.incoming_edges_to_vertex(vertex)
+            vertex_slice = Slice(0, 1)
             requirements = \
-                vertex.get_resources_used_by_atoms(0, 1, graph)
+                vertex.get_resources_used_by_atoms(vertex_slice, graph)
 
             #locate max SDRAM available. SDRAM is the only one that's changeable
             #during partitioning, as DTCM and cpu cycles are bespoke to a

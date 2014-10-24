@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 class ValidRouteChecker(object):
 
     def __init__(self, partitioned_graph, placements, routing_infos,
-                 routing_tables):
+                 routing_tables, machine):
         """constructor for the valid route checker
 
         :param partitioned_graph: the subgraph of the problem spec
@@ -22,6 +22,7 @@ class ValidRouteChecker(object):
         self._placements = placements
         self._routing_infos = routing_infos
         self._routing_tables = routing_tables
+        self._machine = machine
 
     def validate_routes(self):
         """ this method goes though the placements given during init and
@@ -178,7 +179,10 @@ class ValidRouteChecker(object):
             # only goes to new chip
             for link_id in chip_links:
                 #locate next chips router
-                link = current_router.get_link(link_id)
+                machine_router = \
+                    self._machine.get_chip_at(current_router.x,
+                                              current_router.y).router
+                link = machine_router.get_link(link_id)
                 next_router = \
                     self._routing_tables.get_routing_table_for_chip(
                         link.destination_x, link.destination_y)
@@ -203,7 +207,7 @@ class ValidRouteChecker(object):
         :return: None
         :raise PacmanRoutingException: when a router has been visited twice.
         """
-        visited_routers_router = (next_router.chip.x, next_router.chip.y)
+        visited_routers_router = (next_router.x, next_router.y)
         if visited_routers_router in visited_routers:
             raise exceptions.PacmanRoutingException(
                 "visited this router before, there is a cycle here")

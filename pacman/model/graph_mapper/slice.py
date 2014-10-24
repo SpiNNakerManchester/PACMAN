@@ -15,3 +15,9 @@ class Slice(object):
     @property
     def n_atoms(self):
         return (self._hi_atom - self.lo_atom) + 1
+
+    def __str__(self):
+        return "slice with atoms {} to {}".format(self._lo_atom, self._hi_atom)
+
+    def __repr__(self):
+        return self.__str__()
