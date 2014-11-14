@@ -3,10 +3,10 @@ from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
-from pacman.model.partitionable_graph.partitionable_edge import \
-    PartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge import \
+    AbstractPartitionableEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
+from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
 
 from pacman.exceptions import (PacmanValueError, PacmanNotFoundError)
 
@@ -40,12 +40,12 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         subedges = list()
         subvertices.append(PartitionedVertex(None, None))
         subvertices.append(PartitionedVertex(None, None))
-        subedges.append(PartitionedEdge(subvertices[0], subvertices[1]))
-        subedges.append(PartitionedEdge(subvertices[1], subvertices[1]))
-        sube = PartitionedEdge(subvertices[1], subvertices[0])
+        subedges.append(AbstractPartitionedEdge(subvertices[0], subvertices[1]))
+        subedges.append(AbstractPartitionedEdge(subvertices[1], subvertices[1]))
+        sube = AbstractPartitionedEdge(subvertices[1], subvertices[0])
         subedges.append(sube)
         graph = GraphMapper()
-        edge = PartitionableEdge(MyVertex(10, "pre"), MyVertex(5, "post"))
+        edge = AbstractPartitionableEdge(MyVertex(10, "pre"), MyVertex(5, "post"))
         graph.add_partitioned_edge(sube, edge)
         graph.add_partitioned_edge(subedges[0], edge)
         subedges_from_edge = \
@@ -62,8 +62,8 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         subvert2 = PartitionedVertex(3, 4, None)
 
         subedges = list()
-        subedges.append(PartitionedEdge(subvertices[0], subvertices[1]))
-        subedges.append(PartitionedEdge(subvertices[1], subvertices[1]))
+        subedges.append(AbstractPartitionedEdge(subvertices[0], subvertices[1]))
+        subedges.append(AbstractPartitionedEdge(subvertices[1], subvertices[1]))
 
         graph_mapper = GraphMapper()
         vert = MyVertex(4, "Some testing vertex")
@@ -109,16 +109,16 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         subvertices.append(PartitionedVertex(5, 9, None))
 
         subedges = list()
-        subedges.append(PartitionedEdge(subvertices[0], subvertices[1]))
-        subedges.append(PartitionedEdge(subvertices[1], subvertices[1]))
+        subedges.append(AbstractPartitionedEdge(subvertices[0], subvertices[1]))
+        subedges.append(AbstractPartitionedEdge(subvertices[1], subvertices[1]))
 
-        sube = PartitionedEdge(subvertices[1], subvertices[0])
+        sube = AbstractPartitionedEdge(subvertices[1], subvertices[0])
         subedges.append(sube)
 
         # Create the graph mapper
         graph = GraphMapper()
 
-        edge = PartitionableEdge(MyVertex(10, "pre"), MyVertex(5, "post"))
+        edge = AbstractPartitionableEdge(MyVertex(10, "pre"), MyVertex(5, "post"))
         graph.add_partitioned_edge(sube, edge)
         graph.add_partitioned_edge(subedges[0], edge)
 

@@ -1,9 +1,10 @@
-from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.exceptions import PacmanInvalidParameterException
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
 
 
-class PartitionableEdge(object):
+@add_metaclass(ABCMeta)
+class AbstractPartitionableEdge(object):
     """ Represents a directional edge in a partitionable_graph between two vertices
     """
 
@@ -21,10 +22,11 @@ class PartitionableEdge(object):
         self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
-        
+
+    @abstractmethod
     def create_subedge(self, pre_subvertex, post_subvertex, label=None):
         """ Create a subedge between the pre_subvertex and the post_subvertex
-        
+
         :param pre_subvertex: The subvertex at the start of the subedge
         :type pre_subvertex:\
                     :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
@@ -36,24 +38,9 @@ class PartitionableEdge(object):
                     specified and the edge has a label, a label will be provided
         :type label: str
         :return: The created subedge
-        :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
+        :rtype: :py:class:`pacman.model.subgraph.subedge.FixedRoutePartitionableEdge`
         :raise None: does not raise any known exceptions
         """
-        if not isinstance(pre_subvertex, PartitionedVertex):
-            raise PacmanInvalidParameterException(
-                "pre_subvertex", str(pre_subvertex),
-                "Must be a pacman.model"
-                ".partitioned_graph.subvertex.PartitionedVertex")
-        if not isinstance(post_subvertex, PartitionedVertex):
-            raise PacmanInvalidParameterException(
-                "post_subvertex",
-                str(post_subvertex),
-                "Must be a pacman.model.partitioned_graph.subvertex.PartitionedVertex")
-
-        if label is None and self.label is not None:
-            label = self.label
-
-        return PartitionedEdge(pre_subvertex, post_subvertex, label)
 
     @property
     def pre_vertex(self):
@@ -84,3 +71,10 @@ class PartitionableEdge(object):
         :raise None: Raises no known exceptions
         """
         return self._label
+
+    @abstractmethod
+    def is_partitionable_edge(self):
+        """helper method for is instance
+
+        :return:
+        """

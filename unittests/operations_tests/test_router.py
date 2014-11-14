@@ -1,10 +1,10 @@
 import unittest
-from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
+from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.operations.router_algorithms import SteinerTreeWeightedRouting
 from pacman.operations.router_algorithms import BasicDijkstraRouting
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge \
+    import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
@@ -45,7 +45,7 @@ class TestRouter(unittest.TestCase):
         #sort out graph
         self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
-        self.edge1 = PartitionableEdge(self.vert1, self.vert2, "First edge")
+        self.edge1 = AbstractPartitionableEdge(self.vert1, self.vert2, "First edge")
         self.verts = [self.vert1, self.vert2]
         self.edges = [self.edge1]
         self.graph = PartitionableGraph("Graph", self.verts, self.edges)
@@ -55,7 +55,7 @@ class TestRouter(unittest.TestCase):
             0, 10, self.vert1.get_resources_used_by_atoms(0, 10, []))
         self.subvert2 = PartitionedVertex(
             0, 5, self.vert2.get_resources_used_by_atoms(0, 10, []))
-        self.subedge = PartitionedEdge(self.subvert1, self.subvert2)
+        self.subedge = AbstractPartitionedEdge(self.subvert1, self.subvert2)
         self.subgraph.add_subvertex(self.subvert1)
         self.subgraph.add_subvertex(self.subvert2)
         self.subgraph.add_subedge(self.subedge)

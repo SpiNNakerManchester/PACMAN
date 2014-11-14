@@ -14,7 +14,7 @@ from pacman.exceptions import PacmanPlaceException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.graph_mapper.graph_mapper import GraphMapper
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
@@ -75,9 +75,9 @@ class TestRadialPlacer(unittest.TestCase):
         self.vert1 = Vertex(100, "New AbstractConstrainedVertex 1")
         self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = Vertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = PartitionableEdge(self.vert1, self.vert2, "First edge")
-        self.edge2 = PartitionableEdge(self.vert2, self.vert1, "Second edge")
-        self.edge3 = PartitionableEdge(self.vert1, self.vert3, "Third edge")
+        self.edge1 = AbstractPartitionableEdge(self.vert1, self.vert2, "First edge")
+        self.edge2 = AbstractPartitionableEdge(self.vert2, self.vert1, "Second edge")
+        self.edge3 = AbstractPartitionableEdge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = PartitionableGraph("Graph", self.verts, self.edges)

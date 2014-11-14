@@ -334,7 +334,7 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         logger.error("Generate_routing_reports: Can't open file {} for "
                      "writing.".format(file_name))
 
-    f_routing.write("        PartitionableEdge Routing Report\n")
+    f_routing.write("        AbstractPartitionableEdge Routing Report\n")
     f_routing.write("        ===================\n\n")
     time_date_string = time.strftime("%c")
     f_routing.write("Generated: {}".format(time_date_string))
@@ -345,7 +345,7 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         from_v, to_v = e.pre_vertex, e.post_vertex
         from_v_sz, to_v_sz = from_v.n_atoms, to_v.n_atoms
         fr_v_name, to_v_name = from_v.label, to_v.label
-        string = "**** PartitionableEdge '{}', from vertex: '{}' (size: {})"\
+        string = "**** AbstractPartitionableEdge '{}', from vertex: '{}' (size: {})"\
                  .format(e.label, fr_v_name, from_v_sz)
         string = "{}, to vertex: '{}' (size: {})\n"\
                  .format(string, to_v_name, to_v_sz)
