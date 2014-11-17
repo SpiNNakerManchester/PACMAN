@@ -71,7 +71,7 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
 
         :param out_going_subedge: the outgoing subedge from a given subvert
         :param placement: the placement for the given subvert
-        :type out_going_subedge: pacman.model.partitioned_graph.subegde.PartitionedEdge
+        :type out_going_subedge: pacman.model.partitioned_graph.subegde.FixedRoutePartitionableEdge
         :type placement: pacman.model.placements.placement.Placement
         :return: a subedge_routing_info which contains the key, and mask of the\
          subvert

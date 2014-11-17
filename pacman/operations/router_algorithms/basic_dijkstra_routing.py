@@ -1,7 +1,7 @@
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
-from pacman.operations.router_algorithms.abstract_router_algorithm \
-    import AbstractRouterAlgorithm
+from pacman.operations.router_algorithms.abstract_multi_cast_router_algorithm \
+    import AbstractMultiCastRouterAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 
@@ -11,7 +11,7 @@ from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 logger = logging.getLogger(__name__)
 
 
-class BasicDijkstraRouting(AbstractRouterAlgorithm):
+class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
     """ An routing algorithm that can find routes for subedges between\
         subvertices in a partitioned_graph that have been placed on a
         machine by the use of a dijkstra shortest path algorithm
@@ -27,7 +27,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
 
         <params to be implemented when done>
         """
-        AbstractRouterAlgorithm.__init__(self)
+        AbstractMultiCastRouterAlgorithm.__init__(self)
         self._k = k
         self._l = l
         self._m = m

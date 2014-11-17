@@ -12,6 +12,7 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
 from spinn_machine.processor import Processor
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
+from pacman.model.graph_mapper.slice import Slice
 from pacman.exceptions import PacmanPartitionException
 
 import logging
@@ -132,11 +133,11 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     vertex.get_resources_used_by_atoms(
                         counted, counted + alloc - 1, graph)
 
-                subvert = \
-                    PartitionedVertex(
-                        label="subvertex with lo atom {} and hi atom {}"
-                              .format(counted, alloc - 1),
-                        resources_required=subvertex_usage)
+                vertex_slice = Slice(counted, alloc - 1)
+                subvert = vertex.create_subvertex(
+                    self, subvertex_usage, vertex_slice,
+                    label="subvertex with lo atom {} and hi atom {}"
+                    .format(counted, alloc - 1))
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(
                     subvert, counted, counted + alloc - 1, vertex)

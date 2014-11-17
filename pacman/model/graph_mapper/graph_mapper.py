@@ -1,4 +1,5 @@
-from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
+from pacman.model.partitioned_graph.abstract_partitioned_edge \
+    import AbstractPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import (PacmanValueError,
                                PacmanNotFoundError,
@@ -67,23 +68,23 @@ class GraphMapper(object):
         :param partitioned_edge: a partitioned_edge to be added to the
             partitioned_graph
         :type partitioned_edge:
-            :py:class:`pacman.model.partitioned_graph.partitionedEdge.PartitionedEdge`
+            :py:class:`pacman.model.partitioned_graph.partitionedEdge.FixedRoutePartitionableEdge`
         :param partitionable_edge: the partitionable_edge associated with this
             partitioned_edge
         :type partitionable_edge:
-        :py:class:`pacman.model.partitionable_graph.partitionable_edge.PartitionableEdge`
+        :py:class:`pacman.model.partitionable_graph.partitionable_edge.AbstractPartitionableEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanTypeError: If the partitioned_edge is
             of an inappropriate type.
         """
         if (partitioned_edge is None or
-                not isinstance(partitioned_edge, PartitionedEdge)):
+                not isinstance(partitioned_edge, AbstractPartitionedEdge)):
             raise PacmanTypeError(
                 "partitioned_edge", str(partitioned_edge),
                 "Must be an instance of"
                 " pacman.model.partitioned_graph.partitionedEdge"
-                ".PartitionedEdge")
+                ".FixedRoutePartitionableEdge")
 
         if (partitionable_edge is not None and partitionable_edge
                 not in self._subedges_from_edge.keys()):
@@ -99,7 +100,7 @@ class GraphMapper(object):
         :param partitioned_edges: an iterable of partitioned_edges to add to
             this partitioned_graph
         :param partitioned_edges : partitioned_edges iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.subedge.FixedRoutePartitionableEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -127,7 +128,7 @@ class GraphMapper(object):
         """ supporting method to get all subedges for a given edge
 
         :param edge: the edge for which to find the associated subedges
-        :type edge: `pacman.model.graph.edge.PartitionableEdge`
+        :type edge: `pacman.model.graph.edge.AbstractPartitionableEdge`
         :return: a set of subedges
         :rtype: iterable set or none
         :raise pacman.exceptions.PacmanNotFoundError: If the edge is not known.
@@ -154,9 +155,9 @@ class GraphMapper(object):
         """ supporting method to get the edge for a given subedge
 
         :param subedge: the subedge for which to find the associated edge
-        :type subedge: `pacman.model.subgraph.subedge.PartitionedEdge`
+        :type subedge: `pacman.model.subgraph.subedge.FixedRoutePartitionableEdge`
         :return: an edge
-        :rtype: `pacman.model.graph.edge.PartitionableEdge`
+        :rtype: `pacman.model.graph.edge.AbstractPartitionableEdge`
         :raise pacman.exceptions.PacmanNotFoundError: If the subedge is not
             known.
         """

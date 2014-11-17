@@ -141,8 +141,6 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
                     if not isinstance(constraint, AbstractPartitionerConstraint):
                         subvert.add_constraint(constraint)
 
-
-
         self._generate_sub_edges(subgraph, graph_mapper, graph)
 
         return subgraph, graph_mapper
@@ -257,11 +255,10 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-                subvertex = PartitionedVertex(used_resources,
-                                              "subvertex with low atoms {} and "
-                                              "hi atoms {} for vertex {}"
-                                              .format(lo_atom, hi_atom, 
-                                                      vertex.label))
+                subvertex = vertex.create_subvertex(
+                    used_resources, Slice(lo_atom, hi_atom),
+                    "subvertex with low atoms {} and hi atoms {} for vertex {}"
+                    .format(lo_atom, hi_atom, vertex.label))
                 self._placement_to_subvert_mapper[subvertex] = \
                     PlacerChipAndCoreConstraint(x, y, p)
                 #update objects

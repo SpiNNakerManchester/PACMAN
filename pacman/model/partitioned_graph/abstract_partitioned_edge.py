@@ -1,4 +1,10 @@
-class PartitionedEdge(object):
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
+
+
+@add_metaclass(ABCMeta)
+class AbstractPartitionedEdge(object):
     """ Represents part of a division of an edge to match the division of the\
         vertices on either side of the edge
     """
@@ -19,6 +25,13 @@ class PartitionedEdge(object):
         self._pre_subvertex = pre_subvertex
         self._post_subvertex = post_subvertex
         self._label = label
+
+    @abstractmethod
+    def is_partitioned_edge(self):
+        """ helper method for isinstance
+
+        :return:
+        """
 
     @property
     def pre_subvertex(self):

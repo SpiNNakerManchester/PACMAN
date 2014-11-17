@@ -1,8 +1,8 @@
-from pacman.operations.router_algorithms.abstract_router_algorithm import \
-    AbstractRouterAlgorithm
+from pacman.operations.router_algorithms.abstract_multi_cast_router_algorithm import \
+    AbstractMultiCastRouterAlgorithm
 
 
-class PetersWeightedDijkstraRouting(AbstractRouterAlgorithm):
+class PetersWeightedDijkstraRouting(AbstractMultiCastRouterAlgorithm):
     """ An routing algorithm that can find routes for subedges between\
         subvertices in a partitioned_graph that have been placed on a
         machine by the use of a dijkstra shortest path algorithm

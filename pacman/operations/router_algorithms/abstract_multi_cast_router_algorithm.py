@@ -6,7 +6,7 @@ from pacman.model.routing_tables.multicast_routing_tables import \
 
 
 @add_metaclass(ABCMeta)
-class AbstractRouterAlgorithm(object):
+class AbstractMultiCastRouterAlgorithm(object):
     """ An abstract algorithm that can find routes for subedges between\
         subvertices in a partitioned_graph that have been placed on a machine
     """
