@@ -31,3 +31,15 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                    something goes wrong with the allocation
         """
 
+    @abstractmethod
+    def _generate_keys_with_neuron_ids(self, vertex_slice, vertex, placement,
+                                       subedge):
+        """ generates all keys required for a subvertex placed on a processor
+        based on the number of neurons in the subvertex
+
+        :param vertex_slice: the slice representing the subvertex
+        :param placement: the placement of the subvertex
+        :param vertex: the vertex this subvertex exists from
+        :param subedge: the subedge associated with this key
+        :return: a list of neuron based keys.
+        """

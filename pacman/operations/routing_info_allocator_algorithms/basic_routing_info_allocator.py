@@ -80,10 +80,13 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         """
         key = self._get_key_from_placement(placement)
         subedge_routing_info = SubedgeRoutingInfo(
-            key=key, mask=constants.DEFAULT_MASK, subedge=out_going_subedge)
+            key=key, mask=constants.DEFAULT_MASK, subedge=out_going_subedge,
+            key_with_neuron_ids_function=self._generate_keys_with_neuron_ids)
         #check for storage of masks
         self.check_masks(constants.DEFAULT_MASK, key, placement.subvertex)
         return subedge_routing_info
+
+
 
     @staticmethod
     def _get_key_from_placement(placement):
@@ -137,3 +140,30 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         """
         combo = key & mask
         return combo
+
+    def _generate_keys_with_neuron_ids(self, vertex_slice, vertex, placement,
+                                       subedge):
+        """ generates a list of keys with neuron ids
+
+        :param vertex_slice: the vertex slice of this subvertex
+        :param vertex: the vertex this subvertex is associated with
+        :param placement: the placment of this subvertex
+        :param subedge: the subedge associated with this key
+        :return: list of keys with neuron ids
+        """
+        keys = dict()
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+            key_with_neuron_id = self._get_key_with_neuron_id(placement, atom)
+            keys[atom] = key_with_neuron_id
+        return keys
+
+    def _get_key_with_neuron_id(self, placement, atom):
+        """ generates a key with a neuron id based off the placement and atom
+
+        :param placement: the placement of the subvertex
+        :param atom: the aton of this subvertex
+        :return:the key with a neuron id added to it
+        """
+        key = self._get_key_from_placement(placement)
+        key += atom
+        return key
