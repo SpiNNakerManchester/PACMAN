@@ -1,4 +1,3 @@
-from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.partitionable_graph.abstract_constrained_vertex import \
     AbstractConstrainedVertex
 

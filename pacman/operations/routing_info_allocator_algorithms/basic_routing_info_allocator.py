@@ -152,9 +152,9 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         :return: list of keys with neuron ids
         """
         keys = dict()
-        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+        for atom in range(0, vertex_slice.n_atoms):
             key_with_neuron_id = self._get_key_with_neuron_id(placement, atom)
-            keys[atom] = key_with_neuron_id
+            keys[vertex_slice.lo_atom + atom] = key_with_neuron_id
         return keys
 
     def _get_key_with_neuron_id(self, placement, atom):
