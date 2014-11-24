@@ -49,3 +49,10 @@ class PartitionedEdge(object):
         :raise None: Raises no known exceptions
         """
         return self._label
+
+    def __str__(self):
+        return "subedge between {}:{}".format(self._pre_subvertex,
+                                              self._post_subvertex)
+
+    def __repr__(self):
+        return self.__str__()

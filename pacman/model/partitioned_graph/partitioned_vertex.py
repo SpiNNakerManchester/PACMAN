@@ -38,3 +38,9 @@ class PartitionedVertex(AbstractConstrainedVertex):
         :raise None: Raises no known exceptions
         """
         return self._resources_required
+
+    def __str__(self):
+        return self._label
+
+    def __repr__(self):
+        return self.__str__()
