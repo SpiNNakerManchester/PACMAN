@@ -140,9 +140,6 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
                 for constraint in associated_vertex.constraints:
                     if not isinstance(constraint, AbstractPartitionerConstraint):
                         subvert.add_constraint(constraint)
-
-
-
         self._generate_sub_edges(subgraph, graph_mapper, graph)
 
         return subgraph, graph_mapper
