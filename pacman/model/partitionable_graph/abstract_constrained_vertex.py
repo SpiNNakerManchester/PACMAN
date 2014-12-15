@@ -61,7 +61,8 @@ class AbstractConstrainedVertex(object):
                 "constraint", constraint, "Must be a pacman.model."
                                           "constraints.abstract_constraint."
                                           "AbstractConstraint")
-        self._constraints.append(constraint)
+        if constraint not in self._constraints:
+            self._constraints.append(constraint)
 
     def add_constraints(self, constraints):
         """ Add an iterable of constraints to the collection of constraints for\
