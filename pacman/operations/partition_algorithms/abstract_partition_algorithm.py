@@ -48,12 +48,12 @@ class AbstractPartitionAlgorithm(object):
         self._runtime_in_machine_time_steps = runtime_in_machine_time_steps
         self._supported_constraints = list()
         self._sdram_tracker = SDRAMTracker()
-    
+
     @abstractmethod
     def partition(self, graph, machine):
         """ Partition a partitionable_graph so that each subvertex will fit
         on a processor within the machine
-            
+
         :param graph: The partitionable_graph to partition
         :type graph:
         :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
@@ -82,8 +82,11 @@ class AbstractPartitionAlgorithm(object):
         #locate any instances of PlacerChipAndCoreConstraint
         for constraint in vertex_constraints:
             if isinstance(constraint, PlacerChipAndCoreConstraint):
-                sdram_available = self._sdram_tracker.get_usage(constraint.x,
-                                                                constraint.y)
+                sdram_used = self._sdram_tracker.get_usage(constraint.x,
+                                                           constraint.y)
+                chip_sdram = machine.get_chip_at(constraint.x,
+                                                 constraint.y).sdram.size
+                sdram_available = chip_sdram - sdram_used
                 return ResourceContainer(
                     cpu=CPUCyclesPerTickResource(Processor.CPU_AVAILABLE),
                     dtcm=DTCMResource(Processor.DTCM_AVAILABLE),
