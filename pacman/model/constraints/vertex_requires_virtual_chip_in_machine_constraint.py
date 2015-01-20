@@ -23,11 +23,12 @@ class VertexRequiresVirtualChipInMachineConstraint(AbstractUtilityConstraint):
         :raise None: does not raise any known exceptions
         """
         AbstractUtilityConstraint.__init__(
-            self, "AbstractConstrainedVertex Requires a virtual chip in the machine with coords "
-                  "{}:{} connected to the real chip at coords {}:{} on link {}"
-                  .format(virtual_chip_coords[0], virtual_chip_coords[1],
-                          connected_to_chip_coords[0],
-                          connected_to_chip_coords[1],
+            self, "AbstractConstrainedVertex Requires a virtual chip in the "
+                  "machine with coords {}:{} connected to the real chip at "
+                  "coords {}:{} on link {}"
+                  .format(virtual_chip_coords['x'], virtual_chip_coords['y'],
+                          connected_to_chip_coords['x'],
+                          connected_to_chip_coords['y'],
                           connected_chip_link_id))
         self._virtual_chip_coords = virtual_chip_coords
         self._connected_to_chip_coords = connected_to_chip_coords
