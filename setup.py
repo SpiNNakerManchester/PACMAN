@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="SpiNNaker_PACMAN",
-    version="2015.001",
+    version="2015.002",
     description="Partition and Configuration Manager",
     url="https://github.com/SpiNNakerManchester/PACMAN",
     license="GNU GPLv3.0",
@@ -26,5 +26,5 @@ setup(
               'pacman.operations.router_check_functionality',
               'pacman.operations.routing_info_allocator_algorithms',
               'pacman.utilities'],
-    install_requires=['six', 'enum34', 'SpiNNMachine >= 2015.001']
+    install_requires=['six', 'enum34', 'SpiNNMachine >= 2015.002']
 )
