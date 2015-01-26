@@ -1,5 +1,7 @@
 from pacman.exceptions import PacmanValueError
 
+import collections
+
 
 class Slice(collections.namedtuple('Slice', 
                                    'lo_atom hi_atom n_atoms as_slice')):

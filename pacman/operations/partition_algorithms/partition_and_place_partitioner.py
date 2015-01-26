@@ -49,9 +49,10 @@ pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPart
         """
         AbstractPartitionAlgorithm.__init__(self, machine_time_step,
                                             runtime_in_machine_time_steps)
-        #add supported constraints
+        # add supported constraints
         self._supported_constraints.append(PartitionerMaximumSizeConstraint)
-        self._supported_constraints.append(PartitionerSameSizeAsVertexConstraint)
+        self._supported_constraints.append(
+            PartitionerSameSizeAsVertexConstraint)
 
         self._placer_algorithm = None
         self._placement_to_subvert_mapper = dict()
@@ -80,16 +81,18 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
                 "The placer algorithm submitted is not a recognised placer "
                 "algorithm")
 
-    #inherited from AbstractPartitionAlgorithm
+    # inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
-        """ Partition a partitionable_graph so that each subvertex will fit on a processor\
-            within the machine
+        """ Partition a partitionable_graph so that each subvertex will fit \
+            on a processor within the machine
 
         :param graph: The partitionable_graph to partition
         :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
-        :param machine: The machine with respect to which to partition the partitionable_graph
+        :param machine: The machine with respect to which to partition the \
+        partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
+        :return: A partitioned_graph of partitioned vertices and edges from \
+        the partitionable_graph
         :rtype: :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
@@ -107,7 +110,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
 
         graph_mapper = GraphMapper(graph.label, subgraph.label)
 
-        #sort out vertex's by constraints
+        # sort out vertex's by constraints
         vertices = utility_calls.sort_objects_by_constraint_authority(vertices)
 
         n_atoms = 0
@@ -120,17 +123,17 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
 
         # Partition one vertex at a time
         for vertex in vertices:
-            #check that the vertex hasn't already been partitioned
+            # check that the vertex hasn't already been partitioned
             subverts_from_vertex = \
                 graph_mapper.get_subvertices_from_vertex(vertex)
-            #if not, partition
+            # if not, partition
             if subverts_from_vertex is None:
                 self._partition_vertex(
                     vertex, subgraph, graph_mapper, machine, graph)
             progress_bar.update(vertex.n_atoms)
         progress_bar.end()
 
-        #update constraints for subverts
+        # update constraints for subverts
         for subvert in subgraph.subvertices:
             if subvert in self._placement_to_subvert_mapper.keys():
                 subvert.add_constraint(
@@ -138,7 +141,8 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
                 associated_vertex = \
                     graph_mapper.get_vertex_from_subvertex(subvert)
                 for constraint in associated_vertex.constraints:
-                    if not isinstance(constraint, AbstractPartitionerConstraint):
+                    if not isinstance(constraint,
+                                      AbstractPartitionerConstraint):
                         subvert.add_constraint(constraint)
 
         self._generate_sub_edges(subgraph, graph_mapper, graph)
@@ -163,7 +167,8 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
 
         :param vertex: the vertex to partition
         :param subgraph: the partitioned_graph to add subverts to
-        :param graph_to_subgraph_mapper: the mappings object from partitionable_graph to \
+        :param graph_to_subgraph_mapper: the mappings object from \
+        partitionable_graph to \
         partitioned_graph which needs to be update with new subverts
         :param machine: the machien object
         :param graph: the partitionable_graph object
@@ -184,10 +189,10 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
             self._locate_vertices_to_partition_now(vertex)
 
         # Prepare for partitioning, getting information
-        #todo not needed till we get to random distrubtions
+        # todo not needed till we get to random distrubtions
         partition_data_objects = None
 
-        #locate max atoms per core
+        # locate max atoms per core
         possible_max_atoms = list()
         possible_max_atoms.append(vertex.get_max_atoms_per_core())
 
@@ -200,7 +205,7 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
                 possible_max_atoms.append(constraint.size)
         max_atoms_per_core = min(possible_max_atoms)
 
-        #partition by atoms
+        # partition by atoms
         self._partition_by_atoms(partiton_together_vertices, vertex.n_atoms,
                                  max_atoms_per_core, partition_data_objects,
                                  subgraph, graph, graph_to_subgraph_mapper,
@@ -220,13 +225,16 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
         considered that have max_atom constraints
         :param partition_data_objects: the parittion objects for memory \
         estiamtes
-        :param subgraph: the partitioned_graph of the propblem space to put subverts in
-        :param graph_to_subgraph_mapper: the mapper from partitionable_graph to partitioned_graph
+        :param subgraph: the partitioned_graph of the propblem space to put \
+        subverts in
+        :param graph_to_subgraph_mapper: the mapper from partitionable_graph \
+        to partitioned_graph
         :param machine: the machien object
         :param graph: the partitionable_graph object
         :type graph: pacman.model.graph.partitionable_graph.PartitionableGraph
         :type machine: spinnmachine.machine.Machine object
-        :type vertices: iterable list of pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex
+        :type vertices: iterable list of \
+        pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex
         :type n_atoms: int
         :type max_atoms_per_core: int
         :type partition_data_objects: iterable lsit of partitionable obejcts
@@ -237,7 +245,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
 
-            #logger.debug("Maximum available resources for "
+            # logger.debug("Maximum available resources for "
             #             "partitioning: {}".format(resources))
 
             lo_atom = n_atoms_placed
@@ -255,14 +263,13 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-                subvertex = PartitionedVertex(used_resources,
-                                              "subvertex with low atoms {} and "
-                                              "hi atoms {} for vertex {}"
-                                              .format(lo_atom, hi_atom, 
-                                                      vertex.label))
+                subvertex = vertex.create_subvertex(
+                    used_resources, Slice(lo_atom, hi_atom),
+                    "subvertex with low atoms {} and hi atoms {} for vertex {}"
+                    .format(lo_atom, hi_atom, vertex.label))
                 self._placement_to_subvert_mapper[subvertex] = \
                     PlacerChipAndCoreConstraint(x, y, p)
-                #update objects
+                # update objects
                 subgraph.add_subvertex(subvertex)
                 graph_to_subgraph_mapper.add_subvertex(
                     subvertex=subvertex, lo_atom=lo_atom, hi_atom=hi_atom,
@@ -271,7 +278,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                 self._complete_placements.add_placement(
                     Placement(x=x, y=y, p=p, subvertex=subvertex))
 
-    #todo need to fix for random distributions
+    # todo need to fix for random distributions
     # noinspection PyUnusedLocal
     def _scale_down_resources(self, lo_atom, hi_atom, vertices, machine,
                               partition_data_objects, max_atoms_per_core,
@@ -309,15 +316,15 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             vertex = vertices[i]
             # TODO -> Needs to be updated for random distributions
             partition_data_object = None
-            #get max resources available on machine
+            # get max resources available on machine
             resources = self._get_maximum_resources_per_processor(
                 vertex_constraints=vertex.constraints, machine=machine)
-            #get resources for vertexes
+            # get resources for vertexes
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(vertex_slice,
                                                                 graph)
             
-            #figure max ratio
+            # figure max ratio
             ratio = self._find_max_ratio(used_resources, resources)
 
             while ratio > 1.0 and hi_atom >= lo_atom:
@@ -344,7 +351,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             # If we couldn't partition, raise and exception
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
-                    "AbstractConstrainedVertex {} could not be partitioned".format(vertex.label))
+                    "AbstractConstrainedVertex {} could not be "
+                    "partitioned".format(vertex.label))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
@@ -355,7 +363,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             # other placements to use (hopefully) less resources
             if hi_atom < min_hi_atom:
                 min_hi_atom = hi_atom
-                #TODO needs to be tied in (old code resulted in no loops, so new code has omitted the code for future look ats
+                # TODO needs to be tied in (old code resulted in no loops, so
+                # TODO new code has omitted the code for future look ats
 
             # Place the vertex
             placement_constraints = \
@@ -365,9 +374,9 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             if self._placer_algorithm is not None:
                 # noinspection PyProtectedMember
                 x, y, p = \
-                    self._placer_algorithm._try_to_place(placement_constraints,
-                                                         used_resources, "",
-                                                         self._complete_placements)
+                    self._placer_algorithm._try_to_place(
+                        placement_constraints, used_resources, "",
+                        self._complete_placements)
                 used_placements.append((vertex, partition_data_object, x, y, p,
                                         used_resources, resources))
             else:
@@ -412,7 +421,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
         while ((ratio < 1.0) and ((hi_atom + 1) < vertex.n_atoms)
                 and ((hi_atom - lo_atom + 2) < max_atoms_per_core)):
 
-            #logger.debug("Scaling up - Current subvertex from"
+            # logger.debug("Scaling up - Current subvertex from"
             #    " %d to %d of %d, ratio = %f, resources = %s" % (lo_atom,
             #             hi_atom, no_atoms, ratio, used_resources))
 
@@ -498,7 +507,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
         :type vertex: pacman.model.graph.vertex.AbstractConstrainedVertex
         :return: iterable of vertexes that need to be partitioned in the same \
         way
-        :rtype: iterable of pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex
+        :rtype: iterable of \
+        pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex
         :raise PacmanPartitionException: if the vertices that need to be \
         partitioned in the same way have different numbers of atoms
         """
