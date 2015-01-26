@@ -162,7 +162,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                 raise exceptions.PacmanPlaceException(
                     "cannot place subvertex {} in processor {}:{}:{} as "
                     "it has already been assigned".format(subvertex_label,
-                                                          x, y))
+                                                          x, y, p))
         else:
             chip_usage = self._sdram_tracker.get_usage(x, y)
             total_usage_after_assigment =\

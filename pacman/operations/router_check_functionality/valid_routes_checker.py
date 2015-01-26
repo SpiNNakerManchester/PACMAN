@@ -9,7 +9,6 @@ class ValidRouteChecker(object):
     def __init__(self, partitioned_graph, placements, routing_infos,
                  routing_tables, machine):
         """constructor for the valid route checker
-
         :param partitioned_graph: the subgraph of the problem spec
         :param placements: the placements container
         :param routing_infos:  the routing info container
@@ -31,7 +30,6 @@ class ValidRouteChecker(object):
         checks that the routing entries within the routing tables support
         reaching the correction destinations as well as not producing any
         cycles.
-
         :return: None
         :raises PacmanRoutingException: when either no routing table entry is
         found by the search on a given router, a cycle is detected (this is
@@ -39,7 +37,6 @@ class ValidRouteChecker(object):
          visiting the same router duirng the same trace) or when it has
          compelted the trace and there are still destinations which have
          not been visited
-
         """
         placement_tuple = namedtuple('Placement', 'x y p')
         for placement in self._placements.placements:
@@ -67,7 +64,6 @@ class ValidRouteChecker(object):
                       placement_tuple):
         """entrance method to locate if the routing tables work for the
         source to desks as defined
-
         :param source_placement: the placement from which the search started
         :param dest_placements: the placements to which this trace should visit
         only once
@@ -131,7 +127,6 @@ class ValidRouteChecker(object):
             self, source_placement, key, reached_placements, placement_tuple):
         """this method starts the trace, by using the source placemnts
         router and tracing from the route.
-
         :param source_placement: the soruce placement used by the trace
         :param placement_tuple: the reprenstation of a placement
         :param key: the key being used by the partitioned_vertex which resides
@@ -157,7 +152,6 @@ class ValidRouteChecker(object):
                                   placement_tuple):
         """ this method recurively searches though routing tables till
         no more entries are registered with this key
-
         :param entry: the orginal entry used by the first router which
         resides on the soruce placement chip.
         :param placement_tuple: represnetation of a placement
@@ -202,7 +196,6 @@ class ValidRouteChecker(object):
     @staticmethod
     def _check_visited_routers(chip_x, chip_y, visited_routers):
         """checks if the trace has visited this router already
-
         :param next_router: the next router to add to visited routers
         :param visited_routers: routers already visted
         :return: None
@@ -218,7 +211,6 @@ class ValidRouteChecker(object):
     def _check_keys(self, outgoing_subedges_from_a_placement):
         """checks that all the subedges handed to the algorithum have the
         same key
-
         :param outgoing_subedges_from_a_placement:  the subegdes to check
         :return :None
         :raises Exception: when the keymask_combo is different between the
@@ -239,12 +231,10 @@ class ValidRouteChecker(object):
     def _check_processor(processor_ids, current_router, reached_placements,
                          placement_tuple):
         """checks for processors to be removed
-
         :param reached_placements: the placements to which the trace visited
         :param processor_ids: the processor ids which the last router entry
         said the trace should visit
         :param current_router: the current router being used in the trace
-
         :return: None
         :raise None: this method does not raise any known exceptions
         """
@@ -258,7 +248,6 @@ class ValidRouteChecker(object):
     @staticmethod
     def _locate_routing_entry(current_router, key):
         """loate the entry from the router based off the subedge
-
         :param current_router: the current router being used in the trace
         :param key: the key being used by the source placement
         :return None:
@@ -270,4 +259,4 @@ class ValidRouteChecker(object):
             if key_combo == entry.key_combo:
                 return entry
         else:
-            raise exceptions.PacmanRoutingException("no entry located")
+            raise exceptions.PacmanRoutingException("no entry located") 

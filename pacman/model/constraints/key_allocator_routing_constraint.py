@@ -3,26 +3,36 @@ from pacman.model.constraints.abstract_router_constraint \
 
 
 class KeyAllocatorRoutingConstraint(AbstractRouterConstraint):
-    """ A constraint which limits the number of atoms of a single subvertex\
-        during the partitioner process
+    """ A constraint which controls the functions used to determine key and
+     mask and key with neuron ids.
     """
 
-    def __init__(self, function_call):
+    def __init__(self, key_mask_function_call,
+                 key_with_atom_ids_function_call):
         """
 
-        :param size: The maximum number of atoms to assign to each subvertex
-        :type size: int
+        :param key_mask_function_call:
+        the call required to generate the key and mask
+        :type key_mask_function_call: a python method
+        :param key_with_atom_ids_function_call:
+        the call required to generate keys with enuron ids
+        :type key_with_atom_ids_function_call: python function
         :raise None: does not raise any known exceptions
         """
         AbstractRouterConstraint.__init__(
             self, "key allocator constraint where subedges coming from the "
                   "vertex requires a specific key and mask which are generated "
-                  "from the function call {}".format(function_call))
-        self._function_call = function_call
+                  "from the function call {}".format(key_mask_function_call))
+        self._key_function_call = key_mask_function_call
+        self._atom_ids_function_call = key_with_atom_ids_function_call
 
     def is_router_constraint(self):
         return True
 
     @property
-    def function_call(self):
-        return self._function_call
+    def key_function_call(self):
+        return self._key_function_call
+
+    @property
+    def key_with_atom_ids_function_call(self):
+        return self._atom_ids_function_call

@@ -63,9 +63,11 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             abstract_constraint_type=AbstractPartitionerConstraint)
         #start progress bar
         progress_bar = ProgressBar(len(graph.vertices),
-                                   "on partitioning the partitionable_graph's vertices")
+                                   "on partitioning the partitionable_graph's"
+                                   " vertices")
         vertices = graph.vertices
-        subgraph = PartitionedGraph(label="partitioned_graph for partitionable_graph {}".format(graph.label))
+        subgraph = PartitionedGraph(label="partitioned_graph for partitionable"
+                                          "_graph {}".format(graph.label))
         graph_to_subgraph_mapper = GraphMapper(graph.label, subgraph.label)
         # Partition one vertex at a time
         for vertex in vertices:
