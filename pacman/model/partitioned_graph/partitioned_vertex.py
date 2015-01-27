@@ -19,8 +19,6 @@ class PartitionedVertex(AbstractConstrainedVertex):
                     .AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
-                    * If lo_atom is less than 0
-                    * If hi_atom is less than lo_atom
         """
         AbstractConstrainedVertex.__init__(self, label=label)
         self._label = label
