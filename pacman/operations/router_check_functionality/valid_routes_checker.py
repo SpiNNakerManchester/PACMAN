@@ -231,8 +231,9 @@ class ValidRouteChecker(object):
                 key = current_key
             elif key != current_key:
                 raise exceptions.PacmanRoutingException(
-                    "the keys from this placement do not match."
-                    " Please rectify and retry")
+                    "the keys {} and {} from this placement do not match."
+                    " Please rectify and retry"
+                    .format(hex(key), hex(current_key)))
         return key
 
     @staticmethod
