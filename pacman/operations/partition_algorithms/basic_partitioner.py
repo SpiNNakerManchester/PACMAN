@@ -133,7 +133,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                 subvert = vertex.create_subvertex(
                     vertex_slice, subvertex_usage,
                     "subvertex with low atoms {} and hi atoms {} for vertex {}"
-                    .format(counted, alloc - 1, vertex.label))
+                    .format(counted, alloc - 1, vertex.label),
+                    vertex.constraints)
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(
                     subvert, counted, counted + alloc - 1, vertex)
