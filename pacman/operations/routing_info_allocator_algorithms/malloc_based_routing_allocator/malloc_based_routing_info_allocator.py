@@ -83,7 +83,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         if partitioned_vertex not in vertex_keys:
             self._vertex_to_routing_info_register[partitioned_vertex] \
                 = dict()
-        routing_info = SubedgeRoutingInfo(int(key), int(mask), subedge)
+        routing_info = SubedgeRoutingInfo(key, mask, subedge)
         self._vertex_to_routing_info_register[partitioned_vertex][subedge]\
             = routing_info
         return routing_info
@@ -141,7 +141,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 FreeSpace(free_space_slot.start_address,
                           key - free_space_slot.start_address)
             self._free_space_tracker.insert(position, left_slot)
-        right_slot = FreeSpace(max_key,
+        right_slot = FreeSpace(max_key + 1,
                                max_free_space_slot_key - max_key)
         self._free_space_tracker.insert(position + 1, right_slot)
 
@@ -199,7 +199,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         temp_value = math.floor(math.log(n_neurons, 2))
         max_value = int(math.pow(2, 32))
         max_atoms_covered = \
-            math.pow(2, int(math.log(int(math.pow(2, temp_value + 1)), 2)) + 1)
+            int(math.log(int(math.pow(2, temp_value + 1)), 2)) + 1
         mask = max_value - int(math.pow(2, temp_value + 1))
         return mask, max_atoms_covered
 
@@ -212,7 +212,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :return: a routinginfo object that encompasses the
         """
         key, mask = self._handle_space_for_neurons(n_neurons)
-        key_combo = int(key) & mask
+        key_combo = key & mask
         routing_info = self._update_data_objects(
             key_combo, key, mask, partitioned_vertex, subedge)
         return routing_info
