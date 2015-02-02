@@ -5,6 +5,8 @@ from six import add_metaclass
 
 from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
+from pacman.model.constraints.partitioner_maximum_size_constraint import \
+    PartitionerMaximumSizeConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
