@@ -20,7 +20,7 @@ from pacman.utilities.progress_bar import ProgressBar
 
 class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
-    def __init__(self):
+    def __init__(self, graph_mapper):
         AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
         self._supported_constraints.append(KeyAllocatorRoutingConstraint)
         self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
@@ -28,6 +28,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         self._vertex_to_routing_info_register = dict()
         self._registered_key_combos = dict()
         self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
+        self._graph_mapper = graph_mapper
 
     def _register_a_key(self, key, mask, partitioned_vertex, subedge):
         """ function to handle edges and vertices which have specific
@@ -220,12 +221,10 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
     def _request_a_key(self, n_neurons, partitioned_vertex, subedge):
         """ takes a number of neurons and detemrines a key and mask that
 
-        :param n_neurons: the numebr of neurons to be used by the
-        partitioned vertex that the key has to cover
-        :param partitioned_vertex: the parititoned vertex to be considered
-        :param subedge: the subedge that this key is associated with
-        :return: a routinginfo object that encompasses the key, mask,
-         of this edge and vertex
+        :param n_neurons:
+        :param partitioned_vertex:
+        :param subedge:
+        :return: a routinginfo object that encompasses the
         """
         if partitioned_vertex in self._vertex_to_routing_info_register.keys():
             routing_infos_on_sub_edges = \
@@ -311,8 +310,11 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 out_going_subedges = subgraph.\
                     outgoing_subedges_from_subvertex(partitioned_vertex)
                 for out_going_subedge in out_going_subedges:
+                    vertex_slice = \
+                        self._graph_mapper.get_subvertex_slice(
+                            partitioned_vertex)
                     routing_info = \
-                        self._request_a_key(partitioned_vertex.n_atoms,
+                        self._request_a_key(vertex_slice.n_atoms,
                                             partitioned_vertex,
                                             out_going_subedge)
                     routing_infos.add_subedge_info(routing_info)
