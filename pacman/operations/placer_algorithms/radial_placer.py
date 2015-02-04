@@ -19,13 +19,18 @@ class RadialPlacer(BasicPlacer):
 
     #overloaded method from basicPlacer
     def _deal_with_non_constrained_placement(self, subvertex, used_resources,
-                                             chips):
+                                             chips, start_chip_x=0,
+                                             start_chip_y=0):
         """overloaded method of basic placer that changes the ordering in which
         chips are handed to the search algorithm.
 
         :param subvertex: the subvertex to place
         :param used_resources: the used_resources required by the subvertex
         :param chips: the machines chips.
+        :param start_chip_x: the x position of the chip to start the radial from
+        :type start_chip_x: int
+        :param start_chip_y: the y position of the chip to start the radial from
+        :type start_chip_y: int
         :type subvertex:
         :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex'
         :type used_resources:
@@ -43,7 +48,8 @@ class RadialPlacer(BasicPlacer):
 
         current_chip_list_to_check = list()
 
-        current_chip_list_to_check.append(self._machine.get_chip_at(0, 0))
+        current_chip_list_to_check.append(
+            self._machine.get_chip_at(start_chip_x, start_chip_y))
 
         while len(chips_to_check) != 0:
             next_chip_list_to_check = list()
