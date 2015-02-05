@@ -4,6 +4,8 @@ from six import add_metaclass
 
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_radial_placement_from_chip_constraint import \
+    PlacerRadialPlacementFromChipConstraint
 from pacman.model.constraints.placer_subvertex_same_chip_constraint import \
     PlacerSubvertexSameChipConstraint
 from pacman.utilities.placement_tracker import PlacementTracker
@@ -76,6 +78,8 @@ class AbstractPlacerAlgorithm(object):
                 x = self._check_param(other_placement.x, x, subvertex_label)
                 y = self._check_param(other_placement.y, y, subvertex_label)
                 p = self._check_param(other_placement.p, p, subvertex_label)
+            if isinstance(constraint, PlacerRadialPlacementFromChipConstraint):
+                return constraint
         if x is not None and y is not None:
             return PlacerChipAndCoreConstraint(x, y, p)
         else:

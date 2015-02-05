@@ -11,7 +11,7 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         specific chip, and optionally a specific core on that chip
     """
 
-    def __init__(self, x, y, p=None, strength=None):
+    def __init__(self, x, y, p=None):
         """
 
         :param x: the x-coordinate of the chip

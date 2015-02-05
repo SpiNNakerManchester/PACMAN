@@ -1,4 +1,6 @@
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
+from pacman.model.constraints.placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,15 +18,38 @@ class RadialPlacer(BasicPlacer):
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         BasicPlacer.__init__(self, machine)
+        self._supported_constraints.append(
+            PlacerRadialPlacementFromChipConstraint)
+
+    def _deal_with_constraint_placement(self, placement_constraint,
+                                        subvertex_label,
+                                        subvertex_resources):
+        """ used to handle radial placement constraints in a radial form
+        from a given chip
+
+        :param placement_constraint:
+        :param subvertex_label:
+        :param subvertex_resources:
+        :return:
+        """
+        if isinstance(placement_constraint,
+                      PlacerRadialPlacementFromChipConstraint):
+            return self._deal_with_non_constrained_placement(
+                subvertex_label, subvertex_resources, self._machine.chips,
+                placement_constraint.x, placement_constraint.y)
+        else:
+            return BasicPlacer._deal_with_constraint_placement(
+                self, placement_constraint, subvertex_label,
+                subvertex_resources)
 
     #overloaded method from basicPlacer
-    def _deal_with_non_constrained_placement(self, subvertex, used_resources,
-                                             chips, start_chip_x=0,
-                                             start_chip_y=0):
+    def _deal_with_non_constrained_placement(
+            self, subvertex_label, used_resources, chips, start_chip_x=0,
+            start_chip_y=0):
         """overloaded method of basic placer that changes the ordering in which
         chips are handed to the search algorithm.
 
-        :param subvertex: the subvertex to place
+        :param subvertex_label: the subvertex_label for placement
         :param used_resources: the used_resources required by the subvertex
         :param chips: the machines chips.
         :param start_chip_x: the x position of the chip to start the radial from
@@ -71,4 +96,4 @@ class RadialPlacer(BasicPlacer):
 
 
         return BasicPlacer._deal_with_non_constrained_placement(
-            self, subvertex, used_resources, processors_new_order)
+            self, subvertex_label, used_resources, processors_new_order)
