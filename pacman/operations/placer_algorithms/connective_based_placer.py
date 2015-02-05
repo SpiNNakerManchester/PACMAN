@@ -1,5 +1,7 @@
 from pacman.model.constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
+from pacman.model.constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
@@ -50,24 +52,120 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 utility_calls.locate_constraints_of_type(
                     subvertex.constraints, AbstractPlacerConstraint)
             if len(placement_constraints) > 0:
-                real_constrained = False
-                for placement_constraint in placement_constraints:
+                constrained_vertices.append(subvertex)
+            else:
+                unconstrained_vertices.append(subvertex)
 
+        #sort out unconstrained vertices so that they go in order of
+        # most connected
+        unconstrained_vertices = \
+            self._sort_out_unconstrained_vertices_on_connectivity(
+                unconstrained_vertices, partitioned_graph)
 
-
+        sorted(unconstrained_vertices,
+               key=lambda unc_sub_tuple: unc_sub_tuple[1])
 
         # Iterate over subvertices and generate placements
-        progress_bar = ProgressBar(len(ordered_subverts),
+        progress_bar = ProgressBar(len(partitioned_graph.subvertices),
                                    "for placing the partitioned_graphs "
                                    "subvertices")
 
-        for subvertex in ordered_subverts:
+        for subvertex in constrained_vertices:
             # Create and store a new placement
             placement = self._place_subvertex(subvertex, placements)
             placements.add_placement(placement)
             progress_bar.update()
+
+        #take the first and place, then look for most connected
+        completed = dict()
+        first = unconstrained_vertices[0]
+        placement = self._place_subvertex(first[0], placements)
+        placements.add_placement(placement)
+        progress_bar.update()
+        unconstrained_vertices.remove(first)
+        self._append_all_subverts_connected_to(first, partitioned_graph,
+                                               completed)
+
+        #loop around locating next most connected to whats already placed
+        #so that eventally theres none left
+        while len(unconstrained_vertices) > 0:
+            next_subvert = \
+                self._locate_next_most_connected(unconstrained_vertices,
+                                                 completed)
+            placement = self._place_subvertex(next_subvert[0], placements)
+            placements.add_placement(placement)
+            progress_bar.update()
+            unconstrained_vertices.remove(next_subvert)
+            self._append_all_subverts_connected_to(
+                next_subvert, partitioned_graph, completed)
+
         progress_bar.end()
         return placements
+
+    @staticmethod
+    def _locate_next_most_connected(unconstrained_vertices, completed):
+        """locate the next based off whats already been placed
+
+        :param unconstrained_vertices:
+        :param completed:
+        :return:
+        """
+        #no point cycling if theres only one entry
+        if len(unconstrained_vertices) == 1:
+            return unconstrained_vertices[0]
+
+        max_so_far = None
+        for unconstrained_vertex in unconstrained_vertices:
+            current_value = 0
+            for placed_subvert in completed.keys():
+                if unconstrained_vertex[1] in completed[placed_subvert]:
+                    current_value += unconstrained_vertex[1].n_atoms
+            if max_so_far is None or max_so_far[0] < current_value:
+                max_so_far = (current_value, unconstrained_vertex[1])
+
+        #nothing connected to stuff already placed, locate next dense one
+        if max_so_far[0] == 0:
+            sorted(unconstrained_vertices,
+               key=lambda unc_sub_tuple: unc_sub_tuple[1])
+            return unconstrained_vertices[0]
+        else:
+            return max_so_far[1]
+
+    @staticmethod
+    def _append_all_subverts_connected_to(subvert, partitioned_graph,
+                                          mapping):
+        """helper method for figuing most connected
+
+        :param subvert:
+        :param partitioned_graph:
+        :param mapping:
+        :return:
+        """
+        in_edges = partitioned_graph.incoming_subedges_from_subvertex(subvert)
+        mapping[subvert] = list()
+        if in_edges is not None:
+            for in_edge in in_edges:
+                mapping[subvert].append(in_edge.pre_subvertex)
+
+    @staticmethod
+    def _sort_out_unconstrained_vertices_on_connectivity(
+            unconstrained_vertices, partitioned_graph):
+        """ helper method which takes the collection of subvertices and
+         orders them based on whos msot connected
+
+        :param unconstrained_vertices: the list of unordered unconstrained vertices
+        :type iterable of pacman.partitioned_vertices.Partitioned_vertex
+        :return: a list of un_constraiend_vertices
+        """
+        sorted_unconstrained_vertices = list()
+        for subvertex in unconstrained_vertices:
+            total_atoms = 0
+            in_edges = \
+                partitioned_graph.incoming_subedges_from_subvertex(subvertex)
+            for in_edge in in_edges:
+                total_atoms += in_edge.pre_subvertex.n_atoms
+            sorted_unconstrained_vertices.append((subvertex, total_atoms))
+        return sorted_unconstrained_vertices
 
     def _try_to_place(self, placement_constraints, resources, subvert_label,
                       placements):

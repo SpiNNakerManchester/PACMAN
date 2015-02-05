@@ -132,8 +132,6 @@ pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgo
         #update constraints for subverts
         for subvert in subgraph.subvertices:
             if subvert in self._placement_to_subvert_mapper.keys():
-                subvert.add_constraint(
-                    self._placement_to_subvert_mapper[subvert])
                 associated_vertex = \
                     graph_mapper.get_vertex_from_subvertex(subvert)
                 for constraint in associated_vertex.constraints:

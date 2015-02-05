@@ -11,11 +11,6 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         specific chip, and optionally a specific core on that chip
     """
 
-    STRENGTH = Enum(
-        value="STRENGTH",
-        names=[("HARD", 0),
-               ("SOFT", 1)])
-
     def __init__(self, x, y, p=None, strength=None):
         """
 
@@ -25,22 +20,12 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         :type y: int
         :param p: the processor (if any) of the chip
         :type p: int
-        :param strength: how much this constraint needs to be considered
-        :type strength: Enum
         :raise None: does not raise any known exceptions
         """
         AbstractPlacerConstraint.__init__(
             self, label="placer chip and core constraint at coords "
                         "{},{},{}".format(x, y, p))
 
-        if strength is None:
-            self._strength = PlacerChipAndCoreConstraint.STRENGTH.HARD
-        elif isinstance(strength, Enum):
-            self._strength = strength
-        else:
-            raise exceptions.PacmanConfigurationException(
-                "the strength parameter needs to be a STRENGTH Enum "
-                "that is acquired from this class")
         self._x = x
         self._y = y
         self._p = p
@@ -84,14 +69,6 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         :raise None: does not raise any known exceptions
         """
         return self._p
-
-    @property
-    def strength(self):
-        """ how inportant to follow this constraint is
-
-        :return:
-        """
-        return self._strength
 
     @property
     def location(self):
