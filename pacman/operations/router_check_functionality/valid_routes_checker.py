@@ -144,7 +144,8 @@ class ValidRouteChecker(object):
             self._routing_tables.get_routing_table_for_chip(source_placement.x,
                                                             source_placement.y)
         visited_routers = set()
-        visited_routers.add(current_router_table)
+        visited_router_tuple = (current_router_table.x, current_router_table.y)
+        visited_routers.add(visited_router_tuple)
         #get src router
         entry = self._locate_routing_entry(current_router_table, key)
         self._recursive_trace_to_dests(
@@ -188,7 +189,8 @@ class ValidRouteChecker(object):
                     self._routing_tables.get_routing_table_for_chip(
                         link.destination_x, link.destination_y)
                 #check that we've not visited this router before
-                self._check_visited_routers(chip_x, chip_y, visited_routers)
+                self._check_visited_routers(next_router.x, next_router.y,
+                                            visited_routers)
                 #locate next entry
                 entry = self._locate_routing_entry(next_router, key)
                 # get next route value from the new router
