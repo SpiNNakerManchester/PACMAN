@@ -15,7 +15,6 @@ from pacman.model.placements.placements import Placements
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
@@ -254,11 +253,13 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-                subvertex = PartitionedVertex(used_resources,
-                                              "subvertex with low atoms {} and "
-                                              "hi atoms {} for vertex {}"
-                                              .format(lo_atom, hi_atom, 
-                                                      vertex.label))
+                vertex_slice = Slice(lo_atom, hi_atom)
+                subvertex = \
+                    vertex.create_subvertex(
+                        vertex_slice, used_resources,
+                        "subvertex with low atoms {} and hi atoms {} for "
+                        "vertex {}".format(lo_atom, hi_atom, vertex.label),
+                        vertex.constraints)
                 self._placement_to_subvert_mapper[subvertex] = \
                     PlacerChipAndCoreConstraint(x, y, p)
                 #update objects

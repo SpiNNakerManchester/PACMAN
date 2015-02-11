@@ -1,6 +1,8 @@
 import math
 from pacman.model.constraints.abstract_router_constraint import \
     AbstractRouterConstraint
+from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
+    KeyAllocatorFixedMaskConstraint
 from pacman.model.constraints.key_allocator_routing_constraint import \
     KeyAllocatorRoutingConstraint
 from pacman.model.routing_info.routing_info import RoutingInfo
@@ -21,6 +23,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
     def __init__(self, graph_mapper):
         AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
         self._supported_constraints.append(KeyAllocatorRoutingConstraint)
+        self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
         self._free_space_tracker = list()
         self._vertex_to_routing_info_register = dict()
         self._registered_key_combos = dict()
@@ -145,14 +148,26 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                                max_free_space_slot_key - max_key)
         self._free_space_tracker.insert(position + 1, right_slot)
 
-    def _handle_space_for_neurons(self, n_neurons):
+    def _handle_space_for_neurons(self, n_neurons, partitioned_vertex):
         """ sorts out the space objects based on the n_neurons asked to be
         covered by some key.
 
         :param n_neurons: the number of neurons that need to be covered by a key
-        :return:
+        :type n_neurons: int
+        :param partitioned_vertex: the partitioned vertex used in the edge
+        :type partitioned_vertex: pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex
+        :return: the key and mask for the number of neurons being used
         """
-        mask, mask_size = self._calculate_mask(n_neurons)
+        fixed_mask_constraints = utility_calls.\
+            locate_constraints_of_type(partitioned_vertex.constraints,
+                                       KeyAllocatorFixedMaskConstraint)
+        #handle fixed_mask_constraints
+        if len(fixed_mask_constraints) == 0:
+            mask, mask_size = self._calculate_mask(n_neurons)
+        else:
+            mask = fixed_mask_constraints[0].fixed_mask_value
+            mask_size = self._deduce_size_from_mask(mask)
+
         found = False
         key = None
         position = 0
@@ -177,14 +192,14 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :return: the max_neurons deduced from the mask
         """
         position = 0
-        final_mask = 0
+        size = 0
         while position < constants.BITS_IN_KEY:
             temp_mask = mask >> position
             temp_mask &= 0xF
             if temp_mask != 0xF:
-                final_mask += (temp_mask << position)
+                size += (temp_mask << position)
             position += 4
-        return final_mask
+        return size
 
     @staticmethod
     def _calculate_mask(n_neurons):
@@ -211,11 +226,22 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :param subedge:
         :return: a routinginfo object that encompasses the
         """
-        key, mask = self._handle_space_for_neurons(n_neurons)
-        key_combo = int(key) & mask
-        routing_info = self._update_data_objects(
-            key_combo, key, mask, partitioned_vertex, subedge)
-        return routing_info
+        if partitioned_vertex in self._vertex_to_routing_info_register.keys():
+            routing_infos_on_sub_edges = \
+                self._vertex_to_routing_info_register[partitioned_vertex]
+            first_routing_info = \
+                routing_infos_on_sub_edges[routing_infos_on_sub_edges.keys()[0]]
+            routing_info = self._update_data_objects(
+                first_routing_info.key_mask_combo, first_routing_info.key,
+                first_routing_info.mask, partitioned_vertex, subedge)
+            return routing_info
+        else:
+            key, mask = self._handle_space_for_neurons(n_neurons,
+                                                       partitioned_vertex)
+            key_combo = int(key) & mask
+            routing_info = self._update_data_objects(
+                key_combo, key, mask, partitioned_vertex, subedge)
+            return routing_info
 
     def _generate_keys_with_atom_id(self, vertex_slice, vertex, placement,
                                     subedge):
