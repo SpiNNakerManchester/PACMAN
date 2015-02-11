@@ -1,6 +1,8 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 
+from pacman.utilities.ordered_set import OrderedSet
+
 
 class PartitionedGraph(object):
     """ Represents a partitioning of a partitionable_graph
@@ -21,8 +23,8 @@ class PartitionedGraph(object):
                     * If one of the subvertices is not valid
         """
         self._label = label
-        self._subvertices = set()
-        self._subedges = set()
+        self._subvertices = OrderedSet()
+        self._subedges = OrderedSet()
 
         self._outgoing_subedges = dict()
         self._incoming_subedges = dict()

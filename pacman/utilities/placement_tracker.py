@@ -13,9 +13,8 @@ class PlacementTracker():
             key = (chip.x, chip.y)
             self._placements_available[key] = set()
             for processor in chip.processors:
-                if processor.processor_id != 0 or chip.virtual:
-                    self._placements_available[key].add(
-                            processor.processor_id)
+                if not processor.is_monitor or chip.virtual:
+                    self._placements_available[key].add(processor.processor_id)
                     self._free_cores += 1
 
     def assign_core(self, x, y, p):
