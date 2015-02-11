@@ -179,9 +179,6 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
-        # Combine the AbstractConstrainedVertex and PartitionedVertex constraints
-        additional_constraints.extend(self.constraints)
-
         return PartitionedVertex(label=label,
                                  resources_required=resources_required,
                                  constraints=additional_constraints)

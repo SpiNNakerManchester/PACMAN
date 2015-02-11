@@ -57,7 +57,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         else:
             #key has not been registered, therefore start registration process
             #locate space which this key is needing
-            mask_size = self._deduce_size_from_mask(mask)
+            mask_size = utility_calls.deduce_size_from_mask(mask)
             self._handle_space_for_key(key, mask_size)
             #check if subvert hasnt registered a key before, make a new list
             routing_info = self._update_data_objects(
@@ -165,7 +165,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             mask, mask_size = self._calculate_mask(n_neurons)
         else:
             mask = fixed_mask_constraints[0].fixed_mask_value
-            mask_size = self._deduce_size_from_mask(mask)
+            mask_size = utility_calls.deduce_size_from_mask(mask)
 
         found = False
         key = None

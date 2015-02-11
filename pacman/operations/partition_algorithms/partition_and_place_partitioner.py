@@ -258,8 +258,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
                     vertex.create_subvertex(
                         vertex_slice, used_resources,
                         "subvertex with low atoms {} and hi atoms {} for "
-                        "vertex {}".format(lo_atom, hi_atom, vertex.label),
-                        vertex.constraints)
+                        "vertex {}".format(lo_atom, hi_atom, vertex.label))
                 self._placement_to_subvert_mapper[subvertex] = \
                     PlacerChipAndCoreConstraint(x, y, p)
                 #update objects
@@ -344,7 +343,8 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             # If we couldn't partition, raise and exception
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
-                    "AbstractConstrainedVertex {} could not be partitioned".format(vertex.label))
+                    "AbstractConstrainedVertex {} could not be "
+                    "partitioned".format(vertex.label))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
