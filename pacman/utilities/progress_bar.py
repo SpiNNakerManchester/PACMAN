@@ -17,7 +17,8 @@ class ProgressBar(object):
         self.chars_done = 0
         self.string = string_describing_what_being_progressed
 
-        self.create_initial_progress_bar(string_describing_what_being_progressed)
+        self.create_initial_progress_bar(
+            string_describing_what_being_progressed)
 
     def update(self, amount_to_add=1):
         self.currently_completed += amount_to_add

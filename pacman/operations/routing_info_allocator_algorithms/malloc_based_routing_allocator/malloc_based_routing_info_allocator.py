@@ -15,7 +15,6 @@ from pacman.operations.routing_info_allocator_algorithms.\
 from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.free_space import FreeSpace
 from pacman.utilities import utility_calls
-from pacman.utilities.progress_bar import ProgressBar
 
 
 class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
@@ -30,56 +29,60 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
 
     def _register_a_key(self, key, mask, partitioned_vertex, subedge):
-        """ function to handle edges and vertices which have specific
-        requreiments on their key and mask.
+        """ Handle edges and vertices which have specific requireiments on\
+            their key and mask.
 
         :param key: the key needed to be used
-        :param mask: the mask to use with the key
-         (indirectly used for a max atoms)
-        :param partitioned_vertex: the partitioned vertex this key is
-        associated with
+        :param mask: the mask to use with the key\
+                    (indirectly used for a max atoms)
+        :param partitioned_vertex: the partitioned vertex this key is\
+                    associated with
         :param subedge: the subedge assoicated with this key
         :return: the routing info object that encompasses the decisions
-        :raises: PacmanAlreadyExistsException if the key has already been
-        allocated
-        PacmanConfigurationException if there is not enough space to allocate
-        the key given its contraints
+        :raises: PacmanAlreadyExistsException if the key has already been\
+                    allocated
+        :raises: PacmanConfigurationException if there is not enough space to\
+                    allocate the key given its contraints
         """
         key_combo = key & mask
-        #check if key has been used already
+
+        # check if key has been used already
         if key_combo in self._registered_key_combos.keys():
             raise exceptions.PacmanAlreadyExistsException(
-                "this key: {} with mask {} has already been registered to "
-                "vertex {}, not vertex {}. Please use another key and mask and "
-                "try again"
+                "this key: {} with mask {} has already been registered to"
+                " vertex {}, not vertex {}. Please use another key and mask"
+                " and try again"
                 .format(key, mask, self._registered_key_combos[key_combo],
                         partitioned_vertex), key_combo)
         else:
-            #key has not been registered, therefore start registration process
-            #locate space which this key is needing
+
+            # key has not been registered, therefore start registration process
+            # locate space which this key is needing
             mask_size = utility_calls.deduce_size_from_mask(mask)
             self._handle_space_for_key(key, mask_size)
-            #check if subvert hasnt registered a key before, make a new list
+
+            # check if subvert hasnt registered a key before, make a new list
             routing_info = self._update_data_objects(
                 key_combo, key, mask, partitioned_vertex, subedge)
             return routing_info
 
     def _update_data_objects(self, key_combo, key, mask, partitioned_vertex,
                              subedge):
-        """ takes the generated key, mask, and assoicated objects and
-        updates internal represnetations
+        """ Take the generated key, mask, and associated objects and\
+            update internal representations
 
         :param key_combo: the key anded with the mask
-        :param partitioned_vertex: the partitioned vertex which requested a
-        key allocation in the first place
+        :param partitioned_vertex: the partitioned vertex which requested a\
+                    key allocation in the first place
         :param key: the key allocated/requested to it by the system
         :param mask: the mask allocated/requested to it by the system
-        :param subedge: the subegde going out of the partitioned vertex
-        in the first place
+        :param subedge: the subegde going out of the partitioned vertex\
+                    in the first place
         :return: a routing info object which reflects the decisions
         :raises: None
         """
-        #check if subvert hasnt registered a key before, make a new list
+
+        # check if subvert hasn't registered a key before, make a new list
         self._registered_key_combos[key_combo] = partitioned_vertex
         vertex_keys = self._vertex_to_routing_info_register.keys()
         if partitioned_vertex not in vertex_keys:
@@ -91,26 +94,28 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         return routing_info
 
     def _handle_space_for_key(self, key, mask_size):
-        """handles the allocating of space for a speific key and range
-        of neruons. Risk is that this key space has already been allocated
+        """ handle the allocating of space for a speific key and range\
+            of neurons. Risk is that this key space has already been allocated
 
         :param key: the key to be used
         :param mask_size: the max size needed with the mask to cover neurons
         :return: None
-        :raises: PacmanConfigurationException when the key space has already
-        been allocated
+        :raises: PacmanConfigurationException when the key space has already\
+                    been allocated
         """
         reached_slot = False
         found = False
         position = 0
         while not reached_slot and position < len(self._free_space_tracker):
             free_space_slot = self._free_space_tracker[position]
-            #check that slot could contain the start key
+
+            # check that slot could contain the start key
             if free_space_slot.start_address <= key:
                 max_key = key + mask_size
-                max_free_space_slot_key = \
-                    free_space_slot.start_address + free_space_slot.size
-                #check that the top part of the key resides in the slot
+                max_free_space_slot_key = (free_space_slot.start_address
+                                           + free_space_slot.size)
+
+                # check that the top part of the key resides in the slot
                 if max_free_space_slot_key > max_key:
                     reached_slot = True
                     self._reallocate_space(free_space_slot, key, max_key,
@@ -129,7 +134,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :param free_space_slot: the slot thats being adjusted
         :param key: the start address of the key which is to be used to split
         the search space
-        :param max_key: the max key that governs how much of the space to remove
+        :param max_key: the max key that governs how much of the space to\
+                    remove
         :param position: the position of the space slot in the ordered list
         :return: None
         :raises: None
@@ -137,30 +143,33 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         max_free_space_slot_key = \
             free_space_slot.start_address + free_space_slot.size
         self._free_space_tracker.remove(free_space_slot)
-        #if the eky is the start address, then theres no left slot
+
+        # if the eky is the start address, then theres no left slot
         if free_space_slot.start_address != key:
-            left_slot = \
-                FreeSpace(free_space_slot.start_address,
-                          key - free_space_slot.start_address)
+            left_slot = FreeSpace(free_space_slot.start_address,
+                                  key - free_space_slot.start_address)
             self._free_space_tracker.insert(position, left_slot)
         right_slot = FreeSpace(max_key,
                                max_free_space_slot_key - max_key)
         self._free_space_tracker.insert(position + 1, right_slot)
 
     def _handle_space_for_neurons(self, n_neurons, partitioned_vertex):
-        """ sorts out the space objects based on the n_neurons asked to be
-        covered by some key.
+        """ Sort out the space objects based on the n_neurons asked to be\
+            covered by some key.
 
-        :param n_neurons: the number of neurons that need to be covered by a key
+        :param n_neurons: the number of neurons that need to be covered by a\
+                    key
         :type n_neurons: int
         :param partitioned_vertex: the partitioned vertex used in the edge
-        :type partitioned_vertex: pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex
+        :type partitioned_vertex:\
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :return: the key and mask for the number of neurons being used
         """
         fixed_mask_constraints = utility_calls.\
             locate_constraints_of_type(partitioned_vertex.constraints,
                                        KeyAllocatorFixedMaskConstraint)
-        #handle fixed_mask_constraints
+
+        # handle fixed_mask_constraints
         if len(fixed_mask_constraints) == 0:
             mask, mask_size = self._calculate_mask(n_neurons)
         else:
@@ -228,10 +237,10 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
          of this edge and vertex
         """
         if partitioned_vertex in self._vertex_to_routing_info_register.keys():
-            routing_infos_on_sub_edges = \
-                self._vertex_to_routing_info_register[partitioned_vertex]
-            first_routing_info = \
-                routing_infos_on_sub_edges[routing_infos_on_sub_edges.keys()[0]]
+            routing_infos_on_sub_edges = self._vertex_to_routing_info_register[
+                partitioned_vertex]
+            first_routing_info = routing_infos_on_sub_edges[
+                routing_infos_on_sub_edges.keys()[0]]
             routing_info = self._update_data_objects(
                 first_routing_info.key_mask_combo, first_routing_info.key,
                 first_routing_info.mask, partitioned_vertex, subedge)
@@ -246,8 +255,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
     def _generate_keys_with_atom_id(self, vertex_slice, vertex, placement,
                                     subedge):
-        """ generates a dict of atoms to key mapping
-        (to be used within the database)
+        """ Generate a dict of atoms to key mapping
+            (to be used within the database)
 
         :param vertex_slice: the slice used by the partitioned vertex
         :param vertex: the partitioned vertex being considered
@@ -264,29 +273,28 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         return keys
 
     def allocate_routing_info(self, subgraph, placements):
-        """ Allocates routing information to the subedges in a partitioned_graph
+        """ Allocates routing information to the subedges in a\
+            partitioned_graph
 
         :param subgraph: The partitioned_graph to allocate the routing info for
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :param placements: The placements of the subvertices
-        :type placements: :py:class:`pacman.model.placements.placements.Placements`
+        :type placements:\
+                     :py:class:`pacman.model.placements.placements.Placements`
         :return: The routing information
         :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
-        #check that this algorithm supports the constraints put onto the
-        #subvertexes
+        # check that this algorithm supports the constraints put onto the
+        # subvertexes
 
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subvertices,
             supported_constraints=self._supported_constraints,
             abstract_constraint_type=AbstractRouterConstraint)
 
-        #take each subedge and create keys from its placement
-        progress_bar = \
-            ProgressBar(len(subgraph.subvertices),
-                        "on allocating the key's and masks for each subedge")
+        # take each subedge and create keys from its placement
         routing_infos = RoutingInfo()
         for partitioned_vertex in subgraph.subvertices:
             router_constraints_of_vertex =\

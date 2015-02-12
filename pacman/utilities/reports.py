@@ -23,9 +23,6 @@ def router_reports(report_folder, hostname, graph, graph_to_sub_graph_mapper,
                    placements, routing_tables, routing_info, machine,
                    include_dat_based=False):
     router_report_from_router_tables(report_folder, routing_tables)
-    #router_edge_information(report_folder, hostname, partitionable_graph, routing_tables,
-     #                       graph_to_sub_graph_mapper, placements,
-     #                       routing_info, machine)
     if include_dat_based:
         router_report_from_dat_file(report_folder)
 
@@ -38,7 +35,8 @@ def routing_info_reports(report_folder, hostname, subgraph, placements,
 
 def partitioner_reports(report_folder, hostname, graph,
                         graph_to_subgraph_mapper):
-    partitioner_report(report_folder, hostname, graph, graph_to_subgraph_mapper)
+    partitioner_report(report_folder, hostname,
+                       graph, graph_to_subgraph_mapper)
 
 
 def partitioner_report(report_folder, hostname, graph,
@@ -56,7 +54,8 @@ def partitioner_report(report_folder, hostname, graph,
         logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.".format(file_name))
 
-    f_place_by_vertex.write("        Placement Information by AbstractConstrainedVertex\n")
+    f_place_by_vertex.write(
+        "        Placement Information by AbstractConstrainedVertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -67,7 +66,8 @@ def partitioner_report(report_folder, hostname, graph,
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
-        f_place_by_vertex.write("**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
+        f_place_by_vertex.write(
+            "**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
@@ -99,7 +99,8 @@ def placement_report_by_vertex(report_folder, hostname, graph,
         logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.".format(file_name))
 
-    f_place_by_vertex.write("        Placement Information by AbstractConstrainedVertex\n")
+    f_place_by_vertex.write(
+        "        Placement Information by AbstractConstrainedVertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -114,7 +115,8 @@ def placement_report_by_vertex(report_folder, hostname, graph,
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
-        f_place_by_vertex.write("**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
+        f_place_by_vertex.write(
+            "**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
@@ -168,7 +170,7 @@ def placement_by_core(report_folder, hostname, placements, machine,
         written_header = False
         for processor in chip.processors:
             if placements.is_subvertex_on_processor(chip.x, chip.y,
-                                                   processor.processor_id):
+                                                    processor.processor_id):
                 if not written_header:
                     f_place_by_core.write("**** Chip: ({}, {})\n"
                                           .format(chip.x, chip.y))
@@ -222,7 +224,6 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     for placement in placements.placements:
         subvert = placement.subvertex
         vertex = graph_mapper.get_vertex_from_subvertex(subvert)
-        vertex_in_edges = graph.incoming_edges_to_vertex(vertex)
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvert)
         requirements = \
@@ -231,7 +232,7 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
         x, y, p = placement.x, placement.y, placement.p
         f_mem_used_by_core.write(
             "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
-            x, y, p, int(requirements.sdram.get_value() / 1024.0)))
+                x, y, p, int(requirements.sdram.get_value() / 1024.0)))
         used_sdram_by_chip.add_usage(x, y, requirements.sdram.get_value())
 
     for chip in machine.chips:
@@ -241,14 +242,18 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
                 f_mem_used_by_core.write(
                     "**** Chip: ({}, {}) has total memory usage of"
                     " {} KB out of a max of "
-                    "{} MB \n\n".format(chip.x, chip.y, int(used_sdram / 1024.0),
+                    "{} MB \n\n".format(chip.x, chip.y,
+                                        int(used_sdram / 1024.0),
                                         int(SDRAM.DEFAULT_SDRAM_BYTES /
                                             (1024.0 * 1024.0))))
         except KeyError:
+
             # Do Nothing
             pass
+
     # Close file:
     f_mem_used_by_core.close()
+
 
 def routing_info_report(report_folder, hostname, subgraph, placements,
                         routing_infos):
@@ -309,9 +314,9 @@ def router_report_from_router_tables(report_folder, routing_tables):
                 core_id = "({}, {}, {})"\
                     .format((key >> 24 & 0xFF), (key >> 16 & 0xFF),
                             (key >> 11 & 0xF))
-                entry_str = "    {}     {}       {}      {}         {}     " \
-                            " {}\n".format(index, hex_key, hex_mask, hex_route,
-                                           core_id, route_txt)
+                entry_str = ("    {}     {}       {}      {}         {}     "
+                             " {}\n".format(index, hex_key, hex_mask,
+                                            hex_route, core_id, route_txt))
                 entry_count += 1
                 output.write(entry_str)
             output.flush()
@@ -322,7 +327,7 @@ def router_report_from_dat_file(report_folder):
     pass
 
 
-#ToDO NOT CHECKED YET
+# TODO NOT CHECKED YET
 def router_edge_information(report_folder, hostname, graph, routing_tables,
                             graph_mapper, placements, routing_info,
                             machine):
@@ -353,48 +358,50 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         string = "{}, to vertex: '{}' (size: {})\n"\
                  .format(string, to_v_name, to_v_sz)
         f_routing.write(string)
-        subedges = graph_mapper.get_partitioned_edges_from_partitionable_edge(e)
+        subedges = graph_mapper.get_partitioned_edges_from_partitionable_edge(
+            e)
         f_routing.write("Sub-edges: {}\n".format(len(subedges)))
 
         for se in subedges:
             fr_sv, to_sv = se.pre_subvertex, se.post_subvertex
             fr_placement = placements.get_placement_of_subvertex(fr_sv)
             to_placement = placements.get_placement_of_subvertex(to_sv)
-            routing_data = routing_info.get_subedge_information_from_subedge(se)
+            routing_data = routing_info.get_subedge_information_from_subedge(
+                se)
             associated_chips = _get_associated_routing_entries_from(
                 fr_placement, to_placement, routing_tables, routing_data,
                 machine)
 
             route_len = len(associated_chips)
-            fr_core = "({}, {}, {})"\
-                .format(fr_placement.x, fr_placement.y, fr_placement.p)
-            to_core = "({}, {}, {})"\
-                .format(to_placement.x, to_placement.y, to_placement.p)
-            fr_atoms = "{}:{}"\
-                .format(graph_mapper.get_subvertex_slice(fr_placement.subvertex).lo_atom,
-                        graph_mapper.get_subvertex_slice(fr_placement.subvertex).hi_atom)
-            to_atoms = "{}:{}"\
-                .format(to_placement.subvertex.lo_atom,
-                        to_placement.subvertex.hi_atom)
-            string = "Sub-edge from core {}, atoms {},"\
-                .format(fr_core, fr_atoms)
-            string = "{} to core {}, atoms {} has route length: {}\n"\
-                .format(string, to_core, to_atoms, route_len)
+            fr_core = "({}, {}, {})".format(fr_placement.x, fr_placement.y,
+                                            fr_placement.p)
+            to_core = "({}, {}, {})".format(to_placement.x, to_placement.y,
+                                            to_placement.p)
+            fr_atoms = "{}:{}".format((graph_mapper.get_subvertex_slice(
+                                       fr_placement.subvertex).lo_atom),
+                                      (graph_mapper.get_subvertex_slice(
+                                       fr_placement.subvertex).hi_atom))
+            to_atoms = "{}:{}".format(to_placement.subvertex.lo_atom,
+                                      to_placement.subvertex.hi_atom)
+            string = "Sub-edge from core {}, atoms {},".format(fr_core,
+                                                               fr_atoms)
+            string = "{} to core {}, atoms {} has route length: {}\n".format(
+                string, to_core, to_atoms, route_len)
             f_routing.write(string)
+
             # Print route info:
             count_on_this_line = 0
             total_step_count = 0
             for step in associated_chips:
                 if total_step_count == 0:
-                    entry_str = "(({}, {}, {})) -> "\
-                        .format(fr_placement.x, fr_placement.y, fr_placement.p)
+                    entry_str = "(({}, {}, {})) -> ".format(
+                        fr_placement.x, fr_placement.y, fr_placement.p)
                     f_routing.write(entry_str)
-                entry_str = "({}, {}) -> ".format(step['x'],
-                                                  step['y'])
+                entry_str = "({}, {}) -> ".format(step['x'], step['y'])
                 f_routing.write(entry_str)
                 if total_step_count == (route_len - 1):
-                    entry_str = "(({}, {}, {}))"\
-                        .format(to_placement.x, to_placement.y, to_placement.p)
+                    entry_str = "(({}, {}, {}))".format(
+                        to_placement.x, to_placement.y, to_placement.p)
                     f_routing.write(entry_str)
                 total_step_count += 1
                 count_on_this_line += 1
@@ -428,10 +435,10 @@ def _uint_32_to_hex_string(number):
 
 
 def _expand_route_value(processors_ids, link_ids):
+    """ Convert a 32-bit route word into a string which lists the target cores\
+        and links.
     """
-    Convert a 32-bit route word into a string which lists the target cores and
-    links.
-    """
+
     # Convert processor targets to readable values:
     route_string = "["
     first = True
@@ -468,9 +475,10 @@ def _get_associated_routing_entries_from(
         routing_table.get_multicast_routing_entry_by_key_combo(key_combo, mask)
 
     if fr_placement.x == to_placement.x and fr_placement.y == to_placement.y:
-        #check that the last route matches the destination core in the
-        #to_placement add the destination core to the associated chips list
-        #and return the associated chip list
+
+        # check that the last route matches the destination core in the
+        # to_placement add the destination core to the associated chips list
+        # and return the associated chip list
         processors = destinations.processor_ids()
         if to_placement.p in processors:
             associated_chips = list()
@@ -481,9 +489,9 @@ def _get_associated_routing_entries_from(
             return associated_chips
         else:
             raise exceptions.PacmanRoutingException(
-                "Although routing path with key_combo {0:X} reaches chip ({1:d}"
-                ", {2:d}), it does not reach processor {3:d} as requested by "
-                "the destination placement".format(
+                "Although routing path with key_combo {0:X} reaches chip"
+                " ({1:d}, {2:d}), it does not reach processor {3:d} as"
+                " requested by the destination placement".format(
                     key_combo, to_placement.x, to_placement.y, to_placement.p))
     else:
         links = destinations.link_ids()

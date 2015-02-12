@@ -5,6 +5,7 @@ from pacman.model.partitionable_graph.abstract_constrained_vertex import \
 class PartitionedVertex(AbstractConstrainedVertex):
     """ Represents a sub-set of atoms from a AbstractConstrainedVertex
     """
+
     def __init__(self, resources_required, label, constraints=None):
         """
         :param resources_required: The approximate resources needed for

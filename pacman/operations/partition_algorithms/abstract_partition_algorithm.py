@@ -29,17 +29,15 @@ class AbstractPartitionAlgorithm(object):
     """
 
     def __init__(self, machine_time_step, runtime_in_machine_time_steps):
-        """constructor to build a
-        pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
+        """
+
         :param machine_time_step: the length of time in ms for a timer tick
-        :param runtime_in_machine_time_steps: the number of timer ticks expected \
-               to occur due to the runtime
+        :param runtime_in_machine_time_steps: the number of timer ticks\
+               expected to occur due to the runtime
         :type machine_time_step: int
         :type runtime_in_machine_time_steps: long
-        :return: a new
-        pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
-        :rtype:
-        pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
+        :rtype: \
+                    :py:class:`pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm`
         :raises None: does not raise any known exception
         """
         self._machine_time_step = machine_time_step
@@ -50,34 +48,37 @@ class AbstractPartitionAlgorithm(object):
     @abstractmethod
     def partition(self, graph, machine):
         """ Partition a partitionable_graph so that each subvertex will fit
-        on a processor within the machine
+            on a processor within the machine
 
         :param graph: The partitionable_graph to partition
         :type graph:
         :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
-        :param machine: The machine with respect to which to partition the
-        partitionable_graph
+        :param machine: The machine with respect to which to partition the\
+                    partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A partitioned_graph of partitioned vertices and edges
-        from the partitionable_graph
+        :return: A partitioned_graph of partitioned vertices and edges\
+                    from the partitionable_graph
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
-                   goes wrong with the partitioning
+                    goes wrong with the partitioning
         """
 
-    def _get_maximum_resources_per_processor(self, vertex_constraints, machine):
-        """locates the maximum resources available given the subverts already
-        produced
+    def _get_maximum_resources_per_processor(self, vertex_constraints,
+                                             machine):
+        """ Locate the maximum resources available given the subverts already
+            produced
 
         :param vertex_constraints: the constraints of a given vertex
         :param machine: the immutable machine object
-        :type vertex_constraints: list of
-        pacman.model.constraints.abstract_constraint
+        :type vertex_constraints: list of\
+                    :py:class:`pacman.model.constraints.abstract_constraint`
         :type machine: a spinn_machine.machine.Machine object
         :return: the max sdram usage available given sdram allocations
-        :rtype: pacman.model.resources.resource_container.ResourceContainer
+        :rtype: \
+                    :py:class:`pacman.model.resources.resource_container.ResourceContainer`
         """
-        #locate any instances of PlacerChipAndCoreConstraint
+
+        # locate any instances of PlacerChipAndCoreConstraint
         for constraint in vertex_constraints:
             if isinstance(constraint, PlacerChipAndCoreConstraint):
                 sdram_used = self._sdram_tracker.get_usage(constraint.x,
@@ -98,7 +99,7 @@ class AbstractPartitionAlgorithm(object):
             sdram_available = chip.sdram.size - sdram_used
             if sdram_available >= maximum_sdram:
                 maximum_sdram = sdram_available
-            #if a chip has been returned with sdram usage as the hard coded
+            # if a chip has been returned with sdram usage as the hard coded
             # max supported, then stop searching and return max.
             if sdram_available == SDRAM.DEFAULT_SDRAM_BYTES:
                 return ResourceContainer(
@@ -113,23 +114,25 @@ class AbstractPartitionAlgorithm(object):
 
     @staticmethod
     def _generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
-        """generates the sub edges for the subvertices in the partitioned_graph.
+        """ Generate the sub edges for the subvertices in the partitioned_graph
 
         :param subgraph: the partitioned_graph to work with
-        :param graph_to_subgraph_mapper: the mapper between
-        partitionable_graph and partitioned_graph
+        :param graph_to_subgraph_mapper: the mapper between\
+                    partitionable_graph and partitioned_graph
         :param graph: the partitionable_graph to work with
-        :type subgraph:
-        pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph
-        :type graph_to_subgraph_mapper:
-        pacman.model.graph_mapper.GraphMapper
-        :type graph: pacman.model.graph.partitionable_graph.PartitionableGraph
+        :type subgraph:\
+                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
+        :type graph_to_subgraph_mapper:\
+                    :py:class:`pacman.model.graph_mapper.GraphMapper`
+        :type graph:\
+                    :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
         :return: None
         :rtype: None
         :raise None: this method does not raise any known exceptions
 
         """
-         #start progress bar
+
+        # start progress bar
         progress_bar = ProgressBar(len(subgraph.subvertices),
                                    "on partitioning the partitionable_graph's "
                                    "edges")
@@ -148,7 +151,8 @@ class AbstractPartitionAlgorithm(object):
                 for dst_sv in post_subverts:
                     subedge = edge.create_subedge(src_sv, dst_sv)
                     subgraph.add_subedge(subedge)
-                    graph_to_subgraph_mapper.add_partitioned_edge(subedge, edge)
+                    graph_to_subgraph_mapper.add_partitioned_edge(subedge,
+                                                                  edge)
             progress_bar.update()
         progress_bar.end()
 
@@ -186,7 +190,7 @@ class AbstractPartitionAlgorithm(object):
         while not allocated and chip_index < len(chips):
             chip = chips[chip_index]
             key = (chip.x, chip.y)
-            if not key in self._sdram_tracker.keys:
+            if key not in self._sdram_tracker.keys:
                 self._sdram_tracker.add_usage(chip.x, chip.y,
                                               sub_vertex_requirement.
                                               sdram.get_value())
@@ -207,10 +211,10 @@ class AbstractPartitionAlgorithm(object):
 
     @staticmethod
     def _add_vertex_constraints_to_subvertex(subvert, vertex):
-        """private method for partitioners, not to be used by front end
-        updates subvertices with their associated vertex's constraints that are
-        not partitioner based. As future algorithms only use the partitioned_graph,
-        and partitionable constraints should not be needed from now on.
+        """ Update subvertices with their associated vertex's constraints that
+            are not partitioner based. As future algorithms only use the
+            partitioned_graph, and partitionable constraints should not be
+            needed from now on.
         """
         subclasses = AbstractPartitionerConstraint.__subclasses__()
         for constraint in vertex.constraints:

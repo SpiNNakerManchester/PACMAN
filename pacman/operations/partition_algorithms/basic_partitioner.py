@@ -24,33 +24,32 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
     """
 
     def __init__(self, machine_time_step, runtime_in_machine_time_steps):
-        """constructor to build a
-        pacman.operations.partition_algorithms.basic_partitioner.BasicPartitioner
+        """
 
         :param machine_time_step: the length of tiem in ms for a timer tick
         :param runtime_in_machine_time_steps: the number of timer ticks
         expected to occur due to the runtime
         :type machine_time_step: int
         :type runtime_in_machine_time_steps: long
-        :return: a new
-        pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
-        :rtype: pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPartitionAlgorithm
         :raises None: does not raise any known expection
         """
         AbstractPartitionAlgorithm.__init__(self, machine_time_step,
                                             runtime_in_machine_time_steps)
         self._supported_constraints.append(PartitionerMaximumSizeConstraint)
 
-    #inherited from AbstractPartitionAlgorithm
+    # inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
         """ Partition a partitionable_graph so that each
-        subvertex will fit on a processor within the machine
+            subvertex will fit on a processor within the machine
 
         :param graph: The partitionable_graph to partition
-        :type graph: :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
-        :param machine: The machine with respect to which to partition the partitionable_graph
+        :type graph:\
+                    :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :param machine: The machine with respect to which to partition the\
+                    partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A partitioned_graph of partitioned vertices and edges from the partitionable_graph
+        :return: A partitioned_graph of partitioned vertices and edges from\
+                    the partitionable_graph
         :rtype: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
@@ -59,7 +58,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             constrained_vertices=graph.vertices,
             supported_constraints=self._supported_constraints,
             abstract_constraint_type=AbstractPartitionerConstraint)
-        #start progress bar
+
+        # start progress bar
         progress_bar = ProgressBar(len(graph.vertices),
                                    "on partitioning the partitionable_graph's"
                                    " vertices")
@@ -67,15 +67,16 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         subgraph = PartitionedGraph(label="partitioned_graph for partitionable"
                                           "_graph {}".format(graph.label))
         graph_to_subgraph_mapper = GraphMapper(graph.label, subgraph.label)
+
         # Partition one vertex at a time
         for vertex in vertices:
             # Compute atoms per core from resource availability
             requirements = \
                 vertex.get_resources_used_by_atoms(0, 1, graph)
 
-            #locate max SDRAM available. SDRAM is the only one that's changeable
-            #during partitioning, as DTCM and cpu cycles are bespoke to a
-            #processor.
+            # locate max SDRAM available. SDRAM is the only one that's
+            # changeable during partitioning, as DTCM and cpu cycles are
+            # bespoke to a processor.
 
             max_resources_available_on_processor = \
                 self._get_maximum_resources_per_processor(vertex.constraints,
@@ -139,10 +140,11 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     subvert, counted, counted + alloc - 1, vertex)
                 counted = counted + alloc
 
-                #update sdram calc
+                # update sdram calc
                 self._update_sdram_allocator(vertex, subvertex_usage, machine)
                 self._add_vertex_constraints_to_subvertex(subvert, vertex)
-            #update and end progress bars as needed
+
+            # update and end progress bars as needed
             progress_bar.update()
         progress_bar.end()
 

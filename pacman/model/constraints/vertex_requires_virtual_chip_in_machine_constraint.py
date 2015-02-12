@@ -3,9 +3,8 @@ from pacman.model.constraints.abstract_utility_constraint import \
 
 
 class VertexRequiresVirtualChipInMachineConstraint(AbstractUtilityConstraint):
-    """ A constraint which indicates that a vertex has a requirement for some
-    multicast packets to be trnasmitted at given times
-    itself to a multicast source
+    """ A constraint which indicates that a vertex has a requirement for a
+        virtual chip to be added to the machine
     """
 
     def __init__(self, virtual_chip_coords, connected_to_chip_coords,
@@ -49,20 +48,19 @@ class VertexRequiresVirtualChipInMachineConstraint(AbstractUtilityConstraint):
 
     @property
     def connected_to_chip_coords(self):
-        """ the chip to which the virutal chip connects to
+        """ the chip to which the virtual chip connects to
 
-        :return: the chip to which the virutal chip connects to
+        :return: the chip to which the virtual chip connects to
         :rtype: tuple
         :raise None: does not raise any known exceptions
         """
         return self._connected_to_chip_coords
 
-
     @property
     def connected_to_chip_link_id(self):
-        """ the link on the chip to which the virutal chip connects to
+        """ the link on the chip to which the virtual chip connects to
 
-        :return: the link on the chip to which the virutal chip connects to
+        :return: the link on the chip to which the virtual chip connects to
         :rtype: tuple
         :raise None: does not raise any known exceptions
         """

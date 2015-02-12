@@ -7,14 +7,13 @@ class PacmanException(Exception):
         Exception.__init__(self, *args, **kwargs)
 
 
-
 class PacmanInvalidParameterException(PacmanException):
     """ An exception which indicates that a parameter has an invalid value
     """
-    
+
     def __init__(self, parameter, value, problem):
         """
-        
+
         :param parameter: The name of the parameter
         :type parameter: str
         :param value: The value of the parameter
@@ -29,10 +28,10 @@ class PacmanAlreadyExistsException(PacmanException):
     """ An exception that indicates that something already exists and that
         adding another would be a conflict
     """
-    
+
     def __init__(self, item_type, item_id):
         """
-        
+
         :param item_type: The type of the item that already exists
         :type item_type: str
         :param item_id: The id of the item which is in conflict
@@ -44,7 +43,7 @@ class PacmanAlreadyExistsException(PacmanException):
 class PacmanPartitionException(PacmanException):
     """ An exception that indicates that something went wrong with paritioning
     """
-    
+
     def __init__(self, problem):
         """
         :param problem: The problem with the partitioning
@@ -56,7 +55,7 @@ class PacmanPartitionException(PacmanException):
 class PacmanPlaceException(PacmanException):
     """ An exception that indicates that something went wrong with placement
     """
-    
+
     def __init__(self, problem):
         """
         :param problem: The problem with the placement
@@ -68,7 +67,7 @@ class PacmanPlaceException(PacmanException):
 class PacmanPruneException(PacmanException):
     """ An exception that indicates that something went wrong with pruning
     """
-    
+
     def __init__(self, problem):
         """
         :param problem: The problem with the pruning
@@ -81,7 +80,7 @@ class PacmanRouteInfoAllocationException(PacmanException):
     """ An exception that indicates that something went wrong with route info\
         allocation
     """
-    
+
     def __init__(self, problem):
         """
         :param problem: The problem with the allocation
@@ -93,7 +92,7 @@ class PacmanRouteInfoAllocationException(PacmanException):
 class PacmanRoutingException(PacmanException):
     """ An exception that indicates that something went wrong with routing
     """
-    
+
     def __init__(self, problem):
         """
         :param problem: The problem with the routing
@@ -153,9 +152,11 @@ class PacmanValueError(ValueError, PacmanException):
     """Indicates that a value is invalid for some reason."""
     pass
 
+
 class PacmanNotFoundError(KeyError, PacmanException):
     """Indicates that some object has not been found when requested."""
     pass
+
 
 class PacmanTypeError(TypeError, PacmanException):
     """Indicates that an object is of incorrect type."""

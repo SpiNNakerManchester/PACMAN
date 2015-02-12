@@ -13,7 +13,8 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
         """
 
         :param subvertex: The subvertex to place on the same chip
-        :type subvertex: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+        :type subvertex: \
+                    :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :raise None: does not raise any known exceptions
         """
         AbstractPlacerConstraint.__init__(
@@ -37,4 +38,3 @@ class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):
         :raise None: does not raise any known exceptions
         """
         return self._subvertex
-

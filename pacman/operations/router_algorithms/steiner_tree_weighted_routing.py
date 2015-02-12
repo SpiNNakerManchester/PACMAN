@@ -9,10 +9,7 @@ class SteinerTreeWeightedRouting(AbstractRouterAlgorithm):
     """
 
     def __init__(self):
-        """constructor for the
-        pacman.operations.router_algorithms.SteinerTreeWeightedRouting.SteinerTreeWeightedRouting
-
-        <params to be impliemnted when done>
+        """
         """
         pass
 

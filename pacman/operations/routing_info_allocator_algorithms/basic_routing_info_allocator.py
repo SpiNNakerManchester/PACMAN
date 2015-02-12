@@ -17,11 +17,10 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
     """
 
     def __init__(self):
-        """constructor that build a
-pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
+        """
         :return: a new basic routing key info allocator
-        :rtype:
-        :py:class:`pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator.BasicRoutingInfoAllocator`
+        :rtype:\
+                    :py:class:`pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator.BasicRoutingInfoAllocator`
         :raise None: this method does not raise any known exception
 
         """
@@ -33,24 +32,25 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         :param subgraph: The partitioned_graph to allocate the routing info for
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :param placements: The placements of the subvertices
-    :type placements: :py:class:`pacman.model.placements.placements.Placements`
+        :type placements:\
+                    :py:class:`pacman.model.placements.placements.Placements`
         :return: The routing information
         :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
-        #check that this algorithm supports the constraints put onto the
-        #subvertexes
+        # check that this algorithm supports the constraints put onto the
+        # subvertexes
 
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subvertices,
             supported_constraints=self._supported_constraints,
             abstract_constraint_type=AbstractRouterConstraint)
 
-        #take each subedge and create keys from its placement
-        progress_bar = \
-            ProgressBar(len(subgraph.subvertices),
-                        "on allocating the key's and masks for each subedge")
+        # take each subedge and create keys from its placement
+        progress_bar = ProgressBar(len(subgraph.subvertices),
+                                   "on allocating the key's and masks for"
+                                   " each subedge")
         routing_infos = RoutingInfo()
         for subvert in subgraph.subvertices:
             out_going_subedges = \
@@ -66,27 +66,27 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         return routing_infos
 
     def _allocate_subedge_key_mask(self, out_going_subedge, placement):
-        """helper method (can be overloaded by future implementations of key
-        alloc
+        """
 
         :param out_going_subedge: the outgoing subedge from a given subvert
         :param placement: the placement for the given subvert
-        :type out_going_subedge: pacman.model.partitioned_graph.subegde.PartitionedEdge
+        :type out_going_subedge:\
+                    :py:class:`pacman.model.partitioned_graph.subegde.PartitionedEdge`
         :type placement: pacman.model.placements.placement.Placement
-        :return: a subedge_routing_info which contains the key, and mask of the\
-         subvert
-         :rtype: pacman.model.routing_info.subegde_rotuing_info.SubedgeRoutingInfo
+        :return: a subedge_routing_info which contains the key, and mask of\
+                    the subvert
+         :rtype:\
+                    :py:class:`pacman.model.routing_info.subegde_rotuing_info.SubedgeRoutingInfo`
          :raise None: does not raise any known exceptions
         """
         key = self._get_key_from_placement(placement)
         subedge_routing_info = SubedgeRoutingInfo(
             key=key, mask=constants.DEFAULT_MASK, subedge=out_going_subedge,
             key_with_atom_ids_function=self._generate_keys_with_atom_id)
-        #check for storage of masks
+
+        # check for storage of masks
         self.check_masks(constants.DEFAULT_MASK, key, placement.subvertex)
         return subedge_routing_info
-
-
 
     @staticmethod
     def _get_key_from_placement(placement):
@@ -116,7 +116,8 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         """
         if mask not in self._used_masks:
             self._used_masks[mask] = list()
-        #add to list (newly created or otherwise)
+
+        # add to list (newly created or otherwise)
         if key in self._used_masks[mask] \
                 and self._subvert_to_key_mapper[key] != subvert:
             raise exceptions.PacmanRouteInfoAllocationException(

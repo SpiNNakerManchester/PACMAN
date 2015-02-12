@@ -16,7 +16,7 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
                  max_atoms_per_core):
         AbstractPartitionableVertex.__init__(self, n_neurons, label,
                                              max_atoms_per_core)
-        #set up virtual data structures
+        # set up virtual data structures
         self._virtual_chip_coords = virtual_chip_coords
         self._connected_chip_coords = connected_node_coords
         self._connected_chip_edge = connected_node_edge
@@ -25,12 +25,11 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
                                         self._virtual_chip_coords['y'])
         self.add_constraint(placement_constaint)
 
-
     @property
     def model_name(self):
         return "VirtualVertex:{}".format(self.label)
 
-    #inhirrted from partitonable vertex
+    # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 0
 

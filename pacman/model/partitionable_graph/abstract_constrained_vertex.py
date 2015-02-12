@@ -7,10 +7,10 @@ from pacman.exceptions import PacmanInvalidParameterException
 @add_metaclass(ABCMeta)
 class AbstractConstrainedVertex(object):
     """ Represents a AbstractConstrainedVertex of a partitionable_graph, \
-    which contains a number of atoms, and\
+        which contains a number of atoms, and\
         which can be partitioned into a number of subvertices, such that the\
-        total number of atoms in the subvertices adds up to the number of atoms\
-        in the vertex
+        total number of atoms in the subvertices adds up to the number of\
+        atoms in the vertex
     """
 
     def __init__(self, label, constraints=None):
@@ -73,8 +73,8 @@ class AbstractConstrainedVertex(object):
                     .AbstractConstraint`
         :return: None
         :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\
-                    constraints is not valid
+        :raise pacman.exceptions.PacmanInvalidParameterException: If one of \
+                    the constraints is not valid
         """
         if constraints is not None:
             for next_constraint in constraints:
@@ -90,8 +90,8 @@ class AbstractConstrainedVertex(object):
                     .AbstractConstraint`
         :return: None
         :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If one of the\
-                    constraints is not valid
+        :raise pacman.exceptions.PacmanInvalidParameterException: If one of \
+                    the constraints is not valid
         """
         self._constraints = list()
         self.add_constraints(constraints)

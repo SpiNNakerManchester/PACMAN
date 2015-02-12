@@ -3,7 +3,6 @@ from pacman.model.constraints.abstract_placer_constraint import \
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities import constants
-import inspect
 
 
 def locate_constraints_of_type(constraints, constraint_type):
@@ -33,8 +32,8 @@ def check_algorithm_can_support_constraints(
     """ Helper method to find out if an algorithm can support all the\
         constraints given the objects its expected to work on
 
-    :param constrained_vertices: a list of constrained vertices which each has \
-    constraints given to the algorithm
+    :param constrained_vertices: a list of constrained vertices which each has\
+                constraints given to the algorithm
     :type constrained_vertices: iterable of\
                 :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
     :param supported_constraints: The constraints supported
@@ -86,18 +85,18 @@ def sort_objects_by_constraint_authority(objects):
                 "max atoms per core constraint")
         max_rank_so_far = 0
         for constraint in current_object.constraints:
-            #only store ranks for placer contraints and ones that are better
-            #than already seen
+
+            # only store ranks for placer constraints and ones that are better
+            # than already seen
             if (isinstance(constraint, AbstractPlacerConstraint) and
                     constraint.rank >= max_rank_so_far):
                 max_rank_so_far = constraint.rank
-        if not max_rank_so_far in rank_to_object_mapping.keys():
+        if max_rank_so_far not in rank_to_object_mapping.keys():
             rank_to_object_mapping[max_rank_so_far] = list()
         rank_to_object_mapping[max_rank_so_far].append(current_object)
 
-    #collected them all
-    ordered_keys = \
-        sorted(rank_to_object_mapping.keys(), key=int, reverse=True)
+    # collected them all
+    ordered_keys = sorted(rank_to_object_mapping.keys(), key=int, reverse=True)
     ordered_objects = list()
     for ordered_key in ordered_keys:
         object_list = rank_to_object_mapping[ordered_key]
@@ -107,7 +106,7 @@ def sort_objects_by_constraint_authority(objects):
 
 
 def deduce_size_from_mask(mask):
-    """ from the mask, returns the max_number of neurons it covers
+    """ From the mask, returns the max_number of neurons it covers
 
     :param mask: the mask to deduce the number of neurons from
     :return: the max_neurons deduced from the mask

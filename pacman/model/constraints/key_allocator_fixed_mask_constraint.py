@@ -10,7 +10,8 @@ class KeyAllocatorFixedMaskConstraint(AbstractRouterConstraint):
     def __init__(self, fixed_mask_value):
         """
 
-        :param fixed_mask_value: the fixed mask to be used during key allocation
+        :param fixed_mask_value: the fixed mask to be used during key \
+                    allocation
         :type fixed_mask_value: int
         :raise None: does not raise any known exceptions
         """
