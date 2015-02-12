@@ -22,37 +22,35 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractPartitionableVertex(AbstractConstrainedVertex):
-    """the abstract partitionable vertex is a type of vertex that is recongised
-    by the pacman partitioners. Due to this, it is recommended that front end
-    developers inhirrit from this class when creating new neural models.
+    """ The abstract partitionable vertex is a type of vertex that is
+        recognised by the pacman partitioners. Due to this, it is recommended
+        that front end developers inherit from this class when creating new
+        neural models.
 
-    this class enforces methods for supporting the partitioning of a vertex
-    based on cost metrics.
+        This class enforces methods for supporting the partitioning of a vertex
+        based on cost metrics.
     """
 
     def __init__(self, n_atoms, label, max_atoms_per_core, constraints=None):
-        """constructor for the abstract partitionable vertex.
+        """ Constructor for the abstract partitionable vertex.
+
         :param n_atoms: the number of atoms for the vertex
         :param label: the label of the vertex
-        :param max_atoms_per_core: the max atoms that cna be supported by a\
-         core. Note that this is trnaslated into a partitioner max size
-         constraint
-         :param constraints: any extra constranits to be added to this vertex.
-         :type n_atoms: int
-         :type label: str
-         :type max_atoms_per_core: int
-         :type constraints: iterable list
+        :param max_atoms_per_core: the max atoms that cna be supported by a \
+                    core. Note that this is trnaslated into a partitioner max \
+                    size constraint
+        :param constraints: any extra constranits to be added to this vertex.
+        :type n_atoms: int
+        :type label: str
+        :type max_atoms_per_core: int
+        :type constraints: iterable list
 
-         :return: a new \
-         pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex\
-         object
+        :return: the new partitionable vertex object
 
-         :rtype:
-         pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex
+        :rtype: \
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
 
-         :raise None: this method does not raise any exceptions
-
-
+        :raise None: this method does not raise any exceptions
         """
         AbstractConstrainedVertex.__init__(self, label, constraints)
         if n_atoms < 1:
@@ -61,17 +59,18 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                 "Must be at least one atom in the vertex")
 
         self._n_atoms = n_atoms
-        #add the max atom per core constraint
+
+        # add the max atom per core constraint
         max_atom_per_core_constraint = \
             PartitionerMaximumSizeConstraint(max_atoms_per_core)
         self.add_constraint(max_atom_per_core_constraint)
 
     @abstractmethod
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        """method for calculating sdram usage of a collection of atoms
+        """ Get the SDRAM usage of a collection of atoms
 
         :param vertex_slice: the vertex vertex_slice which determines\
-         which atoms are being represented by this vertex
+                    which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return a int value for sdram usage
@@ -81,10 +80,10 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
 
     @abstractmethod
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
-        """method for caulculating dtcm usage for a coltection of atoms
+        """ Get the DTCM usage for a collection of atoms
 
         :param vertex_slice: the vertex vertex_slice which determines\
-         which atoms are being represented by this vertex
+                    which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return a int value for sdram usage
@@ -94,10 +93,10 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
 
     @abstractmethod
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        """Gets the CPU requirements for a range of atoms
+        """ Get the CPU cycles per timestep for a range of atoms
 
         :param vertex_slice: the vertex vertex_slice which determines\
-         which atoms are being represented by this vertex
+                    which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return a int value for sdram usage
@@ -107,24 +106,21 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
 
     @abstractmethod
     def model_name(self):
-        """method to be impliemnted by inhirrted objects. This lists the type of
-        model is being used in a human friednly form
+        """ Get the type of model is being used in a human readable form
 
-        :return: a string rep of the model
+        :return: the name of the model
         :rtype: str
-        :raise None: does not raise any knwon exception
+        :raise None: does not raise any known exception
         """
 
     def get_resources_used_by_atoms(self, vertex_slice, graph):
-        """returns the separate resource requirements for a range of atoms
-        in a resource object with a assumption object that tracks any
-        assumptions made by the model when estimating resource requirement
+        """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
         :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return: a Resource container that contains a CPUCyclesPerTickResource,
-        DTCMResource and SDRAMResource
+        :return: a Resource container that contains a \
+                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
         :rtype: ResourceContainer
         :raise None: this method does not raise any known exception
         """
@@ -139,13 +135,10 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         return resources
 
     def get_max_atoms_per_core(self):
-        """returns the max atom per core possible given the constraints set on
-        this vertex
+        """ Get the maximum number of atoms that can be run on a single core \
+            given the constraints set on this vertex
 
-        :return: the minimum value of a the collection of max_atom constraints \
-        currently instilled on this vertex. It is expected that every vertex
-        has at least one value here, as a default should always have been
-        entered during construction
+        :return: The maximum number of atoms that can be run on a core
         :rtype: int
         :raise None: this method does not raise any known exception
         """
@@ -156,9 +149,9 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                 current_found_max_atoms_per_core = constraint.size
         return current_found_max_atoms_per_core
 
-    def create_subvertex(self, resources_required, label=None,
+    def create_subvertex(self, vertex_slice, resources_required, label=None,
                          additional_constraints=list()):
-        """ Creates a subvertex of this vertex.  Can be overridden in vertex\
+        """ Create a subvertex of this vertex.  Can be overridden in vertex\
             subclasses to create an subvertex instance that contains detailed\
             information
 
@@ -167,18 +160,17 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     subvertex.  If not given and the vertex has a label, a\
                     default label will be given to the subvertex
         :type label: str
+        :param vertex_slice: the slice of the partitionable vertex that this\
+                    partitioned vertex will cover
+        :type vertex_slice: pacman.model.graph_mapper.vertex_slice.VertexSlice
         :param additional_constraints: An iterable of constraints from the\
                     subvertex over-and-above those of the vertex
         :type additional_constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint\
-                    .AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
-        # Combine the AbstractConstrainedVertex and PartitionedVertex constraints
-        additional_constraints.extend(self.constraints)
-
         return PartitionedVertex(label=label,
                                  resources_required=resources_required,
                                  constraints=additional_constraints)
