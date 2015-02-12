@@ -15,6 +15,7 @@ from pacman.model.placements.placements import Placements
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
@@ -251,12 +252,11 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
             # Create the subvertices and placements
             for (vertex, _, x, y, p, used_resources, _) in used_placements:
-                vertex_slice = Slice(lo_atom, hi_atom)
-                subvertex = \
-                    vertex.create_subvertex(
-                        vertex_slice, used_resources,
-                        "subvertex with low atoms {} and hi atoms {} for "
-                        "vertex {}".format(lo_atom, hi_atom, vertex.label))
+                subvertex = PartitionedVertex(used_resources,
+                                              "subvertex with low atoms {} and "
+                                              "hi atoms {} for vertex {}"
+                                              .format(lo_atom, hi_atom, 
+                                                      vertex.label))
                 self._placement_to_subvert_mapper[subvertex] = \
                     PlacerChipAndCoreConstraint(x, y, p)
                 #update objects
@@ -341,8 +341,7 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             # If we couldn't partition, raise and exception
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
-                    "AbstractConstrainedVertex {} could not be "
-                    "partitioned".format(vertex.label))
+                    "AbstractConstrainedVertex {} could not be partitioned".format(vertex.label))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(

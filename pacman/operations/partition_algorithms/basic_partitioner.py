@@ -2,10 +2,10 @@ from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
-from pacman.model.graph_mapper.slice import Slice
 from pacman.operations.partition_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from spinn_machine.processor import Processor
@@ -70,6 +70,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         # Partition one vertex at a time
         for vertex in vertices:
             # Compute atoms per core from resource availability
+            incoming_edges = graph.incoming_edges_to_vertex(vertex)
             requirements = \
                 vertex.get_resources_used_by_atoms(0, 1, graph)
 
@@ -121,6 +122,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     alloc = remaining
                 # Create and store new subvertex, and increment elements
                 #  counted
+                label = "subvert with atoms {} to {} for vertex {}"\
+                    .format(counted, counted + alloc - 1, vertex.label)
                 if counted < 0 or counted + alloc - 1 < 0:
                     raise PacmanPartitionException("Not enough resources"
                                                    " available to create"
@@ -129,11 +132,11 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     vertex.get_resources_used_by_atoms(
                         counted, counted + alloc - 1, graph)
 
-                vertex_slice = Slice(counted, alloc - 1)
-                subvert = vertex.create_subvertex(
-                    vertex_slice, subvertex_usage,
-                    "subvertex with low atoms {} and hi atoms {} for vertex {}"
-                    .format(counted, alloc - 1, vertex.label))
+                subvert = \
+                    PartitionedVertex(
+                        label="subvertex with lo atom {} and hi atom {}"
+                              .format(counted, alloc - 1),
+                        resources_required=subvertex_usage)
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(
                     subvert, counted, counted + alloc - 1, vertex)
@@ -149,3 +152,4 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         self._generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph)
 
         return subgraph, graph_to_subgraph_mapper
+
