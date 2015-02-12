@@ -24,11 +24,12 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         self._supported_constraints.append(KeyAllocatorRoutingConstraint)
         self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
         self._free_space_tracker = list()
-        self._vertex_to_routing_info_register = dict()
+        self._placement_to_routing_info_register = dict()
         self._registered_key_combos = dict()
         self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
 
-    def _register_a_key(self, key, mask, partitioned_vertex, subedge):
+    def _register_a_key(self, key, mask, partitioned_vertex, placement,
+                        subedge):
         """ Handle edges and vertices which have specific requireiments on\
             their key and mask.
 
@@ -37,7 +38,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                     (indirectly used for a max atoms)
         :param partitioned_vertex: the partitioned vertex this key is\
                     associated with
-        :param subedge: the subedge assoicated with this key
+        :param placement: The placement of the partitioned vertex
+        :param subedge: the subedge associated with this key
         :return: the routing info object that encompasses the decisions
         :raises: PacmanAlreadyExistsException if the key has already been\
                     allocated
@@ -63,17 +65,16 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
             # check if subvert hasnt registered a key before, make a new list
             routing_info = self._update_data_objects(
-                key_combo, key, mask, partitioned_vertex, subedge)
+                key_combo, key, mask, placement, subedge)
             return routing_info
 
-    def _update_data_objects(self, key_combo, key, mask, partitioned_vertex,
-                             subedge):
+    def _update_data_objects(self, key_combo, key, mask, placement, subedge):
         """ Take the generated key, mask, and associated objects and\
             update internal representations
 
         :param key_combo: the key anded with the mask
-        :param partitioned_vertex: the partitioned vertex which requested a\
-                    key allocation in the first place
+        :param placement: the placement of the partitioned vertex which\
+                    requested a key allocation in the first place
         :param key: the key allocated/requested to it by the system
         :param mask: the mask allocated/requested to it by the system
         :param subedge: the subegde going out of the partitioned vertex\
@@ -83,14 +84,14 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         """
 
         # check if subvert hasn't registered a key before, make a new list
-        self._registered_key_combos[key_combo] = partitioned_vertex
-        vertex_keys = self._vertex_to_routing_info_register.keys()
-        if partitioned_vertex not in vertex_keys:
-            self._vertex_to_routing_info_register[partitioned_vertex] \
-                = dict()
-        routing_info = SubedgeRoutingInfo(int(key), int(mask), subedge)
-        self._vertex_to_routing_info_register[partitioned_vertex][subedge]\
-            = routing_info
+        self._registered_key_combos[key_combo] = placement
+        if placement not in self._placement_to_routing_info_register:
+            self._placement_to_routing_info_register[placement] = dict()
+        routing_info = SubedgeRoutingInfo(
+            int(key), int(mask), subedge,
+            key_with_atom_ids_function=self._generate_keys_with_atom_id)
+        self._placement_to_routing_info_register[placement][subedge] = \
+            routing_info
         return routing_info
 
     def _handle_space_for_key(self, key, mask_size):
@@ -165,9 +166,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :return: the key and mask for the number of neurons being used
         """
-        fixed_mask_constraints = utility_calls.\
-            locate_constraints_of_type(partitioned_vertex.constraints,
-                                       KeyAllocatorFixedMaskConstraint)
+        fixed_mask_constraints = utility_calls.locate_constraints_of_type(
+            partitioned_vertex.constraints, KeyAllocatorFixedMaskConstraint)
 
         # handle fixed_mask_constraints
         if len(fixed_mask_constraints) == 0:
@@ -221,36 +221,39 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         """
         temp_value = math.floor(math.log(n_neurons, 2))
         max_value = int(math.pow(2, 32))
-        max_atoms_covered = \
-            math.pow(2, int(math.log(int(math.pow(2, temp_value + 1)), 2)) + 1)
+        max_atoms_covered = math.pow(
+            2, int(math.log(int(math.pow(2, temp_value + 1)), 2)) + 1)
         mask = max_value - int(math.pow(2, temp_value + 1))
         return mask, max_atoms_covered
 
-    def _request_a_key(self, n_neurons, partitioned_vertex, subedge):
-        """ takes a number of neurons and detemrines a key and mask that
+    def _request_a_key(self, n_neurons, partitioned_vertex, placement,
+                       subedge):
+        """ takes a number of neurons and determines a key and mask
 
-        :param n_neurons: the numebr of neurons to be used by the
-        partitioned vertex that the key has to cover
-        :param partitioned_vertex: the parititoned vertex to be considered
+        :param n_neurons: the number of neurons to be used by the\
+                    partitioned vertex that the key has to cover
+        :param partitioned_vertex: The partitioned vertex to get a key for
+        :param placement: the placement of the partitioned vertex to be\
+                    considered
         :param subedge: the subedge that this key is associated with
-        :return: a routinginfo object that encompasses the key, mask,
-         of this edge and vertex
+        :return: a routinginfo object that encompasses the key, mask,\
+                    of this edge and vertex
         """
-        if partitioned_vertex in self._vertex_to_routing_info_register.keys():
-            routing_infos_on_sub_edges = self._vertex_to_routing_info_register[
-                partitioned_vertex]
+        if placement in self._placement_to_routing_info_register:
+            routing_infos_on_sub_edges = \
+                self._placement_to_routing_info_register[placement]
             first_routing_info = routing_infos_on_sub_edges[
                 routing_infos_on_sub_edges.keys()[0]]
             routing_info = self._update_data_objects(
                 first_routing_info.key_mask_combo, first_routing_info.key,
-                first_routing_info.mask, partitioned_vertex, subedge)
+                first_routing_info.mask, placement, subedge)
             return routing_info
         else:
             key, mask = self._handle_space_for_neurons(n_neurons,
                                                        partitioned_vertex)
             key_combo = int(key) & mask
             routing_info = self._update_data_objects(
-                key_combo, key, mask, partitioned_vertex, subedge)
+                key_combo, key, mask, placement, subedge)
             return routing_info
 
     def _generate_keys_with_atom_id(self, vertex_slice, vertex, placement,
@@ -265,7 +268,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :return: a dictonary of neuron_id to key mappings.
         :raises: None
         """
-        routing_info = self._vertex_to_routing_info_register[vertex][subedge]
+        routing_info = \
+            self._placement_to_routing_info_register[placement][subedge]
         key = routing_info.key
         keys = dict()
         for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
@@ -297,6 +301,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         # take each subedge and create keys from its placement
         routing_infos = RoutingInfo()
         for partitioned_vertex in subgraph.subvertices:
+            placement = placements.get_placement_of_subvertex(
+                partitioned_vertex)
             router_constraints_of_vertex =\
                 utility_calls.locate_constraints_of_type(
                     partitioned_vertex.constraints,
@@ -308,9 +314,12 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                     key, mask = \
                         router_constraints_of_vertex[0].key_function_call()
                     routing_info = self._register_a_key(
-                        key, mask, partitioned_vertex, out_going_subedge)
+                        key, mask, partitioned_vertex, placement,
+                        out_going_subedge)
                     routing_infos.add_subedge_info(routing_info)
         for partitioned_vertex in subgraph.subvertices:
+            placement = placements.get_placement_of_subvertex(
+                partitioned_vertex)
             router_constraints_of_vertex =\
                 utility_calls.locate_constraints_of_type(
                     partitioned_vertex.constraints,
@@ -321,7 +330,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 for out_going_subedge in out_going_subedges:
                     routing_info = \
                         self._request_a_key(partitioned_vertex.n_atoms,
-                                            partitioned_vertex,
+                                            partitioned_vertex, placement,
                                             out_going_subedge)
                     routing_infos.add_subedge_info(routing_info)
         return routing_infos
