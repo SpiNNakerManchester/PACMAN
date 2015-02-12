@@ -19,23 +19,28 @@ class PlacementTracker():
 
     def assign_core(self, x, y, p):
         key = (x, y)
-        #check key exists
-        if not key in self._placements_available:
+
+        # check key exists
+        if key not in self._placements_available:
             raise exceptions.PacmanPlaceException(
                 "cannot assign to chip {}:{} as the chip does not exist for "
                 "placement".format(x, y))
-        #locate processor list
+
+        # locate processor list
         processors_available = self._placements_available[key]
         if p is None:
+
             # locate first available
             p = self.locate_first_available(x, y)
         else:
-            #check that there's a processor available
+
+            # check that there's a processor available
             if p not in processors_available:
                 raise exceptions.PacmanPlaceException(
                     "cannot assign to processor {} in chip {}:{} as the "
                     "processor has already been assigned")
-        #update processor
+
+        # update processor
         processors_available.remove(p)
         self._free_cores -= 1
         return x, y, p
@@ -67,8 +72,8 @@ class PlacementTracker():
     def locate_first_available(self, x, y):
         key = (x, y)
 
-        #check key exists
-        if not key in self._placements_available.keys():
+        # check key exists
+        if key not in self._placements_available:
             raise exceptions.PacmanPlaceException(
                 "cannot assign to chip {}:{} as the chip does not exist for "
                 "placement".format(x, y))

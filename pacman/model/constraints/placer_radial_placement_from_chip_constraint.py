@@ -3,6 +3,7 @@ from pacman.model.constraints.abstract_placer_constraint import \
 
 import sys
 
+
 class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     """ Creates a constraint object to place a vertex or a subvertex on a\
         specific chip, and optionally a specific core on that chip
