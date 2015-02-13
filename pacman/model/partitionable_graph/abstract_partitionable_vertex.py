@@ -14,7 +14,6 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.resources.resource_container import ResourceContainer
 
-import sys
 import logging
 
 logger = logging.getLogger(__name__)
@@ -142,7 +141,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :rtype: int
         :raise None: this method does not raise any known exception
         """
-        current_found_max_atoms_per_core = sys.maxint
+        current_found_max_atoms_per_core = self._n_atoms
         for constraint in self.constraints:
             if (isinstance(constraint, PartitionerMaximumSizeConstraint) and
                     constraint.size <= current_found_max_atoms_per_core):
