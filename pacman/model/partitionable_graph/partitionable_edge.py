@@ -25,7 +25,8 @@ class PartitionableEdge(object):
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
 
-    def create_subedge(self, pre_subvertex, post_subvertex, label=None):
+    def create_subedge(self, pre_subvertex, post_subvertex, label=None,
+                       n_keys=1):
         """ Create a subedge between the pre_subvertex and the post_subvertex
 
         :param pre_subvertex: The subvertex at the start of the subedge
@@ -39,6 +40,8 @@ class PartitionableEdge(object):
                     specified and the edge has a label, a label will be\
                     provided
         :type label: str
+        :param n_keys: The number of keys required by the edge for routing\
+                    purposes
         :return: The created subedge
         :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
@@ -58,7 +61,7 @@ class PartitionableEdge(object):
         if label is None and self.label is not None:
             label = self.label
 
-        return PartitionedEdge(pre_subvertex, post_subvertex, label)
+        return PartitionedEdge(pre_subvertex, post_subvertex, label, n_keys)
 
     @property
     def pre_vertex(self):

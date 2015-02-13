@@ -12,7 +12,7 @@ class PlacementTracker():
             key = (chip.x, chip.y)
             self._placements_available[key] = set()
             for processor in chip.processors:
-                if processor.processor_id != 0 or chip.virtual:
+                if not processor.is_monitor or chip.virtual:
                     self._placements_available[key].add(
                         processor.processor_id)
                     self._free_cores += 1
@@ -33,6 +33,7 @@ class PlacementTracker():
             # locate first available
             p = self.locate_first_available(x, y)
         else:
+
             # check that there's a processor available
             if p not in processors_available:
                 raise exceptions.PacmanPlaceException(
@@ -72,7 +73,7 @@ class PlacementTracker():
         key = (x, y)
 
         # check key exists
-        if key not in self._placements_available.keys():
+        if key not in self._placements_available:
             raise exceptions.PacmanPlaceException(
                 "cannot assign to chip {}:{} as the chip does not exist for "
                 "placement".format(x, y))

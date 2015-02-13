@@ -133,8 +133,6 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         # update constraints for subverts
         for subvert in subgraph.subvertices:
             if subvert in self._placement_to_subvert_mapper.keys():
-                subvert.add_constraint(
-                    self._placement_to_subvert_mapper[subvert])
                 associated_vertex = \
                     graph_mapper.get_vertex_from_subvertex(subvert)
                 for constraint in associated_vertex.constraints:
@@ -467,7 +465,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :raise None: this method does not raise any known exceptions
 
         """
-        if resources.cpu.get_value() == 0 or max_resources.cpu.get_value() == 0:
+        if (resources.cpu.get_value() == 0
+                or max_resources.cpu.get_value() == 0):
             cpu_ratio = 0
         else:
             cpu_ratio = \

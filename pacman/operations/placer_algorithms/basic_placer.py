@@ -211,7 +211,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         dtcm_per_proc_met = False
         for chip in chips_in_a_ordering:
             for processor in chip.processors:
-                if (processor.processor_id != 0 and
+                if (not processor.is_monitor and
                         self._placement_tracker.has_available_cores_left(
                         chip.x, chip.y, processor.processor_id)):
 

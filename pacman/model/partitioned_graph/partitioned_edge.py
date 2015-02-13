@@ -1,9 +1,9 @@
 class PartitionedEdge(object):
-    """ Represents part of a division of an edge to match the division of the\
-        vertices on either side of the edge
+    """ Represents an edge between two PartitionedVertex instances
     """
 
-    def __init__(self, pre_subvertex, post_subvertex, label=None):
+    def __init__(self, pre_subvertex, post_subvertex, label=None,
+                 n_keys=1):
         """
 
         :param pre_subvertex: the subvertex at the start of the subedge
@@ -14,17 +14,20 @@ class PartitionedEdge(object):
                     :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         :param label: The name of the edge
         :type label: str
+        :param n_keys: The number of distinct keys required by the partitioned\
+                    edge for routing purposes
         :raise None: Raises no known exceptions
         """
         self._pre_subvertex = pre_subvertex
         self._post_subvertex = post_subvertex
+        self._n_keys = n_keys
         self._label = label
 
     @property
     def pre_subvertex(self):
-        """ The subvertex at the start of the subedge
+        """ The partitioned vertex at the start of the edge
 
-        :return: the incoming subvertex
+        :return: the incoming partitioned vertex
         :rtype: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :raise None: Raises no known exceptions
         """
@@ -32,9 +35,9 @@ class PartitionedEdge(object):
 
     @property
     def post_subvertex(self):
-        """ The subvertex at the end of the subedge
+        """ The partitioned vertex at the end of the edge
 
-        :return: the outgoing subvertex
+        :return: the outgoing partitioned vertex
         :rtype: :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :raise None: Raises no known exceptions
         """
@@ -42,7 +45,7 @@ class PartitionedEdge(object):
 
     @property
     def label(self):
-        """ The label of the subedge
+        """ The label of the edge
 
         :return: The name, or None if there is no label
         :rtype: str
@@ -50,9 +53,20 @@ class PartitionedEdge(object):
         """
         return self._label
 
+    @property
+    def n_keys(self):
+        """ The number of keys required by the partitioned edge for routing
+            purposes
+
+        :return: The number of keys required
+        :rtype: int
+        :raise None: Raises no known exceptions
+        """
+        return self._n_keys
+
     def __str__(self):
-        return "subedge between {}:{}".format(self._pre_subvertex,
-                                              self._post_subvertex)
+        return "PartitionedEdge between {}:{}".format(self._pre_subvertex,
+                                                      self._post_subvertex)
 
     def __repr__(self):
         return self.__str__()
