@@ -8,6 +8,8 @@ from pacman import exceptions
 
 logger = logging.getLogger(__name__)
 
+def tag_allocator_report(report_folder, tag_infos):
+    pass
 
 def placer_reports(report_folder, hostname, graph, graph_mapper,
                    placements, machine):

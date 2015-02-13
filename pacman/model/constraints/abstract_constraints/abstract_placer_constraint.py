@@ -2,7 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
+from pacman.model.constraints.abstract_constraints.abstract_constraint import AbstractConstraint
 
 
 @add_metaclass(ABCMeta)

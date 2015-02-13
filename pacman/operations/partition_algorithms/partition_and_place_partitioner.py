@@ -1,34 +1,36 @@
 import logging
-from pacman.model.constraints.abstract_partitioner_constraint import \
+
+from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
-
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import \
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.operations.partition_algorithms.abstract_partition_algorithm\
+from pacman.operations.abstract_algorithms.abstract_partition_algorithm \
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
-from pacman.operations.placer_algorithms.abstract_placer_algorithm import \
-    AbstractPlacerAlgorithm
+from pacman.operations.abstract_algorithms.abstract_requires_placer import \
+    AbstractRequiresPlacer
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanPlaceException
 
+
 logger = logging.getLogger(__name__)
 
 
-class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
+class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm,
+                                   AbstractRequiresPlacer):
     """ An basic algorithm that can partition a partitionable_graph based on atoms
     """
 
@@ -48,36 +50,14 @@ pacman.operations.partition_algorithms.abstract_partition_algorithm.AbstractPart
         """
         AbstractPartitionAlgorithm.__init__(self, machine_time_step,
                                             runtime_in_machine_time_steps)
+        AbstractRequiresPlacer.__init__(self)
+
         #add supported constraints
         self._supported_constraints.append(PartitionerMaximumSizeConstraint)
         self._supported_constraints.append(PartitionerSameSizeAsVertexConstraint)
 
-        self._placer_algorithm = None
         self._placement_to_subvert_mapper = dict()
         self._complete_placements = Placements()
-
-    def set_placer_algorithm(self, placer_algorithm, machine):
-        """ setter method for setting the placer algorithm
-
-        :param placer_algorithm: the new placer algorithm
-        :type placer_algorithm: implementation of \
-pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm
-        :param machine: the machine object
-        :type machine: spinnmachine.machine.Machine object
-
-        :return: None
-        :rtype: None
-        :raise PacmanConfigurationException: if the placer_algorithm is not a\
-        implementation of \
-pacman.operations.placer_algorithms.abstract_placer_algorithm.AbstractPlacerAlgorithm
-
-        """
-        if issubclass(placer_algorithm, AbstractPlacerAlgorithm):
-            self._placer_algorithm = placer_algorithm(machine)
-        else:
-            raise exceptions.PacmanConfigurationException(
-                "The placer algorithm submitted is not a recognised placer "
-                "algorithm")
 
     #inherited from AbstractPartitionAlgorithm
     def partition(self, graph, machine):
@@ -513,3 +493,10 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
             else:
                 partition_together_vertices.append(constraint.vertex)
         return partition_together_vertices
+
+    def requires_placer(self):
+        """ method from reuqires placer component
+
+        :return:
+        """
+        return True

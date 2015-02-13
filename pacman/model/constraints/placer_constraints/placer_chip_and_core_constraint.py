@@ -1,9 +1,7 @@
-from pacman.model.constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
-from pacman import exceptions
-
 import sys
-from enum import Enum
+
+from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
+    import AbstractPlacerConstraint
 
 
 class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):

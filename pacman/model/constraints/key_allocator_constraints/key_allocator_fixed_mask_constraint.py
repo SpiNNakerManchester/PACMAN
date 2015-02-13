@@ -1,4 +1,4 @@
-from pacman.model.constraints.abstract_router_constraint \
+from pacman.model.constraints.abstract_constraints.abstract_router_constraint \
     import AbstractRouterConstraint
 
 

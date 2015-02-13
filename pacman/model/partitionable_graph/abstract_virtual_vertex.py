@@ -1,10 +1,9 @@
 from abc import ABCMeta
-
 from six import add_metaclass
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from pacman.model.constraints.placer_chip_and_core_constraint import \
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 
 

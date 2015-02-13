@@ -1,12 +1,13 @@
 import unittest
+
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.constraints.placer_chip_and_core_constraint import \
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_subvertex_same_chip_constraint import \
+from pacman.model.constraints.placer_constraints.placer_subvertex_same_chip_constraint import \
     PlacerSubvertexSameChipConstraint
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
@@ -25,6 +26,7 @@ from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.router import Router
 from spinn_machine.sdram import SDRAM
+
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     vertex = Vertex(1, None)

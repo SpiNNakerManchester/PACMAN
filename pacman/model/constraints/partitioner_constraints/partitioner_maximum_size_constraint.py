@@ -1,4 +1,4 @@
-from pacman.model.constraints.abstract_partitioner_constraint \
+from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint \
     import AbstractPartitionerConstraint
 
 

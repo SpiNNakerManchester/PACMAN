@@ -1,4 +1,4 @@
-from pacman.model.constraints.abstract_utility_constraint import \
+from pacman.model.constraints.abstract_constraints.abstract_utility_constraint import \
     AbstractUtilityConstraint
 
 

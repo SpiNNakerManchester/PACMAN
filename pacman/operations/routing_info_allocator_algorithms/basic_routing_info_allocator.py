@@ -1,9 +1,8 @@
-from pacman.model.constraints.abstract_router_constraint import \
+from pacman.model.constraints.abstract_constraints.abstract_router_constraint import \
     AbstractRouterConstraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.routing_info_allocator_algorithms.\
-    abstract_routing_info_allocator_algorithm import \
+from pacman.operations.abstract_algorithms.abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
 from pacman.utilities import utility_calls
 from pacman.utilities import constants

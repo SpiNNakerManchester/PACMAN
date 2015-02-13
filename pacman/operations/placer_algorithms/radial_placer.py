@@ -1,12 +1,17 @@
-from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
-from pacman.model.constraints.placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
 import logging
+
+from pacman.operations.abstract_algorithms.abstract_requires_tag_allocator import \
+    AbstractRequiresTagAllocator
+
+from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
+from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
+
 
 logger = logging.getLogger(__name__)
 
 
-class RadialPlacer(BasicPlacer):
+class RadialPlacer(BasicPlacer, AbstractRequiresTagAllocator):
     """ An radial algorithm that can place a partitioned_graph onto a
      machine based off a circle out behaviour from a ethernet at 0 0
     """
@@ -18,6 +23,8 @@ class RadialPlacer(BasicPlacer):
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         BasicPlacer.__init__(self, machine)
+        AbstractRequiresTagAllocator.__init__(self)
+        self._tag_allocator = None
         self._supported_constraints.append(
             PlacerRadialPlacementFromChipConstraint)
 
@@ -97,3 +104,10 @@ class RadialPlacer(BasicPlacer):
 
         return BasicPlacer._deal_with_non_constrained_placement(
             self, subvertex_label, used_resources, processors_new_order)
+
+    def requires_tag_allocator(self):
+        """ method from requires tag allcoator component
+
+        :return:
+        """
+        return True

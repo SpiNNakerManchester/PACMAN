@@ -1,11 +1,11 @@
 from abc import ABCMeta
 from abc import abstractmethod
-
 from six import add_metaclass
+import logging
 
-from pacman.model.constraints.abstract_partitioner_constraint import \
+from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import \
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
@@ -18,7 +18,6 @@ from pacman.utilities.progress_bar import ProgressBar
 from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
 
-import logging
 
 logger = logging.getLogger(__name__)
 

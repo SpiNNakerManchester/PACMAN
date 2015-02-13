@@ -1,16 +1,15 @@
 import math
-from pacman.model.constraints.abstract_router_constraint import \
+from pacman.model.constraints.abstract_constraints.abstract_router_constraint import \
     AbstractRouterConstraint
-from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_mask_constraint import \
     KeyAllocatorFixedMaskConstraint
-from pacman.model.constraints.key_allocator_routing_constraint import \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_routing_constraint import \
     KeyAllocatorRoutingConstraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.utilities import constants
 from pacman import exceptions
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.routing_info_allocator_algorithms.\
-    abstract_routing_info_allocator_algorithm import \
+from pacman.operations.abstract_algorithms.abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
 from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.free_space import FreeSpace

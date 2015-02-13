@@ -1,19 +1,20 @@
-from pacman.model.constraints.abstract_placer_constraint import \
+import logging
+
+from pacman.model.constraints.abstract_constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
-from pacman.operations.placer_algorithms.abstract_placer_algorithm import\
+from pacman.operations.abstract_algorithms.abstract_placer_algorithm import\
     AbstractPlacerAlgorithm
-from pacman.model.constraints.placer_chip_and_core_constraint \
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_subvertex_same_chip_constraint \
+from pacman.model.constraints.placer_constraints.placer_subvertex_same_chip_constraint \
     import PlacerSubvertexSameChipConstraint
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.utilities.progress_bar import ProgressBar
-
-import logging
 from spinn_machine.sdram import SDRAM
+
 
 logger = logging.getLogger(__name__)
 

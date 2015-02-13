@@ -2,11 +2,11 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
+from pacman.model.constraints.abstract_constraints.abstract_constraint import AbstractConstraint
 
 
 @add_metaclass(ABCMeta)
-class AbstractRouterConstraint(AbstractConstraint):
+class AbstractUtilityConstraint(AbstractConstraint):
     """ A constraint that will be used by the router
     """
 
@@ -14,7 +14,7 @@ class AbstractRouterConstraint(AbstractConstraint):
         return True
 
     @abstractmethod
-    def is_router_constraint(self):
+    def is_utility_constraint(self):
         """ Determine if this is a placer constraint
         """
         pass

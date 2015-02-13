@@ -1,12 +1,13 @@
+import logging
+
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
-from pacman.operations.router_algorithms.abstract_router_algorithm \
+from pacman.operations.abstract_algorithms.abstract_router_algorithm \
     import AbstractRouterAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
-
-import logging
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+
 
 logger = logging.getLogger(__name__)
 

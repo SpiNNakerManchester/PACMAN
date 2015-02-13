@@ -1,7 +1,7 @@
-from pacman.model.constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
-
 import sys
+
+from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
+    import AbstractPlacerConstraint
 
 
 class PlacerSubvertexSameChipConstraint(AbstractPlacerConstraint):

@@ -1,10 +1,10 @@
 import unittest
+
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
-from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
 from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.constraints.partitioner_maximum_size_constraint import \
+from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 
 

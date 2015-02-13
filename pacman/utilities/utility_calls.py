@@ -1,9 +1,8 @@
-from pacman.model.constraints.abstract_placer_constraint import \
+from pacman.model.constraints.abstract_constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities import constants
-import inspect
 
 
 def locate_constraints_of_type(constraints, constraint_type):

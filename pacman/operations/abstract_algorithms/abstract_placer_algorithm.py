@@ -1,10 +1,11 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+import logging
 
-from pacman.model.constraints.placer_chip_and_core_constraint import \
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_radial_placement_from_chip_constraint import \
+from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint import \
     PlacerRadialPlacementFromChipConstraint
 from pacman.model.constraints.placer_subvertex_same_chip_constraint import \
     PlacerSubvertexSameChipConstraint
@@ -13,7 +14,6 @@ from pacman.utilities.sdram_tracker import SDRAMTracker
 from pacman import exceptions
 
 
-import logging
 logger = logging.getLogger(__name__)
 
 

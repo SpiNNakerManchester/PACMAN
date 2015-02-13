@@ -1,14 +1,13 @@
-from pacman.model.constraints.abstract_placer_constraint import \
+import logging
+
+from pacman.model.constraints.abstract_constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
 from pacman.utilities.progress_bar import ProgressBar
-
-import logging
 import math
+
 
 logger = logging.getLogger(__name__)
 

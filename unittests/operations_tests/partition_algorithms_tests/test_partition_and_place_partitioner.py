@@ -1,17 +1,16 @@
 import unittest
 
 #pacman imports
-from pacman.model.constraints.abstract_partitioner_constraint import \
+from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
-from pacman.model.constraints \
-    .vertex_requires_virtual_chip_in_machine_constraint \
+from pacman.model.constraints.utility_constraints.vertex_requires_virtual_chip_in_machine_constraint \
     import VertexRequiresVirtualChipInMachineConstraint
-from pacman.model.constraints.partitioner_maximum_size_constraint \
+from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 from pacman.operations.partition_algorithms.partition_and_place_partitioner \
     import PartitionAndPlacePartitioner

@@ -1,9 +1,7 @@
 import unittest
-from pacman.model.constraints.abstract_partitioner_constraint import \
+
+from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
-from pacman.model\
-    .constraints.vertex_requires_virtual_chip_in_machine_constraint import \
-    VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.exceptions import PacmanPartitionException, \
@@ -12,8 +10,6 @@ from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
-from spynnaker.pyNN.models.neural_models.if_curr_exp \
-    import IFCurrentExponentialPopulation as IFCurrVertex
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from spinn_machine.machine import Machine
