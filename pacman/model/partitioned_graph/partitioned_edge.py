@@ -2,8 +2,7 @@ class PartitionedEdge(object):
     """ Represents an edge between two PartitionedVertex instances
     """
 
-    def __init__(self, pre_subvertex, post_subvertex, label=None,
-                 n_keys=1):
+    def __init__(self, pre_subvertex, post_subvertex, label=None):
         """
 
         :param pre_subvertex: the subvertex at the start of the subedge
@@ -20,7 +19,6 @@ class PartitionedEdge(object):
         """
         self._pre_subvertex = pre_subvertex
         self._post_subvertex = post_subvertex
-        self._n_keys = n_keys
         self._label = label
 
     @property
@@ -52,17 +50,6 @@ class PartitionedEdge(object):
         :raise None: Raises no known exceptions
         """
         return self._label
-
-    @property
-    def n_keys(self):
-        """ The number of keys required by the partitioned edge for routing
-            purposes
-
-        :return: The number of keys required
-        :rtype: int
-        :raise None: Raises no known exceptions
-        """
-        return self._n_keys
 
     def __str__(self):
         return "PartitionedEdge between {}:{}".format(self._pre_subvertex,
