@@ -1,7 +1,7 @@
 from pacman import exceptions
 from pacman.model.constraints.\
-    tag_allocator_constraints.tag_allocator_constraint import \
-    TagAllocatorConstraint
+    tag_allocator_constraints.tag_allocator_require_iptag_constraint import \
+    TagAllocatorRequireIptagConstraint
 from pacman.model.tag_infos.tag_infos import TagInfos
 from pacman.operations.abstract_algorithms.\
     abstract_tag_allocator_algorithm import AbstractTagAllocatorAlgorithm
@@ -14,33 +14,34 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
         AbstractTagAllocatorAlgorithm.__init__(self, machine)
         self._tag_infos = TagInfos()
 
-    def allocate(self, tag_infos):
+    def allocate(self, placements):
         """
 
-        :param tag_infos:
+        :param placements:
         :return:
         """
 
         avilable_tag_ids = self._locate_all_seperate_ethernet_connections()
         # iterate though the vertices and set tags which have tag ids set
-        for vertex in self._partitionable_graph.vertices:
-            tag_allocator_constraint = \
-                utility_calls.locate_constraints_of_type(vertex.constraints,
-                                                         TagAllocatorConstraint)
-            if len(tag_allocator_constraint) > 0:
-                tag_id = vertex.tag()
-                if tag_id is not None:
-                    board_address = vertex.board_address
-                    tag_id, board_address = \
-                        self._check_tag(tag_id, board_address, avilable_tag_ids)
-                    vertex.board_address = board_address
-                    self._set_tag(vertex)
+        for placement in placements.placements:
+            tag_allocator_constraints = \
+                utility_calls.locate_constraints_of_type(
+                    placement.subvertex.constraints, TagAllocatorRequireIptagConstraint)
+            if len(tag_allocator_constraints) > 0:
+                for tag_allocator_constraint in tag_allocator_constraints:
+                    tag_id = tag_allocator_constraint.tag
+                    if tag_id is not None:
+                        board_address = tag_allocator_constraint.board_address
+                        tag_id, board_address = self._check_tag(
+                            tag_id, board_address, avilable_tag_ids)
+                        self._set_tag(placement, tag_allocator_constraint,
+                                      board_address, tag_id)
 
         # iterate though the vertices and set tags which have no tag id set
         for vertex in self._partitionable_graph.vertices:
             tag_allocator_constraint = \
                 utility_calls.locate_constraints_of_type(vertex.constraints,
-                                                         TagAllocatorConstraint)
+                                                         TagAllocatorRequireIptagConstraint)
             if len(tag_allocator_constraint) > 0:
                 tag_id = vertex.tag()
                 if tag_id is None:
@@ -49,10 +50,11 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                                                          avilable_tag_ids)
                     vertex.tag = tag
                     vertex.board_address = board_address
-                    self._set_tag(vertex)
+                    self._set_tag(vertex, tag_allocator_constraint)
         return self._tag_infos
 
-    def _set_tag(self, vertex):
+    def _set_tag(self, vertex, constraint):
+
         if isinstance(vertex, AbstractIPTagableVertex):
             self._add_iptag(IPTag(port=vertex.port, address=vertex.address,
                                   tag=vertex.tag,
