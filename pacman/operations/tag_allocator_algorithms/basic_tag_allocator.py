@@ -14,6 +14,10 @@ from pacman.utilities import utility_calls
 
 
 class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
+    """ the basic tag allocator that goes though the boards avilable and applies
+    the iptags and reverse iptags as needed.
+
+    """
 
     def __init__(self, machine):
         AbstractTagAllocatorAlgorithm.__init__(self, machine)
@@ -25,7 +29,8 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
             TagAllocatorRequireReverseIptagConstraint)
 
     def allocate(self, placements):
-        """
+        """ entering method when using the tag allocator in situ. It goes though
+        the placements and check for
         :param placements:
         :return:
         """
@@ -112,6 +117,12 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
 
     def _check_if_iptag_allocated_already(
             self, tag_allocator_constraint, partitioned_vertex_label):
+        """
+
+        :param tag_allocator_constraint:
+        :param partitioned_vertex_label:
+        :return:
+        """
         # uses a iptag that already exists for a collection of boards
         iptags = self._tag_infos.get_iptag_mapping_for(
             tag_allocator_constraint.port, tag_allocator_constraint.address)
@@ -210,13 +221,28 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
     def _check_tag(self, tag_id, board_address, raise_exceptions=True,
                    remove_tag_id_from_set=True):
         """
+        HORRIBLE PIECE OF CODE. This bit does all the comparisions of all the
+        boards and locates the tag and board address to allocate to a
+        constraint. It can raise errors if the raise_exceptions parameter is set
+        to true, and not allocate the tag and board_address (not removed from
+        the data structures that track the avilable tags) if the
+        remove_tag_id_from_set is set to true.
+
+        NOTE: Attempts to clean this bit of code are damn welcome!!!!
+
         :param tag_id: the tag id to be used
         :type tag_id: int or None
         :param board_address: the board address to use
         :type board_address: str, or None
         :param raise_exceptions: a bool to state if this methof should raise
-        exceptions or not
+        exceptions or not. If its asked not to, and results in a position where
+        it shoudl raise an exception, it returns None, None under the
+        assumption that higher level calls will understand this.
         :type raise_exceptions: bool
+        :param remove_tag_id_from_set: a bool which detemrines if the code
+        should allocate a tag and board address or if it should peek under the
+        assumption that later it will be asked to allocate it.
+        :type remove_tag_id_from_set: bool
         :return: the tag and board_address, or None, None if not possible with
         the parameters
         :raises PacmanConfigurationException: when the raise _exceptions
@@ -244,6 +270,8 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                     self._avilable_tag_ids[board_address].remove(tag_id)
                 return tag_id, board_address
             else:
+                # if your expected to raise exceptions do so, otherwise
+                # return None None.
                 if raise_exceptions:
                     raise exceptions.PacmanConfigurationException(
                         "This tag has already been used by some other iptag, "
