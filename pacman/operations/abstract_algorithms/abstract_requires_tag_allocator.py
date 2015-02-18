@@ -10,7 +10,7 @@ from pacman.operations.abstract_algorithms.abstract_tag_allocator_algorithm\
 class AbstractRequiresTagAllocator(object):
 
     def __init__(self):
-        self._tag_allcoator = None
+        self._tag_allocator = None
 
     def set_tag_allocator(self, tag_allocator_algorithum):
         """ setter method for setting the placer algorithm
@@ -26,7 +26,7 @@ pacman.operations.abstract_algorithms.abstract_tag_allocator_algorithm.AbstractT
 
         """
         if isinstance(tag_allocator_algorithum, AbstractTagAllocatorAlgorithm):
-            self._tag_allcoator = tag_allocator_algorithum
+            self._tag_allocator = tag_allocator_algorithum
         else:
             raise exceptions.PacmanConfigurationException(
                 "The placer algorithm submitted is not a recognised placer "

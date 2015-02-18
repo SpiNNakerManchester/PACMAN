@@ -125,7 +125,18 @@ class Placements(object):
         return self._placements.itervalues()
 
     def __repr__(self):
+        """ string representation
+
+        :return:
+        """
         output = ""
         for placement in self._placements:
             output += placement.__repr__()
         return output
+
+    def __iter__(self):
+        """ returns a iterator for the placements object within
+
+        :return:
+        """
+        return iter(self.placements)

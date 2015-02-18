@@ -5,36 +5,25 @@ import sys
 
 class TagAllocatorRequireIptagConstraint(AbstractTagAllocatorConstraint):
 
-    def __init__(self, tag_id, board_address, is_reverse, address, stripe_sdp):
-        AbstractTagAllocatorConstraint.__init__(self)
-        self._board_address = board_address
-        self._is_reverse_ip = is_reverse
-        self._tag_id = tag_id
+    def __init__(self, tag_id, board_address, address, strip_sdp, port):
+        AbstractTagAllocatorConstraint.__init__(self, board_address, port,
+                                                tag_id)
         self._address = address
-        self._stripe_sdp = stripe_sdp
-
-    @property
-    def board_address(self):
-        return self._board_address
-
-    @property
-    def tag_id(self):
-        return self._tag_id
-
-    @property
-    def is_reverse(self):
-        return self._is_reverse_ip
+        self._stripe_sdp = strip_sdp
 
     @property
     def address(self):
         return self._address
 
     @property
-    def stripe_sdp(self):
+    def strip_sdp(self):
         return self._stripe_sdp
 
     def is_placer_constraint(self):
         return True
 
+    def is_tag_allocator_constraint(self):
+        return True
+
     def rank(self):
-        return sys.maxint - 3
+        return sys.maxint - 4

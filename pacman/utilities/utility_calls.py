@@ -95,8 +95,7 @@ def sort_objects_by_constraint_authority(objects):
         rank_to_object_mapping[max_rank_so_far].append(current_object)
 
     #collected them all
-    ordered_keys = \
-        sorted(rank_to_object_mapping.keys(), key=int, reverse=True)
+    ordered_keys = sorted(rank_to_object_mapping.keys(), reverse=True)
     ordered_objects = list()
     for ordered_key in ordered_keys:
         object_list = rank_to_object_mapping[ordered_key]

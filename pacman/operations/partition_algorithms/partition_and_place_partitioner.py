@@ -1,12 +1,16 @@
 import logging
 
-from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
-from pacman.model.constraints.abstract_placer_constraint import \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_placer_constraint import \
     AbstractPlacerConstraint
-from pacman.model.constraints.partitioner_constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
+from pacman.model.constraints.placer_constraints.\
+    placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
@@ -15,7 +19,8 @@ from pacman.model.placements.placements import Placements
 from pacman.operations.abstract_algorithms.abstract_partition_algorithm \
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.constraints.partitioner_maximum_size_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
 from pacman.operations.abstract_algorithms.abstract_requires_placer import \
@@ -342,10 +347,9 @@ py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
 
             if self._placer_algorithm is not None:
                 # noinspection PyProtectedMember
-                x, y, p = \
-                    self._placer_algorithm._try_to_place(placement_constraints,
-                                                         used_resources, "",
-                                                         self._complete_placements)
+                x, y, p = self._placer_algorithm._try_to_place(
+                    placement_constraints, used_resources, "",
+                    self._complete_placements)
                 used_placements.append((vertex, partition_data_object, x, y, p,
                                         used_resources, resources))
             else:

@@ -1,44 +1,53 @@
-from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
-
 import sys
+from pacman.model.constraints.tag_allocator_constraints.\
+    abstract_tag_allocator_constraint import \
+    AbstractTagAllocatorConstraint
 
 
-class TagAllocatorRequireIptagConstraint(AbstractPlacerConstraint):
+class TagAllocatorRequireReverseIptagConstraint(AbstractTagAllocatorConstraint):
 
-    def __init__(self, tag_id, board_address, is_reverse, address, stripe_sdp):
-        AbstractPlacerConstraint.__init__(
-            self, "Placement vertex near ethernet on board {} ass it needs an "
-                  "entry in the IPTAG table with tag {}"
-            .format(board_address, tag_id))
-        self._board_address = board_address
-        self._is_reverse_ip = is_reverse
-        self._tag_id = tag_id
-        self._address = address
-        self._stripe_sdp = stripe_sdp
-
-    @property
-    def board_address(self):
-        return self._board_address
+    def __init__(self, tag_id, board_address, port_num, port, placement_x=None,
+                 placement_y=None, placement_p=None):
+        AbstractTagAllocatorConstraint.__init__(self, board_address, port,
+                                                tag_id)
+        self._placement_x = placement_x
+        self._placement_y = placement_y
+        self._placement_p = placement_p
+        self._port_num = port_num
 
     @property
-    def tag_id(self):
-        return self._tag_id
+    def port_num(self):
+        return self._port_num
 
     @property
-    def is_reverse(self):
-        return self._is_reverse_ip
+    def placement_x(self):
+        return self._placement_x
 
     @property
-    def address(self):
-        return self._address
+    def placement_y(self):
+        return self._placement_y
 
     @property
-    def stripe_sdp(self):
-        return self._stripe_sdp
+    def placement_p(self):
+        return self._placement_p
+
+    @placement_p.setter
+    def placement_p(self, new_value):
+        self._placement_p = new_value
+
+    @placement_x.setter
+    def placement_x(self, new_value):
+        self._placement_x = new_value
+
+    @placement_y.setter
+    def placement_y(self, new_value):
+        self._placement_y = new_value
 
     def is_placer_constraint(self):
         return True
 
+    def is_tag_allocator_constraint(self):
+        return True
+
     def rank(self):
-        return sys.maxint - 3
+        return sys.maxint - 4

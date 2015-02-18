@@ -1,12 +1,15 @@
 import logging
 
-from pacman.model.constraints.abstract_constraints.abstract_placer_constraint import \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_placer_constraint import \
     AbstractPlacerConstraint
 from pacman.operations.abstract_algorithms.abstract_placer_algorithm import\
     AbstractPlacerAlgorithm
-from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint \
+from pacman.model.constraints.placer_constraints.\
+    placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints.placer_subvertex_same_chip_constraint \
+from pacman.model.constraints.placer_constraints.\
+    placer_subvertex_same_chip_constraint \
     import PlacerSubvertexSameChipConstraint
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
@@ -31,6 +34,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :type machine: :py:class:`spinn_machine.machine.Machine`
         """
         AbstractPlacerAlgorithm.__init__(self, machine)
+
         self._supported_constraints.append(PlacerChipAndCoreConstraint)
         self._supported_constraints.append(PlacerSubvertexSameChipConstraint)
 
@@ -115,14 +119,14 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         :rtype: int, int, int
         :raise None: this method does not raise any known exceptions
         """
-        placement_constraint = \
+        placement_constraints = \
             self._reduce_constraints(placement_constraints, subvert_label,
                                      placements)
 
         #if there's a placement constraint, then check out the chip and only
         # that chip
-        if placement_constraint is not None:
-            return self._deal_with_constraint_placement(placement_constraint,
+        if len(placement_constraints) != 0:
+            return self._deal_with_constraint_placement(placement_constraints,
                                                         subvert_label,
                                                         resources)
         else:
@@ -138,7 +142,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         SHOULD NOT BE CALLED OUTSIDE THIS CLASS
 
         :param subvertex_label: the label of the subvertex to be placed
-        :param placement_constraint: the placement constraint of this subvertex
+        :param placement_constraint: placement constraint of this subvertex
         :param subvertex_resources: the resource required by this subvertex
         :type subvertex_label: str
         :type placement_constraint: pacman.constraints.placer_chip_and_core_constraint
@@ -150,6 +154,15 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         available to be assigned or theres not enough memory of the available \
         cores to assign this subvertex.
         """
+        if not isinstance(placement_constraint,
+                          PlacerChipAndCoreConstraint):
+            raise exceptions.PacmanConfigurationException(
+                "there is a constraint here which the basic placer cannot"
+                " recongise. The only constraint here should be a  "
+                "chip and core constraint. Please rectify and try "
+                "again. The lsit of constraints was {}"
+                .format(placement_constraint))
+
         x = placement_constraint.x
         y = placement_constraint.y
         p = placement_constraint.p
@@ -178,9 +191,8 @@ class BasicPlacer(AbstractPlacerAlgorithm):
                     "cannot place subvertex {} on chip {}:{} as there is "
                     "not enough available memory".format(subvertex_label, x, y))
 
-    def _deal_with_non_constrained_placement(self, subvertex_label,
-                                              used_resources,
-                                              chips_in_a_ordering):
+    def _deal_with_non_constrained_placement(
+            self, subvertex_label, used_resources, chips_in_a_ordering):
         """ place a subvertex which doesnt have a constraint
 
         :param subvertex_label: the of the subvert to place
