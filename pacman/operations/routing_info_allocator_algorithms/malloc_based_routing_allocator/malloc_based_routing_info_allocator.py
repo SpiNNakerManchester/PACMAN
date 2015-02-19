@@ -1,336 +1,382 @@
 import math
-from pacman.model.constraints.abstract_router_constraint import \
-    AbstractRouterConstraint
+import numpy
+
+from pacman.model.constraints.abstract_key_allocator_constraint import \
+    AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_same_keys_constraint import \
+    KeyAllocatorSameKeysConstraint
 from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
     KeyAllocatorFixedMaskConstraint
-from pacman.model.constraints.key_allocator_routing_constraint import \
-    KeyAllocatorRoutingConstraint
+from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
+    import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.utilities import constants
-from pacman import exceptions
+from pacman.model.routing_info.key_and_mask import KeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
+
 from pacman.operations.routing_info_allocator_algorithms.\
     abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
 from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.free_space import FreeSpace
+
 from pacman.utilities import utility_calls
+from pacman.exceptions import PacmanRouteInfoAllocationException
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
+    """ A Routing Info Allocation Allocator algorithm that keeps track of
+        free keys and attempts to allocate them as requested
+    """
 
     def __init__(self):
         AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
-        self._supported_constraints.append(KeyAllocatorRoutingConstraint)
+        self._supported_constraints.append(KeyAllocatorSameKeysConstraint)
         self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
+        self._supported_constraints.append(
+            KeyAllocatorFixedKeyAndMaskConstraint)
+        self._supported_constraints.append(
+            KeyAllocatorContiguousRangeContraint)
+
         self._free_space_tracker = list()
-        self._placement_to_routing_info_register = dict()
-        self._registered_key_combos = dict()
         self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
 
-    def _register_a_key(self, key, mask, partitioned_vertex, placement,
-                        subedge):
-        """ Handle edges and vertices which have specific requireiments on\
-            their key and mask.
-
-        :param key: the key needed to be used
-        :param mask: the mask to use with the key\
-                    (indirectly used for a max atoms)
-        :param partitioned_vertex: the partitioned vertex this key is\
-                    associated with
-        :param placement: The placement of the partitioned vertex
-        :param subedge: the subedge associated with this key
-        :return: the routing info object that encompasses the decisions
-        :raises: PacmanAlreadyExistsException if the key has already been\
-                    allocated
-        :raises: PacmanConfigurationException if there is not enough space to\
-                    allocate the key given its contraints
+    def _find_slot(self, base_key, lo=0):
+        """ Find the free slot with the closest key <= base_key using a binary
+            search
         """
-        key_combo = key & mask
+        hi = len(self._free_space_tracker) - 1
+        free_space_slot = self._free_space_tracker[lo]
+        while lo < hi:
+            mid = int(math.ceil(float(lo + hi) / 2.0))
+            free_space_slot = self._free_space_tracker[mid]
 
-        # check if key has been used already
-        if key_combo in self._registered_key_combos.keys():
-            raise exceptions.PacmanAlreadyExistsException(
-                "this key: {} with mask {} has already been registered to"
-                " vertex {}, not vertex {}. Please use another key and mask"
-                " and try again"
-                .format(key, mask, self._registered_key_combos[key_combo],
-                        partitioned_vertex), key_combo)
-        else:
-
-            # key has not been registered, therefore start registration process
-            # locate space which this key is needing
-            mask_size = utility_calls.deduce_size_from_mask(mask)
-            self._handle_space_for_key(key, mask_size)
-
-            # check if subvert hasnt registered a key before, make a new list
-            routing_info = self._update_data_objects(
-                key_combo, key, mask, placement, subedge)
-            return routing_info
-
-    def _update_data_objects(self, key_combo, key, mask, placement, subedge):
-        """ Take the generated key, mask, and associated objects and\
-            update internal representations
-
-        :param key_combo: the key anded with the mask
-        :param placement: the placement of the partitioned vertex which\
-                    requested a key allocation in the first place
-        :param key: the key allocated/requested to it by the system
-        :param mask: the mask allocated/requested to it by the system
-        :param subedge: the subegde going out of the partitioned vertex\
-                    in the first place
-        :return: a routing info object which reflects the decisions
-        :raises: None
-        """
-
-        # check if subvert hasn't registered a key before, make a new list
-        self._registered_key_combos[key_combo] = placement
-        if placement not in self._placement_to_routing_info_register:
-            self._placement_to_routing_info_register[placement] = dict()
-        routing_info = SubedgeRoutingInfo(
-            int(key), int(mask), subedge,
-            key_with_atom_ids_function=self._generate_keys_with_atom_id)
-        self._placement_to_routing_info_register[placement][subedge] = \
-            routing_info
-        return routing_info
-
-    def _handle_space_for_key(self, key, mask_size):
-        """ handle the allocating of space for a speific key and range\
-            of neurons. Risk is that this key space has already been allocated
-
-        :param key: the key to be used
-        :param mask_size: the max size needed with the mask to cover neurons
-        :return: None
-        :raises: PacmanConfigurationException when the key space has already\
-                    been allocated
-        """
-        reached_slot = False
-        found = False
-        position = 0
-        while not reached_slot and position < len(self._free_space_tracker):
-            free_space_slot = self._free_space_tracker[position]
-
-            # check that slot could contain the start key
-            if free_space_slot.start_address <= key:
-                max_key = key + mask_size
-                max_free_space_slot_key = (free_space_slot.start_address
-                                           + free_space_slot.size)
-
-                # check that the top part of the key resides in the slot
-                if max_free_space_slot_key > max_key:
-                    reached_slot = True
-                    self._reallocate_space(free_space_slot, key, max_key,
-                                           position)
+            if free_space_slot.start_address > base_key:
+                hi = mid - 1
             else:
-                reached_slot = True
-            position += 1
-        if not found:
-            raise exceptions.PacmanConfigurationException(
-                "Could not allocate the key, as there is no free space"
-                " avilable where this key can reside")
+                lo = mid
 
-    def _reallocate_space(self, free_space_slot, key, max_key, position):
-        """ method that relalocates space as required
+        # If we have gone off the end of the array, we haven't found a slot
+        if (lo >= len(self._free_space_tracker) or hi < 0
+                or self._free_space_tracker[lo].start_address > base_key):
+            return None
+        return lo
 
-        :param free_space_slot: the slot thats being adjusted
-        :param key: the start address of the key which is to be used to split
-        the search space
-        :param max_key: the max key that governs how much of the space to\
-                    remove
-        :param position: the position of the space slot in the ordered list
-        :return: None
-        :raises: None
+    def _allocate_keys(self, base_key, n_keys):
+        """ Handle the allocating of space for a given set of keys
+
+        :param base_key: the first key to allocate
+        :param n_keys: the number of keys to allocate
+        :raises: PacmanRouteInfoAllocationException when the key cannot be\
+                    assigned with the given number of keys
         """
-        max_free_space_slot_key = \
-            free_space_slot.start_address + free_space_slot.size
-        self._free_space_tracker.remove(free_space_slot)
 
-        # if the eky is the start address, then theres no left slot
-        if free_space_slot.start_address != key:
-            left_slot = FreeSpace(free_space_slot.start_address,
-                                  key - free_space_slot.start_address)
-            self._free_space_tracker.insert(position, left_slot)
-        right_slot = FreeSpace(max_key,
-                               max_free_space_slot_key - max_key)
-        self._free_space_tracker.insert(position + 1, right_slot)
+        index = self._find_slot(base_key)
+        if index is None:
+            raise PacmanRouteInfoAllocationException(
+                "Space for {} keys starting at {} has already been allocated"
+                .format(n_keys, base_key))
 
-    def _handle_space_for_neurons(self, n_neurons, partitioned_vertex):
-        """ Sort out the space objects based on the n_neurons asked to be\
-            covered by some key.
+        # base_key should be >= slot key at this point
+        self._do_allocation(index, base_key, n_keys)
 
-        :param n_neurons: the number of neurons that need to be covered by a\
-                    key
-        :type n_neurons: int
-        :param partitioned_vertex: the partitioned vertex used in the edge
-        :type partitioned_vertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
-        :return: the key and mask for the number of neurons being used
+    def _check_allocation(self, index, base_key, n_keys):
+        """ Check if there is enough space for a given set of keys
+            starting at a base key inside a given slot
+
+        :param index: The index of the free space slot to check
+        :param base_key: The key to start with - must be inside the slot
+        :param n_keys: The number of keys to be allocated -\
+                       should be power of 2
         """
-        fixed_mask_constraints = utility_calls.locate_constraints_of_type(
-            partitioned_vertex.constraints, KeyAllocatorFixedMaskConstraint)
+        free_space_slot = self._free_space_tracker[index]
+        space = (free_space_slot.size
+                 - (base_key - free_space_slot.start_address))
 
-        # handle fixed_mask_constraints
-        if len(fixed_mask_constraints) == 0:
-            mask, mask_size = self._calculate_mask(n_neurons)
+        if free_space_slot.start_address > base_key:
+            raise PacmanRouteInfoAllocationException(
+                "Trying to allocate a key in the wrong slot!")
+        if n_keys == 0 or (n_keys & (n_keys - 1)) != 0:
+            raise PacmanRouteInfoAllocationException(
+                "Trying to allocate {} keys, which is not a power of 2"
+                .format(n_keys))
+
+        # Check if there is enough space for the keys
+        if space < n_keys:
+            return None
+        return space
+
+    def _do_allocation(self, index, base_key, n_keys):
+        """ Allocate a given base key and number of keys into the space
+            at the given slot
+
+        :param index: The index of the free space slot to check
+        :param base_key: The key to start with - must be inside the slot
+        :param n_keys: The number of keys to be allocated -\
+                       should be power of 2
+        """
+
+        free_space_slot = self._free_space_tracker[index]
+        if free_space_slot.start_address > base_key:
+            raise PacmanRouteInfoAllocationException(
+                "Trying to allocate a key in the wrong slot!")
+        if n_keys == 0 or (n_keys & (n_keys - 1)) != 0:
+            raise PacmanRouteInfoAllocationException(
+                "Trying to allocate {} keys, which is not a power of 2"
+                .format(n_keys))
+
+        # Check if there is enough space to allocate
+        space = self._check_allocation(index, base_key, n_keys)
+        if space is None:
+            raise PacmanRouteInfoAllocationException(
+                "Not enough space to allocate {} keys starting at {}".format(
+                    n_keys, hex(base_key)))
+
+        if (free_space_slot.start_address == base_key
+                and free_space_slot.size == n_keys):
+
+            # If the slot exactly matches the space, remove it
+            del self._free_space_trackerp[index]
+
+        elif free_space_slot.start_address == base_key:
+
+            # If the slot starts with the key, reduce the size
+            self._free_space_tracker[index] = FreeSpace(
+                free_space_slot.start_address + n_keys,
+                free_space_slot.size - n_keys)
+
+        elif space == n_keys:
+
+            # If the space at the end exactly matches the spot, reduce the size
+            self._free_space_tracker[index] = FreeSpace(
+                free_space_slot.start_address,
+                free_space_slot.size - n_keys)
+
         else:
-            mask = fixed_mask_constraints[0].fixed_mask_value
-            mask_size = utility_calls.deduce_size_from_mask(mask)
 
-        found = False
-        key = None
-        position = 0
-        while not found and position < len(self._free_space_tracker):
-            free_space_slot = self._free_space_tracker[position]
-            if free_space_slot.size > mask_size:
-                key = free_space_slot.start_address
-                max_key = key + mask_size
-                self._reallocate_space(free_space_slot, key, max_key, position)
-                found = True
-        if not found:
-            raise exceptions.PacmanConfigurationException(
-                "there is no space avilable that can contain this key, please"
-                "readjust your key allocation and try again")
-        return key, mask
+            # Otherwise, the allocation lies in the middle of the region:
+            # First, reduce the size of the space before the allocation
+            self._free_space_tracker[index] = FreeSpace(
+                free_space_slot.start_address,
+                base_key - free_space_slot.start_address)
 
-    @staticmethod
-    def _deduce_size_from_mask(mask):
-        """ from the mask, returns the max_number of neurons it covers
+            # Then add a new space after the allocation
+            self._free_space_tracker.insert(index + 1, FreeSpace(
+                base_key + n_keys,
+                free_space_slot.start_address + free_space_slot.size
+                - (base_key + n_keys)))
 
-        :param mask: the mask to deduce the number of neurons from
-        :return: the max_neurons deduced from the mask
+    def _get_key_ranges(self, key, mask):
+        """ Get a generator of base_key, n_keys pairs that represent ranges
+            allowed by the mask
+
+        :param key: The base key
+        :param mask: The mask
         """
-        position = 0
-        size = 0
-        while position < constants.BITS_IN_KEY:
-            temp_mask = mask >> position
-            temp_mask &= 0xF
-            if temp_mask != 0xF:
-                size += (temp_mask << position)
-            position += 4
-        return size
+        unwrapped_mask = numpy.unpackbits(
+            numpy.asarray([mask], dtype=">u4").view(dtype="uint8"))
+        first_zeros = list()
+        remaining_zeros = list()
+        pos = len(unwrapped_mask) - 1
 
-    @staticmethod
-    def _calculate_mask(n_neurons):
-        """calculates a mask for a number of neurons (placed at bottom of key)
-        and informs next emthod of the max neurons it covers as this has to be
-         a power of two from the actual number of n_neurons
+        # Keep the indices of the first set of zeros
+        while pos >= 0 and unwrapped_mask[pos] == 0:
+            first_zeros.append(pos)
+            pos -= 1
 
-        :param n_neurons: the number of neurons the mask has to cover
-        :return: the mask generated from the n_neurons and the total number of
-        atoms the mask can cover
+        # Find all the remaining zeros
+        while pos >= 0:
+            if unwrapped_mask[pos] == 0:
+                remaining_zeros.append(pos)
+            pos -= 1
+
+        # Loop over 2^len(remaining_zeros) to produce the base key,
+        # with n_keys being 2^len(first_zeros)
+        n_sets = 2 ** len(remaining_zeros)
+        n_keys = 2 ** len(first_zeros)
+        unwrapped_key = numpy.unpackbits(
+            numpy.asarray([key], dtype=">u4").view(dtype="uint8"))
+        for value in range(n_sets):
+            generated_key = numpy.copy(unwrapped_key)
+            unwrapped_value = numpy.unpackbits(
+                numpy.asarray([value], dtype=">u4")
+                     .view(dtype="uint8"))[-len(remaining_zeros):]
+            generated_key[remaining_zeros] = unwrapped_value
+            yield numpy.packbits(generated_key).view(dtype=">u4")[0], n_keys
+
+    def _get_possible_keys(self, mask):
+        """ Get a generator of all possible keys such that key & mask == key
+
+        :param mask: The mask to find the valid keys from
         """
-        temp_value = math.floor(math.log(n_neurons, 2))
-        max_value = int(math.pow(2, 32))
-        max_atoms_covered = math.pow(
-            2, int(math.log(int(math.pow(2, temp_value + 1)), 2)) + 1)
-        mask = max_value - int(math.pow(2, temp_value + 1))
-        return mask, max_atoms_covered
+        # Get the position of the ones in the mask - assume 32-bits
+        unwrapped_mask = numpy.unpackbits(
+            numpy.asarray([mask], dtype=">u4").view(dtype="uint8"))
+        ones = numpy.where(unwrapped_mask == 1)[0]
+        n_zeros = 32 - len(ones)
 
-    def _request_a_key(self, n_neurons, partitioned_vertex, placement,
-                       subedge):
-        """ takes a number of neurons and determines a key and mask
+        # We now know how many possible keys there are - 2^n_zeros
+        n_keys = 2 ** n_zeros
+        logger.debug("Mask", hex(mask), "is valid for", n_keys, "keys")
 
-        :param n_neurons: the number of neurons to be used by the\
-                    partitioned vertex that the key has to cover
-        :param partitioned_vertex: The partitioned vertex to get a key for
-        :param placement: the placement of the partitioned vertex to be\
-                    considered
-        :param subedge: the subedge that this key is associated with
-        :return: a routinginfo object that encompasses the key, mask,\
-                    of this edge and vertex
+        # Get the first valid key >= first space start address
+        min_key = self._free_space_tracker[0].start_address
+        if min_key & mask != min_key:
+            min_key = ((self._free_space_tracker[0].start_address + n_keys)
+                       & mask)
+        unwrapped_min_key = numpy.unpackbits(
+            numpy.asarray([min_key], dtype=">u4").view(dtype="uint8"))
+        unwrapped_min_value = numpy.zeros(32, dtype="uint8")
+        unwrapped_min_value[-len(ones):] = unwrapped_min_key[ones]
+        min_value = numpy.packbits(unwrapped_min_value).view(dtype=">u4")[0]
+        logger.debug("first valid key for mask", hex(mask), "is", hex(min_key),
+                     "which is key number", min_value)
+
+        # Generate up to 2^len(ones) keys
+        for value in range(min_value, n_keys):
+            key = numpy.zeros(32, dtype="uint8")
+            unwrapped_value = numpy.unpackbits(
+                numpy.asarray([value], dtype=">u4")
+                     .view(dtype="uint8"))[-len(ones):]
+            key[ones] = unwrapped_value
+            yield numpy.packbits(key).view(dtype=">u4")[0]
+
+    def _get_possible_masks(self, n_keys, is_contiguous):
+        """ Get the possible masks given the number of keys
+
+        :param n_keys: The number of keys to generate a mask for
+        :param is_contiguous: True if the keys should be contiguous
         """
-        if placement in self._placement_to_routing_info_register:
-            routing_infos_on_sub_edges = \
-                self._placement_to_routing_info_register[placement]
-            first_routing_info = routing_infos_on_sub_edges[
-                routing_infos_on_sub_edges.keys()[0]]
-            routing_info = self._update_data_objects(
-                first_routing_info.key_mask_combo, first_routing_info.key,
-                first_routing_info.mask, placement, subedge)
-            return routing_info
-        else:
-            key, mask = self._handle_space_for_neurons(n_neurons,
-                                                       partitioned_vertex)
-            key_combo = int(key) & mask
-            routing_info = self._update_data_objects(
-                key_combo, key, mask, placement, subedge)
-            return routing_info
 
-    def _generate_keys_with_atom_id(self, vertex_slice, vertex, placement,
-                                    subedge):
-        """ Generate a dict of atoms to key mapping
-            (to be used within the database)
+        # TODO: Generate all the masks - currently only the obvious
+        # mask with the zeros at the bottom is generated but the zeros
+        # could actually be anywhere
+        n_zeros = int(math.ceil(math.log(n_keys, 2)))
+        n_ones = 32 - n_zeros
+        return [(((1 << n_ones) - 1) << n_zeros)]
 
-        :param vertex_slice: the slice used by the partitioned vertex
-        :param vertex: the partitioned vertex being considered
-        :param placement: the position on the machine in x,y,p
-        :param subedge: the subedge being considered
-        :return: a dictonary of neuron_id to key mappings.
-        :raises: None
-        """
-        routing_info = \
-            self._placement_to_routing_info_register[placement][subedge]
-        key = routing_info.key
-        keys = dict()
-        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
-            keys[atom] = key + atom
-        return keys
+    def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
 
-    def allocate_routing_info(self, subgraph, placements):
-        """ Allocates routing information to the subedges in a\
-            partitioned_graph
+        # If there are fixed keys and masks, allocate them
+        for key_and_mask in keys_and_masks:
 
-        :param subgraph: The partitioned_graph to allocate the routing info for
-        :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
-        :param placements: The placements of the subvertices
-        :type placements:\
-                     :py:class:`pacman.model.placements.placements.Placements`
-        :return: The routing information
-        :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
-        :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
-                   something goes wrong with the allocation
-        """
-        # check that this algorithm supports the constraints put onto the
-        # subvertexes
+            # If there is a fixed mask, check it doesn't clash
+            if fixed_mask is not None and fixed_mask != key_and_mask.mask:
+                raise PacmanRouteInfoAllocationException(
+                    "Cannot meet conflicting constraints")
 
+            # Go through the mask sets and allocate
+            for key, n_keys in self._get_key_ranges(
+                    key_and_mask.key, key_and_mask.mask):
+                self._allocate_keys(key, n_keys)
+
+    def _allocate_keys_and_masks(self, fixed_mask, edge_n_keys, is_contiguous):
+
+        # If there isn't a fixed mask, generate a fixed mask based
+        # on the number of keys required
+        masks_available = [fixed_mask]
+        if fixed_mask is None:
+            masks_available = self._get_possible_masks(edge_n_keys,
+                                                       is_contiguous)
+
+        # For each usable mask, try all of the possible keys and
+        # see if a match is possible
+        mask_found = None
+        key_found = None
+        for mask in masks_available:
+
+            key_found = None
+            for key in self._get_possible_keys(mask):
+
+                # Check if all the key ranges can be allocated
+                matched_all = True
+                index = 0
+                for (base_key, n_keys) in self._get_key_ranges(
+                        key, mask):
+                    logger.debug("Finding slot for", hex(base_key))
+                    index = self._find_slot(base_key, lo=index)
+                    logger.debug("Slot for", hex(base_key), "is", index)
+                    if index is None:
+                        matched_all = False
+                        break
+                    space = self._check_allocation(index, base_key,
+                                                   n_keys)
+                    logger.debug("Space for", hex(base_key), "is", space)
+                    if space is None:
+                        matched_all = False
+                        break
+
+                if matched_all:
+                    logger.debug("Matched key", hex(key))
+                    key_found = key
+                    break
+
+            # If we found a matching key, store the mask that worked
+            if key_found is not None:
+                logger.debug("Matched mask", hex(mask))
+                mask_found = mask
+                break
+
+        # If we found a working key and mask that can be assigned,
+        # Allocate them
+        if key_found is not None and mask_found is not None:
+            for (base_key, n_keys) in self._get_key_ranges(
+                    key_found, mask):
+                self._allocate_keys(base_key, n_keys)
+
+            # If we get here, we can assign the keys to the edges
+            keys_and_masks = list([KeyAndMask(key=key_found,
+                                              mask=mask)])
+            return keys_and_masks
+
+        raise PacmanRouteInfoAllocationException(
+            "Could not find space to allocate keys")
+
+    def allocate_routing_info(self, subgraph, placements, n_keys_map):
+
+        # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=subgraph.subvertices,
+            constrained_vertices=subgraph.subedges,
             supported_constraints=self._supported_constraints,
-            abstract_constraint_type=AbstractRouterConstraint)
+            abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-        # take each subedge and create keys from its placement
+        # Get the partitioned edges grouped by those that require the same key
+        same_key_groups = self._get_edge_groups(subgraph)
+
+        # Go through the groups and allocate keys
         routing_infos = RoutingInfo()
-        for partitioned_vertex in subgraph.subvertices:
-            placement = placements.get_placement_of_subvertex(
-                partitioned_vertex)
-            router_constraints_of_vertex =\
-                utility_calls.locate_constraints_of_type(
-                    partitioned_vertex.constraints,
-                    KeyAllocatorRoutingConstraint)
-            if len(router_constraints_of_vertex) == 1:
-                out_going_subedges = subgraph.\
-                    outgoing_subedges_from_subvertex(partitioned_vertex)
-                for out_going_subedge in out_going_subedges:
-                    key, mask = \
-                        router_constraints_of_vertex[0].key_function_call()
-                    routing_info = self._register_a_key(
-                        key, mask, partitioned_vertex, placement,
-                        out_going_subedge)
-                    routing_infos.add_subedge_info(routing_info)
-        for partitioned_vertex in subgraph.subvertices:
-            placement = placements.get_placement_of_subvertex(
-                partitioned_vertex)
-            router_constraints_of_vertex =\
-                utility_calls.locate_constraints_of_type(
-                    partitioned_vertex.constraints,
-                    KeyAllocatorRoutingConstraint)
-            if len(router_constraints_of_vertex) == 0:
-                out_going_subedges = subgraph.\
-                    outgoing_subedges_from_subvertex(partitioned_vertex)
-                for out_going_subedge in out_going_subedges:
-                    routing_info = \
-                        self._request_a_key(partitioned_vertex.n_atoms,
-                                            partitioned_vertex, placement,
-                                            out_going_subedge)
-                    routing_infos.add_subedge_info(routing_info)
+        for group in same_key_groups:
+
+            # Get any fixed keys and masks from the group and attempt to
+            # allocate them
+            keys_and_masks = self._get_fixed_key_and_mask(group)
+            fixed_mask = self._get_fixed_mask(group)
+
+            if keys_and_masks is not None:
+
+                self._allocate_fixed_keys_and_masks(keys_and_masks, fixed_mask)
+            else:
+
+                edge_n_keys = None
+                for edge in group:
+                    n_keys = n_keys_map.n_keys_for_partitioned_edge(edge)
+                    if edge_n_keys is None:
+                        edge_n_keys = n_keys
+                    elif edge_n_keys != n_keys:
+                        raise PacmanRouteInfoAllocationException(
+                            "Two edges require the same keys but request a"
+                            " different number of keys")
+                keys_and_masks = self._allocate_keys_and_masks(
+                    fixed_mask, edge_n_keys, self._is_contiguous_range(group))
+
+            # Allocate the routing information
+            for edge in group:
+                routing_infos.add_subedge_info(
+                    SubedgeRoutingInfo(keys_and_masks, edge))
+
         return routing_infos

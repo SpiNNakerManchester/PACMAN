@@ -13,3 +13,10 @@ class FreeSpace(object):
     @property
     def size(self):
         return self._size
+
+    def __repr__(self):
+        return "FreeSpace:start={}:size={}".format(self._start_address,
+                                                   self._size)
+
+    def __str__(self):
+        return self.__repr__()

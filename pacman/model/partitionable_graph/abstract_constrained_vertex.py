@@ -20,8 +20,7 @@ class AbstractConstrainedVertex(object):
         :type label: str
         :param constraints: The constraints of the vertex
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint\
-                    .AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
                     * If the number of atoms is less than 1

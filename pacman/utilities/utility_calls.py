@@ -103,20 +103,3 @@ def sort_objects_by_constraint_authority(objects):
         for current_object in object_list:
             ordered_objects.append(current_object)
     return ordered_objects
-
-
-def deduce_size_from_mask(mask):
-    """ From the mask, returns the max_number of neurons it covers
-
-    :param mask: the mask to deduce the number of neurons from
-    :return: the max_neurons deduced from the mask
-    """
-    position = 0
-    size = 0
-    while position < constants.BITS_IN_KEY:
-        temp_mask = mask >> position
-        temp_mask &= 0xF
-        if temp_mask != 0xF:
-            size += (temp_mask << position)
-        position += 4
-    return size

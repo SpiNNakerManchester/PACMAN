@@ -36,9 +36,9 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :param n_atoms: the number of atoms for the vertex
         :param label: the label of the vertex
         :param max_atoms_per_core: the max atoms that cna be supported by a \
-                    core. Note that this is trnaslated into a partitioner max \
+                    core. Note that this is translated into a partitioner max \
                     size constraint
-        :param constraints: any extra constranits to be added to this vertex.
+        :param constraints: any extra constraints to be added to this vertex.
         :type n_atoms: int
         :type label: str
         :type max_atoms_per_core: int
@@ -74,7 +74,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return a int value for sdram usage
         :rtype: int
-        :raise None: this emthod raises no known exception
+        :raise None: this method raises no known exception
         """
 
     @abstractmethod
@@ -100,7 +100,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return a int value for sdram usage
         :rtype: int
-        :raise None: this emthod raises no known exception
+        :raise None: this method raises no known exception
         """
 
     @abstractmethod
