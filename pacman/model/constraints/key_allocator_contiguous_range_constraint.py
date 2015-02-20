@@ -11,3 +11,6 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
     def __init__(self):
         AbstractKeyAllocatorConstraint.__init__(
             self, "Key allocator constraint to ensure that keys are not split")
+
+    def is_key_allocator_constraint(self):
+        return True

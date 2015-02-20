@@ -48,7 +48,7 @@ class RadialPlacer(BasicPlacer):
             start_chip_y=0):
         """ Changes the ordering in which chips are handed to the search
             algorithm.
-        
+
         :param subvertex_label: the subvertex_label for placement
         :param used_resources: the used_resources required by the subvertex
         :param chips: the machines chips.
@@ -96,4 +96,4 @@ class RadialPlacer(BasicPlacer):
             current_chip_list_to_check = next_chip_list_to_check
 
         return BasicPlacer._deal_with_non_constrained_placement(
-            self, subvertex, used_resources, processors_new_order)
+            self, subvertex_label, used_resources, processors_new_order)

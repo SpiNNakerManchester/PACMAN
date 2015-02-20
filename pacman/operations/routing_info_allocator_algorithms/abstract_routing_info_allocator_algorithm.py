@@ -47,12 +47,12 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                 for same_key_constraint in same_key_constraints:
                     edge_to_match = \
                         same_key_constraint.partitioned_edge_to_match
-                    found_edges.append(edge_to_match)
+                    found_edges.add(edge_to_match)
                     if edge_to_match in same_key_groups:
                         found_groups.append(same_key_groups[edge_to_match])
 
                 # Check if the current edge is already in a group
-                found_edges.append(partitioned_edge)
+                found_edges.add(partitioned_edge)
                 if partitioned_edge in same_key_groups:
                     found_groups.append(same_key_groups[partitioned_edge])
 
@@ -66,16 +66,16 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
 
                     # If there is one group, just add to that
                     group_to_add_to = found_groups[0]
-                    group_to_add_to.extend(found_edges)
+                    group_to_add_to.update(found_edges)
                     for edge in found_edges:
                         same_key_groups[edge] = group_to_add_to
 
                 else:
 
                     # Otherwise we must merge the groups already found
-                    new_group = list()
+                    new_group = set()
                     for group in found_groups:
-                        new_group.extend(group)
+                        new_group.update(group)
                     for edge in found_edges:
                         same_key_groups[edge] = new_group
 
@@ -83,10 +83,10 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
 
                 # Otherwise, if the edge is not in a group,
                 # put it in a new group by itself
-                same_key_groups[partitioned_edge] = list([partitioned_edge])
+                same_key_groups[partitioned_edge] = set([partitioned_edge])
 
         # Reduce the dictionary into a set of groups
-        return set(same_key_groups.itervalues())
+        return set(frozenset(group) for group in same_key_groups.itervalues())
 
     def _is_contiguous_range(self, same_key_group):
         """ Determine if any edge in the group has a\

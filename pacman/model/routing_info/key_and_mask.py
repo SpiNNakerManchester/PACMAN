@@ -48,7 +48,7 @@ class KeyAndMask(object):
                 and self._mask == key_and_mask.mask)
 
     def __repr__(self):
-        return "KeyAndMask:{}:{}".format(self._key, self._mask)
+        return "KeyAndMask:{}:{}".format(hex(self._key), hex(self._mask))
 
     def __hash__(self, key_and_mask):
         return self.__repr__().__hash__()

@@ -256,8 +256,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                 vertex_slice = Slice(lo_atom, hi_atom)
                 subvertex = vertex.create_subvertex(
                     vertex_slice, used_resources,
-                    "subvertex with low atoms {} and hi atoms {} for "
-                    "vertex {}".format(lo_atom, hi_atom, vertex.label))
+                    "{}:{}:{}".format(vertex.label, lo_atom, hi_atom))
                 self._placement_to_subvert_mapper[subvertex] = \
                     PlacerChipAndCoreConstraint(x, y, p)
 

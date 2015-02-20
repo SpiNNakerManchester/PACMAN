@@ -139,6 +139,7 @@ class AbstractPartitionAlgorithm(object):
 
         # Partition edges according to vertex partitioning
         for src_sv in subgraph.subvertices:
+
             # For each out edge of the parent vertex...
             vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(src_sv)
             out_edges = graph.outgoing_edges_from_vertex(vertex)

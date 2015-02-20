@@ -33,12 +33,6 @@ class SubedgeRoutingInfo(object):
         self._keys_and_masks = keys_and_masks
         self._subedge = subedge
         self._key_list_function = key_list_function
-        if self._key & self._mask != self._key:
-            raise exceptions.PacmanConfigurationException(
-                "This routing info is invalid as the mask and key together "
-                "alters the key_combo. This is deemed to be a error from "
-                "spynnaker's point of view and therefore please rectify and"
-                "try again")
 
     def get_keys(self, n_keys=None):
         """ Get the ordered list of individual keys allocated to the subedge
@@ -65,30 +59,16 @@ class SubedgeRoutingInfo(object):
         return key_array
 
     @property
-    def key_mask_combo(self):
-        """ The combination of the key and the mask
-
-        :return: the key mask combo
-        :rtype: int
-        :raise None: does not raise any known exceptions
-        """
-        return self._key & self._mask
-
-    @property
-    def key(self):
-        return self._key
-
-    @property
-    def mask(self):
-        return self._mask
+    def keys_and_masks(self):
+        return self._keys_and_masks
 
     @property
     def subedge(self):
         return self._subedge
 
     def __repr__(self):
-        return "subedge:{}, key:{}, mask:{}"\
-            .format(self._subedge, hex(self._key), hex(self._mask))
+        return "subedge:{}, keys_and_masks:{}"\
+            .format(self._subedge, self._keys_and_masks)
 
     def __str__(self):
         return self.__repr__()

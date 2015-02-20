@@ -3,6 +3,9 @@ from collections import namedtuple
 import logging
 logger = logging.getLogger(__name__)
 
+# Define an internal class for placements
+PlacementTuple = namedtuple('PlacementTuple', 'x y p')
+
 
 class ValidRouteChecker(object):
 
@@ -37,7 +40,6 @@ class ValidRouteChecker(object):
                     detected
 
         """
-        placement_tuple = namedtuple('Placement', 'x y p')
         for placement in self._placements.placements:
             outgoing_edges_for_partitioned_vertex = \
                 self._partitioned_graph.outgoing_subedges_from_subvertex(
@@ -45,66 +47,58 @@ class ValidRouteChecker(object):
 
             # locate all placements to which this placement/subvertex will
             # communicate with
-            destination_placements = set()
             for outgoing_edge in outgoing_edges_for_partitioned_vertex:
                 dest_placement = self._placements.get_placement_of_subvertex(
                     outgoing_edge.post_subvertex)
-                destination_placements.add(
-                    placement_tuple(dest_placement.x, dest_placement.y,
-                                    dest_placement.p))
+                self._search_route(placement,
+                                   PlacementTuple(x=dest_placement.x,
+                                                  y=dest_placement.y,
+                                                  p=dest_placement.p),
+                                   outgoing_edge)
 
-            # only check placements that have outgoing edges
-            if len(outgoing_edges_for_partitioned_vertex) > 0:
-
-                # check that the routing elements for this placement work
-                # as expected
-                self._search_route(placement, destination_placements,
-                                   outgoing_edges_for_partitioned_vertex,
-                                   placement_tuple)
-
-    def _search_route(self, source_placement, dest_placements, outgoing_edges,
-                      placement_tuple):
+    def _search_route(self, source_placement, dest_placement, outgoing_edge):
         """ Locate if the routing tables work for the source to desks as\
             defined
 
         :param source_placement: the placement from which the search started
-        :param dest_placements: the placements to which this trace should\
+        :param dest_placement: the placement to which this trace should\
                     visit only once
-        :param outgoing_edges: the outgoing edges from the partitioned_vertex\
+        :param outgoing_edge: the outgoing edge from the partitioned_vertex\
                     which resides on the processor.
         :return: None
         :raise PacmanRoutingException: when the trace completes and there are\
                     still destinations not visited
         """
-        key = self._check_keys(outgoing_edges)
-        for dest in dest_placements:
-            logger.debug("[{}:{}:{}]".format(dest.x, dest.y, dest.p))
+        keys_and_masks = self._routing_infos.get_keys_and_masks_from_subedge(
+            outgoing_edge)
+        logger.debug("[{}:{}:{}]".format(dest_placement.x, dest_placement.y,
+                                         dest_placement.p))
 
         located_dests = set()
-        self._start_trace_via_routing_tables(
-            source_placement, key, located_dests, placement_tuple)
+        for key_and_mask in keys_and_masks:
+            self._start_trace_via_routing_tables(
+                source_placement, key_and_mask.key, located_dests)
 
         # start removing from located_dests and check if dests not reached
-        failed_to_reach_dests = list()
-        for dest in dest_placements:
-            if dest in located_dests:
-                located_dests.remove(dest)
-            else:
-                failed_to_reach_dests.append(dest)
+        failed_to_reach_dest = False
+        if dest_placement in located_dests:
+            located_dests.remove(dest_placement)
+        else:
+            failed_to_reach_dest = True
 
         # check for error if trace didnt reach a destination it was meant to
         error_message = ""
-        if len(failed_to_reach_dests) > 0:
+        if failed_to_reach_dest:
             output_string = ""
-            for dest in failed_to_reach_dests:
-                output_string += "[{}:{}:{}]".format(dest.x, dest.y, dest.p)
+            output_string += "[{}:{}:{}]".format(dest_placement)
             source_processor = "[{}:{}:{}]".format(
                 source_placement.x, source_placement.y, source_placement.p)
             error_message += ("failed to locate all dstinations with subvertex"
-                              " {} on processor {} with key {} as it didnt "
+                              " {} on processor {} with keys {} as it didnt "
                               "reach dests {}".format(
                                   source_placement.subvertex.label,
-                                  source_processor, key, output_string))
+                                  source_processor, keys_and_masks,
+                                  output_string))
 
         # check for error if the trace went to a destination it shouldn't have
         if len(located_dests) > 0:
@@ -115,9 +109,10 @@ class ValidRouteChecker(object):
                 source_placement.x, source_placement.y, source_placement.p)
             error_message += ("trace went to more failed to locate all "
                               "destinations with subvertex {} on processor {} "
-                              "with key {} as it didnt reach dests {}".format(
+                              "with keys {} as it didnt reach dests {}".format(
                                   source_placement.subvertex.label,
-                                  source_processor, key, output_string))
+                                  source_processor, keys_and_masks,
+                                  output_string))
 
         # raise error if required
         if error_message != "":
@@ -125,17 +120,17 @@ class ValidRouteChecker(object):
         else:
             logger.debug("successful test between {} and {}"
                          .format(source_placement.subvertex.label,
-                                 dest_placements))
+                                 dest_placement))
 
     def _start_trace_via_routing_tables(
-            self, source_placement, key, reached_placements, placement_tuple):
+            self, source_placement, key, reached_placements):
         """this method starts the trace, by using the source placemnts
         router and tracing from the route.
 
         :param source_placement: the soruce placement used by the trace
         :param placement_tuple: the reprenstation of a placement
-        :param key: the key being used by the partitioned_vertex which resides
-        on the soruce placement
+        :param key: the key being used by the partitioned_vertex which resides\
+                    on the soruce placement
         :param reached_placements: the placements reached during the trace
         :return: None
         :raises None: this method does not raise any known exception
@@ -151,8 +146,7 @@ class ValidRouteChecker(object):
         entry = self._locate_routing_entry(current_router_table, key)
         self._recursive_trace_to_dests(
             entry, current_router_table, source_placement.x,
-            source_placement.y, key, visited_routers, reached_placements,
-            placement_tuple)
+            source_placement.y, key, visited_routers, reached_placements)
 
     # locates the next dest pos to check
     def _recursive_trace_to_dests(self, entry, current_router, chip_x, chip_y,
@@ -232,27 +226,6 @@ class ValidRouteChecker(object):
                 .format(visited_routers, visited_routers_router))
         else:
             visited_routers.add(visited_routers_router)
-
-    def _check_keys(self, outgoing_subedges_from_a_placement):
-        """ Check that all the subedges handed to the algorithm have the
-            same key
-
-        :param outgoing_subedges_from_a_placement: the subegdes to check
-        :return: None
-        :raises Exception: when the keymask_combo is different between the\
-                    subedges
-        """
-        key = None
-        for sub_edge in outgoing_subedges_from_a_placement:
-            current_key = self._routing_infos.get_key_from_subedge(sub_edge)
-            if key is None:
-                key = current_key
-            elif key != current_key:
-                raise exceptions.PacmanRoutingException(
-                    "the keys {} and {} from this placement do not match."
-                    " Please rectify and retry"
-                    .format(hex(key), hex(current_key)))
-        return key
 
     @staticmethod
     def _check_processor(processor_ids, current_router, reached_placements,

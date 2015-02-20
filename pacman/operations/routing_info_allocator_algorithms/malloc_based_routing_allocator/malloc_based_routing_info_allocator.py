@@ -352,6 +352,17 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         routing_infos = RoutingInfo()
         for group in same_key_groups:
 
+            # Check how many keys are needed for the edges of the group
+            edge_n_keys = None
+            for edge in group:
+                n_keys = n_keys_map.n_keys_for_partitioned_edge(edge)
+                if edge_n_keys is None:
+                    edge_n_keys = n_keys
+                elif edge_n_keys != n_keys:
+                    raise PacmanRouteInfoAllocationException(
+                        "Two edges require the same keys but request a"
+                        " different number of keys")
+
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
             keys_and_masks = self._get_fixed_key_and_mask(group)
@@ -362,15 +373,6 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 self._allocate_fixed_keys_and_masks(keys_and_masks, fixed_mask)
             else:
 
-                edge_n_keys = None
-                for edge in group:
-                    n_keys = n_keys_map.n_keys_for_partitioned_edge(edge)
-                    if edge_n_keys is None:
-                        edge_n_keys = n_keys
-                    elif edge_n_keys != n_keys:
-                        raise PacmanRouteInfoAllocationException(
-                            "Two edges require the same keys but request a"
-                            " different number of keys")
                 keys_and_masks = self._allocate_keys_and_masks(
                     fixed_mask, edge_n_keys, self._is_contiguous_range(group))
 

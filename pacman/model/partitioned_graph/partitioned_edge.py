@@ -79,8 +79,8 @@ class PartitionedEdge(object):
         return self._label
 
     def __str__(self):
-        return "PartitionedEdge between {}:{}".format(self._pre_subvertex,
-                                                      self._post_subvertex)
+        return "PartitionedEdge:{}->{}".format(self._pre_subvertex,
+                                               self._post_subvertex)
 
     def __repr__(self):
         return self.__str__()
