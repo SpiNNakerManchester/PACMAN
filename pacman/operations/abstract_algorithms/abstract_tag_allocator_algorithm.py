@@ -38,7 +38,11 @@ class AbstractTagAllocatorAlgorithm(object):
          taggablely constraitned partitioned vertex.
 
         :param taggable_constraint: the taggable constraint
+        :type taggable_constraint: instance of:
+        "pacman.model.constraints.abstract_constraints.abstract_taggable_constraint.AbstractTaggableConstraint"
         :param placement_tracker: the placement tracker used by the placer
+        :type placement_tracker: instance of:
+        "pacman.utilities.placement_tracker.PlacementTracker"
         :return: a board address which this constraint can satisfy
         """
 

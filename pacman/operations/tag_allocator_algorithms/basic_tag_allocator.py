@@ -29,33 +29,56 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
             TagAllocatorRequireReverseIptagConstraint)
 
     def allocate(self, placements):
-        """ entering method when using the tag allocator in situ. It goes though
-        the placements and check for
-        :param placements:
-        :return:
+        """ entering method when using the tag allocator in situ.
+         It calls methods which use the placements to check for taggable
+         constraints and first time deals with tags with tag ids and the
+         second for tags without tag ids
+        :param placements: the placements object from the front end
+        :type placements: pacman.model.placements.placements.Placements
+        :return: A taginfo object which contains all the iptags and
+        reverseiptags used by the spinnaker machine
+        :rtype: pacman.model.tag_info.tag_infos.TagInfos
+        :raises None: this method does not raise any known exceptions
         """
         self._check_algorithum_supported_constraints(placements)
         self._deal_with_placements(placements, True)
         self._deal_with_placements(placements, False)
         return self._tag_infos
 
-    def allocate_for_constraint(self, taggable_constraint, partitioned_vertex):
-        """
+    def allocate_for_constraint(self, taggable_constraint,
+                                partitioned_vertex_label):
+        """opening method for a placer algorithum to allocate a taggable vertex
+        based off its constraint in a one by one mode.
 
-        :param taggable_constraint:
-        :return:
+        :param taggable_constraint:the constraint to be considered
+        :type taggable_constraint: instance of
+        "pacman.model.constraints.abstract_constraints.abstract_taggable_constraint.AbstractTaggableConstraint"
+        :param partitioned_vertex_label: the label of the partitioned_vertex to
+        which this constraint is associated with.
+        :type partitioned_vertex_label: str
+        :return None: this method does not return any thing
+        :raises None: this method does not raise any known exceptions
         """
         self._handle_tag_constraint(
-            taggable_constraint, True, partitioned_vertex)
+            taggable_constraint, True, partitioned_vertex_label)
         self._handle_tag_constraint(
-            taggable_constraint, False, partitioned_vertex)
+            taggable_constraint, False, partitioned_vertex_label)
 
     def _deal_with_placements(self, placements, for_tags_with_tags):
-        """
+        """ method that checks though the placements object and locates any
+         which contain taggable constraints, if so its then sent to other
+         emthods that generate the tag as required. Note that if ignores
+         taggable constraints which do not have tag_ids if the
+         for_tags_with_tags is set to False and ignores ones with tags when
+         for_tags_with_tags is set to True.
 
-        :param placements:
-        :param for_tags_with_tags:
-        :return:
+        :param placements: the placements object from the front end
+        :type placements: pacman.model.placements.placements.Placements
+        :param for_tags_with_tags: bool which tells the handle tag constraint
+        method to search for a tag if this constraint contains a tag_id or not.
+        :type for_tags_with_tags: bool
+        :return None: this method does not return anything
+        :raises None: this method does not raise any known exceptions
         """
         # iterate though the placements and set tags which have tag ids set
         for placement in placements:
@@ -73,11 +96,23 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
 
     def _handle_tag_constraint(self, tag_allocator_constraint,
                                for_tags_with_tags, partitioned_vertex_label):
-        """
+        """ deals with a specific constraint and builds/locates its tag.
+         This method can do nothing if the constraint being considered does not
+         contain a tagid and the for_tags_with_tags is set to False.
 
-        :param tag_allocator_constraint:
-        :param for_tags_with_tags:
-        :return:
+        :param tag_allocator_constraint: the constraint to be considered
+        :param for_tags_with_tags: bool which says if it should be
+        considering constraints which have a tag_id or not
+        :param partitioned_vertex_label: the label of the partitioned vertex to
+        which this constraint is associated
+        :type tag_allocator_constraint: instance of
+        "pacman.model.constraints.abstract_constraints.abstract_taggable_constraint.AbstractTaggableConstraint"
+        :type for_tags_with_tags: bool
+        :type partitioned_vertex_label: str
+        :return None: this method does not return anything
+        :raises PacmanConfigurationException: because two identical reverse
+        iptags have been decuded to be needed, yet this cannot be due a
+         reversie iptag pointing at one core
         """
         #if dealing with tag this time around, allcoate tag to
         #  constraint and built in iptag objects
@@ -89,14 +124,14 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
             # destination already
             if (isinstance(tag_allocator_constraint,
                            TagAllocatorRequireIptagConstraint)
-                    and self._tag_infos.contains_iptag_mapping_for(
+                    and self._tag_infos.contains_iptag_for(
                         tag_allocator_constraint.port,
                         tag_allocator_constraint.address)):
                 self._check_if_iptag_allocated_already(tag_allocator_constraint,
                                                        partitioned_vertex_label)
             elif (isinstance(tag_allocator_constraint,
                              TagAllocatorRequireReverseIptagConstraint)
-                    and self._tag_infos.contains_reverse_iptag_mapping_for(
+                    and self._tag_infos.contains_reverse_iptag_for(
                         tag_allocator_constraint.placement_x,
                         tag_allocator_constraint.placement_y,
                         tag_allocator_constraint.placement_p,
@@ -117,14 +152,20 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
 
     def _check_if_iptag_allocated_already(
             self, tag_allocator_constraint, partitioned_vertex_label):
-        """
+        """iterates through the current tags and sees if theres one which
+        already meets the constraints requirements, if so then it will use
+        that one, otherwise itll create a new one.
 
-        :param tag_allocator_constraint:
+        :param tag_allocator_constraint: the constraint to be linked to a tag
+        :type tag_allocator_constraint: instance of
+        "pacman.model.constraints.abstract_constraints.abstract_taggable_constraint.AbstractTaggableConstraint"
         :param partitioned_vertex_label:
-        :return:
+        the label of the partitioned vertex to be linked to this tag
+        :type partitioned_vertex_label: str
+        :return None: this method does not return anything
         """
         # uses a iptag that already exists for a collection of boards
-        iptags = self._tag_infos.get_iptag_mapping_for(
+        iptags = self._tag_infos.get_iptag_for(
             tag_allocator_constraint.port, tag_allocator_constraint.address)
 
         located_tag_for_board = False
@@ -147,10 +188,14 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
             self._set_tag(tag_allocator_constraint, partitioned_vertex_label)
 
     def _set_tag(self, constraint, partitioned_vertex_label):
-        """
+        """ Private method that creates determines what type of tag to create
+         based off the type of constraint parameter
 
-        :param constraint:
-        :return:
+        :param constraint: the constraint in question to create a tag from
+        :type constraint: a instance of:
+        "pacman.model.constraints.abstract_constraints.abstract_taggable_constraint.AbstractTaggableConstraint"
+        :return None: this method does not return any thing
+        :raises None: this method does not raise an exception
         """
         if isinstance(constraint, TagAllocatorRequireIptagConstraint):
             self._tag_infos.add_iptag(
@@ -167,18 +212,18 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                 port_num=constraint.port_num,
                 partitioned_vertex=partitioned_vertex_label)
 
-    def is_tag_allocator(self):
-        """ helper method for is_instance
-        :return:
-        """
-        return True
-
     def locate_board_for(self, taggable_constraint, placement_tracker):
-        """
+        """ overrided method from abstract_taggable_algorithm
+        method that a placer can call to deduce the board address of a
+         taggablely constraitned partitioned vertex.
 
-        :param taggable_constraint:
-        :param placement_tracker:
-        :return:
+        :param taggable_constraint: the taggable constraint
+        :type taggable_constraint: instance of:
+        "pacman.model.constraints.abstract_constraints.abstract_taggable_constraint.AbstractTaggableConstraint"
+        :param placement_tracker: the placement tracker used by the placer
+        :type placement_tracker: instance of:
+        "pacman.utilities.placement_tracker.PlacementTracker"
+        :return: a board address which this constraint can satisfy
         """
         if taggable_constraint.board_address is not None:
 
@@ -207,7 +252,7 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
             while index < len(area_codes) and not found:
                 if placement_tracker.\
                         ethernet_area_code_has_avilable_cores_left(
-                        area_codes[index]):
+                        area_codes.keys()[index]):
                     tag, board_address = self._check_tag(
                         taggable_constraint.tag_id,
                         taggable_constraint.board_address, False)
@@ -283,11 +328,11 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
         elif tag_id is not None and board_address is None:
             key_index = 0
             while key_index < len(self._avilable_tag_ids.keys()):
-                key = self._avilable_tag_ids.keys()[key_index]
-                if tag_id in self._avilable_tag_ids[key]:
+                board_address = self._avilable_tag_ids.keys()[key_index]
+                if tag_id in self._avilable_tag_ids[board_address]:
                     if remove_tag_id_from_set:
-                        self._avilable_tag_ids[key].remove(tag_id)
-                    return tag_id, key
+                        self._avilable_tag_ids[board_address].remove(tag_id)
+                    return tag_id, board_address
                 key_index += 1
             if raise_exceptions:
                 raise exceptions.PacmanConfigurationException(
@@ -315,12 +360,12 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
         elif tag_id is None and board_address is None:
             key_index = 0
             while key_index < len(self._avilable_tag_ids.keys()):
-                key = self._avilable_tag_ids.keys()[key_index]
-                if len(self._avilable_tag_ids[key]) != 0:
+                board_address = self._avilable_tag_ids.keys()[key_index]
+                if len(self._avilable_tag_ids[board_address]) != 0:
                     tag_id = self._avilable_tag_ids[board_address].pop()
                     if not remove_tag_id_from_set:
                         self._avilable_tag_ids[board_address].add(tag_id)
-                    return tag_id, key
+                    return tag_id, board_address
                 key_index += 1
             if raise_exceptions:
                 raise exceptions.PacmanConfigurationException(
@@ -336,3 +381,9 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                     "try again.")
             else:
                 return None, None
+
+    def is_tag_allocator(self):
+        """ helper method for is_instance
+        :return:
+        """
+        return True

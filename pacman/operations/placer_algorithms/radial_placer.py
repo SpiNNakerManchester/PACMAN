@@ -173,9 +173,16 @@ class RadialPlacer(BasicPlacer, AbstractRequiresTagAllocator):
             if x is None and y is None and p is None:
                 chips = self._placement_tracker.\
                     get_chips_in_ethernet_area_code(taggable.board_address)
-                return self._deal_with_non_constrained_placement(
+                x, y, p = self._deal_with_non_constrained_placement(
                     subvertex_label, subvertex_resources, chips, chips[0].x,
                     chips[0].y)
+
+            # if a reverse iptag constraint, then set the placement coords
+            if isinstance(taggable,
+                          TagAllocatorRequireReverseIptagConstraint):
+                taggable.placement_p = p
+                taggable.placement_x = x
+                taggable.placement_y = y
         return x, y, p
 
     #overloaded method from basicPlacer
