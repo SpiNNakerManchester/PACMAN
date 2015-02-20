@@ -1,4 +1,5 @@
-from pacman.model.constraints.abstract_constraints.abstract_placer_constraint import \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_placer_constraint import \
     AbstractPlacerConstraint
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanConfigurationException

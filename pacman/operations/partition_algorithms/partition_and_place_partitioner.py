@@ -1,11 +1,11 @@
 import logging
-
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.constraints.abstract_constraints.\
     abstract_placer_constraint import \
     AbstractPlacerConstraint
+
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -16,7 +16,7 @@ from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.operations.abstract_algorithms.abstract_partition_algorithm \
+from pacman.operations.abstract_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.constraints.partitioner_constraints.\
@@ -29,7 +29,6 @@ from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanPlaceException
-
 
 logger = logging.getLogger(__name__)
 

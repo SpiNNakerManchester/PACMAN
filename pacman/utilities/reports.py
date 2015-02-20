@@ -256,7 +256,6 @@ def routing_info_report(report_folder, hostname, subgraph, placements,
                         routing_infos):
     file_name = os.path.join(report_folder,
                              "virtual_key_space_information_report.rpt")
-    output = None
     try:
         output = open(file_name, "w")
     except IOError:
@@ -264,15 +263,13 @@ def routing_info_report(report_folder, hostname, subgraph, placements,
                      "Can't open file {} for writing.".format(file_name))
 
     for subvert in subgraph.subvertices:
-        output.write("Subvert: {} \n".format(subvert))
         outgoing_subedges = subgraph.outgoing_subedges_from_subvertex(subvert)
         for outgoing_subedge in outgoing_subedges:
             subedge_routing_info = routing_infos.\
                 get_subedge_information_from_subedge(outgoing_subedge)
-            output.write("{} \n".format(subedge_routing_info))
-        output.write("\n\n")
-    output.flush()
-    output.close()
+
+
+
 
 
 def router_report_from_router_tables(report_folder, routing_tables):

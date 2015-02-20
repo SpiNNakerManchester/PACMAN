@@ -1,7 +1,6 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
-import logging
 
 from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
@@ -18,6 +17,7 @@ from pacman.utilities.progress_bar import ProgressBar
 from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
 
+import logging
 
 logger = logging.getLogger(__name__)
 

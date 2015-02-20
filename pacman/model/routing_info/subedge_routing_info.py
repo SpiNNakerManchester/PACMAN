@@ -43,10 +43,3 @@ class SubedgeRoutingInfo(object):
     def subedge(self):
         return self._subedge
 
-    def __repr__(self):
-        return "subedge:{}, key:{}, mask:{}"\
-            .format(self._subedge, hex(self._key), hex(self._mask))
-
-    def __str__(self):
-        return self.__repr__()
-

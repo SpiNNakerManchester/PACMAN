@@ -156,7 +156,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                 current_found_max_atoms_per_core = constraint.size
         return current_found_max_atoms_per_core
 
-    def create_subvertex(self, vertex_slice, resources_required, label=None,
+    def create_subvertex(self, resources_required, label=None,
                          additional_constraints=list()):
         """ Creates a subvertex of this vertex.  Can be overridden in vertex\
             subclasses to create an subvertex instance that contains detailed\
@@ -167,9 +167,6 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     subvertex.  If not given and the vertex has a label, a\
                     default label will be given to the subvertex
         :type label: str
-        :param vertex_slice: the slice of the partitionable vertex that this
-        partitioned vertex will cover
-        :type vertex_slice: pacman.model.graph_mapper.vertex_slice.VertexSlice
         :param additional_constraints: An iterable of constraints from the\
                     subvertex over-and-above those of the vertex
         :type additional_constraints: iterable of\
@@ -179,6 +176,9 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
+        # Combine the AbstractConstrainedVertex and PartitionedVertex constraints
+        additional_constraints.extend(self.constraints)
+
         return PartitionedVertex(label=label,
                                  resources_required=resources_required,
                                  constraints=additional_constraints)

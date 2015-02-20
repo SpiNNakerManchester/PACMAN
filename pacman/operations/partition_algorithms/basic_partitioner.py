@@ -1,20 +1,21 @@
-import logging
-
-from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
 from pacman.model.graph_mapper.slice import Slice
-from pacman.operations.abstract_algorithms.abstract_partition_algorithm \
+from pacman.operations.abstract_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from spinn_machine.processor import Processor
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanPartitionException
 
+import logging
 
 logger = logging.getLogger(__name__)
 
