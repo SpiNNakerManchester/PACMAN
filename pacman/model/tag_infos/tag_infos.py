@@ -1,6 +1,5 @@
 from spinn_machine.tags.iptag import IPTag
 from spinn_machine.tags.reverse_iptag import ReverseIPTag
-
 from pacman import exceptions
 from spinn_machine.tags.abstract_tag import AbstractIPTAG
 
@@ -65,9 +64,7 @@ class TagInfos(object):
         self._partitioned_vertex_label_to_iptag_mapping[
             partitioned_vertex_label] = iptag
 
-    def add_reverse_ip_tag(
-            self, tag, board_address, port, x, y, p, port_num,
-            partitioned_vertex):
+    def add_reverse_ip_tag(self, tag, board_address, port, x, y, p, port_num):
         """ adds a reverse iptag into the lists which represent the tag-info
         object
 

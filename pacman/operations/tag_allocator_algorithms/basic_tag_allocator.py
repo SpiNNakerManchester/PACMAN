@@ -209,8 +209,7 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                 x=constraint.placement_x, y=constraint.placement_y,
                 p=constraint.placement_p,
                 board_address=constraint.board_address,
-                port_num=constraint.port_num,
-                partitioned_vertex=partitioned_vertex_label)
+                port_num=constraint.port_num)
 
     def locate_board_for(self, taggable_constraint, placement_tracker):
         """ overrided method from abstract_taggable_algorithm
