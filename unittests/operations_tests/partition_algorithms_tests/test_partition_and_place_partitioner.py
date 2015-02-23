@@ -4,7 +4,7 @@ import unittest
 from pacman.model.constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.model.constraints \
     .vertex_requires_virtual_chip_in_machine_constraint \

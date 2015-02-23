@@ -1,20 +1,20 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+import logging
+
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.partitionable_graph.abstract_constrained_vertex \
+from pacman.model.abstract_classes.abstract_constrained_vertex \
     import AbstractConstrainedVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.resources.resource_container import ResourceContainer
 
-import logging
 
 logger = logging.getLogger(__name__)
 

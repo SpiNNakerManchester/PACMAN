@@ -1,4 +1,5 @@
 import unittest
+
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
@@ -16,7 +17,7 @@ from pacman.model.graph_mapper.graph_mapper import GraphMapper
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from spinn_machine.chip import Chip
@@ -25,6 +26,7 @@ from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.router import Router
 from spinn_machine.sdram import SDRAM
+
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     vertex = Vertex(1, None)

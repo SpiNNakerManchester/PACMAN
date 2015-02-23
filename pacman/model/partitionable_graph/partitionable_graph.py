@@ -1,4 +1,4 @@
-from pacman.model.partitionable_graph.abstract_constrained_vertex \
+from pacman.model.abstract_classes.abstract_constrained_vertex \
     import AbstractConstrainedVertex
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge

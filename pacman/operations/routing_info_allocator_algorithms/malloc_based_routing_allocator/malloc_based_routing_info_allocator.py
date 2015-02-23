@@ -51,7 +51,6 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             search
         """
         hi = len(self._free_space_tracker) - 1
-        free_space_slot = self._free_space_tracker[lo]
         while lo < hi:
             mid = int(math.ceil(float(lo + hi) / 2.0))
             free_space_slot = self._free_space_tracker[mid]
@@ -171,7 +170,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 free_space_slot.start_address + free_space_slot.size
                 - (base_key + n_keys)))
 
-    def _get_key_ranges(self, key, mask):
+    @staticmethod
+    def _get_key_ranges(key, mask):
         """ Get a generator of base_key, n_keys pairs that represent ranges
             allowed by the mask
 
@@ -220,21 +220,17 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         ones = numpy.where(unwrapped_mask == 1)[0]
         n_zeros = 32 - len(ones)
 
-        # We now know how many possible keys there are - 2^n_zeros
-        n_keys = 2 ** n_zeros
-        logger.debug("Mask", hex(mask), "is valid for", n_keys, "keys")
+        # We now know how many possible keys there are - 2^n_ONES
+        n_keys = 2 ** len(ones)
+        print("Mask", hex(mask), "is valid for", n_keys, "keys")
 
         # Get the first valid key >= first space start address
         min_key = self._free_space_tracker[0].start_address
         if min_key & mask != min_key:
             min_key = ((self._free_space_tracker[0].start_address + n_keys)
                        & mask)
-        unwrapped_min_key = numpy.unpackbits(
-            numpy.asarray([min_key], dtype=">u4").view(dtype="uint8"))
-        unwrapped_min_value = numpy.zeros(32, dtype="uint8")
-        unwrapped_min_value[-len(ones):] = unwrapped_min_key[ones]
-        min_value = numpy.packbits(unwrapped_min_value).view(dtype=">u4")[0]
-        logger.debug("first valid key for mask", hex(mask), "is", hex(min_key),
+        min_value = min_key / (2 ** n_zeros)
+        print("first valid key for mask", hex(mask), "is", hex(min_key),
                      "which is key number", min_value)
 
         # Generate up to 2^len(ones) keys
@@ -246,7 +242,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             key[ones] = unwrapped_value
             yield numpy.packbits(key).view(dtype=">u4")[0]
 
-    def _get_possible_masks(self, n_keys, is_contiguous):
+    @staticmethod
+    def _get_possible_masks(n_keys, is_contiguous):
         """ Get the possible masks given the number of keys
 
         :param n_keys: The number of keys to generate a mask for

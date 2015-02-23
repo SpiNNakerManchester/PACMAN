@@ -1,4 +1,4 @@
-from pacman.model.partitionable_graph.abstract_constrained_vertex import \
+from pacman.model.abstract_classes.abstract_constrained_vertex import \
     AbstractConstrainedVertex
 
 
@@ -21,11 +21,9 @@ class PartitionedVertex(AbstractConstrainedVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
         """
-        AbstractConstrainedVertex.__init__(self, label=label)
-        self._label = label
+        AbstractConstrainedVertex.__init__(self, label=label,
+                                           constraints=constraints)
         self._resources_required = resources_required
-        self._constraints = list()
-        self.add_constraints(constraints)
 
     @property
     def resources_required(self):

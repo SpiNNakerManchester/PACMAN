@@ -1,4 +1,8 @@
-class PartitionedEdge(object):
+from pacman.model.abstract_classes.abstract_constrained_edge import \
+    AbstractConstrainedEdge
+
+
+class PartitionedEdge(AbstractConstrainedEdge):
     """ Represents an edge between two PartitionedVertex instances
     """
 
@@ -21,10 +25,9 @@ class PartitionedEdge(object):
                     edge for routing purposes
         :raise None: Raises no known exceptions
         """
+        AbstractConstrainedEdge.__init__(self, label, constraints)
         self._pre_subvertex = pre_subvertex
         self._post_subvertex = post_subvertex
-        self._label = label
-        self._constraints = constraints
 
     @property
     def pre_subvertex(self):

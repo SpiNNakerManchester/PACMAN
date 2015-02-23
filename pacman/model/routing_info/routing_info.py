@@ -21,7 +21,10 @@ class RoutingInfo(object):
         self._subedge_infos_by_key = dict()
 
         # Subedge information indexed by subedge
-        self._subedge_info_from_subedge = dict()
+        self._subedge_info_by_subedge = dict()
+
+        # key_masks_ indexed by subvertex
+        self._key_masks_by_subvertex = dict()
 
         if subedge_info_items is not None:
             for subedge_info_item in subedge_info_items:
@@ -39,16 +42,23 @@ class RoutingInfo(object):
                     is already in the set of subedges
         """
 
-        if subedge_info.subedge in self._subedge_info_from_subedge:
+        if subedge_info.subedge in self._subedge_info_by_subedge:
             raise PacmanAlreadyExistsException("PartitionedEdge",
                                                str(subedge_info.subedge))
 
-        self._subedge_info_from_subedge[subedge_info.subedge] = subedge_info
+        self._subedge_info_by_subedge[subedge_info.subedge] = subedge_info
 
         for key_and_mask in subedge_info.keys_and_masks:
             if key_and_mask.key not in self._subedge_infos_by_key:
                 self._subedge_infos_by_key[key_and_mask.key] = list()
             self._subedge_infos_by_key[key_and_mask.key] = subedge_info
+
+        # add the key mask by subvertex mapping
+        pre_sub = subedge_info.subedge.pre_subvertex
+        if pre_sub not in self._key_masks_by_subvertex.keys():
+            self._key_masks_by_subvertex[pre_sub] = list()
+        for key_and_mask in subedge_info.keys_and_masks:
+            self._key_masks_by_subvertex[pre_sub].append(key_and_mask)
 
     @property
     def all_subedge_info(self):
@@ -60,6 +70,22 @@ class RoutingInfo(object):
         :raise None: does not raise any known exceptions
         """
         return self._subedge_info_by_subedge.itervalues()
+
+    def get_key_masks_for_partitioned_vertex(self, partitioned_vertex):
+        """ Get the key_masks objects which this partitioned vertex uses when
+         transmitting packets
+
+        :param partitioned_vertex: the partitioned vertex to locate its
+         key_masks for
+         :type partitioned_vertex:
+         pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex
+        :return: a iterable of keys and masks for the partitioned vertex
+        :rtype: iterable of pacman.model.routing_info.key_and_mask.KeyAndMask
+        """
+        if partitioned_vertex in self._key_masks_by_subvertex.keys():
+            return self._key_masks_by_subvertex[partitioned_vertex]
+        else:
+            return None
 
     def get_subedge_infos_by_key(self, key, mask):
         """ Get the routing information associated with a particular key, once\
@@ -77,7 +103,7 @@ class RoutingInfo(object):
         """
         key_mask_combo = key & mask
         if key_mask_combo in self._subedge_infos_by_key:
-            return self._subedge_info_by_key[key_mask_combo]
+            return self._subedge_infos_by_key[key_mask_combo]
         return None
 
     def get_keys_and_masks_from_subedge(self, subedge):
@@ -90,8 +116,8 @@ class RoutingInfo(object):
         :rtype: int
         :raise None: does not raise any known exceptions
         """
-        if subedge in self._subedge_info_from_subedge:
-            return self._subedge_info_from_subedge[subedge].keys_and_masks
+        if subedge in self._subedge_info_by_subedge:
+            return self._subedge_info_by_subedge[subedge].keys_and_masks
         return None
 
     def get_subedge_information_from_subedge(self, subedge):
@@ -105,6 +131,6 @@ class RoutingInfo(object):
             :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
         :raise None: does not raise any known exceptions
         """
-        if subedge in self._subedge_info_from_subedge:
-            return self._subedge_info_from_subedge[subedge]
+        if subedge in self._subedge_info_by_subedge:
+            return self._subedge_info_by_subedge[subedge]
         return None
