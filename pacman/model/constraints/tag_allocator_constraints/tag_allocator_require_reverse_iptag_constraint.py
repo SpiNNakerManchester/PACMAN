@@ -6,18 +6,18 @@ from pacman.model.constraints.tag_allocator_constraints.\
 
 class TagAllocatorRequireReverseIptagConstraint(AbstractTagAllocatorConstraint):
 
-    def __init__(self, tag_id, board_address, port_num, port, placement_x=None,
+    def __init__(self, tag_id, board_address, sdp_port, port, placement_x=None,
                  placement_y=None, placement_p=None):
         AbstractTagAllocatorConstraint.__init__(self, board_address, port,
                                                 tag_id)
         self._placement_x = placement_x
         self._placement_y = placement_y
         self._placement_p = placement_p
-        self._port_num = port_num
+        self._port_num = sdp_port
 
     @property
-    def port_num(self):
-        """property method for the port_num this constraint is linked to
+    def sdp_port(self):
+        """property method for the sdp_port this constraint is linked to
         (part of a reverse iptag which tells the core what udp port it was sent
          by)
 

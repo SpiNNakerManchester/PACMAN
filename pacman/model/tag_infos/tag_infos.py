@@ -64,7 +64,7 @@ class TagInfos(object):
         self._partitioned_vertex_label_to_iptag_mapping[
             partitioned_vertex_label] = iptag
 
-    def add_reverse_ip_tag(self, tag, board_address, port, x, y, p, port_num):
+    def add_reverse_ip_tag(self, tag, board_address, port, x, y, p, sdp_port):
         """ adds a reverse iptag into the lists which represent the tag-info
         object
 
@@ -78,7 +78,7 @@ class TagInfos(object):
          reverse iptag go to.
         :param p: the p coord for the core that packets being sent via this
          reverse iptag go to.
-        :param port_num: a port_num paramter that is added to the sdp packet
+        :param sdp_port: a sdp_port paramter that is added to the sdp packet
         being injected to a core.
         :return None: this method does not return anything
         :raises PacmanConfigurationException: when the board-address is none,
@@ -95,7 +95,7 @@ class TagInfos(object):
                 "something is wrong with the tag_allocator. Please fix and "
                 "try again")
 
-        reverse_iptag = ReverseIPTag(port, tag, x, y, p, port_num)
+        reverse_iptag = ReverseIPTag(port, tag, x, y, p, sdp_port)
         if board_address not in self._reverse_ip_tags.keys():
             self._reverse_ip_tags[board_address] = list()
         self._reverse_ip_tags[board_address].append(reverse_iptag)
