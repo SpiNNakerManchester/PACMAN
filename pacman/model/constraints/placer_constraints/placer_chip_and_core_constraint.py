@@ -23,7 +23,6 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         AbstractPlacerConstraint.__init__(
             self, label="placer chip and core constraint at coords "
                         "{},{},{}".format(x, y, p))
-
         self._x = x
         self._y = y
         self._p = p
