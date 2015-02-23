@@ -222,7 +222,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
         # We now know how many possible keys there are - 2^n_ONES
         n_keys = 2 ** len(ones)
-        print("Mask", hex(mask), "is valid for", n_keys, "keys")
+        logger.debug("Mask", hex(mask), "is valid for", n_keys, "keys")
 
         # Get the first valid key >= first space start address
         min_key = self._free_space_tracker[0].start_address
@@ -230,7 +230,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             min_key = ((self._free_space_tracker[0].start_address + n_keys)
                        & mask)
         min_value = min_key / (2 ** n_zeros)
-        print("first valid key for mask", hex(mask), "is", hex(min_key),
+        logger.debug("first valid key for mask", hex(mask), "is", hex(min_key),
                      "which is key number", min_value)
 
         # Generate up to 2^len(ones) keys
