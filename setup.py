@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="SpiNNaker_PACMAN",
-    version="2015.002",
+    version="2015.003-alpha-01",
     description="Partition and Configuration Manager",
     url="https://github.com/SpiNNakerManchester/PACMAN",
     license="GNU GPLv3.0",
