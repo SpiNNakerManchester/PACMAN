@@ -1,7 +1,7 @@
 import os
 import time
 import logging
-from pacman.utilities.sdram_tracker import SDRAMTracker
+from pacman.utilities.resource_tracker import ResourceTracker
 from pacman.model.placements import placement
 from spinn_machine.sdram import SDRAM
 from pacman import exceptions
@@ -219,12 +219,11 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     f_mem_used_by_core.write("Generated: %s" % time_date_string)
     f_mem_used_by_core.write(" for target machine '{}'".format(hostname))
     f_mem_used_by_core.write("\n\n")
-    used_sdram_by_chip = SDRAMTracker()
+    used_sdram_by_chip = dict()
 
     for placement in placements.placements:
         subvert = placement.subvertex
         vertex = graph_mapper.get_vertex_from_subvertex(subvert)
-        vertex_in_edges = graph.incoming_edges_to_vertex(vertex)
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvert)
         requirements = \
@@ -233,12 +232,15 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
         x, y, p = placement.x, placement.y, placement.p
         f_mem_used_by_core.write(
             "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
-            x, y, p, int(requirements.sdram.get_value() / 1024.0)))
-        used_sdram_by_chip.add_usage(x, y, requirements.sdram.get_value())
+                x, y, p, int(requirements.sdram.get_value() / 1024.0)))
+        if (x, y) not in used_sdram_by_chip:
+            used_sdram_by_chip[(x, y)] = requirements.sdram.get_value()
+        else:
+            used_sdram_by_chip[(x, y)] += requirements.sdram.get_value()
 
     for chip in machine.chips:
         try:
-            used_sdram = used_sdram_by_chip.get_usage(chip.x, chip.y)
+            used_sdram = used_sdram_by_chip[(chip.x, chip.y)]
             if used_sdram != 0:
                 f_mem_used_by_core.write(
                     "**** Chip: ({}, {}) has total memory usage of"

@@ -1,5 +1,4 @@
-from pacman.model.partitionable_graph.abstract_constrained_vertex import \
-    AbstractConstrainedVertex
+from pacman.model.abstract_constrained_vertex import AbstractConstrainedVertex
 
 
 class PartitionedVertex(AbstractConstrainedVertex):

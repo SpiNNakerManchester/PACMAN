@@ -1,5 +1,5 @@
 import unittest
-from pacman.utilities.sdram_tracker import SDRAMTracker
+from pacman.utilities.resource_tracker import ResourceTracker
 from spinn_machine.sdram import SDRAM
 
 
@@ -7,7 +7,7 @@ class TestSDRAMTracker(unittest.TestCase):
     def test_new_sdram_tracker(self):
         sdram = SDRAM(128*(2**20))
         sdram2 = SDRAM(104*(2**20))
-        sdram_tracker = SDRAMTracker()
+        sdram_tracker = ResourceTracker()
         # Add new values to tracker
         sdram_tracker.add_usage(0, 0, sdram.size)
         sdram_tracker.add_usage(1, 0, sdram2.size)

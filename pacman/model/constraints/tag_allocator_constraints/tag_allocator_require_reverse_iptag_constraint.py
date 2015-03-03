@@ -4,120 +4,40 @@ from pacman.model.constraints.tag_allocator_constraints.\
     AbstractTagAllocatorConstraint
 
 
-class TagAllocatorRequireReverseIptagConstraint(AbstractTagAllocatorConstraint):
+class TagAllocatorRequireReverseIptagConstraint(
+        AbstractTagAllocatorConstraint):
+    """ Constraint that indicates that a Reverse IP tag is required, and the\
+        constraints of the tag required, if any.  Note that simply requiring\
+        an IP tag creates a placement constraint, since only a fixed number\
+        of tags are available on each board
+    """
 
-    def __init__(self, tag_id, board_address, sdp_port, port, placement_x=None,
-                 placement_y=None, placement_p=None):
-        AbstractTagAllocatorConstraint.__init__(self, board_address, port,
-                                                tag_id)
-        self._placement_x = placement_x
-        self._placement_y = placement_y
-        self._placement_p = placement_p
-        self._port_num = sdp_port
+    def __init__(self, port, sdp_port=1, board_address=None, tag_id=None):
+        """
+
+        :param port: The UDP port to listen to on the board for this tag
+        :type port: int
+        :param sdp_port: The SDP port number to be used when constructing SDP\
+                    packets from the received UDP packets for this tag
+        :type sdp_port: int
+        :param board_address: Optional fixed board ip address
+        :type board_address: str
+        :param tag_id: Optional fixed tag id required
+        :type tag_id: int
+        """
+        AbstractTagAllocatorConstraint.__init__(self, board_address, tag_id,
+                                                port)
+        self._sdp_port = sdp_port
 
     @property
     def sdp_port(self):
-        """property method for the sdp_port this constraint is linked to
-        (part of a reverse iptag which tells the core what udp port it was sent
-         by)
-
-        :return:
+        """ The SDP port to use when constructing the SDP message from the\
+            received UDP message
         """
-        return self._port_num
-
-    @property
-    def placement_x(self):
-        """property method for the placement_x this constraint is linked to
-        (part of a reverse iptag which tells the monitor core which core to
-        send packets to which come into spinnaker via the reverse iptag
-        linked to this constraint)
-
-        :return:
-        """
-        return self._placement_x
-
-    @property
-    def placement_y(self):
-        """property method for the placement_y this constraint is linked to
-        (part of a reverse iptag which tells the monitor core which core to
-        send packets to which come into spinnaker via the reverse iptag
-        linked to this constraint)
-
-        :return:
-        """
-        return self._placement_y
-
-    @property
-    def placement_p(self):
-        """property method for the placement_p this constraint is linked to
-        (part of a reverse iptag which tells the monitor core which core to
-        send packets to which come into spinnaker via the reverse iptag
-        linked to this constraint)
-
-        :return:
-        """
-        return self._placement_p
-
-    @placement_p.setter
-    def placement_p(self, new_value):
-        """ setter method for the placement_p this constraint is linked to
-        (part of a reverse iptag which tells the monitor core which core to
-        send packets to which come into spinnaker via the reverse iptag
-        linked to this constraint)
-
-        :param new_value: the new value for the p coord of the core to which
-        packets are sent when they come into spinnaker via the reverse iptag
-        linked to this constraint)
-        :return:
-        """
-        self._placement_p = new_value
-
-    @placement_x.setter
-    def placement_x(self, new_value):
-        """setter method for the placement_x this constraint is linked to
-        (part of a reverse iptag which tells the monitor core which core to
-        send packets to which come into spinnaker via the reverse iptag
-        linked to this constraint)
-
-        :param new_value: the new value for the x coord of the core to which
-        packets are sent when they come into spinnaker via the reverse iptag
-        linked to this constraint)
-        :return:
-        """
-        self._placement_x = new_value
-
-    @placement_y.setter
-    def placement_y(self, new_value):
-        """setter method for the placement_y this constraint is linked to
-        (part of a reverse iptag which tells the monitor core which core to
-        send packets to which come into spinnaker via the reverse iptag
-        linked to this constraint)
-
-        :param new_value: the new value for the y coord of the core to which
-        packets are sent when they come into spinnaker via the reverse iptag
-        linked to this constraint)
-        :return:
-        """
-        self._placement_y = new_value
-
-    def is_placer_constraint(self):
-        """ helper method for is_instance
-
-        :return:
-        """
-        return True
+        return self._sdp_port
 
     def is_tag_allocator_constraint(self):
-        """helper method for is_instance
-
-        :return:
-        """
         return True
 
     def rank(self):
-        """the level to which this constraint should be considered during
-        ordering of constraints
-
-        :return:
-        """
-        return sys.maxint - 4
+        return sys.maxint - 3

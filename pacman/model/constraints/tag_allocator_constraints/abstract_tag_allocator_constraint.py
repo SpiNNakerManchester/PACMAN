@@ -9,71 +9,56 @@ from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
 
 @add_metaclass(ABCMeta)
 class AbstractTagAllocatorConstraint(AbstractPlacerConstraint):
+    """ An abstract constraint for (ip or reverse ip) tag allocation
+    """
 
-    def __init__(self, board_address, port, tag_id):
+    def __init__(self, board_address, tag, port):
+        """
+        :param board_address: A fixed board address required for the tag, or\
+                    None if any address is OK
+        :type board_address: str
+        :param port: The target port of the tag
+        :type port: int
+        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :type tag: int
+        """
         AbstractPlacerConstraint.__init__(self, "tag allocator constraint")
         self._board_address = board_address
-        self._tag_id = tag_id
+        self._tag = tag
         self._port = port
 
     def is_placer_constraint(self):
-        """
-        helper method for is_instance
-        :return:
-        """
         return True
 
     @abstractmethod
     def is_tag_allocator_constraint(self):
-        """
-        helper method for is_instance
-        :return:
+        """ helper method for is_instance
+        :return: True
         """
 
     @property
     def board_address(self):
-        """ property method for the board address this constraint is linked to
-        (part of a iptag and reverse_iptag)
+        """ The board address required, or None if any board is OK
 
-        :return:
+        :return: The board address or None
+        :rtype: str
         """
         return self._board_address
 
     @property
     def port(self):
-        """property method for the port this constraint is linked to
-         (part of a iptag and reverse_iptag)
+        """ The port of the tag
 
-        :return:
+        :return: The port of the tag
+        :rtype: int
         """
         return self._port
 
     @property
-    def tag_id(self):
-        """property method for the tag this constraint is linked to
-        (part of a iptag and reverse_iptag)
+    def tag(self):
+        """ The tag required, or None if any tag is OK
 
-        :return:
+        :return: The tag or None
+        :rtype: int
         """
-        return self._tag_id
-
-    @board_address.setter
-    def board_address(self, new_value):
-        """ setter method to set a new board address to link this constraint to
-        (a tag has been assigned and therefore this is kept for ease)
-
-        :param new_value: the new board address this constraitn is to be
-        assigned to
-        :return:
-        """
-        self._board_address = new_value
-
-    @tag_id.setter
-    def tag_id(self, new_value):
-        """ setter method to set a new tag id to link this constraint to
-        (a tag has been assigned and therefore this is kept for ease)
-
-        :param new_value:
-        :return:
-        """
-        self._tag_id = new_value
+        return self._tag

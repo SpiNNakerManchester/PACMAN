@@ -12,11 +12,13 @@ class VertexRequiresMultiCastSourceConstraint(AbstractUtilityConstraint):
         """
 
         :param commands: The commands that the vertex expects to be trnasmitted
-    :type commands: iterable of pacman.utility.multicastcommand.MultiCastCommand
+        :type commands: iterable of \
+                    pacman.utility.multicastcommand.MultiCastCommand
         :raise None: does not raise any known exceptions
         """
         AbstractUtilityConstraint.__init__(
-            self, "AbstractConstrainedVertex Requires Multi Cast Source Constraint with commands"
+            self, "AbstractConstrainedVertex Requires Multi Cast Source"
+                  " Constraint with commands"
                   "{}".format(commands))
         self._commands = commands
 

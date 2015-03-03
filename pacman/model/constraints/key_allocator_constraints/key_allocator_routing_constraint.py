@@ -21,8 +21,9 @@ class KeyAllocatorRoutingConstraint(AbstractRouterConstraint):
         """
         AbstractRouterConstraint.__init__(
             self, "key allocator constraint where subedges coming from the "
-                  "vertex requires a specific key and mask which are generated "
-                  "from the function call {}".format(key_mask_function_call))
+                  "vertex requires a specific key and mask which are "
+                  "generated from the function call {}".format(
+                      key_mask_function_call))
         self._key_function_call = key_mask_function_call
         self._atom_ids_function_call = key_with_atom_ids_function_call
 

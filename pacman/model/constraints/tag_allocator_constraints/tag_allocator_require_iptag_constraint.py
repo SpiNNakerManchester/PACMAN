@@ -4,52 +4,54 @@ import sys
 
 
 class TagAllocatorRequireIptagConstraint(AbstractTagAllocatorConstraint):
+    """ Constraint that indicates that an IP tag is required, and the\
+        constraints of the tag required, if any.  Note that simply requiring\
+        an IP tag creates a placement constraint, since only a fixed number\
+        of tags are available on each board
+    """
 
-    def __init__(self, tag_id, board_address, address, strip_sdp, port):
-        AbstractTagAllocatorConstraint.__init__(self, board_address, port,
-                                                tag_id)
-        self._address = address
-        self._stripe_sdp = strip_sdp
+    def __init__(self, ip_address, port, strip_sdp, board_address=None,
+                 tag_id=None):
+        """
+
+        :param ip_address: The IP address that the tag will cause data to be\
+                    sent to
+        :type ip_address: str
+        :param port: The port that the tag will cause data to be sent to
+        :type port: int
+        :param strip_sdp: Whether the tag requires that SDP headers are\
+                    stripped before transmission of data
+        :type strip_sdp: bool
+        :param board_address: Optional fixed board ip address
+        :type board_address: str
+        :param tag_id: Optional fixed tag id required
+        :type tag_id: int
+        """
+        AbstractTagAllocatorConstraint.__init__(self, board_address, tag_id,
+                                                port)
+        self._ip_address = ip_address
+        self._strip_sdp = strip_sdp
 
     @property
-    def address(self):
-        """property method for the address this constraint is linked to
-        (part of a iptag)
+    def ip_address(self):
+        """ The ip address to assign to the tag
 
-        :return:
+        :return: An ip address
+        :rtype: str
         """
-        return self._address
+        return self._ip_address
 
     @property
     def strip_sdp(self):
-        """"property method for telling a monitor if it is to strip the SDP
-        header off it when going out of spinnaker with the iptag
-        this constraint is linked to
-        (part of a iptag)
+        """ Whether SDP headers should be stripped for this tag
 
-
-        :return:
+        :return: True if the headers should be stripped, False otherwise
+        :rtype: bool
         """
-        return self._stripe_sdp
-
-    def is_placer_constraint(self):
-        """ helper method for is_instance
-
-        :return:
-        """
-        return True
+        return self._strip_sdp
 
     def is_tag_allocator_constraint(self):
-        """ helper method for is_instance
-
-        :return:
-        """
         return True
 
     def rank(self):
-        """ the level to which this constraint should be considered during
-        ordering of constraints
-
-        :return:
-        """
         return sys.maxint - 4

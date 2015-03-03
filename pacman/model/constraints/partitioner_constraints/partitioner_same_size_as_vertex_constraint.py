@@ -1,5 +1,5 @@
-from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint \
-    import AbstractPartitionerConstraint
+from pacman.model.constraints.abstract_constraints\
+    .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
 class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
@@ -12,12 +12,14 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         """
 
         :param vertex: The vertex to which the constraint refers
-        :type vertex: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+        :type vertex:\
+                    :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
         :raise None: does not raise any known exceptions
         """
         AbstractPartitionerConstraint.__init__(
-            self, "partitioner same size as other vertex constraint with vertex"
-                  "{}".format(vertex))
+            self,
+            "partitioner same size as other vertex constraint with vertex"
+            "{}".format(vertex))
         self._vertex = vertex
 
     def is_partitioner_constraint(self):
