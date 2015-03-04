@@ -46,7 +46,7 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             for out_going_subedge in out_going_subedges:
                 n_keys = n_keys_map.n_keys_for_partitioned_edge(
                     out_going_subedge)
-                if (n_keys > MAX_KEYS_SUPPORTED):
+                if n_keys > MAX_KEYS_SUPPORTED:
                     raise PacmanRouteInfoAllocationException(
                         "This routing info allocator can only support up to {}"
                         " keys for any given subedge; cannot therefore"

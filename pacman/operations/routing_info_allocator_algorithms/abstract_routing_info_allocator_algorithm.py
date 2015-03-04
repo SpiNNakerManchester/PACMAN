@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from collections import OrderedDict
 from six import add_metaclass
 
 from pacman.utilities import utility_calls
@@ -14,6 +15,7 @@ from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_same_keys_constraint \
     import KeyAllocatorSameKeysConstraint
+from pacman.utilities.ordered_set import OrderedSet
 
 
 @add_metaclass(ABCMeta)
@@ -25,7 +27,8 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
     def __init__(self):
         self._supported_constraints = list()
 
-    def _get_edge_groups(self, partitioned_graph):
+    @staticmethod
+    def _get_edge_groups(partitioned_graph):
         """ Utility method to get groups of partitioned edges using any\
             :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorSameKeyConstraint`\
             constraints.  Note that no checking is done here about conflicts\
@@ -33,7 +36,7 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         """
 
         # Keep a dictionary of the group which contains an edge
-        same_key_groups = dict()
+        same_key_groups = OrderedDict()
 
         for partitioned_edge in partitioned_graph.subedges:
             same_key_constraints = utility_calls.locate_constraints_of_type(
@@ -72,7 +75,8 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
 
                 else:
 
-                    # Otherwise we must merge the groups already found
+                    # NOTE: this state should never occur, but if we do then.
+                    # we must merge the groups already found
                     new_group = set()
                     for group in found_groups:
                         new_group.update(group)
@@ -85,10 +89,12 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                 # put it in a new group by itself
                 same_key_groups[partitioned_edge] = set([partitioned_edge])
 
-        # Reduce the dictionary into a set of groups
-        return set(frozenset(group) for group in same_key_groups.itervalues())
+        # Reduce the dictionary into a set of groups (in-mutabable)
+        return OrderedSet(frozenset(group)
+                          for group in same_key_groups.itervalues())
 
-    def _is_contiguous_range(self, same_key_group):
+    @staticmethod
+    def _is_contiguous_range(same_key_group):
         """ Determine if any edge in the group has a\
             :py:class:`pacman.model.constraints.key_allocator_contiguous_range_constraint.KeyAllocatorContiguousRangeContraint`
 
@@ -105,7 +111,8 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                 return True
         return False
 
-    def _get_fixed_mask(self, same_key_group):
+    @staticmethod
+    def _get_fixed_mask(same_key_group):
         """ Get a fixed mask from a group of partitioned edges if a\
             :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorFixedMaskConstraint`\
             constraint exists in any of the edges in the group.
@@ -135,7 +142,8 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
 
         return mask
 
-    def _get_fixed_key_and_mask(self, same_key_group):
+    @staticmethod
+    def _get_fixed_key_and_mask(same_key_group):
         """ Gets a fixed key and mask from a group of partitioned edges if a\
             :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorFixedKeyAndMaskConstraint`\
             constraint exists in any of the edges in the group.
@@ -162,7 +170,7 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                         " masks, {} and {}".format(
                             edge, edge_with_key_and_mask, keys_and_masks,
                             constraint.keys_and_masks))
-
+                print constraint
                 keys_and_masks = constraint.keys_and_masks
                 edge_with_key_and_mask = edge
 

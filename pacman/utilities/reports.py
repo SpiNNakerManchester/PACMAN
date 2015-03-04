@@ -27,10 +27,8 @@ def router_reports(report_folder, hostname, graph, graph_to_sub_graph_mapper,
         router_report_from_dat_file(report_folder)
 
 
-def routing_info_reports(report_folder, hostname, subgraph, placements,
-                         routing_infos):
-    routing_info_report(report_folder, hostname, subgraph, placements,
-                        routing_infos)
+def routing_info_reports(report_folder, subgraph, routing_infos):
+    routing_info_report(report_folder, subgraph, routing_infos)
 
 
 def partitioner_reports(report_folder, hostname, graph,
@@ -221,15 +219,15 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     f_mem_used_by_core.write("\n\n")
     used_sdram_by_chip = SDRAMTracker()
 
-    for placement in placements.placements:
-        subvert = placement.subvertex
+    for current_placement in placements.placements:
+        subvert = current_placement.subvertex
         vertex = graph_mapper.get_vertex_from_subvertex(subvert)
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvert)
         requirements = \
             vertex.get_resources_used_by_atoms(vertex_slice, graph)
 
-        x, y, p = placement.x, placement.y, placement.p
+        x, y, p = current_placement.x, current_placement.y, current_placement.p
         f_mem_used_by_core.write(
             "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
                 x, y, p, int(requirements.sdram.get_value() / 1024.0)))
@@ -255,8 +253,7 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     f_mem_used_by_core.close()
 
 
-def routing_info_report(report_folder, hostname, subgraph, placements,
-                        routing_infos):
+def routing_info_report(report_folder, subgraph, routing_infos):
     file_name = os.path.join(report_folder,
                              "virtual_key_space_information_report.rpt")
     output = None

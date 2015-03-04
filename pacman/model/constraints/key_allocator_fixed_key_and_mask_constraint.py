@@ -1,5 +1,7 @@
 from pacman.model.constraints.abstract_key_allocator_constraint \
     import AbstractKeyAllocatorConstraint
+from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman import exceptions
 
 
 class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
@@ -30,6 +32,13 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         AbstractKeyAllocatorConstraint.__init__(
             self, "key allocator constraint to fix the keys and masks to"
                   " {}".format(keys_and_masks))
+
+        for keys_and_mask in keys_and_masks:
+            if not isinstance(keys_and_mask, KeyAndMask):
+                raise exceptions.PacmanConfigurationException(
+                    "the keys and masks object contains a object that is not"
+                    "a key_and_mask object. Please fix and try again. RTFD")
+
         self._keys_and_masks = keys_and_masks
         self._key_list_function = key_list_function
 
@@ -53,3 +62,7 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         :return: A python function, or None if the default function can be used
         """
         return self._key_list_function
+
+    def __repr__(self):
+        return "fixed_key_mask_constraint_withkey_masks:{}: and key list " \
+               "function {}".format(self.keys_and_masks, self.key_list_function)

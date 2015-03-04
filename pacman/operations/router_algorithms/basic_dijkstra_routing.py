@@ -459,6 +459,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         x_current, y_current = x_destination, y_destination
         routing_entry_route_processors = [processor_dest]
         routing_entry_route_links = list()
+        previous_routing_entry = None
 
         for key_and_mask in subedge_routing_info.keys_and_masks:
 
@@ -657,8 +658,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] -= \
                 self._bw_per_route_entry  # TODO arbitrary
 
-            if (nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction]
-                    < 0):
+            if nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] < 0:
                 print ("Bandwidth overused from ({}, {}) in direction {}! to "
                        "({}, {})".format(x_neighbour, y_neighbour,
                                          dec_direction, x_current, y_current))

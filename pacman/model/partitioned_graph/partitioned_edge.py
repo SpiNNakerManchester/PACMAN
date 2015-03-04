@@ -21,8 +21,6 @@ class PartitionedEdge(AbstractConstrainedEdge):
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :param label: The name of the edge
         :type label: str
-        :param n_keys: The number of distinct keys required by the partitioned\
-                    edge for routing purposes
         :raise None: Raises no known exceptions
         """
         AbstractConstrainedEdge.__init__(self, label, constraints)

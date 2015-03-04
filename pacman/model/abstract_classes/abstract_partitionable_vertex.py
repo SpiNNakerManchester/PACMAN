@@ -1,9 +1,4 @@
-from abc import ABCMeta
-from abc import abstractmethod
-from six import add_metaclass
-import logging
-
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman import exceptions
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
@@ -14,6 +9,12 @@ from pacman.model.abstract_classes.abstract_constrained_vertex \
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.resources.resource_container import ResourceContainer
+
+
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
+import logging
 
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         """
         AbstractConstrainedVertex.__init__(self, label, constraints)
         if n_atoms < 1:
-            raise PacmanInvalidParameterException(
+            raise exceptions.PacmanInvalidParameterException(
                 "n_atoms", str(n_atoms),
                 "Must be at least one atom in the vertex")
 

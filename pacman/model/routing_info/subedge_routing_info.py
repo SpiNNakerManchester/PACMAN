@@ -1,4 +1,3 @@
-from pacman import exceptions
 import numpy
 
 

@@ -1,9 +1,11 @@
+from pacman.model.abstract_classes.abstract_constrained_edge import \
+    AbstractConstrainedEdge
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import PacmanInvalidParameterException
 
 
-class PartitionableEdge(object):
+class PartitionableEdge(AbstractConstrainedEdge):
     """ Represents a directional edge in a partitionable_graph between two
         vertices
     """
@@ -24,10 +26,9 @@ class PartitionableEdge(object):
         :type label: str
         :raise None: Raises no known exceptions
         """
-        self._label = label
+        AbstractConstrainedEdge.__init__(self, label, constraints)
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
-        self._constraints = constraints
 
     def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
                        label=None):
@@ -66,6 +67,10 @@ class PartitionableEdge(object):
         if label is None and self.label is not None:
             label = self.label
 
+        if constraints is None:
+            constraints = list()
+        constraints = constraints.extend(self._constraints)
+
         return PartitionedEdge(pre_subvertex, post_subvertex, constraints,
                                label)
 
@@ -98,25 +103,3 @@ class PartitionableEdge(object):
         :raise None: Raises no known exceptions
         """
         return self._label
-
-    @property
-    def constraints(self):
-        """ The constraints of the edge
-
-        :return: The constraints, or None if there are not constraints
-        :rtype: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        """
-        return self._constraints
-
-    def add_constraint(self, constraint):
-        """ Adds a constraint to the edge
-
-        :param constraint: The constraint to add
-        :type constraint:\
-            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        """
-        if self._constraints is None:
-            self._constraints = list([constraint])
-        else:
-            self._constraints.append(constraint)

@@ -14,7 +14,7 @@ class Placement(object):
         :param y: the y-coordinate of the chip on which the subvertex is placed
         :type y: int
         :param p: the id of the processor on which the subvertex is placed
-        :type p: int
+        :type p: int or None
         :raise None: does not raise any known exceptions
         """
         self._subvertex = subvertex

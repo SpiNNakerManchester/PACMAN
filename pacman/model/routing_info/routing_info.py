@@ -85,7 +85,7 @@ class RoutingInfo(object):
         if partitioned_vertex in self._key_masks_by_subvertex.keys():
             return self._key_masks_by_subvertex[partitioned_vertex]
         else:
-            return None
+            return list()
 
     def get_subedge_infos_by_key(self, key, mask):
         """ Get the routing information associated with a particular key, once\
