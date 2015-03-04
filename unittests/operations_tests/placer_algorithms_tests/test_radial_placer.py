@@ -7,8 +7,6 @@ from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints.placer_subvertex_same_chip_constraint import \
-    PlacerSubvertexSameChipConstraint
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.exceptions import PacmanPlaceException
@@ -227,48 +225,6 @@ class TestRadialPlacer(unittest.TestCase):
 
     def test_unsupported_placer_constraints(self):
         self.assertEqual(True, False, "Test not implemented yet")
-
-    def test_reduce_constraints(self):
-        extra_subvertex = PartitionedVertex(
-            3, 15, get_resources_used_by_atoms(3, 15, []))
-        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
-        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
-        constrained_subvertex = PartitionedVertex(
-            55, 89, get_resources_used_by_atoms(55, 89, []),
-            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
-        self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 1, 2, 3)
-        placement2 = Placement(extra_subvertex, 1, 3, 3)
-        placements = Placements([placement, placement2])
-        placer = RadialPlacer(self.machine, self.graph)
-        constraint = placer._reduce_constraints([chip_and_core,
-                                                 same_chip_as_vertex],
-                                                constrained_subvertex.label,
-                                                placements)
-
-        print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
-            'p:', constraint.p
-
-    def test_reduce_constraints_inverted_order(self):
-        extra_subvertex = PartitionedVertex(
-            3, 15, get_resources_used_by_atoms(3, 15, []))
-        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
-        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
-        constrained_subvertex = PartitionedVertex(
-            55, 89, get_resources_used_by_atoms(55, 89, []),
-            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
-        self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 1, 2, 3)
-        placement2 = Placement(extra_subvertex, 1, 3, 3)
-        placements = Placements([placement, placement2])
-        placer = RadialPlacer(self.machine, self.graph)
-        constraint = placer._reduce_constraints([same_chip_as_vertex,
-                                                 chip_and_core],
-                                                constrained_subvertex.label,
-                                                placements)
-
-        print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
-            'p:', constraint.p
 
     def test_many_subvertices(self):
         subvertices = list()

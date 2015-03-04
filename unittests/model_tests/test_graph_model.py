@@ -2,10 +2,14 @@ import unittest
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
-from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint import \
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_graph \
+    import PartitionableGraph
+from pacman.model.constraints.partitioner_constraints\
+    .partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
+from pacman.model.graph_mapper.slice import Slice
 
 
 class MyVertex(AbstractPartitionableVertex):
@@ -33,11 +37,10 @@ class TestGraphModel(unittest.TestCase):
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
 
     def test_create_new_vertex_without_label(self):
-        vert = MyVertex(10, None, 256)
+        vert = MyVertex(10, "Population", 256)
         self.assertEqual(vert.n_atoms, 10)
         pieces = vert.label.split(" ")
         self.assertIn(pieces[0], "Population n")
-
 
     def test_create_new_vertex_with_constraint_list(self):
         constraint = PartitionerMaximumSizeConstraint(2)
@@ -52,7 +55,8 @@ class TestGraphModel(unittest.TestCase):
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256, [constraint1])
+        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
+                        [constraint1])
         vert.add_constraint(constraint2)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(len(vert.constraints), 2 + 1)
@@ -66,7 +70,8 @@ class TestGraphModel(unittest.TestCase):
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256, [constraint1])
+        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
+                        [constraint1])
         vert.add_constraints(constr)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
@@ -76,27 +81,33 @@ class TestGraphModel(unittest.TestCase):
 
     def test_create_subvertex_from_vertex_with_previous_constraints(self):
         constraint1 = PartitionerMaximumSizeConstraint(2)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256, [constraint1])
+        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
+                        [constraint1])
         subv_from_vert = vert.create_subvertex(
+            Slice(0, 9),
             vert.get_resources_used_by_atoms(0, 9, None))
         self.assertIn(constraint1, subv_from_vert.constraints)
 
     def test_new_create_subvertex_from_vertex_no_constraints(self):
         vert = MyVertex(10, "New AbstractConstrainedVertex", 256)
-        subv_from_vert = vert.create_subvertex(
+        vert.create_subvertex(
+            Slice(0, 9),
             vert.get_resources_used_by_atoms(0, 9, None))
 
     def test_new_create_subvertex_from_vertex_check_resources(self):
         vert = MyVertex(10, "New AbstractConstrainedVertex", 256)
         resources = vert.get_resources_used_by_atoms(0, 9, None)
-        subv_from_vert = vert.create_subvertex(resources, "")
+        subv_from_vert = vert.create_subvertex(Slice(0, 9), resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
 
-    def test_create_new_subvertex_from_vertex_with_additional_constraints(self):
+    def test_create_new_subvertex_from_vertex_with_additional_constraints(
+            self):
         constraint1 = PartitionerMaximumSizeConstraint(2)
         constraint2 = PartitionerMaximumSizeConstraint(3)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256, [constraint1])
+        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
+                        [constraint1])
         subv_from_vert = vert.create_subvertex(
+            Slice(0, 9),
             vert.get_resources_used_by_atoms(0, 9, None), "",
             [constraint2])
         self.assertEqual(len(subv_from_vert.constraints), 2 + 1)
@@ -143,7 +154,8 @@ class TestGraphModel(unittest.TestCase):
             raise AssertionError("edge2 is in outgoing_edges_from vert1")
         iev = graph.incoming_edges_to_vertex(vert1)
         if edge1 in iev or edge3 in iev:
-            raise AssertionError("edge1 or edge3 is in incoming_edges_to vert1")
+            raise AssertionError(
+                "edge1 or edge3 is in incoming_edges_to vert1")
 
 
 if __name__ == '__main__':
