@@ -30,8 +30,7 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
     def is_placer_constraint(self):
         return True
 
-    @property
-    def rank(self):
+    def get_rank(self):
         if self.p is not None:
             return sys.maxint
         else:

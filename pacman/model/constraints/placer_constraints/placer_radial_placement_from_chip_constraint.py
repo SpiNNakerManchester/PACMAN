@@ -33,9 +33,8 @@ class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     def y(self):
         return self._y
 
-    @property
-    def rank(self):
-        return sys.maxint - 5
+    def get_rank(self):
+        return sys.maxint - 10
 
     def is_placer_constraint(self):
         return True

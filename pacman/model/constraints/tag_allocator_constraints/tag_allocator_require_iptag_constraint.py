@@ -53,5 +53,11 @@ class TagAllocatorRequireIptagConstraint(AbstractTagAllocatorConstraint):
     def is_tag_allocator_constraint(self):
         return True
 
-    def rank(self):
-        return sys.maxint - 4
+    def get_rank(self):
+        if self._tag is not None and self._board_address is not None:
+            return sys.maxint - 2
+        elif self._tag is not None:
+            return sys.maxint - 3
+        elif self._board_address is not None:
+            return sys.maxint - 5
+        return sys.maxint - 7

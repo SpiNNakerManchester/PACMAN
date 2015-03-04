@@ -83,7 +83,7 @@ def sort_objects_by_constraint_authority(objects):
     :rtype: list of objects
     :raise None: this method does not raise any known exceptions
     """
-    rank_to_object_mapping = dict()
+    objects_with_rank = list()
     for current_object in objects:
         if not hasattr(current_object, "constraints"):
             raise PacmanConfigurationException(
@@ -96,20 +96,13 @@ def sort_objects_by_constraint_authority(objects):
             # only store ranks for placer contraints and ones that are better
             # than already seen
             if (isinstance(constraint, AbstractPlacerConstraint) and
-                    constraint.rank >= max_rank_so_far):
-                max_rank_so_far = constraint.rank
-        if max_rank_so_far not in rank_to_object_mapping.keys():
-            rank_to_object_mapping[max_rank_so_far] = list()
-        rank_to_object_mapping[max_rank_so_far].append(current_object)
+                    constraint.get_rank() >= max_rank_so_far):
+                max_rank_so_far = constraint.get_rank()
+        objects_with_rank.append((current_object, max_rank_so_far))
 
-    # collected them all
-    ordered_keys = sorted(rank_to_object_mapping.keys(), reverse=True)
-    ordered_objects = list()
-    for ordered_key in ordered_keys:
-        object_list = rank_to_object_mapping[ordered_key]
-        for current_object in object_list:
-            ordered_objects.append(current_object)
-    return ordered_objects
+    ordered_objects = sorted(objects_with_rank, key=lambda item: item[1],
+                             reverse=True)
+    return [item[0] for item in ordered_objects]
 
 
 def _check_constrained_value(value, current_value):

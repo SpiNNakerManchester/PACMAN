@@ -28,7 +28,7 @@ class AbstractPlacerConstraint(AbstractConstraint):
         pass
 
     @abstractmethod
-    def rank(self):
+    def get_rank(self):
         """ Relative importance of this constraint to other placement\
             constraints
         :return: The rank of the constraint, between 0 (least important)\
