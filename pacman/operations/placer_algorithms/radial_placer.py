@@ -1,3 +1,5 @@
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
     tag_allocator_require_iptag_constraint \
     import TagAllocatorRequireIptagConstraint
@@ -39,6 +41,7 @@ class RadialPlacer(AbstractPlacerAlgorithm):
             TagAllocatorRequireIptagConstraint)
         self._supported_constraints.append(
             TagAllocatorRequireReverseIptagConstraint)
+        self._supported_constraints.append(PlacerChipAndCoreConstraint)
 
     def place(self, partitioned_graph, machine):
 

@@ -81,10 +81,15 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 # Add all vertices connected to this one to the set
                 for in_edge in (partitioned_graph
                                 .incoming_subedges_from_subvertex(vertex)):
-                    next_vertices.add(in_edge.pre_subvertex)
+                    if in_edge.pre_subvertex in unconstrained_vertices:
+                        next_vertices.add(in_edge.pre_subvertex)
                 for out_edge in (partitioned_graph
                                  .outgoing_subedges_from_subvertex(vertex)):
-                    next_vertices.add(out_edge.post_subvertex)
+                    if out_edge.post_subvertex in unconstrained_vertices:
+                        next_vertices.add(out_edge.post_subvertex)
+        # finished, so stop progress bar and return placements
+        progress_bar.end()
+        return placements
 
     def _find_max_connected_vertex(self, vertices, partitioned_graph):
         max_connected_vertex = None
