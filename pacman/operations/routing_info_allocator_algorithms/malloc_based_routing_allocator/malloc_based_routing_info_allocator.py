@@ -251,7 +251,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         n_keys = 2 ** len(first_zeros)
         unwrapped_key = numpy.unpackbits(
             numpy.asarray([key], dtype=">u4").view(dtype="uint8"))
-        for value in range(n_sets):
+        for value in xrange(n_sets):
             generated_key = numpy.copy(unwrapped_key)
             unwrapped_value = numpy.unpackbits(
                 numpy.asarray([value], dtype=">u4")
@@ -284,7 +284,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                      "which is key number", min_value)
 
         # Generate up to 2^len(ones) keys
-        for value in range(min_value, n_keys):
+        for value in xrange(min_value, n_keys):
             key = numpy.zeros(32, dtype="uint8")
             unwrapped_value = numpy.unpackbits(
                 numpy.asarray([value], dtype=">u4")
