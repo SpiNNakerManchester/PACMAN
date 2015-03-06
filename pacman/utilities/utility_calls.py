@@ -51,7 +51,7 @@ def check_algorithm_can_support_constraints(
                 :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
     :param abstract_constraint_type: The overall abstract constraint type\
                 supported
-    :type constraints:\
+    :type abstract_constraint_type:\
                 :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
     :return: Nothing is returned
     :rtype: None
@@ -100,7 +100,8 @@ def sort_objects_by_constraint_authority(objects):
                 max_rank_so_far = constraint.get_rank()
         objects_with_rank.append((current_object, max_rank_so_far))
 
-    ordered_objects = sorted(objects_with_rank, key=lambda item: item[1],
+    ordered_objects = sorted(objects_with_rank,
+                             key=lambda cur_item: cur_item[1],
                              reverse=True)
     return [item[0] for item in ordered_objects]
 
@@ -131,9 +132,9 @@ def get_chip_and_core(constraints, chips=None):
     :param chips: Optional list of tuples of (x, y) coordinates of chips,\
                 restricting the allowed chips
     :type chips: iterable of (int, int)
-    :return: tuple of iterable of chip coordinates, and processor id, both of\
+    :return: tuple of a chip x and y coordinates, and processor id, any of\
                 which might be None
-    :rtype: (iterable of (int, int), int)
+    :rtype: (tuple of (int, int, int)
     """
     x = None
     y = None
@@ -150,9 +151,7 @@ def get_chip_and_core(constraints, chips=None):
                 "x, y and chips",
                 "{}, {} and {}".format(x, y, chips),
                 "The constraint cannot be met with the given chips")
-    if x is not None and y is not None:
-        chips = [(x, y)]
-    return (chips, p)
+    return x, y, p
 
 
 def get_ip_tag_info(constraints):

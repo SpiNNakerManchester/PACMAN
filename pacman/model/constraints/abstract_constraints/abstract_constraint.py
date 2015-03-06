@@ -36,6 +36,8 @@ class AbstractConstraint(object):
     @classmethod
     def __subclasshook__(cls, othercls):
         """ Checks if all the abstract methods are present on the subclass
+
+            is only here for duck typing
         """
         if not isabstract(cls) and not isabstract(othercls):
             return NotImplemented

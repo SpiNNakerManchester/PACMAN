@@ -31,7 +31,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         AbstractPartitionAlgorithm.__init__(self)
         self._supported_constraints.append(PartitionerMaximumSizeConstraint)
 
-    def _get_ratio(self, top, bottom):
+    @staticmethod
+    def _get_ratio(top, bottom):
         if bottom == 0:
             return 1.0
         return top / bottom

@@ -1,15 +1,20 @@
 import os
 import time
 import logging
-from pacman.utilities.resource_tracker import ResourceTracker
+
 from pacman.model.placements import placement
-from spinn_machine.sdram import SDRAM
 from pacman import exceptions
+
+
+from spinn_machine.sdram import SDRAM
+
 
 logger = logging.getLogger(__name__)
 
+
 def tag_allocator_report(report_folder, tag_infos):
     pass
+
 
 def placer_reports(report_folder, hostname, graph, graph_mapper,
                    placements, machine):
@@ -125,8 +130,8 @@ def placement_report_by_vertex(report_folder, hostname, graph,
             lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
             hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
-            placement = placements.get_placement_of_subvertex(sv)
-            x, y, p = placement.x, placement.y, placement.p
+            cur_placement = placements.get_placement_of_subvertex(sv)
+            x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
             key = "{},{}".format(x, y)
             if key in used_processors_by_chip.keys():
                 used_procs = used_processors_by_chip[key]
@@ -134,7 +139,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
                 used_procs = list()
                 used_sdram_by_chip.update({key: 0})
             subvertex_by_processor["{},{},{}".format(x, y, p)] = sv
-            new_proc = [p, placement]
+            new_proc = [p, cur_placement]
             used_procs.append(new_proc)
             used_processors_by_chip.update({key: used_procs})
             my_string = "  Slice {}:{} ({} atoms) on core ({}, {}, {}) \n"\
@@ -170,7 +175,7 @@ def placement_by_core(report_folder, hostname, placements, machine,
         written_header = False
         for processor in chip.processors:
             if placements.is_subvertex_on_processor(chip.x, chip.y,
-                                                   processor.processor_id):
+                                                    processor.processor_id):
                 if not written_header:
                     f_place_by_core.write("**** Chip: ({}, {})\n"
                                           .format(chip.x, chip.y))
@@ -221,15 +226,15 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     f_mem_used_by_core.write("\n\n")
     used_sdram_by_chip = dict()
 
-    for placement in placements.placements:
-        subvert = placement.subvertex
+    for cur_placement in placements.placements:
+        subvert = cur_placement.subvertex
         vertex = graph_mapper.get_vertex_from_subvertex(subvert)
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvert)
         requirements = \
             vertex.get_resources_used_by_atoms(vertex_slice, graph)
 
-        x, y, p = placement.x, placement.y, placement.p
+        x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
         f_mem_used_by_core.write(
             "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
                 x, y, p, int(requirements.sdram.get_value() / 1024.0)))
@@ -254,6 +259,7 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     # Close file:
     f_mem_used_by_core.close()
 
+
 def routing_info_report(report_folder, hostname, subgraph, placements,
                         routing_infos):
     file_name = os.path.join(report_folder,
@@ -269,9 +275,6 @@ def routing_info_report(report_folder, hostname, subgraph, placements,
         for outgoing_subedge in outgoing_subedges:
             subedge_routing_info = routing_infos.\
                 get_subedge_information_from_subedge(outgoing_subedge)
-
-
-
 
 
 def router_report_from_router_tables(report_folder, routing_tables):

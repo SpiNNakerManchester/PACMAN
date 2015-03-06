@@ -193,7 +193,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             n_atoms_placed = hi_atom + 1
 
             # Create the subvertices
-            for (vertex, _, _, _, used_resources, _, _) in used_placements:
+            for (vertex, used_resources) in used_placements:
                 vertex_slice = Slice(lo_atom, hi_atom)
                 subvertex = vertex.create_subvertex(
                     vertex_slice, used_resources,
@@ -205,8 +205,27 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                 graph_to_subgraph_mapper.add_subvertex(
                     subvertex, lo_atom, hi_atom, vertex)
 
-    def _reallocate_resources(self, used_placements, resource_tracker,
+    @staticmethod
+    def _reallocate_resources(used_placements, resource_tracker,
                               lo_atom, hi_atom, graph):
+        """ readjusts resoruce allocation and updates the placement list to take
+            into account the new layout of the atoms
+
+        :param used_placements: the original list of tuples containing placement
+                                data
+        :type used_placements: iterable of tuples
+        :param resource_tracker: the tracker of resoruces
+        :type resource_tracker: pacman.utilities.resource_tracker.ResourceTracker
+        :param lo_atom: the lo atom of a slice to be considered
+        :type lo_atom: int
+        :param hi_atom: the hi atom of a slice to be considered
+        :type hi_atom: int
+        :param graph: the partitionable graph used by the parititoner
+        :type graph: pacman.model.partitionable_graph.partitionable_graph.PartitionableGraph
+        :return: the new list of tuples containing placement data
+        :rtype: iterable of tuples
+        """
+
         new_used_placements = list()
         for (placed_vertex, x, y, p, placed_resources,
                 ip_tags, reverse_ip_tags) in used_placements:
@@ -314,7 +333,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             if hi_atom < min_hi_atom:
                 min_hi_atom = hi_atom
                 used_placements = self._reallocate_resources(
-                    used_resources, resource_tracker, lo_atom, hi_atom, graph)
+                    used_placements, resource_tracker, lo_atom, hi_atom, graph)
 
             # Attempt to allocate the resources for this vertex on the machine
             (x, y, p, ip_tags, reverse_ip_tags) = \
@@ -324,7 +343,12 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                 (vertex, x, y, p, used_resources,
                  ip_tags, reverse_ip_tags))
 
-        return used_placements, min_hi_atom
+        # reduce data to what the parent requires
+        final_placements = list()
+        for (vertex, _, _, _, used_resources, _, _) in used_placements:
+            final_placements.append((vertex, used_resources))
+
+        return final_placements, min_hi_atom
 
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,

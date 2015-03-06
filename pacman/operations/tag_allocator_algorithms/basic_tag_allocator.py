@@ -28,6 +28,8 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
             TagAllocatorRequireReverseIptagConstraint)
 
     def allocate_tags(self, machine, placements):
+        """ see AbstractTagAllocatorAlgorithm.allocate_tags
+        """
 
         resource_tracker = ResourceTracker(machine)
 
