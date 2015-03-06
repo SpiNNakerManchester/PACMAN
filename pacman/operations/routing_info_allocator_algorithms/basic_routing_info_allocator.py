@@ -1,8 +1,9 @@
-from pacman.model.constraints.abstract_router_constraint import \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_router_constraint import \
     AbstractRouterConstraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.routing_info_allocator_algorithms.\
+from pacman.operations.abstract_algorithms.\
     abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
 from pacman.utilities import utility_calls
@@ -85,8 +86,6 @@ pacman.operations.routing_info_allocator_algorithms.BasicRoutingInfoAllocator
         #check for storage of masks
         self.check_masks(constants.DEFAULT_MASK, key, placement.subvertex)
         return subedge_routing_info
-
-
 
     @staticmethod
     def _get_key_from_placement(placement):

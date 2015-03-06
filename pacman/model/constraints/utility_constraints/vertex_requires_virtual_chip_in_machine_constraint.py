@@ -1,4 +1,5 @@
-from pacman.model.constraints.abstract_utility_constraint import \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_utility_constraint import \
     AbstractUtilityConstraint
 
 
@@ -56,7 +57,6 @@ class VertexRequiresVirtualChipInMachineConstraint(AbstractUtilityConstraint):
         :raise None: does not raise any known exceptions
         """
         return self._connected_to_chip_coords
-
 
     @property
     def connected_to_chip_link_id(self):

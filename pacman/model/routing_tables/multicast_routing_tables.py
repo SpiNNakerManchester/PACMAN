@@ -53,18 +53,27 @@ class MulticastRoutingTables(object):
         :raise None: does not raise any known exceptions
         """
         return self._routing_tables
-    
+
     def get_routing_table_for_chip(self, x, y):
         """ Get a routing table for a paricular chip
-        
+
         :param x: The x-coordinate of the chip
         :type x: int
         :param y: The y-coordinate of the chip
         :type y: int
         :return: The routing table, or None if no such table exists
-        :rtype:  :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable` or None
+        :rtype:\
+                    :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`\
+                    or None
         :raise None: No known exceptions are raised
         """
         if (x, y) in self._routing_tables_by_chip.keys():
             return self._routing_tables_by_chip[(x, y)]
         return None
+
+    def __iter__(self):
+        """ returns a iterator for the multicast routing tables stored within
+
+        :return: iterator of multicast_routing_table
+        """
+        return iter(self._routing_tables)

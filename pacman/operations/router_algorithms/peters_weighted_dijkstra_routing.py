@@ -1,4 +1,4 @@
-from pacman.operations.router_algorithms.abstract_router_algorithm import \
+from pacman.operations.abstract_algorithms.abstract_router_algorithm import \
     AbstractRouterAlgorithm
 
 

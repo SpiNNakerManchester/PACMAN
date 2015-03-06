@@ -7,11 +7,11 @@ from six import add_metaclass
 class AbstractResource(object):
     """ Represents some finite resource
     """
-    
+
     @abstractmethod
     def get_value(self):
         """ Get the amount of the resource used or available
-        
+
         :return: The amount of the resource
         :rtype: int
         """

@@ -1,21 +1,21 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+import sys
+import logging
+
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.partitionable_graph.abstract_constrained_vertex \
-    import AbstractConstrainedVertex
-from pacman.model.constraints.partitioner_maximum_size_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.abstract_constrained_vertex import AbstractConstrainedVertex
 
-import sys
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -150,8 +150,8 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         return current_found_max_atoms_per_core
 
     def create_subvertex(self, vertex_slice, resources_required, label=None,
-                         additional_constraints=list()):
-        """ Create a subvertex of this vertex.  Can be overridden in vertex\
+                         additional_constraints=None):
+        """ Creates a subvertex of this vertex.  Can be overridden in vertex\
             subclasses to create an subvertex instance that contains detailed\
             information
 
@@ -171,6 +171,15 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
+
+        # if no additional constraints create a empty list
+        if additional_constraints is None:
+            additional_constraints = list()
+
+        # Combine the AbstractConstrainedVertex and PartitionedVertex
+        # constraints
+        additional_constraints.extend(self.constraints)
+
         return PartitionedVertex(label=label,
                                  resources_required=resources_required,
                                  constraints=additional_constraints)
