@@ -75,12 +75,11 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
 
                 else:
 
-                    # NOTE: this state should never occur, but if we do then.
-                    # we must merge the groups already found
+                    # We must merge the groups already found
                     new_group = set()
                     for group in found_groups:
                         new_group.update(group)
-                    for edge in found_edges:
+                    for edge in new_group:
                         same_key_groups[edge] = new_group
 
             elif partitioned_edge not in same_key_groups:
@@ -125,6 +124,7 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         :raise PacmanValueError: If two edges conflict in their requirements
         """
         mask = None
+        fields = None
         edge_with_mask = None
         for edge in same_key_group:
             fixed_mask_constraints = utility_calls.locate_constraints_of_type(
@@ -136,11 +136,17 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                         " key and mask, but have different fixed masks,"
                         " {} and {}".format(edge, edge_with_mask, mask,
                                             fixed_mask_constraint.mask))
-
+                if (fields is not None and
+                        fields != fixed_mask_constraint.fields):
+                    raise PacmanValueError(
+                        "Two Partitioned Edges {} and {} must have the same"
+                        " key and mask, but have different field ranges"
+                        .format(edge, edge_with_mask))
                 mask = fixed_mask_constraint.mask
                 edge_with_mask = edge
+                fields = fixed_mask_constraint.fields
 
-        return mask
+        return mask, fields
 
     @staticmethod
     def _get_fixed_key_and_mask(same_key_group):
@@ -162,15 +168,14 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
             for constraint in constraints:
 
                 # Check for conflicts
-                if (keys_and_masks is not None
-                        and keys_and_masks != constraint.keys_and_masks):
+                if (keys_and_masks is not None and
+                        keys_and_masks != constraint.keys_and_masks):
                     raise PacmanValueError(
                         "Two Partitioned Edges {} and {} must have the same"
                         " key and mask, but have different fixed key and"
                         " masks, {} and {}".format(
                             edge, edge_with_key_and_mask, keys_and_masks,
                             constraint.keys_and_masks))
-                print constraint
                 keys_and_masks = constraint.keys_and_masks
                 edge_with_key_and_mask = edge
 

@@ -71,16 +71,17 @@ class RoutingInfo(object):
         """
         return self._subedge_info_by_subedge.itervalues()
 
-    def get_key_masks_for_partitioned_vertex(self, partitioned_vertex):
-        """ Get the key_masks objects which this partitioned vertex uses when
-         transmitting packets
+    def get_key_and_masks_for_partitioned_vertex(self, partitioned_vertex):
+        """ Get the keys and masks which this partitioned vertex uses when
+            transmitting packets
 
-        :param partitioned_vertex: the partitioned vertex to locate its
-         key_masks for
-         :type partitioned_vertex:
-         pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex
-        :return: a iterable of keys and masks for the partitioned vertex
-        :rtype: iterable of pacman.model.routing_info.key_and_mask.KeyAndMask
+        :param partitioned_vertex: the partitioned vertex to locate its\
+                    key_masks for
+        :type partitioned_vertex:\
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+        :return: an iterable of keys and masks for the partitioned vertex
+        :rtype: iterable of \
+                    :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
         """
         if partitioned_vertex in self._key_masks_by_subvertex.keys():
             return self._key_masks_by_subvertex[partitioned_vertex]
@@ -111,7 +112,7 @@ class RoutingInfo(object):
 
         :param subedge: The subedge
         :type subedge:
-            :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :return: The routing key or None if the subedge does not exist
         :rtype: int
         :raise None: does not raise any known exceptions
@@ -125,10 +126,10 @@ class RoutingInfo(object):
 
         :param subedge: The subedge
         :type subedge:
-            :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :return: The subedge information or None if the subedge does not exist
         :rtype:
-            :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
+                    :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`
         :raise None: does not raise any known exceptions
         """
         if subedge in self._subedge_info_by_subedge:

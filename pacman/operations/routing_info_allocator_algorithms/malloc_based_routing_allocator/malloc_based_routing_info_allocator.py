@@ -1,11 +1,12 @@
 from pacman.model.constraints.abstract_key_allocator_constraint import \
     AbstractKeyAllocatorConstraint
-from pacman.model.constraints.key_allocator_field_limitation_constraint import \
-    KeyAllocatorFieldLimitationConstraint
 from pacman.model.constraints.key_allocator_same_keys_constraint import \
     KeyAllocatorSameKeysConstraint
 from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
     KeyAllocatorFixedMaskConstraint
+from pacman.operations.routing_info_allocator_algorithms\
+    .malloc_based_routing_allocator.key_field_generator \
+    import KeyFieldGenerator
 from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_contiguous_range_constraint \
@@ -37,8 +38,6 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
         self._supported_constraints.append(KeyAllocatorSameKeysConstraint)
         self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
-        self._supported_constraints.append(
-            KeyAllocatorFieldLimitationConstraint)
         self._supported_constraints.append(
             KeyAllocatorFixedKeyAndMaskConstraint)
         self._supported_constraints.append(
@@ -75,16 +74,16 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
             keys_and_masks = self._get_fixed_key_and_mask(group)
-            fixed_mask = self._get_fixed_mask(group)
+            fixed_mask, fields = self._get_fixed_mask(group)
 
-            print "keys and kasks are :{}".format(keys_and_masks)
             if keys_and_masks is not None:
 
                 self._allocate_fixed_keys_and_masks(keys_and_masks, fixed_mask)
             else:
 
                 keys_and_masks = self._allocate_keys_and_masks(
-                    fixed_mask, edge_n_keys, self._is_contiguous_range(group))
+                    fixed_mask, fields, edge_n_keys,
+                    self._is_contiguous_range(group))
 
             # Allocate the routing information
             for edge in group:
@@ -108,11 +107,9 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 lo = mid
 
         # If we have gone off the end of the array, we haven't found a slot
-        if (lo >= len(self._free_space_tracker) or hi < 0
-                or self._free_space_tracker[lo].start_address > base_key):
+        if (lo >= len(self._free_space_tracker) or hi < 0 or
+                self._free_space_tracker[lo].start_address > base_key):
             return None
-        print "space index looking at is {}".format(lo)
-        print " for base_key :{}".format(base_key)
         return lo
 
     def _allocate_keys(self, base_key, n_keys):
@@ -132,7 +129,6 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
         # base_key should be >= slot key at this point
         self._do_allocation(index, base_key, n_keys)
-        print self._free_space_tracker
 
     def _check_allocation(self, index, base_key, n_keys):
         """ Check if there is enough space for a given set of keys
@@ -144,8 +140,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                        should be power of 2
         """
         free_space_slot = self._free_space_tracker[index]
-        space = (free_space_slot.size
-                 - (base_key - free_space_slot.start_address))
+        space = (free_space_slot.size -
+                 (base_key - free_space_slot.start_address))
 
         if free_space_slot.start_address > base_key:
             raise PacmanRouteInfoAllocationException(
@@ -186,8 +182,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 "Not enough space to allocate {} keys starting at {}".format(
                     n_keys, hex(base_key)))
 
-        if (free_space_slot.start_address == base_key
-                and free_space_slot.size == n_keys):
+        if (free_space_slot.start_address == base_key and
+                free_space_slot.size == n_keys):
 
             # If the slot exactly matches the space, remove it
             del self._free_space_tracker[index]
@@ -217,8 +213,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             # Then add a new space after the allocation
             self._free_space_tracker.insert(index + 1, FreeSpace(
                 base_key + n_keys,
-                free_space_slot.start_address + free_space_slot.size
-                - (base_key + n_keys)))
+                free_space_slot.start_address + free_space_slot.size -
+                (base_key + n_keys)))
 
     @staticmethod
     def _get_key_ranges(key, mask):
@@ -228,8 +224,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         :param key: The base key
         :param mask: The mask
         """
-        unwrapped_mask = numpy.unpackbits(
-            numpy.asarray([mask], dtype=">u4").view(dtype="uint8"))
+        unwrapped_mask = utility_calls.expand_to_bit_array(mask)
         first_zeros = list()
         remaining_zeros = list()
         pos = len(unwrapped_mask) - 1
@@ -249,48 +244,13 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         # with n_keys being 2^len(first_zeros)
         n_sets = 2 ** len(remaining_zeros)
         n_keys = 2 ** len(first_zeros)
-        unwrapped_key = numpy.unpackbits(
-            numpy.asarray([key], dtype=">u4").view(dtype="uint8"))
+        unwrapped_key = utility_calls.expand_to_bit_array(key)
         for value in xrange(n_sets):
             generated_key = numpy.copy(unwrapped_key)
-            unwrapped_value = numpy.unpackbits(
-                numpy.asarray([value], dtype=">u4")
-                     .view(dtype="uint8"))[-len(remaining_zeros):]
+            unwrapped_value = utility_calls.expand_to_bit_array(value)[
+                -len(remaining_zeros):]
             generated_key[remaining_zeros] = unwrapped_value
-            yield numpy.packbits(generated_key).view(dtype=">u4")[0], n_keys
-
-    def _get_possible_keys(self, mask):
-        """ Get a generator of all possible keys such that key & mask == key
-
-        :param mask: The mask to find the valid keys from
-        """
-        # Get the position of the ones in the mask - assume 32-bits
-        unwrapped_mask = numpy.unpackbits(
-            numpy.asarray([mask], dtype=">u4").view(dtype="uint8"))
-        ones = numpy.where(unwrapped_mask == 1)[0]
-        n_zeros = 32 - len(ones)
-
-        # We now know how many possible keys there are - 2^n_ONES
-        n_keys = 2 ** len(ones)
-        logger.debug("Mask", hex(mask), "is valid for", n_keys, "keys")
-
-        # Get the first valid key >= first space start address
-        min_key = self._free_space_tracker[0].start_address
-        if min_key & mask != min_key:
-            min_key = ((self._free_space_tracker[0].start_address + n_keys)
-                       & mask)
-        min_value = min_key / (2 ** n_zeros)
-        logger.debug("first valid key for mask", hex(mask), "is", hex(min_key),
-                     "which is key number", min_value)
-
-        # Generate up to 2^len(ones) keys
-        for value in xrange(min_value, n_keys):
-            key = numpy.zeros(32, dtype="uint8")
-            unwrapped_value = numpy.unpackbits(
-                numpy.asarray([value], dtype=">u4")
-                     .view(dtype="uint8"))[-len(ones):]
-            key[ones] = unwrapped_value
-            yield numpy.packbits(key).view(dtype=">u4")[0]
+            yield utility_calls.compress_from_bit_array(generated_key), n_keys
 
     @staticmethod
     def _get_possible_masks(n_keys, is_contiguous):
@@ -320,10 +280,10 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             # Go through the mask sets and allocate
             for key, n_keys in self._get_key_ranges(
                     key_and_mask.key, key_and_mask.mask):
-                print "dealing with key {} for n_keys {}".format(key, n_keys)
                 self._allocate_keys(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, edge_n_keys, is_contiguous):
+    def _allocate_keys_and_masks(self, fixed_mask, fields, edge_n_keys,
+                                 is_contiguous):
 
         # If there isn't a fixed mask, generate a fixed mask based
         # on the number of keys required
@@ -339,35 +299,44 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         mask = None
         for mask in masks_available:
 
+            logger.debug("Trying mask {} for {} keys".format(hex(mask),
+                                                             edge_n_keys))
+
             key_found = None
-            for key in self._get_possible_keys(mask):
+            key_generator = KeyFieldGenerator(mask, fields,
+                                              self._free_space_tracker)
+            for key in key_generator:
+
+                logger.debug("Trying key {}".format(hex(key)))
 
                 # Check if all the key ranges can be allocated
                 matched_all = True
                 index = 0
-                for (base_key, n_keys) in self._get_key_ranges(
-                        key, mask):
-                    logger.debug("Finding slot for", hex(base_key))
+                for (base_key, n_keys) in self._get_key_ranges(key, mask):
+                    logger.debug("Finding slot for {}, n_keys={}".format(
+                        hex(base_key), n_keys))
                     index = self._find_slot(base_key, lo=index)
-                    logger.debug("Slot for", hex(base_key), "is", index)
+                    logger.debug("Slot for {} is {}".format(
+                        hex(base_key), index))
                     if index is None:
                         matched_all = False
                         break
                     space = self._check_allocation(index, base_key,
                                                    n_keys)
-                    logger.debug("Space for", hex(base_key), "is", space)
+                    logger.debug("Space for {} is {}".format(
+                        hex(base_key), space))
                     if space is None:
                         matched_all = False
                         break
 
                 if matched_all:
-                    logger.debug("Matched key", hex(key))
+                    logger.debug("Matched key {}".format(hex(key)))
                     key_found = key
                     break
 
             # If we found a matching key, store the mask that worked
             if key_found is not None:
-                logger.debug("Matched mask", hex(mask))
+                logger.debug("Matched mask {}".format(hex(mask)))
                 mask_found = mask
                 break
 

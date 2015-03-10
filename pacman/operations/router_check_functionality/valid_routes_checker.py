@@ -49,7 +49,7 @@ class ValidRouteChecker(object):
             # communicate with for a given key_and_mask and search its
             # determined destinations
             key_and_masks = \
-                self._routing_infos.get_key_masks_for_partitioned_vertex(
+                self._routing_infos.get_key_and_masks_for_partitioned_vertex(
                     placement.subvertex)
 
             # locate each set for a given key_and_mask

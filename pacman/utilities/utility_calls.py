@@ -2,6 +2,7 @@ from pacman.model.constraints.abstract_placer_constraint import \
     AbstractPlacerConstraint
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanConfigurationException
+import numpy
 
 
 def locate_constraints_of_type(constraints, constraint_type):
@@ -102,3 +103,42 @@ def sort_objects_by_constraint_authority(objects):
         for current_object in object_list:
             ordered_objects.append(current_object)
     return ordered_objects
+
+
+def expand_to_bit_array(value):
+    """ Expand a 32-bit value in to an array of length 32 of uint8 values,\
+        each of which is a 1 or 0
+
+    :param value: The value to expand
+    :type value: int
+    :rtype: [uint8]
+    """
+    return numpy.unpackbits(
+        numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
+
+
+def compress_from_bit_array(bit_array):
+    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0,\
+        into a 32-bit value
+
+    :param bit_array: The array to compress
+    :type bit_array: [uint8]
+    :rtype: int
+    """
+    return numpy.packbits(bit_array).view(dtype=">u4")[0]
+
+
+def compress_bits_from_bit_array(bit_array, bit_positions):
+    """ Compress specific positions from a bit array of 32 uint8 value,\
+        where is a 1 or 0, into a 32-bit value.
+
+    :param bit_array: The array to extract the value from
+    :type bit_array: [uint8]
+    :param bit_positions: The positions of the bits to extract, each value\
+                being between 0 and 31
+    :type bit_positions: [int]
+    :rtype: int
+    """
+    expanded_value = numpy.zeros(32, dtype="uint8")
+    expanded_value[-len(bit_positions):] = bit_array[bit_positions]
+    return compress_from_bit_array(expanded_value)
