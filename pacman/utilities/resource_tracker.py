@@ -91,15 +91,18 @@ class ResourceTracker(object):
             key = (chip_x, chip_y)
 
             # add area codes for ethernets
-            ethernet_connected_chip = machine.get_chip_at(
-                chip.nearest_ethernet_x, chip.nearest_ethernet_y)
-            ethernet_area_code = ethernet_connected_chip.ip_address
-            if ethernet_area_code not in self._ethernet_area_codes:
-                self._ethernet_area_codes[ethernet_area_code] = OrderedSet()
-                self._boards_with_ip_tags.add(ethernet_area_code)
-                self._ethernet_chips[ethernet_area_code] = (
+            if (chip.nearest_ethernet_x is not None and
+                    chip.nearest_ethernet_y is not None):
+                ethernet_connected_chip = machine.get_chip_at(
                     chip.nearest_ethernet_x, chip.nearest_ethernet_y)
-            self._ethernet_area_codes[ethernet_area_code].add(key)
+                ethernet_area_code = ethernet_connected_chip.ip_address
+                if ethernet_area_code not in self._ethernet_area_codes:
+                    self._ethernet_area_codes[
+                        ethernet_area_code] = OrderedSet()
+                    self._boards_with_ip_tags.add(ethernet_area_code)
+                    self._ethernet_chips[ethernet_area_code] = (
+                        chip.nearest_ethernet_x, chip.nearest_ethernet_y)
+                self._ethernet_area_codes[ethernet_area_code].add(key)
 
     def _get_usable_ip_tag_chips(self):
         """ Get the coordinates of any chips that have available ip tags
