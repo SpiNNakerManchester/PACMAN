@@ -1,4 +1,4 @@
-from pacman.model.constraints.abstract_key_allocator_constraint \
+from pacman.model.constraints.abstract_constraints.abstract_key_allocator_constraint \
     import AbstractKeyAllocatorConstraint
 
 

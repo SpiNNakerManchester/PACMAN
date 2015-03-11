@@ -7,8 +7,8 @@ from pacman.utilities import utility_calls
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.routing_info.key_and_mask import KeyAndMask
-from pacman.model.constraints.abstract_key_allocator_constraint \
-    import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.abstract_constraints\
+    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800

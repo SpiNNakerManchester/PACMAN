@@ -1,20 +1,22 @@
-from pacman.model.constraints.abstract_key_allocator_constraint import \
-    AbstractKeyAllocatorConstraint
-from pacman.model.constraints.key_allocator_same_keys_constraint import \
-    KeyAllocatorSameKeysConstraint
-from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
-    KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.abstract_constraints\
+    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_same_keys_constraint import KeyAllocatorSameKeysConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
-from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_contiguous_range_constraint \
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.key_and_mask import KeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.routing_info_allocator_algorithms.\
+from pacman.operations.abstract_algorithms.\
     abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
 from pacman.operations.routing_info_allocator_algorithms.\

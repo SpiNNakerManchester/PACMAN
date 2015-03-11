@@ -40,9 +40,9 @@ class Tags(object):
 
         if (ip_tag.board_address, ip_tag.tag) in self._ip_tags:
             existing_tag = self._ip_tags[(ip_tag.board_address, ip_tag.tag)]
-            if (existing_tag.ip_address != ip_tag.ip_address
-                    or existing_tag.port != ip_tag.port
-                    or existing_tag.strip_sdp != ip_tag.strip_sdp):
+            if (existing_tag.ip_address != ip_tag.ip_address or
+                    existing_tag.port != ip_tag.port or
+                    existing_tag.strip_sdp != ip_tag.strip_sdp):
                 raise PacmanInvalidParameterException(
                     "ip_tag", str(ip_tag),
                     "The tag specified has already been assigned with"
@@ -76,9 +76,10 @@ class Tags(object):
                       the given board-address
         """
 
-        if ((reverse_ip_tag.board_address, reverse_ip_tag.tag) in self._ip_tags
-                or (reverse_ip_tag.board_address, reverse_ip_tag.tag)
-                in self._reverse_ip_tags):
+        if ((reverse_ip_tag.board_address, reverse_ip_tag.tag) in
+                self._ip_tags or
+                (reverse_ip_tag.board_address, reverse_ip_tag.tag) in
+                self._reverse_ip_tags):
             raise PacmanInvalidParameterException(
                 "reverse_ip_tag", reverse_ip_tag,
                 "The tag has already been assigned on the given board")

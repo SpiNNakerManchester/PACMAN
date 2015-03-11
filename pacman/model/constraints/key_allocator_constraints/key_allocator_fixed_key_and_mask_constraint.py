@@ -1,4 +1,4 @@
-from pacman.model.constraints.abstract_key_allocator_constraint \
+from pacman.model.constraints.abstract_constraints.abstract_key_allocator_constraint \
     import AbstractKeyAllocatorConstraint
 from pacman.model.routing_info.key_and_mask import KeyAndMask
 from pacman import exceptions
