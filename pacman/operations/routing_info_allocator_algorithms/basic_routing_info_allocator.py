@@ -1,6 +1,6 @@
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.routing_info_allocator_algorithms.\
+from pacman.operations.abstract_algorithms.\
     abstract_routing_info_allocator_algorithm import \
     AbstractRoutingInfoAllocatorAlgorithm
 from pacman.utilities import utility_calls
@@ -65,11 +65,12 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
     @staticmethod
     def _get_key_from_placement(placement):
-        """returns a key given a placement
+        """ Return a key given a placement
+
         :param placement: the associated placement
-        :type placement: pacman.model.placements.placement.Placement
-        :return a int reperenstation of the key
+        :type placement:\
+                    :py:class:`pacman.model.placements.placement.Placement`
+        :return: The key
         :rtype: int
-        :raise None: does not raise any known expcetions
         """
         return placement.x << 24 | placement.y << 16 | placement.p << 11

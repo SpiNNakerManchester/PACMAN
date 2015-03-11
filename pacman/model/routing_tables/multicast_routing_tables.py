@@ -70,3 +70,10 @@ class MulticastRoutingTables(object):
         if (x, y) in self._routing_tables_by_chip.keys():
             return self._routing_tables_by_chip[(x, y)]
         return None
+
+    def __iter__(self):
+        """ returns a iterator for the multicast routing tables stored within
+
+        :return: iterator of multicast_routing_table
+        """
+        return iter(self._routing_tables)

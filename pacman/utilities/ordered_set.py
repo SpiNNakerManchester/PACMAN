@@ -1,51 +1,93 @@
 import collections
 
 
+class _Node(object):
+
+    def __init__(self, key, prev_node, next_node):
+        self._key = key
+        self._prev_node = prev_node
+        self._next_node = next_node
+
+    @property
+    def key(self):
+        return self._key
+
+    @property
+    def prev_node(self):
+        return self._prev_node
+
+    @prev_node.setter
+    def prev_node(self, prev_node):
+        self._prev_node = prev_node
+
+    @property
+    def next_node(self):
+        return self._next_node
+
+    @next_node.setter
+    def next_node(self, next_node):
+        self._next_node = next_node
+
+
 class OrderedSet(collections.MutableSet):
 
     def __init__(self, iterable=None):
-        self.end = end = []
-        end += [None, end, end]         # sentinel node for doubly linked list
-        self.map = {}                   # key --> [key, prev, next]
+
+        # sentinel node for doubly linked list
+        # prev_node of end points to end of list (for reverse iteration)
+        # next_node of end points to start of list (for forward iteration)
+        self._end = _Node(None, None, None)
+        self._end.prev_node = self._end
+        self._end.next_node = self._end
+
+        # key --> _Node
+        self._map = dict()
+
+        # ior is overridden in mutable set; calls add on each element
         if iterable is not None:
             self |= iterable
 
     def __len__(self):
-        return len(self.map)
+        return len(self._map)
 
     def __contains__(self, key):
-        return key in self.map
+        return key in self._map
 
     def add(self, key):
-        if key not in self.map:
-            end = self.end
-            curr = end[1]
-            curr[2] = end[1] = self.map[key] = [key, curr, end]
+        if key not in self._map:
+            end_prev = self._end.prev_node
+            new_node = _Node(key, end_prev, self._end)
+            self._map[key] = new_node
+            end_prev.next_node = new_node
+            self._end.prev_node = new_node
 
     def discard(self, key):
-        if key in self.map:
-            key, prev, _ = self.map.pop(key)
-            prev[2] = next
-            next[1] = prev
+        if key in self._map:
+            node = self._map.pop(key)
+            prev_node = node.prev_node
+            next_node = node.next_node
+            node.prev_node.next_node = next_node
+            node.next_node.prev_node = prev_node
 
     def __iter__(self):
-        end = self.end
-        curr = end[2]
-        while curr is not end:
-            yield curr[0]
-            curr = curr[2]
+        curr = self._end.next_node
+        while curr is not self._end:
+            yield curr.key
+            curr = curr.next_node
 
     def __reversed__(self):
-        end = self.end
-        curr = end[1]
-        while curr is not end:
-            yield curr[0]
-            curr = curr[1]
+        curr = self._end.prev_node
+        while curr is not self._end:
+            yield curr.key
+            curr = curr.prev_node
 
     def pop(self, last=True):
-        if not self:
+        if len(self._map) == 0:
             raise KeyError('set is empty')
-        key = self.end[1][0] if last else self.end[2][0]
+        if last:
+            key = self._end.prev_node.key
+        else:
+            key = self._end.next_node.key
         self.discard(key)
         return key
 

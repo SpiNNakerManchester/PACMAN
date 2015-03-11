@@ -5,10 +5,9 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.constraints.placer_chip_and_core_constraint import \
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_subvertex_same_chip_constraint import \
-    PlacerSubvertexSameChipConstraint
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.exceptions import PacmanPlaceException
@@ -26,6 +25,7 @@ from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.router import Router
 from spinn_machine.sdram import SDRAM
+
 
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
@@ -227,86 +227,6 @@ class TestBasicPlacer(unittest.TestCase):
 
     def test_unsupported_placer_constraints(self):
         self.assertEqual(True, False, "Test not implemented yet")
-
-    def test_reduce_constraints(self):
-        extra_subvertex = PartitionedVertex(
-            3, 15, get_resources_used_by_atoms(3, 15, []))
-        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
-        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
-        constrained_subvertex = PartitionedVertex(
-            55, 89, get_resources_used_by_atoms(55, 89, []),
-            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
-        self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 2, 3, 3)
-        placement2 = Placement(extra_subvertex, 1, 3, 3)
-        placements = Placements([placement, placement2])
-        placer = BasicPlacer(self.machine, self.graph)
-        constraint = \
-            placer._reduce_constraints([chip_and_core, same_chip_as_vertex],
-                                       constrained_subvertex.label, placements)
-
-        print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
-            'p:', constraint.p
-
-    def test_reduce_constraints_inverted_order(self):
-        extra_subvertex = PartitionedVertex(
-            3, 15, get_resources_used_by_atoms(3, 15, []))
-        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
-        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
-        constrained_subvertex = PartitionedVertex(
-            55, 89, get_resources_used_by_atoms(55, 89, []),
-            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
-        self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 2, 3, 3)
-        placement2 = Placement(extra_subvertex, 1, 3, 3)
-        placements = Placements([placement, placement2])
-        placer = BasicPlacer(self.machine, self.graph)
-        constraint = placer._reduce_constraints([same_chip_as_vertex,
-                                                 chip_and_core],
-                                                constrained_subvertex.label,
-                                                placements)
-
-        print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
-            'p:', constraint.p
-
-    def test_reduce_constraints_invalid(self):
-        extra_subvertex = PartitionedVertex(
-            3, 15, get_resources_used_by_atoms(3, 15, []))
-        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
-        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
-        constrained_subvertex = PartitionedVertex(
-            55, 89, get_resources_used_by_atoms(55, 89, []),
-            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
-        self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 2, 3, 3)
-        placement2 = Placement(extra_subvertex, 1, 3, 2)
-        placements = Placements([placement, placement2])
-        placer = BasicPlacer(self.machine, self.graph)
-        self.assertRaises(PacmanPlaceException,
-                          placer._reduce_constraints(
-                              [chip_and_core, same_chip_as_vertex],
-                              constrained_subvertex.label, placements))
-
-    def test_reduce_constraints_inverted_order_invalid(self):
-        extra_subvertex = PartitionedVertex(
-            3, 15, get_resources_used_by_atoms(3, 15, []))
-        chip_and_core = PlacerChipAndCoreConstraint(3, 3, 15)
-        same_chip_as_vertex = PlacerSubvertexSameChipConstraint(extra_subvertex)
-        constrained_subvertex = PartitionedVertex(
-            55, 89, get_resources_used_by_atoms(55, 89, []),
-            "Constrained vertex", [chip_and_core, same_chip_as_vertex])
-        self.subgraph.add_subvertex(constrained_subvertex)
-        placement = Placement(constrained_subvertex, 2, 3, 3)
-        placement2 = Placement(extra_subvertex, 1, 3, 3)
-        placements = Placements([placement, placement2])
-        placer = BasicPlacer(self.machine, self.graph)
-        self.assertRaises(PacmanPlaceException,
-                          placer._reduce_constraints(
-                              [chip_and_core, same_chip_as_vertex],
-                              constrained_subvertex.label, placements))
-
-        print constraint.label, 'x:', constraint.x, 'y:', constraint.y, \
-            'p:', constraint.p
 
     def test_many_subvertices(self):
         subvertices = list()

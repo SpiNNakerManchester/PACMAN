@@ -1,12 +1,17 @@
 import os
 import time
 import logging
-from pacman.utilities.sdram_tracker import SDRAMTracker
+
 from pacman.model.placements import placement
-from spinn_machine.sdram import SDRAM
 from pacman import exceptions
 
+from spinn_machine.sdram import SDRAM
+
 logger = logging.getLogger(__name__)
+
+
+def tag_allocator_report(report_folder, tag_infos):
+    pass
 
 
 def placer_reports(report_folder, hostname, graph, graph_mapper,
@@ -123,8 +128,8 @@ def placement_report_by_vertex(report_folder, hostname, graph,
             lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
             hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
-            placement = placements.get_placement_of_subvertex(sv)
-            x, y, p = placement.x, placement.y, placement.p
+            cur_placement = placements.get_placement_of_subvertex(sv)
+            x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
             key = "{},{}".format(x, y)
             if key in used_processors_by_chip.keys():
                 used_procs = used_processors_by_chip[key]
@@ -132,7 +137,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
                 used_procs = list()
                 used_sdram_by_chip.update({key: 0})
             subvertex_by_processor["{},{},{}".format(x, y, p)] = sv
-            new_proc = [p, placement]
+            new_proc = [p, cur_placement]
             used_procs.append(new_proc)
             used_processors_by_chip.update({key: used_procs})
             my_string = "  Slice {}:{} ({} atoms) on core ({}, {}, {}) \n"\
@@ -188,13 +193,14 @@ def placement_by_core(report_folder, hostname, placements, machine,
                 lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
                 hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
                 num_atoms = hi_atom - lo_atom + 1
-                p_str = "  Processor {}: AbstractConstrainedVertex: '{}', pop sz: {}\n"\
-                        .format(proc_id, vertex_label, vertex_atoms)
+                p_str = ("  Processor {}: AbstractConstrainedVertex: '{}',"
+                         " pop sz: {}\n".format(
+                             proc_id, vertex_label, vertex_atoms))
                 f_place_by_core.write(p_str)
-                p_str = "               Slice on this core: {}:{} ({} atoms)\n"\
-                        .format(lo_atom, hi_atom, num_atoms)
+                p_str = ("              Slice on this core: {}:{} ({} atoms)\n"
+                         .format(lo_atom, hi_atom, num_atoms))
                 f_place_by_core.write(p_str)
-                p_str = "               Model: {}\n\n".format(vertex_model)
+                p_str = "              Model: {}\n\n".format(vertex_model)
                 f_place_by_core.write(p_str)
                 f_place_by_core.write("\n")
     # Close file:
@@ -217,25 +223,28 @@ def sdram_usage_per_chip(report_folder, hostname, placements, machine,
     f_mem_used_by_core.write("Generated: %s" % time_date_string)
     f_mem_used_by_core.write(" for target machine '{}'".format(hostname))
     f_mem_used_by_core.write("\n\n")
-    used_sdram_by_chip = SDRAMTracker()
+    used_sdram_by_chip = dict()
 
-    for current_placement in placements.placements:
-        subvert = current_placement.subvertex
+    for cur_placement in placements.placements:
+        subvert = cur_placement.subvertex
         vertex = graph_mapper.get_vertex_from_subvertex(subvert)
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvert)
         requirements = \
             vertex.get_resources_used_by_atoms(vertex_slice, graph)
 
-        x, y, p = current_placement.x, current_placement.y, current_placement.p
+        x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
         f_mem_used_by_core.write(
             "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
                 x, y, p, int(requirements.sdram.get_value() / 1024.0)))
-        used_sdram_by_chip.add_usage(x, y, requirements.sdram.get_value())
+        if (x, y) not in used_sdram_by_chip:
+            used_sdram_by_chip[(x, y)] = requirements.sdram.get_value()
+        else:
+            used_sdram_by_chip[(x, y)] += requirements.sdram.get_value()
 
     for chip in machine.chips:
         try:
-            used_sdram = used_sdram_by_chip.get_usage(chip.x, chip.y)
+            used_sdram = used_sdram_by_chip[(chip.x, chip.y)]
             if used_sdram != 0:
                 f_mem_used_by_core.write(
                     "**** Chip: ({}, {}) has total memory usage of"

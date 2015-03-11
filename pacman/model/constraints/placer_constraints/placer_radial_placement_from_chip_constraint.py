@@ -1,11 +1,11 @@
-from pacman.model.constraints.abstract_placer_constraint import \
-    AbstractPlacerConstraint
-
 import sys
+
+from pacman.model.constraints.abstract_constraints.\
+    abstract_placer_constraint import AbstractPlacerConstraint
 
 
 class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
-    """ Creates a constraint object to place a vertex or a subvertex on a\
+    """ Creates a constraint object to place the subvertices of a vertex on a\
         specific chip, and optionally a specific core on that chip
     """
 
@@ -33,9 +33,8 @@ class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     def y(self):
         return self._y
 
-    @property
-    def rank(self):
-        return sys.maxint - 3
+    def get_rank(self):
+        return sys.maxint - 10
 
     def is_placer_constraint(self):
         return True

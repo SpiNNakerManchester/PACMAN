@@ -6,32 +6,38 @@ from inspect import isabstract
 
 @add_metaclass(ABCMeta)
 class AbstractConstraint(object):
-    """ This represents a general constraint in PACMAN, which tells the various\
-        modules what they can and can't do
+    """ This represents a general constraint in PACMAN, which tells the \
+        various modules what they can and can't do
     """
 
     def __init__(self, label):
+        """
+
+        :param label: A label for the constraint
+        """
         self._label = label
 
     @property
     def label(self):
-        """getter for label
+        """ The label of the constraint
 
-        :return: string rep of the constraint
+        :return: string representation of the constraint
         :rtype: str
-        :raise None: this does not raise any known exception
         """
         return self._label
 
     @abstractmethod
     def is_constraint(self):
-        """ Determine if this is a constraint - for abstract to work correctly
+        """ Determine if this is a constraint - for is_instance to work\
+            correctly
         """
         pass
 
     @classmethod
     def __subclasshook__(cls, othercls):
         """ Checks if all the abstract methods are present on the subclass
+
+            is only here for duck typing
         """
         if not isabstract(cls) and not isabstract(othercls):
             return NotImplemented

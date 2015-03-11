@@ -135,3 +135,10 @@ class RoutingInfo(object):
         if subedge in self._subedge_info_by_subedge:
             return self._subedge_info_by_subedge[subedge]
         return None
+
+    def __iter__(self):
+        """ returns a iterator for the subedge routing infos
+
+        :return: a iterator of subedge routing infos
+        """
+        return iter(self._subedge_info)

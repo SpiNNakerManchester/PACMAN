@@ -1,6 +1,7 @@
-from pacman.model.constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
 import sys
+
+from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
+    import AbstractPlacerConstraint
 
 
 class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
@@ -29,8 +30,7 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
     def is_placer_constraint(self):
         return True
 
-    @property
-    def rank(self):
+    def get_rank(self):
         if self.p is not None:
             return sys.maxint
         else:

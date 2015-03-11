@@ -2,7 +2,8 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
+from pacman.model.constraints.abstract_constraints.abstract_constraint \
+    import AbstractConstraint
 
 
 @add_metaclass(ABCMeta)
@@ -11,6 +12,10 @@ class AbstractPlacerConstraint(AbstractConstraint):
     """
 
     def __init__(self, label):
+        """
+
+        :param label: A label for the constraint
+        """
         AbstractConstraint.__init__(self, label)
 
     def is_constraint(self):
@@ -23,10 +28,11 @@ class AbstractPlacerConstraint(AbstractConstraint):
         pass
 
     @abstractmethod
-    def rank(self):
-        """property method for all placer constraints to have for sorting
-        :return: the importance of this constraint over others in the same \
-        catergory
-        :rtype: int between 0 and sys.maxint.
+    def get_rank(self):
+        """ Relative importance of this constraint to other placement\
+            constraints
+        :return: The rank of the constraint, between 0 (least important)\
+                    and sys.maxint (most important)
+        :rtype: int
         :raise None: does not raise any known exception
         """

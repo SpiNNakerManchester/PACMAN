@@ -1,6 +1,6 @@
 import unittest
 
-from pacman.model.constraints.abstract_partitioner_constraint import \
+from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
