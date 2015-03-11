@@ -92,3 +92,4 @@ class AbstractPartitionAlgorithm(object):
         for constraint in vertex.constraints:
             if not isinstance(constraint, AbstractPartitionerConstraint):
                 constraints.append(constraint)
+        return constraints
