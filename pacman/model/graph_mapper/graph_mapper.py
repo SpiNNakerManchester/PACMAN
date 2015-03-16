@@ -86,7 +86,7 @@ class GraphMapper(object):
                 ".PartitionedEdge")
 
         if (partitionable_edge is not None and partitionable_edge
-                not in self._subedges_from_edge.keys()):
+                not in self._subedges_from_edge):
             self._subedges_from_edge[partitionable_edge] = set()
 
         if partitionable_edge is not None:
@@ -119,7 +119,7 @@ class GraphMapper(object):
         :rtype: iterable set or None
         :raise None: Raises no known exceptions
         """
-        if vertex in self._subvertices_from_vertex.keys():
+        if vertex in self._subvertices_from_vertex:
             return self._subvertices_from_vertex[vertex]
         return None
 
@@ -132,7 +132,7 @@ class GraphMapper(object):
         :rtype: iterable set or none
         :raise pacman.exceptions.PacmanNotFoundError: If the edge is not known.
         """
-        if edge in self._subedges_from_edge.keys():
+        if edge in self._subedges_from_edge:
             return self._subedges_from_edge[edge]
         raise PacmanNotFoundError('{} not in graph mapper.'.format(edge))
 
@@ -146,7 +146,7 @@ class GraphMapper(object):
         :raise pacman.exceptions.PacmanNotFoundError: If the subvertex is not
             known.
         """
-        if subvertex in self._vertex_from_subvertex.keys():
+        if subvertex in self._vertex_from_subvertex:
             return self._vertex_from_subvertex[subvertex]
         raise PacmanNotFoundError('{} not in graph mapper'.format(subvertex))
 
@@ -160,7 +160,7 @@ class GraphMapper(object):
         :raise pacman.exceptions.PacmanNotFoundError: If the subedge is not
             known.
         """
-        if subedge in self._edge_from_subedge.keys():
+        if subedge in self._edge_from_subedge:
             return self._edge_from_subedge[subedge]
         raise PacmanNotFoundError('{} not in graph mapper'.format(subedge))
 
@@ -173,7 +173,7 @@ class GraphMapper(object):
         :raise PacmanNotFoundError: when the subvertex is none or
             the subvertex is not contianed within the mapping object
         """
-        if subvertex not in self._subvertex_to_slice.keys():
+        if subvertex not in self._subvertex_to_slice:
             raise PacmanNotFoundError(
                 "{} not in graph mapper".format(subvertex))
         else:

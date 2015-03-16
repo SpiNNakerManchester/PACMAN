@@ -55,7 +55,7 @@ class RoutingInfo(object):
 
         # add the key mask by subvertex mapping
         pre_sub = subedge_info.subedge.pre_subvertex
-        if pre_sub not in self._key_masks_by_subvertex.keys():
+        if pre_sub not in self._key_masks_by_subvertex:
             self._key_masks_by_subvertex[pre_sub] = list()
         for key_and_mask in subedge_info.keys_and_masks:
             self._key_masks_by_subvertex[pre_sub].append(key_and_mask)
@@ -83,7 +83,7 @@ class RoutingInfo(object):
         :rtype: iterable of \
                     :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
         """
-        if partitioned_vertex in self._key_masks_by_subvertex.keys():
+        if partitioned_vertex in self._key_masks_by_subvertex:
             return self._key_masks_by_subvertex[partitioned_vertex]
         else:
             return list()

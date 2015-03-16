@@ -74,8 +74,7 @@ class MulticastRoutingTable(object):
         key_mask_combo, mask = \
             multicast_routing_entry.key_combo, multicast_routing_entry.mask
         tuple_key = (key_mask_combo, mask)
-        if tuple_key in (self._multicast_routing_entries_by_key_combo_mask
-                             .keys()):
+        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
             del self._multicast_routing_entries_by_key_combo_mask[tuple_key]
             self._multicast_routing_entries.remove(multicast_routing_entry)
         else:
@@ -139,7 +138,6 @@ class MulticastRoutingTable(object):
                 "this and try again.")
 
         tuple_key = (key_combo, mask)
-        if tuple_key in (self._multicast_routing_entries_by_key_combo_mask
-                             .keys()):
+        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
             return self._multicast_routing_entries_by_key_combo_mask[tuple_key]
         return None

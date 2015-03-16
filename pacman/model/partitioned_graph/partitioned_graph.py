@@ -83,14 +83,14 @@ class PartitionedGraph(object):
 
         self._subedges.add(subedge)
 
-        if subedge.pre_subvertex in self._outgoing_subedges.keys():
+        if subedge.pre_subvertex in self._outgoing_subedges:
             self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
         else:
             raise PacmanInvalidParameterException(
                 "PartitionedEdge pre_subvertex", str(subedge.pre_subvertex),
                 " Must exist in the partitioned_graph")
 
-        if subedge.post_subvertex in self._incoming_subedges.keys():
+        if subedge.post_subvertex in self._incoming_subedges:
             self._incoming_subedges[subedge.post_subvertex].append(subedge)
         else:
             raise PacmanInvalidParameterException(
@@ -126,7 +126,7 @@ class PartitionedGraph(object):
                     :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
         """
-        if subvertex in self._outgoing_subedges.keys():
+        if subvertex in self._outgoing_subedges:
             return self._outgoing_subedges[subvertex]
         return None
 
@@ -143,7 +143,7 @@ class PartitionedGraph(object):
                     :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
         """
-        if subvertex in self._incoming_subedges.keys():
+        if subvertex in self._incoming_subedges:
             return self._incoming_subedges[subvertex]
         return None
 

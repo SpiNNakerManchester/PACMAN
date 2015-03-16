@@ -131,7 +131,7 @@ def placement_report_by_vertex(report_folder, hostname, graph,
             cur_placement = placements.get_placement_of_subvertex(sv)
             x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
             key = "{},{}".format(x, y)
-            if key in used_processors_by_chip.keys():
+            if key in used_processors_by_chip:
                 used_procs = used_processors_by_chip[key]
             else:
                 used_procs = list()

@@ -188,7 +188,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :rtype: None
         :raise None: this method does not raise any known exception
         """
-        for key in nodes_info.keys():
+        for key in nodes_info:
             if nodes_info[key] is not None:
                 self._update_neighbour_weights(nodes_info, machine, key)
 
@@ -274,7 +274,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
         :rtype: None
         :raise None: this method does not raise any known exception
         """
-        for key in dijkstra_tables.keys():
+        for key in dijkstra_tables:
             dijkstra_tables[key]["lowest cost"] = None
             dijkstra_tables[key]["activated?"] = False
 
@@ -342,7 +342,7 @@ class BasicDijkstraRouting(AbstractRouterAlgorithm):
             graph_lowest_cost = None
 
             # Find the next node to be activated
-            for key in dijkstra_tables.keys():
+            for key in dijkstra_tables:
 
                 # Don't continue if the node hasn't even been touched yet
                 if (dijkstra_tables[key]["lowest cost"] is not None
