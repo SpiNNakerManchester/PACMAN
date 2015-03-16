@@ -14,6 +14,8 @@ from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_reverse_iptag_constraint \
     import TagAllocatorRequireReverseIptagConstraint
 
+import numpy
+
 
 def locate_constraints_of_type(constraints, constraint_type):
     """ Locates all constraints of a given type out of a list
@@ -112,8 +114,8 @@ def _check_constrained_value(value, current_value):
     :param value: The value to check
     :param current_value: The existing value
     """
-    if (current_value is not None and value is not None
-            and value != current_value):
+    if (current_value is not None and value is not None and
+            value != current_value):
         raise PacmanValueError(
             "Multiple constraints with conflicting values")
     if value is not None:
@@ -184,3 +186,42 @@ def get_ip_tag_info(constraints):
                 constraint.board_address, board_address)
             reverse_ip_tags.append(constraint)
     return board_address, ip_tags, reverse_ip_tags
+
+
+def expand_to_bit_array(value):
+    """ Expand a 32-bit value in to an array of length 32 of uint8 values,\
+        each of which is a 1 or 0
+
+    :param value: The value to expand
+    :type value: int
+    :rtype: [uint8]
+    """
+    return numpy.unpackbits(
+        numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
+
+
+def compress_from_bit_array(bit_array):
+    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0,\
+        into a 32-bit value
+
+    :param bit_array: The array to compress
+    :type bit_array: [uint8]
+    :rtype: int
+    """
+    return numpy.packbits(bit_array).view(dtype=">u4")[0]
+
+
+def compress_bits_from_bit_array(bit_array, bit_positions):
+    """ Compress specific positions from a bit array of 32 uint8 value,\
+        where is a 1 or 0, into a 32-bit value.
+
+    :param bit_array: The array to extract the value from
+    :type bit_array: [uint8]
+    :param bit_positions: The positions of the bits to extract, each value\
+                being between 0 and 31
+    :type bit_positions: [int]
+    :rtype: int
+    """
+    expanded_value = numpy.zeros(32, dtype="uint8")
+    expanded_value[-len(bit_positions):] = bit_array[bit_positions]
+    return compress_from_bit_array(expanded_value)

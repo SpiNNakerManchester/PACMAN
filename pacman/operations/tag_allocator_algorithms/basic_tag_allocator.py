@@ -1,4 +1,4 @@
-from pacman.model.constraints.tag_allocator_constraints.\
+from pacman.model.constraints.abstract_constraints.\
     abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
     tag_allocator_require_iptag_constraint import \
@@ -13,6 +13,7 @@ from pacman.utilities import utility_calls
 from pacman.utilities.resource_tracker import ResourceTracker
 from spinn_machine.tags.iptag import IPTag
 from spinn_machine.tags.reverse_iptag import ReverseIPTag
+from pacman.utilities.progress_bar import ProgressBar
 
 
 class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
@@ -34,15 +35,23 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
         resource_tracker = ResourceTracker(machine)
 
         # Check that the algorithm can handle the constraints
+        progress_bar = ProgressBar(placements.n_placements,
+                                   "Allocating Tags")
+        placements_with_tags = list()
         for placement in placements.placements:
             utility_calls.check_algorithm_can_support_constraints(
                 constrained_vertices=[placement.subvertex],
                 supported_constraints=self._supported_constraints,
                 abstract_constraint_type=AbstractTagAllocatorConstraint)
+            if len(utility_calls.locate_constraints_of_type(
+                    placement.subvertex.constraints,
+                    AbstractTagAllocatorConstraint)):
+                placements_with_tags.append(placement)
+            progress_bar.update()
 
         # Go through and allocate the tags
         tags = Tags()
-        for placement in placements.placements:
+        for placement in placements_with_tags:
             vertex = placement.subvertex
 
             # Get the constraint details for the tags
@@ -76,4 +85,5 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                         placement.y, placement.p, tag_constraint.sdp_port)
                     tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
 
+        progress_bar.end()
         return tags

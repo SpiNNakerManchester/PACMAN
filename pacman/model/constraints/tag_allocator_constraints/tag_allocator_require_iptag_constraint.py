@@ -1,4 +1,4 @@
-from pacman.model.constraints.tag_allocator_constraints.\
+from pacman.model.constraints.abstract_constraints.\
     abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 import sys
 

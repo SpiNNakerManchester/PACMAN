@@ -1,5 +1,5 @@
-from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
     tag_allocator_require_iptag_constraint \
     import TagAllocatorRequireIptagConstraint
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class RadialPlacer(AbstractPlacerAlgorithm):
-    """ An radial algorithm that can place a partitioned graph onto a
+    """ A placement algorithm that can place a partitioned graph onto a
         machine choosing chips radiating in a circle from 0, 0
     """
 
@@ -102,8 +102,8 @@ class RadialPlacer(AbstractPlacerAlgorithm):
         search = deque([first_chip])
         while len(search) > 0:
             chip = search.pop()
-            if (resource_tracker is None
-                    or resource_tracker.is_chip_available(chip.x, chip.y)):
+            if (resource_tracker is None or
+                    resource_tracker.is_chip_available(chip.x, chip.y)):
                 found_chips.add((chip.x, chip.y))
             done_chips.add(chip)
 

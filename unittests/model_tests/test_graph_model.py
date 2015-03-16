@@ -1,6 +1,6 @@
 import unittest
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
@@ -124,10 +124,10 @@ class TestGraphModel(unittest.TestCase):
     def test_create_new_subedge_from_edge(self):
         vert1 = MyVertex(10, "New AbstractConstrainedVertex 1", 256)
         subv_from_vert1 = vert1.create_subvertex(
-            0, 9, vert1.get_resources_used_by_atoms(Slice(0, 9), None))
+            Slice(0, 9), vert1.get_resources_used_by_atoms(Slice(0, 9), None))
         vert2 = MyVertex(5, "New AbstractConstrainedVertex 2", 256)
         subv_from_vert2 = vert2.create_subvertex(
-            0, 4, vert2.get_resources_used_by_atoms(Slice(0, 4), None))
+            Slice(0, 4), vert2.get_resources_used_by_atoms(Slice(0, 4), None))
         edge1 = PartitionableEdge(vert1, vert2, "First edge")
         subedge1 = edge1.create_subedge(subv_from_vert1, subv_from_vert2)
         self.assertEqual(subedge1.label, "First edge")

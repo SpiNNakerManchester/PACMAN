@@ -36,7 +36,7 @@ class MulticastRoutingTables(object):
                                                str(routing_table))
 
         if (routing_table.x, routing_table.y) in \
-                self._routing_tables_by_chip.keys():
+                self._routing_tables_by_chip:
             raise PacmanAlreadyExistsException("Routing table",
                                                str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
@@ -67,7 +67,7 @@ class MulticastRoutingTables(object):
                     or None
         :raise None: No known exceptions are raised
         """
-        if (x, y) in self._routing_tables_by_chip.keys():
+        if (x, y) in self._routing_tables_by_chip:
             return self._routing_tables_by_chip[(x, y)]
         return None
 

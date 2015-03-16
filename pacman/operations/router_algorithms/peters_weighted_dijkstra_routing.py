@@ -14,7 +14,7 @@ class PetersWeightedDijkstraRouting(AbstractRouterAlgorithm):
 
         <params to be impliemnted when done>
         """
-        pass
+        AbstractRouterAlgorithm.__init__(self)
 
     def route(self, routing_info_allocation, placements, machine, sub_graph):
         """ Find routes between the subedges with the allocated information,
