@@ -23,7 +23,7 @@ from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.free_space import FreeSpace
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanRouteInfoAllocationException
-
+from pacman.utilities.progress_bar import ProgressBar
 
 import math
 import numpy
@@ -60,6 +60,9 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         same_key_groups = self._get_edge_groups(subgraph)
 
         # Go through the groups and allocate keys
+        progress_bar = ProgressBar(len(same_key_groups),
+                                   "on allocating the key's and masks for"
+                                   " each subedge")
         routing_infos = RoutingInfo()
         for group in same_key_groups:
             # Check how many keys are needed for the edges of the group
@@ -91,7 +94,9 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             for edge in group:
                 routing_infos.add_subedge_info(
                     SubedgeRoutingInfo(keys_and_masks, edge))
+            progress_bar.update()
 
+        progress_bar.end()
         return routing_infos
 
     def _find_slot(self, base_key, lo=0):

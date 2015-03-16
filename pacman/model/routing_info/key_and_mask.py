@@ -44,8 +44,8 @@ class KeyAndMask(object):
         return self._mask
 
     def __eq__(self, key_and_mask):
-        return (self._key == key_and_mask.key
-                and self._mask == key_and_mask.mask)
+        return (self._key == key_and_mask.key and
+                self._mask == key_and_mask.mask)
 
     def __repr__(self):
         return "KeyAndMask:{}:{}".format(hex(self._key), hex(self._mask))
@@ -63,12 +63,14 @@ class KeyAndMask(object):
         :return: The number of keys
         :rtype: int
         """
-        #converts mask into array of bit representation
+        # converts mask into array of bit representation
         unwrapped_mask = numpy.unpackbits(
             numpy.asarray([self._mask], dtype=">u4").view(dtype="uint8"))
-        #how many zeros are in the bit represetnation array
+
+        # how many zeros are in the bit represetnation array
         zeros = numpy.where(unwrapped_mask == 0)[0]
-        #number of keys avilable from this mask size
+
+        # number of keys avilable from this mask size
         return 2 ** len(zeros)
 
     def get_keys(self, key_array=None, offset=0, n_keys=None):
@@ -88,9 +90,13 @@ class KeyAndMask(object):
                     the array
         :rtype: (array-like of int, int)
         """
+        # Get the position of the zeros in the mask - assume 32-bits
+        unwrapped_mask = numpy.unpackbits(
+            numpy.asarray([self._mask], dtype=">u4").view(dtype="uint8"))
+        zeros = numpy.where(unwrapped_mask == 0)[0]
 
         # We now know how many values there are - 2^len(zeros)
-        max_n_keys = self.n_keys
+        max_n_keys = 2 ** len(zeros)
         if key_array is not None and len(key_array) < max_n_keys:
             max_n_keys = len(key_array)
         if n_keys is None or n_keys > max_n_keys:
@@ -101,6 +107,7 @@ class KeyAndMask(object):
         # Create a list of 2^len(zeros) keys
         unwrapped_key = numpy.unpackbits(
             numpy.asarray([self._key], dtype=">u4").view(dtype="uint8"))
+
         # for each key, create its key with the idea of a neuron id being
         # continious and live at a offsettable position from the bottom of
         # the key
