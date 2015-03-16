@@ -13,6 +13,7 @@ from pacman.utilities import utility_calls
 from pacman.utilities.resource_tracker import ResourceTracker
 from spinn_machine.tags.iptag import IPTag
 from spinn_machine.tags.reverse_iptag import ReverseIPTag
+from pacman.utilities.progress_bar import ProgressBar
 
 
 class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
@@ -42,6 +43,8 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
 
         # Go through and allocate the tags
         tags = Tags()
+        progress_bar = ProgressBar(len(placement.placements),
+                                   "Allocating Tags")
         for placement in placements.placements:
             vertex = placement.subvertex
 
@@ -75,5 +78,7 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                         board_address, tag, tag_constraint.port, placement.x,
                         placement.y, placement.p, tag_constraint.sdp_port)
                     tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+            progress_bar.update()
 
+        progress_bar.end()
         return tags
