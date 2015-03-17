@@ -141,6 +141,7 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                         " {} and {}".format(edge, edge_with_mask, mask,
                                             fixed_mask_constraint.mask))
                 if (fields is not None and
+                        fixed_mask_constraint.fields is not None and
                         fields != fixed_mask_constraint.fields):
                     raise PacmanValueError(
                         "Two Partitioned Edges {} and {} must have the same"
@@ -148,7 +149,8 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                         .format(edge, edge_with_mask))
                 mask = fixed_mask_constraint.mask
                 edge_with_mask = edge
-                fields = fixed_mask_constraint.fields
+                if fixed_mask_constraint.fields is not None:
+                    fields = fixed_mask_constraint.fields
 
         return mask, fields
 
