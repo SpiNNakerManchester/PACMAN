@@ -1,10 +1,11 @@
-from pacman.model.partitionable_graph.abstract_constrained_vertex import \
+from pacman.model.abstract_classes.abstract_constrained_vertex import \
     AbstractConstrainedVertex
 
 
 class PartitionedVertex(AbstractConstrainedVertex):
     """ Represents a sub-set of atoms from a AbstractConstrainedVertex
     """
+
     def __init__(self, resources_required, label, constraints=None):
         """
         :param resources_required: The approximate resources needed for
@@ -19,14 +20,10 @@ class PartitionedVertex(AbstractConstrainedVertex):
                     .AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
-                    * If lo_atom is less than 0
-                    * If hi_atom is less than lo_atom
         """
-        AbstractConstrainedVertex.__init__(self, label=label)
-        self._label = label
+        AbstractConstrainedVertex.__init__(self, label=label,
+                                           constraints=constraints)
         self._resources_required = resources_required
-        self._constraints = list()
-        self.add_constraints(constraints)
 
     @property
     def resources_required(self):

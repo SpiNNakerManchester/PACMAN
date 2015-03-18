@@ -1,68 +1,118 @@
-from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
-import logging
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.tag_allocator_constraints.\
+    tag_allocator_require_iptag_constraint \
+    import TagAllocatorRequireIptagConstraint
+from pacman.model.constraints.tag_allocator_constraints.\
+    tag_allocator_require_reverse_iptag_constraint \
+    import TagAllocatorRequireReverseIptagConstraint
+from pacman.model.constraints.placer_constraints.\
+    placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
+from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
+    import AbstractPlacerConstraint
+from pacman.model.placements.placements import Placements
+from pacman.model.placements.placement import Placement
+from pacman.utilities import utility_calls
+from pacman.utilities.ordered_set import OrderedSet
+from pacman.utilities.resource_tracker import ResourceTracker
+from pacman.utilities.progress_bar import ProgressBar
+from pacman.exceptions import PacmanPlaceException
+from pacman.operations.abstract_algorithms.abstract_placer_algorithm \
+    import AbstractPlacerAlgorithm
 
+from collections import deque
+import logging
 logger = logging.getLogger(__name__)
 
 
-class RadialPlacer(BasicPlacer):
-    """ An radial algorithm that can place a partitioned_graph onto a
-     machine based off a circle out behaviour from a ethernet at 0 0
+class RadialPlacer(AbstractPlacerAlgorithm):
+    """ A placement algorithm that can place a partitioned graph onto a
+        machine choosing chips radiating in a circle from 0, 0
     """
 
-    def __init__(self, machine):
-        """constructor to build a
-        pacman.operations.placer_algorithms.RadialPlacer.RadialPlacer
-        :param machine: The machine on which to place the partitionable_graph
-        :type machine: :py:class:`spinn_machine.machine.Machine`
+    def __init__(self):
         """
-        BasicPlacer.__init__(self, machine)
-
-    #overloaded method from basicPlacer
-    def _deal_with_non_constrained_placement(self, subvertex, used_resources,
-                                             chips):
-        """overloaded method of basic placer that changes the ordering in which
-        chips are handed to the search algorithm.
-
-        :param subvertex: the subvertex to place
-        :param used_resources: the used_resources required by the subvertex
-        :param chips: the machines chips.
-        :type subvertex:
-        :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex'
-        :type used_resources:
-        py:class'pacman.model.resource_container.ResourceContainer'
-        :type chips: iterable of spinn_machine.chip.Chip
-        :return: a placement object
-        :rtype: a py:class'pacman.model.placements.placements.Placements'
-        :raise None: this class does not raise any known exceptions
         """
-        processors_new_order = list()
-        chips_to_check = list()
+        AbstractPlacerAlgorithm.__init__(self)
+        self._supported_constraints.append(
+            PlacerRadialPlacementFromChipConstraint)
+        self._supported_constraints.append(
+            TagAllocatorRequireIptagConstraint)
+        self._supported_constraints.append(
+            TagAllocatorRequireReverseIptagConstraint)
+        self._supported_constraints.append(PlacerChipAndCoreConstraint)
 
-        for chip in chips:
-            chips_to_check.append(chip)
+    def place(self, partitioned_graph, machine):
 
-        current_chip_list_to_check = list()
+        # check that the algorithm can handle the constraints
+        utility_calls.check_algorithm_can_support_constraints(
+            constrained_vertices=partitioned_graph.subvertices,
+            supported_constraints=self._supported_constraints,
+            abstract_constraint_type=AbstractPlacerConstraint)
 
-        current_chip_list_to_check.append(self._machine.get_chip_at(0, 0))
+        placements = Placements()
+        ordered_subverts = utility_calls.sort_objects_by_constraint_authority(
+            partitioned_graph.subvertices)
 
-        while len(chips_to_check) != 0:
-            next_chip_list_to_check = list()
-            for chip in current_chip_list_to_check:
-                if chip in chips_to_check:
-                    processors_new_order.append(chip)
-                    chips_to_check.remove(chip)
-                    neighbouring_chip_coordinates = \
-                        chip.router.get_neighbouring_chips_coords()
-                    for neighbour_data in neighbouring_chip_coordinates:
-                        if neighbour_data is not None:
-                            neighbour_chip = \
-                                self._machine.get_chip_at(neighbour_data['x'],
-                                                          neighbour_data['y'])
-                            if(neighbour_chip in chips_to_check and
-                               not neighbour_chip in next_chip_list_to_check):
-                                next_chip_list_to_check.append(neighbour_chip)
-            current_chip_list_to_check = next_chip_list_to_check
+        # Iterate over subvertices and generate placements
+        progress_bar = ProgressBar(len(ordered_subverts),
+                                   "for placing the partitioned_graphs "
+                                   "subvertices")
+        resource_tracker = ResourceTracker(
+            machine, self._generate_radial_chips(machine))
+        for vertex in ordered_subverts:
+            self._place_vertex(vertex, resource_tracker, machine, placements)
+            progress_bar.update()
+        progress_bar.end()
+        return placements
 
+    def _place_vertex(self, vertex, resource_tracker, machine, placements):
 
-        return BasicPlacer._deal_with_non_constrained_placement(
-            self, subvertex, used_resources, processors_new_order)
+        # Check for the radial placement constraint
+        radial_constraints = utility_calls.locate_constraints_of_type(
+            [vertex], PlacerRadialPlacementFromChipConstraint)
+        start_x = 0
+        start_y = 0
+        for constraint in radial_constraints:
+            if start_x is None:
+                start_x = constraint.x
+            elif start_x != constraint.x:
+                raise PacmanPlaceException("Non-matching constraints")
+            if start_y is None:
+                start_y = constraint.y
+            elif start_y != constraint.y:
+                raise PacmanPlaceException("Non-matching constraints")
+        chips = None
+        if start_x is not None and start_y is not None:
+            chips = self._generate_radial_chips(machine, resource_tracker,
+                                                start_x, start_y)
+
+        # Create and store a new placement
+        (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
+            vertex.resources_required, vertex.constraints, chips)
+        placement = Placement(vertex, x, y, p)
+        placements.add_placement(placement)
+
+    def _generate_radial_chips(self, machine, resource_tracker=None,
+                               start_chip_x=0, start_chip_y=0):
+        first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
+        done_chips = set()
+        found_chips = OrderedSet()
+        search = deque([first_chip])
+        while len(search) > 0:
+            chip = search.pop()
+            if (resource_tracker is None or
+                    resource_tracker.is_chip_available(chip.x, chip.y)):
+                found_chips.add((chip.x, chip.y))
+            done_chips.add(chip)
+
+            # Examine the links of the chip to find the next chips
+            for link in chip.router.links:
+                next_chip = machine.get_chip_at(link.destination_x,
+                                                link.destination_y)
+
+                # Don't search found chips again
+                if next_chip not in done_chips:
+                    search.appendleft(next_chip)
+        return found_chips

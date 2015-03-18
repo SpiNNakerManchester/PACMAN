@@ -1,5 +1,7 @@
 import unittest
-from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
+
+from pacman.model.partitioned_graph.abstract_partitioned_edge import \
+    AbstractPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.operations.router_algorithms import SteinerTreeWeightedRouting
 from pacman.operations.router_algorithms import BasicDijkstraRouting
@@ -14,8 +16,7 @@ from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from spinn_machine.virutal_machine import VirtualMachine
 from pacman.utilities import constants
-
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 
 

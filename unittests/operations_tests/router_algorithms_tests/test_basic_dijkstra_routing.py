@@ -30,9 +30,8 @@ from spinn_machine.chip import Chip
 from spinn_machine.machine import Machine
 
 import unittest
-from spinn_machine.virutal_machine import VirtualMachine
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 
 

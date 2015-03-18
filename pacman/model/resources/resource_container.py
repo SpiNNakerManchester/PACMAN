@@ -9,10 +9,12 @@ class ResourceContainer(object):
         :param dtcm: the amount of dtcm used
         :param sdram: the amount of sdram used
         :param cpu: the amount of cpu used
-        :type dtcm: pacman.models.resources.dtcm_resource.dtcmResource
-        :type sdram: pacman.models.resources.sdram_resource.sdramResource
-        :type cpu: pacman.models.resources.cpu_resource.cpuResource
-        :return a new pacman.models.resources.resource_container.ResourceContainer
+        :type dtcm:\
+                    :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
+        :type sdram:\
+                    :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
+        :type cpu:\
+                    :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
         :rtype: pacman.models.resources.resource_container.ResourceContainer
         :raise None: does not raise any known exception
 

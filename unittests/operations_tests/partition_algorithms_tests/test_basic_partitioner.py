@@ -1,10 +1,8 @@
 import unittest
-from pacman.model.constraints.abstract_partitioner_constraint import \
+
+from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
-from pacman.model\
-    .constraints.vertex_requires_virtual_chip_in_machine_constraint import \
-    VertexRequiresVirtualChipInMachineConstraint
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException
@@ -27,8 +25,8 @@ from spinn_machine.chip import Chip
 class Vertex(AbstractPartitionableVertex):
 
     def __init__(self, n_atoms, label):
-        AbstractPartitionableVertex.__init__(self, label=label, n_atoms=n_atoms,
-                                             max_atoms_per_core=256)
+        AbstractPartitionableVertex.__init__(
+            self, label=label, n_atoms=n_atoms, max_atoms_per_core=256)
         self._model_based_max_atoms_per_core = 256
 
     def model_name(self):

@@ -1,15 +1,17 @@
 import unittest
+
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.model.graph_mapper.slice import Slice
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.model.partitionable_graph.abstract_partitionable_edge import \
     AbstractPartitionableEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
+from pacman.model.partitioned_graph.abstract_partitioned_edge import \
+    AbstractPartitionedEdge
 
-from pacman.exceptions import (PacmanValueError, PacmanNotFoundError)
+from pacman.exceptions import (PacmanNotFoundError)
 
 
 class MyVertex(AbstractPartitionableVertex):
