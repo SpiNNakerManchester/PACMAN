@@ -118,5 +118,5 @@ class KeyAndMask(object):
                      .view(dtype="uint8"))[-len(zeros):]
             key[zeros] = unwrapped_value
             key_array[value + offset] = \
-                numpy.packbits(key).view(dtype=">u4")[0]
+                numpy.packbits(key).view(dtype=">u4")[0].item()
         return key_array, n_keys
