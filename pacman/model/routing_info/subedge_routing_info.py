@@ -50,7 +50,7 @@ class SubedgeRoutingInfo(object):
             for key_and_mask in self._keys_and_masks:
                 n_keys += key_and_mask.n_keys
 
-        key_array = numpy.zeros(n_keys, dtype="<u4")
+        key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0
         for key_and_mask in self._keys_and_masks:
             _, offset = key_and_mask.get_keys(

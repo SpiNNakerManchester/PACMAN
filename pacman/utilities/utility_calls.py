@@ -208,7 +208,7 @@ def compress_from_bit_array(bit_array):
     :type bit_array: [uint8]
     :rtype: int
     """
-    return numpy.packbits(bit_array).view(dtype=">u4")[0]
+    return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
 
 
 def compress_bits_from_bit_array(bit_array, bit_positions):
