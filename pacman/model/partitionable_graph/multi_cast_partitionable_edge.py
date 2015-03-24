@@ -30,17 +30,17 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
         """
         AbstractPartitionableEdge.__init__(self, pre_vertex, post_vertex,
                                            label)
-        
+
     @abstractmethod
     def is_multi_cast_partitionable_edge(self):
         """ helper method for is instance
-        
+
         :return:
         """
-        
+
     def is_partitionable_edge(self):
         """ helper method for is instance
-        
+
         :return:
         """
         return True
@@ -49,14 +49,10 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
         if not isinstance(pre_subvertex, PartitionedVertex):
             raise exceptions.PacmanInvalidParameterException(
                 "pre_subvertex", str(pre_subvertex),
-                "Must be a pacman.model"
-                ".partitioned_graph.subvertex.PartitionedVertex")
+                "Must be a PartitionedVertex")
         if not isinstance(post_subvertex, PartitionedVertex):
             raise exceptions.PacmanInvalidParameterException(
-                "post_subvertex",
-                str(post_subvertex),
-                "Must be a pacman.model.partitioned_graph.subvertex."
-                "PartitionedVertex")
+                "post_subvertex", str(post_subvertex), "PartitionedVertex")
 
         if label is None and self.label is not None:
             label = self.label

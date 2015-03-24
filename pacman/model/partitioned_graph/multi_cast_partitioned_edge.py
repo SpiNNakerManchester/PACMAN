@@ -1,11 +1,7 @@
-from abc import ABCMeta
-from abc import abstractmethod
-from six import add_metaclass
 from pacman.model.partitioned_graph.abstract_partitioned_edge import \
     AbstractPartitionedEdge
 
 
-@add_metaclass(ABCMeta)
 class MultiCastPartitionedEdge(AbstractPartitionedEdge):
     """ Represents part of a division of an edge to match the division of the\
         vertices on either side of the edge
@@ -26,17 +22,10 @@ class MultiCastPartitionedEdge(AbstractPartitionedEdge):
         """
         AbstractPartitionedEdge.__init__(self, pre_subvertex, post_subvertex,
                                          label)
-        
-    @abstractmethod
-    def is_multi_cast_partitioned_edge(self):
-        """ helper method for is instance
-        
-        :return:
-        """
-        
+
     def is_partitioned_edge(self):
         """ helper method for is instance
-        
+
         :return:
         """
         return True

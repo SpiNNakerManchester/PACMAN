@@ -2,16 +2,14 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
-from pacman.model.abstract_classes.abstract_constrained_edge import \
-    AbstractConstrainedEdge
-from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.model.abstract_classes.abstract_constrained_edge\
+    import AbstractConstrainedEdge
 
 
 @add_metaclass(ABCMeta)
 class AbstractPartitionableEdge(AbstractConstrainedEdge):
-    """ Represents a directional edge in a partitionable_graph between two vertices
+    """ Represents a directional edge in a partitionable graph between two\
+        vertices
     """
 
     def __init__(self, pre_vertex, post_vertex, constraints=None, label=None):
@@ -54,30 +52,10 @@ class AbstractPartitionableEdge(AbstractConstrainedEdge):
                     provided
         :type label: str
         :return: The created subedge
-        :rtype: :py:class:`pacman.model.subgraph.subedge.FixedRoutePartitionableEdge`
+        :rtype:\
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :raise None: does not raise any known exceptions
         """
-        if not isinstance(pre_subvertex, PartitionedVertex):
-            raise PacmanInvalidParameterException(
-                "pre_subvertex", str(pre_subvertex),
-                "Must be a pacman.model"
-                ".partitioned_graph.subvertex.PartitionedVertex")
-        if not isinstance(post_subvertex, PartitionedVertex):
-            raise PacmanInvalidParameterException(
-                "post_subvertex",
-                str(post_subvertex),
-                "Must be a pacman.model.partitioned_graph.subvertex"
-                ".PartitionedVertex")
-
-        if label is None and self.label is not None:
-            label = self.label
-
-        if constraints is None:
-            constraints = list()
-        constraints = constraints.extend(self._constraints)
-
-        return PartitionedEdge(pre_subvertex, post_subvertex, constraints,
-                               label)
 
     @property
     def pre_vertex(self):

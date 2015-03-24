@@ -3,7 +3,7 @@ import unittest
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.model.graph_mapper.slice import Slice
-from pacman.model.abstract_classes.abstract_partitionable_vertex import \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.model.partitionable_graph.abstract_partitionable_edge import \
     AbstractPartitionableEdge

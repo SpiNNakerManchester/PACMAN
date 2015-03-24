@@ -3,6 +3,7 @@ from pacman.model.constraints.abstract_constraints.\
     AbstractPartitionerConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
+from pacman.model.graph_mapper.slice import Slice
 from pacman.operations.abstract_algorithms.abstract_partition_algorithm\
     import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
@@ -11,7 +12,6 @@ from pacman.model.constraints.partitioner_constraints.\
     import PartitionerMaximumSizeConstraint
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
-from pacman.model.graph_mapper.slice import Slice
 from pacman.exceptions import PacmanPartitionException
 
 import logging

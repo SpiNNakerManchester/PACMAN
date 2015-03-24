@@ -112,8 +112,7 @@ class RoutingInfo(object):
 
         :param subedge: The subedge
         :type subedge:
-                    :py:class:`pacman.model.partitioned_graph.\
-                    fixed_route_partitioned_edge.FixedRoutePartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.multi_cast_partitioned_edge.MultiCastPartitionedEdge`
         :return: The routing key or None if the subedge does not exist
         :rtype: int
         :raise None: does not raise any known exceptions
@@ -127,8 +126,7 @@ class RoutingInfo(object):
 
         :param subedge: The subedge
         :type subedge:
-                    :py:class:`pacman.model.partitioned_graph.\
-                    fixed_route_partitioned_edge.FixedRoutePartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.multi_cast_partitioned_edge.MultiCastPartitionedEdge`
         :return: The subedge information or None if the subedge does not exist
         :rtype:
                     :py:class:`pacman.model.routing_info.subedge_routing_info.SubedgeRoutingInfo`

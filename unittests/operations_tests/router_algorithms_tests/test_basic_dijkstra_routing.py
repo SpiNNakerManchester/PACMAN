@@ -31,7 +31,7 @@ from spinn_machine.machine import Machine
 
 import unittest
 
-from pacman.model.abstract_classes.abstract_partitionable_vertex import \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 
 

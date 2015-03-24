@@ -46,7 +46,7 @@ class ValidRouteChecker(object):
             outgoing_edges_for_partitioned_vertex = \
                 self._partitioned_graph.outgoing_subedges_from_subvertex(
                     placement.subvertex)
-            #locate all placements to which this placement/subvertex will
+            # locate all placements to which this placement/subvertex will
             # communicate with
             destination_placements = set()
             for outgoing_edge in outgoing_edges_for_partitioned_vertex:
@@ -55,9 +55,11 @@ class ValidRouteChecker(object):
                 destination_placements.add(
                     placement_tuple(dest_placement.x, dest_placement.y,
                                     dest_placement.p))
-            #only check placements that have outgoing edges
+
+            # only check placements that have outgoing edges
             if len(outgoing_edges_for_partitioned_vertex) > 0:
-                #check that the routing elements for this placement work
+
+                # check that the routing elements for this placement work
                 # as expected
                 self._search_route(placement, destination_placements,
                                    outgoing_edges_for_partitioned_vertex,
@@ -86,7 +88,7 @@ class ValidRouteChecker(object):
         self._start_trace_via_routing_tables(
             source_placement, key, located_dests, placement_tuple)
 
-        #start removing from located_dests and check if dests not reached
+        # start removing from located_dests and check if dests not reached
         failed_to_reach_dests = list()
         for dest in dest_placements:
             if dest in located_dests:
@@ -94,7 +96,7 @@ class ValidRouteChecker(object):
             else:
                 failed_to_reach_dests.append(dest)
 
-        #check for error if trace didnt reach a destination it was meant to
+        # check for error if trace didnt reach a destination it was meant to
         error_message = ""
         if len(failed_to_reach_dests) > 0:
             output_string = ""
@@ -102,11 +104,11 @@ class ValidRouteChecker(object):
                 output_string += "[{}:{}:{}]".format(dest.x, dest.y, dest.p)
             source_processor = "[{}:{}:{}]".format(
                 source_placement.x, source_placement.y, source_placement.p)
-            error_message += "failed to locate all dstinations with subvertex" \
-                             " {} on processor {} with key {} as it didnt " \
-                             "reach dests {}".format(
-                             source_placement.subvertex.label, source_processor,
-                             key, output_string)
+            error_message += ("failed to locate all dstinations with subvertex"
+                              " {} on processor {} with key {} as it didnt "
+                              "reach dests {}".format(
+                                  source_placement.subvertex.label,
+                                  source_processor, key, output_string))
         # check for error if the trace went to a destination it shouldnt have
         if len(located_dests) > 0:
             output_string = ""
@@ -114,12 +116,12 @@ class ValidRouteChecker(object):
                 output_string += "[{}:{}:{}]".format(dest.x, dest.y, dest.p)
             source_processor = "[{}:{}:{}]".format(
                 source_placement.x, source_placement.y, source_placement.p)
-            error_message += "trace went to more failed to locate all " \
-                             "dstinations with subvertex {} on processor {} " \
-                             "with key {} as it didnt reach dests {}".format(
-                             source_placement.subvertex.label, source_processor,
-                             key, output_string)
-        #raise error if required
+            error_message += ("trace went to more failed to locate all "
+                              "dstinations with subvertex {} on processor {} "
+                              "with key {} as it didnt reach dests {}".format(
+                                  source_placement.subvertex.label,
+                                  source_processor, key, output_string))
+        # raise error if required
         if error_message != "":
             raise exceptions.PacmanRoutingException(error_message)
         else:
@@ -145,11 +147,13 @@ class ValidRouteChecker(object):
                                                             source_placement.y)
         visited_routers = set()
         visited_routers.add(current_router_table)
-        #get src router
+
+        # get src router
         entry = self._locate_routing_entry(current_router_table, key)
         self._recursive_trace_to_dests(
-            entry, current_router_table, source_placement.x, source_placement.y,
-            key, visited_routers, reached_placements, placement_tuple)
+            entry, current_router_table, source_placement.x,
+            source_placement.y, key, visited_routers, reached_placements,
+            placement_tuple)
 
     # locates the next dest pos to check
     def _recursive_trace_to_dests(self, entry, current_router, chip_x, chip_y,
@@ -171,26 +175,32 @@ class ValidRouteChecker(object):
         :return: None
         :raise None: this method does not raise any known exceptions
         """
-        #determine where the route takes us
+
+        # determine where the route takes us
         chip_links = entry.link_ids
         processor_values = entry.processor_ids
         if len(chip_links) > 0:  # if goes downa chip link
             if len(processor_values) > 0:  # also goes to a processor
                 self._check_processor(processor_values, current_router,
                                       reached_placements, placement_tuple)
+
             # only goes to new chip
             for link_id in chip_links:
-                #locate next chips router
+
+                # locate next chips router
                 machine_router = \
                     self._machine.get_chip_at(chip_x, chip_y).router
                 link = machine_router.get_link(link_id)
                 next_router = \
                     self._routing_tables.get_routing_table_for_chip(
                         link.destination_x, link.destination_y)
-                #check that we've not visited this router before
+
+                # check that we've not visited this router before
                 self._check_visited_routers(chip_x, chip_y, visited_routers)
-                #locate next entry
+
+                # locate next entry
                 entry = self._locate_routing_entry(next_router, key)
+
                 # get next route value from the new router
                 self._recursive_trace_to_dests(
                     entry, next_router, link.destination_x, link.destination_y,
@@ -253,7 +263,6 @@ class ValidRouteChecker(object):
         for processor_id in processor_ids:
             reached_placements.add(placement_tuple(dest_x, dest_y,
                                                    processor_id))
-
 
     @staticmethod
     def _locate_routing_entry(current_router, key):

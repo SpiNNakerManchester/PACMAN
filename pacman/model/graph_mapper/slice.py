@@ -1,5 +1,4 @@
 from pacman.exceptions import PacmanValueError
-
 import collections
 
 

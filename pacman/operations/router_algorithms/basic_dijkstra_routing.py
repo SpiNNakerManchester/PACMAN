@@ -1,13 +1,15 @@
-from pacman.model.routing_tables.multicast_routing_table import \
-    MulticastRoutingTable
-from pacman.operations.abstract_algorithms.\
-    abstract_multi_cast_router_algorithm import AbstractMultiCastRouterAlgorithm
+from pacman.model.routing_tables.multicast_routing_table\
+    import MulticastRoutingTable
+from pacman.operations.abstract_algorithms\
+    .abstract_multi_cast_router_algorithm\
+    import AbstractMultiCastRouterAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 
 import logging
+from pacman.model.partitioned_graph.multi_cast_partitioned_edge import MultiCastPartitionedEdge
 
 
 logger = logging.getLogger(__name__)
@@ -50,10 +52,10 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
         :param partitioned_graph: the partitioned_graph object
-        :type partitioned_graph:
-        pacman.partitioned_graph.partitioned_graph.PartitionedGraph
+        :type partitioned_graph:\
+                    :py:class:`pacman.partitioned_graph.partitioned_graph.PartitionedGraph`
         :return: The discovered routes
-        :rtype:z
+        :rtype:\
                     :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
                    goes wrong with the routing
@@ -72,6 +74,9 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
             subvert = placement.subvertex
             out_going_sub_edges = \
                 partitioned_graph.outgoing_subedges_from_subvertex(subvert)
+            out_going_sub_edges = filter(
+                lambda edge: isinstance(edge, MultiCastPartitionedEdge),
+                out_going_sub_edges)
 
             dest_chips = set()
             subedges_to_route = list()
@@ -323,9 +328,9 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
                 # "neighbours" is a list of 6 links or None objects.
                 # There is a None object where there is no connection to
                 # that neighbour.
-                if ((neighbour is not None)
-                        and not (neighbour.destination_x == x_source
-                                 and neighbour.destination_y == y_source)):
+                if ((neighbour is not None) and
+                        not (neighbour.destination_x == x_source and
+                             neighbour.destination_y == y_source)):
 
                     # These variables change with every look at a new neighbour
                     self._update_neighbour(
@@ -345,14 +350,13 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
             for key in dijkstra_tables:
 
                 # Don't continue if the node hasn't even been touched yet
-                if (dijkstra_tables[key]["lowest cost"] is not None
-                    and not dijkstra_tables[key]["activated?"]
-                    and (graph_lowest_cost is not None
-                    and dijkstra_tables[key]["lowest cost"] < graph_lowest_cost
-                         or graph_lowest_cost is None)):
-                            graph_lowest_cost = \
-                                dijkstra_tables[key]["lowest cost"]
-                            x_current, y_current = int(key[0]), int(key[1])
+                if (dijkstra_tables[key]["lowest cost"] is not None and
+                        not dijkstra_tables[key]["activated?"] and
+                        (graph_lowest_cost is not None and
+                         (dijkstra_tables[key]["lowest cost"] <
+                          graph_lowest_cost) or graph_lowest_cost is None)):
+                    graph_lowest_cost = dijkstra_tables[key]["lowest cost"]
+                    x_current, y_current = int(key[0]), int(key[1])
 
             # If there were no unactivated nodes with costs,
             # but the destination was not reached this iteration,
@@ -418,13 +422,13 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
         # and the lowest cost if the new cost is less, or if
         # there is no current cost
         new_weight = float(chip_lowest_cost + weight)
-        if (not neighbour_activated
-                and (neighbour_lowest_cost is None
-                     or new_weight < neighbour_lowest_cost)):
+        if (not neighbour_activated and
+                (neighbour_lowest_cost is None or
+                 new_weight < neighbour_lowest_cost)):
 
-                # update dijkstra table
-                dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] =\
-                    new_weight
+            # update dijkstra table
+            dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] =\
+                new_weight
 
         if (dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] == 0) \
                 and (x_neighbour != x_source or y_neighbour != y_source):
@@ -615,13 +619,13 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
         neighbour_weight = \
             nodes_info[(x_neighbour, y_neighbour)]["weights"][dec_direction]
         chip_sought_cost = \
-            (dijkstra_tables[(x_current, y_current)]["lowest cost"]
-             - neighbour_weight)
+            (dijkstra_tables[(x_current, y_current)]["lowest cost"] -
+             neighbour_weight)
         neighbours_lowest_cost = \
             dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"]
 
-        if (neighbours_lowest_cost is not None
-                and abs(neighbours_lowest_cost - chip_sought_cost) <
+        if (neighbours_lowest_cost is not None and
+                abs(neighbours_lowest_cost - chip_sought_cost) <
                 0.00000000001):
 
             # get other routing table and entry
@@ -642,9 +646,9 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
 
                         # merge routes
                         merged_entry = self._merge_entries(
-                            other_routing_table_entry, (), entry_is_defaultable,
-                            edge_key_combo, edge_mask, [dec_direction],
-                            router_table)
+                            other_routing_table_entry, (),
+                            entry_is_defaultable, edge_key_combo, edge_mask,
+                            [dec_direction], router_table)
                         previous_routing_entry = merged_entry
                 else:
                     entry = MulticastRoutingEntry(
@@ -660,7 +664,8 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
             nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] -= \
                 self._bw_per_route_entry  # TODO arbitrary
 
-            if nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] < 0:
+            if (nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] <
+                    0):
                 print ("Bandwidth overused from ({}, {}) in direction {}! to "
                        "({}, {})".format(x_neighbour, y_neighbour,
                                          dec_direction, x_current, y_current))
