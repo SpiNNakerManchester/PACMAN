@@ -17,10 +17,10 @@ class AbstractPartitionableEdge(AbstractConstrainedEdge):
 
         :param pre_vertex: the vertex at the start of the edge
         :type pre_vertex: \
-                    :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param post_vertex: the vertex at the end of the edge
         :type post_vertex: \
-                    :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param constraints: The constraints of the edge
         :type constraints: list of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
@@ -39,10 +39,10 @@ class AbstractPartitionableEdge(AbstractConstrainedEdge):
 
         :param pre_subvertex: The subvertex at the start of the subedge
         :type pre_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :param post_subvertex: The subvertex at the end of the subedge
         :type post_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :param constraints: The constraints of the vertex
         :type constraints: iterable of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
@@ -62,7 +62,8 @@ class AbstractPartitionableEdge(AbstractConstrainedEdge):
         """ The vertex at the start of the edge
 
         :return: A vertex
-        :rtype: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+        :rtype:\
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :raise None: Raises no known exceptions
         """
         return self._pre_vertex
@@ -72,7 +73,8 @@ class AbstractPartitionableEdge(AbstractConstrainedEdge):
         """ The vertex at the end of the edge
 
         :return: A vertex
-        :rtype: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+        :rtype:\
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :raise None: Raises no known exceptions
         """
         return self._post_vertex
