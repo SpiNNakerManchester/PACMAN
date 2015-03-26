@@ -1,6 +1,3 @@
-from abc import ABCMeta
-from abc import abstractmethod
-from six import add_metaclass
 from pacman.model.partitioned_graph.fixed_route_partitioned_edge import \
     FixedRoutePartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
@@ -9,7 +6,6 @@ from pacman.model.partitionable_graph.abstract_partitionable_edge \
 from pacman import exceptions
 
 
-@add_metaclass(ABCMeta)
 class FixedRoutePartitionableEdge(AbstractPartitionableEdge):
     """ Represents part of a division of an edge to match the division of the\
         vertices on either side of the edge
@@ -30,13 +26,6 @@ class FixedRoutePartitionableEdge(AbstractPartitionableEdge):
         """
         AbstractPartitionableEdge.__init__(self, pre_subvertex, post_subvertex,
                                            label)
-
-    @abstractmethod
-    def is_fixed_route_partitionable_edge(self):
-        """ helper method for is instance
-
-        :return:
-        """
 
     def is_partitionable_edge(self):
         """ helper method for is instance
