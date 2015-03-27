@@ -22,6 +22,10 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         self._vertex = vertex
 
     def is_partitioner_constraint(self):
+        """
+        helper method for is instance
+        :return:
+        """
         return True
 
     @property
