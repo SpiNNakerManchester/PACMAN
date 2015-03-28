@@ -61,7 +61,8 @@ class GraphMapper(object):
         self._subvertex_to_slice[subvertex] = Slice(lo_atom=lo_atom,
                                                     hi_atom=hi_atom)
 
-    def add_partitioned_edge(self, partitioned_edge, partitionable_edge):
+    def add_partitioned_edge(
+            self, partitioned_edge, partitionable_edge):
         """ Add a partitioned_edge to this partitioned_graph
 
         :param partitioned_edge: a partitioned_edge to be added to the
