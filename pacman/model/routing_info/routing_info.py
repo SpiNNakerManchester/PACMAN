@@ -141,4 +141,4 @@ class RoutingInfo(object):
 
         :return: a iterator of subedge routing infos
         """
-        return iter(self._subedge_info)
+        return iter(self._subedge_infos_by_key)
