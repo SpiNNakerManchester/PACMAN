@@ -1,7 +1,7 @@
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge \
+    import AbstractPartitionableEdge
 from pacman.exceptions import PacmanInvalidParameterException
 
 
@@ -22,7 +22,7 @@ class PartitionableGraph(object):
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param edges: An iterable of initial edges in the partitionable graph
         :type edges: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.edge.PartitionableEdge`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the edges is not valid
                     * If one of the vertices in not valid
@@ -78,13 +78,14 @@ class PartitionableGraph(object):
         """ Add an edge to this partitionable_graph
 
         :param edge: an edge to be added to the partitionable_graph
-        :type edge: :py:class:`pacman.model.graph.edge.PartitionableEdge`
+        :type edge:\
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the edge\
                     is not valid
         """
-        if edge is not None and isinstance(edge, PartitionableEdge):
+        if edge is not None and isinstance(edge, AbstractPartitionableEdge):
             self._edges.append(edge)
             self._outgoing_edges[edge.pre_vertex].append(edge)
             self._incoming_edges[edge.post_vertex].append(edge)
@@ -92,14 +93,14 @@ class PartitionableGraph(object):
             raise PacmanInvalidParameterException(
                 "edge", str(edge),
                 "Must be an instance of pacman.model.partitionable_graph"
-                ".edge.PartitionableEdge")
+                ".edge.AbstractPartitionableEdge")
 
     def add_edges(self, edges):
         """ Add an iterable of edges to this partitionable_graph
 
         :param edges: an iterable of edges to be added to the graph
         :type edges: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.edge.PartitionableEdge`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If any edge\
@@ -118,7 +119,7 @@ class PartitionableGraph(object):
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: an iterable of edges which have vertex as their pre_vertex
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.edge.PartitionableEdge`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
         :raise None: does not raise any known exceptions
         """
 
@@ -133,7 +134,7 @@ class PartitionableGraph(object):
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: an iterable of edges which have vertex as their post_vertex
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.edge.PartitionableEdge`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
         :raise None: does not raise any known exceptions
         """
         return self._incoming_edges[vertex]
@@ -164,6 +165,6 @@ class PartitionableGraph(object):
 
         :return: an iterable of edges
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.edge.PartitionableEdge`
+                    :py:class:`pacman.model.partitionable_graph.edge.AbstractPartitionableEdge`
         """
         return self._edges

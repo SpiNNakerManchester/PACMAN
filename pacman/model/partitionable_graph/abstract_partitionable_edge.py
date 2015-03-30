@@ -1,12 +1,14 @@
-from pacman.model.abstract_classes.abstract_constrained_edge import \
-    AbstractConstrainedEdge
-from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.exceptions import PacmanInvalidParameterException
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
+
+from pacman.model.abstract_classes.abstract_constrained_edge\
+    import AbstractConstrainedEdge
 
 
-class PartitionableEdge(AbstractConstrainedEdge):
-    """ Represents a directional edge in a partitionable_graph between two
+@add_metaclass(ABCMeta)
+class AbstractPartitionableEdge(AbstractConstrainedEdge):
+    """ Represents a directional edge in a partitionable graph between two\
         vertices
     """
 
@@ -15,10 +17,10 @@ class PartitionableEdge(AbstractConstrainedEdge):
 
         :param pre_vertex: the vertex at the start of the edge
         :type pre_vertex: \
-                    :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param post_vertex: the vertex at the end of the edge
         :type post_vertex: \
-                    :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param constraints: The constraints of the edge
         :type constraints: list of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
@@ -30,16 +32,17 @@ class PartitionableEdge(AbstractConstrainedEdge):
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
 
+    @abstractmethod
     def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
                        label=None):
         """ Create a subedge between the pre_subvertex and the post_subvertex
 
         :param pre_subvertex: The subvertex at the start of the subedge
         :type pre_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :param post_subvertex: The subvertex at the end of the subedge
         :type post_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :param constraints: The constraints of the vertex
         :type constraints: iterable of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
@@ -49,37 +52,18 @@ class PartitionableEdge(AbstractConstrainedEdge):
                     provided
         :type label: str
         :return: The created subedge
-        :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
+        :rtype:\
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :raise None: does not raise any known exceptions
         """
-        if not isinstance(pre_subvertex, PartitionedVertex):
-            raise PacmanInvalidParameterException(
-                "pre_subvertex", str(pre_subvertex),
-                "Must be a pacman.model"
-                ".partitioned_graph.subvertex.PartitionedVertex")
-        if not isinstance(post_subvertex, PartitionedVertex):
-            raise PacmanInvalidParameterException(
-                "post_subvertex",
-                str(post_subvertex),
-                "Must be a pacman.model.partitioned_graph.subvertex"
-                ".PartitionedVertex")
-
-        if label is None and self.label is not None:
-            label = self.label
-
-        if constraints is None:
-            constraints = list()
-        constraints = constraints.extend(self._constraints)
-
-        return PartitionedEdge(pre_subvertex, post_subvertex, constraints,
-                               label)
 
     @property
     def pre_vertex(self):
         """ The vertex at the start of the edge
 
         :return: A vertex
-        :rtype: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+        :rtype:\
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :raise None: Raises no known exceptions
         """
         return self._pre_vertex
@@ -89,7 +73,8 @@ class PartitionableEdge(AbstractConstrainedEdge):
         """ The vertex at the end of the edge
 
         :return: A vertex
-        :rtype: :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+        :rtype:\
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :raise None: Raises no known exceptions
         """
         return self._post_vertex
@@ -103,3 +88,10 @@ class PartitionableEdge(AbstractConstrainedEdge):
         :raise None: Raises no known exceptions
         """
         return self._label
+
+    @abstractmethod
+    def is_partitionable_edge(self):
+        """helper method for is instance
+
+        :return:
+        """

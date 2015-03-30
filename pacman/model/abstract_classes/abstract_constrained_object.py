@@ -20,15 +20,14 @@ class AbstractConstrainedObject(object):
 
         :param constraint: constraint to add
         :type constraint:\
-                    :py:class:`pacman.model.constraints.abstract_constraint\
-                    .AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     constraint is not valid
         """
-        if (constraint is None
-                or not isinstance(constraint, AbstractConstraint)):
+        if (constraint is None or
+                not isinstance(constraint, AbstractConstraint)):
             raise PacmanInvalidParameterException(
                 "constraint", constraint, "Must be a pacman.model."
                                           "constraints.abstract_constraint."
@@ -41,8 +40,7 @@ class AbstractConstrainedObject(object):
 
         :param constraints: iterable of constraints to add
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint\
-                    .AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If one of \

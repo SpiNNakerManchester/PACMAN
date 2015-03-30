@@ -1,18 +1,21 @@
-from pacman.operations.abstract_algorithms.abstract_router_algorithm \
-    import AbstractRouterAlgorithm
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
+from pacman.model.routing_tables.multicast_routing_tables import \
+    MulticastRoutingTables
 
 
-class SteinerTreeWeightedRouting(AbstractRouterAlgorithm):
-    """ An routing algorithm that can find routes for subedges between\
-        subvertices in a partitioned_graph that have been placed on a
-        machine by the use of a dijkstra shortest path algorithm
+@add_metaclass(ABCMeta)
+class AbstractMultiCastRouterAlgorithm(object):
+    """ An abstract algorithm that can find routes for multicast subedges\
+        between subvertices in a partitioned_graph that have been placed on a\
+        machine
     """
 
     def __init__(self):
-        """
-        """
-        AbstractRouterAlgorithm.__init__(self)
+        self._routing_tables = MulticastRoutingTables()
 
+    @abstractmethod
     def route(self, routing_info_allocation, placements, machine, sub_graph):
         """ Find routes between the subedges with the allocated information,
             placed in the given places
@@ -25,9 +28,12 @@ class SteinerTreeWeightedRouting(AbstractRouterAlgorithm):
                     :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param sub_graph: the partitioned_graph object
+        :type sub_graph:\
+                    :py:class:`pacman.partitioned_graph.partitioned_graph.Subgraph`
         :return: The discovered routes
-        :rtype:
-        :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
+        :rtype:\
+                    :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
                    goes wrong with the routing
         """
