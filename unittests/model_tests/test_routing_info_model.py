@@ -2,7 +2,7 @@ import unittest
 from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
+from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 
@@ -10,7 +10,7 @@ class TestRoutingTables(unittest.TestCase):
     def test_create_new_subedge_routing_info(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         self.assertEqual(sri.subedge, sube)
         self.assertEqual(sri.key, 0x0012)
@@ -19,7 +19,7 @@ class TestRoutingTables(unittest.TestCase):
     def test_create_new_routing_info(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         RoutingInfo([sri])
 
@@ -27,8 +27,8 @@ class TestRoutingTables(unittest.TestCase):
             self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube1 = PartitionedEdge(subv1, subv2)
-        sube2 = PartitionedEdge(subv2, subv1)
+        sube1 = AbstractPartitionedEdge(subv1, subv2)
+        sube2 = AbstractPartitionedEdge(subv2, subv1)
         sri1 = SubedgeRoutingInfo(sube1, 0x0012, 0x00ff)
         sri2 = SubedgeRoutingInfo(sube2, 0x0012, 0x00ff)
         with self.assertRaises(PacmanAlreadyExistsException):
@@ -38,8 +38,8 @@ class TestRoutingTables(unittest.TestCase):
             self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube1 = PartitionedEdge(subv1, subv2)
-        sube2 = PartitionedEdge(subv1, subv1)
+        sube1 = AbstractPartitionedEdge(subv1, subv2)
+        sube2 = AbstractPartitionedEdge(subv1, subv1)
         sri1 = SubedgeRoutingInfo(sube1, 0x0012, 0x00ff)
         sri2 = SubedgeRoutingInfo(sube2, 0x0012, 0x00ff)
         RoutingInfo([sri1, sri2])
@@ -47,7 +47,7 @@ class TestRoutingTables(unittest.TestCase):
     def test_all_subedge_info(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
         all_info = ri.all_subedge_info
@@ -57,10 +57,10 @@ class TestRoutingTables(unittest.TestCase):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
         subedges = list()
-        subedges.append(PartitionedEdge(subv1, subv2))
-        subedges.append(PartitionedEdge(subv1, subv1))
-        subedges.append(PartitionedEdge(subv2, subv2))
-        subedges.append(PartitionedEdge(subv2, subv1))
+        subedges.append(AbstractPartitionedEdge(subv1, subv2))
+        subedges.append(AbstractPartitionedEdge(subv1, subv1))
+        subedges.append(AbstractPartitionedEdge(subv2, subv2))
+        subedges.append(AbstractPartitionedEdge(subv2, subv1))
         sri = list()
         for i in range(4):
             sri.append(SubedgeRoutingInfo(subedges[i], 0x0012 + i, 0x00ff))
@@ -72,7 +72,7 @@ class TestRoutingTables(unittest.TestCase):
     def test_get_subedge_info_by_key_matching(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
         self.assertEqual(ri.get_subedge_info_by_key(0xff12, 0x00ff), sri)
@@ -80,7 +80,7 @@ class TestRoutingTables(unittest.TestCase):
     def test_get_subedge_info_by_key_not_matching(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
         self.assertEqual(ri.get_subedge_info_by_key(0xff12, 0x000f), None)
@@ -88,7 +88,7 @@ class TestRoutingTables(unittest.TestCase):
     def test_get_key_from_subedge_info(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
         self.assertEqual(ri.get_key_from_subedge(sri.subedge), 0x0012)
@@ -96,15 +96,15 @@ class TestRoutingTables(unittest.TestCase):
     def test_get_key_from_subedge_info_not_matching(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
-        self.assertEqual(ri.get_key_from_subedge(PartitionedEdge(subv1, subv1)), None)
+        self.assertEqual(ri.get_key_from_subedge(AbstractPartitionedEdge(subv1, subv1)), None)
 
     def test_get_subedge_information_from_subedge(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
         self.assertEqual(ri.get_subedge_information_from_subedge(sri.subedge),
@@ -113,11 +113,11 @@ class TestRoutingTables(unittest.TestCase):
     def test_get_subedge_information_from_subedge_not_matching(self):
         subv1 = PartitionedVertex(0, 1, None)
         subv2 = PartitionedVertex(2, 3, None)
-        sube = PartitionedEdge(subv1, subv2)
+        sube = AbstractPartitionedEdge(subv1, subv2)
         sri = SubedgeRoutingInfo(sube, 0x0012, 0x00ff)
         ri = RoutingInfo([sri])
         self.assertEqual(
-            ri.get_subedge_information_from_subedge(PartitionedEdge(subv1, subv1)),
+            ri.get_subedge_information_from_subedge(AbstractPartitionedEdge(subv1, subv1)),
             None)
 
 

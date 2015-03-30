@@ -1,9 +1,9 @@
 import unittest
 
-from pacman.model.abstract_classes.abstract_partitionable_vertex import \
-    AbstractPartitionableVertex
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+    AbstractPartitionableVertex   
+from pacman.model.partitionable_graph.abstract_partitionable_edge \
+    import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
 from pacman.model.constraints.partitioner_constraints\
@@ -117,7 +117,7 @@ class TestGraphModel(unittest.TestCase):
     def test_create_new_edge(self):
         vert1 = MyVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = MyVertex(5, "New AbstractConstrainedVertex 2", 256)
-        edge1 = PartitionableEdge(vert1, vert2, "First edge")
+        edge1 = AbstractPartitionableEdge(vert1, vert2, "First edge")
         self.assertEqual(edge1.pre_vertex, vert1)
         self.assertEqual(edge1.post_vertex, vert2)
 
@@ -128,7 +128,7 @@ class TestGraphModel(unittest.TestCase):
         vert2 = MyVertex(5, "New AbstractConstrainedVertex 2", 256)
         subv_from_vert2 = vert2.create_subvertex(
             Slice(0, 4), vert2.get_resources_used_by_atoms(Slice(0, 4), None))
-        edge1 = PartitionableEdge(vert1, vert2, "First edge")
+        edge1 = AbstractPartitionableEdge(vert1, vert2, "First edge")
         subedge1 = edge1.create_subedge(subv_from_vert1, subv_from_vert2)
         self.assertEqual(subedge1.label, "First edge")
 
@@ -139,9 +139,9 @@ class TestGraphModel(unittest.TestCase):
         vert1 = MyVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = MyVertex(5, "New AbstractConstrainedVertex 2", 256)
         vert3 = MyVertex(3, "New AbstractConstrainedVertex 3", 256)
-        edge1 = PartitionableEdge(vert1, vert2, "First edge")
-        edge2 = PartitionableEdge(vert2, vert1, "First edge")
-        edge3 = PartitionableEdge(vert1, vert3, "First edge")
+        edge1 = AbstractPartitionableEdge(vert1, vert2, "First edge")
+        edge2 = AbstractPartitionableEdge(vert2, vert1, "First edge")
+        edge3 = AbstractPartitionableEdge(vert1, vert3, "First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
         graph = PartitionableGraph("Graph", verts, edges)

@@ -2,6 +2,8 @@ import os
 import time
 import logging
 
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
+    import MultiCastPartitionableEdge
 from pacman.model.placements import placement
 from pacman import exceptions
 
@@ -88,7 +90,7 @@ def partitioner_report(report_folder, hostname, graph,
                      " writing.".format(file_name))
 
     f_place_by_vertex.write(
-        "        Placement Information by AbstractConstrainedVertex\n")
+        "        Placement Information by Vertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -100,7 +102,7 @@ def partitioner_report(report_folder, hostname, graph,
         vertex_model = v.model_name
         num_atoms = v.n_atoms
         f_place_by_vertex.write(
-            "**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
+            "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
@@ -139,7 +141,7 @@ def placement_report_with_partitionable_graph_by_vertex(
                      " writing.".format(file_name))
 
     f_place_by_vertex.write(
-        "        Placement Information by AbstractConstrainedVertex\n")
+        "        Placement Information by Vertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -155,7 +157,7 @@ def placement_report_with_partitionable_graph_by_vertex(
         vertex_model = v.model_name
         num_atoms = v.n_atoms
         f_place_by_vertex.write(
-            "**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
+            "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
@@ -295,7 +297,7 @@ def placement_report_with_partitionable_graph_by_core(
                 lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
                 hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
                 num_atoms = hi_atom - lo_atom + 1
-                p_str = ("  Processor {}: AbstractConstrainedVertex: '{}',"
+                p_str = ("  Processor {}: Vertex: '{}',"
                          " pop sz: {}\n".format(
                              proc_id, vertex_label, vertex_atoms))
                 f_place_by_core.write(p_str)
@@ -519,18 +521,19 @@ def router_edge_information(report_folder, hostname, graph, routing_tables,
         logger.error("Generate_routing_reports: Can't open file {} for "
                      "writing.".format(file_name))
 
-    f_routing.write("        PartitionableEdge Routing Report\n")
+    f_routing.write("        Edge Routing Report\n")
     f_routing.write("        ===================\n\n")
     time_date_string = time.strftime("%c")
     f_routing.write("Generated: {}".format(time_date_string))
     f_routing.write(" for target machine '{}'".format(hostname))
     f_routing.write("\n\n")
 
-    for e in graph.edges:
+    for e in filter(lambda edge: isinstance(edge, MultiCastPartitionableEdge),
+                    graph.edges):
         from_v, to_v = e.pre_vertex, e.post_vertex
         from_v_sz, to_v_sz = from_v.n_atoms, to_v.n_atoms
         fr_v_name, to_v_name = from_v.label, to_v.label
-        string = "**** PartitionableEdge '{}', from vertex: '{}' (size: {})"\
+        string = "**** Edge '{}', from vertex: '{}' (size: {})"\
                  .format(e.label, fr_v_name, from_v_sz)
         string = "{}, to vertex: '{}' (size: {})\n"\
                  .format(string, to_v_name, to_v_sz)
