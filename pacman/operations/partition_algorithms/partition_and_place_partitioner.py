@@ -104,7 +104,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
         :param vertex: the vertex to partition
         :type vertex:\
-                    py:class:`pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param subgraph: the partitioned_graph to add subverts to
         :type subgraph:\
                     py:class:`pacman.model.partitioned_graph.partitioned_graph.Subgraph`
@@ -156,7 +156,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :param vertices: the vertexes that need to be partitoned at the same \
                     time
         :type vertices: iterable list of\
-                    :py:class:`pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param n_atoms: the atoms of the first vertex
         :type n_atoms: int
         :param max_atoms_per_core: the min max atoms from all the vertexes \
@@ -211,17 +211,19 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         """ readjusts resoruce allocation and updates the placement list to take
             into account the new layout of the atoms
 
-        :param used_placements: the original list of tuples containing placement
-                                data
+        :param used_placements: the original list of tuples containing\
+                    placement data
         :type used_placements: iterable of tuples
         :param resource_tracker: the tracker of resoruces
-        :type resource_tracker: pacman.utilities.resource_tracker.ResourceTracker
+        :type resource_tracker:\
+                    :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
         :param lo_atom: the lo atom of a slice to be considered
         :type lo_atom: int
         :param hi_atom: the hi atom of a slice to be considered
         :type hi_atom: int
         :param graph: the partitionable graph used by the parititoner
-        :type graph: pacman.model.partitionable_graph.partitionable_graph.PartitionableGraph
+        :type graph:
+                    :py:class:`pacman.model.partitionable_graph.partitionable_graph.PartitionableGraph`
         :return: the new list of tuples containing placement data
         :rtype: iterable of tuples
         """
@@ -261,7 +263,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :param vertices: the vertexes that need to be partitioned at the same \
                     time
         :type vertices: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param max_atoms_per_core: the min max atoms from all the vertexes \
                     considered that have max_atom constraints
         :type max_atoms_per_core: int
@@ -320,8 +322,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
-                    "AbstractConstrainedVertex {} could not be "
-                    "partitioned".format(vertex.label))
+                    "Vertex {} could not be partitioned".format(vertex.label))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
@@ -368,7 +369,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :type max_atoms_per_core: int
         :param vertex: the vertexes to scale up the num atoms per core for
         :type vertex:\
-                    :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param resources: the resource estimate for the vertex for a given\
                     number of atoms
         :type resources:\
@@ -387,8 +388,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         # Keep searching while the ratio is still in range,
         # the next hi_atom value is still less than the number of atoms,
         # and the number of atoms is less than the constrained number of atoms
-        while ((ratio < 1.0) and ((hi_atom + 1) < vertex.n_atoms)
-                and ((hi_atom - lo_atom + 2) < max_atoms_per_core)):
+        while ((ratio < 1.0) and ((hi_atom + 1) < vertex.n_atoms) and
+                ((hi_atom - lo_atom + 2) < max_atoms_per_core)):
 
             # Update the hi_atom, keeping track of the last hi_atom which
             # resulted in a ratio < 1.0
@@ -418,7 +419,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
         :param vertices: a iterable list of vertices
         :type vertices: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: the minimum level of max atoms from all constraints
         :rtype: int
         :raise None: this method does not raise any known exceptions
@@ -453,20 +454,20 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         :raise None: this method does not raise any known exceptions
 
         """
-        if (resources.cpu.get_value() == 0
-                or max_resources.cpu.get_value() == 0):
+        if (resources.cpu.get_value() == 0 or
+                max_resources.cpu.get_value() == 0):
             cpu_ratio = 0
         else:
             cpu_ratio = (float(resources.cpu.get_value()) /
                          float(max_resources.cpu.get_value()))
-        if (resources.dtcm.get_value() == 0
-                or max_resources.dtcm.get_value() == 0):
+        if (resources.dtcm.get_value() == 0 or
+                max_resources.dtcm.get_value() == 0):
             dtcm_ratio = 0
         else:
             dtcm_ratio = (float(resources.dtcm.get_value()) /
                           float(max_resources.dtcm.get_value()))
-        if (resources.sdram.get_value() == 0
-                or max_resources.sdram.get_value() == 0):
+        if (resources.sdram.get_value() == 0 or
+                max_resources.sdram.get_value() == 0):
             sdram_ratio = 0
         else:
             sdram_ratio = (float(resources.sdram.get_value()) /
@@ -480,11 +481,11 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
         :param vertex: the vertex that is currently being partitioned
         :type vertex:\
-                    :py:class:`pacman.model.graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: iterable of vertexes that need to be partitioned with the\
                     exact same range of atoms
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.vertex.AbstractConstrainedVertex`
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :raise PacmanPartitionException: if the vertices that need to be \
                     partitioned the same have different numbers of atoms
         """

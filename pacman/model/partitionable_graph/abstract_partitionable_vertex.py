@@ -33,25 +33,19 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
     """
 
     def __init__(self, n_atoms, label, max_atoms_per_core, constraints=None):
-        """ Constructor for the abstract partitionable vertex.
+        """
 
         :param n_atoms: the number of atoms for the vertex
+        :type n_atoms: int
         :param label: the label of the vertex
+        :type label: str
         :param max_atoms_per_core: the max atoms that cna be supported by a \
                     core. Note that this is translated into a partitioner max \
                     size constraint
-        :param constraints: any extra constraints to be added to this vertex.
-        :type n_atoms: int
-        :type label: str
         :type max_atoms_per_core: int
-        :type constraints: iterable list
-
-        :return: the new partitionable vertex object
-
-        :rtype: \
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
-
-        :raise None: this method does not raise any exceptions
+        :param constraints: any extra constraints to be added to this vertex.
+        :type constraints: iterable of\
+                    :py:class:`pacman.model.constraints.abstract_contraints.abstract_constraint.AbstractConstraint`
         """
         AbstractConstrainedVertex.__init__(self, label, constraints)
         if n_atoms < 1:

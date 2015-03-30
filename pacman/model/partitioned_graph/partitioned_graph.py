@@ -7,6 +7,7 @@ from pacman.utilities.ordered_set import OrderedSet
 class PartitionedGraph(object):
     """ Represents a partitioning of a partitionable_graph
     """
+
     def __init__(self, label=None, subvertices=None, subedges=None):
         """
 
@@ -14,10 +15,10 @@ class PartitionedGraph(object):
         :type label: str
         :param subvertices: an iterable of vertices in the partitionable_graph
         :type subvertices: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitionable_vertex.PartitionedVertex`
         :param subedges: an iterable of subedges in the partitionable_graph
         :type subedges: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the subedges is not valid
                     * If one of the subvertices is not valid
@@ -35,9 +36,9 @@ class PartitionedGraph(object):
     def add_subvertex(self, subvertex):
         """ Add a subvertex to this partitioned_graph
 
-        :param subvertex: a subvertex to be added to the partitionable_graph
+        :param subvertex: a subvertex to be added to the partitioned graph
         :type subvertex:\
-                    :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -57,7 +58,7 @@ class PartitionedGraph(object):
         :param subvertices: an iterable of subvertices to add to this\
                     partitioned_graph
         :type subvertices: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -72,14 +73,15 @@ class PartitionedGraph(object):
 
         :param subedge: a subedge to be added to the partitioned_graph
         :type subedge:\
-                    :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subedge is not valid
         """
         if subedge in self._subedges:
-            raise PacmanAlreadyExistsException("PartitionedEdge", str(subedge))
+            raise PacmanAlreadyExistsException(
+                "FixedRoutePartitionableEdge", str(subedge))
 
         self._subedges.add(subedge)
 
@@ -87,14 +89,16 @@ class PartitionedGraph(object):
             self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
         else:
             raise PacmanInvalidParameterException(
-                "PartitionedEdge pre_subvertex", str(subedge.pre_subvertex),
+                "FixedRoutePartitionableEdge pre_subvertex",
+                str(subedge.pre_subvertex),
                 " Must exist in the partitioned_graph")
 
         if subedge.post_subvertex in self._incoming_subedges:
             self._incoming_subedges[subedge.post_subvertex].append(subedge)
         else:
             raise PacmanInvalidParameterException(
-                "PartitionedEdge post_subvertex", str(subedge.post_subvertex),
+                "FixedRoutePartitionableEdge post_subvertex",
+                str(subedge.post_subvertex),
                 " Must exist in the partitioned_graph")
 
     def add_subedges(self, subedges):
@@ -103,7 +107,7 @@ class PartitionedGraph(object):
         :param subedges: an iterable of subedges to add to this\
                     partitioned_graph
         :type subedges: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -119,11 +123,11 @@ class PartitionedGraph(object):
 
         :param subvertex: the subvertex for which to find the outgoing subedges
         :type subvertex:\
-                    :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :return: an iterable of subedges which have subvertex as their\
                     pre_subvertex
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :raise None: does not raise any known exceptions
         """
         if subvertex in self._outgoing_subedges:
@@ -136,11 +140,11 @@ class PartitionedGraph(object):
 
         :param subvertex: the subvertex for which to find the incoming subedges
         :type subvertex:\
-                    :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :return: an iterable of subedges which have subvertex as their\
                     post_subvertex
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :raise None: does not raise any known exceptions
         """
         if subvertex in self._incoming_subedges:
@@ -153,7 +157,7 @@ class PartitionedGraph(object):
 
         :return: an iterable of subvertices
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         """
         return self._subvertices
 
@@ -163,7 +167,7 @@ class PartitionedGraph(object):
 
         :return: an iterable of subedges
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.subedge.PartitionedEdge`
+                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         """
         return self._subedges
 
