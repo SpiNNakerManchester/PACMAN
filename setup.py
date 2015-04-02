@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="SpiNNaker_PACMAN",
-    version="2015.003-alpha-03",
+    version="2015.003-rc-01",
     description="Partition and Configuration Manager",
     url="https://github.com/SpiNNakerManchester/PACMAN",
     license="GNU GPLv3.0",
@@ -18,7 +18,6 @@ setup(
               'pacman.model.constraints.partitioner_constraints',
               'pacman.model.constraints.placer_constraints',
               'pacman.model.constraints.tag_allocator_constraints',
-              'pacman.model.constraints.utility_constraints',
               'pacman.model.graph_mapper',
               'pacman.model.partitionable_graph',
               'pacman.model.partitioned_graph',
@@ -29,6 +28,7 @@ setup(
               'pacman.model.tags',
               'pacman.operations',
               'pacman.operations.abstract_algorithms',
+              'pacman.operations.multi_cast_router_check_functionality',
               'pacman.operations.partition_algorithms',
               'pacman.operations.placer_algorithms',
               'pacman.operations.router_algorithms',
@@ -38,5 +38,5 @@ setup(
               'pacman.operations.tag_allocator_algorithms',
               'pacman.utilities'],
     install_requires=['six', 'enum34', 'numpy',
-                      'SpiNNMachine >= 2015.003-alpha-01']
+                      'SpiNNMachine >= 2015.003-rc-01']
 )
