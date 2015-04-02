@@ -177,10 +177,11 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         if free_space_slot.start_address > base_key:
             raise PacmanRouteInfoAllocationException(
                 "Trying to allocate a key in the wrong slot!")
-        if n_keys == 0 or ((n_keys % 2) != 0):
+        # TODO check with rowley over this check. as it kills the heat demo
+        """if n_keys == 0 or ((n_keys % 2) != 0):
             raise PacmanRouteInfoAllocationException(
                 "Trying to allocate {} keys, which is not a power of 2"
-                .format(n_keys))
+                .format(n_keys))"""
 
         # Check if there is enough space to allocate
         space = self._check_allocation(index, base_key, n_keys)

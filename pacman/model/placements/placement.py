@@ -1,3 +1,8 @@
+"""
+Placement file
+"""
+
+
 class Placement(object):
     """ Represents a placement of a subvertex on a specific processor on a\
         specific chip in the machine

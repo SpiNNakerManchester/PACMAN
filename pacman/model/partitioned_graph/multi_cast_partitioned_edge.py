@@ -7,7 +7,8 @@ class MultiCastPartitionedEdge(AbstractPartitionedEdge):
         vertices on either side of the edge
     """
 
-    def __init__(self, pre_subvertex, post_subvertex, label=None):
+    def __init__(self, pre_subvertex, post_subvertex, label=None,
+                 constraints=None):
         """
 
         :param pre_subvertex: the subvertex at the start of the subedge
@@ -18,10 +19,13 @@ class MultiCastPartitionedEdge(AbstractPartitionedEdge):
                     :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         :param label: The name of the edge
         :type label: str
+        :param constraints: constraitns for this edge
+        :type constraints: iterable of :
+        pacman.model.constraints.abstract_constraints.abstract_constraint.AbstractConstraint
         :raise None: Raises no known exceptions
         """
         AbstractPartitionedEdge.__init__(self, pre_subvertex, post_subvertex,
-                                         label)
+                                         constraints, label)
 
     def is_partitioned_edge(self):
         """ helper method for is instance
