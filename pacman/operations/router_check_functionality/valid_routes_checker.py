@@ -64,10 +64,11 @@ class ValidRouteChecker(object):
                             dest_placement = \
                                 self._placements.get_placement_of_subvertex(
                                     outgoing_edge.post_subvertex)
-                            destination_placements.append(
-                                PlacementTuple(x=dest_placement.x,
-                                               y=dest_placement.y,
-                                               p=dest_placement.p))
+                            dest_tuple = PlacementTuple(x=dest_placement.x,
+                                                        y=dest_placement.y,
+                                                        p=dest_placement.p)
+                            if dest_tuple not in destination_placements:
+                                destination_placements.append(dest_tuple)
                 # search for these destinations
                 self._search_route(placement, destination_placements,
                                    key_and_mask)
