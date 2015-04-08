@@ -4,65 +4,17 @@ test that tests the partitionable graph
 """
 
 # pacman imports
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
-    AbstractPartitionableVertex
 from pacman.model.constraints.partitioner_constraints\
     .partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
+# unit tests imports
+from unittests.test_vertex import TestVertex
+
 # general imports
 import unittest
-
-
-class MyVertex(AbstractPartitionableVertex):
-    """
-    test vertex
-    """
-
-    def get_resources_used_by_atoms(self, vertex_slice, vertex_in_edges):
-        """
-        standard method call to get the sdram, cpu and dtcm usage of a
-        collection of atoms
-        :param vertex_slice: the collection of atoms
-        :param vertex_in_edges: the edges coming into this partitionable vertex
-        :return:
-        """
-        return None
-
-    def model_name(self):
-        """
-        the model name of this test vertex
-        :return:
-        """
-        return "test model"
-
-    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        """
-
-        :param vertex_slice: the atoms being considered
-        :param graph: the partitionable graph
-        :return: the amount of cpu (in cycles this model will use)
-        """
-        return 1 * vertex_slice.n_atoms
-
-    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
-        """
-
-        :param vertex_slice: the atoms being considered
-        :param graph: the partitionable graph
-        :return: the amount of dtcm (in bytes this model will use)
-        """
-        return 1 * vertex_slice.n_atoms
-
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        """
-        :param vertex_slice: the atoms being considered
-        :param graph: the partitionable graph
-        :return: the amount of sdram (in bytes this model will use)
-        """
-        return 1 * vertex_slice.n_atoms
 
 
 class TestPartitionableGraphModel(unittest.TestCase):
@@ -74,7 +26,7 @@ class TestPartitionableGraphModel(unittest.TestCase):
         test initisation of a vertex
         :return:
         """
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
 
@@ -83,10 +35,11 @@ class TestPartitionableGraphModel(unittest.TestCase):
         test initisation of a vertex without a label
         :return:
         """
-        vert = MyVertex(10, "Population", 256)
+        vert = TestVertex(10, "Population", 256)
         self.assertEqual(vert.n_atoms, 10)
         pieces = vert.label.split(" ")
         self.assertIn(pieces[0], "Population n")
+
 
     def test_create_new_vertex_with_constraint_list(self):
         """
@@ -94,7 +47,8 @@ class TestPartitionableGraphModel(unittest.TestCase):
         :return:
         """
         constraint = PartitionerMaximumSizeConstraint(2)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256, [constraint])
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256,
+                          [constraint])
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
         self.assertEqual(vert.constraints[0], constraint)
@@ -109,8 +63,8 @@ class TestPartitionableGraphModel(unittest.TestCase):
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
-                        [constraint1])
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256,
+                          [constraint1])
         vert.add_constraint(constraint2)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(len(vert.constraints), 2 + 1)
@@ -128,8 +82,8 @@ class TestPartitionableGraphModel(unittest.TestCase):
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
-                        [constraint1])
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256,
+                          [constraint1])
         vert.add_constraints(constr)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
@@ -145,8 +99,8 @@ class TestPartitionableGraphModel(unittest.TestCase):
         :return:
         """
         constraint1 = PartitionerMaximumSizeConstraint(2)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
-                        [constraint1])
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256,
+                          [constraint1])
         subv_from_vert = vert.create_subvertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
@@ -159,7 +113,7 @@ class TestPartitionableGraphModel(unittest.TestCase):
         partitioned vertex type.
         :return:
         """
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         subvertex = vert.create_subvertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
@@ -172,8 +126,8 @@ class TestPartitionableGraphModel(unittest.TestCase):
 
         :return:
         """
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256)
-        resources = vert.get_resources_used_by_atoms(0, 9, None)
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        resources = vert.get_resources_used_by_atoms(Slice(0, 9), None)
         subv_from_vert = vert.create_subvertex(Slice(0, 9), resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
 
@@ -186,8 +140,8 @@ class TestPartitionableGraphModel(unittest.TestCase):
         """
         constraint1 = PartitionerMaximumSizeConstraint(2)
         constraint2 = PartitionerMaximumSizeConstraint(3)
-        vert = MyVertex(10, "New AbstractConstrainedVertex", 256,
-                        [constraint1])
+        vert = TestVertex(10, "New AbstractConstrainedVertex", 256,
+                          [constraint1])
         subv_from_vert = vert.create_subvertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None), "",
