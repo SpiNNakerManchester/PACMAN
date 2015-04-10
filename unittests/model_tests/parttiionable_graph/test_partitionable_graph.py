@@ -8,9 +8,11 @@ from pacman.model.partitionable_graph.abstract_partitionable_edge \
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
 
+# uinit test object imports
+from uinit_test_objects.test_vertex import TestVertex
+
 # general imports
 import unittest
-from unittests.test_vertex import TestVertex
 
 
 class TestPartitionableGraphModel(unittest.TestCase):

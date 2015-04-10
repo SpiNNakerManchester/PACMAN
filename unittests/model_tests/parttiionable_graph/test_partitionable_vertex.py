@@ -11,7 +11,7 @@ from pacman.model.graph_mapper.slice import Slice
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 # unit tests imports
-from unittests.test_vertex import TestVertex
+from uinit_test_objects.test_vertex import TestVertex
 
 # general imports
 import unittest
@@ -104,7 +104,7 @@ class TestPartitionableGraphModel(unittest.TestCase):
         subv_from_vert = vert.create_subvertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
-        self.assertIn(constraint1, subv_from_vert.constraints)
+        self.assertNotIn(constraint1, subv_from_vert.constraints)
 
     def test_new_create_subvertex_from_vertex_no_constraints(self):
         """
@@ -146,6 +146,7 @@ class TestPartitionableGraphModel(unittest.TestCase):
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None), "",
             [constraint2])
-        self.assertEqual(len(subv_from_vert.constraints), 2 + 1)
+        subv_from_vert.add_constraint(constraint1)
+        self.assertEqual(len(subv_from_vert.constraints), 2)
         self.assertEqual(subv_from_vert.constraints[1], constraint1)
         self.assertEqual(subv_from_vert.constraints[0], constraint2)

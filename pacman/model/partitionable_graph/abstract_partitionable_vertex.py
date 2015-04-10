@@ -163,6 +163,9 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     constraints.
         :type constraints: iterable of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+        :param resources_required: the amount of resources that the given
+        partitioned vertex is to use.
+        :type resources_required: pacman.model.resources.resource_container.ResourceContainer
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
