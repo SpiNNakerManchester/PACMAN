@@ -13,6 +13,11 @@ class TestVertex(AbstractPartitionableVertex):
     test vertex
     """
 
+    def __init__(self, n_atoms, label, max_atoms_per_core=123):
+        AbstractPartitionableVertex.__init__(
+            self, n_atoms=n_atoms, max_atoms_per_core=max_atoms_per_core,
+            label=label)
+
     def get_resources_used_by_atoms(self, vertex_slice, vertex_in_edges):
         """
         standard method call to get the sdram, cpu and dtcm usage of a
