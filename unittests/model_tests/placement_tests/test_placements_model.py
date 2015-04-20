@@ -1,6 +1,7 @@
 """
 tests for placements
 """
+
 # pacman imports
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
