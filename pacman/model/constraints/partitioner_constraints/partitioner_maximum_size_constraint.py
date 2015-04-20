@@ -1,3 +1,8 @@
+"""
+PartitionerMaximumSizeConstraint
+"""
+
+# pacman import
 from pacman.model.constraints.abstract_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
@@ -20,6 +25,10 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
         self._size = size
 
     def is_partitioner_constraint(self):
+        """
+        helper methof for isinistance
+        :return:
+        """
         return True
 
     @property

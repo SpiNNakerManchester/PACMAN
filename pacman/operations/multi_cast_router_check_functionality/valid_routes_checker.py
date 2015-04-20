@@ -1,10 +1,23 @@
+"""
+ValidRouteChecker
+"""
+
+# pacman imports
 from pacman import exceptions
+
+# general imports
 from collections import namedtuple
 import logging
+
+
 logger = logging.getLogger(__name__)
 
 
 class ValidRouteChecker(object):
+    """
+    class for checking (via the same process that the routers on spinnaker
+    would do) if the routing tables produced by the PACMAN system are correct.
+    """
 
     def __init__(self, partitioned_graph, placements, routing_infos,
                  routing_tables, machine):
@@ -213,7 +226,10 @@ class ValidRouteChecker(object):
     def _check_visited_routers(chip_x, chip_y, visited_routers):
         """checks if the trace has visited this router already
 
-        :param next_router: the next router to add to visited routers
+        :param chip_x: the x coord of the router to check if we've visited
+        before via the visited routers list
+        :param chip_y: the y coord of the router to check if we've visited
+        before via the visited routers list
         :param visited_routers: routers already visted
         :return: None
         :raise PacmanRoutingException: when a router has been visited twice.
