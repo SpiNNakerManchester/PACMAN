@@ -5,13 +5,13 @@ from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.exceptions import PacmanRoutingException
-from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
+from pacman.model.abstract_classes.abstract_partitioned_edge import AbstractPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.model.partitionable_graph.abstract_partitionable_edge \
+from pacman.model.abstract_classes.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
@@ -31,7 +31,7 @@ from spinn_machine.machine import Machine
 
 import unittest
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 
 

@@ -3,7 +3,7 @@ test that tests the partitionable graph
 """
 
 # pacman imports
-from pacman.model.partitionable_graph.abstract_partitionable_edge \
+from pacman.model.abstract_classes.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph

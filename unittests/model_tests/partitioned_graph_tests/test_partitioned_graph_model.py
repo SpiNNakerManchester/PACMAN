@@ -5,7 +5,7 @@ TestPartitionedGraphModel
 # pacman imports
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.partitioned_graph.abstract_partitioned_edge\
+from pacman.model.abstract_classes.abstract_partitioned_edge \
     import AbstractPartitionedEdge
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException

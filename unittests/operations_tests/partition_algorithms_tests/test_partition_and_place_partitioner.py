@@ -1,11 +1,7 @@
 import unittest
 
-#pacman imports
-from pacman.model.constraints.abstract_constraints.abstract_partitioner_constraint import \
-    AbstractPartitionerConstraint
+# pacman imports
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
-    AbstractPartitionableVertex
 from pacman.model.constraints.utility_constraints.vertex_requires_virtual_chip_in_machine_constraint \
     import VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint \
@@ -19,10 +15,10 @@ from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
-from pacman.model.partitionable_graph.abstract_partitionable_edge import \
+from pacman.model.abstract_classes.abstract_partitionable_edge import \
     AbstractPartitionableEdge as Edge
 
-#spinn_machine imports
+# spinn_machine imports
 from spinn_machine.machine import Machine
 from spinn_machine.processor import Processor
 from spinn_machine.sdram import SDRAM
@@ -30,50 +26,7 @@ from spinn_machine.link import Link
 from spinn_machine.router import Router
 from spinn_machine.chip import Chip
 
-
-class NewPartitionerConstraint(AbstractPartitionerConstraint):
-
-    def __init__(self, label):
-        AbstractPartitionerConstraint.__init__(self, label)
-
-    def is_constraint(self):
-        return True
-
-    def is_partitioner_constraint(self):
-        """ Determine if this is a partitioner constraint
-        """
-        return True
-
-
-class Vertex(AbstractPartitionableVertex):
-
-    def __init__(self, n_atoms, label):
-        AbstractPartitionableVertex.__init__(self, label=label, n_atoms=n_atoms,
-                                             max_atoms_per_core=256)
-        self._model_based_max_atoms_per_core = 256
-
-    def get_maximum_atoms_per_core(self):
-        return self._model_based_max_atoms_per_core
-
-    @property
-    def custom_max_atoms_per_core(self):
-        return None
-
-    def model_name(self):
-        return "test vertex"
-
-    #Copied from IF_CURR_EXP
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        return 782 * ((hi_atom - lo_atom) + 1)
-
-    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
-        return 200 * (hi_atom - lo_atom)
-
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
-        return 4000 + (50 * (hi_atom - lo_atom))
-
-
-class TestPartitioAndPlacePartitioner(unittest.TestCase):
+class TestPartitionAndPlacePartitioner(unittest.TestCase):
     def setUp(self):
         self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")

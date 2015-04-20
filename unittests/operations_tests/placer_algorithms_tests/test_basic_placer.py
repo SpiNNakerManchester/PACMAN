@@ -8,15 +8,13 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.graph_mapper.graph_mapper import GraphMapper
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.partitionable_graph.abstract_partitionable_edge import AbstractPartitionableEdge
+from pacman.model.abstract_classes.abstract_partitionable_edge import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 from spinn_machine.chip import Chip
