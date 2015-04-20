@@ -1,6 +1,6 @@
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from pacman.model.partitionable_graph.abstract_partitionable_edge \
+from pacman.model.abstract_classes.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman.exceptions import PacmanInvalidParameterException
 

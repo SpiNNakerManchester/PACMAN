@@ -1,7 +1,7 @@
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.model.partitionable_graph.abstract_partitionable_edge import \
+from pacman.model.abstract_classes.abstract_partitionable_edge import \
     AbstractPartitionableEdge
 from pacman import exceptions
 

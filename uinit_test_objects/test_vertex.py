@@ -4,7 +4,7 @@ test vertex used in many unit tests
 """
 
 # pacman imports
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 
 

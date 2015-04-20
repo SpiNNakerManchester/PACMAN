@@ -3,7 +3,7 @@ GraphMapper
 """
 
 # pacman imports
-from pacman.model.partitioned_graph.abstract_partitioned_edge \
+from pacman.model.abstract_classes.abstract_partitioned_edge \
     import AbstractPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import (PacmanValueError,
