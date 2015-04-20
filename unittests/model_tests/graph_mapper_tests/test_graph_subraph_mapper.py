@@ -90,6 +90,10 @@ class TestGraphSubgraphMapper(unittest.TestCase):
             self.assertNotIn(sub, returned_subverts)
 
     def test_get_vertex_from_subvertex(self):
+        """
+        test that the graph mapper can retribve a vertex froma  given subvertex
+        :return:
+        """
         subvertices = list()
         subvertices.append(PartitionedVertex(None, ""))
         subvertices.append(PartitionedVertex(None, ""))

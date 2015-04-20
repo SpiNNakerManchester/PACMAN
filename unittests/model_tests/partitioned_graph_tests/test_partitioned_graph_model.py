@@ -3,10 +3,10 @@ TestPartitionedGraphModel
 """
 
 # pacman imports
+from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
+    MultiCastPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.abstract_classes.abstract_partitioned_edge \
-    import AbstractPartitionedEdge
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 
@@ -28,20 +28,27 @@ class TestPartitionedGraphModel(unittest.TestCase):
 
     def test_new_empty_subgraph(self):
         """
-        test that the creation of a
+        test that the creation of a empty partitioned graph works
         :return:
         """
         PartitionedGraph()
 
     def test_new_subgraph(self):
+        """
+        tests that after building a partitioned graph, all partitined vertices
+        and partitioend edges are in existance
+        :return:
+        """
         subvertices = list()
         subedges = list()
         for i in range(10):
-            subvertices.append(PartitionedVertex(0, 4, None))
+            subvertices.append(PartitionedVertex(None, ""))
         for i in range(5):
-            subedges.append(AbstractPartitionedEdge(subvertices[0], subvertices[(i + 1)]))
+            subedges.append(MultiCastPartitionedEdge(subvertices[0],
+                                                     subvertices[(i + 1)]))
         for i in range(5, 10):
-            subedges.append(AbstractPartitionedEdge(subvertices[5], subvertices[(i + 1) % 10]))
+            subedges.append(MultiCastPartitionedEdge(
+                subvertices[5], subvertices[(i + 1) % 10]))
         subgraph = PartitionedGraph(subvertices=subvertices, subedges=subedges)
         outgoing = subgraph.outgoing_subedges_from_subvertex(subvertices[0])
         for i in range(5):
@@ -71,45 +78,70 @@ class TestPartitionedGraphModel(unittest.TestCase):
             self.assertIn(subedge, subedges)
 
     def test_add_duplicate_subvertex(self):
+        """
+        testing that adding the same partitioned vertex twice will cause an
+        error
+        :return:
+        """
         subvertices = list()
         subedges = list()
-        subv = PartitionedVertex(0, 4, None)
+        subv = PartitionedVertex(None, "")
         subvertices.append(subv)
-        subvertices.append(PartitionedVertex(5, 9, None))
+        subvertices.append(PartitionedVertex(None, ""))
         subvertices.append(subv)
-        subedges.append(AbstractPartitionedEdge(subvertices[0], subvertices[1]))
-        subedges.append(AbstractPartitionedEdge(subvertices[1], subvertices[0]))
+        subedges.append(MultiCastPartitionedEdge(subvertices[0],
+                                                 subvertices[1]))
+        subedges.append(MultiCastPartitionedEdge(subvertices[1],
+                                                 subvertices[0]))
         with self.assertRaises(PacmanAlreadyExistsException):
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 
     def test_add_duplicate_subedge(self):
+        """
+        test that adding the same partitioned edge will cause an error
+        :return:
+        """
         with self.assertRaises(PacmanAlreadyExistsException):
             subvertices = list()
             subedges = list()
-            subvertices.append(PartitionedVertex(5, 9, None))
-            subvertices.append(PartitionedVertex(5, 9, None))
-            sube = AbstractPartitionedEdge(subvertices[0], subvertices[1])
+            subvertices.append(PartitionedVertex(None, ""))
+            subvertices.append(PartitionedVertex(None, ""))
+            sube = MultiCastPartitionedEdge(subvertices[0], subvertices[1])
             subedges.append(sube)
             subedges.append(sube)
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 
     def test_add_subedge_with_no_existing_pre_subvertex_in_subgraph(self):
+        """
+        test that adding a edge where the pre vertex has not been added
+        to the partitioned graph coauses ane rror
+        :return:
+        """
         subvertices = list()
         subedges = list()
-        subvertices.append(PartitionedVertex(0, 4, None))
-        subvertices.append(PartitionedVertex(5, 9, None))
-        subedges.append(AbstractPartitionedEdge(subvertices[0], subvertices[1]))
-        subedges.append(AbstractPartitionedEdge(PartitionedVertex(0, 100, None), subvertices[0]))
+        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(PartitionedVertex(None, ""))
+        subedges.append(MultiCastPartitionedEdge(subvertices[0],
+                                                 subvertices[1]))
+        subedges.append(MultiCastPartitionedEdge(
+            PartitionedVertex(None, ""), subvertices[0]))
         with self.assertRaises(PacmanInvalidParameterException):
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 
     def test_add_subedge_with_no_existing_post_subvertex_in_subgraph(self):
+        """
+        test that adding a edge where the post vertex has not been added
+        to the partitioned graph coauses ane rror
+        :return:
+        """
         subvertices = list()
         subedges = list()
-        subvertices.append(PartitionedVertex(0, 4, None))
-        subvertices.append(PartitionedVertex(5, 9, None))
-        subedges.append(AbstractPartitionedEdge(subvertices[0], subvertices[1]))
-        subedges.append(AbstractPartitionedEdge(subvertices[0], PartitionedVertex(0, 100, None)))
+        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(PartitionedVertex(None, ""))
+        subedges.append(MultiCastPartitionedEdge(subvertices[0],
+                                                 subvertices[1]))
+        subedges.append(MultiCastPartitionedEdge(
+            subvertices[0], PartitionedVertex(None, "")))
         with self.assertRaises(PacmanInvalidParameterException):
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 
