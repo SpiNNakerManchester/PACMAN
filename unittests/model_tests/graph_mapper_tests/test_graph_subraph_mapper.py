@@ -7,6 +7,7 @@ from uinit_test_objects.test_edge import TestPartitionableEdge
 from uinit_test_objects.test_vertex import TestVertex
 
 # pacman imports
+from pacman.model.graph_mapper.slice import Slice
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
@@ -76,8 +77,10 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         graph_mapper = GraphMapper()
         vert = TestVertex(4, "Some testing vertex")
 
-        graph_mapper.add_subvertex(subvert1, 0, 1, vert)
-        graph_mapper.add_subvertex(subvert2, 2, 3, vert)
+        vertex_slice = Slice(0, 1)
+        graph_mapper.add_subvertex(subvert1, vertex_slice, vert)
+        vertex_slice = Slice(2, 3)
+        graph_mapper.add_subvertex(subvert2, vertex_slice, vert)
 
         returned_subverts = graph_mapper.get_subvertices_from_vertex(vert)
 
@@ -97,8 +100,10 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         graph_mapper = GraphMapper()
         vert = TestVertex(10, "Some testing vertex")
 
-        graph_mapper.add_subvertex(subvert1, 1, 2, vert)
-        graph_mapper.add_subvertex(subvert2, 3, 4, vert)
+        vertex_slice = Slice(0, 1)
+        graph_mapper.add_subvertex(subvert1, vertex_slice, vert)
+        vertex_slice = Slice(2, 3)
+        graph_mapper.add_subvertex(subvert2, vertex_slice, vert)
 
         self.assertEqual(
             vert, graph_mapper.get_vertex_from_subvertex(subvert1))

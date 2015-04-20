@@ -32,13 +32,17 @@ class MulticastRoutingTables(object):
                     table already exists for the chip
         """
         if routing_table in self._routing_tables:
-            raise PacmanAlreadyExistsException("Routing table",
-                                               str(routing_table))
+            raise PacmanAlreadyExistsException(
+                "The Routing table {} has already been added to the collection"
+                " before and therefore already exists".format(routing_table),
+                str(routing_table))
 
         if (routing_table.x, routing_table.y) in \
                 self._routing_tables_by_chip:
-            raise PacmanAlreadyExistsException("Routing table",
-                                               str(routing_table))
+            raise PacmanAlreadyExistsException(
+                "The Routing table for chip {}:{} already exists in this "
+                "collection and thefore is deemed an error to readd it"
+                .format(routing_table.x, routing_table.y), str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
             routing_table
         self._routing_tables.add(routing_table)

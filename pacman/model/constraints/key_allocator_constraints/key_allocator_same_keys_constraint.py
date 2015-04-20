@@ -22,6 +22,10 @@ class KeyAllocatorSameKeysConstraint(AbstractKeyAllocatorConstraint):
         self._partitioned_edge_to_match = partitioned_edge_to_match
 
     def is_key_allocator_constraint(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     @property

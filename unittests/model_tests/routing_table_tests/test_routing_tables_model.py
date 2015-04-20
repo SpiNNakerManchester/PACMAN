@@ -1,16 +1,33 @@
-import unittest
+"""
+TestRoutingInfo
+"""
+
+# pacman imports
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 from pacman.exceptions import PacmanAlreadyExistsException
 
+# spinnmanchine imports
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
-class TestRoutingInfo(unittest.TestCase):
+# general imports
+import unittest
+
+
+class TestRoutingTable(unittest.TestCase):
+    """
+    tests for the routing table object
+    """
     def test_new_multicast_routing_table(self):
-        key_combo = 0xff35
-        mask = 0x00ff
+        """
+        test that creating a multicast routing entry and adding it to the table
+        works
+        :return:
+        """
+        key_combo = 0xff000
+        mask = 0xff000
         proc_ids = list()
         link_ids = list()
         for i in range(18):
@@ -20,8 +37,8 @@ class TestRoutingInfo(unittest.TestCase):
         multicast_entries = list()
         for i in range(5):
             multicast_entries.append(
-                MulticastRoutingEntry(key_combo + i, mask, proc_ids, link_ids,
-                                      True))
+                MulticastRoutingEntry(key_combo + i, mask + i, proc_ids,
+                                      link_ids, True))
         mrt = MulticastRoutingTable(0, 0, multicast_entries)
         self.assertEqual(mrt.x, 0)
         self.assertEqual(mrt.y, 0)
@@ -32,19 +49,29 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(len(mre), len(multicast_entries))
         for i in range(5):
             self.assertEqual(
-                mrt.get_multicast_routing_entry_by_key_combo(key_combo + i, mask),
+                mrt.get_multicast_routing_entry_by_key_combo(
+                    key_combo + i, mask + i),
                 multicast_entries[i])
         self.assertEqual(mrt.get_multicast_routing_entry_by_key_combo(
-            key_combo + 5, mask), None)
+            key_combo + 5, mask + 5), None)
         self.assertEqual(mrt.get_multicast_routing_entry_by_key_combo(
-            key_combo - 1, mask), None)
+            key_combo - 1, mask - 1), None)
 
     def test_new_multicast_routing_table_empty(self):
+        """
+        tests creating a basic multicast routing table
+        :return:
+        """
         MulticastRoutingTable(0, 0)
 
     def test_new_multicast_routing_table_duplicate_entry(self):
-        key = 0xff35
-        mask = 0x00ff
+        """
+        test that adding multiple identical entries into a multicast table
+        causes an error
+        :return:
+        """
+        key_combo = 0xff35
+        mask = 0xff35
         proc_ids = list()
         link_ids = list()
         for i in range(18):
@@ -53,15 +80,16 @@ class TestRoutingInfo(unittest.TestCase):
             link_ids.append(i)
         multicast_entries = list()
         for i in range(5):
-            multicast_entries.append(
-                MulticastRoutingEntry(key + i, mask, proc_ids, link_ids, True))
+            multicast_entries.append(MulticastRoutingEntry(
+                key_combo + i, mask + i, proc_ids, link_ids, True))
         mrt = MulticastRoutingTable(0, 0, multicast_entries)
         with self.assertRaises(PacmanAlreadyExistsException):
             mrt.add_mutlicast_routing_entry(multicast_entries[0])
 
-    def test_new_multicast_routing_table_duplicate_key(self):
-        key = 0xff35
-        mask = 0x00ff
+    def test_new_multicast_routing_table_duplicate_key_combo(self):
+
+        key_combo = 0xff35
+        mask = 0xffff
         proc_ids = list()
         link_ids = list()
         for i in range(18):
@@ -70,24 +98,24 @@ class TestRoutingInfo(unittest.TestCase):
             link_ids.append(i)
         multicast_entries = list()
         for i in range(5):
-            multicast_entries.append(
-                MulticastRoutingEntry(key, mask, proc_ids, link_ids, True))
+            multicast_entries.append(MulticastRoutingEntry(
+                key_combo, mask, proc_ids, link_ids, True))
         with self.assertRaises(PacmanAlreadyExistsException):
             MulticastRoutingTable(0, 0, multicast_entries)
 
     def test_new_multicast_routing_tables(self):
-        key = 0xff35
-        mask = 0x00ff
+        key_combo = 0xff35
+        mask = 0xffff
         proc_ids = list()
         link_ids = list()
         for i in range(18):
             proc_ids.append(i)
         for i in range(6):
             link_ids.append(i)
-        multicast_entries1 = MulticastRoutingEntry(key, mask, proc_ids,
-                                                   link_ids, True)
-        multicast_entries2 = MulticastRoutingEntry(key - 1, mask, proc_ids,
-                                                   link_ids, True)
+        multicast_entries1 = MulticastRoutingEntry(
+            key_combo, mask, proc_ids, link_ids, True)
+        multicast_entries2 = MulticastRoutingEntry(
+            key_combo - 1, mask - 1, proc_ids, link_ids, True)
         mrt = list()
 
         t1 = MulticastRoutingTable(0, 0, [multicast_entries1])
@@ -109,19 +137,19 @@ class TestRoutingInfo(unittest.TestCase):
 
     def test_add_routing_table_for_duplicate_chip(self):
         with self.assertRaises(PacmanAlreadyExistsException):
-            key = 0xff35
-            mask = 0x00ff
+            key_combo = 0xff35
+            mask = 0xffff
             proc_ids = list()
             link_ids = list()
             for i in range(18):
                 proc_ids.append(i)
             for i in range(6):
                 link_ids.append(i)
-            multicast_entries1 = MulticastRoutingEntry(key, mask, proc_ids,
-                                                       link_ids, True)
+            multicast_entries1 = MulticastRoutingEntry(
+                key_combo, mask, proc_ids, link_ids, True)
 
-            multicast_entries2 = MulticastRoutingEntry(key - 1, mask, proc_ids,
-                                                       link_ids, True)
+            multicast_entries2 = MulticastRoutingEntry(
+                key_combo - 1, mask, proc_ids, link_ids, True)
             mrt = list()
             mrt.append(MulticastRoutingTable(3, 0, [multicast_entries1]))
             mrt.append(MulticastRoutingTable(3, 0, [multicast_entries2]))

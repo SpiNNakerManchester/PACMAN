@@ -203,7 +203,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                 # update objects
                 subgraph.add_subvertex(subvertex)
                 graph_to_subgraph_mapper.add_subvertex(
-                    subvertex, lo_atom, hi_atom, vertex)
+                    subvertex, vertex_slice, vertex)
 
     @staticmethod
     def _reallocate_resources(used_placements, resource_tracker,

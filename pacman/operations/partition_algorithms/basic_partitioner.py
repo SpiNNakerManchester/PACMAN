@@ -116,7 +116,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
                     self._get_remaining_constraints(vertex))
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(
-                    subvert, counted, counted + alloc - 1, vertex)
+                    subvert, vertex_slice, vertex)
                 counted = counted + alloc
 
                 # update allocated resources

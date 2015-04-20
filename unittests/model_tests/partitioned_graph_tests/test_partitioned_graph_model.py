@@ -1,23 +1,36 @@
-import unittest
+"""
+TestPartitionedGraphModel
+"""
+
+# pacman imports
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
+from pacman.model.partitioned_graph.abstract_partitioned_edge\
+    import AbstractPartitionedEdge
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 
+# general imports
+import unittest
 
-class TestSubgraphModel(unittest.TestCase):
+
+class TestPartitionedGraphModel(unittest.TestCase):
+    """
+    Tests that test the functionality of the partitioned graph object
+    """
+
     def test_new_vertex(self):
-        PartitionedVertex(0, 9, None)
-
-    def test_new_vertex_lo_eq_hi(self):
-        PartitionedVertex(5, 5, None)
-
-    def test_new_vertex_lo_gt_hi(self):
-        with self.assertRaises(PacmanInvalidParameterException):
-            PartitionedVertex(9, 0, None)
+        """
+        test the creation of a partitioned vertex
+        :return:
+        """
+        PartitionedVertex(None, "")
 
     def test_new_empty_subgraph(self):
+        """
+        test that the creation of a
+        :return:
+        """
         PartitionedGraph()
 
     def test_new_subgraph(self):

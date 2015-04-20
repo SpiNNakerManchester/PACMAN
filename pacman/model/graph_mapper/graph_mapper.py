@@ -1,13 +1,20 @@
+"""
+GraphMapper
+"""
+
+# pacman imports
 from pacman.model.partitioned_graph.abstract_partitioned_edge \
     import AbstractPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.exceptions import (PacmanValueError,
                                PacmanNotFoundError,
                                PacmanTypeError)
-from pacman.model.graph_mapper.slice import Slice
 
 
 class GraphMapper(object):
+    """
+    a mapping object between graphs.
+    """
 
     def __init__(self, first_graph_label="", second_graph_label=""):
         self._vertex_from_subvertex = dict()
@@ -21,14 +28,26 @@ class GraphMapper(object):
 
     @property
     def first_graph_label(self):
+        """
+        returns the label of the graph mapper's first graph.
+        :return:
+        """
         return self._first_graph_label
 
-    def add_subvertex(self, subvertex, lo_atom, hi_atom, vertex):
+    def add_subvertex(self, subvertex, vertex_slice, vertex):
         """ Add a subvertex to this partitioned_graph
 
         :param subvertex: a subvertex to be added to the partitionable_graph
         :type subvertex:
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+        :param vertex_slice: the chunk of atoms from the partitionable vertex
+        that the partitioned vertex is going to represent
+        :type vertex_slice:
+        :py:class:`pacman.model.graph_mapper.slice.Slice`
+        :param vertex: the partitionable vertex to associate this partitioned
+        vertex with
+        :type vertex: instance of
+        :py:class:`pacman.model.partitionable_graph.abstract_partitionable_graph.AbstractPartitionableGraph`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanValueError: Atom selection is out of\
@@ -41,23 +60,18 @@ class GraphMapper(object):
                 "subvertex", str(subvertex),
                 "Must be an instance of"
                 " pacman.model.partitioned_graph.subvertex.SubVertex")
-        if lo_atom < 0:
-            raise PacmanValueError("lo_atom {:d} < 0".format(lo_atom))
-        if lo_atom > hi_atom:
-            raise PacmanValueError(
-                "hi_atom {:d} < lo_atom {:d}".format(hi_atom, lo_atom))
 
         if vertex not in self._subvertices_from_vertex:
             self._subvertices_from_vertex[vertex] = set()
 
-        if hi_atom >= vertex.n_atoms:
+        if vertex_slice.hi_atom >= vertex.n_atoms:
             raise PacmanValueError(
-                "hi_atom {:d} >= maximum {:d}".format(hi_atom, vertex.n_atoms))
+                "hi_atom {:d} >= maximum {:d}".format(vertex_slice.hi_atom,
+                                                      vertex.n_atoms))
 
         self._vertex_from_subvertex[subvertex] = vertex
         self._subvertices_from_vertex[vertex].add(subvertex)
-        self._subvertex_to_slice[subvertex] = Slice(lo_atom=lo_atom,
-                                                    hi_atom=hi_atom)
+        self._subvertex_to_slice[subvertex] = vertex_slice
 
     def add_partitioned_edge(self, partitioned_edge, partitionable_edge):
         """ Add a partitioned_edge to this partitioned_graph
