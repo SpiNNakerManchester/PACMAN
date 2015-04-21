@@ -302,18 +302,11 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
 
                 # Scale the resources by the ratio
                 old_n_atoms = (hi_atom - lo_atom) + 1
-                new_n_atoms = int(float(old_n_atoms) / ratio)
+                new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))
 
                 # Avoid infinite looping
                 if old_n_atoms == new_n_atoms:
                     new_n_atoms -= 1
-                else:
-                    # Subtract a tenth of the difference between the old
-                    # and new
-                    possible_new_n_atoms = \
-                        new_n_atoms - int((old_n_atoms - new_n_atoms) / 10.0)
-                    if possible_new_n_atoms > 0:
-                        new_n_atoms = possible_new_n_atoms
 
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
