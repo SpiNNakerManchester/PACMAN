@@ -41,7 +41,7 @@ class MyTestCase(unittest.TestCase):
 
         try:
             self._print_keys_and_masks(allocator._allocate_keys_and_masks(
-                                       0xFFFFFF00, 20, True))
+                                       0xFFFFFF00, None, 20, True))
         except:
             traceback.print_exc()
             self.fail("Unexpected exception is raised when allocating a key!")
@@ -60,13 +60,14 @@ class MyTestCase(unittest.TestCase):
 
         try:
             self._print_keys_and_masks(allocator._allocate_keys_and_masks(
-                                       None, 20, True))
+                                       None, None, 20, True))
         except:
             traceback.print_exc()
             self.fail("Unexpected exception is raised when allocating a key!")
 
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
+
         print allocator._free_space_tracker
         self.assertEqual(len(allocator._free_space_tracker), 1, error)
         self.assertEqual(allocator._free_space_tracker[0].start_address, 32,
@@ -83,27 +84,27 @@ class MyTestCase(unittest.TestCase):
 
         allocator._allocate_fixed_keys_and_masks(
             [KeyAndMask(0x800, 0xFFFFF800)], None)
-        print allocator._free_space_tracker
 
         for mask, keys in zip(fixed_masks, n_keys):
             self._print_keys_and_masks(
-                allocator._allocate_keys_and_masks(mask, keys, True))
-            print allocator._free_space_tracker
+                allocator._allocate_keys_and_masks(mask, None, keys, True))
+
+        print allocator._free_space_tracker
 
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
         self.assertEqual(len(allocator._free_space_tracker), 3, error)
         self.assertEqual(allocator._free_space_tracker[0].start_address, 288,
                          error)
-        self.assertEqual(allocator._free_space_tracker[0].size, 224,
+        self.assertEqual(allocator._free_space_tracker[0].size, 1760,
                          error)
         self.assertEqual(allocator._free_space_tracker[1].start_address,
-                         768, error)
-        self.assertEqual(allocator._free_space_tracker[1].size, 1280,
+                         0x1100, error)
+        self.assertEqual(allocator._free_space_tracker[1].size, 0x1FFF00,
                          error)
         self.assertEqual(allocator._free_space_tracker[2].start_address,
-                         6144, error)
-        self.assertEqual(allocator._free_space_tracker[2].size, 0xFFFFE800,
+                         0x201800, error)
+        self.assertEqual(allocator._free_space_tracker[2].size, 0xFFDFE800,
                          error)
 
 if __name__ == '__main__':
