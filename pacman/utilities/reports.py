@@ -81,7 +81,7 @@ def partitioner_report(report_folder, hostname, graph,
     """
     # Cycle through all vertices, and foreach cycle through its sub-vertices.
     # For each sub-vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
+    file_name = os.path.join(report_folder, "partitioned_by_vertex.rpt")
     f_place_by_vertex = None
     try:
         f_place_by_vertex = open(file_name, "w")
@@ -97,7 +97,8 @@ def partitioner_report(report_folder, hostname, graph,
     f_place_by_vertex.write(" for target machine '{}'".format(hostname))
     f_place_by_vertex.write("\n\n")
 
-    for v in graph.vertices:
+    vertices = sorted(graph.vertices, key=lambda x: x.label)
+    for v in vertices:
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
@@ -107,13 +108,20 @@ def partitioner_report(report_folder, hostname, graph,
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
 
-        for sv in graph_mapper.get_subvertices_from_vertex(v):
+        partitioned_vertices = \
+            sorted(graph_mapper.get_subvertices_from_vertex(v),
+                   key=lambda x: x.label)
+        partitioned_vertices = \
+            sorted(partitioned_vertices,
+                   key=lambda x: graph_mapper.get_subvertex_slice(x).lo_atom)
+        for sv in partitioned_vertices:
             lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
             hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
             my_string = "  Slice {}:{} ({} atoms) \n"\
                         .format(lo_atom, hi_atom, num_atoms)
             f_place_by_vertex.write(my_string)
+            f_place_by_vertex.flush()
         f_place_by_vertex.write("\n")
     # Close file:
     f_place_by_vertex.close()
@@ -152,7 +160,8 @@ def placement_report_with_partitionable_graph_by_vertex(
     used_sdram_by_chip = dict()
     subvertex_by_processor = dict()
 
-    for v in graph.vertices:
+    vertices = sorted(graph.vertices, key=lambda x: x.label)
+    for v in vertices:
         vertex_name = v.label
         vertex_model = v.model_name
         num_atoms = v.n_atoms
@@ -162,7 +171,14 @@ def placement_report_with_partitionable_graph_by_vertex(
         f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
 
-        for sv in graph_mapper.get_subvertices_from_vertex(v):
+        partitioned_vertices = \
+            sorted(graph_mapper.get_subvertices_from_vertex(v),
+                   key=lambda vert: vert.label)
+        partitioned_vertices = \
+            sorted(partitioned_vertices,
+                   key=lambda pvert:
+                   graph_mapper.get_subvertex_slice(pvert).lo_atom)
+        for sv in partitioned_vertices:
             lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
             hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
@@ -217,7 +233,8 @@ def placement_report_without_partitionable_graph_by_vertex(
     used_sdram_by_chip = dict()
     subvertex_by_processor = dict()
 
-    for v in partitioned_graph.subvertices:
+    vertices = sorted(partitioned_graph.subvertices, key=lambda sub: sub.label)
+    for v in vertices:
         vertex_name = v.label
         vertex_model = v.model_name
         f_place_by_vertex.write(
@@ -395,7 +412,9 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
     f_mem_used_by_core.write("\n\n")
     used_sdram_by_chip = dict()
 
-    for cur_placement in placements.placements:
+    placements = sorted(placements.placements, key=lambda x: x.subvertex.label)
+
+    for cur_placement in placements:
         subvert = cur_placement.subvertex
         requirements = subvert.resources_required
 
@@ -445,6 +464,7 @@ def routing_info_report(report_folder, subgraph, routing_infos):
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
 
+    partitioned_vertices = sorted(subgraph.subvertices, key=lambda x: x.label)
     for subvert in subgraph.subvertices:
         output.write("Subvert: {} \n".format(subvert))
         outgoing_subedges = subgraph.outgoing_subedges_from_subvertex(subvert)
