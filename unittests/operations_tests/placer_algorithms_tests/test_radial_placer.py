@@ -11,9 +11,10 @@ from pacman.exceptions import PacmanPlaceException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.graph_mapper.graph_mapper import GraphMapper
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.abstract_classes.abstract_partitionable_edge import AbstractPartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge\
+    import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.abstract_classes.abstract_partitionable_vertex import \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from spinn_machine.chip import Chip

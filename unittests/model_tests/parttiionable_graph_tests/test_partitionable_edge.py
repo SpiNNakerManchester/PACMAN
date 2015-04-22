@@ -15,7 +15,7 @@ from uinit_test_objects.test_vertex import TestVertex
 
 # general imports
 import unittest
-from pacman.model.abstract_classes.abstract_partitioned_edge import \
+from pacman.model.partitioned_graph.abstract_partitioned_edge import \
     AbstractPartitionedEdge
 
 

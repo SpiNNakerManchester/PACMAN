@@ -28,8 +28,8 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         self.assertEqual(sri.subedge, sube)
         key_and_mask = sri.keys_and_masks
-        self.assertEqual(key_and_mask.key, 0x0012)
-        self.assertEqual(key_and_mask.mask, 0x00ff)
+        self.assertEqual(key_and_mask[0].key, 0x0012)
+        self.assertEqual(key_and_mask[0].mask, 0x00ff)
 
     def test_create_new_routing_info(self):
         """

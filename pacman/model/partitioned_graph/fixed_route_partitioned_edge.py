@@ -1,4 +1,4 @@
-from pacman.model.abstract_classes.abstract_partitioned_edge import \
+from pacman.model.partitioned_graph.abstract_partitioned_edge import \
     AbstractPartitionedEdge
 
 

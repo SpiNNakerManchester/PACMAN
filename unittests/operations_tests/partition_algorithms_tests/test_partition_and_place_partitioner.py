@@ -3,7 +3,8 @@ test for partitioning
 """
 
 # pacman imports
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints\
+    .partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException, PacmanValueError
@@ -44,7 +45,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.vert1 = TestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = MultiCastPartitionableEdge(self.vert1, self.vert2, 
+        self.edge1 = MultiCastPartitionableEdge(self.vert1, self.vert2,
                                                 None, "First edge")
         self.edge2 = MultiCastPartitionableEdge(self.vert2, self.vert1,
                                                 None, "Second edge")
@@ -340,7 +341,7 @@ class TestBasicPartitioner(unittest.TestCase):
         subgraph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(len(subgraph.subvertices), 0)
 #                #                     #                     #                      #                #           #
-    
+
     def test_operation_with_same_size_as_vertex_constraint(self):
         """
         test that the partition and place partitioner can handle same size as

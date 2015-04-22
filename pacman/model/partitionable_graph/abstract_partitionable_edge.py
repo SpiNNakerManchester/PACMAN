@@ -12,7 +12,7 @@ class AbstractPartitionableEdge(AbstractConstrainedEdge):
         vertices
     """
 
-    def __init__(self, pre_vertex, post_vertex, label=None, constraints=None):
+    def __init__(self, pre_vertex, post_vertex, constraints=None, label=None):
         """
 
         :param pre_vertex: the vertex at the start of the edge

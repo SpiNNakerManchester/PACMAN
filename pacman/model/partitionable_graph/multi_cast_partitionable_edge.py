@@ -1,7 +1,7 @@
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.model.abstract_classes.abstract_partitionable_edge import \
+from pacman.model.partitionable_graph.abstract_partitionable_edge import \
     AbstractPartitionableEdge
 from pacman import exceptions
 
@@ -28,7 +28,7 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
         :raise None: Raises no known exceptions
         """
         AbstractPartitionableEdge.__init__(self, pre_vertex, post_vertex,
-                                           label, constraints)
+                                           constraints, label)
 
     def is_partitionable_edge(self):
         """ helper method for is instance
