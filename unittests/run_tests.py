@@ -23,13 +23,16 @@ testmodules = [
     'utilities_tests.test_reports',
     'utilities_tests.test_utility_calls',
     'operations_tests.partition_algorithms_tests.test_basic_partitioner',
-    'operations_tests.partition_algorithms_tests.test_partition_and_place_partitioner',
+    'operations_tests.partition_algorithms_tests.'
+    'test_partition_and_place_partitioner',
     'operations_tests.placer_algorithms_tests.test_basic_placer',
     'operations_tests.placer_algorithms_tests.test_radial_placer',
     'operations_tests.router_algorithms_tests.test_basic_dijkstra_routing',
     'operations_tests.router_algorithms_tests.test_generic_router',
-    'operations_tests.routing_info_algorithms_tests.test_basic_routing_info_allocator'
-    'operations_tests.routing_info_algorithms_tests.test_malloc_routing_info_allocator']
+    'operations_tests.routing_info_algorithms_tests.'
+    'test_basic_routing_info_allocator'
+    'operations_tests.routing_info_algorithms_tests.'
+    'test_malloc_routing_info_allocator']
 
 suite = unittest.TestSuite()
 
