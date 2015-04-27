@@ -123,6 +123,7 @@ class MyTestCase(unittest.TestCase):
 
         self.machine = Machine(chips)
 
+    @unittest.skip("demonstrating skipping")
     def set_up_4_node_board(self):
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -149,6 +150,7 @@ class MyTestCase(unittest.TestCase):
 
         self.machine = Machine(chips)
 
+    @unittest.skip("demonstrating skipping")
     def test_new_basic_router(self):
         dijkstra_router = BasicDijkstraRouting()
         self.assertEqual(dijkstra_router._k, 1)
@@ -158,6 +160,7 @@ class MyTestCase(unittest.TestCase):
                          dijkstra_router.BW_PER_ROUTE_ENTRY)
         self.assertEqual(dijkstra_router._max_bw, dijkstra_router.MAX_BW)
 
+    @unittest.skip("demonstrating skipping")
     def test_run_basic_routing_off_chip_custom_100_node_machine(self):
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
@@ -171,6 +174,7 @@ class MyTestCase(unittest.TestCase):
                     routing_entry.processor_ids,
                     routing_entry.link_ids)
 
+    @unittest.skip("demonstrating skipping")
     def test_run_basic_routing_off_chip_custom_4_node_machine(self):
         self.set_up_4_node_board()
         dijkstra_router = BasicDijkstraRouting()
@@ -186,6 +190,7 @@ class MyTestCase(unittest.TestCase):
                     routing_entry.processor_ids,
                     routing_entry.link_ids)
 
+    @unittest.skip("demonstrating skipping")
     def test_bad_machine_setup(self):
         # create machine
         flops = 1000
@@ -222,6 +227,7 @@ class MyTestCase(unittest.TestCase):
                 partitioned_graph=self.subgraph,
                 routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_routing_on_chip_custom_4_node_machine(self):
         self.placements = Placements()
         self.placement1 = Placement(x=1, y=0, p=2, subvertex=self.subvert1)
@@ -250,6 +256,7 @@ class MyTestCase(unittest.TestCase):
                     routing_entry.processor_ids,
                     routing_entry.link_ids)
 
+    @unittest.skip("demonstrating skipping")
     def test_full_machine_routing(self):
         placements = Placements()
         self.placement1 = Placement(x=1, y=0, p=2, subvertex=self.subvert1)
@@ -302,6 +309,7 @@ class MyTestCase(unittest.TestCase):
                     routing_entry.processor_ids,
                     routing_entry.link_ids)
 
+    @unittest.skip("demonstrating skipping")
     def test_routing_to_other_machine(self):
         self.assertEqual(True, False, "Test not implemented yet")
 

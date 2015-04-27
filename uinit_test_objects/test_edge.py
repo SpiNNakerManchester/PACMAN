@@ -11,7 +11,7 @@ class TestPartitionableEdge(AbstractPartitionableEdge):
 
     def __init__(self, pre_vertex, post_vertex, label=None, constraints=None):
         AbstractPartitionableEdge.__init__(
-            self, pre_vertex, post_vertex, label, constraints)
+            self, pre_vertex, post_vertex, constraints, label)
 
     def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
                        label=None):

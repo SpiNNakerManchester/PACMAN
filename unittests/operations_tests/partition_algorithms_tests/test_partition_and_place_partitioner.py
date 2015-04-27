@@ -356,7 +356,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         subgraph, graph_to_sub_graph_mapper = \
             partitioner.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 3)
+        self.assertEqual(len(subgraph.subvertices), 5)
 
     def test_operation_with_same_size_as_vertex_constraint_large_vertices(self):
         """
@@ -374,7 +374,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         subgraph, graph_to_sub_graph_mapper = \
             partitioner.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 3)
+        self.assertEqual(len(subgraph.subvertices), 6)
 
     def test_operation_same_size_as_vertex_constraint_different_order(self):
         """
@@ -393,7 +393,8 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         subgraph, graph_to_sub_graph_mapper = \
             partitioner.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 3)
+        # split in 256 each, so 4 partitioned vertices
+        self.assertEqual(len(subgraph.subvertices), 4)
 
     def test_operation_with_same_size_as_vertex_constraint_exception(self):
         """

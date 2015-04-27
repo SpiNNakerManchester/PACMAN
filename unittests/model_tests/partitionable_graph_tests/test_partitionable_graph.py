@@ -3,8 +3,8 @@ test that tests the partitionable graph
 """
 
 # pacman imports
-from pacman.model.partitionable_graph.abstract_partitionable_edge \
-    import AbstractPartitionableEdge
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
+    import MultiCastPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph \
     import PartitionableGraph
 
@@ -31,9 +31,9 @@ class TestPartitionableGraphModel(unittest.TestCase):
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
         vert3 = TestVertex(3, "New AbstractConstrainedVertex 3", 256)
-        edge1 = AbstractPartitionableEdge(vert1, vert2, "First edge")
-        edge2 = AbstractPartitionableEdge(vert2, vert1, "First edge")
-        edge3 = AbstractPartitionableEdge(vert1, vert3, "First edge")
+        edge1 = MultiCastPartitionableEdge(vert1, vert2, None, "First edge")
+        edge2 = MultiCastPartitionableEdge(vert2, vert1, None, "First edge")
+        edge3 = MultiCastPartitionableEdge(vert1, vert3, None, "First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
         graph = PartitionableGraph("Graph", verts, edges)

@@ -136,11 +136,13 @@ class TestRadialPlacer(unittest.TestCase):
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_subvertices(self.subvertices)
 
+    @unittest.skip("demonstrating skipping")
     def test_new_basic_placer(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.assertEqual(self.bp._machine, self.machine)
         self.assertEqual(self.bp._graph, self.graph)
 
+    @unittest.skip("demonstrating skipping")
     def test_place_where_subvertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
@@ -148,6 +150,7 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.subvertex.label, placement.subvertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
+    @unittest.skip("demonstrating skipping")
     def test_place_where_subvertices_have_vertices(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.graph_mapper = GraphMapper()
@@ -157,6 +160,7 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.subvertex.label, placement.subvertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
+    @unittest.skip("demonstrating skipping")
     def test_place_subvertex_too_big_with_vertex(self):
         large_vertex = Vertex(500, "Large vertex 500")
         large_subvertex = large_vertex.create_subvertex(
@@ -170,9 +174,11 @@ class TestRadialPlacer(unittest.TestCase):
         with self.assertRaises(PacmanPlaceException):
             placements = self.bp.place(self.subgraph, self.graph_mapper)
 
+    @unittest.skip("demonstrating skipping")
     def test_try_to_place(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_subvertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.subvertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
@@ -195,6 +201,7 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.subvertex.label, placement.subvertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
+    @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_subvertices_have_vertices(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.subvertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
@@ -217,15 +224,19 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.subvertex.label, placement.subvertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
+    @unittest.skip("demonstrating skipping")
     def test_unsupported_non_placer_constraint(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("demonstrating skipping")
     def test_unsupported_placer_constraint(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("demonstrating skipping")
     def test_unsupported_placer_constraints(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("demonstrating skipping")
     def test_many_subvertices(self):
         subvertices = list()
         for i in range(20 * 17): #51 atoms per each processor on 20 chips
@@ -256,6 +267,7 @@ class TestRadialPlacer(unittest.TestCase):
         sorted_info = sorted(unorderdered_info, key=lambda x: int(x[1]))
         pp(sorted_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_too_many_subvertices(self):
         subvertices = list()
         for i in range(100 * 17): #50 atoms per each processor on 20 chips
@@ -271,6 +283,7 @@ class TestRadialPlacer(unittest.TestCase):
         with self.assertRaises(PacmanPlaceException):
             placements = self.bp.place(self.subgraph, self.graph_mapper)
 
+    @unittest.skip("demonstrating skipping")
     def test_fill_machine(self):
         subvertices = list()
         for i in range(99 * 17): #50 atoms per each processor on 20 chips

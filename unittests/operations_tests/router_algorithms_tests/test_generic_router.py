@@ -60,6 +60,7 @@ class TestRouter(unittest.TestCase):
         self.subgraph.add_subvertex(self.subvert2)
         self.subgraph.add_subedge(self.subedge)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_same_chip_route(self):
         #sort out placements
         self.placements = Placements()
@@ -81,6 +82,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_neighbour_chip(self):
         #sort out placements
         self.placements = Placements()
@@ -102,6 +104,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_one_hop_route_all_default_link_0(self):
         #sort out placements
         self.placements = Placements()
@@ -123,6 +126,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_one_hop_route_all_default_link_1(self):
         self.placements = Placements()
         self.placement1 = Placement(x=0, y=0, p=2, subvertex=self.subvert1)
@@ -143,6 +147,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_one_hop_route_all_default_link_2(self):
         self.placements = Placements()
         self.placement1 = Placement(x=0, y=0, p=2, subvertex=self.subvert1)
@@ -163,6 +168,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_one_hop_route_all_default_link_3(self):
         self.placements = Placements()
         self.placement1 = Placement(x=2, y=0, p=2, subvertex=self.subvert1)
@@ -183,6 +189,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_one_hop_route_all_default_link_4(self):
         self.placements = Placements()
         self.placement1 = Placement(x=2, y=2, p=2, subvertex=self.subvert1)
@@ -203,6 +210,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_one_hop_route_all_default_link_5(self):
         self.placements = Placements()
         self.placement1 = Placement(x=0, y=2, p=2, subvertex=self.subvert1)
@@ -223,6 +231,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_one_hop_route_not_default(self):
         #sort out placements
         self.placements = Placements()
@@ -244,6 +253,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_router_with_multi_hop_route_across_board(self):
         #sort out placements
         self.placements = Placements()
@@ -265,6 +275,7 @@ class TestRouter(unittest.TestCase):
             partitioned_graph=self.subgraph,
             routing_info_allocation=self.routing_info)
 
+    @unittest.skip("demonstrating skipping")
     def test_new_router(self):
         report_folder = "..\reports"
         self.routing = BasicDijkstraRouting()
@@ -276,6 +287,7 @@ class TestRouter(unittest.TestCase):
                               BasicDijkstraRouting)
         self.assertEqual(self.routing._graph_to_subgraph_mappings, None)
 
+    @unittest.skip("demonstrating skipping")
     def test_new_router_set_non_default_routing_algorithm(self):
         report_folder = "..\reports"
         self.routing = BasicDijkstraRouting()
@@ -285,6 +297,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(self.routing._hostname, None)
         self.assertEqual(self.routing._graph_to_subgraph_mappings, None)
 
+    @unittest.skip("demonstrating skipping")
     def test_run_router(self):
         #sort out placements
         self.placements = Placements()
