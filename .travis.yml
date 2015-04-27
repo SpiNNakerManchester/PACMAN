@@ -6,9 +6,6 @@ matrix:
 virtualenv:
   system_site_packages: true
 
-before_install:
- - sudo apt-get install -qq python-pytest
-
 before_script:
   - python ./setup.py install
-script: pytest
+script: "pytest ."
