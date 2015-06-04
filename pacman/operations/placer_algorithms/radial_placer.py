@@ -72,8 +72,8 @@ class RadialPlacer(AbstractPlacerAlgorithm):
         # Check for the radial placement constraint
         radial_constraints = utility_calls.locate_constraints_of_type(
             [vertex], PlacerRadialPlacementFromChipConstraint)
-        start_x = 0
-        start_y = 0
+        start_x = None
+        start_y = None
         for constraint in radial_constraints:
             if start_x is None:
                 start_x = constraint.x
