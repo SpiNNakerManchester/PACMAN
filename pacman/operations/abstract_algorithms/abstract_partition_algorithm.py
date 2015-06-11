@@ -68,7 +68,6 @@ class AbstractPartitionAlgorithm(object):
 
             # For each out edge of the parent vertex...
             vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(src_sv)
-            src_sv_slice = graph_to_subgraph_mapper.get_subvertex_slice(src_sv)
             out_edges = graph.outgoing_edges_from_vertex(vertex)
             for edge in out_edges:
 
@@ -77,10 +76,7 @@ class AbstractPartitionAlgorithm(object):
                 post_subverts = (graph_to_subgraph_mapper
                                  .get_subvertices_from_vertex(post_vertex))
                 for dst_sv in post_subverts:
-                    dst_sv_slice = (graph_to_subgraph_mapper
-                                    .get_subvertex_slice(dst_sv))
-                    subedge = edge.create_subedge(src_sv, src_sv_slice,
-                                                  dst_sv, dst_sv_slice)
+                    subedge = edge.create_subedge(src_sv, dst_sv)
                     subgraph.add_subedge(subedge)
                     graph_to_subgraph_mapper.add_partitioned_edge(
                         subedge, edge)

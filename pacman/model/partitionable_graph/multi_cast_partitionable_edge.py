@@ -37,10 +37,16 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
         """
         return True
 
-    def create_subedge(self, pre_subvertex, pre_subvertex_slice,
-                       post_subvertex, post_subvertex_slice, label=None,
+    def create_subedge(self, pre_subvertex, post_subvertex, label=None,
                        constraints=None):
         """
+        method for creating a partitioned multicast edge
+        :param pre_subvertex: the soruce partitioned vertex
+        :param post_subvertex: the destination partitioned vertex
+        :param label: the label of this partitioned edge
+        :param constraints: the constraints wnated to be put on this
+        partitioned edge
+        :return:
         """
         if not isinstance(pre_subvertex, PartitionedVertex):
             raise exceptions.PacmanInvalidParameterException(

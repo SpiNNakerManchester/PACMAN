@@ -33,25 +33,16 @@ class AbstractPartitionableEdge(AbstractConstrainedEdge):
         self._post_vertex = post_vertex
 
     @abstractmethod
-    def create_subedge(self, pre_subvertex, pre_subvertex_slice,
-                       post_subvertex, post_subvertex_slice, constraints=None,
+    def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
                        label=None):
         """ Create a subedge between the pre_subvertex and the post_subvertex
 
         :param pre_subvertex: The subvertex at the start of the subedge
         :type pre_subvertex:\
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
-        :param pre_subvertex_slice: The vertex slice associated with the\
-                    pre_subvertex
-        :type pre_subvertex_slice:\
-                    :py:class:`pacman.model.graph_mapper.slice.Slice`
         :param post_subvertex: The subvertex at the end of the subedge
         :type post_subvertex:\
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
-        :param post_subvertex_slice: The vertex_slice associated with the\
-                    post_subvertex
-        :type post_subvertex_slice:\
-                    :py:class:`pacman.model.graph_mapper.slice.Slice`
         :param constraints: The constraints of the vertex
         :type constraints: iterable of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
