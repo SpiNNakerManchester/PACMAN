@@ -104,17 +104,20 @@ class TestPartitionableEdgeModel(unittest.TestCase):
         """
         constraint1 = KeyAllocatorContiguousRangeContraint()
         vert1 = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        subv_from_vert1_slice = Slice(0, 9)
         subv_from_vert1 = vert1.create_subvertex(
-            Slice(0, 9),
-            vert1.get_resources_used_by_atoms(Slice(0, 9), None))
+            subv_from_vert1_slice,
+            vert1.get_resources_used_by_atoms(subv_from_vert1_slice, None))
         vert2 = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        subv_from_vert2_slice = Slice(0, 9)
         subv_from_vert2 = vert2.create_subvertex(
-            Slice(0, 9),
-            vert2.get_resources_used_by_atoms(Slice(0, 9), None))
+            subv_from_vert2_slice,
+            vert2.get_resources_used_by_atoms(subv_from_vert2_slice, None))
         edge1 = TestPartitionableEdge(vert1, vert2, "edge 1")
         edge1.add_constraint(constraint1)
 
-        subedge = edge1.create_subedge(subv_from_vert1, subv_from_vert2)
+        subedge = edge1.create_subedge(subv_from_vert1, subv_from_vert1_slice,
+                                       subv_from_vert2, subv_from_vert2_slice)
         self.assertIn(constraint1, subedge.constraints)
 
     def test_new_create_subvertex_from_vertex_no_constraints(self):

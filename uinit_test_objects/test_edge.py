@@ -13,7 +13,8 @@ class TestPartitionableEdge(AbstractPartitionableEdge):
         AbstractPartitionableEdge.__init__(
             self, pre_vertex, post_vertex, constraints, label)
 
-    def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
+    def create_subedge(self, pre_subvertex, pre_subvertex_slice,
+                       post_subvertex, post_subvertex_slice, constraints=None,
                        label=None):
         """ method to create subedges
 
@@ -29,7 +30,8 @@ class TestPartitionableEdge(AbstractPartitionableEdge):
         else:
             constraints = self._constraints
             print constraints
-        return MultiCastPartitionedEdge(pre_subvertex, post_subvertex,
+        return MultiCastPartitionedEdge(pre_subvertex, pre_subvertex_slice,
+                                        post_subvertex, post_subvertex_slice,
                                         label, constraints)
 
     def is_partitionable_edge(self):
