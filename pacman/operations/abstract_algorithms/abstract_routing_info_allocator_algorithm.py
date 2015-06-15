@@ -1,12 +1,10 @@
-from abc import ABCMeta
-from abc import abstractmethod
-from collections import OrderedDict
-from six import add_metaclass
+"""
+AbstractRoutingInfoAllocatorAlgorithm
+"""
 
+# pacamn imports
 from pacman.utilities import utility_calls
-
 from pacman.exceptions import PacmanValueError
-
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -19,7 +17,15 @@ from pacman.model.constraints.key_allocator_constraints\
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_same_keys_constraint \
     import KeyAllocatorSameKeysConstraint
-from pacman.utilities.ordered_set import OrderedSet
+
+# spinnmachine imports
+from spinn_machine.utilities.ordered_set import OrderedSet
+
+# general imports
+from abc import ABCMeta
+from abc import abstractmethod
+from collections import OrderedDict
+from six import add_metaclass
 
 
 @add_metaclass(ABCMeta)

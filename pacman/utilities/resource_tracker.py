@@ -6,7 +6,7 @@ from pacman import exceptions
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.utilities.ordered_set import OrderedSet
+from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.utilities import utility_calls
 from pacman.model.resources.cpu_cycles_per_tick_resource \
     import CPUCyclesPerTickResource
@@ -27,7 +27,7 @@ class ResourceTracker(object):
                     the set of chips used, or to re-order the chips.  Note\
                     also that on de-allocation, the order is no longer\
                     guaranteed.
-        :type chips: iterable of (x, y) tuples of coordinates of chips
+        :type chips: iterable of chips
         """
 
         # The amount of SDRAM used by each chip,
@@ -79,15 +79,16 @@ class ResourceTracker(object):
 
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors
-        self._chips_available = OrderedSet(chips)
+        self._chips_available = OrderedSet()
+        chips_to_use = chips
         if chips is None:
-            for chip in machine.chips:
-                key = (chip.x, chip.y)
-                self._chips_available.add(key)
+            chips_to_use = machine.chips
+        for chip in chips_to_use:
+            key = (chip.x, chip.y)
+            self._chips_available.add(key)
 
         # Initialize the ethernet area codes
         for (chip_x, chip_y) in self._chips_available:
-            chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
             # add area codes for ethernets
