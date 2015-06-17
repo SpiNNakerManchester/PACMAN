@@ -1,8 +1,3 @@
-"""
-RadialPlacer
-"""
-
-# pacman imports
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
@@ -19,15 +14,15 @@ from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.utilities import utility_calls
+from pacman.utilities.ordered_set import OrderedSet
 from pacman.utilities.resource_tracker import ResourceTracker
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPlaceException
 from pacman.operations.abstract_algorithms.abstract_placer_algorithm \
     import AbstractPlacerAlgorithm
 
-# general imports
+from collections import deque
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -65,7 +60,7 @@ class RadialPlacer(AbstractPlacerAlgorithm):
                                    "for placing the partitioned_graphs "
                                    "subvertices")
         resource_tracker = ResourceTracker(
-            machine, machine.generate_radial_chips())
+            machine, self._generate_radial_chips(machine))
         for vertex in ordered_subverts:
             self._place_vertex(vertex, resource_tracker, machine, placements)
             progress_bar.update()
@@ -77,8 +72,8 @@ class RadialPlacer(AbstractPlacerAlgorithm):
         # Check for the radial placement constraint
         radial_constraints = utility_calls.locate_constraints_of_type(
             [vertex], PlacerRadialPlacementFromChipConstraint)
-        start_x = None
-        start_y = None
+        start_x = 0
+        start_y = 0
         for constraint in radial_constraints:
             if start_x is None:
                 start_x = constraint.x
@@ -90,11 +85,34 @@ class RadialPlacer(AbstractPlacerAlgorithm):
                 raise PacmanPlaceException("Non-matching constraints")
         chips = None
         if start_x is not None and start_y is not None:
-            chips = machine.generate_radial_chips(
-                resource_tracker, start_x, start_y)
+            chips = self._generate_radial_chips(machine, resource_tracker,
+                                                start_x, start_y)
 
         # Create and store a new placement
         (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
             vertex.resources_required, vertex.constraints, chips)
         placement = Placement(vertex, x, y, p)
         placements.add_placement(placement)
+
+    def _generate_radial_chips(self, machine, resource_tracker=None,
+                               start_chip_x=0, start_chip_y=0):
+        first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
+        done_chips = set()
+        found_chips = OrderedSet()
+        search = deque([first_chip])
+        while len(search) > 0:
+            chip = search.pop()
+            if (resource_tracker is None or
+                    resource_tracker.is_chip_available(chip.x, chip.y)):
+                found_chips.add((chip.x, chip.y))
+            done_chips.add(chip)
+
+            # Examine the links of the chip to find the next chips
+            for link in chip.router.links:
+                next_chip = machine.get_chip_at(link.destination_x,
+                                                link.destination_y)
+
+                # Don't search found chips again
+                if next_chip not in done_chips:
+                    search.appendleft(next_chip)
+        return found_chips

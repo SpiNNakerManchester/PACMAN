@@ -1,7 +1,7 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 
-from spinn_machine.utilities.ordered_set import OrderedSet
+from pacman.utilities.ordered_set import OrderedSet
 
 
 class PartitionedGraph(object):
