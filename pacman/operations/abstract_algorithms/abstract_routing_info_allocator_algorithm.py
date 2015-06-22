@@ -2,6 +2,10 @@ from abc import ABCMeta
 from abc import abstractmethod
 from collections import OrderedDict
 from six import add_metaclass
+from pacman.model.routing_tables.multicast_routing_table import \
+    MulticastRoutingTable
+from pacman.model.routing_tables.multicast_routing_tables import \
+    MulticastRoutingTables
 
 from pacman.utilities import utility_calls
 
@@ -20,6 +24,7 @@ from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_same_keys_constraint \
     import KeyAllocatorSameKeysConstraint
 from pacman.utilities.ordered_set import OrderedSet
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 
 @add_metaclass(ABCMeta)
@@ -30,6 +35,7 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
 
     def __init__(self):
         self._supported_constraints = list()
+        self._routing_tables = MulticastRoutingTables()
 
     @staticmethod
     def _get_edge_groups(partitioned_graph):
@@ -187,8 +193,49 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
 
         return keys_and_masks
 
+    def _add_routing_key_entries(
+            self, routing_paths, subedge_routing_info, out_going_subedge):
+        """
+        creates and adds entries for routing tables as required for the path
+        :param routing_paths: the routing paths object generated from
+        routing info
+        :param subedge_routing_info: the subedge info object that contains keys
+        :param out_going_subedge: the edge this is aossicated with
+        :return: None
+        """
+        path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
+        # iterate thoguh the entries in each path, adding a router entry if required
+        for path_entry in path_entries:
+            # locate the router
+            router = self._routing_tables.get_routing_table_for_chip(
+                path_entry.router_x, path_entry.router_y)
+            if router is None:
+                router = MulticastRoutingTable(
+                    path_entry.router_x, path_entry.router_y)
+                self._routing_tables.add_routing_table(router)
+
+            # add entries as required, or emrge them if entries alrteady exist
+            for key_and_mask in subedge_routing_info.keys_and_masks:
+                multicast_routing_entry = MulticastRoutingEntry(
+                    routing_entry_key=key_and_mask.key_combo,
+                    defaultable=path_entry.defaultable, mask=key_and_mask.mask,
+                    link_ids=path_entry.out_going_links,
+                    processor_ids=path_entry.out_going_processors)
+                stored_entry = router.get_multicast_routing_entry_by_key_combo(
+                    key_and_mask.key_combo, key_and_mask.mask)
+                if stored_entry is None:
+                    router.add_mutlicast_routing_entry(MulticastRoutingEntry(
+                        routing_entry_key=key_and_mask.key_combo,
+                        defaultable=path_entry.defaultable,
+                        mask=key_and_mask.mask,
+                        link_ids=path_entry.out_going_links,
+                        processor_ids=path_entry.out_going_processors))
+                else:
+                    stored_entry.merge(multicast_routing_entry)
+
     @abstractmethod
-    def allocate_routing_info(self, subgraph, placements, n_keys_map):
+    def allocate_routing_info(self, subgraph, placements, n_keys_map,
+                              routing_paths):
         """ Allocates routing information to the partitioned edges in a\
             partitioned graph
 
@@ -202,8 +249,13 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                     of keys required by the edges
         :type n_keys_map:\
                     :py:class:`pacman.model.routing_info.abstract_partitioned_edge_n_keys_map.AbstractPartitionedEdgeNKeysMap`
+        :param routing_paths: the paths each partitionededge takes to get from
+        soruce to  destination.
+        :type routing_paths:
+            :py:class:`pacman.model.routing_paths.multicast_routing_paths.MulticastRoutingPaths
         :return: The routing information
-        :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
+        :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`,
+                :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """

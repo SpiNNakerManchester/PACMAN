@@ -14,7 +14,7 @@ from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.operations.abstract_algorithms.\
     abstract_routing_info_allocator_algorithm import \
@@ -48,7 +48,8 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         self._free_space_tracker = list()
         self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
 
-    def allocate_routing_info(self, subgraph, placements, n_keys_map):
+    def allocate_routing_info(
+            self, subgraph, placements, n_keys_map, routing_paths):
 
         # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
@@ -92,12 +93,15 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
             # Allocate the routing information
             for edge in group:
-                routing_infos.add_subedge_info(
-                    SubedgeRoutingInfo(keys_and_masks, edge))
+                subedge_info = SubedgeRoutingInfo(keys_and_masks, edge)
+                routing_infos.add_subedge_info(subedge_info)
+
+                # update routing tables with entries
+                self._add_routing_key_entries(routing_paths, subedge_info, edge)
             progress_bar.update()
 
         progress_bar.end()
-        return routing_infos
+        return routing_infos, self._routing_tables
 
     def _find_slot(self, base_key, lo=0):
         """ Find the free slot with the closest key <= base_key using a binary
@@ -356,7 +360,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 self._allocate_keys(base_key, n_keys)
 
             # If we get here, we can assign the keys to the edges
-            keys_and_masks = list([KeyAndMask(key=key_found,
+            keys_and_masks = list([BaseKeyAndMask(base_key=key_found,
                                               mask=mask)])
             return keys_and_masks
 

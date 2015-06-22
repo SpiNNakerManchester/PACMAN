@@ -4,7 +4,7 @@ test for subedge routing infos
 # pacman imports
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
-from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
@@ -24,7 +24,7 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         self.assertEqual(sri.subedge, sube)
         key_and_mask = sri.keys_and_masks
@@ -40,7 +40,7 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         RoutingInfo([sri])
 

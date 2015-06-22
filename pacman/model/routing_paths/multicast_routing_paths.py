@@ -27,20 +27,22 @@ class MulticastRoutingPaths(object):
         self._edge_to_routing_path_map[entry.edge].append(entry)
 
         # update router_to_entries_map
-        if entry.router not in self._router_to_entries_map:
-            self._router_to_entries_map[entry.router] = list()
-        self._router_to_entries_map[entry.router].append(entry)
+        key = (entry.router_x, entry.router_y)
+        if key not in self._router_to_entries_map:
+            self._router_to_entries_map[key] = list()
+        self._router_to_entries_map[key].append(entry)
 
-    def get_entries_for_router(self, router):
+    def get_entries_for_router(self, router_x, router_y):
         """
         returns the set of mutlicast path entries assigned to this router
         :param router:
         :return:
         """
-        if router not in self._router_to_entries_map:
+        key = (router_x, router_y)
+        if key not in self._router_to_entries_map:
             return ()
         else:
-            return self._router_to_entries_map[router]
+            return self._router_to_entries_map[key]
 
     def get_entries_for_edge(self, edge):
         """
@@ -54,14 +56,15 @@ class MulticastRoutingPaths(object):
         else:
             return self._edge_to_routing_path_map[edge]
 
-    def get_entry_on_coords_for_edge(self, edge, router):
+    def get_entry_on_coords_for_edge(self, edge, router_x, router_y):
         """
         returns a entry from a spefici coord if possible
         :param edge:
-        :param router
+        :param router_x
+        :param router_y
         :return:
         """
-        entries = self.get_entries_for_router(router)
+        entries = self.get_entries_for_router(router_x, router_y)
         for entry in entries:
             if entry.edge == edge:
                 return entry

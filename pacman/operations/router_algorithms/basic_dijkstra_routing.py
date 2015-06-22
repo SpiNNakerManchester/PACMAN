@@ -5,8 +5,6 @@ BasicDijkstraRouting
 # pacman imports
 from pacman.model.routing_paths.multicast_routing_path_entry import \
     MulticastRoutingPathEntry
-from pacman.model.routing_tables.multicast_routing_table\
-    import MulticastRoutingTable
 from pacman.operations.abstract_algorithms\
     .abstract_multi_cast_router_algorithm\
     import AbstractMultiCastRouterAlgorithm
@@ -14,9 +12,6 @@ from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
     import MultiCastPartitionedEdge
-
-# spinnmachine imports
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 # genral imports
 import logging
@@ -220,8 +215,7 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
             if nodes_info[key]["neighbours"][n] is not None:
                 neighbour = nodes_info[key]["neighbours"][n]
                 xn, yn = neighbour.destination_x, neighbour.destination_y
-                router = self._machine.get_chip_at(xn, yn).router
-                entries = self._routing_paths.get_entries_for_router(router)
+                entries = self._routing_paths.get_entries_for_router(xn, yn)
                 nodes_info[key]["weights"][n] = self._get_weight(
                     machine.get_chip_at(xn, yn).router,
                     nodes_info[key]["bws"][n],
@@ -454,10 +448,9 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
         routing_entry_route_processors = [processor_dest]
         routing_entry_route_links = None
 
-        router = self._machine.get_chip_at(x_destination, y_destination).router
         entry = MulticastRoutingPathEntry(
-            router=router, defaultable=False, edge=subedge,
-            out_going_links=routing_entry_route_links,
+            router_x=x_destination, router_y=y_destination, defaultable=False,
+            edge=subedge, out_going_links=routing_entry_route_links,
             outgoing_processors=routing_entry_route_processors)
         self._routing_paths.add_path_entry(entry)
         previous_routing_entry = entry
@@ -556,10 +549,10 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
                 abs(neighbours_lowest_cost - chip_sought_cost) <
                 0.00000000001):
 
-            router = self._machine.get_chip_at(x_neighbour, y_neighbour).router
             entry = MulticastRoutingPathEntry(
-                router=router, edge=subedge, incoming_link=neighbour_index,
-                out_going_links=dec_direction, outgoing_processors=None)
+                router_x=x_neighbour, router_y=y_neighbour, edge=subedge,
+                incoming_link=neighbour_index, out_going_links=dec_direction,
+                outgoing_processors=None)
 
             self._routing_paths.add_path_entry(entry)
             previous_routing_entry = entry

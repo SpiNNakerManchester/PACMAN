@@ -2,7 +2,7 @@ import unittest
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
     import MallocBasedRoutingInfoAllocator
-from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 import traceback
 
 
@@ -12,7 +12,7 @@ class MyTestCase(unittest.TestCase):
         allocator = MallocBasedRoutingInfoAllocator()
         try:
             allocator._allocate_fixed_keys_and_masks(
-                [KeyAndMask(0x800, 0xFFFFF800)], None)
+                [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
 
         except:
             traceback.print_exc()
@@ -83,7 +83,7 @@ class MyTestCase(unittest.TestCase):
         allocator = MallocBasedRoutingInfoAllocator()
 
         allocator._allocate_fixed_keys_and_masks(
-            [KeyAndMask(0x800, 0xFFFFF800)], None)
+            [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
 
         for mask, keys in zip(fixed_masks, n_keys):
             self._print_keys_and_masks(

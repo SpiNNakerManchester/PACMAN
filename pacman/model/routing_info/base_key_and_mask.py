@@ -2,23 +2,23 @@ from pacman import exceptions
 import numpy
 
 
-class KeyAndMask(object):
+class BaseKeyAndMask(object):
     """ A Key and Mask to be used for routing
     """
 
-    def __init__(self, key, mask):
+    def __init__(self, base_key, mask):
         """
-        :param key: The routing key
-        :type key: int
+        :param base_key: The routing key
+        :type base_key: int
         :param mask: The routing mask
         :type mask: int
         :raise PacmanConfigurationException: If key & mask != key i.e. the key\
                     is not valid for the given mask
         """
-        self._key = key
+        self._base_key = base_key
         self._mask = mask
 
-        if key & mask != key:
+        if base_key & mask != base_key:
             raise exceptions.PacmanConfigurationException(
                 "This routing info is invalid as the mask and key together "
                 "alters the key. This is deemed to be a error from "
@@ -27,12 +27,20 @@ class KeyAndMask(object):
 
     @property
     def key(self):
-        """ The key
+        """ The base key
 
-        :return: The key
+        :return: The base key
         :rtype: int
         """
-        return self._key
+        return self._base_key
+
+    @property
+    def key_combo(self):
+        """
+        the key combo
+        :return:
+        """
+        return self._base_key & self._mask
 
     @property
     def mask(self):
@@ -44,11 +52,11 @@ class KeyAndMask(object):
         return self._mask
 
     def __eq__(self, key_and_mask):
-        return (self._key == key_and_mask.key and
+        return (self._base_key == key_and_mask.key and
                 self._mask == key_and_mask.mask)
 
     def __repr__(self):
-        return "KeyAndMask:{}:{}".format(hex(self._key), hex(self._mask))
+        return "KeyAndMask:{}:{}".format(hex(self._base_key), hex(self._mask))
 
     def __str__(self):
         return self.__repr__()
@@ -106,7 +114,7 @@ class KeyAndMask(object):
 
         # Create a list of 2^len(zeros) keys
         unwrapped_key = numpy.unpackbits(
-            numpy.asarray([self._key], dtype=">u4").view(dtype="uint8"))
+            numpy.asarray([self._base_key], dtype=">u4").view(dtype="uint8"))
 
         # for each key, create its key with the idea of a neuron id being
         # continious and live at a offsettable position from the bottom of

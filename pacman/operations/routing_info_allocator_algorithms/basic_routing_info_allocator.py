@@ -6,7 +6,7 @@ from pacman.operations.abstract_algorithms.\
 from pacman.utilities import utility_calls
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
@@ -26,7 +26,12 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
     def __init__(self):
         AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
 
-    def allocate_routing_info(self, subgraph, placements, n_keys_map):
+    def allocate_routing_info(self, subgraph, placements, n_keys_map,
+                              routing_paths):
+        """
+        see pacman.operations.abstract_algorithms.
+        abstract_routing_info_allocator_algorithm
+        """
 
         # check that this algorithm supports the constraints put onto the
         # partitioned_edges
@@ -55,13 +60,25 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 placement = placements.get_placement_of_subvertex(subvert)
                 if placement is not None:
                     key = self._get_key_from_placement(placement)
-                    keys_and_masks = list([KeyAndMask(key=key, mask=MASK)])
+                    keys_and_masks = list([BaseKeyAndMask(base_key=key,
+                                                          mask=MASK)])
                     subedge_routing_info = SubedgeRoutingInfo(
                         keys_and_masks, out_going_subedge)
                     routing_infos.add_subedge_info(subedge_routing_info)
+                else:
+                    raise PacmanRouteInfoAllocationException(
+                        "This subverte '{}' has no placement! this should "
+                        "never occur, please fix adn try again."
+                        .format(subvert))
+                # update routing tables with entries
+                self._add_routing_key_entries(
+                    routing_paths, subedge_routing_info, out_going_subedge)
             progress_bar.update()
         progress_bar.end()
-        return routing_infos
+
+        return routing_infos, self._routing_tables
+
+
 
     @staticmethod
     def _get_key_from_placement(placement):

@@ -118,14 +118,13 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
                 text = text + "P{}".format(entry.incoming_processor)
             else:
                 text = "(L:{}".format(link_labels[entry.incoming_link])
-            link = entry.router.links.next()
-            text += "->{}:{}".format(link.source_x, link.source_y)
+            text += "->{}:{}".format(entry.router_x, entry.router_y)
             if entry.defaultable:
                 text += ":D"
-            if entry.out_going_processors is not None:
+            if len(entry.out_going_processors) != 0:
                 for processor in entry.out_going_processors:
                     text = text + "->P{}".format(processor)
-            if entry.out_going_links is not None:
+            if len(entry.out_going_links) != 0:
                 for link in entry.out_going_links:
                     text += "->{}".format(link_labels[link])
             f_routing.write(text)

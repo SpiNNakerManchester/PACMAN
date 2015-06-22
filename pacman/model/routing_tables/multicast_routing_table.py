@@ -25,7 +25,7 @@ class MulticastRoutingTable(object):
         self._x = x
         self._y = y
         self._multicast_routing_entries = set()
-        self._multicast_routing_entries_by_key_combo_mask = OrderedDict()
+        self._multicast_routing_entries_by_routing_entry_key = OrderedDict()
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
@@ -42,15 +42,15 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
         """
-        key_mask_combo, mask = \
-            multicast_routing_entry.key_combo, multicast_routing_entry.mask
+        routing_entry_key = multicast_routing_entry.routing_entry_key
+        mask = multicast_routing_entry.mask
 
-        tuple_key = (key_mask_combo, mask)
-        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
+        tuple_key = (routing_entry_key, mask)
+        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
             raise exceptions.PacmanAlreadyExistsException(
                 "Multicast_routing_entry", str(multicast_routing_entry))
 
-        self._multicast_routing_entries_by_key_combo_mask[tuple_key] =\
+        self._multicast_routing_entries_by_routing_entry_key[tuple_key] =\
             multicast_routing_entry
         self._multicast_routing_entries.add(multicast_routing_entry)
 
@@ -68,8 +68,8 @@ class MulticastRoutingTable(object):
         key_mask_combo, mask = \
             multicast_routing_entry.key_combo, multicast_routing_entry.mask
         tuple_key = (key_mask_combo, mask)
-        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
-            del self._multicast_routing_entries_by_key_combo_mask[tuple_key]
+        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
+            del self._multicast_routing_entries_by_routing_entry_key[tuple_key]
             self._multicast_routing_entries.remove(multicast_routing_entry)
         else:
             raise exceptions.PacmanNotExistException(
@@ -137,6 +137,7 @@ class MulticastRoutingTable(object):
                 "correct this and try again.".format(key_combo, mask))
 
         tuple_key = (key_combo, mask)
-        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
-            return self._multicast_routing_entries_by_key_combo_mask[tuple_key]
+        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
+            return self._multicast_routing_entries_by_routing_entry_key[
+                tuple_key]
         return None

@@ -86,7 +86,7 @@ class ValidRouteChecker(object):
         pacman.model.placements.placement.Placement
         :type dest_placements: iterable of PlacementTuple
         :type key_and_mask: instanceof
-        pacman.model.routing_info.key_and_mask.KeyAndMask
+        pacman.model.routing_info.key_and_mask.BaseKeyAndMask
         :return: None
         :raise PacmanRoutingException: when the trace completes and there are\
                     still destinations not visited
@@ -290,7 +290,7 @@ class ValidRouteChecker(object):
         """
         for entry in current_router.multicast_routing_entries:
             key_combo = entry.mask & key
-            if key_combo == entry.key_combo:
+            if key_combo == entry.routing_entry_key:
                 return entry
         else:
             raise exceptions.PacmanRoutingException("no entry located")

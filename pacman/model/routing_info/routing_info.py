@@ -140,7 +140,7 @@ class RoutingInfo(object):
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :return: an iterable of keys and masks for the partitioned vertex
         :rtype: iterable of \
-                    :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
+                    :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`
         """
         if partitioned_vertex in self._key_masks_by_subvertex:
             return self._key_masks_by_subvertex[partitioned_vertex]

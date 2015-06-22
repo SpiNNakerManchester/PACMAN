@@ -11,13 +11,15 @@ class MulticastRoutingPathEntry(object):
     a entry which defines the directions of a entry in a multi-cast routing path
     """
 
-    def __init__(self, router, edge, out_going_links, outgoing_processors,
-                 incoming_processor=None,
+    def __init__(self, router_x, router_y, edge, out_going_links,
+                 outgoing_processors, incoming_processor=None,
                  incoming_link=None, defaultable=False):
         """
         builder for a MulticastRoutingPathEntry
-        :param router: the router this is associated with
-        :type router: spinnmachine.router.Router
+        :param router_x: the x coord of the router this is associated with
+        :type router_x: int
+        :param router_y: the y coord of the router this is associated with
+        :type router_y: int
         :param edge: the partitioned edge this entry is associated with
         :type edge: pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge
         :param out_going_links: the edges this path entry goes down
@@ -32,15 +34,18 @@ class MulticastRoutingPathEntry(object):
          :type defaultable: boolean
         :return:
         """
-        self._router = router
+        self._router_x = router_x
+        self._router_y = router_y
         self._edge = edge
         if isinstance(out_going_links, int):
-            self._out_going_links = (out_going_links)
+            self._out_going_links = list()
+            self._out_going_links.append(out_going_links)
         else:
             self._out_going_links = out_going_links
 
         if isinstance(outgoing_processors, int):
-            self._out_going_processors = (outgoing_processors)
+            self._out_going_processors = list()
+            self._out_going_processors.append(outgoing_processors)
         else:
             self._out_going_processors = outgoing_processors
 
@@ -63,12 +68,20 @@ class MulticastRoutingPathEntry(object):
 
 
     @property
-    def router(self):
+    def router_x(self):
         """
-        property for router
+        property for router x coord
         :return:
         """
-        return self._router
+        return self._router_x
+
+    @property
+    def router_y(self):
+        """
+        property for router y coord
+        :return:
+        """
+        return self._router_y
 
     @property
     def edge(self):
@@ -84,7 +97,10 @@ class MulticastRoutingPathEntry(object):
         property for the processors out of this router for this path entry
         :return:
         """
-        return self._out_going_processors
+        if self._out_going_processors is None:
+            return ()
+        else:
+            return self._out_going_processors
 
     @property
     def out_going_links(self):
@@ -92,7 +108,10 @@ class MulticastRoutingPathEntry(object):
         property for the outgoibng links from this path entry
         :return:
         """
-        return self._out_going_links
+        if self._out_going_links is None:
+            return ()
+        else:
+            return self._out_going_links
 
     @property
     def incoming_link(self):

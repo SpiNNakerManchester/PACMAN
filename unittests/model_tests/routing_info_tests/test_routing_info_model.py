@@ -5,7 +5,7 @@ test for routing infos
 from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
-from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
@@ -29,8 +29,8 @@ class TestRoutingInfos(unittest.TestCase):
         sube2 = MultiCastPartitionedEdge(subv2, subv1)
         keys_and_masks1 = list()
         keys_and_masks2 = list()
-        keys_and_masks1.append(KeyAndMask(0x0012, 0x00ff))
-        keys_and_masks2.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks1.append(BaseKeyAndMask(0x0012, 0x00ff))
+        keys_and_masks2.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri1 = SubedgeRoutingInfo(keys_and_masks1, sube1)
         sri2 = SubedgeRoutingInfo(keys_and_masks2, sube2)
         self.assertRaises(PacmanAlreadyExistsException, RoutingInfo,
@@ -48,8 +48,8 @@ class TestRoutingInfos(unittest.TestCase):
         sube2 = MultiCastPartitionedEdge(subv1, subv1)
         keys_and_masks1 = list()
         keys_and_masks2 = list()
-        keys_and_masks1.append(KeyAndMask(0x0012, 0x00ff))
-        keys_and_masks2.append(KeyAndMask(0x0013, 0x00ff))
+        keys_and_masks1.append(BaseKeyAndMask(0x0012, 0x00ff))
+        keys_and_masks2.append(BaseKeyAndMask(0x0013, 0x00ff))
         sri1 = SubedgeRoutingInfo(keys_and_masks1, sube1)
         sri2 = SubedgeRoutingInfo(keys_and_masks2, sube2)
         RoutingInfo([sri1, sri2])
@@ -64,7 +64,7 @@ class TestRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks1 = list()
-        keys_and_masks1.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks1.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks1, sube)
         ri = RoutingInfo([sri])
         for info in ri.all_subedge_info:
@@ -85,7 +85,7 @@ class TestRoutingInfos(unittest.TestCase):
         sri = list()
         for i in range(4):
             keys_and_masks = list()
-            keys_and_masks.append(KeyAndMask(0x0012 + i, 0x00ff))
+            keys_and_masks.append(BaseKeyAndMask(0x0012 + i, 0x00ff))
             sri.append(SubedgeRoutingInfo(keys_and_masks, subedges[i]))
         ri = RoutingInfo(sri)
         i = 0
@@ -103,7 +103,7 @@ class TestRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         ri = RoutingInfo([sri])
         self.assertIn(sri, ri.get_subedge_infos_by_key(0xff12, 0x00ff))
@@ -118,7 +118,7 @@ class TestRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         ri = RoutingInfo([sri])
         self.assertEqual(ri.get_subedge_infos_by_key(0xff12, 0x000f), None)
@@ -132,7 +132,7 @@ class TestRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         ri = RoutingInfo([sri])
         ri_keys_and_masks = ri.get_keys_and_masks_from_subedge(sri.subedge)
@@ -145,7 +145,7 @@ class TestRoutingInfos(unittest.TestCase):
         sube = MultiCastPartitionedEdge(subv1, subv2)
         subz = MultiCastPartitionedEdge(subv2, subv1)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         ri = RoutingInfo([sri])
         ri_keys_and_masks = ri.get_keys_and_masks_from_subedge(subz)
@@ -156,7 +156,7 @@ class TestRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         ri = RoutingInfo([sri])
         self.assertEqual(ri.get_subedge_information_from_subedge(sri.subedge),
@@ -167,7 +167,7 @@ class TestRoutingInfos(unittest.TestCase):
         subv2 = PartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
-        keys_and_masks.append(KeyAndMask(0x0012, 0x00ff))
+        keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = SubedgeRoutingInfo(keys_and_masks, sube)
         ri = RoutingInfo([sri])
         self.assertEqual(
