@@ -172,7 +172,8 @@ class ResourceTracker(object):
             return chips_to_use
         elif board_address is not None:
             return self._ethernet_area_codes[board_address]
-        elif ip_tags is not None or reverse_ip_tags is not None:
+        elif ((ip_tags is not None and len(ip_tags) > 0) or
+                (reverse_ip_tags is not None and len(reverse_ip_tags) > 0)):
             return self._get_usable_ip_tag_chips()
         return self._chips_available
 
