@@ -204,6 +204,8 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         :return: None
         """
         path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
+        if "Inhibitory_Cells:100:199" in out_going_subedge.__repr__():
+            pass
         # iterate thoguh the entries in each path, adding a router entry if required
         for path_entry in path_entries:
             # locate the router
@@ -221,7 +223,7 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                     defaultable=path_entry.defaultable, mask=key_and_mask.mask,
                     link_ids=path_entry.out_going_links,
                     processor_ids=path_entry.out_going_processors)
-                stored_entry = router.get_multicast_routing_entry_by_key_combo(
+                stored_entry = router.get_multicast_routing_entry_by_routing_entry_key(
                     key_and_mask.key_combo, key_and_mask.mask)
                 if stored_entry is None:
                     router.add_mutlicast_routing_entry(MulticastRoutingEntry(
@@ -231,7 +233,9 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
                         link_ids=path_entry.out_going_links,
                         processor_ids=path_entry.out_going_processors))
                 else:
-                    stored_entry.merge(multicast_routing_entry)
+                    merged_entry = stored_entry.merge(multicast_routing_entry)
+                    router.remove_multicast_routing_entry(stored_entry)
+                    router.add_mutlicast_routing_entry(merged_entry)
 
     @abstractmethod
     def allocate_routing_info(self, subgraph, placements, n_keys_map,

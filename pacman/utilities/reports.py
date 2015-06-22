@@ -566,7 +566,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
             entry_count = 0
             for entry in routing_table.multicast_routing_entries:
                 index = entry_count & 0xFFFF
-                key = entry.key_combo
+                key = entry.routing_entry_key
                 mask = entry.mask
                 hex_route = _reduce_route_value(entry.processor_ids,
                                                 entry.link_ids)
@@ -647,7 +647,7 @@ def _get_associated_routing_entries_from(
     key_combo = routing_data.key_combo
     mask = routing_data.mask
     destinations = \
-        routing_table.get_multicast_routing_entry_by_key_combo(key_combo, mask)
+        routing_table.get_multicast_routing_entry_by_routing_entry_key(key_combo, mask)
 
     if fr_placement.x == to_placement.x and fr_placement.y == to_placement.y:
 
