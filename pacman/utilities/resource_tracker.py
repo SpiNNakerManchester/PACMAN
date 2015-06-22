@@ -362,7 +362,7 @@ class ResourceTracker(object):
         :rtype: bool
         """
         # If there are no tags to assign, declare that they are available
-        if ip_tags is None:
+        if ip_tags is None or len(ip_tags) == 0:
             return True
 
         # If there is a fixed board address and the chip is not on the board
@@ -426,7 +426,7 @@ class ResourceTracker(object):
         :rtype: bool
         """
         # If there are no tags, declare they are available
-        if reverse_ip_tags is None:
+        if reverse_ip_tags is None or len(reverse_ip_tags) == 0:
             return True
 
         # If there is a fixed board address and the chip is not on the board
@@ -530,7 +530,7 @@ class ResourceTracker(object):
         :return: iterable of tuples of (board address, tag) assigned
         :rtype: iterable of (str, int)
         """
-        if ip_tags is None:
+        if ip_tags is None or len(ip_tags) == 0:
             return None
         allocations = list()
         for ip_tag in ip_tags:
@@ -575,7 +575,7 @@ class ResourceTracker(object):
         :return: iterable of tuples of (board address, tag) assigned
         :rtype: iterable of (str, int)
         """
-        if reverse_ip_tags is None:
+        if reverse_ip_tags is None or len(reverse_ip_tags) == 0:
             return None
         allocations = list()
         for reverse_ip_tag in reverse_ip_tags:
