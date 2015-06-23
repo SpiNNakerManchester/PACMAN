@@ -68,18 +68,23 @@ class AbstractPartitionAlgorithm(object):
 
             # For each out edge of the parent vertex...
             vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(src_sv)
-            out_edges = graph.outgoing_edges_from_vertex(vertex)
-            for edge in out_edges:
+            outgoing_partitions = \
+                graph.outgoing_edges_partitions_from_vertex(vertex)
+            for outgoing_partition_identifer in outgoing_partitions:
+                out_edges = \
+                    outgoing_partitions[outgoing_partition_identifer].edges
+                for edge in out_edges:
 
-                # ... and create and store a new subedge for each postsubvertex
-                post_vertex = edge.post_vertex
-                post_subverts = (graph_to_subgraph_mapper
-                                 .get_subvertices_from_vertex(post_vertex))
-                for dst_sv in post_subverts:
-                    subedge = edge.create_subedge(src_sv, dst_sv)
-                    subgraph.add_subedge(subedge)
-                    graph_to_subgraph_mapper.add_partitioned_edge(
-                        subedge, edge)
+                    # and create and store a new subedge for each postsubvertex
+                    post_vertex = edge.post_vertex
+                    post_subverts = (graph_to_subgraph_mapper
+                                     .get_subvertices_from_vertex(post_vertex))
+                    for dst_sv in post_subverts:
+                        subedge = edge.create_subedge(src_sv, dst_sv)
+                        subgraph.add_subedge(subedge,
+                                             outgoing_partition_identifer)
+                        graph_to_subgraph_mapper.add_partitioned_edge(
+                            subedge, edge)
             progress_bar.update()
         progress_bar.end()
 

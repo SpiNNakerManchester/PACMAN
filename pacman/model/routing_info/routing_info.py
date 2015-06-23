@@ -4,8 +4,6 @@ object RoutingInfo
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.constraints.key_allocator_constraints.key_allocator_same_keys_constraint import \
-    KeyAllocatorSameKeysConstraint
 from pacman.utilities import utility_calls
 
 class RoutingInfo(object):
@@ -63,20 +61,8 @@ class RoutingInfo(object):
                     .append(subedge_info)
             # need to check that subedge infos are linked properly
             elif self._subedge_infos_by_key[key_and_mask.key] != subedge_info:
-                valid = self._check_subedge_infos_are_compatible(subedge_info,
-                                                                 key_and_mask)
-                if valid:
-                    self._subedge_infos_by_key[key_and_mask.key]\
-                        .append(subedge_info)
-                else:
-                    raise exceptions.PacmanAlreadyExistsException(
-                        "This key has already been applied to the subedge info"
-                        " {}. Therfore adding subedge {} would overwrite {} "
-                        "data".format(
-                            self._subedge_infos_by_key[key_and_mask.key],
-                            subedge_info,
-                            self._subedge_infos_by_key[key_and_mask.key]),
-                        subedge_info)
+                self._subedge_infos_by_key[key_and_mask.key]\
+                    .append(subedge_info)
 
         # add the key mask by subvertex mapping
         pre_sub = subedge_info.subedge.pre_subvertex
@@ -84,40 +70,6 @@ class RoutingInfo(object):
             self._key_masks_by_subvertex[pre_sub] = list()
         for key_and_mask in subedge_info.keys_and_masks:
             self._key_masks_by_subvertex[pre_sub].append(key_and_mask)
-
-    def _check_subedge_infos_are_compatible(self, subedge_info, key_and_mask):
-        """
-        helper method that checks if the two subedges are linked.
-        This is done by either the comparision of the subedges or the subedges
-        within their KeyAllocatorSameKeysConstraint, which they must have
-        :param subedge_info: the new subedge info to compare against
-        :param key_and_mask: the key_mask from said subedge info
-        :return:
-        """
-        stored_subedge = self._subedge_infos_by_key[key_and_mask.key][0].subedge
-        new_subedge = subedge_info.subedge
-        stored_constraint = utility_calls.locate_constraints_of_type(
-            stored_subedge.constraints, KeyAllocatorSameKeysConstraint)
-        new_constraint = utility_calls.locate_constraints_of_type(
-            new_subedge.constraints, KeyAllocatorSameKeysConstraint)
-        # if neiher have a constraint, then they cant be equal and thus need to
-        # be failed
-        if len(stored_constraint) == 0 and len(new_constraint) == 0:
-            return False
-        # if only one of them has a constraint, the other must be compared
-        # against that subedge (all point at one subedge)
-        elif (len(stored_constraint) == 0 and
-                new_constraint[0].partitioned_edge_to_match == stored_subedge):
-            return True
-        elif (len(new_constraint) == 0 and
-                stored_constraint[0].partitioned_edge_to_match == new_subedge):
-            return True
-        # if both have a constraint, compare the constraints subedge
-        elif (stored_constraint[0].partitioned_edge_to_match ==
-                new_constraint[0].partitioned_edge_to_match):
-            return True
-        else:
-            return False
 
     @property
     def all_subedge_info(self):

@@ -1,8 +1,6 @@
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_same_keys_constraint import KeyAllocatorSameKeysConstraint
-from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
@@ -38,7 +36,6 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
     def __init__(self):
         AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
-        self._supported_constraints.append(KeyAllocatorSameKeysConstraint)
         self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
         self._supported_constraints.append(
             KeyAllocatorFixedKeyAndMaskConstraint)
