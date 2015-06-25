@@ -333,12 +333,18 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                     used_placements, resource_tracker, lo_atom, hi_atom, graph)
 
             # Attempt to allocate the resources for this vertex on the machine
-            (x, y, p, ip_tags, reverse_ip_tags) = \
-                resource_tracker.allocate_constrained_resources(
-                    used_resources, vertex.constraints)
-            used_placements.append(
-                (vertex, x, y, p, used_resources,
-                 ip_tags, reverse_ip_tags))
+            try:
+                (x, y, p, ip_tags, reverse_ip_tags) = \
+                    resource_tracker.allocate_constrained_resources(
+                        used_resources, vertex.constraints)
+                used_placements.append(
+                    (vertex, x, y, p, used_resources,
+                     ip_tags, reverse_ip_tags))
+            except exceptions.PacmanValueError as e:
+                
+                raise exceptions.PacmanValueError(
+                    "Unable to allocate requested resources to"
+                    " vertex {}:\n{}".format(vertex, e))
 
         # reduce data to what the parent requires
         final_placements = list()
