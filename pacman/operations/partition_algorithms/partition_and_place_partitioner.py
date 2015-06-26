@@ -1,3 +1,7 @@
+"""
+PartitionAndPlacePartitioner
+"""
+
 import logging
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
@@ -8,8 +12,7 @@ from pacman.model.constraints.partitioner_constraints.\
     import PartitionerSameSizeAsVertexConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
-from pacman.operations.abstract_algorithms.abstract_partition_algorithm\
-    import AbstractPartitionAlgorithm
+from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
@@ -23,24 +26,14 @@ from pacman.utilities.resource_tracker import ResourceTracker
 logger = logging.getLogger(__name__)
 
 
-class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
+class PartitionAndPlacePartitioner(object):
     """  A partitioner that tries to ensure that SDRAM is not overloaded by\
          keeping track of the SDRAM usage on the various chips
 
     """
 
-    def __init__(self):
-        """
-        """
-        AbstractPartitionAlgorithm.__init__(self)
-
-        # add supported constraints
-        self._supported_constraints.append(PartitionerMaximumSizeConstraint)
-        self._supported_constraints.append(
-            PartitionerSameSizeAsVertexConstraint)
-
     # inherited from AbstractPartitionAlgorithm
-    def partition(self, graph, machine):
+    def __call__(self, graph, machine):
         """ Partition a partitionable_graph so that each subvertex will fit\
             on a processor within the machine
 
@@ -60,7 +53,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             abstract_constraint_type=AbstractPartitionerConstraint,
-            supported_constraints=self._supported_constraints)
+            supported_constraints=[PartitionerMaximumSizeConstraint,
+                                   PartitionerSameSizeAsVertexConstraint])
 
         # Load the vertices and create the subgraph to fill
         vertices = graph.vertices
@@ -94,9 +88,13 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
             progress_bar.update(vertex.n_atoms)
         progress_bar.end()
 
-        self._generate_sub_edges(subgraph, graph_mapper, graph)
+        partition_algorithm_utilities.generate_sub_edges(
+            subgraph, graph_mapper, graph)
 
-        return subgraph, graph_mapper
+        results = dict()
+        results['partitioned_graph'] = subgraph
+        results['graph_mapper'] = graph_mapper
+        return results
 
     def _partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper,
                           resource_tracker, graph):
@@ -198,7 +196,8 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                 subvertex = vertex.create_subvertex(
                     vertex_slice, used_resources,
                     "{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
-                    self._get_remaining_constraints(vertex))
+                    partition_algorithm_utilities.get_remaining_constraints(
+                        vertex))
 
                 # update objects
                 subgraph.add_subvertex(subvertex)

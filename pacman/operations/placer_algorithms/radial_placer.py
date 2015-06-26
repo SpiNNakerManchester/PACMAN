@@ -1,3 +1,8 @@
+"""
+RadialPlacer
+"""
+
+# pacamn imports
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
@@ -18,37 +23,30 @@ from pacman.utilities.ordered_set import OrderedSet
 from pacman.utilities.resource_tracker import ResourceTracker
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPlaceException
-from pacman.operations.abstract_algorithms.abstract_placer_algorithm \
-    import AbstractPlacerAlgorithm
 
+# general imports
 from collections import deque
 import logging
+
+
 logger = logging.getLogger(__name__)
 
 
-class RadialPlacer(AbstractPlacerAlgorithm):
+class RadialPlacer(object):
     """ A placement algorithm that can place a partitioned graph onto a
         machine choosing chips radiating in a circle from 0, 0
     """
 
-    def __init__(self):
-        """
-        """
-        AbstractPlacerAlgorithm.__init__(self)
-        self._supported_constraints.append(
-            PlacerRadialPlacementFromChipConstraint)
-        self._supported_constraints.append(
-            TagAllocatorRequireIptagConstraint)
-        self._supported_constraints.append(
-            TagAllocatorRequireReverseIptagConstraint)
-        self._supported_constraints.append(PlacerChipAndCoreConstraint)
-
-    def place(self, partitioned_graph, machine):
+    def __call__(self, partitioned_graph, machine):
 
         # check that the algorithm can handle the constraints
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=partitioned_graph.subvertices,
-            supported_constraints=self._supported_constraints,
+            supported_constraints=[
+                PlacerRadialPlacementFromChipConstraint,
+                TagAllocatorRequireIptagConstraint,
+                TagAllocatorRequireReverseIptagConstraint,
+                PlacerChipAndCoreConstraint],
             abstract_constraint_type=AbstractPlacerConstraint)
 
         placements = Placements()
@@ -65,7 +63,7 @@ class RadialPlacer(AbstractPlacerAlgorithm):
             self._place_vertex(vertex, resource_tracker, machine, placements)
             progress_bar.update()
         progress_bar.end()
-        return placements
+        return {'placements': placements}
 
     def _place_vertex(self, vertex, resource_tracker, machine, placements):
 

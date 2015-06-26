@@ -1,5 +1,13 @@
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint import \
+    PlacerRadialPlacementFromChipConstraint
 from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
+from pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint import \
+    TagAllocatorRequireIptagConstraint
+from pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint import \
+    TagAllocatorRequireReverseIptagConstraint
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
@@ -23,12 +31,16 @@ class ConnectiveBasedPlacer(RadialPlacer):
         """
         RadialPlacer.__init__(self)
 
-    def place(self, partitioned_graph, machine):
+    def __call__(self, partitioned_graph, machine):
 
         # check that the algorithm can handle the constraints
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=partitioned_graph.subvertices,
-            supported_constraints=self._supported_constraints,
+            supported_constraints=[
+                PlacerRadialPlacementFromChipConstraint,
+                TagAllocatorRequireIptagConstraint,
+                TagAllocatorRequireReverseIptagConstraint,
+                PlacerChipAndCoreConstraint],
             abstract_constraint_type=AbstractPlacerConstraint)
 
         # Sort the vertices into those with and those without
@@ -89,7 +101,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                         next_vertices.add(out_edge.post_subvertex)
         # finished, so stop progress bar and return placements
         progress_bar.end()
-        return placements
+        return {'placements': placements}
 
     def _find_max_connected_vertex(self, vertices, partitioned_graph):
         max_connected_vertex = None

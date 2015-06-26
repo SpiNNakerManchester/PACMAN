@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 def tag_allocator_report(report_folder, tag_infos):
     pass
 
-
 def placer_reports_with_partitionable_graph(
         report_folder, hostname, graph, graph_mapper, placements, machine):
     """
@@ -60,12 +59,9 @@ def router_reports(report_folder, routing_paths, hostname):
     router_report_from_paths(report_folder, routing_paths, hostname)
 
 
-def routing_info_reports(report_folder, subgraph, routing_infos, routing_tables,
-                         include_dat_based=False):
+def routing_info_reports(report_folder, subgraph, routing_infos, routing_tables):
     routing_info_report(report_folder, subgraph, routing_infos)
     router_report_from_router_tables(report_folder, routing_tables)
-    if include_dat_based:
-        router_report_from_dat_file(report_folder)
 
 
 def partitioner_reports(report_folder, hostname, graph,
@@ -138,8 +134,7 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
     f_routing.close()
 
 
-def partitioner_report(report_folder, hostname, graph,
-                       graph_mapper):
+def partitioner_report(report_folder, hostname, graph, graph_mapper):
     """
     Generate report on the placement of sub-vertices onto cores.
     """
@@ -584,10 +579,6 @@ def router_report_from_router_tables(report_folder, routing_tables):
                 output.write(entry_str)
             output.flush()
             output.close()
-
-
-def router_report_from_dat_file(report_folder):
-    pass
 
 
 def _reduce_route_value(processors_ids, link_ids):

@@ -1,7 +1,14 @@
+"""
+MallocBasedRoutingInfoAllocator
+"""
+
+# pacman imports
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
+from pacman.model.routing_tables.multicast_routing_tables import \
+    MulticastRoutingTables
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
@@ -14,48 +21,44 @@ from pacman.model.constraints.key_allocator_constraints\
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.abstract_algorithms.\
-    abstract_routing_info_allocator_algorithm import \
-    AbstractRoutingInfoAllocatorAlgorithm
 from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.free_space import FreeSpace
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.algorithm_utilities import \
+    routing_info_allocator_utilities
 
+# generla imports
 import math
 import numpy
 import logging
 logger = logging.getLogger(__name__)
 
 
-class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
+class MallocBasedRoutingInfoAllocator(object):
     """ A Routing Info Allocation Allocator algorithm that keeps track of
         free keys and attempts to allocate them as requested
     """
 
-    def __init__(self):
-        AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
-        self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
-        self._supported_constraints.append(
-            KeyAllocatorFixedKeyAndMaskConstraint)
-        self._supported_constraints.append(
-            KeyAllocatorContiguousRangeContraint)
-
-        self._free_space_tracker = list()
-        self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
-
-    def allocate_routing_info(
-            self, subgraph, placements, n_keys_map, routing_paths):
+    def __call__(self, subgraph, n_keys_map, routing_paths):
 
         # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subedges,
-            supported_constraints=self._supported_constraints,
+            supported_constraints=[
+                KeyAllocatorFixedMaskConstraint,
+                KeyAllocatorFixedKeyAndMaskConstraint,
+                KeyAllocatorContiguousRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
+        self._free_space_tracker = list()
+        self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
+        routing_tables = MulticastRoutingTables()
+
         # Get the partitioned edges grouped by those that require the same key
-        same_key_groups = self._get_edge_groups(subgraph)
+        same_key_groups = \
+            routing_info_allocator_utilities.get_edge_groups(subgraph)
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(len(same_key_groups),
@@ -76,17 +79,21 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
-            keys_and_masks = self._get_fixed_key_and_mask(group)
-            fixed_mask, fields = self._get_fixed_mask(group)
+            keys_and_masks = routing_info_allocator_utilities.\
+                get_fixed_key_and_mask(group)
+            fixed_mask, fields = \
+                routing_info_allocator_utilities.get_fixed_mask(group)
 
             if keys_and_masks is not None:
 
                 self._allocate_fixed_keys_and_masks(keys_and_masks, fixed_mask)
             else:
-
+                if not routing_info_allocator_utilities.\
+                        is_contiguous_range(group):
+                    logger.warning("Algorithm will still produce continious "
+                                   "keys")
                 keys_and_masks = self._allocate_keys_and_masks(
-                    fixed_mask, fields, edge_n_keys,
-                    self._is_contiguous_range(group))
+                    fixed_mask, fields, edge_n_keys)
 
             # Allocate the routing information
             for edge in group:
@@ -94,11 +101,13 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 routing_infos.add_subedge_info(subedge_info)
 
                 # update routing tables with entries
-                self._add_routing_key_entries(routing_paths, subedge_info, edge)
+                routing_info_allocator_utilities.add_routing_key_entries(
+                    routing_paths, subedge_info, edge, routing_tables)
             progress_bar.update()
 
         progress_bar.end()
-        return routing_infos, self._routing_tables
+        return {'routing_infos': routing_infos,
+                'routing_tables': routing_tables}
 
     def _find_slot(self, base_key, lo=0):
         """ Find the free slot with the closest key <= base_key using a binary
@@ -262,11 +271,10 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             yield utility_calls.compress_from_bit_array(generated_key), n_keys
 
     @staticmethod
-    def _get_possible_masks(n_keys, is_contiguous):
+    def _get_possible_masks(n_keys):
         """ Get the possible masks given the number of keys
 
         :param n_keys: The number of keys to generate a mask for
-        :param is_contiguous: True if the keys should be contiguous
         """
 
         # TODO: Generate all the masks - currently only the obvious
@@ -291,15 +299,13 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                     key_and_mask.key, key_and_mask.mask):
                 self._allocate_keys(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, fields, edge_n_keys,
-                                 is_contiguous):
+    def _allocate_keys_and_masks(self, fixed_mask, fields, edge_n_keys):
 
         # If there isn't a fixed mask, generate a fixed mask based
         # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = self._get_possible_masks(edge_n_keys,
-                                                       is_contiguous)
+            masks_available = self._get_possible_masks(edge_n_keys)
 
         # For each usable mask, try all of the possible keys and
         # see if a match is possible

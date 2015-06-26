@@ -5,9 +5,8 @@ BasicDijkstraRouting
 # pacman imports
 from pacman.model.routing_paths.multicast_routing_path_entry import \
     MulticastRoutingPathEntry
-from pacman.operations.abstract_algorithms\
-    .abstract_multi_cast_router_algorithm\
-    import AbstractMultiCastRouterAlgorithm
+from pacman.model.routing_paths.multicast_routing_paths import \
+    MulticastRoutingPaths
 from pacman.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
@@ -20,7 +19,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
+class BasicDijkstraRouting(object):
     """ An routing algorithm that can find routes for subedges between\
         subvertices in a partitioned_graph that have been placed on a
         machine by the use of a dijkstra shortest path algorithm
@@ -29,22 +28,8 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
     BW_PER_ROUTE_ENTRY = 0.01
     MAX_BW = 250
 
-    def __init__(self, k=1, l=0, m=0, bw_per_route_entry=BW_PER_ROUTE_ENTRY,
-                 max_bw=MAX_BW):
-        """constructor for the
-        pacman.operations.router_algorithms.DijkstraRouting.DijkstraRouting
-
-        <params to be implemented when done>
-        """
-        AbstractMultiCastRouterAlgorithm.__init__(self)
-        self._k = k
-        self._l = l
-        self._m = m
-        self._bw_per_route_entry = bw_per_route_entry
-        self._max_bw = max_bw
-        self._machine = None
-
-    def route(self, placements, machine, partitioned_graph):
+    def __call__(self, placements, machine, partitioned_graph, k=1, l=0, m=0,
+                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
         """ Find routes between the subedges with the allocated information,
             placed in the given places
 
@@ -64,7 +49,14 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
         """
 
         # set up basic data structures
+        self._routing_paths = MulticastRoutingPaths()
+        self._k = k
+        self._l = l
+        self._m = m
+        self._bw_per_route_entry = bw_per_route_entry
+        self._max_bw = max_bw
         self._machine = machine
+
         nodes_info = self._initiate_node_info(machine)
         dijkstra_tables = self._initiate_dijkstra_tables(machine)
         self._update_all_weights(nodes_info, machine)
@@ -112,7 +104,7 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
                     dest_placement.p, subedge, nodes_info, placement.p)
             progress.update()
         progress.end()
-        return self._routing_paths
+        return {'routing_paths': self._routing_paths}
 
     def _initiate_node_info(self, machine):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \

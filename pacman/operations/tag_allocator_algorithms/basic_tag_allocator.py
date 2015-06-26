@@ -1,3 +1,8 @@
+"""
+BasicTagAllocator
+"""
+
+# pacman imports
 from pacman.model.constraints.abstract_constraints.\
     abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
@@ -7,28 +12,22 @@ from pacman.model.constraints.tag_allocator_constraints.\
     tag_allocator_require_reverse_iptag_constraint import \
     TagAllocatorRequireReverseIptagConstraint
 from pacman.model.tags.tags import Tags
-from pacman.operations.abstract_algorithms.\
-    abstract_tag_allocator_algorithm import AbstractTagAllocatorAlgorithm
 from pacman.utilities import utility_calls
 from pacman.utilities.resource_tracker import ResourceTracker
-from spinn_machine.tags.iptag import IPTag
-from spinn_machine.tags.reverse_iptag import ReverseIPTag
 from pacman.utilities.progress_bar import ProgressBar
 
+# spinnmachine imports
+from spinn_machine.tags.iptag import IPTag
+from spinn_machine.tags.reverse_iptag import ReverseIPTag
 
-class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
+
+class BasicTagAllocator(object):
     """ Basic tag allocator that goes though the boards available and applies
         the iptags and reverse iptags as needed.
 
     """
 
-    def __init__(self):
-        AbstractTagAllocatorAlgorithm.__init__(self)
-        self._supported_constraints.append(TagAllocatorRequireIptagConstraint)
-        self._supported_constraints.append(
-            TagAllocatorRequireReverseIptagConstraint)
-
-    def allocate_tags(self, machine, placements):
+    def __call__(self, machine, placements):
         """ see AbstractTagAllocatorAlgorithm.allocate_tags
         """
 
@@ -41,7 +40,10 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
         for placement in placements.placements:
             utility_calls.check_algorithm_can_support_constraints(
                 constrained_vertices=[placement.subvertex],
-                supported_constraints=self._supported_constraints,
+                supported_constraints=[
+                    TagAllocatorRequireIptagConstraint,
+                    TagAllocatorRequireReverseIptagConstraint
+                ],
                 abstract_constraint_type=AbstractTagAllocatorConstraint)
             if len(utility_calls.locate_constraints_of_type(
                     placement.subvertex.constraints,
@@ -86,4 +88,4 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                     tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
 
         progress_bar.end()
-        return tags
+        return {'tags': tags}
