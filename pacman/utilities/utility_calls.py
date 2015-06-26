@@ -32,12 +32,10 @@ def locate_constraints_of_type(constraints, constraint_type):
                 :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
     :raises None: no known exceptions
     """
-    passed_constraints = list()
-    for constraint in constraints:
-        if isinstance(constraint, constraint_type):
-            passed_constraints.append(constraint)
-    return passed_constraints
-
+    # ADR replaced "long-form" loop with comprehension (marginally improved
+    # efficiency for no degradation in readability)
+    return [constraint for constraint in constraints
+            if isinstance(constraint, constraint_type)]
 
 def check_algorithm_can_support_constraints(
         constrained_vertices, supported_constraints, abstract_constraint_type):
@@ -72,8 +70,11 @@ def check_algorithm_can_support_constraints(
                 if not found:
                     raise PacmanInvalidParameterException(
                         "constraints", constraint.__class__,
-                        "Constraints of this class are not supported by this"
-                        " algorithm")
+                        "Vertex %s has constraint %s not supported by this"
+                        " algorithm" % (constrained_vertex.label, 
+                                    constraint.__class__.__name__))
+                    return False
+    return True
 
 
 def sort_objects_by_constraint_authority(objects):

@@ -14,6 +14,8 @@ from pacman.utilities.resource_tracker import ResourceTracker
 from spinn_machine.tags.iptag import IPTag
 from spinn_machine.tags.reverse_iptag import ReverseIPTag
 from pacman.utilities.progress_bar import ProgressBar
+from pacman.model.partitioned_graph.taggable_partitioned_vertex import \
+     TaggablePartitionedVertex
 
 
 class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
@@ -35,8 +37,15 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
         resource_tracker = ResourceTracker(machine)
 
         # Check that the algorithm can handle the constraints
-        progress_bar = ProgressBar(placements.n_placements,
+        placements_with_tags = [placement for placement in placements.placements
+                  if isinstance(placement.subvertex, TaggablePartitionedVertex)
+                  and utility_calls.check_algorithm_can_support_constraints(
+                      constrained_vertices=[placement.subvertex],
+                      supported_constraints=self._supported_constraints,
+                      abstract_constraint_type=AbstractTagAllocatorConstraint)]
+        progress_bar = ProgressBar(len(placements_with_tags),
                                    "Allocating Tags")
+        """
         placements_with_tags = list()
         for placement in placements.placements:
             utility_calls.check_algorithm_can_support_constraints(
@@ -48,6 +57,7 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                     AbstractTagAllocatorConstraint)):
                 placements_with_tags.append(placement)
             progress_bar.update()
+        """
 
         # Go through and allocate the tags
         tags = Tags()
@@ -67,6 +77,7 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                     resources, chips, placement.p, board_address, ip_tags,
                     reverse_ip_tags)
 
+            print "Allocated tags for vertex %s, forward: %s, reverse: %s" % (vertex.label, returned_ip_tags, returned_reverse_ip_tags)
             # Put the allocated ip tag information into the tag object
             if returned_ip_tags is not None:
                 for (tag_constraint, (board_address, tag)) in zip(
@@ -75,6 +86,7 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                         board_address, tag, tag_constraint.ip_address,
                         tag_constraint.port, tag_constraint.strip_sdp)
                     tags.add_ip_tag(ip_tag, vertex)
+                    vertex.add_ip_tag(ip_tag) 
 
             # Put the allocated reverse ip tag information into the tag object
             if returned_reverse_ip_tags is not None:
@@ -84,6 +96,8 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
                         board_address, tag, tag_constraint.port, placement.x,
                         placement.y, placement.p, tag_constraint.sdp_port)
                     tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+                    vertex.add_reverse_ip_tag(reverse_ip_tag)
+            progress_bar.update()
 
         progress_bar.end()
         return tags
