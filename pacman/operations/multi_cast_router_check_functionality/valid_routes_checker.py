@@ -229,7 +229,7 @@ def _recursive_trace_to_dests(
                 entry, next_router, link.destination_x, link.destination_y,
                 key, visited_routers, reached_placements, machine,
                 routing_tables)
-
+            
     # only goes to a processor
     elif len(processor_values) > 0:
         _check_processor(processor_values, current_router, reached_placements)
@@ -274,19 +274,27 @@ def _check_processor(processor_ids, current_router, reached_placements):
         reached_placements.add(PlacementTuple(dest_x, dest_y,
                                               processor_id))
 
-
 def _locate_routing_entry(current_router, key):
     """ locate the entry from the router based off the subedge
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement
     :return None:
-    :raise PacmanRoutingException: when there is no entry located on this\
-                router.
+    :raise PacmanRoutingException: when there is no entry located on this
+    router.
     """
+    found_entry = None
     for entry in current_router.multicast_routing_entries:
         key_combo = entry.mask & key
-        if key_combo == entry.routing_entry_key:
-            return entry
+        if key_combo == entry.key_combo:
+            if found_entry is None:
+                found_entry = entry
+            else:
+                logger.warn(
+                    "Found more than one entry for key {}. This could be "
+                    "an error, as currently no router supports overloading"
+                    " of entries.")
+    if found_entry is not None:
+        return found_entry
     else:
         raise exceptions.PacmanRoutingException("no entry located")
