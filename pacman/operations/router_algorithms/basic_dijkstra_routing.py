@@ -549,11 +549,14 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
                 abs(neighbours_lowest_cost - chip_sought_cost) <
                 0.00000000001):
 
+            # create entry for next hop going backwards
             entry = MulticastRoutingPathEntry(
                 router_x=x_neighbour, router_y=y_neighbour, edge=subedge,
-                incoming_link=neighbour_index, out_going_links=dec_direction,
+                incoming_link=None, out_going_links=dec_direction,
                 outgoing_processors=None)
-
+            previous_routing_entry.add_in_coming_processor_direction(
+                neighbour_index)
+            # add entry for next hop going backwards into path
             self._routing_paths.add_path_entry(entry)
             previous_routing_entry = entry
             made_an_entry = True

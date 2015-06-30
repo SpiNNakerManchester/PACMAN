@@ -129,12 +129,12 @@ class ValidRouteChecker(object):
                 output_string += "[{}:{}:{}]".format(dest.x, dest.y, dest.p)
             source_processor = "[{}:{}:{}]".format(
                 source_placement.x, source_placement.y, source_placement.p)
-            error_message += ("trace went to more failed to locate all "
-                              "destinations with subvertex {} on processor {} "
-                              "with keys {} as it didnt reach dests {}".format(
-                                  source_placement.subvertex.label,
-                                  source_processor, key_and_mask,
-                                  output_string))
+            error_message += (
+                "Path shows that packets from subvertex {} on processor {}"
+                " went to incorrect processors. The cores it went to "
+                "incorrectly were {}".format(
+                    source_placement.subvertex.label, source_processor,
+                    output_string))
 
         # raise error if required
         if error_message != "":
@@ -220,6 +220,12 @@ class ValidRouteChecker(object):
                 next_router = \
                     self._routing_tables.get_routing_table_for_chip(
                         link.destination_x, link.destination_y)
+                if next_router is None:
+                    raise exceptions.PacmanNotExistException(
+                        "The link {} from router {} does not go to a router. "
+                        "This was expected to have a router from entry {}. "
+                        "Please fix and try again."
+                        .format(link, machine_router, entry))
 
                 # check that we've not visited this router before
                 self._check_visited_routers(next_router.x, next_router.y,
