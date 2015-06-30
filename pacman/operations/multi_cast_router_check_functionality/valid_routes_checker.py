@@ -237,7 +237,9 @@ class ValidRouteChecker(object):
         visited_routers_router = (chip_x, chip_y)
         if visited_routers_router in visited_routers:
             raise exceptions.PacmanRoutingException(
-                "visited this router before, there is a cycle here")
+                "visited router {} before. Ive visited these routers {}."
+                "therefore is a cycle here"
+                .format(visited_routers_router, visited_routers))
         else:
             visited_routers.add(visited_routers_router)
 
@@ -290,9 +292,18 @@ class ValidRouteChecker(object):
         :raise PacmanRoutingException: when there is no entry located on this
         router.
         """
+        found_entry = None
         for entry in current_router.multicast_routing_entries:
             key_combo = entry.mask & key
             if key_combo == entry.key_combo:
-                return entry
+                if found_entry is None:
+                    found_entry = entry
+                else:
+                    logger.warn(
+                        "Found more than one entry for key {}. This could be "
+                        "an error, as currently no router supports overloading"
+                        " of entries.")
+        if found_entry is not None:
+            return found_entry
         else:
             raise exceptions.PacmanRoutingException("no entry located")

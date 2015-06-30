@@ -449,7 +449,7 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
         routing_entry_route_links = None
 
         entry = MulticastRoutingPathEntry(
-            router_x=x_destination, router_y=y_destination, defaultable=False,
+            router_x=x_destination, router_y=y_destination,
             edge=subedge, out_going_links=routing_entry_route_links,
             outgoing_processors=routing_entry_route_processors)
         self._routing_paths.add_path_entry(entry)

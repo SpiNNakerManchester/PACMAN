@@ -13,7 +13,7 @@ class MulticastRoutingPathEntry(object):
 
     def __init__(self, router_x, router_y, edge, out_going_links,
                  outgoing_processors, incoming_processor=None,
-                 incoming_link=None, defaultable=False):
+                 incoming_link=None):
         """
         builder for a MulticastRoutingPathEntry
         :param router_x: the x coord of the router this is associated with
@@ -30,8 +30,6 @@ class MulticastRoutingPathEntry(object):
         :type incoming_processor: int between 0 and 17
         :param incoming_link: the direction this entry came from in link
         :type incoming_link: iint between 0 and 5
-        :param defaultable: checks if this entry can be defaulted away
-         :type defaultable: boolean
         :return:
         """
         self._router_x = router_x
@@ -51,7 +49,6 @@ class MulticastRoutingPathEntry(object):
 
         self._incoming_link = incoming_link
         self._incoming_processor = incoming_processor
-        self._defaultable = self._is_defaultable()
 
         if (self._incoming_link is not None and
                 self._incoming_processor is not None):
@@ -135,7 +132,7 @@ class MulticastRoutingPathEntry(object):
         the proeprty method for defaultable
         :return:
         """
-        return self._defaultable
+        return self._is_defaultable()
 
     def add_out_going_direction_link(self, direction):
         """
@@ -150,7 +147,6 @@ class MulticastRoutingPathEntry(object):
             raise exceptions.PacmanAlreadyExistsException(
                 "the link {} already exists in the mutli-cast-r"
                 "outing-apth-entry".format(direction), str(direction))
-        self._defaultable = self._is_defaultable()
 
     def add_out_going_direction_processor(self, direction):
         """
@@ -165,7 +161,6 @@ class MulticastRoutingPathEntry(object):
             raise exceptions.PacmanAlreadyExistsException(
                 "the processor {} already exists in the mutli-cast-r"
                 "outing-apth-entry".format(direction), str(direction))
-        self._defaultable = False
 
     def add_in_coming_processor_direction(self, procesor_id):
         """

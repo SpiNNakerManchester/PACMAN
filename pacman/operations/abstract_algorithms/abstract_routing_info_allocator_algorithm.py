@@ -159,39 +159,41 @@ class AbstractRoutingInfoAllocatorAlgorithm(object):
         :return: None
         """
         path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
-        if "Inhibitory_Cells:100:199" in out_going_subedge.__repr__():
-            pass
         # iterate thoguh the entries in each path, adding a router entry if required
         for path_entry in path_entries:
-            # locate the router
-            router = self._routing_tables.get_routing_table_for_chip(
-                path_entry.router_x, path_entry.router_y)
-            if router is None:
-                router = MulticastRoutingTable(
+            if not path_entry.defaultable:
+                # locate the router
+                router = self._routing_tables.get_routing_table_for_chip(
                     path_entry.router_x, path_entry.router_y)
-                self._routing_tables.add_routing_table(router)
+                if router is None:
+                    router = MulticastRoutingTable(
+                        path_entry.router_x, path_entry.router_y)
+                    self._routing_tables.add_routing_table(router)
 
-            # add entries as required, or emrge them if entries alrteady exist
-            for key_and_mask in subedge_routing_info.keys_and_masks:
-                multicast_routing_entry = MulticastRoutingEntry(
-                    routing_entry_key=key_and_mask.key_combo,
-                    defaultable=path_entry.defaultable, mask=key_and_mask.mask,
-                    link_ids=path_entry.out_going_links,
-                    processor_ids=path_entry.out_going_processors)
-                stored_entry = \
-                    router.get_multicast_routing_entry_by_routing_entry_key(
-                        key_and_mask.key_combo, key_and_mask.mask)
-                if stored_entry is None:
-                    router.add_mutlicast_routing_entry(MulticastRoutingEntry(
+                # add entries as required, or emrge them if entries alrteady exist
+                for key_and_mask in subedge_routing_info.keys_and_masks:
+                    multicast_routing_entry = MulticastRoutingEntry(
                         routing_entry_key=key_and_mask.key_combo,
                         defaultable=path_entry.defaultable,
                         mask=key_and_mask.mask,
                         link_ids=path_entry.out_going_links,
-                        processor_ids=path_entry.out_going_processors))
-                else:
-                    merged_entry = stored_entry.merge(multicast_routing_entry)
-                    router.remove_multicast_routing_entry(stored_entry)
-                    router.add_mutlicast_routing_entry(merged_entry)
+                        processor_ids=path_entry.out_going_processors)
+                    stored_entry = router.\
+                        get_multicast_routing_entry_by_routing_entry_key(
+                            key_and_mask.key_combo, key_and_mask.mask)
+                    if stored_entry is None:
+                        router.add_mutlicast_routing_entry(
+                            MulticastRoutingEntry(
+                                routing_entry_key=key_and_mask.key_combo,
+                                defaultable=path_entry.defaultable,
+                                mask=key_and_mask.mask,
+                                link_ids=path_entry.out_going_links,
+                                processor_ids=path_entry.out_going_processors))
+                    else:
+                        merged_entry = \
+                            stored_entry.merge(multicast_routing_entry)
+                        router.remove_multicast_routing_entry(stored_entry)
+                        router.add_mutlicast_routing_entry(merged_entry)
 
     @abstractmethod
     def allocate_routing_info(self, subgraph, placements, n_keys_map,
