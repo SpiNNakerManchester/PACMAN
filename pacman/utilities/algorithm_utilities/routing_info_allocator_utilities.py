@@ -143,8 +143,6 @@ def add_routing_key_entries(
     :return: None
     """
     path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
-    if "Inhibitory_Cells:100:199" in out_going_subedge.__repr__():
-        pass
     # iterate thoguh the entries in each path, adding a router entry if required
     for path_entry in path_entries:
         # locate the router

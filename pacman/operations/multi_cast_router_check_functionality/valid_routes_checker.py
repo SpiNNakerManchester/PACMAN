@@ -161,7 +161,7 @@ def _start_trace_via_routing_tables(source_placement, key, reached_placements,
     _recursive_trace_to_dests(
         entry, current_router_table, source_placement.x,
         source_placement.y, key, visited_routers, reached_placements,
-        routing_tables, machine)
+        machine, routing_tables)
 
 
 # locates the next dest pos to check
@@ -286,7 +286,7 @@ def _locate_routing_entry(current_router, key):
     found_entry = None
     for entry in current_router.multicast_routing_entries:
         key_combo = entry.mask & key
-        if key_combo == entry.key_combo:
+        if key_combo == entry.routing_entry_key:
             if found_entry is None:
                 found_entry = entry
             else:
