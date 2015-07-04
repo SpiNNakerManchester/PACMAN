@@ -17,7 +17,7 @@ class KeyFieldGenerator(object):
 
         expanded_mask = utility_calls.expand_to_bit_array(fixed_mask)
         zeros = numpy.where(expanded_mask == 0)[0]
-        self._n_mask_keys = 2 ** zeros
+        self._n_mask_keys = 2 ** len(zeros)
 
         # If there are no fields, add the mask as a field
         the_fields = fields
