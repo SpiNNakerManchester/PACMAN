@@ -1,6 +1,15 @@
+"""
+ValidRouteChecker
+"""
+
+# pacman imports
 from pacman import exceptions
+from pacman.utilities.progress_bar import ProgressBar
+
+# general imports
 from collections import namedtuple
 import logging
+
 logger = logging.getLogger(__name__)
 
 # Define an internal class for placements
@@ -8,6 +17,9 @@ PlacementTuple = namedtuple('PlacementTuple', 'x y p')
 
 
 class ValidRouteChecker(object):
+    """
+    ValidRouteChecker
+    """
 
     def __init__(self, partitioned_graph, placements, routing_infos,
                  routing_tables, machine):
@@ -40,6 +52,10 @@ class ValidRouteChecker(object):
                     detected
 
         """
+        # each subvertex represents a core in the board
+        progress = ProgressBar(len(list(self._placements.placements)),
+                               "Verifying the routes from each core travel to "
+                               "the correct locations")
         for placement in self._placements.placements:
             outgoing_edges_for_partitioned_vertex = \
                 self._partitioned_graph.outgoing_subedges_from_subvertex(
@@ -72,6 +88,8 @@ class ValidRouteChecker(object):
                 # search for these destinations
                 self._search_route(placement, destination_placements,
                                    key_and_mask)
+            progress.update()
+        progress.end()
 
     def _search_route(self, source_placement, dest_placements, key_and_mask):
         """ Locate if the routing tables work for the source to desks as\
