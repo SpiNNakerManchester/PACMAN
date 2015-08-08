@@ -63,6 +63,18 @@ class PacmanPlaceException(PacmanException):
         """
         PacmanException.__init__(self, problem)
 
+class PacmanTagAllocationException(PacmanException):
+    """ An exception that indicates that something went wrong with tag
+        allocation
+    """
+
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the placement
+        :type problem: str
+        """
+        PacmanException.__init__(self, problem)
+
 
 class PacmanPruneException(PacmanException):
     """ An exception that indicates that something went wrong with pruning
