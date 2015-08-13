@@ -1,11 +1,20 @@
+"""
+MallocBasedRoutingInfoAllocator
+"""
+
+# pacman imports
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_same_keys_constraint import KeyAllocatorSameKeysConstraint
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
-from pacman.model.data_request_interfaces.abstract_requires_routing_info_partitioned_vertex import \
+from pacman.model.data_request_interfaces.\
+    abstract_requires_routing_info_partitioned_vertex import \
     RequiresRoutingInfoPartitionedVertex
+from pacman.operations.abstract_algorithms.\
+    abstract_routing_info_allocator_algorithm import \
+    AbstractRoutingInfoAllocatorAlgorithm
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
@@ -18,15 +27,13 @@ from pacman.model.constraints.key_allocator_constraints\
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.key_and_mask import KeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.abstract_algorithms.\
-    abstract_routing_info_allocator_algorithm import \
-    AbstractRoutingInfoAllocatorAlgorithm
-from pacman.operations.routing_info_allocator_algorithms.\
-    malloc_based_routing_allocator.free_space import FreeSpace
+from pacman.model.resources.element_free_space import ElementFreeSpace
 from pacman.utilities import utility_calls
-from pacman.exceptions import PacmanRouteInfoAllocationException
+from pacman.exceptions import PacmanRouteInfoAllocationException, \
+    PacmanElementAllocationException
 from pacman.utilities.progress_bar import ProgressBar
 
+# general imports
 import math
 import numpy
 import logging
@@ -48,7 +55,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             KeyAllocatorContiguousRangeContraint)
 
         self._free_space_tracker = list()
-        self._free_space_tracker.append(FreeSpace(0, math.pow(2, 32)))
+        self._free_space_tracker.append(ElementFreeSpace(0, math.pow(2, 32)))
 
     def allocate_routing_info(self, subgraph, placements, n_keys_map):
 
@@ -116,131 +123,6 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         progress_bar.end()
         return routing_infos
 
-    def _find_slot(self, base_key, lo=0):
-        """ Find the free slot with the closest key <= base_key using a binary
-            search
-        """
-        hi = len(self._free_space_tracker) - 1
-        while lo < hi:
-            mid = int(math.ceil(float(lo + hi) / 2.0))
-            free_space_slot = self._free_space_tracker[mid]
-
-            if free_space_slot.start_address > base_key:
-                hi = mid - 1
-            else:
-                lo = mid
-
-        # If we have gone off the end of the array, we haven't found a slot
-        if (lo >= len(self._free_space_tracker) or hi < 0 or
-                self._free_space_tracker[lo].start_address > base_key):
-            return None
-        return lo
-
-    def _allocate_keys(self, base_key, n_keys):
-        """ Handle the allocating of space for a given set of keys
-
-        :param base_key: the first key to allocate
-        :param n_keys: the number of keys to allocate
-        :raises: PacmanRouteInfoAllocationException when the key cannot be\
-                    assigned with the given number of keys
-        """
-
-        index = self._find_slot(base_key)
-        if index is None:
-            raise PacmanRouteInfoAllocationException(
-                "Space for {} keys starting at {} has already been allocated"
-                .format(n_keys, base_key))
-
-        # base_key should be >= slot key at this point
-        self._do_allocation(index, base_key, n_keys)
-
-    def _check_allocation(self, index, base_key, n_keys):
-        """ Check if there is enough space for a given set of keys
-            starting at a base key inside a given slot
-
-        :param index: The index of the free space slot to check
-        :param base_key: The key to start with - must be inside the slot
-        :param n_keys: The number of keys to be allocated -\
-                       should be power of 2
-        """
-        free_space_slot = self._free_space_tracker[index]
-        space = (free_space_slot.size -
-                 (base_key - free_space_slot.start_address))
-
-        if free_space_slot.start_address > base_key:
-            raise PacmanRouteInfoAllocationException(
-                "Trying to allocate a key in the wrong slot!")
-        if n_keys == 0 or (n_keys & (n_keys - 1)) != 0:
-            raise PacmanRouteInfoAllocationException(
-                "Trying to allocate {} keys, which is not a power of 2"
-                .format(n_keys))
-
-        # Check if there is enough space for the keys
-        if space < n_keys:
-            return None
-        return space
-
-    def _do_allocation(self, index, base_key, n_keys):
-        """ Allocate a given base key and number of keys into the space
-            at the given slot
-
-        :param index: The index of the free space slot to check
-        :param base_key: The key to start with - must be inside the slot
-        :param n_keys: The number of keys to be allocated -\
-                       should be power of 2
-        """
-
-        free_space_slot = self._free_space_tracker[index]
-        if free_space_slot.start_address > base_key:
-            raise PacmanRouteInfoAllocationException(
-                "Trying to allocate a key in the wrong slot!")
-        # TODO check with rowley over this check. as it kills the heat demo
-        """if n_keys == 0 or ((n_keys % 2) != 0):
-            raise PacmanRouteInfoAllocationException(
-                "Trying to allocate {} keys, which is not a power of 2"
-                .format(n_keys))"""
-
-        # Check if there is enough space to allocate
-        space = self._check_allocation(index, base_key, n_keys)
-        if space is None:
-            raise PacmanRouteInfoAllocationException(
-                "Not enough space to allocate {} keys starting at {}".format(
-                    n_keys, hex(base_key)))
-
-        if (free_space_slot.start_address == base_key and
-                free_space_slot.size == n_keys):
-
-            # If the slot exactly matches the space, remove it
-            del self._free_space_tracker[index]
-
-        elif free_space_slot.start_address == base_key:
-
-            # If the slot starts with the key, reduce the size
-            self._free_space_tracker[index] = FreeSpace(
-                free_space_slot.start_address + n_keys,
-                free_space_slot.size - n_keys)
-
-        elif space == n_keys:
-
-            # If the space at the end exactly matches the spot, reduce the size
-            self._free_space_tracker[index] = FreeSpace(
-                free_space_slot.start_address,
-                free_space_slot.size - n_keys)
-
-        else:
-
-            # Otherwise, the allocation lies in the middle of the region:
-            # First, reduce the size of the space before the allocation
-            self._free_space_tracker[index] = FreeSpace(
-                free_space_slot.start_address,
-                base_key - free_space_slot.start_address)
-
-            # Then add a new space after the allocation
-            self._free_space_tracker.insert(index + 1, FreeSpace(
-                base_key + n_keys,
-                free_space_slot.start_address + free_space_slot.size -
-                (base_key + n_keys)))
-
     @staticmethod
     def _get_key_ranges(key, mask):
         """ Get a generator of base_key, n_keys pairs that represent ranges
@@ -305,7 +187,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             # Go through the mask sets and allocate
             for key, n_keys in self._get_key_ranges(
                     key_and_mask.key, key_and_mask.mask):
-                self._allocate_keys(key, n_keys)
+                self._allocate_elements(key, n_keys)
 
     def _allocate_keys_and_masks(self, fixed_mask, fields, edge_n_keys,
                                  is_contiguous):
@@ -370,7 +252,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         if key_found is not None and mask_found is not None:
             for (base_key, n_keys) in self._get_key_ranges(
                     key_found, mask):
-                self._allocate_keys(base_key, n_keys)
+                self._allocate_elements(base_key, n_keys)
 
             # If we get here, we can assign the keys to the edges
             keys_and_masks = list([KeyAndMask(key=key_found,
@@ -379,3 +261,30 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
         raise PacmanRouteInfoAllocationException(
             "Could not find space to allocate keys")
+
+    def _check_allocation(self, index, base_element_id, n_elements):
+        """ Check if there is enough space for a given set of element ids
+            starting at a base element id inside a given slot
+
+        :param index: The index of the free space slot to check
+        :param base_element_id: The element id to start with -
+        must be inside the slot
+        :param n_elements: The number of elements to be allocated -\
+                       should be power of 2
+        """
+        free_space_slot = self._free_space_tracker[index]
+        space = (free_space_slot.size -
+                 (base_element_id - free_space_slot.start_address))
+
+        if free_space_slot.start_address > base_element_id:
+            raise PacmanElementAllocationException(
+                "Trying to allocate a element id in the wrong slot!")
+        if n_elements == 0 or (n_elements & (n_elements - 1)) != 0:
+            raise PacmanElementAllocationException(
+                "Trying to allocate {} elements, which is not a power of 2"
+                .format(n_elements))
+
+        # Check if there is enough space for the keys
+        if space < n_elements:
+            return None
+        return space

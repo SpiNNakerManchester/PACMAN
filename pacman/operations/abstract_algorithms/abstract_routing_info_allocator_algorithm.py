@@ -1,12 +1,13 @@
-from abc import ABCMeta
-from abc import abstractmethod
-from collections import OrderedDict
-from six import add_metaclass
+"""
+AbstractRoutingInfoAllocatorAlgorithm
+"""
 
+# pacman imports
+from pacman.operations.abstract_algorithms.\
+    abstract_element_allocator_algorithm import \
+    AbstractElementAllocatorAlgorithm
 from pacman.utilities import utility_calls
-
 from pacman.exceptions import PacmanValueError
-
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -21,14 +22,22 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorSameKeysConstraint
 from pacman.utilities.ordered_set import OrderedSet
 
+# general imports
+from abc import ABCMeta
+from abc import abstractmethod
+from collections import OrderedDict
+from six import add_metaclass
+import math
+
 
 @add_metaclass(ABCMeta)
-class AbstractRoutingInfoAllocatorAlgorithm(object):
+class AbstractRoutingInfoAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
     """ An abstract algorithm that can produce routing keys and masks for\
         subedges in a partitioned_graph
     """
 
     def __init__(self):
+        AbstractElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
         self._supported_constraints = list()
 
     @staticmethod
