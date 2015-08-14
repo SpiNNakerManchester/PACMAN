@@ -16,8 +16,7 @@ from abc import abstractmethod
 
 @add_metaclass(ABCMeta)
 class AbstractVirtualVertex(AbstractPartitionableVertex):
-    """
-    a clas that allows models to define that they are virtual
+    """ A class that allows models to define that they are virtual
     """
 
     def __init__(self, n_atoms, spinnaker_link_id, label, max_atoms_per_core):
