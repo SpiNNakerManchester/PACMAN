@@ -83,7 +83,7 @@ class AbstractElementAllocatorAlgorithm(object):
         if space is None:
             raise exceptions.PacmanElementAllocationException(
                 "Not enough space to allocate {} elements starting at {}"
-                .format( n_elements, hex(base_element_id)))
+                .format(n_elements, hex(base_element_id)))
 
         if (free_space_slot.start_address == base_element_id and
                 free_space_slot.size == n_elements):
