@@ -18,6 +18,7 @@ setup(
               'pacman.model.constraints.partitioner_constraints',
               'pacman.model.constraints.placer_constraints',
               'pacman.model.constraints.tag_allocator_constraints',
+              'pacman.model.data_request_interfaces',
               'pacman.model.graph_mapper',
               'pacman.model.partitionable_graph',
               'pacman.model.partitioned_graph',
