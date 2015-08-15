@@ -16,7 +16,7 @@ class ElementFreeSpace(object):
 
     def __repr__(self):
         return "ElementFreeSpace:start={}:size={}".format(
-            self._start_address, self._size)
+            hex(self._start_address), self._size)
 
     def __str__(self):
         return self.__repr__()
