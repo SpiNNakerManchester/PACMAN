@@ -49,7 +49,7 @@ class MallocBasedChipIdAllocator(AbstractElementAllocatorAlgorithm):
                 chip_id_x, chip_id_y = self._allocate_id()
                 vertex.virtual_chip_x = chip_id_x
                 vertex.virtual_chip_y = chip_id_y
-                progress_bar.update()
+            progress_bar.update()
         progress_bar.end()
 
     def _allocate_id(self):
