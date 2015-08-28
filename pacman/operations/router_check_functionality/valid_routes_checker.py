@@ -54,8 +54,7 @@ class ValidRouteChecker(object):
         """
         # each subvertex represents a core in the board
         progress = ProgressBar(len(list(self._placements.placements)),
-                               "Verifying the routes from each core travel to "
-                               "the correct locations")
+                               "Verifying routes")
         for placement in self._placements.placements:
             outgoing_edges_for_partitioned_vertex = \
                 self._partitioned_graph.outgoing_subedges_from_subvertex(

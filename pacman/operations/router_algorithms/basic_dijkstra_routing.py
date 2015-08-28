@@ -68,7 +68,7 @@ class BasicDijkstraRouting(AbstractMultiCastRouterAlgorithm):
 
         # each subvertex represents a core in the board
         progress = ProgressBar(len(list(placements.placements)),
-                               "Creating routing entries for each subvertex")
+                               "Creating routing entries")
 
         for placement in placements.placements:
             subvert = placement.subvertex

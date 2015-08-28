@@ -70,8 +70,7 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(len(same_key_groups),
-                                   "on allocating the key's and masks for"
-                                   " each subedge")
+                                   "Allocating routing keys")
         routing_infos = RoutingInfo()
         for group in same_key_groups:
             # Check how many keys are needed for the edges of the group

@@ -46,8 +46,7 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
 
         # start progress bar
         progress_bar = ProgressBar(len(graph.vertices),
-                                   "on partitioning the partitionable_graph's"
-                                   " vertices")
+                                   "Partitioning graph vertices")
         vertices = graph.vertices
         subgraph = PartitionedGraph(label="partitioned_graph for partitionable"
                                           "_graph {}".format(graph.label))

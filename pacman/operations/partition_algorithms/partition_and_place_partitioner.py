@@ -75,8 +75,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
         n_atoms = 0
         for vertex in vertices:
             n_atoms += vertex.n_atoms
-        progress_bar = ProgressBar(
-            n_atoms, "Partitioning the partitionable_graph's vertices")
+        progress_bar = ProgressBar(n_atoms, "Partitioning graph vertices")
 
         resource_tracker = ResourceTracker(machine)
 
@@ -341,7 +340,7 @@ class PartitionAndPlacePartitioner(AbstractPartitionAlgorithm):
                     (vertex, x, y, p, used_resources,
                      ip_tags, reverse_ip_tags))
             except exceptions.PacmanValueError as e:
-                
+
                 raise exceptions.PacmanValueError(
                     "Unable to allocate requested resources to"
                     " vertex {}:\n{}".format(vertex, e))

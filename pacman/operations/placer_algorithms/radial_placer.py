@@ -57,8 +57,7 @@ class RadialPlacer(AbstractPlacerAlgorithm):
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
-                                   "for placing the partitioned_graphs "
-                                   "subvertices")
+                                   "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         for vertex in ordered_subverts:

@@ -51,8 +51,7 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
         # take each subedge and create keys from its placement
         progress_bar = ProgressBar(len(subgraph.subvertices),
-                                   "on allocating the key's and masks for"
-                                   " each subedge")
+                                   "Allocating routing keys")
         routing_infos = RoutingInfo()
         for subvert in subgraph.subvertices:
             out_going_subedges = subgraph.outgoing_subedges_from_subvertex(

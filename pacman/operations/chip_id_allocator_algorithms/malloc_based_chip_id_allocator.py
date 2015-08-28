@@ -34,8 +34,7 @@ class MallocBasedChipIdAllocator(AbstractElementAllocatorAlgorithm):
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(
             (len(partitionable_graph.vertices) + len(list(machine.chips))),
-            "on allocating the chip id's for the machine's real and virtual "
-            "chips")
+            "Allocating virtual identifiers")
 
         # allocate standard ids for real chips
         for chip in machine.chips:

@@ -36,7 +36,7 @@ class BasicTagAllocator(AbstractTagAllocatorAlgorithm):
 
         # Check that the algorithm can handle the constraints
         progress_bar = ProgressBar(placements.n_placements,
-                                   "Allocating Tags")
+                                   "Allocating tags")
         placements_with_tags = list()
         for placement in placements.placements:
             utility_calls.check_algorithm_can_support_constraints(
