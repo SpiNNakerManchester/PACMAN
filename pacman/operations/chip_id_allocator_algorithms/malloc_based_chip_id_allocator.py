@@ -46,8 +46,7 @@ class MallocBasedChipIdAllocator(AbstractElementAllocatorAlgorithm):
         for vertex in partitionable_graph.vertices:
             if isinstance(vertex, AbstractVirtualVertex):
                 chip_id_x, chip_id_y = self._allocate_id()
-                vertex.virtual_chip_x = chip_id_x
-                vertex.virtual_chip_y = chip_id_y
+                vertex.set_virtual_chip_coordinates(chip_id_x, chip_id_y)
             progress_bar.update()
         progress_bar.end()
 
