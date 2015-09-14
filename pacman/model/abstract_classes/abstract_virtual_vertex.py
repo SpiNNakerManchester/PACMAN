@@ -28,11 +28,6 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
         self._virtual_chip_y = None
         self._spinnaker_link_id = spinnaker_link_id
 
-        placement_constaint = \
-            PlacerChipAndCoreConstraint(self._virtual_chip_x,
-                                        self._virtual_chip_y)
-        self.add_constraint(placement_constaint)
-
     @property
     def virtual_chip_x(self):
         return self._virtual_chip_x
@@ -41,18 +36,17 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
     def virtual_chip_y(self):
         return self._virtual_chip_y
 
-    @virtual_chip_x.setter
-    def virtual_chip_x(self, new_value):
-        self._virtual_chip_x = new_value
-
-    @virtual_chip_y.setter
-    def virtual_chip_y(self, new_value):
-        self._virtual_chip_y = new_value
+    def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
+        self._virtual_chip_x = virtual_chip_x
+        self._virtual_chip_y = virtual_chip_y
+        placement_constaint = \
+            PlacerChipAndCoreConstraint(self._virtual_chip_x,
+                                        self._virtual_chip_y)
+        self.add_constraint(placement_constaint)
 
     @property
-    def get_spinnaker_link_id(self):
-        """
-        proeprty for returning the spinnaker link being used
+    def spinnaker_link_id(self):
+        """ property for returning the spinnaker link being used
         :return:
         """
         return self._spinnaker_link_id
