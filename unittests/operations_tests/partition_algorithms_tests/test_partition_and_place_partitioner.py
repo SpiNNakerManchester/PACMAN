@@ -340,7 +340,6 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = PartitionableGraph()
         subgraph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(len(subgraph.subvertices), 0)
-#                #                     #                     #                      #                #           #
 
     def test_operation_with_same_size_as_vertex_constraint(self):
         """
@@ -410,6 +409,15 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         self.assertRaises(PacmanPartitionException, partitioner.partition,
                           self.graph, self.machine)
+
+    def test_partitioning_with_2_massive_pops(self):
+        self.setup()
+        constrained_vertex = TestVertex(16000, "Constrained")
+        self.graph.add_vertex(constrained_vertex)
+        constrained_vertex = TestVertex(16000, "Constrained")
+        self.graph.add_vertex(constrained_vertex)
+        partitioner = PartitionAndPlacePartitioner()
+        partitioner.partition(self.graph, self.machine)
 
     @unittest.skip("Test not implemented yet")
     def test_detect_subclass_hierarchy(self):
