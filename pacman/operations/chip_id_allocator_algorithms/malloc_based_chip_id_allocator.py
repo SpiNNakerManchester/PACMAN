@@ -5,9 +5,9 @@ MallocBasedChipIdAllocator
 # pacman imports
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman.operations.abstract_algorithms.\
-    abstract_element_allocator_algorithm import \
-    AbstractElementAllocatorAlgorithm
+from pacman.operations.abstract_algorithms\
+    .abstract_chip_id_allocator_algorithm\
+    import AbstractChipIdAllocatorAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
 
 # general imports
@@ -16,13 +16,13 @@ import math
 logger = logging.getLogger(__name__)
 
 
-class MallocBasedChipIdAllocator(AbstractElementAllocatorAlgorithm):
+class MallocBasedChipIdAllocator(AbstractChipIdAllocatorAlgorithm):
     """ A Chip id Allocation Allocator algorithm that keeps track of
         chip ids and attempts to allocate them as requested
     """
 
     def __init__(self):
-        AbstractElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
+        AbstractChipIdAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
     def allocate_chip_ids(self, partitionable_graph, machine):
         """
@@ -47,6 +47,7 @@ class MallocBasedChipIdAllocator(AbstractElementAllocatorAlgorithm):
             if isinstance(vertex, AbstractVirtualVertex):
                 chip_id_x, chip_id_y = self._allocate_id()
                 vertex.set_virtual_chip_coordinates(chip_id_x, chip_id_y)
+                self._create_virtual_chip(machine, vertex)
             progress_bar.update()
         progress_bar.end()
 

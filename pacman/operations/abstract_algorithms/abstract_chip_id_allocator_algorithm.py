@@ -1,13 +1,24 @@
+from spinn_machine.sdram import SDRAM
+from spinn_machine.chip import Chip
+from spinn_machine.link import Link
+from spinn_machine.processor import Processor
+from spinn_machine.router import Router
+
 from pacman.operations.abstract_algorithms\
     .abstract_element_allocator_algorithm \
     import AbstractElementAllocatorAlgorithm
+
 from abc import abstractmethod
 from six import add_metaclass
 from abc import ABCMeta
+import sys
 
 
 @add_metaclass(ABCMeta)
 class AbstractChipIdAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
+
+    def __init__(self, size_begin, size_end):
+        AbstractElementAllocatorAlgorithm.__init__(self, size_begin, size_end)
 
     @abstractmethod
     def allocate_chip_ids(self, partitionable_graph, machine):
@@ -15,18 +26,16 @@ class AbstractChipIdAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
         """
 
     def _create_virtual_chip(self, machine, virtual_vertex):
-        """ Create a virtual chip as a real chip in the spinnmachine machine\
-            object
+        """ Create a virtual chip as a real chip in the machine
         :param virtual_vertex: virutal vertex to convert into a real chip
         :return: the real chip
         """
-        sdram_object = SDRAM()
 
-        # creates the two links
-        spinnaker_link_id = virtual_vertex.spinnaker_link_id
-        spinnaker_link_data = \
-            self._machine.locate_connected_chips_coords_and_link(
-                config.getint("Machine", "version"), spinnaker_link_id)
+        # Get the spinnaker link from the machine
+        spinnaker_link_data = machine.get_spinnaker_link_with_id(
+            virtual_vertex.spinnaker_link_id)
+
+        # Create link to the virtual chip from the real chip
         virtual_link_id = (spinnaker_link_data.connected_link + 3) % 6
         to_virtual_chip_link = Link(
             destination_x=virtual_vertex.virtual_chip_x,
@@ -37,6 +46,7 @@ class AbstractChipIdAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
             multicast_default_to=virtual_link_id,
             source_link_id=spinnaker_link_data.connected_link)
 
+        # Create link to the real chip from the virtual chip
         from_virtual_chip_link = Link(
             destination_x=spinnaker_link_data.connected_chip_x,
             destination_y=spinnaker_link_data.connected_chip_y,
@@ -48,9 +58,9 @@ class AbstractChipIdAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
 
         # create the router
         links = [from_virtual_chip_link]
-        router_object = MachineRouter(
+        router_object = Router(
             links=links, emergency_routing_enabled=False,
-            clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
+            clock_speed=Router.ROUTER_DEFAULT_CLOCK_SPEED,
             n_available_multicast_entries=sys.maxint)
 
         # create the processors
@@ -61,14 +71,14 @@ class AbstractChipIdAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
                                         virtual_core_id == 0))
 
         # connect the real chip with the virtual one
-        connected_chip = self._machine.get_chip_at(
+        connected_chip = machine.get_chip_at(
             spinnaker_link_data.connected_chip_x,
             spinnaker_link_data.connected_chip_y)
         connected_chip.router.add_link(to_virtual_chip_link)
 
         # return new v chip
-        return Chip(
-            processors=processors, router=router_object, sdram=sdram_object,
+        machine.add_chip(Chip(
+            processors=processors, router=router_object,
+            sdram=SDRAM(total_size=0),
             x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
-            virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
-
+            virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None))
