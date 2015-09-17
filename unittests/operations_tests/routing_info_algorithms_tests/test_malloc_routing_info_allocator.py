@@ -4,6 +4,7 @@ from pacman.operations.routing_info_allocator_algorithms\
     import MallocBasedRoutingInfoAllocator
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 import traceback
+import sys
 
 
 class MyTestCase(unittest.TestCase):
@@ -85,27 +86,30 @@ class MyTestCase(unittest.TestCase):
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
 
+        print allocator._free_space_tracker
+
         for mask, keys in zip(fixed_masks, n_keys):
             self._print_keys_and_masks(
                 allocator._allocate_keys_and_masks(mask, None, keys, True))
+            print allocator._free_space_tracker
 
         print allocator._free_space_tracker
 
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
         self.assertEqual(len(allocator._free_space_tracker), 3, error)
-        self.assertEqual(allocator._free_space_tracker[0].start_address, 288,
-                         error)
-        self.assertEqual(allocator._free_space_tracker[0].size, 1760,
-                         error)
+        self.assertEqual(allocator._free_space_tracker[0].start_address,
+                         0x120, error)
+        self.assertEqual(allocator._free_space_tracker[0].size,
+                         224, error)
         self.assertEqual(allocator._free_space_tracker[1].start_address,
-                         0x1100, error)
-        self.assertEqual(allocator._free_space_tracker[1].size, 0x1FFF00,
-                         error)
+                         0x300, error)
+        self.assertEqual(allocator._free_space_tracker[1].size,
+                         1280, error)
         self.assertEqual(allocator._free_space_tracker[2].start_address,
-                         0x201800, error)
-        self.assertEqual(allocator._free_space_tracker[2].size, 0xFFDFE800,
-                         error)
+                         0x1800, error)
+        self.assertEqual(allocator._free_space_tracker[2].size,
+                         0x100000000L - 0x1800, error)
 
 if __name__ == '__main__':
     unittest.main()

@@ -58,8 +58,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
 
         # Iterate over constrained vertices and generate placements
         progress_bar = ProgressBar(len(partitioned_graph.subvertices),
-                                   "for placing the partitioned_graphs "
-                                   "subvertices")
+                                   "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         for vertex in constrained_vertices:

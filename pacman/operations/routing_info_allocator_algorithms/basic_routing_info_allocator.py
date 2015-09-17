@@ -2,12 +2,18 @@
 BasicRoutingInfoAllocator
 """
 
+from pacman.model.data_request_interfaces.\
+    abstract_requires_routing_info_partitioned_vertex import \
+    RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
+from pacman.operations.abstract_algorithms.\
+    abstract_routing_info_allocator_algorithm import \
+    AbstractRoutingInfoAllocatorAlgorithm
 from pacman.utilities import utility_calls
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
@@ -19,7 +25,7 @@ MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
 
 
-class BasicRoutingInfoAllocator(object):
+class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
     """ An basic algorithm that can produce routing keys and masks for\
         edges in a partitioned_graph based on the x,y,p of the placement\
         of the preceding partitioned vertex.
@@ -56,15 +62,16 @@ class BasicRoutingInfoAllocator(object):
 
         # check that this algorithm supports the constraints put onto the
         # partitioned_edges
+        supported_constraints = []
+        supported_constraints.append(RequiresRoutingInfoPartitionedVertex)
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subedges,
-            supported_constraints=[],
+            supported_constraints=supported_constraints,
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each subedge and create keys from its placement
         progress_bar = ProgressBar(len(subgraph.subvertices),
-                                   "on allocating the key's and masks for"
-                                   " each subedge")
+                                   "Allocating routing keys")
         routing_infos = RoutingInfo()
         routing_tables = MulticastRoutingTables()
         for subvert in subgraph.subvertices:
@@ -96,6 +103,21 @@ class BasicRoutingInfoAllocator(object):
                 routing_info_allocator_utilities.add_routing_key_entries(
                     routing_paths, subedge_routing_info, out_going_subedge,
                     routing_tables)
+
+        # handle the request for all partitioned vertices which require the
+        # routing info for configuring their data.
+        for partitioned_vertex in subgraph.subvertices:
+            if isinstance(partitioned_vertex,
+                          RequiresRoutingInfoPartitionedVertex):
+                vertex_sub_edge_routing_infos = list()
+                outgoing_edges = subgraph.\
+                    outgoing_subedges_from_subvertex(partitioned_vertex)
+                for outgoing_edge in outgoing_edges:
+                    vertex_sub_edge_routing_infos.append(
+                        routing_infos.
+                        get_subedge_information_from_subedge(outgoing_edge))
+                partitioned_vertex.set_routing_infos(
+                    vertex_sub_edge_routing_infos)
             progress_bar.update()
         progress_bar.end()
 

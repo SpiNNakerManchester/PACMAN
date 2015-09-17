@@ -89,6 +89,19 @@ class PacmanRouteInfoAllocationException(PacmanException):
         PacmanException.__init__(self, problem)
 
 
+class PacmanElementAllocationException(PacmanException):
+    """ An exception that indicates that something went wrong with element\
+        allocation
+    """
+
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the allocation
+        :type problem: str
+        """
+        PacmanException.__init__(self, problem)
+
+
 class PacmanRoutingException(PacmanException):
     """ An exception that indicates that something went wrong with routing
     """

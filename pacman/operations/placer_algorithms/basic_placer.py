@@ -51,8 +51,7 @@ class BasicPlacer(object):
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
-                                   "for placing the partitioned_graphs "
-                                   "subvertices")
+                                   "Placing graph vertices")
         resource_tracker = ResourceTracker(machine)
         for subvertex in ordered_subverts:
 

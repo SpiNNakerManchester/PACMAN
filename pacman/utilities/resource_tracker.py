@@ -172,7 +172,8 @@ class ResourceTracker(object):
             return chips_to_use
         elif board_address is not None:
             return self._ethernet_area_codes[board_address]
-        elif ip_tags is not None or reverse_ip_tags is not None:
+        elif ((ip_tags is not None and len(ip_tags) > 0) or
+                (reverse_ip_tags is not None and len(reverse_ip_tags) > 0)):
             return self._get_usable_ip_tag_chips()
         return self._chips_available
 
@@ -362,7 +363,7 @@ class ResourceTracker(object):
         :rtype: bool
         """
         # If there are no tags to assign, declare that they are available
-        if ip_tags is None:
+        if ip_tags is None or len(ip_tags) == 0:
             return True
 
         # If there is a fixed board address and the chip is not on the board
@@ -426,7 +427,7 @@ class ResourceTracker(object):
         :rtype: bool
         """
         # If there are no tags, declare they are available
-        if reverse_ip_tags is None:
+        if reverse_ip_tags is None or len(reverse_ip_tags) == 0:
             return True
 
         # If there is a fixed board address and the chip is not on the board
@@ -530,7 +531,7 @@ class ResourceTracker(object):
         :return: iterable of tuples of (board address, tag) assigned
         :rtype: iterable of (str, int)
         """
-        if ip_tags is None:
+        if ip_tags is None or len(ip_tags) == 0:
             return None
         allocations = list()
         for ip_tag in ip_tags:
@@ -575,7 +576,7 @@ class ResourceTracker(object):
         :return: iterable of tuples of (board address, tag) assigned
         :rtype: iterable of (str, int)
         """
-        if reverse_ip_tags is None:
+        if reverse_ip_tags is None or len(reverse_ip_tags) == 0:
             return None
         allocations = list()
         for reverse_ip_tag in reverse_ip_tags:
@@ -696,9 +697,29 @@ class ResourceTracker(object):
                         reverse_ip_tags_allocated)
 
         # If no chip is available, raise an exception
+        n_cores, n_chips, max_sdram = self._available_resources(usable_chips)
         raise exceptions.PacmanValueError(
             "No resources available to allocate the given resources"
-            " within the given constraints")
+            " within the given constraints:\n"
+            "    Request for CPU: {}, DTCM: {}, SDRAM: {}\n"
+            "    Resources available which meet constraints:"
+            " {} Cores on {} chips, largest SDRAM space: {}".format(
+                resources.cpu.get_value(), resources.dtcm.get_value(),
+                resources.sdram.get_value(), n_cores, n_chips, max_sdram))
+
+    def _available_resources(self, usable_chips):
+        n_cores = 0
+        max_sdram = 0
+        for x, y in usable_chips:
+            chip = self._machine.get_chip_at(x, y)
+            if (x, y) in self._core_tracker:
+                n_cores += len(self._core_tracker[x, y])
+            else:
+                n_cores += len(chip.processors)
+            sdram_available = self._sdram_available(chip, (x, y))
+            if sdram_available > max_sdram:
+                max_sdram = sdram_available
+        return n_cores, len(usable_chips), max_sdram
 
     def get_maximum_constrained_resources_available(self, constraints,
                                                     chips=None):

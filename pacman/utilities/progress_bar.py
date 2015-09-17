@@ -31,16 +31,15 @@ class ProgressBar(object):
         else:
             self.chars_per_thing = (float(ProgressBar.MAX_LENGTH_IN_CHARS) /
                                     float(self.total_number_of_things_to_do))
-        print("Progress {}".format(string_describing_what_being_progressed),
-              file=sys.stderr)
+        print(string_describing_what_being_progressed, file=sys.stderr)
         print("|0                           50%                         100%|",
               file=sys.stderr)
         print(" ", end="", file=sys.stderr)
         self.check_differences()
 
     def check_differences(self):
-        expected_chars_done = math.floor(self.currently_completed
-                                         * self.chars_per_thing)
+        expected_chars_done = math.floor(self.currently_completed *
+                                         self.chars_per_thing)
         if self.currently_completed == self.total_number_of_things_to_do:
             expected_chars_done = ProgressBar.MAX_LENGTH_IN_CHARS
         while self.chars_done < expected_chars_done:
