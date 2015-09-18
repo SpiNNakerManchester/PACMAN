@@ -6,8 +6,6 @@ MallocBasedRoutingInfoAllocator
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_same_keys_constraint import KeyAllocatorSameKeysConstraint
-from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
@@ -26,9 +24,10 @@ from pacman.model.constraints.key_allocator_constraints\
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.model.resources.element_free_space import ElementFreeSpace
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanRouteInfoAllocationException
+from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
+    ElementAllocatorAlgorithm
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
@@ -46,6 +45,9 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         free keys and attempts to allocate them as requested
     """
 
+    def __init__(self):
+        ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
+
     def __call__(self, subgraph, n_keys_map, routing_paths):
 
         # check that this algorithm supports the constraints
@@ -54,12 +56,9 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             supported_constraints=[
                 KeyAllocatorFixedMaskConstraint,
                 KeyAllocatorFixedKeyAndMaskConstraint,
-                KeyAllocatorContiguousRangeContraint,
-                KeyAllocatorSameKeysConstraint],
+                KeyAllocatorContiguousRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
-        
-        self._free_space_tracker = list()
-        self._free_space_tracker.append(ElementFreeSpace(0, math.pow(2, 32)))
+
         routing_tables = MulticastRoutingTables()
         
         # Get the partitioned edges grouped by those that require the same key
@@ -264,30 +263,3 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         raise PacmanRouteInfoAllocationException(
             "Could not find space to allocate keys")
-
-    def _check_allocation(self, index, base_element_id, n_elements):
-        """ Check if there is enough space for a given set of element ids
-            starting at a base element id inside a given slot
-
-        :param index: The index of the free space slot to check
-        :param base_element_id: The element id to start with -
-        must be inside the slot
-        :param n_elements: The number of elements to be allocated -\
-                       should be power of 2
-        """
-        free_space_slot = self._free_space_tracker[index]
-        space = (free_space_slot.size -
-                 (base_element_id - free_space_slot.start_address))
-
-        if free_space_slot.start_address > base_element_id:
-            raise exceptions.PacmanElementAllocationException(
-                "Trying to allocate a element id in the wrong slot!")
-        if n_elements == 0 or (n_elements & (n_elements - 1)) != 0:
-            raise exceptions.PacmanElementAllocationException(
-                "Trying to allocate {} elements, which is not a power of 2"
-                .format(n_elements))
-
-        # Check if there is enough space for the keys
-        if space < n_elements:
-            return None
-        return space

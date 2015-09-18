@@ -5,7 +5,7 @@
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
-                <param_type>File</param_type>
+                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -35,7 +35,7 @@
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
-                <param_type>File</param_type>
+                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -61,7 +61,7 @@
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
-                <param_type>File</param_type>
+                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -79,7 +79,7 @@
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
-                <param_type>File</param_type>
+                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>subgraph</param_name>
@@ -101,7 +101,7 @@
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
-                <param_type>File</param_type>
+                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -123,7 +123,7 @@
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
-                <param_type>File</param_type>
+                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>tag_infos</param_name>

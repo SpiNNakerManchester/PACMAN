@@ -5,6 +5,8 @@ collection of fucntiosn which together vaidate routes.
 from pacman import exceptions
 from collections import namedtuple
 import logging
+from pacman.utilities.progress_bar import ProgressBar
+
 logger = logging.getLogger(__name__)
 
 # Define an internal class for placements
@@ -30,6 +32,9 @@ def validate_routes(partitioned_graph, placements, routing_infos,
                 detected
 
     """
+    progress = ProgressBar(
+        len(list(placements.placements)),
+        "Verifying the routes from each core travel to the correct locations")
     for placement in placements.placements:
         outgoing_edges_for_partitioned_vertex = \
             partitioned_graph.outgoing_subedges_from_subvertex(
@@ -62,6 +67,8 @@ def validate_routes(partitioned_graph, placements, routing_infos,
             # search for these destinations
             _search_route(placement, destination_placements, key_and_mask,
                           routing_tables, machine)
+        progress.update()
+    progress.end()
 
 
 def _search_route(source_placement, dest_placements, key_and_mask,

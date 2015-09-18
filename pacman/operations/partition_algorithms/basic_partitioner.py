@@ -109,7 +109,8 @@ class BasicPartitioner(object):
 
                 subvert = vertex.create_subvertex(
                     vertex_slice, subvertex_usage,
-                    "{}:{}:{}".format(vertex.label, counted, alloc - 1),
+                    "{}:{}:{}".format(vertex.label, counted,
+                                      (counted + (alloc - 1))),
                     partition_algorithm_utilities.
                     get_remaining_constraints(vertex))
                 subgraph.add_subvertex(subvert)

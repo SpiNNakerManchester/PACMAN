@@ -4,14 +4,11 @@ PACMANAlgorithmExecutor
 
 # pacman imports
 from pacman import exceptions
-from pacman import operations
-from pacman.utilities.algorithm_utilities.algorithm_data import AlgorithmData
-from pacman import utilities
+from pacman.utilities.file_format_coders.xml_file_formats.xml_file_decoder\
+    import XMLFileDecoder
 
 # general imports
 import logging
-from lxml import etree
-import os
 import importlib
 
 logger = logging.getLogger(__name__)
@@ -97,30 +94,11 @@ class PACMANAlgorithmExecutor(object):
                     "algorithum_name if its a interal to pacman algorithm. "
                     "Please rectify this and try again")
 
-        # set up xml reader for standard pacman algorithums xml file reader
-        xml_paths.append(os.path.join(os.path.dirname(operations.__file__),
-                                      "algorithms_metadata.xml"))
-        xml_paths.append(os.path.join(os.path.dirname(utilities.__file__),
-                                      "reports_metadata.xml"))
+        # decode the algorithms specs
+        xml_decoder = XMLFileDecoder(None, xml_paths)
+        algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
 
-        # parse xmls
-        xml_roots = list()
-        for xml_path in xml_paths:
-            xml_roots.append(etree.parse(xml_path))
-
-        algorithm_data_objects = dict()
-        for xml_root in xml_roots:
-            elements = xml_root.findall(".//algorithm")
-            for element in elements:
-                if element.get('name') in algorithm_data_objects:
-                    raise exceptions.PacmanConfigurationException(
-                        "There are two algorithms with the same name in these"
-                        "xml files {}. Please rectify and try again."
-                        .format(xml_paths))
-                else:
-                    algorithm_data_objects[element.get('name')] = \
-                        self._generate_algorithm_data(element)
-
+        # filter for just algorithms we want to use
         self._algorithms = list()
         for algorithms_name in algorithms_names:
             self._algorithms.append(algorithm_data_objects[algorithms_name])
@@ -182,70 +160,6 @@ class PACMANAlgorithmExecutor(object):
 
         self._algorithms = allocated_algorithums
 
-    def _generate_algorithm_data(self, element):
-        """
-        takes the xml elements and translaters them into tuples for the
-        AlgorithmData object
-        :param element: the lxml element to translate
-        :return: a AlgorithmData
-        """
-        # convert lxml elemtnts into dicts or strings
-        external = False
-        # verify if its a internal or extenral via if it is import-able or
-        # command line based
-        command_line = element.find("command_line_command")
-        if command_line is not None:
-            command_line = command_line.text
-        python_module = element.find("python_module")
-        if python_module is not None:
-            python_module = python_module.text
-        python_class = element.find("python_class")
-        if python_class is not None:
-            python_class = python_class.text
-        python_function = element.find("python_function")
-        if python_function is not None:
-            python_function = python_function.text
-
-        if python_module is None and command_line is not None:
-            external = True
-        elif python_module is not None and command_line is None:
-            external = False
-        elif ((python_module is None and command_line is None) or
-                (python_module is not None and command_line is not None)):
-            raise exceptions.PacmanConfigurationException(
-                "Cannot deduce what to do when either both command line and "
-                "python mudle are none or are filled in. Please rectify and "
-                "try again")
-
-        # get other params
-        required_inputs = \
-            self._translate_parameters(element.find("required_inputs"))
-        optional_inputs = \
-            self._translate_parameters(element.find("optional_inputs"))
-        outputs = \
-            self._translate_parameters(element.find("produces_outputs"))
-        return AlgorithmData(
-            algorithm_id=element.get('name'), command_line_string=command_line,
-            inputs=required_inputs, optional_inputs=optional_inputs,
-            outputs=outputs, external=external, python_import=python_module,
-            python_class=python_class, python_function=python_function)
-
-    @staticmethod
-    def _translate_parameters(parameters_element):
-        """
-        converts a xml parameter element into a dict
-        :param parameters_element:
-        :return:
-        """
-        translated_params = list()
-        if parameters_element is not None:
-            parameters = parameters_element.findall("parameter")
-            for parameter in parameters:
-                translated_params.append(
-                    {'name': parameter.find("param_name").text,
-                     'type': parameter.find("param_type").text})
-        return translated_params
-
     def execute_mapping(self, inputs):
         """
         executes the algorithms
@@ -259,46 +173,86 @@ class PACMANAlgorithmExecutor(object):
 
         for algorithm in self._algorithms:
             # exeucte the algorithm and store outputs
-            if not algorithm.external:
-                # import the python module to run
-                if (algorithm.python_class is not None and
-                        algorithm.python_function is None):
-                    # if class, instansisate it
-                    python_algorithm = getattr(
-                        importlib.import_module(algorithm.python_module_import),
-                        algorithm.python_class)
-                    # create instanation of the algorithm to run
-                    python_algorithm = python_algorithm()
-                elif (algorithm.python_function is not None and
-                        algorithm.python_class is None):
-                    # just a function, so no instantation required
-                    python_algorithm = getattr(
-                        importlib.import_module(algorithm.python_module_import),
-                        algorithm.python_function)
-                else:
-                    raise exceptions.PacmanConfigurationException(
-                        "The algorithm {}, was deduced to be a internal "
-                        "algorithm and yet has resulted in no class or "
-                        "function definition. This makes the auto exeuction "
-                        "impossible. Please fix and try again."
-                        .format(algorithm.algorithm_id))
+            if not algorithm.external: # internal to pacman
+                # create algorithm
+                python_algorithm = self._create_python_object(algorithm)
 
                 # create input dictonary
                 inputs = dict()
                 for input_parameter in algorithm.inputs:
                     inputs[input_parameter['name']] = \
                         self._internal_type_mapping[input_parameter['type']]
+
                 # execute algorithm
                 results = python_algorithm(**inputs)
                 if results is not None:
+
                     # update python data objects
                     for result_name in results:
                         result_type = \
                             algorithm.get_type_from_output_name(result_name)
                         self._internal_type_mapping[result_type] = \
                             results[result_name]
-            else:
-                pass
+            else:  # external to pacman
+                if (algorithm.python_class is not None or
+                        algorithm.python_function is not None):
+
+                    # create a algorithm for python object
+                    python_algorithm = self._create_python_object(algorithm)
+                    self._create_input_files(algorithm)
+                    python_algorithm(**inputs)
+                    self._convert_output_files(algorithm)
+
+                else:  # none python algorithm
+                    self._create_input_files(algorithm)
+                    #execute
+                    self._convert_output_files(algorithm)
+
+    def _create_input_files(self, algorithm):
+        """
+        creates the input files for the algorithm
+        :param algorithm: the algorthum
+        :return:
+        """
+
+
+    def _convert_output_files(self, algorithm):
+        """
+        decodes the output files from the algorithm
+        :param algorithm:
+        :return: the algorithm
+        """
+
+    @staticmethod
+    def _create_python_object(algorithm):
+        """
+        creates the python algorithum from the spec
+        :param algorithm: the algorithm spec
+        :return: an instantated object for the algorithm
+        """
+        # import the python module to run
+        if (algorithm.python_class is not None and
+                algorithm.python_function is None):
+            # if class, instansisate it
+            python_algorithm = getattr(
+                importlib.import_module(algorithm.python_module_import),
+                algorithm.python_class)
+            # create instanation of the algorithm to run
+            python_algorithm = python_algorithm()
+        elif (algorithm.python_function is not None and
+                algorithm.python_class is None):
+            # just a function, so no instantation required
+            python_algorithm = getattr(
+                importlib.import_module(algorithm.python_module_import),
+                algorithm.python_function)
+        else:
+            raise exceptions.PacmanConfigurationException(
+                "The algorithm {}, was deduced to be a internal "
+                "algorithm and yet has resulted in no class or "
+                "function definition. This makes the auto exeuction "
+                "impossible. Please fix and try again."
+                .format(algorithm.algorithm_id))
+        return python_algorithm
 
     def get_item(self, item_type):
         """

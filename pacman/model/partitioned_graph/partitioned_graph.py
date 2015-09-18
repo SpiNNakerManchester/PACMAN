@@ -160,7 +160,7 @@ class PartitionedGraph(object):
         elif partition_identifer not in self._outgoing_subedges[subvertex]:
             return ()
         else:
-            return self._outgoing_subedges[subvertex][partition_identifer]
+            return self._outgoing_subedges[subvertex][partition_identifer].edges
 
     def outgoing_edges_partitions_from_vertex(self, sub_vertex):
         """ Locates all the outgoing edge partitions for a given vertex

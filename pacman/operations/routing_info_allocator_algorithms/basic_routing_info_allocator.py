@@ -11,9 +11,6 @@ from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
-from pacman.operations.abstract_algorithms.\
-    abstract_routing_info_allocator_algorithm import \
-    AbstractRoutingInfoAllocatorAlgorithm
 from pacman.utilities import utility_calls
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
@@ -25,7 +22,7 @@ MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
 
 
-class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
+class BasicRoutingInfoAllocator(object):
     """ An basic algorithm that can produce routing keys and masks for\
         edges in a partitioned_graph based on the x,y,p of the placement\
         of the preceding partitioned vertex.
@@ -62,8 +59,7 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
         # check that this algorithm supports the constraints put onto the
         # partitioned_edges
-        supported_constraints = []
-        supported_constraints.append(RequiresRoutingInfoPartitionedVertex)
+        supported_constraints = [RequiresRoutingInfoPartitionedVertex]
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subedges,
             supported_constraints=supported_constraints,

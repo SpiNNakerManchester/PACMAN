@@ -13,6 +13,7 @@ from pacman.utilities.outgoing_edge_partition import OutgoingEdgePartition
 # general imports
 import uuid
 
+
 class PartitionableGraph(object):
     """ Represents a collection of vertices and edges between vertices that \
         make up a partitionable graph i.e. a graph whose vertices can be \
@@ -141,7 +142,7 @@ class PartitionableGraph(object):
         if partition_identifer is None:
             edges = list()
             for partition in self._outgoing_edges[vertex]:
-                edges.extend(partition.edges)
+                edges.extend(self._outgoing_edges[vertex][partition].edges)
             return edges
         # if no partition then return empty list
         elif partition_identifer not in self._outgoing_edges[vertex]:
