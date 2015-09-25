@@ -140,6 +140,19 @@ class PacmanNotExistException(PacmanException):
         """
         PacmanException.__init__(self, problem)
 
+class PacmanAlgorithmFailedToCompleteException(PacmanException):
+    """ An exception that indicates that a pacman algorithm ran from outside the
+    software stack has failed to complete for some unknown reason.
+
+    """
+
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the routing
+        :type problem: str
+        """
+        PacmanException.__init__(self, problem)
+
 
 class PacmanSubvertexAlreadyPlacedError(ValueError):
     """Indicates multiple placements are being made for a subvertex."""

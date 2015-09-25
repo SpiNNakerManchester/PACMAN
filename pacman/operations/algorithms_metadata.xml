@@ -5,21 +5,21 @@
         <required_inputs>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>PartitionableGraph</param_type>
+                <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>Partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>Graph_mapper</param_name>
-                <param_type>GraphMapper</param_type>
+                <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -29,21 +29,21 @@
         <required_inputs>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>PartitionableGraph</param_type>
+                <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
-                <param_type>GraphMapper</param_type>
+                <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -53,17 +53,17 @@
         <required_inputs>
             <parameter>
                 <param_name>partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -73,17 +73,17 @@
         <required_inputs>
             <parameter>
                 <param_name>partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -93,17 +93,17 @@
         <required_inputs>
             <parameter>
                 <param_name>partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -113,15 +113,15 @@
         <required_inputs>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
         </required_inputs>
         <optional_inputs>
@@ -149,7 +149,7 @@
         <produces_outputs>
             <parameter>
                 <param_name>routing_paths</param_name>
-                <param_type>RoutingPaths</param_type>
+                <param_type>MemoryRoutingPaths</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -159,29 +159,29 @@
         <required_inputs>
             <parameter>
                 <param_name>subgraph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>AbstractPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_paths</param_name>
-                <param_type>RoutingPaths</param_type>
+                <param_type>MemoryRoutingPaths</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>RoutingInfos</param_type>
+                <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>RoutingTables</param_type>
+                <param_type>MemoryRoutingTables</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -191,25 +191,25 @@
         <required_inputs>
             <parameter>
                 <param_name>subgraph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>AbstractPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_paths</param_name>
-                <param_type>RoutingPaths</param_type>
+                <param_type>MemoryRoutingPaths</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>RoutingInfos</param_type>
+                <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>RoutingTables</param_type>
+                <param_type>MemoryRoutingTables</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -219,17 +219,17 @@
         <required_inputs>
             <parameter>
                 <param_name>partitionable_graph</param_name>
-                <param_type>PartitionableGraph</param_type>
+                <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -239,17 +239,17 @@
         <required_inputs>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>tags</param_name>
-                <param_type>Tags</param_type>
+                <param_type>MemoryTags</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -259,23 +259,23 @@
         <required_inputs>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>RoutingInfos</param_type>
+                <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>RoutingTables</param_type>
+                <param_type>MemoryRoutingTables</param_type>
             </parameter>
         </required_inputs>
     </algorithm>

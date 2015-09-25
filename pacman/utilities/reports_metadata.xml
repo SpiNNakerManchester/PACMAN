@@ -13,19 +13,19 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>PartitionableGraph</param_type>
+                <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
-                <param_type>GraphMapper</param_type>
+                <param_type>MemoryGraphMapper</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
     </algorithm>
@@ -43,15 +43,15 @@
             </parameter>
             <parameter>
                 <param_name>sub_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>Placements</param_type>
+                <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>Machine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
     </algorithm>
@@ -69,7 +69,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_paths</param_name>
-                <param_type>RoutingPaths</param_type>
+                <param_type>MemoryRoutingPaths</param_type>
             </parameter>
         </required_inputs>
     </algorithm>
@@ -83,15 +83,15 @@
             </parameter>
             <parameter>
                 <param_name>subgraph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>RoutingInfos</param_type>
+                <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>RoutingTables</param_type>
+                <param_type>MemoryRoutingTables</param_type>
             </parameter>
         </required_inputs>
     </algorithm>
@@ -109,11 +109,11 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>PartitionableGraph</param_type>
+                <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_to_subgraph_mapper</param_name>
-                <param_type>GraphMapper</param_type>
+                <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
     </algorithm>
@@ -127,7 +127,7 @@
             </parameter>
             <parameter>
                 <param_name>tag_infos</param_name>
-                <param_type>Tags</param_type>
+                <param_type>MemoryTags</param_type>
             </parameter>
         </required_inputs>
     </algorithm>
