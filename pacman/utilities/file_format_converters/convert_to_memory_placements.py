@@ -49,10 +49,19 @@ class ConvertToMemoryPlacements(object):
             if vertex_label not in file_allocations:
                 # virtual chip or tag chip
                 constraints_for_vertex = self._locate_constraints(
-                    vertex_label, subvertex.constraints)
+                    vertex_label, constraints)
+                if self._valid_constraints_for_external_device(
+                        constraints_for_vertex):
+
+
+                elif self._valid_constraints_for_tag(constraints_for_vertex):
 
 
 
+                else:
+                    raise exceptions.PacmanConfigurationException(
+                        "I dont recongise this pattern of constraints for a"
+                        "vertex which does not have a placement")
             else:
                 memory_placements.add_placement(
                     Placement(x=file_placements[vertex_label][0],
@@ -62,6 +71,35 @@ class ConvertToMemoryPlacements(object):
 
         # return the file format
         return {"MemoryPlacements": memory_placements}
+
+    @staticmethod
+    def __valid_constraints_for_tag(constraints_for_vertex):
+        """
+
+        :param constraints_for_vertex:
+        :return:
+        """
+        for constraint in constraints_for_vertex:
+            if constraint['type'] == "reserve_resource" and
+
+    @staticmethod
+    def _valid_constraints_for_external_device(constraints_for_vertex):
+        """
+        search for the constraint pattern which represetns a external device
+        :param constraints_for_vertex: constraints for a vertex
+        :return: bool
+        """
+        found_route_end_point = False
+        found_placement_constraint = False
+        for constraint in constraints_for_vertex:
+            if constraint['type'] == "location":
+                found_placement_constraint = True
+            if constraint['type'] == "route_endpoint":
+                found_route_end_point = True
+        if found_placement_constraint and found_route_end_point:
+            return True
+        else:
+            return False
 
     @staticmethod
     def _validate_file_read_data(
