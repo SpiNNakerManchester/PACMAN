@@ -4,12 +4,7 @@ PACMANAlgorithmExecutor
 
 # pacman imports
 from pacman import exceptions
-from pacman.utilities.file_format_coders.json_file_formats.json_file_coder \
-    import JsonFileCoder
-from pacman.utilities.file_format_coders.json_file_formats.json_file_decoder \
-    import JsonFileDecoder
-from pacman.utilities.file_format_coders.xml_file_formats.xml_file_decoder\
-    import XMLFileDecoder
+from pacman.utilities.
 
 # general imports
 import logging
@@ -100,12 +95,6 @@ class PACMANAlgorithmExecutor(object):
         # decode the algorithms specs
         xml_decoder = XMLFileDecoder(None, xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
-
-        # read up converts from memory and file based objects
-        xml_paths = os.path.join(
-            os.path.dirname(file_format_converters.__file__),
-            "converter_algorithms_metadata.xml")
-        xml_decoder = XMLFileDecoder(None, xml_paths)
         converter_algorithm_data_objects = \
             xml_decoder.decode_algorithm_data_objects()
 
