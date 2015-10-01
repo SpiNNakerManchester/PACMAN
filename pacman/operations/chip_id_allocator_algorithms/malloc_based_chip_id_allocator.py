@@ -51,6 +51,8 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             progress_bar.update()
         progress_bar.end()
 
+        return {"machine": machine}
+
     def _allocate_id(self):
         """
         allocate a chip id from the free space

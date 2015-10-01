@@ -114,3 +114,12 @@ class AlgorithmData(object):
                 return output['type']
         else:
             return None
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "{}:{}:{}:{}:{}:{}:{}:{}:{}".format(
+            self._id, self._command_line_string, self._python_import_string,
+            self._inputs, self._optional_inputs, self._outputs, self._external,
+            self._python_class, self._python_function)

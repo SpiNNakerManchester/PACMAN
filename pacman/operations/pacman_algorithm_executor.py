@@ -4,7 +4,8 @@ PACMANAlgorithmExecutor
 
 # pacman imports
 from pacman import exceptions
-from pacman.utilities.
+from pacman.utilities.file_format_converters.convert_algorithms_metadata \
+    import ConvertAlgorithmsMetadata
 
 # general imports
 import logging
@@ -92,9 +93,15 @@ class PACMANAlgorithmExecutor(object):
                                       "algorithms_metadata.xml"))
         xml_paths.append(os.path.join(os.path.dirname(utilities.__file__),
                                       "reports_metadata.xml"))
+
+        converter_xml_path = list()
+        converter_xml_path.append(os.path.join(
+            os.path.dirname(file_format_converters.__file__),
+            "converter_algorithms_metadata.xml"))
         # decode the algorithms specs
-        xml_decoder = XMLFileDecoder(None, xml_paths)
+        xml_decoder = ConvertAlgorithmsMetadata(xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
+        xml_decoder = ConvertAlgorithmsMetadata(converter_xml_path)
         converter_algorithm_data_objects = \
             xml_decoder.decode_algorithm_data_objects()
 
@@ -105,7 +112,7 @@ class PACMANAlgorithmExecutor(object):
 
         # sort_out_order_of_algorithms for exeuction
         self._sort_out_order_of_algorithms(
-            inputs, required_outputs, converter_algorithm_data_objects)
+            inputs, required_outputs, converter_algorithm_data_objects.values())
 
     def _sort_out_order_of_algorithms(
             self, inputs, required_outputs, optional_converter_algorithms):
@@ -122,8 +129,8 @@ class PACMANAlgorithmExecutor(object):
         """
 
         allocated_algorithums = list()
-        generated_outputs = list()
-        generated_outputs.extend(inputs)
+        generated_outputs = set()
+        generated_outputs.union(inputs)
         allocated_a_algorithm = True
         while len(self._algorithms) != 0 and allocated_a_algorithm:
             allocated_a_algorithm = False
@@ -141,7 +148,7 @@ class PACMANAlgorithmExecutor(object):
                     generated_outputs)
             else:
                 suitable_algorithm = self._locate_suitable_algorithm(
-                optional_converter_algorithms, inputs)
+                    optional_converter_algorithms, inputs)
                 if suitable_algorithm is not None:
                     allocated_algorithums.append(suitable_algorithm)
                     allocated_a_algorithm = True
@@ -152,11 +159,13 @@ class PACMANAlgorithmExecutor(object):
                     raise exceptions.PacmanConfigurationException(
                         "I was not able to deduce a future algortihm to use as"
                         "I only have the inputs {} and am missing the outputs "
-                        "{} from the requirements of the end user. Please"
-                        "add a algorithm(s) which uses the defined inputs "
-                        "and generates the required outputs and rerun me. "
-                        "Thanks".format(inputs, list(set(generated_outputs)
-                                                     - set(inputs))))
+                        "{} from the requirements of the end user. The only"
+                        " avilable functions are {}. Please add a algorithm(s) "
+                        "which uses the defined inputs and generates the "
+                        "required outputs and rerun me. Thanks"
+                        .format(
+                            inputs, list(set(required_outputs) - set(inputs)),
+                            self._algorithms + optional_converter_algorithms))
 
         all_required_outputs_generated = True
         failed_to_generate_output_string = ""
@@ -185,8 +194,8 @@ class PACMANAlgorithmExecutor(object):
         """
         algorithm_list.remove(algorithm)
         for output in algorithm.outputs:
-            inputs.append(output['type'])
-            generated_outputs.append(output['type'])
+            inputs.add(output['type'])
+            generated_outputs.add(output['type'])
 
 
     def _locate_suitable_algorithm(self, algorithm_list, inputs):
