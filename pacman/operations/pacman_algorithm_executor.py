@@ -29,7 +29,8 @@ class PACMANAlgorithmExecutor(object):
     def __init__(self, reports_states, in_debug_mode=True):
         """
         :param reports_states: the pacman report object
-        :param in_debug_mode:
+        :param in_debug_mode: bool which tells the algorithm exeuctor to add
+        any debug algorithms if needed
         :return:
         """
         # pacman mapping objects
@@ -247,22 +248,13 @@ class PACMANAlgorithmExecutor(object):
         python_algorithm = self._create_python_object(algorithm)
 
         # create input dictonary
-        inputs = dict()
-        for input_parameter in algorithm.inputs:
-            inputs[input_parameter['name']] = \
-                self._internal_type_mapping[input_parameter['type']]
+        inputs = self._create_input_commands(algorithm)
 
         # execute algorithm
         results = python_algorithm(**inputs)
 
         # move outputs into internal data objects
-        if results is not None:
-            # update python data objects
-            for result_name in results:
-                result_type = \
-                    algorithm.get_type_from_output_name(result_name)
-                self._internal_type_mapping[result_type] = \
-                    results[result_name]
+        self._map_output_files(results, algorithm)
 
     def _handle_external_algorithm(self, algorithm):
         """
@@ -274,26 +266,61 @@ class PACMANAlgorithmExecutor(object):
                 algorithm.python_function is not None):
             # create a algorithm for python object
             python_algorithm = self._create_python_object(algorithm)
-            input_params = self._create_input_files(algorithm)
-            python_algorithm(**input_params)
-            self._convert_output_files(algorithm)
+            input_params = self._create_input_commands(algorithm)
+            results = python_algorithm(**input_params)
+            self._map_output_files(results, algorithm)
 
         else:  # none python algorithm
-            input_params = self._create_input_files(algorithm)
+            input_params = self._create_input_commands(algorithm)
             input_string = ""
-            for param in input_params:
-                input_string += "{}={} ".format(param, input_params[param])
+            #for param in input_params:
+            #    input_string += "{}={} ".format(param, input_params[param])
             # execute other command
             return_code = subprocess.call(
-                [algorithm.command_line_string, input_string])
+                [a.format(**input_params) for a in algorithm.command_line_args])
             if return_code != 0:
                 raise exceptions.\
                     PacmanAlgorithmFailedToCompleteException(
                         "The algorithm {} failed to complete correctly, "
                         "Due to this algorithm being outside of the "
-                        "software stacks defaultly supported algorthims,"
+                        "software stack's defaultly supported algorthims,"
                         " we refer to the algorthm builder to rectify this.")
-            self._convert_output_files(algorithm)
+            self._map_output_files(algorithm.outputs, algorithm)
+
+    def _create_input_commands(self, algorithm):
+        """
+        converts internal type mapping into a input dictory for the algorithm
+        :param algorithm: the algorithm in question
+        :return: a dictonry containing input names and the corrasponding
+        internal type mapping's object
+        """
+        params = dict()
+        for input_param in algorithm.inputs:
+            params[input_param['name']] = \
+                self._internal_type_mapping[input_param['type']]
+        return params
+
+    def _map_output_files(self, results, algorithm):
+        """
+        translates the outputs results into the internal type mappings
+        :param results: the results from the algorithm
+        :param algorithm: the algorithm itself
+        :return: None
+        :raises PacmanAlgorithmFailedToCompleteException: when the algorithm
+        returns no results
+        """
+        if results is not None:
+            # update python data objects
+            for result_name in results:
+                result_type = \
+                    algorithm.get_type_from_output_name(result_name)
+                self._internal_type_mapping[result_type] = \
+                    results[result_name]
+            self._map_output_files(results, algorithm)
+        else:
+            raise exceptions.PacmanAlgorithmFailedToCompleteException(
+                "The algorithm did not generate any outputs. This is deemed to"
+                " be an error of some sort. Please fix and try again")
 
     @staticmethod
     def _create_python_object(algorithm):
@@ -329,7 +356,7 @@ class PACMANAlgorithmExecutor(object):
     def get_item(self, item_type):
         """
 
-        :param item_type:
-        :return:
+        :param item_type: the item from the internal type mapping to be returned
+        :return: the returned item
         """
         return self._internal_type_mapping[item_type]
