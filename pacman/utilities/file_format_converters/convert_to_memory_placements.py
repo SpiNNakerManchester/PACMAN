@@ -5,10 +5,12 @@ from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman import exceptions
 from pacman.utilities import file_format_schemas
+from pacman.utilities import constants
 
 import os
 import json
 import validictory
+from pacman.utilities.resource_tracker import ResourceTracker
 
 
 class ConvertToMemoryPlacements(object):
@@ -30,14 +32,20 @@ class ConvertToMemoryPlacements(object):
         """
 
         # load the json files
-        file_placements = json.load(placements)
-        core_allocations = json.load(allocations)
-        constraints = json.load(constraints)
+        file_placements, core_allocations, constraints = \
+            self._load_json_files(placements, allocations, constraints)
 
+        # validate the json files against the schemas
         self._validate_file_read_data(
             file_placements, core_allocations, constraints)
 
+        # drop the type and allocations bit of core allocations
+        # (makes lower code simplier)
+        core_allocations = core_allocations['allocations']
+
         memory_placements = Placements()
+        resoruce_tracker_for_external_devices = \
+            ResourceTracker(extended_machine)
 
         # process placements
         for vertex_label in file_placements:
@@ -51,11 +59,34 @@ class ConvertToMemoryPlacements(object):
                         self._valid_constraints_for_external_device(
                             constraints_for_vertex)
                     if len(external_device_constraints) != 0:
+
+                        # get data for virutal chip
                         route_constraint = \
                             external_device_constraints['end_point']
-                        route_direction = route_constraint['direction']
+                        route_direction = constants.EDGES(
+                            route_constraint['direction'].upper())
+                        placement_constraint = \
+                            external_device_constraints['placement']
+                        coords = placement_constraint['location']
 
+                        # locate virtual chip
+                        link = extended_machine.get_chip_at(
+                            coords[0], coords[1]).router.get_link(
+                            route_direction.value)
+                        destination_chip = extended_machine.get_chip_at(
+                            link.destination_x, link.destination_y)
 
+                        # get core from resource tracker
+                        (x, y, p, _, _) = \
+                            resoruce_tracker_for_external_devices.\
+                            allocate_resources(
+                                subvertex.resources_required,
+                                subvertex.constraints)
+
+                        # create placement
+                        placements.add_placement(Placement(
+                            subvertex, destination_chip.x, destination_chip.y,
+                            p))
                     else:
                         raise exceptions.PacmanConfigurationException(
                             "I dont recongise this pattern of constraints for a"
@@ -73,7 +104,27 @@ class ConvertToMemoryPlacements(object):
                                   subvertex=subvertex))
 
         # return the file format
-        return {"MemoryPlacements": memory_placements}
+        return {"placements": memory_placements}
+
+    @staticmethod
+    def _load_json_files(placements, allocations, constraints):
+        """
+        reads in the 3 json files needed for the conversion
+        :param placements:
+        :param allocations:
+        :param constraints:
+        :return:
+        """
+
+        placments_file = open(placements, "r")
+        allocations_file = open(allocations, "r")
+        constraints_file = open(constraints, "r")
+
+        file_placements = json.load(placments_file)
+        core_allocations = json.load(allocations_file)
+        constraints = json.load(constraints_file)
+
+        return file_placements, core_allocations, constraints
 
     @staticmethod
     def _valid_constraints_for_external_device(constraints_for_vertex):

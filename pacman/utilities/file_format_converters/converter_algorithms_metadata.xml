@@ -84,7 +84,7 @@
         <python_class>ConvertToMemoryPlacements</python_class>
         <required_inputs>
             <parameter>
-                <param_name>machine</param_name>
+                <param_name>extended_machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
