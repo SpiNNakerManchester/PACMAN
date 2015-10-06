@@ -15,7 +15,7 @@ from collections import defaultdict
 
 import os
 import json
-#import validictory
+import validictory
 import hashlib
 
 DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX = 1
@@ -26,7 +26,7 @@ class ConvertToFilePartitionedGraph(object):
     converts a memory based partitioned graph into a file based partitioned graph
     """
 
-    def __call__(self, partitioned_graph, folder_path):
+    def __call__(self, partitioned_graph, file_path):
         """
 
         :param partitioned_graph:
@@ -110,17 +110,19 @@ class ConvertToFilePartitionedGraph(object):
                     vertex_outgoing_partitions[vertex_partition]\
                     .type.name.lower()
 
-        file_path = os.path.join(folder_path, "graph.json")
         file_to_write = open(file_path, "w")
         json.dump(json_graph_dictory_rep, file_to_write)
         file_to_write.close()
 
         # validate the schema
         partitioned_graph_schema_file_path = os.path.join(
-            file_format_schemas.__file__, "partitioned_graph.json"
+            os.path.dirname(file_format_schemas.__file__),
+            "partitioned_graph.json"
         )
-        #validictory.validate(
-        #    json_graph_dictory_rep, partitioned_graph_schema_file_path)
+        file_to_read = open(partitioned_graph_schema_file_path, "r")
+        partitioned_graph_schema = json.load(file_to_read)
+        validictory.validate(
+            json_graph_dictory_rep, partitioned_graph_schema)
 
         return {"partitioned_graph": file_path}
 

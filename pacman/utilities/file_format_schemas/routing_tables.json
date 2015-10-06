@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "Gives a set of routing table entries for all relevant chips in a system.",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "chip": {
+                "description": "The chip the routing table entries are for.",
+                "type": "array",
+                "items": [
+                    {"type": "integer", "minimum": 0},
+                    {"type": "integer", "minimum": 0}
+                ],
+                "additionalItems": false
+            },
+            "entries": {
+                "description": "The routing table entries.",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "key": {"$ref": "#/resources/keyValue"},
+                        "mask": {"$ref": "#/resources/keyValue"},
+                        "directions": {
+                            "type": "array",
+                            "items": {"$ref": "#/resources/direction"},
+                            "uniqueItems": true,
+                            "additionalItems": false
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": ["key", "mask", "directions"]
+                }
+            }
+        },
+        "additionalProperties": false,
+        "required": ["chip", "entries"]
+    },
+    
+    "resources": {
+        "keyValue": {
+            "description": "A valid unsigned 32-bit value.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+        },
+        "link": {
+            "description": "A chip-to-chip link.",
+            "type": "string",
+            "enum": [
+                "east", "north_east", "north",
+                "west", "south_west", "south"
+            ]
+        },
+        "core": {
+            "description": "A specific core.",
+            "type": "string",
+            "enum": [
+                "core0", "core1", "core2", "core3",
+                "core4", "core5", "core6", "core7",
+                "core8", "core9", "core10", "core11",
+                "core12", "core13", "core14", "core15",
+                "core16", "core17"
+            ]
+        },
+        "direction": {
+            "description": "A chip-to-chip link or a specific core.",
+            "oneOf": [
+                {"$ref": "#/resources/link"},
+                {"$ref": "#/resources/core"}
+            ]
+        }
+    }
+}
+

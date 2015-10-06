@@ -4,7 +4,7 @@ from pacman.utilities import file_format_schemas
 from collections import defaultdict
 
 import json
-#import validictory
+import validictory
 import os
 
 CHIP_HOMOGENIOUS_CORES = 18
@@ -74,20 +74,21 @@ class ConvertToFileMachine(object):
             chip_resouce_exceptions_list
 
         # dump to json file
-        machine_file_path = os.path.join(file_path, "machine.json")
-        file_to_write = open(machine_file_path, "w")
+        file_to_write = open(file_path, "w")
         json.dump(json_dictory_rep, file_to_write)
         file_to_write.close()
 
         # validate the schema
         machine_schema_file_path = os.path.join(
-            file_format_schemas.__file__, "machine.json"
+            os.path.dirname(file_format_schemas.__file__), "machine.json"
         )
+        file_to_read = open(machine_schema_file_path, "r")
+        machine_schema = json.load(file_to_read)
 
-        #validictory.validate(
-        #    json_dictory_rep, machine_schema_file_path)
+        validictory.validate(
+            json_dictory_rep, machine_schema)
 
-        return {'file_machine': machine_file_path}
+        return {'file_machine': file_path}
 
     @staticmethod
     def _check_for_exceptions(
@@ -104,14 +105,13 @@ class ConvertToFileMachine(object):
 
         no_processors = CHIP_HOMOGENIOUS_CORES
         if (not machine.get_chip_at(x_coord, y_coord).
-                is_processor_with_id(no_processors)):
+                is_processor_with_id(no_processors - 1)):
             # locate the highest core id
             has_processor = False
-            no_processors -= 1
             while not has_processor and no_processors > 0:
-                has_processor = machine.get_chip_at(x_coord, y_coord).\
-                    is_processor_with_id(no_processors)
                 no_processors -= 1
+                has_processor = machine.get_chip_at(x_coord, y_coord).\
+                    is_processor_with_id(no_processors - 1)
 
             chip_exceptions = dict()
             chip_exceptions["cores"] = no_processors
@@ -119,5 +119,7 @@ class ConvertToFileMachine(object):
             chip_resource_exceptions[(x_coord, y_coord)] = chip_exceptions
 
         for chip in machine.ethernet_connected_chips:
+            if (chip.x, chip.y) not in chip_resource_exceptions:
+                chip_resource_exceptions[(chip.x, chip.y)] = dict()
             chip_resource_exceptions[(chip.x, chip.y)]['tags'] = \
                 len(chip.tag_ids)

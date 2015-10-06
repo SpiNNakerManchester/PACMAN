@@ -1,0 +1,88 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "For each edge, gives the route generated.",
+    "type": "object",
+    "properties": {"$ref": "#/resources/routingTree"},
+    
+    "resources": {
+        "routingTree": {
+            "description": "Recursively describes the steps taken by a route.",
+            "type": "object",
+            "properties": {
+                "chip": {
+                    "description": "The chip coordinates of the current hop in the route.",
+                    "type": "array",
+                    "items": [
+                        {"type": "integer", "minimum": 0},
+                        {"type": "integer", "minimum": 0}
+                    ],
+                    "additionalItems": false
+                },
+                "children": {
+                    "description": "The next hops in the route.",
+                    "type": "array",
+                    "items": {
+                        "description": "Describes a further hop in a route.",
+                        "oneOf": [
+                            {
+                                "description": "A hop leading to another chip.",
+                                "type": "object",
+                                "properties": {
+                                    "route": {"$ref": "#/resources/link"},
+                                    "next_hop": {"$ref": "#/resources/routingTree"}
+                                },
+                                "additionalProperties": false,
+                                "required": ["route", "next_hop"]
+                            },
+                            {
+                                "description": "A hop leading to a vertex.",
+                                "type": "object",
+                                "properties": {
+                                    "route": {
+                                        "oneOf": [
+                                            {"$ref": "#/resources/direction"},
+                                            {"type": "null"}
+                                        ]
+                                    },
+                                    "next_hop": {"type": "string"}
+                                },
+                                "additionalProperties": false,
+                                "required": ["route", "next_hop"]
+                            }
+                        ]
+                    },
+                    "uniqueItems": true
+                }
+            },
+            "required": ["chip", "children"],
+            "additionalProperties": false
+        },
+        "link": {
+            "description": "A chip-to-chip link.",
+            "type": "string",
+            "enum": [
+                "east", "north_east", "north",
+                "west", "south_west", "south"
+            ]
+        },
+        "core": {
+            "description": "A specific core.",
+            "type": "string",
+            "enum": [
+                "core0", "core1", "core2", "core3",
+                "core4", "core5", "core6", "core7",
+                "core8", "core9", "core10", "core11",
+                "core12", "core13", "core14", "core15",
+                "core16", "core17"
+            ]
+        },
+        "direction": {
+            "description": "A chip-to-chip link or a specific core.",
+            "oneOf": [
+                {"$ref": "#/resources/link"},
+                {"$ref": "#/resources/core"}
+            ]
+        }
+    }
+}

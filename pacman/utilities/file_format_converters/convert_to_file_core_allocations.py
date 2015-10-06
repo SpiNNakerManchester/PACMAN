@@ -2,7 +2,7 @@ from pacman.utilities import file_format_schemas
 
 import os
 import json
-#import validictory
+import validictory
 
 
 class ConvertToFileCoreAllocations(object):
@@ -10,7 +10,7 @@ class ConvertToFileCoreAllocations(object):
     ConvertToFileCoreAllocations: converts placements to core allocations
     """
 
-    def __call__(self, placements, folder_path):
+    def __call__(self, placements, file_path):
         """
 
         :param placements:
@@ -28,9 +28,6 @@ class ConvertToFileCoreAllocations(object):
             json_core_allocations_dict[placement.subvertex.label] = \
                 [placement.p, placement.p + 1]
 
-        # generate file path
-        file_path = os.path.join(folder_path, "allocations_cores.json")
-
         # dump dict into json file
         file_to_write = open(file_path, "w")
         json.dump(json_core_allocations_dict, file_to_write)
@@ -38,10 +35,13 @@ class ConvertToFileCoreAllocations(object):
 
         # validate the schema
         core_allocations_schema_file_path = os.path.join(
-            file_format_schemas.__file__, "core_allocations.json"
+            os.path.dirname(file_format_schemas.__file__),
+            "core_allocations.json"
         )
+        file_to_read = open(core_allocations_schema_file_path, "r")
+        core_allocations_schema = json.load(file_to_read)
         validictory.validate(
-            json_core_allocations_dict, core_allocations_schema_file_path)
+            json_core_allocations_dict, core_allocations_schema)
 
         # return the file format
         return {"FileCoreAllocations": file_path}

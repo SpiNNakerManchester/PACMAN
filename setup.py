@@ -39,6 +39,6 @@ setup(
               'pacman.operations.routing_info_allocator_algorithms.malloc_based_routing_allocator',
               'pacman.operations.tag_allocator_algorithms',
               'pacman.utilities'],
-    install_requires=['six', 'enum34', 'numpy',
+    install_requires=['six', 'enum34', 'numpy', 'validictory',
                       'SpiNNMachine == 2015.004']
 )

@@ -261,7 +261,7 @@ class PACMANAlgorithmExecutor(object):
         results = python_algorithm(**inputs)
 
         # move outputs into internal data objects
-        self._map_output_files(results, algorithm)
+        self._map_output_parameters(results, algorithm)
 
     def _handle_external_algorithm(self, algorithm):
         """
@@ -269,40 +269,53 @@ class PACMANAlgorithmExecutor(object):
         :param algorithm: the algorthum
         :return: None
         """
-        if (algorithm.python_class is not None or
-                algorithm.python_function is not None):
-            # create a algorithm for python object
-            python_algorithm = self._create_python_object(algorithm)
-            input_params = self._create_input_commands(algorithm)
-            results = python_algorithm(**input_params)
-            self._map_output_files(results, algorithm)
+        input_params = self._create_input_commands(algorithm)
 
-        else:  # none python algorithm
-            input_params = self._create_input_commands(algorithm)
+        inputs = \
+            [a.format(**input_params) for a in algorithm.command_line_args]
 
-            inputs = \
-                [a.format(**input_params) for a in algorithm.command_line_args]
+        # output debug info in case things go wrong
+        logger.debug(
+            "The inputs to the external mapping function are {}"
+            .format(inputs))
 
-            # output debug info in case things go wrong
-            logger.debug(
-                "The inputs to the external mapping function are {}"
-                .format(inputs))
+        # execute other command
+        child = subprocess.Popen(
+            inputs, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE)
+        child.wait()
 
-            # execute other command
-            return_code = subprocess.call(
-                [a.format(**input_params) for a in algorithm.command_line_args])
+        # check the return code for a successful execution
+        if child.returncode != 0:
+            stdout, stderr = child.communicate()
+            raise exceptions.\
+                PacmanAlgorithmFailedToCompleteException(
+                    "The algorithm {} failed to complete correctly, "
+                    "returning error code {}. \n The inputs to the "
+                    "algorithm were {}. \n The stdout from the algorithm "
+                    "were {}. \n The stderr from the algorithm were {}.\n"
+                    " Due to this algorithm being outside of the software "
+                    "stack's defaultly supported algorthims, we refer to "
+                    "the algorthm builder to rectify this.".format(
+                        algorithm.algorithm_id, child.returncode,
+                        inputs, stdout, stderr))
 
-            # check the return code for a successful execution
-            if return_code != 0:
-                raise exceptions.\
-                    PacmanAlgorithmFailedToCompleteException(
-                        "The algorithm {} failed to complete correctly, "
-                        "returning error code {}. Due to this algorithm being "
-                        "outside of the software stack's defaultly supported "
-                        "algorthims, we refer to the algorthm builder to "
-                        "rectify this.".format(
-                            algorithm.algorithm_id, return_code))
-            self._map_output_files(algorithm.outputs, algorithm)
+        outputs = self._sort_out_external_algorithm_outputs(algorithm)
+        self._map_output_parameters(outputs, algorithm)
+
+    def _sort_out_external_algorithm_outputs(self, algorithm):
+        """
+        all outputs from a external algorithum have to be files, these names
+        have been handed to them via the inputs. So a mapping between them is
+        needed
+        :param algorithm: the external algorithum
+        :return: the list of mapped outputs
+        """
+        outputs = dict()
+        for output in algorithm.outputs:
+            outputs[output['name']] = \
+                self._internal_type_mapping[output['name']]
+        return outputs
 
     def _create_input_commands(self, algorithm):
         """
@@ -317,7 +330,7 @@ class PACMANAlgorithmExecutor(object):
                 self._internal_type_mapping[input_param['type']]
         return params
 
-    def _map_output_files(self, results, algorithm):
+    def _map_output_parameters(self, results, algorithm):
         """
         translates the outputs results into the internal type mappings
         :param results: the results from the algorithm

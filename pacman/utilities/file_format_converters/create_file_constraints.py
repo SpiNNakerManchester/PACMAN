@@ -33,7 +33,7 @@ from pacman.utilities import file_format_schemas
 
 import json
 import os
-#import validictory
+import validictory
 
 
 class CreateConstraintsToFile(object):
@@ -41,16 +41,13 @@ class CreateConstraintsToFile(object):
      creates constraitns file from the machine adn partitioend graph
     """
 
-    def __call__(self, partitioned_graph, machine, folder_path):
+    def __call__(self, partitioned_graph, machine, file_path):
         """
 
         :param partitioned_graph:
         :param machine:
         :return:
         """
-
-        file_name = "constraints.json"
-        file_path = os.path.join(folder_path, file_name)
         json_constraints_dictory_rep = list()
         self._add_monitor_core_reserve(json_constraints_dictory_rep)
         self._add_extra_monitor_cores(json_constraints_dictory_rep, machine)
@@ -63,10 +60,14 @@ class CreateConstraintsToFile(object):
 
         # validate the schema
         partitioned_graph_schema_file_path = os.path.join(
-            file_format_schemas.__file__, "constraints.json"
+            os.path.dirname(file_format_schemas.__file__), "constraints.json"
         )
-        #validictory.validate(
-        #    json_constraints_dictory_rep, partitioned_graph_schema_file_path)
+
+        # for debug purposes, read schema and validate
+        file_to_read = open(partitioned_graph_schema_file_path, "r")
+        partitioned_graph_schema = json.load(file_to_read)
+        validictory.validate(
+            json_constraints_dictory_rep, partitioned_graph_schema)
 
         return {'constraints': file_path}
 
@@ -214,9 +215,8 @@ class CreateConstraintsToFile(object):
                     reserve_monitor['type'] = "reserve_resource"
                     reserve_monitor['resource'] = "cores"
                     reserve_monitor['reservation'] = \
-                        "[{}]".format(processor.processor_id)
-                    reserve_monitor['location'] = \
-                        "[{}, {}]".format(chip.x, chip.y)
+                        [processor.processor_id, processor.processor_id + 1]
+                    reserve_monitor['location'] = [chip.x, chip.y]
                     json_constraints_dictory_rep.append(reserve_monitor)
 
     @staticmethod
@@ -224,6 +224,6 @@ class CreateConstraintsToFile(object):
         reserve_monitor = dict()
         reserve_monitor['type'] = "reserve_resource"
         reserve_monitor['resource'] = "cores"
-        reserve_monitor['reservation'] = "[0]"
-        reserve_monitor['location'] = "null"
+        reserve_monitor['reservation'] = [0, 1]
+        reserve_monitor['location'] = None
         json_constraints_dictory_rep.append(reserve_monitor)
