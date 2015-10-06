@@ -4,7 +4,7 @@ from pacman.utilities import file_format_schemas
 from collections import defaultdict
 
 import json
-import validictory
+#import validictory
 import os
 
 CHIP_HOMOGENIOUS_CORES = 18
@@ -46,8 +46,8 @@ class ConvertToFileMachine(object):
         chip_resource_exceptions = defaultdict()
 
         # write dead chips
-        for x_coord in range(0, machine.max_chip_x):
-            for y_coord in range(0, machine.max_chip_y):
+        for x_coord in range(0, machine.max_chip_x + 1):
+            for y_coord in range(0, machine.max_chip_y + 1):
                 if (not machine.is_chip_at(x_coord, y_coord)
                         or machine.get_chip_at(x_coord, y_coord).virtual):
                     json_dictory_rep['dead_chips'].append([x_coord, y_coord])
@@ -57,8 +57,8 @@ class ConvertToFileMachine(object):
                         router = machine.get_chip_at(x_coord, y_coord).router
                         if not router.is_link(link_id):
                             json_dictory_rep['dead_links'].append(
-                                [x_coord, y_coord, "\"{}\"".format(
-                                 constants.EDGES[link_id].value.lower)])
+                                [x_coord, y_coord, "{}".format(
+                                 constants.EDGES(link_id).name.lower())])
                     self._check_for_exceptions(
                         json_dictory_rep, x_coord, y_coord, machine,
                         chip_resource_exceptions)
@@ -74,17 +74,20 @@ class ConvertToFileMachine(object):
             chip_resouce_exceptions_list
 
         # dump to json file
-        with open(file_path, 'w') as outfile:
-            json.dump(json_dictory_rep, outfile)
+        machine_file_path = os.path.join(file_path, "machine.json")
+        file_to_write = open(machine_file_path, "w")
+        json.dump(json_dictory_rep, file_to_write)
+        file_to_write.close()
 
         # validate the schema
         machine_schema_file_path = os.path.join(
             file_format_schemas.__file__, "machine.json"
         )
-        validictory.validate(
-            json_dictory_rep, machine_schema_file_path)
 
-        return {'FileMachine': file_path}
+        #validictory.validate(
+        #    json_dictory_rep, machine_schema_file_path)
+
+        return {'file_machine': machine_file_path}
 
     @staticmethod
     def _check_for_exceptions(
@@ -115,6 +118,6 @@ class ConvertToFileMachine(object):
 
             chip_resource_exceptions[(x_coord, y_coord)] = chip_exceptions
 
-        for chip in machine.ethernet_connected_chips():
+        for chip in machine.ethernet_connected_chips:
             chip_resource_exceptions[(chip.x, chip.y)]['tags'] = \
                 len(chip.tag_ids)

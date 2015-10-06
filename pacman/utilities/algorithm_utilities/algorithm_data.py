@@ -8,13 +8,13 @@ class AlgorithmData(object):
     data object for reading in xml and locations
     """
 
-    def __init__(self, algorithm_id, command_line_string, python_import, inputs,
+    def __init__(self, algorithm_id, command_line_args, python_import, inputs,
                  optional_inputs, outputs, external, python_class,
                  python_function):
         """
 
         :param algorithm_id:
-        :param command_line_string:
+        :param command_line_args:
         :param inputs:
         :param optional_inputs:
         :param outputs:
@@ -22,7 +22,7 @@ class AlgorithmData(object):
         :return:
         """
         self._id = algorithm_id
-        self._command_line_string = command_line_string
+        self._command_line_args = command_line_args
         self._python_import_string = python_import
         self._inputs = inputs
         self._optional_inputs = optional_inputs
@@ -80,12 +80,12 @@ class AlgorithmData(object):
         return self._optional_inputs
 
     @property
-    def command_line(self):
+    def command_line_args(self):
         """
         the string which is to be the command line to call if external call
         :return:
         """
-        return self._command_line_string
+        return self._command_line_args
 
     @property
     def external(self):
@@ -120,6 +120,6 @@ class AlgorithmData(object):
 
     def __str__(self):
         return "{}:{}:{}:{}:{}:{}:{}:{}:{}".format(
-            self._id, self._command_line_string, self._python_import_string,
+            self._id, self._command_line_args, self._python_import_string,
             self._inputs, self._optional_inputs, self._outputs, self._external,
             self._python_class, self._python_function)

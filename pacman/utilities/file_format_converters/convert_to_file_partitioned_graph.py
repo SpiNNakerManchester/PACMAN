@@ -15,7 +15,7 @@ from collections import defaultdict
 
 import os
 import json
-import validictory
+#import validictory
 import hashlib
 
 DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX = 1
@@ -72,7 +72,8 @@ class ConvertToFilePartitionedGraph(object):
                 vertices_resources[vertex.label] = vertex_resources
                 vertex_resources["cores"] = \
                     DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX
-                vertex_resources["sdram"] = vertex.resources_required.sdram
+                vertex_resources["sdram"] = \
+                    vertex.resources_required.sdram.get_value()
 
                 # add fake vertex
                 vertex_resources = dict()
@@ -87,7 +88,8 @@ class ConvertToFilePartitionedGraph(object):
                 vertices_resources[vertex.label] = vertex_resources
                 vertex_resources["cores"] = \
                     DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX
-                vertex_resources["sdram"] = vertex.resources_required.sdram
+                vertex_resources["sdram"] = \
+                    vertex.resources_required.sdram.get_value()
             vertex_outgoing_partitions = \
                 partitioned_graph.outgoing_edges_partitions_from_vertex(vertex)
 
@@ -100,23 +102,27 @@ class ConvertToFilePartitionedGraph(object):
                 hyper_edge_dict["source"] = vertex.label
 
                 sinks_string = []
-                for edge in vertex_outgoing_partitions[vertex_partition]:
+                for edge in vertex_outgoing_partitions[vertex_partition].edges:
                     sinks_string.append(edge.post_subvertex.label)
                 hyper_edge_dict['sinks'] = sinks_string
                 hyper_edge_dict["weight"] = 1.0
-                hyper_edge_dict["type"] = vertex_partition.type.value
+                hyper_edge_dict["type"] = \
+                    vertex_outgoing_partitions[vertex_partition]\
+                    .type.name.lower()
 
         file_path = os.path.join(folder_path, "graph.json")
-        json.dump(json_graph_dictory_rep, file_path)
+        file_to_write = open(file_path, "w")
+        json.dump(json_graph_dictory_rep, file_to_write)
+        file_to_write.close()
 
         # validate the schema
         partitioned_graph_schema_file_path = os.path.join(
             file_format_schemas.__file__, "partitioned_graph.json"
         )
-        validictory.validate(
-            json_graph_dictory_rep, partitioned_graph_schema_file_path)
+        #validictory.validate(
+        #    json_graph_dictory_rep, partitioned_graph_schema_file_path)
 
-        return {"FilePartitionedGraph": file_path}
+        return {"partitioned_graph": file_path}
 
 
 

@@ -9,6 +9,7 @@ from pacman.utilities import file_format_schemas
 import os
 import json
 import validictory
+from
 
 
 
@@ -73,7 +74,7 @@ class ConvertToMemoryPlacements(object):
         return {"MemoryPlacements": memory_placements}
 
     @staticmethod
-    def __valid_constraints_for_tag(constraints_for_vertex):
+    def _valid_constraints_for_tag(constraints_for_vertex):
         """
 
         :param constraints_for_vertex:

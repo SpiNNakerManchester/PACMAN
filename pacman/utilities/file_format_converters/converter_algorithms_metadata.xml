@@ -68,7 +68,7 @@
                 <param_type>MemoryMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>folder_path</param_name>
+                <param_name>file_path</param_name>
                 <param_type>FileFormatFolderPath</param_type>
             </parameter>
         </required_inputs>
@@ -108,6 +108,30 @@
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="CreateConstraintsToFile">
+        <python_module>pacman.utilities.file_format_converters.create_file_constraints</python_module>
+        <python_class>CreateConstraintsToFile</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+             <parameter>
+                <param_name>folder_path</param_name>
+                <param_type>FileFormatFolderPath</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>constraints</param_name>
+                <param_type>FileConstraints</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>

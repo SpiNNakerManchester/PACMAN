@@ -12,6 +12,7 @@ import logging
 import importlib
 import subprocess
 import os
+from collections import defaultdict
 
 from pacman.utilities import file_format_converters
 from pacman import utilities
@@ -37,7 +38,7 @@ class PACMANAlgorithmExecutor(object):
         self._algorithms = list()
 
         # define mapping between types and internal values
-        self._internal_type_mapping = dict()
+        self._internal_type_mapping = defaultdict()
 
         # define mapping between output types and reports
         if reports_states is not None and reports_states.tag_allocation_report:
@@ -157,6 +158,12 @@ class PACMANAlgorithmExecutor(object):
                         optional_converter_algorithms, suitable_algorithm,
                         inputs, generated_outputs)
                 else:
+                    algorithums_left_names = list()
+                    for algorithm in self._algorithms:
+                        algorithums_left_names.append(algorithm.algorithm_id)
+                    for algorithm in optional_converter_algorithms:
+                        algorithums_left_names.append(algorithm.algorithm_id)
+
                     raise exceptions.PacmanConfigurationException(
                         "I was not able to deduce a future algortihm to use as"
                         "I only have the inputs {} and am missing the outputs "
@@ -166,7 +173,7 @@ class PACMANAlgorithmExecutor(object):
                         "required outputs and rerun me. Thanks"
                         .format(
                             inputs, list(set(required_outputs) - set(inputs)),
-                            self._algorithms + optional_converter_algorithms))
+                            algorithums_left_names))
 
         all_required_outputs_generated = True
         failed_to_generate_output_string = ""
@@ -272,19 +279,29 @@ class PACMANAlgorithmExecutor(object):
 
         else:  # none python algorithm
             input_params = self._create_input_commands(algorithm)
-            input_string = ""
-            #for param in input_params:
-            #    input_string += "{}={} ".format(param, input_params[param])
+
+            inputs = \
+                [a.format(**input_params) for a in algorithm.command_line_args]
+
+            # output debug info in case things go wrong
+            logger.debug(
+                "The inputs to the external mapping function are {}"
+                .format(inputs))
+
             # execute other command
             return_code = subprocess.call(
                 [a.format(**input_params) for a in algorithm.command_line_args])
+
+            # check the return code for a successful execution
             if return_code != 0:
                 raise exceptions.\
                     PacmanAlgorithmFailedToCompleteException(
                         "The algorithm {} failed to complete correctly, "
-                        "Due to this algorithm being outside of the "
-                        "software stack's defaultly supported algorthims,"
-                        " we refer to the algorthm builder to rectify this.")
+                        "returning error code {}. Due to this algorithm being "
+                        "outside of the software stack's defaultly supported "
+                        "algorthims, we refer to the algorthm builder to "
+                        "rectify this.".format(
+                            algorithm.algorithm_id, return_code))
             self._map_output_files(algorithm.outputs, algorithm)
 
     def _create_input_commands(self, algorithm):
@@ -316,8 +333,7 @@ class PACMANAlgorithmExecutor(object):
                     algorithm.get_type_from_output_name(result_name)
                 self._internal_type_mapping[result_type] = \
                     results[result_name]
-            self._map_output_files(results, algorithm)
-        else:
+        elif len(algorithm.outputs) != 0:
             raise exceptions.PacmanAlgorithmFailedToCompleteException(
                 "The algorithm did not generate any outputs. This is deemed to"
                 " be an error of some sort. Please fix and try again")

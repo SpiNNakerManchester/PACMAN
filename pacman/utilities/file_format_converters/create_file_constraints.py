@@ -33,7 +33,7 @@ from pacman.utilities import file_format_schemas
 
 import json
 import os
-import validictory
+#import validictory
 
 
 class CreateConstraintsToFile(object):
@@ -56,16 +56,19 @@ class CreateConstraintsToFile(object):
         self._add_extra_monitor_cores(json_constraints_dictory_rep, machine)
         self._search_graph_for_placement_constraints(
             json_constraints_dictory_rep, partitioned_graph, machine)
-        json.dump(json_constraints_dictory_rep, file_path)
+
+        file_to_write = open(file_path, "w")
+        json.dump(json_constraints_dictory_rep, file_to_write)
+        file_to_write.close()
 
         # validate the schema
         partitioned_graph_schema_file_path = os.path.join(
             file_format_schemas.__file__, "constraints.json"
         )
-        validictory.validate(
-            json_constraints_dictory_rep, partitioned_graph_schema_file_path)
+        #validictory.validate(
+        #    json_constraints_dictory_rep, partitioned_graph_schema_file_path)
 
-        return {'FileConstraints': file_path}
+        return {'constraints': file_path}
 
     def _search_graph_for_placement_constraints(
             self, json_constraints_dictory_rep, partitioned_graph, machine):

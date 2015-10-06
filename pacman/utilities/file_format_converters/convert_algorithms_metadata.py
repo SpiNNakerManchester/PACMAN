@@ -60,9 +60,9 @@ class ConvertAlgorithmsMetadata(object):
         external = False
         # verify if its a internal or extenral via if it is import-able or
         # command line based
-        command_line = element.find("command_line_command")
-        if command_line is not None:
-            command_line = command_line.text
+        command_line_args = element.find("command_line_args")
+        if command_line_args is not None:
+            command_line_args = self._translate_args(command_line_args)
         python_module = element.find("python_module")
         if python_module is not None:
             python_module = python_module.text
@@ -73,12 +73,12 @@ class ConvertAlgorithmsMetadata(object):
         if python_function is not None:
             python_function = python_function.text
 
-        if python_module is None and command_line is not None:
+        if python_module is None and command_line_args is not None:
             external = True
-        elif python_module is not None and command_line is None:
+        elif python_module is not None and command_line_args is None:
             external = False
-        elif ((python_module is None and command_line is None) or
-                (python_module is not None and command_line is not None)):
+        elif ((python_module is None and command_line_args is None) or
+                (python_module is not None and command_line_args is not None)):
             raise exceptions.PacmanConfigurationException(
                 "Cannot deduce what to do when either both command line and "
                 "python mudle are none or are filled in. Please rectify and "
@@ -92,10 +92,29 @@ class ConvertAlgorithmsMetadata(object):
         outputs = \
             self._translate_parameters(element.find("produces_outputs"))
         return AlgorithmData(
-            algorithm_id=element.get('name'), command_line_string=command_line,
-            inputs=required_inputs, optional_inputs=optional_inputs,
-            outputs=outputs, external=external, python_import=python_module,
-            python_class=python_class, python_function=python_function)
+            algorithm_id=element.get('name'),
+            command_line_args=command_line_args, inputs=required_inputs,
+            optional_inputs=optional_inputs, outputs=outputs, external=external,
+            python_import=python_module, python_class=python_class,
+            python_function=python_function)
+
+    @staticmethod
+    def _translate_args(args_element):
+        """
+        converts a xml arg element into a list of args
+        :param args_element:
+        :return:
+        """
+        translated_args = list()
+        if args_element is not None:
+            args = args_element.findall("arg")
+            for arg in args:
+                translated_args.append(arg.text)
+        # return none if empty
+        if len(translated_args) == 0:
+            return None
+        else:
+            return translated_args
 
     @staticmethod
     def _translate_parameters(parameters_element):

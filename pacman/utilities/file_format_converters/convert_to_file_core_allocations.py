@@ -2,7 +2,7 @@ from pacman.utilities import file_format_schemas
 
 import os
 import json
-import validictory
+#import validictory
 
 
 class ConvertToFileCoreAllocations(object):
@@ -32,7 +32,9 @@ class ConvertToFileCoreAllocations(object):
         file_path = os.path.join(folder_path, "allocations_cores.json")
 
         # dump dict into json file
-        json.dump(json_core_allocations_dict, file_path)
+        file_to_write = open(file_path, "w")
+        json.dump(json_core_allocations_dict, file_to_write)
+        file_to_write.close()
 
         # validate the schema
         core_allocations_schema_file_path = os.path.join(
