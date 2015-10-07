@@ -1,16 +1,19 @@
 """
-
+ConvertToMemoryPlacements:  takes the fileplacemenmts, machine,
+    partitioned graph and constraints and builds a memory placements object
 """
+
+# pacman imports
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman import exceptions
 from pacman.utilities import file_format_schemas
 from pacman.utilities import constants
 
+# general imports
 import os
 import json
 import validictory
-from pacman.utilities.resource_tracker import ResourceTracker
 
 
 class ConvertToMemoryPlacements(object):
@@ -44,8 +47,6 @@ class ConvertToMemoryPlacements(object):
         core_allocations = core_allocations['allocations']
 
         memory_placements = Placements()
-        resoruce_tracker_for_external_devices = \
-            ResourceTracker(extended_machine)
 
         # process placements
         for vertex_label in file_placements:
@@ -76,17 +77,10 @@ class ConvertToMemoryPlacements(object):
                         destination_chip = extended_machine.get_chip_at(
                             link.destination_x, link.destination_y)
 
-                        # get core from resource tracker
-                        (x, y, p, _, _) = \
-                            resoruce_tracker_for_external_devices.\
-                            allocate_resources(
-                                subvertex.resources_required,
-                                subvertex.constraints)
-
                         # create placement
                         placements.add_placement(Placement(
                             subvertex, destination_chip.x, destination_chip.y,
-                            p))
+                            None))
                     else:
                         raise exceptions.PacmanConfigurationException(
                             "I dont recongise this pattern of constraints for a"

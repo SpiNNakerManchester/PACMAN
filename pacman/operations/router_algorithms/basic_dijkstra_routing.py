@@ -7,7 +7,7 @@ from pacman.model.routing_paths.multicast_routing_path_entry import \
     MulticastRoutingPathEntry
 from pacman.model.routing_paths.multicast_routing_paths import \
     MulticastRoutingPaths
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
     import MultiCastPartitionedEdge
@@ -437,7 +437,11 @@ class BasicDijkstraRouting(object):
         """
         # Set the tracking node to the destination to begin with
         x_current, y_current = x_destination, y_destination
-        routing_entry_route_processors = [processor_dest]
+        routing_entry_route_processors = []
+
+        # if the processor is None, dont add to router path entry
+        if processor_dest is not None:
+            routing_entry_route_processors.append(processor_dest)
         routing_entry_route_links = None
 
         entry = MulticastRoutingPathEntry(

@@ -6,7 +6,7 @@ from pacman import exceptions
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.utilities.ordered_set import OrderedSet
+from pacman.utilities.utility_objs.ordered_set import OrderedSet
 from pacman.utilities import utility_calls
 from pacman.model.resources.cpu_cycles_per_tick_resource \
     import CPUCyclesPerTickResource

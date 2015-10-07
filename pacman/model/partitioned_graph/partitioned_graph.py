@@ -5,8 +5,8 @@ PartitionedGraph
 # pacman imports
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.utilities.ordered_set import OrderedSet
-from pacman.utilities.outgoing_edge_partition import OutgoingEdgePartition
+from pacman.utilities.utility_objs.ordered_set import OrderedSet
+from pacman.utilities.utility_objs.outgoing_edge_partition import OutgoingEdgePartition
 
 # general imports
 import uuid

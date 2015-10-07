@@ -13,8 +13,8 @@ from pacman.model.constraints.placer_constraints.\
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.utilities import utility_calls
-from pacman.utilities.progress_bar import ProgressBar
-from pacman.utilities.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 # general imports
 import logging

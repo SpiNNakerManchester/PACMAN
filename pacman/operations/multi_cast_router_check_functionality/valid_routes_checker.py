@@ -2,10 +2,11 @@
 collection of fucntiosn which together vaidate routes.
 """
 
-from pacman import exceptions
 from collections import namedtuple
 import logging
-from pacman.utilities.progress_bar import ProgressBar
+
+from pacman import exceptions
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 

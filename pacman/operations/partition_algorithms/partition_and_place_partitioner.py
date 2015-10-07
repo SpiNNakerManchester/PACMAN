@@ -3,10 +3,10 @@ PartitionAndPlacePartitioner
 """
 
 import logging
+
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
-
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -18,10 +18,10 @@ from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities import utility_calls
-from pacman.utilities.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 logger = logging.getLogger(__name__)
 

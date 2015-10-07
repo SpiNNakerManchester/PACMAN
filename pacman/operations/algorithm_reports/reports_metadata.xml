@@ -1,6 +1,6 @@
 <algorithms>
     <algorithm name="PlacerReportWithPartitionableGraph">
-        <python_module>pacman.utilities.reports</python_module>
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>placer_reports_with_partitionable_graph</python_function>
         <required_inputs>
             <parameter>
@@ -30,7 +30,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="PlacerReportWithoutPartitionableGraph">
-        <python_module>pacman.utilities.reports</python_module>
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>placer_reports_without_partitionable_graph</python_function>
         <required_inputs>
             <parameter>
@@ -56,7 +56,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="RouterReports">
-        <python_module>pacman.utilities.reports</python_module>
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>router_reports</python_function>
         <required_inputs>
             <parameter>
@@ -74,7 +74,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="routingInfoReports">
-        <python_module>pacman.utilities.reports</python_module>
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>routing_info_reports</python_function>
         <required_inputs>
             <parameter>
@@ -96,7 +96,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="PartitionerReport">
-        <python_module>pacman.utilities.reports</python_module>
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>partitioner_reports</python_function>
         <required_inputs>
             <parameter>
@@ -118,7 +118,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="TagReport">
-        <python_module>pacman.utilities.reports</python_module>
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>tag_allocator_report</python_function>
         <required_inputs>
             <parameter>

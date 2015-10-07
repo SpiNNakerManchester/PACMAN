@@ -28,10 +28,9 @@ from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
-from pacman import exceptions
 
 # general imports
 import math

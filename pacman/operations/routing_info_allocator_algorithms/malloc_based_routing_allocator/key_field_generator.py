@@ -1,8 +1,8 @@
-from pacman.utilities import utility_calls
-from pacman.utilities.field import Field
-from pacman.exceptions import PacmanRouteInfoAllocationException
-
 import numpy
+
+from pacman.utilities import utility_calls
+from pacman.utilities.utility_objs.field import Field
+from pacman.exceptions import PacmanRouteInfoAllocationException
 
 
 class KeyFieldGenerator(object):

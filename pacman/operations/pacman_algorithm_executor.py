@@ -4,41 +4,54 @@ PACMANAlgorithmExecutor
 
 # pacman imports
 from pacman import exceptions
+from pacman.interfaces.abstract_provides_provenance_data import \
+    AbstractProvidesProvenanceData
 from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
+from pacman.utilities import file_format_converters
+from pacman.operations import algorithm_reports
+from pacman import operations
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # general imports
 import logging
 import importlib
 import subprocess
 import os
+from lxml import etree
 from collections import defaultdict
-
-from pacman.utilities import file_format_converters
-from pacman import utilities
-from pacman import operations
+from pacman.utilities.utility_objs.timer import Timer
 
 logger = logging.getLogger(__name__)
 
 
-class PACMANAlgorithmExecutor(object):
+class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
     """
     an executor of pacman algorithums where the order is decuded from the input
     and outputs of the algorithm based off its xml data
     """
 
-    def __init__(self, reports_states, in_debug_mode=True):
+    def __init__(self, reports_states, algorithms, inputs, xml_paths,
+                 required_outputs, in_debug_mode=True, do_timings=True):
         """
         :param reports_states: the pacman report object
         :param in_debug_mode: bool which tells the algorithm exeuctor to add
         any debug algorithms if needed
         :return:
         """
+        AbstractProvidesProvenanceData.__init__(self)
+
+        # provanence data store
+        self._provanence_data = etree.Element("Provenance_data_from_PACMAN")
+
         # pacman mapping objects
         self._algorithms = list()
 
         # define mapping between types and internal values
         self._internal_type_mapping = defaultdict()
+
+        # store timing request
+        self._do_timing = do_timings
 
         # define mapping between output types and reports
         if reports_states is not None and reports_states.tag_allocation_report:
@@ -59,8 +72,11 @@ class PACMANAlgorithmExecutor(object):
         if in_debug_mode:
             self._algorithms.append("ValidRoutesChecker")
 
-    def set_up_pacman_algorthms_listings(self, algorithms, xml_paths, inputs,
-                                         required_outputs):
+        self._set_up_pacman_algorthms_listings(
+            algorithms, xml_paths, inputs, required_outputs)
+
+    def _set_up_pacman_algorthms_listings(self, algorithms, xml_paths, inputs,
+                                          required_outputs):
         """ trnaslates the algoreithum string and uses the config xml to create
         algorithm objects
 
@@ -93,8 +109,8 @@ class PACMANAlgorithmExecutor(object):
         # (used in decode_algorithm_data_objects func)
         xml_paths.append(os.path.join(os.path.dirname(operations.__file__),
                                       "algorithms_metadata.xml"))
-        xml_paths.append(os.path.join(os.path.dirname(utilities.__file__),
-                                      "reports_metadata.xml"))
+        xml_paths.append(os.path.join(os.path.dirname(
+            algorithm_reports.__file__), "reports_metadata.xml"))
 
         converter_xml_path = list()
         converter_xml_path.append(os.path.join(
@@ -205,8 +221,8 @@ class PACMANAlgorithmExecutor(object):
             inputs.add(output['type'])
             generated_outputs.add(output['type'])
 
-
-    def _locate_suitable_algorithm(self, algorithm_list, inputs):
+    @staticmethod
+    def _locate_suitable_algorithm(algorithm_list, inputs):
         """
         locates a suitable algorithm
         :param algorithm_list: the list of algoirthms to choose from
@@ -257,8 +273,18 @@ class PACMANAlgorithmExecutor(object):
         # create input dictonary
         inputs = self._create_input_commands(algorithm)
 
+        # set up timer
+        timer = None
+        if self._do_timing:
+            timer = Timer()
+            timer.start_timing()
+
         # execute algorithm
         results = python_algorithm(**inputs)
+
+        # handle_prov_data
+        if self._do_timing:
+            self._handle_prov(timer, algorithm)
 
         # move outputs into internal data objects
         self._map_output_parameters(results, algorithm)
@@ -279,11 +305,24 @@ class PACMANAlgorithmExecutor(object):
             "The inputs to the external mapping function are {}"
             .format(inputs))
 
+        # create progress bar for external algorithm
+        algorithum_progress_bar = ProgressBar(
+            1, "Running external algorithm {}".format(algorithm.algorithm_id))
+
+        timer = None
+        if self._do_timing:
+            timer = Timer()
+            timer.start_timing()
+
         # execute other command
         child = subprocess.Popen(
             inputs, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             stdin=subprocess.PIPE)
         child.wait()
+        algorithum_progress_bar.end()
+
+        if self._do_timing:
+           self._handle_prov(timer, algorithm)
 
         # check the return code for a successful execution
         if child.returncode != 0:
@@ -389,3 +428,34 @@ class PACMANAlgorithmExecutor(object):
         :return: the returned item
         """
         return self._internal_type_mapping[item_type]
+
+    def write_provenance_data_in_xml(self, file_path, transceiver,
+                                     placement=None):
+        """
+
+        :param file_path:
+        :param transceiver:
+        :param placement:
+        :return:
+        """
+        # write xml form into file provided
+        writer = open(file_path, "w")
+        writer.write(etree.tostring(self._provanence_data, pretty_print=True))
+        writer.flush()
+        writer.close()
+
+    def _handle_prov(self, timer, algorithm):
+        time_taken = timer.take_sample()
+        # get timing element
+        provanence_data_timings = None
+        if len(self._provanence_data) == 0:
+            provanence_data_timings = etree.SubElement(
+                self._provanence_data, "algorithum_timings")
+        else:
+            provanence_data_timings = self._provanence_data[0]
+
+        # write timing element
+        algorithum_provanence_data = etree.SubElement(
+            provanence_data_timings,
+            "algorithm_{}".format(algorithm.algorithm_id))
+        algorithum_provanence_data.text = str(time_taken)

@@ -8,7 +8,7 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.partitionable_graph.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.utilities.outgoing_edge_partition import OutgoingEdgePartition
+from pacman.utilities.utility_objs.outgoing_edge_partition import OutgoingEdgePartition
 
 # general imports
 import uuid

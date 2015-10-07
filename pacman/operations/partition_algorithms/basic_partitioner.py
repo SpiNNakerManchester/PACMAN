@@ -2,6 +2,8 @@
 BasicPartitioner
 """
 
+import logging
+
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
@@ -12,13 +14,11 @@ from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanPartitionException
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
-
-import logging
-from pacman.utilities.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,4 @@
 import unittest
-import pacman.utilities.reports
 
 
 class MyTestCase(unittest.TestCase):

@@ -1,3 +1,5 @@
+import logging
+
 from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint import \
@@ -11,10 +13,8 @@ from pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_re
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
-from pacman.utilities.progress_bar import ProgressBar
-from pacman.utilities.resource_tracker import ResourceTracker
-
-import logging
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 logger = logging.getLogger(__name__)
 
