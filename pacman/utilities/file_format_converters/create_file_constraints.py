@@ -33,7 +33,7 @@ from pacman.utilities import file_format_schemas
 
 import json
 import os
-import validictory
+import jsonschema
 
 
 class CreateConstraintsToFile(object):
@@ -66,7 +66,7 @@ class CreateConstraintsToFile(object):
         # for debug purposes, read schema and validate
         file_to_read = open(partitioned_graph_schema_file_path, "r")
         partitioned_graph_schema = json.load(file_to_read)
-        validictory.validate(
+        jsonschema.validate(
             json_constraints_dictory_rep, partitioned_graph_schema)
 
         return {'constraints': file_path}
@@ -138,7 +138,9 @@ class CreateConstraintsToFile(object):
     def _handle_vertex_constraint(
             constraint, json_constraints_dictory_rep, vertex):
         if not isinstance(vertex, AbstractVirtualVertex):
-            if isinstance(constraint, AbstractPlacerConstraint):
+            if (isinstance(constraint, AbstractPlacerConstraint)
+                    and not isinstance(constraint,
+                                       AbstractTagAllocatorConstraint)):
                 chip_loc_constraint = dict()
                 chip_loc_constraint['type'] = "location"
                 chip_loc_constraint['vertex'] = vertex.label

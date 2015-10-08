@@ -6,7 +6,7 @@ from pacman.utilities import file_format_schemas
 
 import os
 import json
-import validictory
+import jsonschema
 
 class ConvertToFilePlacement(object):
     """
@@ -41,7 +41,7 @@ class ConvertToFilePlacement(object):
         file_to_read = open(placements_schema_file_path, "r")
         placements_schema = json.load(file_to_read)
 
-        validictory.validate(
+        jsonschema.validate(
             json_placement_dictory_rep, placements_schema)
 
         # return the file format

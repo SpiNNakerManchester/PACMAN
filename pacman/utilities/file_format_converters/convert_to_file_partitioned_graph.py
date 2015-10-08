@@ -15,7 +15,7 @@ from collections import defaultdict
 
 import os
 import json
-import validictory
+import jsonschema
 import hashlib
 
 DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX = 1
@@ -73,7 +73,7 @@ class ConvertToFilePartitionedGraph(object):
                 vertex_resources["cores"] = \
                     DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX
                 vertex_resources["sdram"] = \
-                    vertex.resources_required.sdram.get_value()
+                    int(vertex.resources_required.sdram.get_value())
 
                 # add fake vertex
                 vertex_resources = dict()
@@ -89,7 +89,7 @@ class ConvertToFilePartitionedGraph(object):
                 vertex_resources["cores"] = \
                     DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX
                 vertex_resources["sdram"] = \
-                    vertex.resources_required.sdram.get_value()
+                    int(vertex.resources_required.sdram.get_value())
             vertex_outgoing_partitions = \
                 partitioned_graph.outgoing_edges_partitions_from_vertex(vertex)
 
@@ -121,7 +121,7 @@ class ConvertToFilePartitionedGraph(object):
         )
         file_to_read = open(partitioned_graph_schema_file_path, "r")
         partitioned_graph_schema = json.load(file_to_read)
-        validictory.validate(
+        jsonschema.validate(
             json_graph_dictory_rep, partitioned_graph_schema)
 
         return {"partitioned_graph": file_path}

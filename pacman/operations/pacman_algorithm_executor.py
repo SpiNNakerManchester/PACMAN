@@ -154,7 +154,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             allocated_a_algorithm = False
             # check each algorithm to see if its usable with current inputs
             suitable_algorithm = self._locate_suitable_algorithm(
-                self._algorithms, inputs)
+                self._algorithms, inputs, generated_outputs, False)
 
             # add the suitable algorithms to the list and take there outputs
             #  as new inputs
@@ -166,7 +166,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     generated_outputs)
             else:
                 suitable_algorithm = self._locate_suitable_algorithm(
-                    optional_converter_algorithms, inputs)
+                    optional_converter_algorithms, inputs, generated_outputs,
+                    True)
                 if suitable_algorithm is not None:
                     allocated_algorithums.append(suitable_algorithm)
                     allocated_a_algorithm = True
@@ -203,7 +204,20 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 "I was not able to generate the outputs {}. Please rectify "
                 "this and try again".format(failed_to_generate_output_string))
 
+        # iterate through the list removing algorithms which are obsolete
+        self._prune_unnessary_algorithms(allocated_algorithums)
+
         self._algorithms = allocated_algorithums
+
+    @staticmethod
+    def _prune_unnessary_algorithms(allocated_algorithums):
+        """
+
+        :param allocated_algorithums:
+        :return:
+        """
+        #TODO optimisations!
+        pass
 
     @staticmethod
     def _remove_algorithm_and_update_outputs(
@@ -222,11 +236,15 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             generated_outputs.add(output['type'])
 
     @staticmethod
-    def _locate_suitable_algorithm(algorithm_list, inputs):
+    def _locate_suitable_algorithm(
+            algorithm_list, inputs, generated_outputs, look_for_noval_output):
         """
         locates a suitable algorithm
         :param algorithm_list: the list of algoirthms to choose from
         :param inputs: the inputs avilable currently
+        :param generated_outputs: the current outputs expected to be generated
+        :param look_for_noval_output: bool which says that alghorithms need
+        to produce a noval output
         :return: a suitable algorithm which uses the inputs
         """
         position = 0
@@ -238,7 +256,15 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             for input_parameter in algorithm.inputs:
                 if input_parameter['type'] not in inputs:
                     all_inputs_avilable = False
-            if all_inputs_avilable and suitable_algorithm is None:
+            adds_to_output = False
+            if look_for_noval_output:
+                for output_parameter in algorithm.outputs:
+                    if output_parameter['type'] not in generated_outputs:
+                        adds_to_output = True
+            if (all_inputs_avilable
+                    and ((look_for_noval_output and adds_to_output)
+                         or (not look_for_noval_output))
+                    and suitable_algorithm is None):
                 suitable_algorithm = algorithm
             position += 1
         return suitable_algorithm

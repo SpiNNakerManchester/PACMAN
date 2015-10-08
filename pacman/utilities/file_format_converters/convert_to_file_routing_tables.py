@@ -1,14 +1,16 @@
 """
-ConvertToFileRoutingPaths
+ConvertToFileRoutingTables
 """
 from pacman import exceptions
 
 
-class ConvertToFileRoutingPaths(object):
+class ConvertToFileRoutingTables(object):
     """
-    converts routingPaths to file routing paths
+    converts routing tables to file routing tables
     """
 
-    def __call__(self, routing_paths, folder_path):
+    def __call__(self, routing_tables, folder_path):
         raise exceptions.PacmanNotExistException(
             "This function currently does not exist. Tough luck matey!")
+
+

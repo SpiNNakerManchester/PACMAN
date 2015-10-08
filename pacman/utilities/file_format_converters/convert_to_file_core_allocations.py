@@ -2,7 +2,7 @@ from pacman.utilities import file_format_schemas
 
 import os
 import json
-import validictory
+import jsonschema
 
 
 class ConvertToFileCoreAllocations(object):
@@ -40,7 +40,7 @@ class ConvertToFileCoreAllocations(object):
         )
         file_to_read = open(core_allocations_schema_file_path, "r")
         core_allocations_schema = json.load(file_to_read)
-        validictory.validate(
+        jsonschema.validate(
             json_core_allocations_dict, core_allocations_schema)
 
         # return the file format

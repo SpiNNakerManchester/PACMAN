@@ -4,7 +4,7 @@ from pacman.utilities import file_format_schemas
 from collections import defaultdict
 
 import json
-import validictory
+import jsonschema
 import os
 
 CHIP_HOMOGENIOUS_CORES = 18
@@ -85,7 +85,7 @@ class ConvertToFileMachine(object):
         file_to_read = open(machine_schema_file_path, "r")
         machine_schema = json.load(file_to_read)
 
-        validictory.validate(
+        jsonschema.validate(
             json_dictory_rep, machine_schema)
 
         return {'file_machine': file_path}

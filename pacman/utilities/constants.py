@@ -11,4 +11,3 @@ EDGES = Enum(
            ("WEST", 3),
            ("SOUTH_WEST", 4),
            ("SOUTH", 5)])
-

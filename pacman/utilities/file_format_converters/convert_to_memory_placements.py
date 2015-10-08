@@ -13,7 +13,7 @@ from pacman.utilities import constants
 # general imports
 import os
 import json
-import validictory
+import jsonschema
 
 
 class ConvertToMemoryPlacements(object):
@@ -167,11 +167,11 @@ class ConvertToMemoryPlacements(object):
         file_to_read = open(file_constraints_schema_file_path, "r")
         constraints_schema = json.load(file_to_read)
 
-        validictory.validate(
+        jsonschema.validate(
             file_placements, placements_schema)
-        validictory.validate(
+        jsonschema.validate(
             file_allocations, core_allocations_schema)
-        validictory.validate(
+        jsonschema.validate(
             constraints, constraints_schema)
 
     @staticmethod

@@ -207,6 +207,44 @@ class PartitionedGraph(object):
                 return vertex
         return None
 
+    def get_subedge_with_label(self, label, destination_sub_vertex):
+        """ locates the subedge which has the same label of the input
+
+        :param label: the input label to search for.
+        :param destination_sub_vertex: the subvertex to which this edge goes to
+        :return: the partitionedEdge or None if theres no vertex with this label
+        """
+        for subvertex in self._subvertices:
+            for edge_partition_id in self._outgoing_subedges[subvertex]:
+                vertex_and_partition_id = \
+                    "{}:{}".format(subvertex.label, edge_partition_id)
+                if vertex_and_partition_id == label:
+                    edge_partition = \
+                        self._outgoing_subedges[subvertex][edge_partition_id]
+                    edges = edge_partition.edges
+
+                    for edge in edges:
+                        if edge.post_subvertex == destination_sub_vertex:
+                            return edge
+        return None
+
+    def get_source_subvertex_with_label(self, label):
+        """ locates the subedge which has the same label of the input
+
+        :param label: the input label to search for.
+        :return: the partitionedEdge or None if theres no vertex with this label
+        """
+        for subvertex in self._subvertices:
+            for edge_partition_id in self._outgoing_subedges[subvertex]:
+                vertex_and_partition_id = \
+                    "{}:{}".format(subvertex.label, edge_partition_id)
+                if vertex_and_partition_id == label:
+                    edge_partition = \
+                        self._outgoing_subedges[subvertex][edge_partition_id]
+                    edge = edge_partition.edges[0]
+                    return edge.pre_subvertex
+        return None
+
     @property
     def subvertices(self):
         """ The subvertices of the partitioned_graph
