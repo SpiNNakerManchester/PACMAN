@@ -49,7 +49,7 @@ class ConvertToFilePartitionedGraph(object):
             # handle external devices
             if isinstance(vertex, AbstractVirtualVertex):
                 vertex_resources = dict()
-                vertices_resources[vertex.label] = vertex_resources
+                vertices_resources[id(vertex)] = vertex_resources
                 vertex_resources["cores"] = 0
 
             # handle taged vertices
@@ -61,7 +61,7 @@ class ConvertToFilePartitionedGraph(object):
                 hyper_edge_dict = dict()
                 edges_resources[hashlib.md5(vertex.label).hexdigest()] = \
                     hyper_edge_dict
-                hyper_edge_dict["source"] = vertex.label
+                hyper_edge_dict["source"] = str(id(vertex))
                 hyper_edge_dict['sinks'] = \
                     [hashlib.md5(vertex.label).hexdigest()]
                 hyper_edge_dict["weight"] = 1.0
@@ -69,7 +69,7 @@ class ConvertToFilePartitionedGraph(object):
 
                 # add the tagable vertex
                 vertex_resources = dict()
-                vertices_resources[vertex.label] = vertex_resources
+                vertices_resources[id(vertex)] = vertex_resources
                 vertex_resources["cores"] = \
                     DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX
                 vertex_resources["sdram"] = \
@@ -77,15 +77,15 @@ class ConvertToFilePartitionedGraph(object):
 
                 # add fake vertex
                 vertex_resources = dict()
-                vertices_resources[hashlib.md5(vertex.label).hexdigest()] = \
-                    vertex_resources
+                vertices_resources[
+                    hashlib.md5(vertex.label).hexdigest()] = vertex_resources
                 vertex_resources["cores"] = 0
                 vertex_resources["sdram"] = 0
 
             # handel standard vertices
             else:
                 vertex_resources = dict()
-                vertices_resources[vertex.label] = vertex_resources
+                vertices_resources[id(vertex)] = vertex_resources
                 vertex_resources["cores"] = \
                     DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX
                 vertex_resources["sdram"] = \
@@ -97,13 +97,13 @@ class ConvertToFilePartitionedGraph(object):
             for vertex_partition in vertex_outgoing_partitions:
                 hyper_edge_dict = dict()
                 edges_resources[
-                    "{}:{}".format(vertex.label, vertex_partition)] = \
+                    "{}:{}".format(id(vertex), vertex_partition)] = \
                     hyper_edge_dict
-                hyper_edge_dict["source"] = vertex.label
+                hyper_edge_dict["source"] = str(id(vertex))
 
                 sinks_string = []
                 for edge in vertex_outgoing_partitions[vertex_partition].edges:
-                    sinks_string.append(edge.post_subvertex.label)
+                    sinks_string.append(str(id(edge.post_subvertex)))
                 hyper_edge_dict['sinks'] = sinks_string
                 hyper_edge_dict["weight"] = 1.0
                 hyper_edge_dict["type"] = \

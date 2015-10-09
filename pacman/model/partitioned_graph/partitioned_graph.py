@@ -196,14 +196,14 @@ class PartitionedGraph(object):
             return self._incoming_subedges[subvertex]
         return None
 
-    def get_subvertex_with_label(self, label):
+    def get_subvertex_with_repr(self, label):
         """ Locates the subvertex which has the same label of the input
 
         :param label: the input label to search for.
         :return: the partitionedVertex or None if theres no vertex with this label
         """
         for vertex in self._subvertices:
-            if vertex.label == label:
+            if str(id(vertex)) == label:
                 return vertex
         return None
 
@@ -217,7 +217,7 @@ class PartitionedGraph(object):
         for subvertex in self._subvertices:
             for edge_partition_id in self._outgoing_subedges[subvertex]:
                 vertex_and_partition_id = \
-                    "{}:{}".format(subvertex.label, edge_partition_id)
+                    "{}:{}".format(id(subvertex), edge_partition_id)
                 if vertex_and_partition_id == label:
                     edge_partition = \
                         self._outgoing_subedges[subvertex][edge_partition_id]
@@ -237,7 +237,7 @@ class PartitionedGraph(object):
         for subvertex in self._subvertices:
             for edge_partition_id in self._outgoing_subedges[subvertex]:
                 vertex_and_partition_id = \
-                    "{}:{}".format(subvertex.label, edge_partition_id)
+                    "{}:{}".format(id(subvertex), edge_partition_id)
                 if vertex_and_partition_id == label:
                     edge_partition = \
                         self._outgoing_subedges[subvertex][edge_partition_id]

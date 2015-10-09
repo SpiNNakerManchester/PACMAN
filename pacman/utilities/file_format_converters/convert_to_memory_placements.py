@@ -49,13 +49,13 @@ class ConvertToMemoryPlacements(object):
         memory_placements = Placements()
 
         # process placements
-        for vertex_label in file_placements:
-            subvertex = partitioned_graph.get_subvertex_with_label(vertex_label)
-            if vertex_label not in core_allocations:
+        for vertex_repr in file_placements:
+            subvertex = partitioned_graph.get_subvertex_with_repr(vertex_repr)
+            if vertex_repr not in core_allocations:
                 if subvertex is not None:
                     # virtual chip or tag chip
                     constraints_for_vertex = self._locate_constraints(
-                        vertex_label, constraints)
+                        vertex_repr, constraints)
                     external_device_constraints = \
                         self._valid_constraints_for_external_device(
                             constraints_for_vertex)
@@ -89,12 +89,12 @@ class ConvertToMemoryPlacements(object):
                 if subvertex is None:
                     raise exceptions.PacmanConfigurationException(
                         "Failed to locate the partitioned vertex in the "
-                        "partitioned graph with label {}".format(vertex_label))
+                        "partitioned graph with label {}".format(vertex_repr))
                 else:
                     memory_placements.add_placement(
-                        Placement(x=file_placements[vertex_label][0],
-                                  y=file_placements[vertex_label][1],
-                                  p=core_allocations[vertex_label][0],
+                        Placement(x=file_placements[vertex_repr][0],
+                                  y=file_placements[vertex_repr][1],
+                                  p=core_allocations[vertex_repr][0],
                                   subvertex=subvertex))
 
         # return the file format

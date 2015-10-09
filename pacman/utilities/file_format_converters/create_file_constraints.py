@@ -143,15 +143,14 @@ class CreateConstraintsToFile(object):
                                        AbstractTagAllocatorConstraint)):
                 chip_loc_constraint = dict()
                 chip_loc_constraint['type'] = "location"
-                chip_loc_constraint['vertex'] = vertex.label
-                chip_loc_constraint['location'] = \
-                    "[{}, {}]".format(constraint.x, constraint.y)
+                chip_loc_constraint['vertex'] = str(id(vertex))
+                chip_loc_constraint['location'] = [constraint.x, constraint.y]
                 json_constraints_dictory_rep.append(chip_loc_constraint)
             if (isinstance(constraint, PlacerChipAndCoreConstraint)
                     and constraint.p is not None):
                 chip_loc_constraint = dict()
                 chip_loc_constraint['type'] = "resource"
-                chip_loc_constraint['vertex'] = vertex.label
+                chip_loc_constraint['vertex'] = str(id(vertex))
                 chip_loc_constraint['resource'] = "cores"
                 chip_loc_constraint['range'] = \
                     "[{}, {}]".format(constraint.p, constraint.p + 1)
@@ -159,13 +158,15 @@ class CreateConstraintsToFile(object):
         if isinstance(constraint, AbstractTagAllocatorConstraint):
             tag_constraint = dict()
             tag_constraint['type'] = "resource"
-            tag_constraint['vertex'] = vertex.label
+            tag_constraint['vertex'] = str(id(vertex))
             if isinstance(constraint,
                           TagAllocatorRequireIptagConstraint):
                 tag_constraint['resource'] = "iptag"
+                tag_constraint['range'] = [0, 1]
             elif isinstance(constraint,
                             TagAllocatorRequireReverseIptagConstraint):
                 tag_constraint['resource'] = "reverse_iptag"
+                tag_constraint['range'] = [0, 1]
             else:
                 raise exceptions.PacmanConfigurationException(
                     "Converter does not regonsise this tag constraint."
@@ -179,16 +180,16 @@ class CreateConstraintsToFile(object):
             if isinstance(constraint,
                           KeyAllocatorContiguousRangeContraint):
                 key_constraint = dict()
-                key_constraint['type'] = "resource"
-                key_constraint['edge'] = edge.label
+                key_constraint['type'] = "reserve_resource"
+                key_constraint['edge'] = str(id(edge))
                 key_constraint['resource'] = "keys"
                 key_constraint['restriction'] = "continious_range"
                 json_constraints_dictory_rep.append(key_constraint)
             if isinstance(constraint,
                           KeyAllocatorFixedKeyAndMaskConstraint):
                 key_constraint = dict()
-                key_constraint['type'] = "resource"
-                key_constraint['edge'] = edge.label
+                key_constraint['type'] = "reserve_resource"
+                key_constraint['edge'] = str(id(edge))
                 key_constraint['resource'] = "keys"
                 key_constraint['restriction'] = "[key, mask]"
                 constraint_string = "["
@@ -201,8 +202,8 @@ class CreateConstraintsToFile(object):
             if isinstance(constraint,
                           KeyAllocatorFixedMaskConstraint):
                 key_constraint = dict()
-                key_constraint['type'] = "resource"
-                key_constraint['edge'] = edge.label
+                key_constraint['type'] = "reserve_resource"
+                key_constraint['edge'] = str(id(edge))
                 key_constraint['resource'] = "keys"
                 key_constraint['restriction'] = "[mask]"
                 key_constraint['mask'] = constraint.mask

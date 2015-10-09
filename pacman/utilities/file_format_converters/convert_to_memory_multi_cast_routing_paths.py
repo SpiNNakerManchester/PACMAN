@@ -39,12 +39,12 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
             "CORE_15": (True, 15),
             "CORE_16": (True, 16),
             "CORE_17": (True, 17),
-            "LINK_0": (False, 0),
-            "LINK_1": (False, 1),
-            "LINK_2": (False, 2),
-            "LINK_3": (False, 3),
-            "LINK_4": (False, 4),
-            "LINK_5": (False, 5)
+            "EAST": (False, 0),
+            "NORTH_EAST": (False, 1),
+            "NORTH": (False, 2),
+            "WEST": (False, 3),
+            "SOUTH_WEST": (False, 4),
+            "SOUTH": (False, 5)
         }
 
     def __call__(self, file_routing_paths, partitioned_graph, placements,
@@ -91,29 +91,21 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                     memory_edges)
             else:
                 memory_edges += self._handle_core_level_entry(
-                    placements, chip_coords, source_p, partitioned_graph,
-                    edge_id, direction_data, next_hop, machine)
+                    placements, chip_coords, source_p, source_link_id,
+                    partitioned_graph, edge_id, direction_data, next_hop,
+                    machine)
         return memory_edges
 
     def _handle_none_core_level_entries(
             self, direction_data, edge_id, next_hop, partitioned_graph,
             machine, placements, chip_coords, source_link_id, memory_edges):
         if direction_data[0]:
-            local_memory_edges = self._create_entries_for_path(
-                edge_id, next_hop, direction_data[1], None,
-                partitioned_graph, machine, placements)
+            # has a core level here. focus on core level entries
+            local_memory_edges = self._handle_core_level_entry(
+                placements, chip_coords, None, source_link_id,
+                partitioned_graph, edge_id, direction_data, next_hop, machine)
             memory_edges += local_memory_edges
-            for memory_edge in local_memory_edges:
-                entry = MulticastRoutingPathEntry(
-                    router_x=chip_coords[0], router_y=chip_coords[1],
-                    edge=memory_edge, out_going_links=None,
-                    outgoing_processors=direction_data[1],
-                    incoming_processor=None,
-                    incoming_link=source_link_id)
-
-                # add entry to system
-                self._multi_cast_routing_paths.add_path_entry(entry)
-        else:
+        else: # none core level. keep searching
             local_memory_edges = self._create_entries_for_path(
                 edge_id, next_hop, direction_data[1], None,
                 partitioned_graph, machine, placements)
@@ -127,10 +119,11 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                     incoming_link=source_link_id)
                 # add entry to system
                 self._multi_cast_routing_paths.add_path_entry(entry)
+        return memory_edges
 
     def _handle_core_level_entry(
-            self, placements, chip_coords, source_p, partitioned_graph,
-            edge_id, direction_data, next_hop, machine):
+            self, placements, chip_coords, source_p, source_link,
+            partitioned_graph, edge_id, direction_data, next_hop, machine):
         """
 
         :param placements:
@@ -155,7 +148,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                 router_x=chip_coords[0], router_y=chip_coords[1],
                 edge=memory_edge, outgoing_processors=direction_data[1],
                 out_going_links=None, incoming_processor=source_p,
-                incoming_link=None)
+                incoming_link=source_link)
             memory_edges.append(memory_edge)
 
             # add entry to system
@@ -171,7 +164,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                     edge=memory_edge, outgoing_processors=None,
                     out_going_links=direction_data[1],
                     incoming_processor=source_p,
-                    incoming_link=None)
+                    incoming_link=source_link)
 
                 # add entry to system
                 self._multi_cast_routing_paths.add_path_entry(entry)
@@ -207,7 +200,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
         routing_paths_schema = json.load(file_to_read)
 
         # vlaidate json file from json schema
-        jsonschema.validate(
-            file_routing_paths, routing_paths_schema)
+        #jsonschema.validate(
+        #    file_routing_paths, routing_paths_schema)
 
         return file_routing_paths
