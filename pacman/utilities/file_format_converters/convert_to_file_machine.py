@@ -1,5 +1,6 @@
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 from collections import defaultdict
 
@@ -27,6 +28,9 @@ class ConvertToFileMachine(object):
         :param file_path:
         :return:
         """
+        progress_bar = ProgressBar(
+            ((machine.max_chip_x + 1) * (machine.max_chip_y + 1)) + 2,
+            "Converting to json machine")
 
         # write basic stuff
         json_dictory_rep = dict()
@@ -62,12 +66,14 @@ class ConvertToFileMachine(object):
                     self._check_for_exceptions(
                         json_dictory_rep, x_coord, y_coord, machine,
                         chip_resource_exceptions)
+                progress_bar.update()
 
         # convert dict into list
         chip_resouce_exceptions_list = []
         for (chip_x, chip_y) in chip_resource_exceptions:
             chip_resouce_exceptions_list.append(
                 [chip_x, chip_y, chip_resource_exceptions[(chip_x, chip_y)]])
+        progress_bar.update()
 
         # store exceptions into json form
         json_dictory_rep['chip_resource_exceptions'] = \
@@ -87,6 +93,10 @@ class ConvertToFileMachine(object):
 
         jsonschema.validate(
             json_dictory_rep, machine_schema)
+
+        # update and complete progress bar
+        progress_bar.update()
+        progress_bar.end()
 
         return {'file_machine': file_path}
 

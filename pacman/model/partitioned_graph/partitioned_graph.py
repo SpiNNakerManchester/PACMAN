@@ -32,6 +32,8 @@ class PartitionedGraph(object):
         self._outgoing_subedges = dict()
         self._incoming_subedges = dict()
 
+        self._id_to_object_mapping = dict()
+
     def add_subvertex(self, subvertex):
         """ Add a subvertex to this partitioned_graph
 
@@ -50,6 +52,8 @@ class PartitionedGraph(object):
                                                str(subvertex))
         self._outgoing_subedges[subvertex] = dict()
         self._incoming_subedges[subvertex] = list()
+        # update id mapping
+        self._id_to_object_mapping[str(id(subvertex))] = subvertex
 
     def add_subvertices(self, subvertices):
         """ Add some subvertices to this partitioned_graph
@@ -202,12 +206,12 @@ class PartitionedGraph(object):
         :param label: the input label to search for.
         :return: the partitionedVertex or None if theres no vertex with this label
         """
-        for vertex in self._subvertices:
-            if str(id(vertex)) == label:
-                return vertex
-        return None
+        if label in self._id_to_object_mapping:
+            return self._id_to_object_mapping[label]
+        else:
+            return None
 
-    def get_subedge_with_label(self, label, destination_sub_vertex):
+    def get_subedge_with_label(self, label, destination_sub_vertex=None):
         """ locates the subedge which has the same label of the input
 
         :param label: the input label to search for.
@@ -222,27 +226,12 @@ class PartitionedGraph(object):
                     edge_partition = \
                         self._outgoing_subedges[subvertex][edge_partition_id]
                     edges = edge_partition.edges
-
-                    for edge in edges:
-                        if edge.post_subvertex == destination_sub_vertex:
-                            return edge
-        return None
-
-    def get_source_subvertex_with_label(self, label):
-        """ locates the subedge which has the same label of the input
-
-        :param label: the input label to search for.
-        :return: the partitionedEdge or None if theres no vertex with this label
-        """
-        for subvertex in self._subvertices:
-            for edge_partition_id in self._outgoing_subedges[subvertex]:
-                vertex_and_partition_id = \
-                    "{}:{}".format(id(subvertex), edge_partition_id)
-                if vertex_and_partition_id == label:
-                    edge_partition = \
-                        self._outgoing_subedges[subvertex][edge_partition_id]
-                    edge = edge_partition.edges[0]
-                    return edge.pre_subvertex
+                    if destination_sub_vertex is None:
+                        return edges[0]
+                    else:
+                        for edge in edges:
+                            if edge.post_subvertex == destination_sub_vertex:
+                                return edge
         return None
 
     @property

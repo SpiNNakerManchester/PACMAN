@@ -8,7 +8,7 @@ from pacman.model.constraints.abstract_constraints.\
     abstract_tag_allocator_constraint import \
     AbstractTagAllocatorConstraint
 from pacman.utilities import utility_calls
-
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
 
 from collections import defaultdict
@@ -33,7 +33,9 @@ class ConvertToFilePartitionedGraph(object):
         :param folder_path:
         :return:
         """
-
+        progress_bar = ProgressBar(
+            len(partitioned_graph.subvertices),
+            "Converting to json partitioned graph")
         # write basic stuff
         json_graph_dictory_rep = dict()
 
@@ -109,6 +111,7 @@ class ConvertToFilePartitionedGraph(object):
                 hyper_edge_dict["type"] = \
                     vertex_outgoing_partitions[vertex_partition]\
                     .type.name.lower()
+            progress_bar.update()
 
         file_to_write = open(file_path, "w")
         json.dump(json_graph_dictory_rep, file_to_write)
@@ -123,6 +126,8 @@ class ConvertToFilePartitionedGraph(object):
         partitioned_graph_schema = json.load(file_to_read)
         jsonschema.validate(
             json_graph_dictory_rep, partitioned_graph_schema)
+
+        progress_bar.end()
 
         return {"partitioned_graph": file_path}
 

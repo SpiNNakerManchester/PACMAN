@@ -30,6 +30,7 @@ from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 import json
 import os
@@ -43,16 +44,26 @@ class CreateConstraintsToFile(object):
 
     def __call__(self, partitioned_graph, machine, file_path):
         """
-
-        :param partitioned_graph:
-        :param machine:
+        tqakes a partitioned graph, machine and file path and creates a
+        constraints.json file
+        :param partitioned_graph: the partitioned graph
+        :param machine: the machine
         :return:
         """
+
+        progress_bar = ProgressBar(
+            (len(partitioned_graph.subvertices) +
+             len(partitioned_graph.subedges)) + 2,
+            "creating json constraints")
+
         json_constraints_dictory_rep = list()
         self._add_monitor_core_reserve(json_constraints_dictory_rep)
+        progress_bar.update()
         self._add_extra_monitor_cores(json_constraints_dictory_rep, machine)
+        progress_bar.update()
         self._search_graph_for_placement_constraints(
-            json_constraints_dictory_rep, partitioned_graph, machine)
+            json_constraints_dictory_rep, partitioned_graph, machine,
+            progress_bar)
 
         file_to_write = open(file_path, "w")
         json.dump(json_constraints_dictory_rep, file_to_write)
@@ -69,23 +80,28 @@ class CreateConstraintsToFile(object):
         jsonschema.validate(
             json_constraints_dictory_rep, partitioned_graph_schema)
 
+        # complete progress bar
+        progress_bar.end()
+
         return {'constraints': file_path}
 
     def _search_graph_for_placement_constraints(
-            self, json_constraints_dictory_rep, partitioned_graph, machine):
+            self, json_constraints_dictory_rep, partitioned_graph, machine,
+            progress_bar):
         for vertex in partitioned_graph.subvertices:
             for constraint in vertex.constraints:
                 self._handle_vertex_constraint(
                     constraint, json_constraints_dictory_rep, vertex)
+                progress_bar.update()
             if isinstance(vertex, AbstractVirtualVertex):
                 self._handle_virtual_vertex(
                     vertex, json_constraints_dictory_rep, machine)
-        """
+
         for edge in partitioned_graph.subedges:
             for constraint in edge.constraints:
-                self._handle_edge_constraint(
-                    constraint, json_constraints_dictory_rep, edge)
-        """
+                progress_bar.update()
+                #self._handle_edge_constraint(
+                #    constraint, json_constraints_dictory_rep, edge
 
     def _handle_virtual_vertex(self, vertex, json_constraints_dictory_rep,
                                machine):
@@ -104,11 +120,10 @@ class CreateConstraintsToFile(object):
         virtual_chip_location_constraint["vertex"] = vertex.label
         virtual_chip_location_constraint["location"] = real_chip_id
 
-
     @staticmethod
     def _locate_connected_chip_data(vertex, machine):
         """
-
+        searches and fnds the connected virutal chip
         :param vertex:
         :param machine:
         :return:
@@ -131,7 +146,7 @@ class CreateConstraintsToFile(object):
                 "Please fix and try again.")
         else:
             return ("[{}, {}]".format(router.get_link(link_id).destination_x,
-                                     router.get_link(link_id).destination_y),
+                                      router.get_link(link_id).destination_y),
                     router.get_link(link_id).multicast_default_from)
 
     @staticmethod

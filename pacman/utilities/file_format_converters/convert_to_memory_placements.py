@@ -50,7 +50,8 @@ class ConvertToMemoryPlacements(object):
 
         # process placements
         for vertex_repr in file_placements:
-            subvertex = partitioned_graph.get_subvertex_with_repr(vertex_repr)
+            subvertex = \
+                partitioned_graph.get_subvertex_with_repr(vertex_repr)
             if vertex_repr not in core_allocations:
                 if subvertex is not None:
                     # virtual chip or tag chip

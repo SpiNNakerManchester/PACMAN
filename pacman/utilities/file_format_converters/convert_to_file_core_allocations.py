@@ -1,4 +1,5 @@
 from pacman.utilities import file_format_schemas
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 import os
 import json
@@ -18,6 +19,9 @@ class ConvertToFileCoreAllocations(object):
         :return:
         """
 
+        progress_bar = ProgressBar( len(placements),
+                                    "Converting to json core allocations")
+
         # write basic stuff
         json_core_allocations_dict = dict()
 
@@ -27,6 +31,7 @@ class ConvertToFileCoreAllocations(object):
         for placement in placements:
             json_core_allocations_dict[placement.subvertex.label] = \
                 [placement.p, placement.p + 1]
+            progress_bar.update()
 
         # dump dict into json file
         file_to_write = open(file_path, "w")
@@ -42,6 +47,9 @@ class ConvertToFileCoreAllocations(object):
         core_allocations_schema = json.load(file_to_read)
         jsonschema.validate(
             json_core_allocations_dict, core_allocations_schema)
+
+        # complete progress bar
+        progress_bar.end()
 
         # return the file format
         return {"FileCoreAllocations": file_path}

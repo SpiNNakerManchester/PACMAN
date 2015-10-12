@@ -6,6 +6,7 @@ from pacman.model.routing_paths.multicast_routing_path_entry import \
 from pacman.model.routing_paths.multicast_routing_paths import \
     MulticastRoutingPaths
 from pacman.utilities import file_format_schemas
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 import json
 import os
@@ -52,17 +53,21 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
 
         # load the json files
         file_routing_paths = self._handle_json_files(file_routing_paths)
-
+        progress_bar = ProgressBar(len(file_routing_paths),
+                                   "Converting to PACMAN routing paths")
         # iterate though the path for each edge and create entries
         for edge_id in file_routing_paths:
-            vertex = partitioned_graph.get_source_subvertex_with_label(edge_id)
+            edge = partitioned_graph.get_subedge_with_label(edge_id)
             # if the vertex is none, its a vertex with the special skills of
             # needing no cores. therefore ignore
-            if vertex is not None:
-                placement = placements.get_placement_of_subvertex(vertex)
+            if edge is not None:
+                placement = placements.get_placement_of_subvertex(
+                    edge.pre_subvertex)
                 self._create_entries_for_path(
                     edge_id, file_routing_paths[edge_id], None, placement.p,
                     partitioned_graph, machine, placements)
+            progress_bar.update()
+        progress_bar.end()
 
         return {'routing_paths': self._multi_cast_routing_paths}
 
