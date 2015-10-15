@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="SpiNNaker_PACMAN",
-    version="2015.004",
+    version="2015.004.01",
     description="Partition and Configuration Manager",
     url="https://github.com/SpiNNakerManchester/PACMAN",
     license="GNU GPLv3.0",
@@ -41,5 +41,5 @@ setup(
               'pacman.utilities'],
     install_requires=[
         'six', 'enum34', 'numpy', 'jsonschema', 'SpiNNMan == 2015.004',
-        'SpiNNMachine == 2015.004']
+        'SpiNNMachine == 2015.004.01']
 )

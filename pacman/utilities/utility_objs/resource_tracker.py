@@ -710,6 +710,7 @@ class ResourceTracker(object):
     def _available_resources(self, usable_chips):
         n_cores = 0
         max_sdram = 0
+        n_chips = 0
         for x, y in usable_chips:
             chip = self._machine.get_chip_at(x, y)
             if (x, y) in self._core_tracker:
@@ -719,7 +720,8 @@ class ResourceTracker(object):
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:
                 max_sdram = sdram_available
-        return n_cores, len(usable_chips), max_sdram
+            n_chips += 1
+        return n_cores, n_chips, max_sdram
 
     def get_maximum_constrained_resources_available(self, constraints,
                                                     chips=None):
