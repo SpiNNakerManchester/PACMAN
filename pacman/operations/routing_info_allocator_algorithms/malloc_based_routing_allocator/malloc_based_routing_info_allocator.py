@@ -106,23 +106,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 # update routing tables with entries
                 routing_info_allocator_utilities.add_routing_key_entries(
                     routing_paths, subedge_info, edge, routing_tables)
+
             progress_bar.update()
-
-        # handle the request for all partitioned vertices which require the
-        # routing info for configuring their data.
-        for partitioned_vertex in subgraph.subvertices:
-            if isinstance(partitioned_vertex,
-                          RequiresRoutingInfoPartitionedVertex):
-                vertex_sub_edge_routing_infos = list()
-                outgoing_edges = subgraph.\
-                    outgoing_subedges_from_subvertex(partitioned_vertex)
-                for outgoing_edge in outgoing_edges:
-                    vertex_sub_edge_routing_infos.append(
-                        routing_infos.
-                        get_subedge_information_from_subedge(outgoing_edge))
-                partitioned_vertex.set_routing_infos(
-                    vertex_sub_edge_routing_infos)
-
         progress_bar.end()
         return {'routing_infos': routing_infos,
                 'routing_tables': routing_tables}

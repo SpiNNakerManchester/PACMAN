@@ -37,6 +37,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param reports_states: the pacman report object
         :param in_debug_mode: bool which tells the algorithm exeuctor to add
         any debug algorithms if needed
+
         :return:
         """
         AbstractProvidesProvenanceData.__init__(self)
@@ -146,15 +147,19 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :return: None
         """
 
+        input_names = set()
+        for input_item in inputs:
+            input_names.add(input_item['type'])
+
         allocated_algorithums = list()
         generated_outputs = set()
-        generated_outputs.union(inputs)
+        generated_outputs.union(input_names)
         allocated_a_algorithm = True
         while len(self._algorithms) != 0 and allocated_a_algorithm:
             allocated_a_algorithm = False
             # check each algorithm to see if its usable with current inputs
             suitable_algorithm = self._locate_suitable_algorithm(
-                self._algorithms, inputs, generated_outputs, False)
+                self._algorithms, input_names, generated_outputs, False)
 
             # add the suitable algorithms to the list and take there outputs
             #  as new inputs
@@ -162,18 +167,18 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 allocated_algorithums.append(suitable_algorithm)
                 allocated_a_algorithm = True
                 self._remove_algorithm_and_update_outputs(
-                    self._algorithms, suitable_algorithm, inputs,
+                    self._algorithms, suitable_algorithm, input_names,
                     generated_outputs)
             else:
                 suitable_algorithm = self._locate_suitable_algorithm(
-                    optional_converter_algorithms, inputs, generated_outputs,
-                    True)
+                    optional_converter_algorithms, input_names,
+                    generated_outputs, True)
                 if suitable_algorithm is not None:
                     allocated_algorithums.append(suitable_algorithm)
                     allocated_a_algorithm = True
                     self._remove_algorithm_and_update_outputs(
                         optional_converter_algorithms, suitable_algorithm,
-                        inputs, generated_outputs)
+                        input_names, generated_outputs)
                 else:
                     algorithums_left_names = list()
                     for algorithm in self._algorithms:
@@ -189,7 +194,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                         "which uses the defined inputs and generates the "
                         "required outputs and rerun me. Thanks"
                         .format(
-                            inputs, list(set(required_outputs) - set(inputs)),
+                            input_names,
+                            list(set(required_outputs) - set(input_names)),
                             algorithums_left_names))
 
         all_required_outputs_generated = True
@@ -306,8 +312,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             timer.start_timing()
 
         # execute algorithm
-        results = python_algorithm(**inputs)
-
+        try:
+            results = python_algorithm(**inputs)
+        except TypeError as type_error:
+            raise exceptions.PacmanTypeError(
+                "The algorithm {} does not seem to understand the parameter"
+                " {} even though its xml states that its inputs are {}"
+                .format(algorithm.algorithm_id, type_error, algorithm.inputs))
         # handle_prov_data
         if self._do_timing:
             self._handle_prov(timer, algorithm)
@@ -409,6 +420,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             for result_name in results:
                 result_type = \
                     algorithm.get_type_from_output_name(result_name)
+                if result_type is None:
+                    raise exceptions.PacmanTypeError(
+                        "The result with name {} does not corraspond to any of"
+                        "the outputs for algorithm {} which has outputs {}"
+                        .format(result_name, algorithm.algorithm_id,
+                                algorithm.outputs))
                 self._internal_type_mapping[result_type] = \
                     results[result_name]
         elif len(algorithm.outputs) != 0:
