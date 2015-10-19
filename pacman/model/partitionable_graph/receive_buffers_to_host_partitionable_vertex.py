@@ -38,6 +38,10 @@ class ReceiveBuffersToHostPartitionableVertex(object):
             self.add_constraint(placement_constraint)
 
     @abstractmethod
+    def get_buffered_regions_list(self):
+        pass
+
+    @abstractmethod
     def add_constraint(self, constraint):
         pass
 
