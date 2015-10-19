@@ -76,6 +76,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         self._set_up_pacman_algorthms_listings(
             algorithms, xml_paths, inputs, required_outputs)
 
+        self._inputs = inputs
+
     def _set_up_pacman_algorthms_listings(self, algorithms, xml_paths, inputs,
                                           required_outputs):
         """ trnaslates the algoreithum string and uses the config xml to create
@@ -275,14 +277,14 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             position += 1
         return suitable_algorithm
 
-    def execute_mapping(self, inputs):
+    def execute_mapping(self):
         """
         executes the algorithms
         :param inputs: the imputs stated in setup function
         :return: None
         """
 
-        for input_parameter in inputs:
+        for input_parameter in self._inputs:
             self._internal_type_mapping[input_parameter['type']] = \
                 input_parameter['value']
 
