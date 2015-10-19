@@ -243,7 +243,7 @@
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryMachine</param_type>
+                <param_type>MemoryExtendedMachine</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>

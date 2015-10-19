@@ -9,7 +9,6 @@ from pacman.interfaces.abstract_provides_provenance_data import \
 from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
 from pacman.utilities import file_format_converters
-from pacman.operations import algorithm_reports
 from pacman import operations
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
@@ -31,8 +30,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
     and outputs of the algorithm based off its xml data
     """
 
-    def __init__(self, reports_states, algorithms, inputs, xml_paths,
-                 required_outputs, in_debug_mode=True, do_timings=True):
+    def __init__(self, algorithms, inputs, xml_paths,
+                 required_outputs, do_timings=True):
         """
         :param reports_states: the pacman report object
         :param in_debug_mode: bool which tells the algorithm exeuctor to add
@@ -53,25 +52,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         # store timing request
         self._do_timing = do_timings
-
-        # define mapping between output types and reports
-        if reports_states is not None and reports_states.tag_allocation_report:
-            self._algorithms.append("TagReport")
-        if reports_states is not None and reports_states.routing_info_report:
-            self._algorithms.append("routingInfoReports")
-        if reports_states is not None and reports_states.router_report:
-            self._algorithms.append("RouterReports")
-        if reports_states is not None and reports_states.partitioner_report:
-            self._algorithms.append("PartitionerReport")
-        if (reports_states is not None and
-                reports_states.placer_report_with_partitionable_graph):
-            self._algorithms.append("PlacerReportWithPartitionableGraph")
-        if (reports_states is not None and
-                reports_states.placer_report_without_partitionable_graph):
-            self._algorithms.append("PlacerReportWithoutPartitionableGraph")
-        # add debug algorithms if needed
-        if in_debug_mode:
-            self._algorithms.append("ValidRoutesChecker")
 
         self._set_up_pacman_algorthms_listings(
             algorithms, xml_paths, inputs, required_outputs)
@@ -112,8 +92,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # (used in decode_algorithm_data_objects func)
         xml_paths.append(os.path.join(os.path.dirname(operations.__file__),
                                       "algorithms_metadata.xml"))
-        xml_paths.append(os.path.join(os.path.dirname(
-            algorithm_reports.__file__), "reports_metadata.xml"))
 
         converter_xml_path = list()
         converter_xml_path.append(os.path.join(
@@ -187,18 +165,22 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                         algorithums_left_names.append(algorithm.algorithm_id)
                     for algorithm in optional_converter_algorithms:
                         algorithums_left_names.append(algorithm.algorithm_id)
+                    algorithms_used = list()
+                    for algorithm in allocated_algorithums:
+                        algorithms_used.append(algorithm.algorithm_id)
 
                     raise exceptions.PacmanConfigurationException(
                         "I was not able to deduce a future algortihm to use as"
                         "I only have the inputs {} and am missing the outputs "
                         "{} from the requirements of the end user. The only"
-                        " avilable functions are {}. Please add a algorithm(s) "
+                        " avilable functions are {}, after I have ran "
+                        "functions {}. Please add a algorithm(s) "
                         "which uses the defined inputs and generates the "
                         "required outputs and rerun me. Thanks"
                         .format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
-                            algorithums_left_names))
+                            algorithums_left_names, algorithms_used))
 
         all_required_outputs_generated = True
         failed_to_generate_output_string = ""
@@ -320,7 +302,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             raise exceptions.PacmanTypeError(
                 "The algorithm {} does not seem to understand the parameter"
                 " {} even though its xml states that its inputs are {}"
-                .format(algorithm.algorithm_id, type_error, algorithm.inputs))
+                .format(algorithm.algorithm_id, type_error.message,
+                        algorithm.inputs))
         # handle_prov_data
         if self._do_timing:
             self._handle_prov(timer, algorithm)
@@ -450,14 +433,19 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 importlib.import_module(algorithm.python_module_import),
                 algorithm.python_class)
             # create instanation of the algorithm to run
-            python_algorithm = python_algorithm()
+            try:
+                python_algorithm = python_algorithm()
+            except TypeError as type_error:
+                raise exceptions.PacmanConfigurationException(
+                    "The algorithm {} has failed to be instaiated due to {}"
+                    .format(algorithm.algorithm_id, type_error.message))
         elif (algorithm.python_function is not None and
                 algorithm.python_class is None):
             # just a function, so no instantation required
             python_algorithm = getattr(
                 importlib.import_module(algorithm.python_module_import),
                 algorithm.python_function)
-        else: # nither, but is a python object.... error
+        else:  # nither, but is a python object.... error
             raise exceptions.PacmanConfigurationException(
                 "The algorithm {}, was deduced to be a internal "
                 "algorithm and yet has resulted in no class or "
