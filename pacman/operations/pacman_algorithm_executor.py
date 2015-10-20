@@ -17,6 +17,7 @@ import logging
 import importlib
 import subprocess
 import os
+import traceback
 from lxml import etree
 from collections import defaultdict
 from pacman.utilities.utility_objs.timer import Timer
@@ -300,10 +301,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             results = python_algorithm(**inputs)
         except TypeError as type_error:
             raise exceptions.PacmanTypeError(
-                "The algorithm {} does not seem to understand the parameter"
-                " {} even though its xml states that its inputs are {}"
-                .format(algorithm.algorithm_id, type_error.message,
-                        algorithm.inputs))
+                "The algorithm {} has crashed for some unknown reason. "
+                "Its inputs were {} and the error message was {} with stack {}"
+                "We refer to the devleoper for fixing this issue."
+                .format(
+                    algorithm.algorithm_id, algorithm.inputs,
+                    type_error.message, traceback.format_exc()))
         # handle_prov_data
         if self._do_timing:
             self._handle_prov(timer, algorithm)
