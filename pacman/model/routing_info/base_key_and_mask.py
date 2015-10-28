@@ -61,7 +61,7 @@ class BaseKeyAndMask(object):
     def __str__(self):
         return self.__repr__()
 
-    def __hash__(self, key_and_mask):
+    def __hash__(self):
         return self.__repr__().__hash__()
 
     @property

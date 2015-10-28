@@ -213,9 +213,9 @@
             </parameter>
         </produces_outputs>
     </algorithm>
-    <algorithm name="PopulationbasedRoutingInfoAllocator">
-        <python_module>pacman.operations.routing_info_allocator_algorithms.malloc_based_routing_allocator.population_based_routing_info_allocator</python_module>
-        <python_class>PopulationbasedRoutingInfoAllocator</python_class>
+    <algorithm name="VertexBasedRoutingInfoAllocator">
+        <python_module>pacman.operations.routing_info_allocator_algorithms.field_based_routing_allocator.vertex_based_routing_info_allocator</python_module>
+        <python_class>VertexBasedRoutingInfoAllocator</python_class>
         <required_inputs>
             <parameter>
                 <param_name>subgraph</param_name>

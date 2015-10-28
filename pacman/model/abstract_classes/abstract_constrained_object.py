@@ -12,7 +12,7 @@ class AbstractConstrainedObject(object):
 
     def __init__(self, label, constraints=None):
         self._label = label
-        self._constraints = list()
+        self._constraints = set()
         self.add_constraints(constraints)
 
     def add_constraint(self, constraint):
@@ -32,7 +32,7 @@ class AbstractConstrainedObject(object):
                 "constraint", constraint, "Must be a pacman.model."
                                           "constraints.abstract_constraint."
                                           "AbstractConstraint")
-        self._constraints.append(constraint)
+        self._constraints.add(constraint)
 
     def add_constraints(self, constraints):
         """ Add an iterable of constraints to the collection of constraints for\

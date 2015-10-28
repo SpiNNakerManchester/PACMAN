@@ -2,6 +2,8 @@
 OutgoingEdgePartition
 """
 from enum import Enum
+from pacman.model.abstract_classes.abstract_constrained_object import \
+    AbstractConstrainedObject
 from pacman.model.partitionable_graph.fixed_route_partitionable_edge import \
     FixedRoutePartitionableEdge
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
@@ -20,12 +22,13 @@ EDGE_TYPES = Enum(
            ("FIXED_ROUTE", 3)])
 
 
-class OutgoingEdgePartition(object):
+class OutgoingEdgePartition(AbstractConstrainedObject):
     """
     A collection of egdes which have the same semantics
     """
 
-    def __init__(self, identifier):
+    def __init__(self, identifier, constraints=None, label=None):
+        AbstractConstrainedObject.__init__(self, label, constraints)
         self._identifier = identifier
         self._type = None
         self._edges = list()

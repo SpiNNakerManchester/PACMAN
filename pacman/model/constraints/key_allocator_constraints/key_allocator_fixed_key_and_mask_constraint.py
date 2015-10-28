@@ -43,6 +43,10 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         self._key_list_function = key_list_function
 
     def is_key_allocator_constraint(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     @property
@@ -66,3 +70,19 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
     def __repr__(self):
         return "fixed_key_mask_constraint_withkey_masks:{}: and key list " \
                "function {}".format(self.keys_and_masks, self.key_list_function)
+
+    def __eq__(self, other):
+        if not isinstance(other, KeyAllocatorFixedKeyAndMaskConstraint):
+            return False
+        else:
+            if other.key_list_function != self._key_list_function:
+                return False
+            else:
+                for key_and_mask in self._keys_and_masks:
+                    if key_and_mask not in other.keys_and_masks:
+                        return False
+                return True
+
+    def __hash__(self):
+        frozen_elements = frozenset(self._keys_and_masks)
+        return (frozen_elements, self._key_list_function).__hash__()

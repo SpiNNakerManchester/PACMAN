@@ -5,13 +5,13 @@ MallocBasedRoutingInfoAllocator
 # pacman imports
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_fixed_field_constraint import \
+    KeyAllocatorFixedFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
-from pacman.model.data_request_interfaces.\
-    abstract_requires_routing_info_partitioned_vertex import \
-    RequiresRoutingInfoPartitionedVertex
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
@@ -25,12 +25,12 @@ from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.utilities import utility_calls
-from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
+from pacman import exceptions
 
 # general imports
 import math
@@ -51,66 +51,157 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=subgraph.subedges,
+            constrained_vertices=subgraph.partitions,
             supported_constraints=[
                 KeyAllocatorFixedMaskConstraint,
                 KeyAllocatorFixedKeyAndMaskConstraint,
                 KeyAllocatorContiguousRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
+        # verify that no edge has more than 1 of a constraint ,and that
+        # constraints are compatible
+        routing_info_allocator_utilities.\
+            check_types_of_edge_constraint(subgraph)
+
         routing_tables = MulticastRoutingTables()
+        routing_infos = RoutingInfo()
         
         # Get the partitioned edges grouped by those that require the same key
-        same_key_groups = \
+        (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
+         flexi_field_groups, continious_groups, none_continious_groups) = \
             routing_info_allocator_utilities.get_edge_groups(subgraph)
 
+        # warn users that none continious keys are going to work in
+        # continious mode
+        for group in none_continious_groups:
+            logger.warning(
+                "The subvertex {} has a set of edges {} "
+                "which has not been requested to have continous keys. The "
+                "algorithm will anyway allocate keys in a continious"
+                " manner.".format(group[0].pre_subvertex, group))
+            continious_groups.append(group)
+
         # Go through the groups and allocate keys
-        progress_bar = ProgressBar(len(same_key_groups),
-                                   "Allocating routing keys")
-        routing_infos = RoutingInfo()
-        for group in same_key_groups:
-            # Check how many keys are needed for the edges of the group
-            edge_n_keys = None
-            for edge in group:
-                n_keys = n_keys_map.n_keys_for_partitioned_edge(edge)
-                if edge_n_keys is None:
-                    edge_n_keys = n_keys
-                elif edge_n_keys != n_keys:
-                    raise PacmanRouteInfoAllocationException(
-                        "Two edges require the same keys but request a"
-                        " different number of keys")
+        progress_bar = ProgressBar(
+            len(subgraph.partitions), "Allocating routing keys")
+
+        # allocate the groups that have fixed keys
+        for group in fixed_key_groups:  # fixed keys groups
+
+            # check n keys consistent through partition
+            routing_info_allocator_utilities.\
+                check_n_keys_are_same_through_partition(group, n_keys_map)
 
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
-            keys_and_masks = routing_info_allocator_utilities.\
-                get_fixed_key_and_mask(group)
-            fixed_mask, fields = \
-                routing_info_allocator_utilities.get_fixed_mask(group)
+            fixed_mask = None
+            fixed_key_and_mask_constraint = \
+                utility_calls.locate_constraints_of_type(
+                    group.constraints, KeyAllocatorFixedKeyAndMaskConstraint)[0]
 
-            if keys_and_masks is not None:
+            # attempt to allocate them
+            self._allocate_fixed_keys_and_masks(
+                fixed_key_and_mask_constraint.keys_and_masks, fixed_mask)
 
-                self._allocate_fixed_keys_and_masks(keys_and_masks, fixed_mask)
-            else:
-                if not routing_info_allocator_utilities.\
-                        is_contiguous_range(group):
-                    logger.warning("Algorithm will still produce continious "
-                                   "keys")
-                keys_and_masks = self._allocate_keys_and_masks(
-                    fixed_mask, fields, edge_n_keys)
+            # update the pacman data objects
+            self._update_routing_objects(
+                fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
+                routing_paths, group, routing_tables)
 
-            # Allocate the routing information
-            for edge in group:
-                subedge_info = SubedgeRoutingInfo(keys_and_masks, edge)
-                routing_infos.add_subedge_info(subedge_info)
-
-                # update routing tables with entries
-                routing_info_allocator_utilities.add_routing_key_entries(
-                    routing_paths, subedge_info, edge, routing_tables)
+            continious_groups.remove(group)
 
             progress_bar.update()
+
+        for group in fixed_mask_groups:  # fixed mask groups
+
+            # check n keys consistent through partition
+            routing_info_allocator_utilities.\
+                check_n_keys_are_same_through_partition(group, n_keys_map)
+
+            # get mask and fields if need be
+            fixed_mask = utility_calls.locate_constraints_of_type(
+                group.constraints, KeyAllocatorFixedMaskConstraint)[0].mask
+
+            fields = None
+            if group in fixed_field_groups:
+                fields = utility_calls.locate_constraints_of_type(
+                    group.constraints,
+                    KeyAllocatorFixedFieldConstraint)[0].fields
+                fixed_field_groups.remove(group)
+
+            # try to allocate
+            keys_and_masks = self._allocate_keys_and_masks(
+                fixed_mask, fields,
+                n_keys_map.n_keys_for_partitioned_edge(group.edges[0]))
+
+            # update the pacman data objects
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, routing_paths, group,
+                routing_tables)
+
+            continious_groups.remove(group)
+
+            progress_bar.update()
+
+        for group in fixed_field_groups:
+            fields = utility_calls.locate_constraints_of_type(
+                group.constraints,
+                KeyAllocatorFixedFieldConstraint)[0].fields
+            # try to allocate
+            keys_and_masks = self._allocate_keys_and_masks(
+                None, fields,
+                n_keys_map.n_keys_for_partitioned_edge(group.edges[0]))
+
+            # update the pacman data objects
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, routing_paths, group,
+                routing_tables)
+
+            continious_groups.remove(group)
+
+            progress_bar.update()
+
+        for group in flexi_field_groups:
+            raise exceptions.PacmanConfigurationException(
+                "I cant handle these. please fix and try again")
+
+        for group in continious_groups:
+            keys_and_masks = self._allocate_keys_and_masks(
+                None, None,
+                n_keys_map.n_keys_for_partitioned_edge(group.edges[0]))
+
+            # update the pacman data objects
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, routing_paths, group,
+                routing_tables)
+
+
         progress_bar.end()
         return {'routing_infos': routing_infos,
                 'routing_tables': routing_tables}
+
+    @staticmethod
+    def _update_routing_objects(
+            keys_and_masks, routing_infos, routing_paths, group,
+            routing_tables):
+        """
+
+        :param keys_and_masks:
+        :param routing_infos:
+        :param routing_paths:
+        :param group:
+        :param routing_tables:
+        :return:
+        """
+
+        # Allocate the routing information
+        for edge in group.edges:
+            subedge_info = SubedgeRoutingInfo(keys_and_masks, edge)
+            routing_infos.add_subedge_info(subedge_info)
+
+            # update routing tables with entries
+            routing_info_allocator_utilities.add_routing_key_entries(
+                routing_paths, subedge_info, edge, routing_tables)
 
     @staticmethod
     def _get_key_ranges(key, mask):
@@ -169,7 +260,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
             # If there is a fixed mask, check it doesn't clash
             if fixed_mask is not None and fixed_mask != key_and_mask.mask:
-                raise PacmanRouteInfoAllocationException(
+                raise exceptions.PacmanRouteInfoAllocationException(
                     "Cannot meet conflicting constraints")
 
             # Go through the mask sets and allocate
@@ -245,5 +336,80 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                                                   mask=mask)])
             return keys_and_masks
 
-        raise PacmanRouteInfoAllocationException(
+        raise exceptions.PacmanRouteInfoAllocationException(
             "Could not find space to allocate keys")
+
+    def _allocate_flexi_fields(self, fields, n_keys):
+        """
+
+        :param fields:
+        :param n_keys:
+        :return:
+        """
+        # If there isn't a fixed mask, generate a fixed mask based
+        # on the number of keys required
+        masks_available = self._get_possible_masks(n_keys)
+
+        # For each usable mask, try all of the possible keys and
+        # see if a match is possible
+        mask_found = None
+        key_found = None
+        mask = None
+        for mask in masks_available:
+
+            logger.debug(
+                "Trying mask {} for {} keys".format(hex(mask), n_keys))
+
+            key_found = None
+            key_generator = KeyFlexiFieldGenerator(mask, fields,
+                                                   self._free_space_tracker)
+            for key in key_generator:
+
+                logger.debug("Trying key {}".format(hex(key)))
+
+                # Check if all the key ranges can be allocated
+                matched_all = True
+                index = 0
+                for (base_key, n_keys) in self._get_key_ranges(key, mask):
+                    logger.debug("Finding slot for {}, n_keys={}".format(
+                        hex(base_key), n_keys))
+                    index = self._find_slot(base_key, lo=index)
+                    logger.debug("Slot for {} is {}".format(
+                        hex(base_key), index))
+                    if index is None:
+                        matched_all = False
+                        break
+                    space = self._check_allocation(index, base_key,
+                                                   n_keys)
+                    logger.debug("Space for {} is {}".format(
+                        hex(base_key), space))
+                    if space is None:
+                        matched_all = False
+                        break
+
+                if matched_all:
+                    logger.debug("Matched key {}".format(hex(key)))
+                    key_found = key
+                    break
+
+            # If we found a matching key, store the mask that worked
+            if key_found is not None:
+                logger.debug("Matched mask {}".format(hex(mask)))
+                mask_found = mask
+                break
+
+        # If we found a working key and mask that can be assigned,
+        # Allocate them
+        if key_found is not None and mask_found is not None:
+            for (base_key, n_keys) in self._get_key_ranges(
+                    key_found, mask):
+                self._allocate_elements(base_key, n_keys)
+
+            # If we get here, we can assign the keys to the edges
+            keys_and_masks = list([BaseKeyAndMask(base_key=key_found,
+                                                  mask=mask)])
+            return keys_and_masks
+
+        raise exceptions.PacmanRouteInfoAllocationException(
+            "Could not find space to allocate keys")
+

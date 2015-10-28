@@ -13,7 +13,7 @@ from collections import OrderedDict
 from math import log
 
 
-class BitField(object):
+class RigsBitField(object):
     """Defines a hierarchical bit field and the values of those fields.
 
     Conceptually, a bit field is a sequence of bits which are logically broken

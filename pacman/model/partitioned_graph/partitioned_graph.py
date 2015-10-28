@@ -6,7 +6,8 @@ PartitionedGraph
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.utilities.utility_objs.ordered_set import OrderedSet
-from pacman.utilities.utility_objs.outgoing_edge_partition import OutgoingEdgePartition
+from pacman.utilities.utility_objs.outgoing_edge_partition import \
+    OutgoingEdgePartition
 
 # general imports
 import uuid
@@ -71,7 +72,8 @@ class PartitionedGraph(object):
             for next_subvertex in subvertices:
                 self.add_subvertex(next_subvertex)
 
-    def add_subedge(self, subedge, partition_id=None):
+    def add_subedge(self, subedge, partition_id=None,
+                    partition_constraints=None):
         """ Add a subedge to this partitioned_graph
 
         :param subedge: a subedge to be added to the partitioned_graph
@@ -100,7 +102,7 @@ class PartitionedGraph(object):
             if (partition_id not in
                     self._outgoing_subedges[subedge.pre_subvertex]):
                 self._outgoing_subedges[subedge.pre_subvertex][partition_id] = \
-                    OutgoingEdgePartition(partition_id)
+                    OutgoingEdgePartition(partition_id, partition_constraints)
             self._outgoing_subedges[subedge.pre_subvertex][partition_id]\
                 .add_edge(subedge)
         else:
@@ -182,6 +184,20 @@ class PartitionedGraph(object):
             return self._outgoing_subedges[sub_vertex]
         else:
             return ()
+
+    @property
+    def partitions(self):
+        """
+        property method for all the partitions in the graph
+        :return: iterable of\
+                     :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
+        """
+        partitions = list()
+        for sub_vertex in self._subvertices:
+            partition = self.outgoing_edges_partitions_from_vertex(sub_vertex)
+            for partition_identifer in partition:
+                partitions.append(partition[partition_identifer])
+        return partitions
 
     def incoming_subedges_from_subvertex(self, subvertex):
         """ Locate the subedges for which subvertex is the post_subvertex.\

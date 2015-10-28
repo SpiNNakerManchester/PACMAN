@@ -33,5 +33,8 @@ class Field(object):
         return (self._lo, self._hi, self._mask).__hash__()
 
     def __eq__(self, other_field):
-        return (self._lo == other_field.lo and self._hi == other_field.hi
-                and self._mask == other_field._mask)
+        if not isinstance(other_field, Field):
+            return False
+        else:
+            return (self._lo == other_field.lo and self._hi == other_field.hi
+                    and self._mask == other_field.mask)

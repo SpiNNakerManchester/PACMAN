@@ -13,4 +13,28 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
             self, "Key allocator constraint to ensure that keys are not split")
 
     def is_key_allocator_constraint(self):
+        """
+        helper method for instance
+        :return:
+        """
         return True
+
+    def __eq__(self, other):
+        """
+        over load of equals so that two KeyAllocatorContiguousRangeContraints
+        return True
+        :param other: another constraint
+        :return:
+        """
+        if not isinstance(other, KeyAllocatorContiguousRangeContraint):
+            return False
+        else:
+            return True
+
+    def __hash__(self):
+        """
+
+        :return:
+        """
+        return hash("Key allocator constraint to ensure "
+                    "that keys are not split")

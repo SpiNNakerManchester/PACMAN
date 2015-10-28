@@ -2,18 +2,14 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
-from pacman.model.abstract_classes.abstract_constrained_edge import \
-    AbstractConstrainedEdge
-
 
 @add_metaclass(ABCMeta)
-class AbstractPartitionedEdge(AbstractConstrainedEdge):
+class AbstractPartitionedEdge(object):
     """ Represents part of a division of an edge to match the division of the\
         vertices on either side of the edge
     """
 
-    def __init__(self, pre_subvertex, post_subvertex, constraints=None,
-                 label=None):
+    def __init__(self, pre_subvertex, post_subvertex, label=None):
         """
 
         :param pre_subvertex: the subvertex at the start of the subedge
@@ -29,9 +25,9 @@ class AbstractPartitionedEdge(AbstractConstrainedEdge):
         :type label: str
         :raise None: Raises no known exceptions
         """
-        AbstractConstrainedEdge.__init__(self, label, constraints)
         self._pre_subvertex = pre_subvertex
         self._post_subvertex = post_subvertex
+        self._label = label
 
     @abstractmethod
     def is_partitioned_edge(self):
@@ -61,28 +57,6 @@ class AbstractPartitionedEdge(AbstractConstrainedEdge):
         :raise None: Raises no known exceptions
         """
         return self._post_subvertex
-
-    @property
-    def constraints(self):
-        """ The constraints of the edge
-
-        :return: The constraints, or None if there are not constraints
-        :rtype: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        """
-        return self._constraints
-
-    def add_constraint(self, constraint):
-        """ Adds a constraint to the edge
-
-        :param constraint: The constraint to add
-        :type constraint:\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        """
-        if self._constraints is None:
-            self._constraints = list([constraint])
-        else:
-            self._constraints.append(constraint)
 
     @property
     def label(self):

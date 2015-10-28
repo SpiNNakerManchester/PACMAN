@@ -34,8 +34,7 @@ class FixedRoutePartitionableEdge(AbstractPartitionableEdge):
         """
         return True
 
-    def create_subedge(self, pre_subvertex, post_subvertex, label=None,
-                       constraints=None):
+    def create_subedge(self, pre_subvertex, post_subvertex, label=None):
         """
         method to create a fixed route partitioned edge from a fixed route
          partitionable edge
@@ -57,5 +56,4 @@ class FixedRoutePartitionableEdge(AbstractPartitionableEdge):
         if label is None and self.label is not None:
             label = self.label
 
-        return FixedRoutePartitionedEdge(pre_subvertex, post_subvertex, label,
-                                         constraints)
+        return FixedRoutePartitionedEdge(pre_subvertex, post_subvertex, label)

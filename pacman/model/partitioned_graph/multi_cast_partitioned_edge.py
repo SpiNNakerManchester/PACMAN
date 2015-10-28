@@ -7,8 +7,7 @@ class MultiCastPartitionedEdge(AbstractPartitionedEdge):
         vertices on either side of the edge
     """
 
-    def __init__(self, pre_subvertex, post_subvertex, label=None,
-                 constraints=None):
+    def __init__(self, pre_subvertex, post_subvertex, label=None):
         """
 
         :param pre_subvertex: the subvertex at the start of the subedge
@@ -25,7 +24,7 @@ class MultiCastPartitionedEdge(AbstractPartitionedEdge):
         :raise None: Raises no known exceptions
         """
         AbstractPartitionedEdge.__init__(self, pre_subvertex, post_subvertex,
-                                         constraints, label)
+                                         label)
 
     def is_partitioned_edge(self):
         """ helper method for is instance
