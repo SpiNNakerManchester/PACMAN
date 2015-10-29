@@ -55,35 +55,17 @@ class VertexBasedRoutingInfoAllocator(object):
         self._handle_application_space(
             bit_field_space, seen_fields, field_mapper, bit_field_space)
 
-        # set up values
-        for partition in subgraph.partitions:
-            for constraint in partition.constraints:
-                if isinstance(constraint, KeyAllocatorFixedFieldConstraint):
-                    pass
-                if isinstance(constraint, KeyAllocatorFlexiFieldConstraint):
-                    inputs = dict()
-                    for field in constraint.fields:
-                        if field.instance_value is not None:
-                            inputs[field.id] = field.instance_value
-                    bit_field_space(**inputs)
-
-                if isinstance(constraint, KeyAllocatorFixedMaskConstraint):
-                    pass
-                if isinstance(constraint,
-                              KeyAllocatorFixedKeyAndMaskConstraint):
-                    for key_and_mask in constraint.keys_and_masks:
-                        random_identifer = field_mapper[key_and_mask]
-                        # set the value for the field
-                        bit_field_space(random_identifer=key_and_mask.key)
-
-        # extract keys for each partition
+        # assgin fields to positions in the space. if shits going to hit the
+        # fan, its here
         bit_field_space.assign_fields()
 
         # create routing_info_allocator
         routing_info = RoutingInfo()
         routing_tables = MulticastRoutingTables()
 
+        # extract keys and masks for each edge from the bitfield
         for partition in subgraph.partitions:
+
             for edge in partition.edges:
                 sub_edge_info = SubedgeRoutingInfo("", edge)
                 routing_info.add_subedge_info(sub_edge_info)
@@ -122,7 +104,9 @@ class VertexBasedRoutingInfoAllocator(object):
                     top_level_bit_field.add_field(random_identifer, 31, 0)
                     field_mapper[key_and_mask] = random_identifer
                     # set the value for the field
-                    top_level_bit_field(random_identifer=key_and_mask.key)
+                    inputs = dict()
+                    inputs[random_identifer] = key_and_mask.key
+                    top_level_bit_field(**inputs)
             else:
                 self._handle_flexi_field_allocation(bit_field_space, field,
                                                     fields)
@@ -130,9 +114,22 @@ class VertexBasedRoutingInfoAllocator(object):
     def _handle_flexi_field_allocation(self, bit_field_space, field, fields):
         # field must be a flexi field, work accordingly
         bit_field_space.add_field(field)
-        for nested_fields in fields[field]:
-            self._handle_flexi_field_allocation(bit_field_space, nested_fields,
-                                                fields[field])
+        for field_instance in fields[field]:
+            # only carry on if theres more to create
+            if len(fields[field][field_instance]) > 0:
+                inputs = dict()
+                inputs[field] = field_instance
+                internal_bit_field = bit_field_space(**inputs)
+                for nested_field in fields[field][field_instance]:
+                    self._handle_flexi_field_allocation(
+                        internal_bit_field, nested_field,
+                        fields[field][field_instance])
+            if not isinstance(field_instance, int):
+                for value in range(field_instance[1], field_instance[0]):
+                    inputs = dict()
+                    inputs[field] = value - field_instance[1]
+                    bit_field_space(**inputs)
+
 
     @staticmethod
     def _convert_into_fields(entity):
@@ -207,17 +204,48 @@ class VertexBasedRoutingInfoAllocator(object):
                 if constraint_field.id == seen_field:
                     found_field = seen_field
 
-            # check for state
+            # seen the field before but not at this level. error
             if found_field is None and constraint_field in known_fields:
                 raise exceptions.PacmanConfigurationException(
                     "Cant find the field {} in the expected position"
                         .format(constraint_field))
+
+            # if not seen the field before
             if found_field is None and constraint_field.id not in known_fields:
-                current_level[constraint_field.id] = dict()
+                next_level = dict()
+                instance_level = dict()
+                current_level[constraint_field.id] = instance_level
+
+                if constraint_field.instance_value is not None:
+                    instance_level[constraint_field.instance_value] = next_level
+                else:
+                    instance_level[constraint_field.instance_range] = next_level
                 known_fields.append(constraint_field.id)
-                current_level = current_level[constraint_field.id]
+                current_level = next_level
+
+            # if found a field, check if its instance has indeed been put in
+            # before
             if found_field is not None:
-                current_level = current_level[constraint_field.id]
+                instances = current_level[constraint_field.id]
+                if (constraint_field.instance_value is not None
+                        and constraint_field.instance_value in instances):
+                    current_level = instances[constraint_field.instance_value]
+                elif (constraint_field.instance_value is not None
+                        and constraint_field.instance_value not in instances):
+                    next_level = dict()
+                    instance_level = dict()
+                    instances[constraint_field.instance_value] = instance_level
+                    instances[constraint_field.instance_value] = next_level
+                    current_level = next_level
+                elif (constraint_field.instance_range is not None
+                        and constraint_field.instance_range not in instances):
+                    next_level = dict()
+                    instance_level = dict()
+                    instances[constraint_field.instance_range] = instance_level
+                    instances[constraint_field.instance_range] = next_level
+                    current_level = next_level
+                else:
+                    current_level = instances[constraint_field.instance_range]
 
     def _determine_groups(self, subgraph, graph_mapper, partitionable_graph):
 
@@ -267,8 +295,10 @@ class VertexBasedRoutingInfoAllocator(object):
                                  instance_value=verts.index(vertex)))
 
         # subpop flexi field
-        fields.append(FlexiField(flexi_field_id="SubPopulation",
-                                 instance_value=subverts.index(subvert)))
+        fields.append(FlexiField(
+            flexi_field_id="SubPopulation{}"
+            .format(verts.index(vertex)),
+            instance_value=subverts.index(subvert)))
 
         fields.append(FlexiField(
             flexi_field_id="POP({}:{})Neurons"

@@ -33,12 +33,28 @@ class FlexiField(object):
         return self._instance_value
 
     @property
+    def instance_range_hi(self):
+        """
+
+        :return:
+        """
+        return self._instance_range_hi
+
+    @property
+    def instance_range_lo(self):
+        """
+
+        :return:
+        """
+        return self._instance_range_lo
+
+    @property
     def instance_range(self):
         """
 
         :return:
         """
-        return [self._instance_range_hi, self._instance_range_lo]
+        return (self.instance_range_hi, self._instance_range_lo)
 
     def __eq__(self, other):
         if not isinstance(other, FlexiField):
