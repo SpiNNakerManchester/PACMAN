@@ -10,8 +10,11 @@ from pacman.model.constraints.tag_allocator_constraints.\
 
 @add_metaclass(ABCMeta)
 class ReceiveBuffersToHostPartitionableVertex(object):
-    def __init__(self, buffering_output=False):
+    def __init__(
+            self, buffering_ip_address, buffering_port, buffering_output=False):
         self._buffering_output = buffering_output
+        self._buffering_ip_address = buffering_ip_address
+        self._buffering_port = buffering_port
 
     @property
     def buffering_output(self):
@@ -22,15 +25,13 @@ class ReceiveBuffersToHostPartitionableVertex(object):
             self._buffering_output = True
 
             # here I need to add the code to associate a tag to the vertex
-            notification_ip_address = None
-            notification_port = None
             board_address = None
             notification_tag = None
-            notification_strip_sdp = False
+            notification_strip_sdp = True
 
             self.add_constraint(
                 TagAllocatorRequireIptagConstraint(
-                    notification_ip_address, notification_port,
+                    self._buffering_ip_address, self._buffering_port,
                     notification_strip_sdp, board_address, notification_tag))
 
             # add placement constraint
