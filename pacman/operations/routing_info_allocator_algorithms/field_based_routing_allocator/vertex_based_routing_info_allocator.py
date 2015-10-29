@@ -1,7 +1,8 @@
 """
 
 """
-from pacman.model.constraints.key_allocator_constraints.key_allocator_contiguous_range_constraint import \
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_contiguous_range_constraint import \
     KeyAllocatorContiguousRangeContraint
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_field_constraint import \
@@ -20,6 +21,7 @@ from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.operations.routing_info_allocator_algorithms.\
     field_based_routing_allocator.rigs_bitfield import \
     RigsBitField
@@ -42,7 +44,8 @@ class VertexBasedRoutingInfoAllocator(object):
                  routing_paths):
 
         # ensure groups are stable and correct
-        self._determine_groups(subgraph, graph_mapper, partitionable_graph)
+        self._determine_groups(subgraph, graph_mapper, partitionable_graph,
+                               n_keys_map)
 
         # define the key space
         bit_field_space = RigsBitField(32)
@@ -65,9 +68,13 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # extract keys and masks for each edge from the bitfield
         for partition in subgraph.partitions:
+            # get keys and masks
+            keys_and_masks = self._discover_keys_and_masks(
+                partition, bit_field_space, n_keys_map)
 
+            # update routing info for each edge in the partition
             for edge in partition.edges:
-                sub_edge_info = SubedgeRoutingInfo("", edge)
+                sub_edge_info = SubedgeRoutingInfo(keys_and_masks, edge)
                 routing_info.add_subedge_info(sub_edge_info)
 
                 # update routing tables with entries
@@ -77,9 +84,93 @@ class VertexBasedRoutingInfoAllocator(object):
         return {'routing_infos': routing_info,
                 'routing_tables': routing_tables}
 
+    def _discover_keys_and_masks(self, partition, bit_field_space, n_keys_map):
+        keys_and_masks = list()
+        fixed_key_constraints = utility_calls.locate_constraints_of_type(
+            partition.constraints, KeyAllocatorFixedKeyAndMaskConstraint)
+        fixed_mask_constraints = utility_calls.locate_constraints_of_type(
+            partition.constraints, KeyAllocatorFixedMaskConstraint)
+        fixed_field_constraints = utility_calls.locate_constraints_of_type(
+            partition.constraints, KeyAllocatorFixedFieldConstraint)
+        flexi_field_constraints = utility_calls.locate_constraints_of_type(
+            partition.constraints, KeyAllocatorFlexiFieldConstraint)
+        continious_constraints = utility_calls.locate_constraints_of_type(
+            partition.constraints, KeyAllocatorContiguousRangeContraint)
+
+        if len(fixed_key_constraints) > 0:
+            pass
+        elif len(fixed_mask_constraints) > 0:
+            pass
+        elif len(fixed_field_constraints) > 0:
+            pass
+        elif len(flexi_field_constraints) > 0:
+            inputs = dict()
+            range_based_flexi_fields = list()
+            for field in flexi_field_constraints[0].fields:
+                if field.instance_value is not None:
+                    inputs[field.id] = field.instance_value
+                else:
+                    range_based_flexi_fields.append(field)
+            if len(range_based_flexi_fields) != 0:
+                mask = bit_field_space(**inputs).get_mask()
+                keys_and_masks = self._handle_recursive_range_fields(
+                    range_based_flexi_fields, bit_field_space,
+                    keys_and_masks, inputs, 0)
+                if len(continious_constraints) != 0:
+                    are_continious = \
+                        self._check_keys_are_continious(keys_and_masks)
+                    if not are_continious:
+                        raise exceptions.PacmanConfigurationException(
+                            "These keys returned from the bitfield are"
+                            "not continous. Therefore cannot be used")
+                    result = list()
+                    result.append(keys_and_masks[0])
+                return result
+            else:
+                key = bit_field_space(**inputs).get_value()
+                mask = bit_field_space(**inputs).get_mask()
+                keys_and_masks.append(BaseKeyAndMask(key, mask))
+                return keys_and_masks
+
+        else:
+            raise exceptions.PacmanConfigurationException(
+                "Cant figure out what to do with a partition with no "
+                "constraints. exploded.")
+
+        return keys_and_masks
+
+    @staticmethod
+    def _check_keys_are_continious(keys_and_masks):
+        last_key = None
+        for keys_and_mask in keys_and_masks:
+            if last_key is None:
+                last_key = keys_and_mask.key
+            else:
+                if last_key + 1 != keys_and_mask.key:
+                    return False
+                last_key = keys_and_mask.key
+        return True
+
+    def _handle_recursive_range_fields(
+            self, range_based_flexi_fields, bit_field_space, keys_and_masks,
+            inputs, position):
+
+        for value in range(0,
+                           range_based_flexi_fields[position].instance_n_keys):
+            inputs[range_based_flexi_fields[position].id] = value
+            if position < len(range_based_flexi_fields):
+                key = bit_field_space(**inputs).get_value()
+                mask = bit_field_space(**inputs).get_mask()
+                keys_and_masks.append(BaseKeyAndMask(key, mask))
+            else:
+                position += 1
+                keys_and_masks.extend(self._handle_recursive_range_fields(
+                    range_based_flexi_fields, bit_field_space, keys_and_masks,
+                    inputs, position))
+        return keys_and_masks
+
     def _handle_application_space(
-            self, bit_field_space, fields, field_mapper,
-            top_level_bit_field):
+            self, bit_field_space, fields, field_mapper, top_level_bit_field):
 
         for field in fields:
             if field == "FIXED_MASK":
@@ -118,16 +209,16 @@ class VertexBasedRoutingInfoAllocator(object):
             # only carry on if theres more to create
             if len(fields[field][field_instance]) > 0:
                 inputs = dict()
-                inputs[field] = field_instance
+                inputs[field] = field_instance.instance_value
                 internal_bit_field = bit_field_space(**inputs)
                 for nested_field in fields[field][field_instance]:
                     self._handle_flexi_field_allocation(
                         internal_bit_field, nested_field,
                         fields[field][field_instance])
-            if not isinstance(field_instance, int):
-                for value in range(field_instance[1], field_instance[0]):
+            if field_instance.instance_n_keys is not None:
+                for value in range(0, field_instance.instance_n_keys):
                     inputs = dict()
-                    inputs[field] = value - field_instance[1]
+                    inputs[field] = value
                     bit_field_space(**inputs)
 
 
@@ -215,11 +306,7 @@ class VertexBasedRoutingInfoAllocator(object):
                 next_level = dict()
                 instance_level = dict()
                 current_level[constraint_field.id] = instance_level
-
-                if constraint_field.instance_value is not None:
-                    instance_level[constraint_field.instance_value] = next_level
-                else:
-                    instance_level[constraint_field.instance_range] = next_level
+                instance_level[constraint_field] = next_level
                 known_fields.append(constraint_field.id)
                 current_level = next_level
 
@@ -227,27 +314,17 @@ class VertexBasedRoutingInfoAllocator(object):
             # before
             if found_field is not None:
                 instances = current_level[constraint_field.id]
-                if (constraint_field.instance_value is not None
-                        and constraint_field.instance_value in instances):
-                    current_level = instances[constraint_field.instance_value]
-                elif (constraint_field.instance_value is not None
-                        and constraint_field.instance_value not in instances):
+                if constraint_field in instances:
+                    current_level = instances[constraint_field]
+                elif constraint_field.instance_value not in instances:
                     next_level = dict()
                     instance_level = dict()
-                    instances[constraint_field.instance_value] = instance_level
-                    instances[constraint_field.instance_value] = next_level
+                    instances[constraint_field] = instance_level
+                    instances[constraint_field] = next_level
                     current_level = next_level
-                elif (constraint_field.instance_range is not None
-                        and constraint_field.instance_range not in instances):
-                    next_level = dict()
-                    instance_level = dict()
-                    instances[constraint_field.instance_range] = instance_level
-                    instances[constraint_field.instance_range] = next_level
-                    current_level = next_level
-                else:
-                    current_level = instances[constraint_field.instance_range]
 
-    def _determine_groups(self, subgraph, graph_mapper, partitionable_graph):
+    def _determine_groups(self, subgraph, graph_mapper, partitionable_graph,
+                          n_keys_map):
 
         routing_info_allocator_utilities.check_types_of_edge_constraint(
             subgraph)
@@ -270,10 +347,11 @@ class VertexBasedRoutingInfoAllocator(object):
                     and len(fixed_mask_constraints) == 0
                     and len(fixed_field_constraints) == 0):
                 self._add_field_constraints(
-                    partition, graph_mapper, partitionable_graph)
+                    partition, graph_mapper, partitionable_graph, n_keys_map)
 
     @staticmethod
-    def _add_field_constraints(partition, graph_mapper, partitionable_graph):
+    def _add_field_constraints(partition, graph_mapper, partitionable_graph,
+                               n_keys_map):
         """
         searches though the subgraph adding field constraints for the key
          allocator
@@ -301,9 +379,10 @@ class VertexBasedRoutingInfoAllocator(object):
             instance_value=subverts.index(subvert)))
 
         fields.append(FlexiField(
-            flexi_field_id="POP({}:{})Neurons"
+            flexi_field_id="POP({}:{})Keys"
             .format(verts.index(vertex), subverts.index(subvert)),
-            instance_range=graph_mapper.get_subvertex_slice(subvert)))
+            instance_n_keys=n_keys_map.n_keys_for_partitioned_edge(
+                partition.edges[0])))
 
         # add constraint to the subedge
         partition.add_constraint(KeyAllocatorFlexiFieldConstraint(fields))
