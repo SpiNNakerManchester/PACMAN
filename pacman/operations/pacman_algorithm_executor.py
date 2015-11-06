@@ -76,18 +76,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         # dedeuce if the algoruthms are internal or external
         algorithms_names = self._algorithms
-        algorithm_strings = algorithms.split(",")
-        for algorithm_string in algorithm_strings:
-            split_string = algorithm_string.split(":")
-            if len(split_string) == 1:
-                algorithms_names.append(split_string[0])
-            else:
-                raise exceptions.PacmanConfigurationException(
-                    "The tool chain expects config params of list of 1 "
-                    "element with ,. Where the elements are either: the "
-                    "algorithum_name:algorithm_config_file_path, or "
-                    "algorithum_name if its a interal to pacman algorithm."
-                    " Please rectify this and try again")
+        algorithms_names.extend(algorithms)
 
         # set up xml reader for standard pacman algorithums xml file reader
         # (used in decode_algorithm_data_objects func)
