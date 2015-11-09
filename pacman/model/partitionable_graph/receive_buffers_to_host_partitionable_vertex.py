@@ -10,21 +10,51 @@ from pacman.model.constraints.tag_allocator_constraints.\
 
 @add_metaclass(ABCMeta)
 class ReceiveBuffersToHostPartitionableVertex(object):
+    """
+    This class stores the information required to activate the buffering
+    output functionality for a vertex
+    """
     def __init__(
             self, buffering_ip_address, buffering_port, buffering_output=False):
+        """
+
+        :param buffering_ip_address: IP address of the host which supports
+        the buffering output functionality
+        :type buffering_ip_address: string
+        :param buffering_port: UDP port of the host which supports
+        the buffering output functionality
+        :type buffering_port: int
+        :param buffering_output: boolean indicating if the buffering output
+        functionality is activated
+        :param buffering_output: bool
+        :return: None
+        :rtype: None
+        """
         self._buffering_output = buffering_output
         self._buffering_ip_address = buffering_ip_address
         self._buffering_port = buffering_port
 
     @property
     def buffering_output(self):
+        """
+        Returns true if the output buffering mechanism is activated
+
+        :return: Boolean indicating whether the output buffering mechanism
+        is activated
+        :rtype: bool
+        """
         return self._buffering_output
 
     def set_buffering_output(self):
+        """
+        Activates the output buffering mechanism
+
+        :return: None
+        :rtype: None
+        """
         if not self._buffering_output:
             self._buffering_output = True
 
-            # here I need to add the code to associate a tag to the vertex
             board_address = None
             notification_tag = None
             notification_strip_sdp = True
