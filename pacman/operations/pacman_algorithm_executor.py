@@ -76,18 +76,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         # dedeuce if the algoruthms are internal or external
         algorithms_names = self._algorithms
-        algorithm_strings = algorithms.split(",")
-        for algorithm_string in algorithm_strings:
-            split_string = algorithm_string.split(":")
-            if len(split_string) == 1:
-                algorithms_names.append(split_string[0])
-            else:
-                raise exceptions.PacmanConfigurationException(
-                    "The tool chain expects config params of list of 1 element"
-                    "with ,. Where the elements are either: the "
-                    "algorithum_name:algorithm_config_file_path, or "
-                    "algorithum_name if its a interal to pacman algorithm. "
-                    "Please rectify this and try again")
+        algorithms_names.extend(algorithms)
 
         # set up xml reader for standard pacman algorithums xml file reader
         # (used in decode_algorithm_data_objects func)
@@ -172,12 +161,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
                     raise exceptions.PacmanConfigurationException(
                         "I was not able to deduce a future algortihm to use as"
-                        "I only have the inputs {} and am missing the outputs "
-                        "{} from the requirements of the end user. The only"
-                        " avilable functions are {}, after I have ran "
-                        "functions {}. Please add a algorithm(s) "
-                        "which uses the defined inputs and generates the "
-                        "required outputs and rerun me. Thanks"
+                        "I only have the inputs \n{} \n and am missing the "
+                        "outputs \n {} \n from the requirements of the end "
+                        "user. The only avilable functions are \n {} \n, "
+                        "after I have ran functions \n {}\n. Please add a "
+                        "algorithm(s) which uses the defined inputs and "
+                        "generates the required outputs and rerun me. Thanks"
                         .format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
