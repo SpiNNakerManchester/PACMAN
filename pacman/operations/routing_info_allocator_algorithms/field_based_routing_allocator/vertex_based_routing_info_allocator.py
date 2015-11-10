@@ -32,7 +32,7 @@ from pacman import exceptions
 
 import uuid
 
-from pacman.utilities.utility_objs.flexi_field import FlexiField
+from pacman.utilities.utility_objs.flexi_field import FlexiField, SUPPORTED_TAGS
 
 
 class VertexBasedRoutingInfoAllocator(object):
@@ -112,7 +112,6 @@ class VertexBasedRoutingInfoAllocator(object):
                 else:
                     range_based_flexi_fields.append(field)
             if len(range_based_flexi_fields) != 0:
-                mask = bit_field_space(**inputs).get_mask()
                 keys_and_masks = self._handle_recursive_range_fields(
                     range_based_flexi_fields, bit_field_space,
                     keys_and_masks, inputs, 0)
@@ -159,8 +158,10 @@ class VertexBasedRoutingInfoAllocator(object):
                            range_based_flexi_fields[position].instance_n_keys):
             inputs[range_based_flexi_fields[position].id] = value
             if position < len(range_based_flexi_fields):
-                key = bit_field_space(**inputs).get_value()
-                mask = bit_field_space(**inputs).get_mask()
+                key = bit_field_space(**inputs).get_value(
+                    tag=SUPPORTED_TAGS.APPLICATION.name)
+                mask = bit_field_space(**inputs).get_mask(
+                    tag=SUPPORTED_TAGS.ROUTING.name)
                 keys_and_masks.append(BaseKeyAndMask(key, mask))
             else:
                 position += 1
@@ -204,7 +205,12 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _handle_flexi_field_allocation(self, bit_field_space, field, fields):
         # field must be a flexi field, work accordingly
-        bit_field_space.add_field(field)
+        example_entry = self._check_entries_are_tag_consistent(fields, field)
+        if example_entry.tag is None:
+            bit_field_space.add_field(field)
+        else:
+            bit_field_space.add_field(field, tags=example_entry.tag)
+
         for field_instance in fields[field]:
             # only carry on if theres more to create
             if len(fields[field][field_instance]) > 0:
@@ -220,6 +226,19 @@ class VertexBasedRoutingInfoAllocator(object):
                     inputs = dict()
                     inputs[field] = value
                     bit_field_space(**inputs)
+
+    @staticmethod
+    def _check_entries_are_tag_consistent(fields, field):
+        first = None
+        for field_instance in fields[field]:
+            if first is None:
+                first = field_instance
+            elif field_instance.tag != first.tag:
+                raise exceptions.PacmanConfigurationException(
+                    "Two fields with the same id, but with different tags. "
+                    "This is deemed an error and therefore please fix before"
+                    "trying again. thanks you")
+        return first
 
 
     @staticmethod
@@ -370,17 +389,19 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # pop based flexi field
         fields.append(FlexiField(flexi_field_id="Population",
-                                 instance_value=verts.index(vertex)))
+                                 instance_value=verts.index(vertex),
+                                 tag=SUPPORTED_TAGS.ROUTING.name))
 
         # subpop flexi field
         fields.append(FlexiField(
-            flexi_field_id="SubPopulation{}"
-            .format(verts.index(vertex)),
+            flexi_field_id="SubPopulation{}".format(verts.index(vertex)),
+            tag=SUPPORTED_TAGS.ROUTING.name,
             instance_value=subverts.index(subvert)))
 
         fields.append(FlexiField(
             flexi_field_id="POP({}:{})Keys"
             .format(verts.index(vertex), subverts.index(subvert)),
+            tag=SUPPORTED_TAGS.APPLICATION.name,
             instance_n_keys=n_keys_map.n_keys_for_partitioned_edge(
                 partition.edges[0])))
 
