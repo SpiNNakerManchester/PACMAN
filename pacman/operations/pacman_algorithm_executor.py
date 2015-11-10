@@ -161,12 +161,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
                     raise exceptions.PacmanConfigurationException(
                         "I was not able to deduce a future algortihm to use as"
-                        "I only have the inputs {} and am missing the outputs "
-                        "{} from the requirements of the end user. The only"
-                        " avilable functions are {}, after I have ran "
-                        "functions {}. Please add a algorithm(s) "
-                        "which uses the defined inputs and generates the "
-                        "required outputs and rerun me. Thanks"
+                        "I only have the inputs \n{} \n and am missing the "
+                        "outputs \n {} \n from the requirements of the end "
+                        "user. The only avilable functions are \n {} \n, "
+                        "after I have ran functions \n {}\n. Please add a "
+                        "algorithm(s) which uses the defined inputs and "
+                        "generates the required outputs and rerun me. Thanks"
                         .format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
