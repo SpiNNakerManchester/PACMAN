@@ -140,6 +140,7 @@ class PacmanNotExistException(PacmanException):
         """
         PacmanException.__init__(self, problem)
 
+
 class PacmanAlgorithmFailedToCompleteException(PacmanException):
     """ An exception that indicates that a pacman algorithm ran from outside the
     software stack has failed to complete for some unknown reason.

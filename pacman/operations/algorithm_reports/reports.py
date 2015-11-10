@@ -2,8 +2,6 @@ import os
 import time
 import logging
 
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
-    import MultiCastPartitionableEdge
 from pacman.model.placements import placement
 from pacman import exceptions
 
@@ -15,14 +13,16 @@ logger = logging.getLogger(__name__)
 def tag_allocator_report(report_folder, tag_infos):
     pass
 
+
 def placer_reports_with_partitionable_graph(
         report_folder, hostname, graph, graph_mapper, placements, machine):
-    """
-    reports producable from placement given a partitionable graph's existence
+    """ Reports that can be produced from placement given a partitionable\
+        graph's existence
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param graph: the partitionable graph to which placements were built
-    :param graph_mapper: the mapping between partitionable and partitioned graphs
+    :param graph_mapper: the mapping between partitionable and partitioned \
+                graphs
     :param placements: the placements objects built by the placer.
     :param machine: the python spinnmanchine object
     :return None
@@ -34,10 +34,10 @@ def placer_reports_with_partitionable_graph(
     sdram_usage_report_per_chip(
         report_folder, hostname, placements, machine)
 
+
 def placer_reports_without_partitionable_graph(
         report_folder, hostname, sub_graph, placements, machine):
     """
-    reports producable from placement given a partitionable graph's existence
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machiens hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
@@ -54,12 +54,12 @@ def placer_reports_without_partitionable_graph(
         report_folder, hostname, placements, machine)
 
 
-
 def router_reports(report_folder, routing_paths, hostname):
     router_report_from_paths(report_folder, routing_paths, hostname)
 
 
-def routing_info_reports(report_folder, subgraph, routing_infos, routing_tables):
+def routing_info_reports(
+        report_folder, subgraph, routing_infos, routing_tables):
     routing_info_report(report_folder, subgraph, routing_infos)
     router_report_from_router_tables(report_folder, routing_tables)
 
@@ -98,8 +98,8 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
     link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
 
     for e in routing_paths.all_subedges():
-        text = "**** SubEdge '{}', from vertex: '{}' to vertex: '{}'"\
-                 .format(e.label, e.pre_subvertex.label, e.post_subvertex.label)
+        text = "**** SubEdge '{}', from vertex: '{}' to vertex: '{}'".format(
+            e.label, e.pre_subvertex.label, e.post_subvertex.label)
         f_routing.write(text)
         f_routing.write("\n")
 
@@ -523,7 +523,6 @@ def routing_info_report(report_folder, subgraph, routing_infos):
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
 
-    partitioned_vertices = sorted(subgraph.subvertices, key=lambda x: x.label)
     for subvert in subgraph.subvertices:
         output.write("Subvert: {} \n".format(subvert))
         outgoing_subedges = subgraph.outgoing_subedges_from_subvertex(subvert)
@@ -638,7 +637,8 @@ def _get_associated_routing_entries_from(
     key_combo = routing_data.key_combo
     mask = routing_data.mask
     destinations = \
-        routing_table.get_multicast_routing_entry_by_routing_entry_key(key_combo, mask)
+        routing_table.get_multicast_routing_entry_by_routing_entry_key(
+            key_combo, mask)
 
     if fr_placement.x == to_placement.x and fr_placement.y == to_placement.y:
 

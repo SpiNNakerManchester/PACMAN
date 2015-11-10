@@ -38,14 +38,11 @@ import jsonschema
 
 
 class CreateConstraintsToFile(object):
-    """
-     creates constraitns file from the machine adn partitioend graph
+    """ Creates constraints file from the machine and partitioned graph
     """
 
     def __call__(self, partitioned_graph, machine, file_path):
         """
-        tqakes a partitioned graph, machine and file path and creates a
-        constraints.json file
         :param partitioned_graph: the partitioned graph
         :param machine: the machine
         :return:
@@ -100,8 +97,6 @@ class CreateConstraintsToFile(object):
         for edge in partitioned_graph.subedges:
             for constraint in edge.constraints:
                 progress_bar.update()
-                #self._handle_edge_constraint(
-                #    constraint, json_constraints_dictory_rep, edge
 
     def _handle_virtual_vertex(self, vertex, json_constraints_dictory_rep,
                                machine):
@@ -122,8 +117,8 @@ class CreateConstraintsToFile(object):
 
     @staticmethod
     def _locate_connected_chip_data(vertex, machine):
-        """
-        searches and fnds the connected virutal chip
+        """ Finds the connected virtual chip
+
         :param vertex:
         :param machine:
         :return:
@@ -153,16 +148,16 @@ class CreateConstraintsToFile(object):
     def _handle_vertex_constraint(
             constraint, json_constraints_dictory_rep, vertex):
         if not isinstance(vertex, AbstractVirtualVertex):
-            if (isinstance(constraint, AbstractPlacerConstraint)
-                    and not isinstance(constraint,
-                                       AbstractTagAllocatorConstraint)):
+            if (isinstance(constraint, AbstractPlacerConstraint) and
+                    not isinstance(constraint,
+                                   AbstractTagAllocatorConstraint)):
                 chip_loc_constraint = dict()
                 chip_loc_constraint['type'] = "location"
                 chip_loc_constraint['vertex'] = str(id(vertex))
                 chip_loc_constraint['location'] = [constraint.x, constraint.y]
                 json_constraints_dictory_rep.append(chip_loc_constraint)
-            if (isinstance(constraint, PlacerChipAndCoreConstraint)
-                    and constraint.p is not None):
+            if (isinstance(constraint, PlacerChipAndCoreConstraint) and
+                    constraint.p is not None):
                 chip_loc_constraint = dict()
                 chip_loc_constraint['type'] = "resource"
                 chip_loc_constraint['vertex'] = str(id(vertex))
@@ -187,7 +182,7 @@ class CreateConstraintsToFile(object):
                     "Converter does not regonsise this tag constraint."
                     "Please update this algorithum and try again.")
             json_constraints_dictory_rep.append(tag_constraint)
-                    
+
     @staticmethod
     def _handle_edge_constraint(
             constraint, json_constraints_dictory_rep, edge):

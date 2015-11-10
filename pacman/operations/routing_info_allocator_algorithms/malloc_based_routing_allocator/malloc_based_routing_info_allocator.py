@@ -1,6 +1,3 @@
-"""
-MallocBasedRoutingInfoAllocator
-"""
 
 # pacman imports
 from pacman.model.constraints.abstract_constraints\
@@ -9,9 +6,6 @@ from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
-from pacman.model.data_request_interfaces.\
-    abstract_requires_routing_info_partitioned_vertex import \
-    RequiresRoutingInfoPartitionedVertex
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
@@ -59,7 +53,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         routing_tables = MulticastRoutingTables()
-        
+
         # Get the partitioned edges grouped by those that require the same key
         same_key_groups = \
             routing_info_allocator_utilities.get_edge_groups(subgraph)

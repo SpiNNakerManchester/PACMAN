@@ -4,7 +4,7 @@ object RoutingInfo
 
 # pacman imports
 from pacman import exceptions
-from pacman.utilities import utility_calls
+
 
 class RoutingInfo(object):
     """ An association of a set of subedges to a non-overlapping set of keys\

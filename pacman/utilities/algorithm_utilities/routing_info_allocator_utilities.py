@@ -34,9 +34,9 @@ def get_edge_groups(partitioned_graph):
         outgoing_edge_partitions = \
             partitioned_graph.outgoing_edges_partitions_from_vertex(
                 partitioned_vertex)
-        for partition_identifer in outgoing_edge_partitions:
+        for partition_identifier in outgoing_edge_partitions:
             same_key_groups.append(
-                outgoing_edge_partitions[partition_identifer].edges)
+                outgoing_edge_partitions[partition_identifier].edges)
     return same_key_groups
 
 
@@ -132,19 +132,22 @@ def get_fixed_key_and_mask(same_key_group):
 
 
 def add_routing_key_entries(
-        routing_paths, subedge_routing_info, out_going_subedge, routing_tables):
+        routing_paths, subedge_routing_info, out_going_subedge,
+        routing_tables):
     """
     creates and adds entries for routing tables as required for the path
-    :param routing_paths: the routing paths object generated from
-    routing info
+    :param routing_paths: the routing paths object generated from routing info
     :param subedge_routing_info: the subedge info object that contains keys
     :param out_going_subedge: the edge this is aossicated with
     :param routing_tables: the routing tables to adjust
     :return: None
     """
     path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
-    # iterate thoguh the entries in each path, adding a router entry if required
+
+    # iterate thoguh the entries in each path, adding a router entry if
+    # required
     for path_entry in path_entries:
+
         # locate the router
         router = routing_tables.get_routing_table_for_chip(
             path_entry.router_x, path_entry.router_y)

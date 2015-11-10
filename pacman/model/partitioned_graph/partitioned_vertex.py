@@ -8,7 +8,7 @@ class PartitionedVertex(AbstractConstrainedVertex):
 
     def __init__(self, resources_required, label, constraints=None):
         """
-        :param resources_required: The approximate resources needed for
+        :param resources_required: The approximate resources needed for\
                                    the vertex
         :type resources_required:
         :py:class:`pacman.models.resources.resource_container.ResourceContainer`
@@ -30,8 +30,8 @@ class PartitionedVertex(AbstractConstrainedVertex):
         """The resources that vertex requires
 
         :return: The resources required by the vertex
-        :rtype:
-        :py:class:`pacman.models.resources.resource_container.ResourceContainer`
+        :rtype:\
+                    :py:class:`pacman.models.resources.resource_container.ResourceContainer`
         :raise None: Raises no known exceptions
         """
         return self._resources_required
