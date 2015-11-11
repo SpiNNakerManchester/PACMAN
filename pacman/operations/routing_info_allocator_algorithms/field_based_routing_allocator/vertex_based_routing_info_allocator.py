@@ -85,7 +85,8 @@ class VertexBasedRoutingInfoAllocator(object):
                 'routing_tables': routing_tables}
 
     def _discover_keys_and_masks(self, partition, bit_field_space, n_keys_map):
-        keys_and_masks = list()
+        routing_keys_and_masks = list()
+        application_keys_and_masks = list()
         fixed_key_constraints = utility_calls.locate_constraints_of_type(
             partition.constraints, KeyAllocatorFixedKeyAndMaskConstraint)
         fixed_mask_constraints = utility_calls.locate_constraints_of_type(
@@ -98,11 +99,11 @@ class VertexBasedRoutingInfoAllocator(object):
             partition.constraints, KeyAllocatorContiguousRangeContraint)
 
         if len(fixed_key_constraints) > 0:
-            pass
+            print "ah"
         elif len(fixed_mask_constraints) > 0:
-            pass
+            print "ah2"
         elif len(fixed_field_constraints) > 0:
-            pass
+            print "ah3"
         elif len(flexi_field_constraints) > 0:
             inputs = dict()
             range_based_flexi_fields = list()
@@ -112,31 +113,33 @@ class VertexBasedRoutingInfoAllocator(object):
                 else:
                     range_based_flexi_fields.append(field)
             if len(range_based_flexi_fields) != 0:
-                keys_and_masks = self._handle_recursive_range_fields(
-                    range_based_flexi_fields, bit_field_space,
-                    keys_and_masks, inputs, 0)
+                routing_keys_and_masks, application_keys_and_masks = \
+                    self._handle_recursive_range_fields(
+                        range_based_flexi_fields, bit_field_space,
+                        routing_keys_and_masks, application_keys_and_masks,
+                        inputs, 0)
                 if len(continious_constraints) != 0:
-                    are_continious = \
-                        self._check_keys_are_continious(keys_and_masks)
+                    are_continious = self._check_keys_are_continious(
+                        application_keys_and_masks)
                     if not are_continious:
                         raise exceptions.PacmanConfigurationException(
                             "These keys returned from the bitfield are"
                             "not continous. Therefore cannot be used")
                     result = list()
-                    result.append(keys_and_masks[0])
+                    result.append(routing_keys_and_masks[0])
                 return result
             else:
                 key = bit_field_space(**inputs).get_value()
                 mask = bit_field_space(**inputs).get_mask()
-                keys_and_masks.append(BaseKeyAndMask(key, mask))
-                return keys_and_masks
+                routing_keys_and_masks.append(BaseKeyAndMask(key, mask))
+                return routing_keys_and_masks
 
         else:
             raise exceptions.PacmanConfigurationException(
                 "Cant figure out what to do with a partition with no "
                 "constraints. exploded.")
 
-        return keys_and_masks
+        return routing_keys_and_masks
 
     @staticmethod
     def _check_keys_are_continious(keys_and_masks):
@@ -151,24 +154,42 @@ class VertexBasedRoutingInfoAllocator(object):
         return True
 
     def _handle_recursive_range_fields(
-            self, range_based_flexi_fields, bit_field_space, keys_and_masks,
-            inputs, position):
+            self, range_based_flexi_fields, bit_field_space,
+            routing_keys_and_masks, application_keys_and_masks, inputs,
+            position):
 
         for value in range(0,
                            range_based_flexi_fields[position].instance_n_keys):
             inputs[range_based_flexi_fields[position].id] = value
             if position < len(range_based_flexi_fields):
-                key = bit_field_space(**inputs).get_value(
-                    tag=SUPPORTED_TAGS.APPLICATION.name)
-                mask = bit_field_space(**inputs).get_mask(
+                # routing keys and masks
+                routing_key = bit_field_space(**inputs).get_value(
                     tag=SUPPORTED_TAGS.ROUTING.name)
-                keys_and_masks.append(BaseKeyAndMask(key, mask))
+                routing_mask = bit_field_space(**inputs).get_mask(
+                    tag=SUPPORTED_TAGS.ROUTING.name)
+                routing_keys_and_masks.append(BaseKeyAndMask(routing_key,
+                                                             routing_mask))
+
+                # application keys and masks
+                application_key = bit_field_space(**inputs).get_value(
+                    tag=SUPPORTED_TAGS.APPLICATION.name)
+                application_mask = bit_field_space(**inputs).get_mask(
+                    tag=SUPPORTED_TAGS.APPLICATION.name)
+                application_keys_and_masks.append(BaseKeyAndMask(
+                    application_key, application_mask))
             else:
                 position += 1
-                keys_and_masks.extend(self._handle_recursive_range_fields(
-                    range_based_flexi_fields, bit_field_space, keys_and_masks,
-                    inputs, position))
-        return keys_and_masks
+                other_routing_keys_and_masks, \
+                    other_application_keys_and_masks = \
+                    self._handle_recursive_range_fields(
+                        range_based_flexi_fields, bit_field_space,
+                        routing_keys_and_masks, application_keys_and_masks,
+                        inputs, position)
+
+                routing_keys_and_masks.extend(other_routing_keys_and_masks)
+                application_keys_and_masks.extend(
+                    other_application_keys_and_masks)
+        return routing_keys_and_masks, application_keys_and_masks
 
     def _handle_application_space(
             self, bit_field_space, fields, field_mapper, top_level_bit_field):
