@@ -1,6 +1,3 @@
-"""
-RadialPlacer
-"""
 
 # pacamn imports
 from pacman.model.constraints.placer_constraints\

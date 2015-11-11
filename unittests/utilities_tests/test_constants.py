@@ -1,5 +1,5 @@
 import unittest
-import spynnaker.pyNN.utilities.constants as constants
+from pacman.utilities import constants
 
 
 class TestConstants(unittest.TestCase):

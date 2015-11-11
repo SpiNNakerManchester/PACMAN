@@ -1,7 +1,3 @@
-"""
-ConvertToMemoryPlacements:  takes the fileplacemenmts, machine,
-    partitioned graph and constraints and builds a memory placements object
-"""
 
 # pacman imports
 from pacman.model.placements.placement import Placement
@@ -17,9 +13,8 @@ import jsonschema
 
 
 class ConvertToMemoryPlacements(object):
-    """
-    ConvertToMemoryPlacements: takes the fileplacemenmts, machine,
-    partitioned graph and constraints and builds a memory placements object
+    """ Takes the file-based placements, machine, partitioned graph and\
+        constraints and builds a memory placements object
     """
 
     def __call__(self, placements, allocations, partitioned_graph,
@@ -84,8 +79,8 @@ class ConvertToMemoryPlacements(object):
                             None))
                     else:
                         raise exceptions.PacmanConfigurationException(
-                            "I dont recongise this pattern of constraints for a"
-                            "vertex which does not have a placement")
+                            "I don't recognise this pattern of constraints for"
+                            " a vertex which does not have a placement")
             else:
                 if subvertex is None:
                     raise exceptions.PacmanConfigurationException(
@@ -135,8 +130,8 @@ class ConvertToMemoryPlacements(object):
                 found_placement_constraint = constraint
             if constraint['type'] == "route_endpoint":
                 found_route_end_point = constraint
-        if (found_placement_constraint is not None
-                and found_route_end_point is not None):
+        if (found_placement_constraint is not None and
+                found_route_end_point is not None):
             return {'end_point': found_route_end_point,
                     'placement': found_placement_constraint}
         else:

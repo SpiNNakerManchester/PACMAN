@@ -17,8 +17,7 @@ ROUTER_HOMOGENIOUS_ENTRIES = 1024
 
 
 class ConvertToFileMachine(object):
-    """
-    converter from memory machien to file machine
+    """ Converter from memory machine to file machine
     """
 
     def __call__(self, machine, file_path):
@@ -44,7 +43,7 @@ class ConvertToFileMachine(object):
             ROUTER_HOMOGENIOUS_ENTRIES
         json_dictory_rep['chip_resources']['tags'] = CHIP_HOMOGENIOUS_TAGS
 
-        # handel exceptions
+        # handle exceptions
         json_dictory_rep['dead_chips'] = list()
         json_dictory_rep['dead_links'] = list()
         chip_resource_exceptions = defaultdict()
@@ -52,8 +51,8 @@ class ConvertToFileMachine(object):
         # write dead chips
         for x_coord in range(0, machine.max_chip_x + 1):
             for y_coord in range(0, machine.max_chip_y + 1):
-                if (not machine.is_chip_at(x_coord, y_coord)
-                        or machine.get_chip_at(x_coord, y_coord).virtual):
+                if (not machine.is_chip_at(x_coord, y_coord) or
+                        machine.get_chip_at(x_coord, y_coord).virtual):
                     json_dictory_rep['dead_chips'].append([x_coord, y_coord])
                 else:
                     # write dead links
@@ -90,7 +89,6 @@ class ConvertToFileMachine(object):
         )
         file_to_read = open(machine_schema_file_path, "r")
         machine_schema = json.load(file_to_read)
-
         jsonschema.validate(
             json_dictory_rep, machine_schema)
 
@@ -116,6 +114,7 @@ class ConvertToFileMachine(object):
         no_processors = CHIP_HOMOGENIOUS_CORES
         if (not machine.get_chip_at(x_coord, y_coord).
                 is_processor_with_id(no_processors - 1)):
+
             # locate the highest core id
             has_processor = False
             while not has_processor and no_processors > 0:
