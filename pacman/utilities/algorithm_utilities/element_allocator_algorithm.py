@@ -14,9 +14,8 @@ import math
 
 @add_metaclass(ABCMeta)
 class ElementAllocatorAlgorithm(object):
-    """
-    abstract element allocator algorithm which allocates elements from
-    a base place for a number of elements
+    """ Abstract element allocator algorithm which allocates elements from\
+        a pool of a given size
     """
 
     def __init__(self, size_begin, size_end):
@@ -28,8 +27,8 @@ class ElementAllocatorAlgorithm(object):
 
         :param base_element_id: the first element id to allocate
         :param n_elements: the number of elements to allocate
-        :raises: PacmanRouteInfoAllocationException when the element id
-         cannot be assigned with the given number of elements
+        :raises: PacmanRouteInfoAllocationException when the element id\
+                    cannot be assigned with the given number of elements
         """
 
         index = self._find_slot(base_element_id)
@@ -42,9 +41,8 @@ class ElementAllocatorAlgorithm(object):
         self._do_allocation(index, base_element_id, n_elements)
 
     def _find_slot(self, base_element_id, lo=0):
-        """ Find the free slot with the closest
-         base element id  <= base element using a binary
-            search
+        """ Find the free slot with the closest\
+            base element id  <= base element using a binary search
         """
         hi = len(self._free_space_tracker) - 1
         while lo < hi:
@@ -63,14 +61,14 @@ class ElementAllocatorAlgorithm(object):
         return lo
 
     def _do_allocation(self, index, base_element_id, n_elements):
-        """ Allocate a given base element id and number of elements into the
-        space at the given slot
+        """ Allocate a given base element id and number of elements into the\
+            space at the given slot
 
         :param index: The index of the free space slot to check
-        :param base_element_id: The element id to start with - must be
-         inside the slot
+        :param base_element_id: The element id to start with - must be\
+                    inside the slot
         :param n_elements: The number of elements to be allocated -\
-                       should be power of 2
+                    should be power of 2
         """
 
         free_space_slot = self._free_space_tracker[index]
@@ -124,10 +122,10 @@ class ElementAllocatorAlgorithm(object):
             starting at a base element id inside a given slot
 
         :param index: The index of the free space slot to check
-        :param base_element_id: The element id to start with -
-        must be inside the slot
+        :param base_element_id: The element id to start with -\
+                    must be inside the slot
         :param n_elements: The number of elements to be allocated -\
-                       should be power of 2
+                    should be power of 2
         """
         free_space_slot = self._free_space_tracker[index]
         space = (free_space_slot.size -

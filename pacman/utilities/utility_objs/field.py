@@ -1,8 +1,7 @@
 
 
 class Field(object):
-    """
-    field object used primiarilly at the field constraint for key allocation
+    """ Field object used primarily at the field constraint for key allocation
     """
 
     def __init__(self, lo, hi, mask):
@@ -33,5 +32,5 @@ class Field(object):
         return (self._lo, self._hi, self._mask).__hash__()
 
     def __eq__(self, other_field):
-        return (self._lo == other_field.lo and self._hi == other_field.hi
-                and self._mask == other_field._mask)
+        return (self._lo == other_field.lo and self._hi == other_field.hi and
+                self._mask == other_field._mask)

@@ -1,7 +1,3 @@
-"""
-PartitionAndPlacePartitioner
-"""
-
 import logging
 
 from pacman.model.constraints.abstract_constraints.\

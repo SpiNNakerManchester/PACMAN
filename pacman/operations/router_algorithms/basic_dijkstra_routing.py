@@ -1,7 +1,3 @@
-"""
-BasicDijkstraRouting
-"""
-
 # pacman imports
 from pacman.model.routing_paths.multicast_routing_path_entry import \
     MulticastRoutingPathEntry

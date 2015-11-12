@@ -1,7 +1,3 @@
-"""
- converts a memory based partitioned graph into a file based partitioned graph
-"""
-
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from pacman.model.constraints.abstract_constraints.\
@@ -22,8 +18,8 @@ DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX = 1
 
 
 class ConvertToFilePartitionedGraph(object):
-    """
-    converts a memory based partitioned graph into a file based partitioned graph
+    """ Converts a memory based partitioned graph into a file based\
+        partitioned graph
     """
 
     def __call__(self, partitioned_graph, file_path):
@@ -54,11 +50,11 @@ class ConvertToFilePartitionedGraph(object):
                 vertices_resources[id(vertex)] = vertex_resources
                 vertex_resources["cores"] = 0
 
-            # handle taged vertices
+            # handle tagged vertices
             elif len(utility_calls.locate_constraints_of_type(
                     vertex.constraints, AbstractTagAllocatorConstraint)) != 0:
 
-                # handel the eddge between the tagable vertex and the fake
+                # handle the edge between the tagable vertex and the fake
                 # vertex
                 hyper_edge_dict = dict()
                 edges_resources[hashlib.md5(vertex.label).hexdigest()] = \
@@ -84,7 +80,7 @@ class ConvertToFilePartitionedGraph(object):
                 vertex_resources["cores"] = 0
                 vertex_resources["sdram"] = 0
 
-            # handel standard vertices
+            # handle standard vertices
             else:
                 vertex_resources = dict()
                 vertices_resources[id(vertex)] = vertex_resources
@@ -95,7 +91,7 @@ class ConvertToFilePartitionedGraph(object):
             vertex_outgoing_partitions = \
                 partitioned_graph.outgoing_edges_partitions_from_vertex(vertex)
 
-            # handel the vertex edges
+            # handle the vertex edges
             for vertex_partition in vertex_outgoing_partitions:
                 hyper_edge_dict = dict()
                 edges_resources[
@@ -130,9 +126,3 @@ class ConvertToFilePartitionedGraph(object):
         progress_bar.end()
 
         return {"partitioned_graph": file_path}
-
-
-
-
-
-

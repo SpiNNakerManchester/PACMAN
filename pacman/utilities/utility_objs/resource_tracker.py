@@ -1,7 +1,3 @@
-"""
-is a resource tracker.
-"""
-
 from pacman import exceptions
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource

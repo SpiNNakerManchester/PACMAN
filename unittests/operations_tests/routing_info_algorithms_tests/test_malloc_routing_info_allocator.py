@@ -4,7 +4,6 @@ from pacman.operations.routing_info_allocator_algorithms\
     import MallocBasedRoutingInfoAllocator
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 import traceback
-import sys
 
 
 class MyTestCase(unittest.TestCase):
