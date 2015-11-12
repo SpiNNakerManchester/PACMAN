@@ -85,10 +85,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
                 self._allocate_fixed_keys_and_masks(keys_and_masks, fixed_mask)
             else:
-                if not routing_info_allocator_utilities.\
-                        is_contiguous_range(group):
-                    logger.warning("Algorithm will still produce continious "
-                                   "keys")
                 keys_and_masks = self._allocate_keys_and_masks(
                     fixed_mask, fields, edge_n_keys)
 

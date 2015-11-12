@@ -135,6 +135,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         allocated_a_algorithm = True
         while len(self._algorithms) != 0 and allocated_a_algorithm:
             allocated_a_algorithm = False
+
             # check each algorithm to see if its usable with current inputs
             suitable_algorithm = self._locate_suitable_algorithm(
                 self._algorithms, input_names, generated_outputs, False)
