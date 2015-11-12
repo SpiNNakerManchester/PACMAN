@@ -36,13 +36,15 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             progress_bar = ProgressBar(
                 (len(partitionable_graph.vertices) + len(list(machine.chips))),
                 "Allocating virtual identifiers")
-        else:
-
+        elif partitioned_graph is not None:
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
                 (len(partitioned_graph.subvertices) +
                  len(list(machine.chips))),
                 "Allocating virtual identifiers")
+        else:
+            progress_bar = ProgressBar(len(list(machine.chips)),
+                                       "Allocating virtual identifiers")
 
         # allocate standard ids for real chips
         for chip in machine.chips:
@@ -61,7 +63,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                         machine, vertex)
                 progress_bar.update()
             progress_bar.end()
-        else:
+        elif partitioned_graph is not None:
 
             # allocate ids for virtual chips
             for vertex in partitioned_graph.subvertices:

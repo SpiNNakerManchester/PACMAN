@@ -33,7 +33,7 @@ class ConvertAlgorithmsMetadata(object):
                 if element.get('name') in algorithm_data_objects:
                     raise exceptions.PacmanConfigurationException(
                         "There are two algorithms with the same name in these"
-                        "xml files {}. Please rectify and try again."
+                        " xml files {}. Please rectify and try again."
                         .format(self._xml_paths))
                 else:
                     algorithm_data_objects[element.get('name')] = \
