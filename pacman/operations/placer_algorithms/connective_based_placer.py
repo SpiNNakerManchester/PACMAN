@@ -101,6 +101,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                                  .outgoing_subedges_from_subvertex(vertex)):
                     if out_edge.post_subvertex in unconstrained_vertices:
                         next_vertices.add(out_edge.post_subvertex)
+
         # finished, so stop progress bar and return placements
         progress_bar.end()
         return {'placements': placements}

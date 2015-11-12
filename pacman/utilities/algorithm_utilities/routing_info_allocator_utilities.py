@@ -138,7 +138,7 @@ def add_routing_key_entries(
     creates and adds entries for routing tables as required for the path
     :param routing_paths: the routing paths object generated from routing info
     :param subedge_routing_info: the subedge info object that contains keys
-    :param out_going_subedge: the edge this is aossicated with
+    :param out_going_subedge: the edge this is associated with
     :param routing_tables: the routing tables to adjust
     :return: None
     """
@@ -156,7 +156,7 @@ def add_routing_key_entries(
                 path_entry.router_x, path_entry.router_y)
             routing_tables.add_routing_table(router)
 
-        # add entries as required, or emrge them if entries alrteady exist
+        # add entries as required, or merge them if entries already exist
         for key_and_mask in subedge_routing_info.keys_and_masks:
             multicast_routing_entry = MulticastRoutingEntry(
                 routing_entry_key=key_and_mask.key_combo,

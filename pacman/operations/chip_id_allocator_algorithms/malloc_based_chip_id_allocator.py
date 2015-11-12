@@ -77,6 +77,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
     def _allocate_id(self):
         """ Allocate a chip id from the free space
+
         :return:
         """
 

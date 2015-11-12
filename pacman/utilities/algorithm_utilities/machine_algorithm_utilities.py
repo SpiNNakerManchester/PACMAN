@@ -8,7 +8,7 @@ import sys
 
 def create_virtual_chip(machine, virtual_vertex):
         """ Create a virtual chip as a real chip in the machine
-        :param virtual_vertex: virutal vertex to convert into a real chip
+        :param virtual_vertex: virtual vertex to convert into a real chip
         :param machine: the machine which will be adjusted
         :return: the real chip
         """

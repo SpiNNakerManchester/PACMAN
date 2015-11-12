@@ -42,8 +42,8 @@ class BasicRoutingInfoAllocator(object):
                     of keys required by the edges
         :type n_keys_map:\
                     :py:class:`pacman.model.routing_info.abstract_partitioned_edge_n_keys_map.AbstractPartitionedEdgeNKeysMap`
-        :param routing_paths: the paths each partitionededge takes to get from
-        soruce to  destination.
+        :param routing_paths: the paths each partitionededge takes to get from\
+                    source to destination.
         :type routing_paths:
             :py:class:`pacman.model.routing_paths.multicast_routing_paths.MulticastRoutingPaths
         :return: The routing information
@@ -91,6 +91,7 @@ class BasicRoutingInfoAllocator(object):
                         "This subverte '{}' has no placement! this should "
                         "never occur, please fix adn try again."
                         .format(subvert))
+
                 # update routing tables with entries
                 routing_info_allocator_utilities.add_routing_key_entries(
                     routing_paths, subedge_routing_info, out_going_subedge,

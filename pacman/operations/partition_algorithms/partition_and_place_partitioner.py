@@ -202,20 +202,20 @@ class PartitionAndPlacePartitioner(object):
     @staticmethod
     def _reallocate_resources(used_placements, resource_tracker,
                               lo_atom, hi_atom, graph):
-        """ readjusts resoruce allocation and updates the placement list to take
-            into account the new layout of the atoms
+        """ re-adjusts resource allocation and updates the placement list to\
+            take into account the new layout of the atoms
 
         :param used_placements: the original list of tuples containing\
                     placement data
         :type used_placements: iterable of tuples
-        :param resource_tracker: the tracker of resoruces
+        :param resource_tracker: the tracker of resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
         :param lo_atom: the lo atom of a slice to be considered
         :type lo_atom: int
         :param hi_atom: the hi atom of a slice to be considered
         :type hi_atom: int
-        :param graph: the partitionable graph used by the parititoner
+        :param graph: the partitionable graph used by the partitioner
         :type graph:
                     :py:class:`pacman.model.partitionable_graph.partitionable_graph.PartitionableGraph`
         :return: the new list of tuples containing placement data

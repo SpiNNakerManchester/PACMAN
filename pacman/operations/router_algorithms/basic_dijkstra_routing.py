@@ -168,13 +168,13 @@ class BasicDijkstraRouting(object):
         return dijkstra_tables
 
     def _update_all_weights(self, nodes_info, machine):
-        """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used by the routing algorithum to change the weights of the nebourign \
-        nodes
+        """ private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
+            used by the routing algorithm to change the weights of the\
+            neighbouring nodes
 
-        :param nodes_info: the node info dictonary
+        :param nodes_info: the node info dictionary
         :param machine: the machine python object that represents the\
-                    strcuture of the machine
+                    structure of the machine
         :type nodes_info: dict
         :type machine 'py:class':spinn_machine.machine.Machine
         :return None
@@ -186,7 +186,7 @@ class BasicDijkstraRouting(object):
                 self._update_neighbour_weights(nodes_info, machine, key)
 
     def _update_neighbour_weights(self, nodes_info, machine, key):
-        """ Change the weights of the neighboring nodes
+        """ Change the weights of the neighbouring nodes
 
         :param nodes_info: the node info dictionary
         :param machine: the machine python object that represents the\
@@ -243,7 +243,7 @@ class BasicDijkstraRouting(object):
     def _reset_tables(dijkstra_tables):
         """ Reset the dijsktra tables for a new path search
 
-        :param dijkstra_tables: the dictory object for the dijkstra-tables
+        :param dijkstra_tables: the dictionary object for the dijkstra-tables
         :type dijkstra_tables: dict
         :return: None
         :rtype: None
@@ -273,7 +273,7 @@ class BasicDijkstraRouting(object):
          :return: None
          :rtype: None
          :raise PacmanRoutingException: when the destination node could not be\
-                    reached from this soruce node.
+                    reached from this source node.
         """
 
         dest_chips_to_find = set(dest_chips)
@@ -349,7 +349,7 @@ class BasicDijkstraRouting(object):
             dijkstra_tables, x_neighbour, y_neighbour, x_current, y_current,
             x_source, y_source, weight):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used to update the lowest cost for each neigbhour of a node
+        used to update the lowest cost for each neighbour of a node
 
         :param dijkstra_tables:
         :param x_current:
@@ -370,7 +370,7 @@ class BasicDijkstraRouting(object):
         :return:
         :rtype:
         :raise PacmanRoutingException: when the algorithm goes to a node that\
-                    doesnt exist in the machine or the node's cost was set\
+                    doesn't exist in the machine or the node's cost was set\
                     too low.
         """
         neighbour_exists = (x_neighbour, y_neighbour) in dijkstra_tables
@@ -425,11 +425,11 @@ class BasicDijkstraRouting(object):
         :type processor_dest:
         :return: the next coords to look into
         :rtype: int int
-        :raise PacmanRoutingException: when the algorithum doesnt find a next\
+        :raise PacmanRoutingException: when the algorithm doesn't find a next\
                     point to search from. AKA, the neighbours of a chip do not\
-                    have a cheaper cost than the node itslef, but the node is\
-                    not the destination or when the algorithum goes to a node\
-                    that's not cosndiered in the weighted search
+                    have a cheaper cost than the node itself, but the node is\
+                    not the destination or when the algorithm goes to a node\
+                    that's not considered in the weighted search
         """
         # Set the tracking node to the destination to begin with
         x_current, y_current = x_destination, y_destination

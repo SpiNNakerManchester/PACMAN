@@ -1,5 +1,5 @@
 """
- creates constraitns file from the machine adn partitioend graph
+ creates constraints file from the machine and partitioned graph
 """
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
@@ -137,7 +137,7 @@ class CreateConstraintsToFile(object):
                 link_id += 1
         if not found_link:
             raise exceptions.PacmanConfigurationException(
-                "Cant find the real chip this virutal chip is connected to."
+                "Cant find the real chip this virtual chip is connected to."
                 "Please fix and try again.")
         else:
             return ("[{}, {}]".format(router.get_link(link_id).destination_x,

@@ -262,7 +262,7 @@ class PartitionedGraph(object):
     def label(self):
         """ The label of the partitioned_graph
 
-        :return: The label or None if there is no lable
+        :return: The label or None if there is no label
         :rtype: str
         :raise None: Raises no known exceptions
         """

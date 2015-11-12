@@ -90,9 +90,11 @@ class PartitionableGraph(object):
         """
         if edge is not None and isinstance(edge, AbstractPartitionableEdge):
             self._edges.append(edge)
-            # if the partition id is none, make a unuque one for storage
+
+            # if the partition id is none, make a unique one for storage
             if partition_id is None:
                 partition_id = str(uuid.uuid4())
+
             # if this partition id not been seen before, add a new partition
             if partition_id not in self._outgoing_edges[edge.pre_vertex]:
                 self._outgoing_edges[edge.pre_vertex][partition_id] = \

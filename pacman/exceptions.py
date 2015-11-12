@@ -41,7 +41,7 @@ class PacmanAlreadyExistsException(PacmanException):
 
 
 class PacmanPartitionException(PacmanException):
-    """ An exception that indicates that something went wrong with paritioning
+    """ An exception that indicates that something went wrong with partitioning
     """
 
     def __init__(self, problem):
@@ -116,7 +116,7 @@ class PacmanRoutingException(PacmanException):
 
 class PacmanConfigurationException(PacmanException):
     """ An exception that indicates that something went wrong with \
-    configuring some part of pacman
+        configuring some part of pacman
     """
 
     def __init__(self, problem):
@@ -128,8 +128,8 @@ class PacmanConfigurationException(PacmanException):
 
 
 class PacmanNotExistException(PacmanException):
-    """An exception that indicates that a routing table entry was attemtpted to\
-    be removed from a routing table which didnt have such an entry
+    """ An exception that indicates that a routing table entry was attempted\
+        to be removed from a routing table which didn't have such an entry
 
     """
 
@@ -142,8 +142,8 @@ class PacmanNotExistException(PacmanException):
 
 
 class PacmanAlgorithmFailedToCompleteException(PacmanException):
-    """ An exception that indicates that a pacman algorithm ran from outside the
-    software stack has failed to complete for some unknown reason.
+    """ An exception that indicates that a pacman algorithm ran from outside\
+        the software stack has failed to complete for some unknown reason.
 
     """
 

@@ -51,9 +51,11 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
         file_routing_paths = self._handle_json_files(file_routing_paths)
         progress_bar = ProgressBar(len(file_routing_paths),
                                    "Converting to PACMAN routing paths")
+
         # iterate though the path for each edge and create entries
         for edge_id in file_routing_paths:
             edge = partitioned_graph.get_subedge_with_label(edge_id)
+
             # if the vertex is none, its a vertex with the special skills of
             # needing no cores. therefore ignore
             if edge is not None:
@@ -102,12 +104,16 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
             self, direction_data, edge_id, next_hop, partitioned_graph,
             machine, placements, chip_coords, source_link_id, memory_edges):
         if direction_data[0]:
+
             # has a core level here. focus on core level entries
             local_memory_edges = self._handle_core_level_entry(
                 placements, chip_coords, None, source_link_id,
                 partitioned_graph, edge_id, direction_data, next_hop, machine)
             memory_edges += local_memory_edges
-        else:  # none core level. keep searching
+
+        else:
+
+            # none core level. keep searching
             local_memory_edges = self._create_entries_for_path(
                 edge_id, next_hop, direction_data[1], None,
                 partitioned_graph, machine, placements)
@@ -119,6 +125,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                     out_going_links=direction_data[1],
                     outgoing_processors=None, incoming_processor=None,
                     incoming_link=source_link_id)
+
                 # add entry to system
                 self._multi_cast_routing_paths.add_path_entry(entry)
         return memory_edges

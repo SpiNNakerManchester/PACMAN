@@ -78,14 +78,14 @@ def _search_route(source_placement, dest_placements, key_and_mask,
 
     :param source_placement: the placement from which the search started
     :param dest_placements: the placements to which this trace should visit\
-    only once
+            only once
     :param key_and_mask: the key and mask associated with this set of
-    subedges
-    :type source_placement: instance of
-    pacman.model.placements.placement.Placement
+            subedges
+    :type source_placement: instance of \
+            pacman.model.placements.placement.Placement
     :type dest_placements: iterable of PlacementTuple
-    :type key_and_mask: instanceof
-    pacman.model.routing_info.key_and_mask.BaseKeyAndMask
+    :type key_and_mask: instance of \
+            pacman.model.routing_info.key_and_mask.BaseKeyAndMask
     :return: None
     :raise PacmanRoutingException: when the trace completes and there are\
                 still destinations not visited
@@ -106,7 +106,7 @@ def _search_route(source_placement, dest_placements, key_and_mask,
         else:
             failed_to_reach_dests.append(dest)
 
-    # check for error if trace didnt reach a destination it was meant to
+    # check for error if trace didn't reach a destination it was meant to
     error_message = ""
     if len(failed_to_reach_dests) > 0:
         output_string = ""
@@ -146,12 +146,12 @@ def _search_route(source_placement, dest_placements, key_and_mask,
 
 def _start_trace_via_routing_tables(source_placement, key, reached_placements,
                                     routing_tables, machine):
-    """this method starts the trace, by using the source placemnts
-    router and tracing from the route.
+    """ This method starts the trace, by using the source placements
+        router and tracing from the route.
 
-    :param source_placement: the soruce placement used by the trace
+    :param source_placement: the source placement used by the trace
     :param key: the key being used by the partitioned_vertex which resides\
-                on the soruce placement
+                on the source placement
     :param reached_placements: the placements reached during the trace
     :return: None
     :raises None: this method does not raise any known exception
@@ -175,28 +175,28 @@ def _start_trace_via_routing_tables(source_placement, key, reached_placements,
 def _recursive_trace_to_dests(
         entry, current_router, chip_x, chip_y, key, visited_routers,
         reached_placements, machine, routing_tables):
-    """ this method recurively searches though routing tables till
-    no more entries are registered with this key
+    """ this method recursively searches though routing tables till
+        no more entries are registered with this key
 
-    :param entry: the orginal entry used by the first router which
-    resides on the soruce placement chip.
-    :param current_router: the router currently being visited during the
-     trace
-    :param key: the key being used by the partitioned_vertex which resides
-    on the soruce placement
-    :param visited_routers: the list of routers which have been visited
-    during this tracve so far
+    :param entry: the original entry used by the first router which\
+            resides on the source placement chip.
+    :param current_router: the router currently being visited during the\
+            trace
+    :param key: the key being used by the partitioned_vertex which resides\
+            on the source placement
+    :param visited_routers: the list of routers which have been visited\
+            during this trace so far
     :param reached_placements: the placements reached during the trace
     :param chip_x: the x coordinate of the chip being considered
     :param chip_y: the y coordinate of the chip being considered
     :type entry: spinnmachine.multicast_routing_entry.MulticastRoutingEntry
-    :type current_router:
-    pacman.model.routing_tables.multicasr_routing_table.MulticastRoutingTable
+    :type current_router:\
+            pacman.model.routing_tables.multicasr_routing_table.MulticastRoutingTable
     :type chip_x: int
     :type chip_y: int
     :type key: int
-    :type visited_routers: iterable of :
-    pacman.model.routing_tables.multicasr_routing_table.MulticastRoutingTable
+    :type visited_routers: iterable of
+            pacman.model.routing_tables.multicasr_routing_table.MulticastRoutingTable
     :type reached_placements: iterable of placement_tuple
     :return: None
     :raise None: this method does not raise any known exceptions
@@ -206,7 +206,7 @@ def _recursive_trace_to_dests(
     chip_links = entry.link_ids
     processor_values = entry.processor_ids
 
-    # if goes downa chip link
+    # if goes down a chip link
     if len(chip_links) > 0:
 
         # also goes to a processor
@@ -244,6 +244,7 @@ def _recursive_trace_to_dests(
 
 def _check_visited_routers(chip_x, chip_y, visited_routers):
     """ Check if the trace has visited this router already
+
     :param chip_x: the x coordinate of the chip being checked
     :param chip_y: the y coordinate of the chip being checked
     :param visited_routers: routers already visted
@@ -259,7 +260,7 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
         raise exceptions.PacmanRoutingException(
             "visited this router before, there is a cycle here. "
             "The routers I've currently visited are {} and the router i'm "
-            "visitiing is {}"
+            "visiting is {}"
             .format(visited_routers, visited_routers_router))
     else:
         visited_routers.add(visited_routers_router)
