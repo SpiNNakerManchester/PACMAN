@@ -26,18 +26,14 @@ logger = logging.getLogger(__name__)
 
 
 class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
-    """
-    an executor of pacman algorithums where the order is decuded from the input
-    and outputs of the algorithm based off its xml data
+    """ An executor of PACMAN algorithms where the order is deduced from the\
+        input and outputs of the algorithm using an XML description of the\
+        algorithm
     """
 
     def __init__(self, algorithms, inputs, xml_paths,
                  required_outputs, do_timings=True):
         """
-        :param reports_states: the pacman report object
-        :param in_debug_mode: bool which tells the algorithm exeuctor to add
-        any debug algorithms if needed
-
         :return:
         """
         AbstractProvidesProvenanceData.__init__(self)
@@ -64,22 +60,22 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         """ trnaslates the algoreithum string and uses the config xml to create
         algorithm objects
 
-        :param algorithms: the string represnetation of the set of algorithms
+        :param algorithms: the string representation of the set of algorithms
         :param inputs: list of input types
         :type inputs: iterable of str
-        :param xml_paths: the list of paths for xml configuration data
+        :param xml_paths: the list of paths for XML configuration data
         :type xml_paths: iterable of strings
         :param required_outputs: the set of outputs that this workflow is meant
         to generate
         :type required_outputs: iterable of types as strings
         """
 
-        # dedeuce if the algoruthms are internal or external
+        # deduce if the algorithms are internal or external
         algorithms_names = self._algorithms
         algorithms_names.extend(algorithms)
 
-        # set up xml reader for standard pacman algorithums xml file reader
-        # (used in decode_algorithm_data_objects func)
+        # set up xml reader for standard pacman algorithms XML file reader
+        # (used in decode_algorithm_data_objects function)
         xml_paths.append(os.path.join(os.path.dirname(operations.__file__),
                                       "algorithms_metadata.xml"))
 
@@ -99,9 +95,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         for algorithms_name in algorithms_names:
             self._algorithms.append(algorithm_data_objects[algorithms_name])
 
-        # sort_out_order_of_algorithms for exeuction
+        # sort_out_order_of_algorithms for execution
         self._sort_out_order_of_algorithms(
-            inputs, required_outputs, converter_algorithm_data_objects.values())
+            inputs, required_outputs,
+            converter_algorithm_data_objects.values())
 
     def _sort_out_order_of_algorithms(
             self, inputs, required_outputs, optional_converter_algorithms):
@@ -127,6 +124,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         allocated_a_algorithm = True
         while len(self._algorithms) != 0 and allocated_a_algorithm:
             allocated_a_algorithm = False
+
             # check each algorithm to see if its usable with current inputs
             suitable_algorithm = self._locate_suitable_algorithm(
                 self._algorithms, input_names, generated_outputs, False)
@@ -185,29 +183,30 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 "this and try again".format(failed_to_generate_output_string))
 
         # iterate through the list removing algorithms which are obsolete
-        self._prune_unnessary_algorithms(allocated_algorithums)
+        self._prune_unnecessary_algorithms(allocated_algorithums)
 
         self._algorithms = allocated_algorithums
 
     @staticmethod
-    def _prune_unnessary_algorithms(allocated_algorithums):
+    def _prune_unnecessary_algorithms(allocated_algorithums):
         """
 
         :param allocated_algorithums:
         :return:
         """
-        #TODO optimisations!
+        # TODO optimisations!
         pass
 
     @staticmethod
     def _remove_algorithm_and_update_outputs(
             algorithm_list, algorithm, inputs, generated_outputs):
-        """
-        updates data structures
-        :param algorithm_list: the list of algorithums to remove algoruthm from
+        """ Update data structures
+
+        :param algorithm_list: the list of algorithms to remove algorithm from
         :param algorithm: the algorithm to remove
         :param inputs: the inputs list to update output from algorithm
-        :param generated_outputs: the outputs list to update output from algorithm
+        :param generated_outputs: the outputs list to update output from\
+                    algorithm
         :return: none
         """
         algorithm_list.remove(algorithm)
@@ -241,10 +240,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 for output_parameter in algorithm.outputs:
                     if output_parameter['type'] not in generated_outputs:
                         adds_to_output = True
-            if (all_inputs_avilable
-                    and ((look_for_noval_output and adds_to_output)
-                         or (not look_for_noval_output))
-                    and suitable_algorithm is None):
+            if (all_inputs_avilable and
+                    ((look_for_noval_output and adds_to_output) or
+                        (not look_for_noval_output)) and
+                    suitable_algorithm is None):
                 suitable_algorithm = algorithm
             position += 1
         return suitable_algorithm
@@ -336,7 +335,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         algorithum_progress_bar.end()
 
         if self._do_timing:
-           self._handle_prov(timer, algorithm)
+            self._handle_prov(timer, algorithm)
 
         # check the return code for a successful execution
         if child.returncode != 0:
@@ -449,7 +448,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
     def get_item(self, item_type):
         """
 
-        :param item_type: the item from the internal type mapping to be returned
+        :param item_type: the item from the internal type mapping to be\
+                    returned
         :return: the returned item
         """
         return self._internal_type_mapping[item_type]
@@ -475,12 +475,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         provanence_data_timings = None
         if len(self._provanence_data) == 0:
             provanence_data_timings = etree.SubElement(
-                self._provanence_data, "algorithum_timings")
+                self._provanence_data, "algorithm_timings")
         else:
             provanence_data_timings = self._provanence_data[0]
 
         # write timing element
-        algorithum_provanence_data = etree.SubElement(
+        algorithm_provanence_data = etree.SubElement(
             provanence_data_timings,
             "algorithm_{}".format(algorithm.algorithm_id))
-        algorithum_provanence_data.text = str(time_taken)
+        algorithm_provanence_data.text = str(time_taken)

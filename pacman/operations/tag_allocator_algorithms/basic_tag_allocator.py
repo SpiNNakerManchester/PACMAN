@@ -1,6 +1,3 @@
-"""
-BasicTagAllocator
-"""
 
 # pacman imports
 from pacman.model.constraints.abstract_constraints.\

@@ -103,46 +103,6 @@
             </parameter>
         </produces_outputs>
     </algorithm>
-    <algorithm name="ConvertToFilePartitionableGraph">
-        <python_module>pacman.utilities.file_format_converters.convert_to_file_partitionable_graph</python_module>
-        <python_class>ConvertToFilePartitionableGraph</python_class>
-        <required_inputs>
-            <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
-            </parameter>
-             <parameter>
-                <param_name>file_path</param_name>
-                <param_type>FilePartitionableGraphFilePath</param_type>
-            </parameter>
-        </required_inputs>
-        <produces_outputs>
-            <parameter>
-                <param_name>constraints</param_name>
-                <param_type>FilePartitionableGraph</param_type>
-            </parameter>
-        </produces_outputs>
-    </algorithm>
-    <algorithm name="ConvertToFileRoutingTables">
-        <python_module>pacman.utilities.file_format_converters.convert_to_file_routing_tables</python_module>
-        <python_class>ConvertToFileRoutingTables</python_class>
-        <required_inputs>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-             <parameter>
-                <param_name>file_path</param_name>
-                <param_type>FileRoutingTablesFilePath</param_type>
-            </parameter>
-        </required_inputs>
-        <produces_outputs>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>FileRoutingTables</param_type>
-            </parameter>
-        </produces_outputs>
-    </algorithm>
     <algorithm name="ConvertToMemoryPlacements">
         <python_module>pacman.utilities.file_format_converters.convert_to_memory_placements</python_module>
         <python_class>ConvertToMemoryPlacements</python_class>
@@ -200,38 +160,6 @@
             <parameter>
                 <param_name>routing_paths</param_name>
                 <param_type>MemoryRoutingPaths</param_type>
-            </parameter>
-        </produces_outputs>
-    </algorithm>
-    <algorithm name="ConvertToMemoryRoutingTables">
-        <python_module>pacman.utilities.file_format_converters.convert_to_memory_routing_tables</python_module>
-        <python_class>ConvertToMemoryRoutingTables</python_class>
-        <required_inputs>
-            <parameter>
-                <param_name>file_routing_tables</param_name>
-                <param_type>FileRoutingtables</param_type>
-            </parameter>
-        </required_inputs>
-        <produces_outputs>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-        </produces_outputs>
-    </algorithm>
-    <algorithm name="ConvertToMemoryPartitionedGraph">
-        <python_module>pacman.utilities.file_format_converters.convert_to_memory_partitioned_graph</python_module>
-        <python_class>ConvertToMemoryPartitionedGraph</python_class>
-        <required_inputs>
-            <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>FilePartitionedGraph</param_type>
-            </parameter>
-        </required_inputs>
-        <produces_outputs>
-            <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>

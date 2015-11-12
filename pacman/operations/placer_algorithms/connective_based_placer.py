@@ -1,14 +1,17 @@
 import logging
 
-from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint import \
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_radial_placement_from_chip_constraint import \
     PlacerRadialPlacementFromChipConstraint
 from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
-from pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint import \
+from pacman.model.constraints.tag_allocator_constraints\
+    .tag_allocator_require_iptag_constraint import \
     TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint import \
+from pacman.model.constraints.tag_allocator_constraints\
+    .tag_allocator_require_reverse_iptag_constraint import \
     TagAllocatorRequireReverseIptagConstraint
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer

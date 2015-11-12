@@ -1,7 +1,3 @@
-"""
-BasicRoutingInfoAllocator
-"""
-
 from pacman.model.data_request_interfaces.\
     abstract_requires_routing_info_partitioned_vertex import \
     RequiresRoutingInfoPartitionedVertex

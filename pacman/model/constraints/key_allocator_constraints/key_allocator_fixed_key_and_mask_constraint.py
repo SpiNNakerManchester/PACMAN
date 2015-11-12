@@ -1,5 +1,5 @@
-from pacman.model.constraints.abstract_constraints.abstract_key_allocator_constraint \
-    import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.abstract_constraints\
+    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman import exceptions
 
@@ -65,4 +65,5 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
 
     def __repr__(self):
         return "fixed_key_mask_constraint_withkey_masks:{}: and key list " \
-               "function {}".format(self.keys_and_masks, self.key_list_function)
+               "function {}".format(
+                   self.keys_and_masks, self.key_list_function)
