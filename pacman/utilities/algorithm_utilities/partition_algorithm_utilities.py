@@ -28,8 +28,7 @@ def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
 
     # start progress bar
     progress_bar = ProgressBar(len(subgraph.subvertices),
-                               "on partitioning the partitionable_graph's "
-                               "edges")
+                               "Partitioning graph edges")
 
     # Partition edges according to vertex partitioning
     for src_sv in subgraph.subvertices:
