@@ -29,10 +29,23 @@ from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 from pacman import exceptions
-
-import uuid
-
+from pacman.utilities.utility_objs.field import Field
 from pacman.utilities.utility_objs.flexi_field import FlexiField, SUPPORTED_TAGS
+
+from enum import Enum
+import uuid
+import math
+
+NUM_BITS_IN_ROUTING = 31
+ROUTING_MASK_BIT = 1
+APPLICATION_MASK_BIT = 0
+START_OF_ROUTING_KEY_POSITION = 0
+
+TYPES_OF_FIELDS = Enum(
+    value="TYPES_OF_FIELDS",
+    names=[("FIXED_MASK", 0),
+           ("FIXED_KEY", 1),
+           ("FIXED_FIELD", 2)])
 
 
 class VertexBasedRoutingInfoAllocator(object):
@@ -52,6 +65,9 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # locate however many types of constrants there are
         seen_fields = self._deduce_types(subgraph)
+
+        if len(seen_fields) > 1:
+            self._locate_application_field_space(seen_fields)
 
         field_mapper = dict()
         # handle the application space
@@ -83,6 +99,78 @@ class VertexBasedRoutingInfoAllocator(object):
 
         return {'routing_infos': routing_info,
                 'routing_tables': routing_tables}
+
+    def _locate_application_field_space(self, seen_fields):
+        required_bits = math.ceil(math.log(len(seen_fields), 2))
+        if TYPES_OF_FIELDS.FIXED_KEY.name in seen_fields:
+            fixed_keys = seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name]
+            # use yield and genrator here
+
+        else:
+            if TYPES_OF_FIELDS.FIXED_MASK.name in seen_fields:
+                fixed_mask_masks = seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name]
+                if len(fixed_mask_masks) > 1:
+                    keys = list(fixed_mask_masks.keys)
+                    first = fixed_mask_masks[keys[0]]
+                    searching = True
+                    bits = None
+                    bit_generator = self._generate_bits_that_satisfy_contraints(
+                        first, required_bits)
+                    while not searching:
+                        searching = True
+                        bits = bit_generator.next()
+                        value_to_check_for = None
+                        for fixed_mask_mask in fixed_mask_masks:
+                            fixed_mask_fields = \
+                                fixed_mask_masks[fixed_mask_mask]
+                            if value_to_check_for is None:
+                                value_to_check_for = self._deduce_bit_value(
+                                    fixed_mask_fields[0].mask, bits)
+                            else:
+                                if value_to_check_for != self._deduce_bit_value(
+                                        fixed_mask_fields[0].mask, bits):
+                                    searching = False
+                else:
+                    keys = list(fixed_mask_masks.keys())
+                    first = fixed_mask_masks[keys[0]]
+                    bit_generator = self._generate_bits_that_satisfy_contraints(
+                        first, required_bits)
+                    bits = bit_generator.next()
+                    bit_values = self._deduce_bit_value(first[0].value, bits)
+
+
+    def _deduce_bit_value(self, mask, bits):
+        bit_value = mask >> int(bits[1])
+        mask = int(math.pow((bits[0] - bits[1]), 2))
+        bit_value &= mask
+        return bit_value
+
+    @staticmethod
+    def _generate_bits_that_satisfy_contraints(
+            fixed_mask_fields, required_bits):
+        """
+        generator for getting valid bits from the first fixed mask
+        :param fixed_mask_fields: the fields from this fixed mask
+        :param required_bits: the number of bits required to match the types
+        :return:
+        """
+        routing_fields = list()
+
+        # locate fields valid for generating collections
+        for field in fixed_mask_fields:
+            if field.tag == SUPPORTED_TAGS.ROUTING:
+                routing_fields.append(field)
+
+        # sort fields based on hi
+        routing_fields.sort(key=lambda field: field.hi)
+
+        # locate next set of bits to yield to higher function
+        for routing_field in routing_fields:
+            if routing_field.hi - routing_field.lo >= required_bits:
+                current_hi = routing_field.hi
+                while (current_hi - required_bits) > routing_field.lo:
+                    yield (current_hi, current_hi - required_bits)
+                    current_hi -= 1
 
     def _discover_keys_and_masks(self, partition, bit_field_space, n_keys_map):
         routing_keys_and_masks = list()
@@ -195,26 +283,28 @@ class VertexBasedRoutingInfoAllocator(object):
             self, bit_field_space, fields, field_mapper, top_level_bit_field):
 
         for field in fields:
-            if field == "FIXED_MASK":
-                for (position, length) in fields['FIXED_MASK']:
+            if field == TYPES_OF_FIELDS.FIXED_MASK.name:
+                for (position, length) in \
+                        fields[TYPES_OF_FIELDS.FIXED_MASK.name]:
                     random_identifer = uuid.uuid4()
                     field_mapper[
                         "FIXED_MASK:{}:{}".format(position, length)] = \
                         random_identifer
-                    bit_field_space.add_field(random_identifer, length,
-                                              position)
-            elif field == "FIXED_FIELDS":
-                for fixed_field in fields['FIXED_FIELDS']:
+                    bit_field_space.add_field(
+                        random_identifer, length, position)
+            elif field == TYPES_OF_FIELDS.FIXED_FIELD.name:
+                for fixed_field in fields[TYPES_OF_FIELDS.FIXED_FIELD.name]:
                     fields_data = self._convert_into_fields(fixed_field.mask)
                     for (position, length) in fields_data:
                         random_identifer = uuid.uuid4()
                         field_mapper[fixed_field] = random_identifer
                         bit_field_space.add_field(
                             random_identifer, length, position)
-            elif field == "FIXED_KEYS":
-                for key_and_mask in fields["FIXED_KEYS"]:
+            elif field == TYPES_OF_FIELDS.FIXED_KEY.name:
+                for key_and_mask in fields[TYPES_OF_FIELDS.FIXED_KEY.name]:
                     random_identifer = uuid.uuid4()
-                    top_level_bit_field.add_field(random_identifer, 31, 0)
+                    top_level_bit_field.add_field(
+                        random_identifer, NUM_BITS_IN_ROUTING, 0)
                     field_mapper[key_and_mask] = random_identifer
                     # set the value for the field
                     inputs = dict()
@@ -268,25 +358,41 @@ class VertexBasedRoutingInfoAllocator(object):
         expanded_mask = utility_calls.expand_to_bit_array(entity)
         # set up for first location
         detected_change = True
-        detected_change_position = 31
-        detected_last_state = expanded_mask[31]
+        detected_change_position = NUM_BITS_IN_ROUTING
+        detected_last_state = expanded_mask[NUM_BITS_IN_ROUTING]
         # iterate up the key looking for fields
-        for position in range(30, 0, -1):
+        for position in range(NUM_BITS_IN_ROUTING - 1,
+                              START_OF_ROUTING_KEY_POSITION, -1):
             if (expanded_mask[position] != detected_last_state
                     and detected_change):
                 detected_change = False
+                if detected_last_state == ROUTING_MASK_BIT:
+                    results.append(Field(
+                        NUM_BITS_IN_ROUTING - detected_change_position,
+                        (detected_change_position - position),
+                        entity, SUPPORTED_TAGS.ROUTING))
+                else:
+                    results.append(Field(
+                        NUM_BITS_IN_ROUTING - detected_change_position,
+                        (detected_change_position - position),
+                        entity, SUPPORTED_TAGS.APPLICATION))
                 detected_last_state = expanded_mask[position]
-                results.append((31 - detected_change_position,
-                                (detected_change_position - position)))
                 detected_change_position = position - 1
             if (expanded_mask[position] != detected_last_state
                     and not detected_change):
                 detected_change = True
                 detected_last_state = expanded_mask[position]
                 detected_change_position = position
-        if detected_change_position != 0:
-            results.append((31 - detected_change_position,
-                            detected_change_position))
+        if detected_change_position != START_OF_ROUTING_KEY_POSITION:
+            if detected_last_state == ROUTING_MASK_BIT:
+                results.append(
+                    Field(NUM_BITS_IN_ROUTING - detected_change_position,
+                          NUM_BITS_IN_ROUTING, entity, SUPPORTED_TAGS.ROUTING))
+            else:
+                results.append(
+                    Field(NUM_BITS_IN_ROUTING - detected_change_position,
+                          NUM_BITS_IN_ROUTING, entity,
+                          SUPPORTED_TAGS.APPLICATION))
         return results
 
     def _deduce_types(self, subgraph):
@@ -306,21 +412,37 @@ class VertexBasedRoutingInfoAllocator(object):
                             constraint, seen_fields, known_fields)
                     if isinstance(constraint,
                                   KeyAllocatorFixedKeyAndMaskConstraint):
-                        if "FIXED_KEYS" not in seen_fields:
-                            seen_fields["FIXED_KEYS"] = list()
+                        if TYPES_OF_FIELDS.FIXED_KEYS.name not in seen_fields:
+                            seen_fields[TYPES_OF_FIELDS.FIXED_KEYS.name] = \
+                                list()
                         for key_mask in constraint.keys_and_masks:
-                            seen_fields["FIXED_KEYS"].append(key_mask)
+                            seen_fields[TYPES_OF_FIELDS.FIXED_KEYS.name].\
+                                append(key_mask)
                     if isinstance(constraint, KeyAllocatorFixedMaskConstraint):
                         fields = self._convert_into_fields(constraint.mask)
-                        if "FIXED_MASK" not in seen_fields:
-                            seen_fields["FIXED_MASK"] = list()
-                            for field in fields:
-                                if field not in seen_fields["FIXED_MASK"]:
-                                    seen_fields["FIXED_MASK"].append(field)
+                        if TYPES_OF_FIELDS.FIXED_MASK.name not in seen_fields:
+                            seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name] =\
+                                dict()
+                        for field in fields:
+                            if field.value not in seen_fields[
+                                    TYPES_OF_FIELDS.FIXED_MASK.name]:
+                                # add a new list for this mask type
+                                seen_fields[
+                                    TYPES_OF_FIELDS.FIXED_MASK.name][
+                                    field.value] = list()
+                            if field not in seen_fields[
+                                    TYPES_OF_FIELDS.FIXED_MASK.name][
+                                    field.value]:
+                                seen_fields[
+                                    TYPES_OF_FIELDS.FIXED_MASK.name][
+                                    field.value].append(field)
+
                     if isinstance(constraint, KeyAllocatorFixedFieldConstraint):
-                        if "FIXED_FIELDS" not in seen_fields:
-                            seen_fields["FIXED_FIELDS"] = list()
-                        seen_fields["FIXED_FIELDS"].append(constraint.fields)
+                        if TYPES_OF_FIELDS.FIXED_FIELD not in seen_fields:
+                            seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name] = \
+                                list()
+                        seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name].\
+                            append(constraint.fields)
         return seen_fields
 
     @staticmethod
