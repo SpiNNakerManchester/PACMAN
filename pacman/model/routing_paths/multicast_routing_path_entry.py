@@ -23,13 +23,13 @@ class MulticastRoutingPathEntry(object):
         :type edge: \
                     :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
         :param out_going_links: the edges this path entry goes down
-        :type out_going_links: iterable of ints between 0 adn 5
+        :type out_going_links: iterable of ints between 0 and 5
         :param outgoing_processors: the processors this path entry goes to
-        :type outgoing_processors: iterable of itns between 0 and 17
+        :type outgoing_processors: iterable of ints between 0 and 17
         :param incoming_processor:  the direction this entry came from
         :type incoming_processor: int between 0 and 17
         :param incoming_link: the direction this entry came from in link
-        :type incoming_link: iint between 0 and 5
+        :type incoming_link: int between 0 and 5
         :return:
         """
         self._router_x = router_x
@@ -148,8 +148,8 @@ class MulticastRoutingPathEntry(object):
             self._out_going_processors.append(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
-                "the processor {} already exists in the mutli-cast-r"
-                "outing-apth-entry".format(direction), str(direction))
+                "the processor {} already exists in the mutlicast-"
+                "routing-path-entry".format(direction), str(direction))
 
     def add_in_coming_processor_direction(self, procesor_id):
         """ Add a processor to the incoming direction

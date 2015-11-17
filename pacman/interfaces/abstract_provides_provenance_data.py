@@ -15,7 +15,7 @@ class AbstractProvidesProvenanceData(object):
     def write_provenance_data_in_xml(self, file_path, transceiver,
                                      placement=None):
         """ Write the provenance data using XML
-        :param file_path: the file apth to write the provenance data to
+        :param file_path: the file path to write the provenance data to
         :param transceiver: the spinnman interface object
         :param placement: the placement object for this subvertex or None if\
                     the system does not require a placement object

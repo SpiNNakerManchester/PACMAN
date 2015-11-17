@@ -1,6 +1,4 @@
-"""
- creates constraitns file from the machine adn partitioend graph
-"""
+
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from pacman.model.constraints.abstract_constraints.\
@@ -137,7 +135,7 @@ class CreateConstraintsToFile(object):
                 link_id += 1
         if not found_link:
             raise exceptions.PacmanConfigurationException(
-                "Cant find the real chip this virutal chip is connected to."
+                "Can't find the real chip this virtual chip is connected to."
                 "Please fix and try again.")
         else:
             return ("[{}, {}]".format(router.get_link(link_id).destination_x,
@@ -179,8 +177,8 @@ class CreateConstraintsToFile(object):
                 tag_constraint['range'] = [0, 1]
             else:
                 raise exceptions.PacmanConfigurationException(
-                    "Converter does not regonsise this tag constraint."
-                    "Please update this algorithum and try again.")
+                    "Converter does not recognise this tag constraint."
+                    "Please update this algorithm and try again.")
             json_constraints_dictory_rep.append(tag_constraint)
 
     @staticmethod

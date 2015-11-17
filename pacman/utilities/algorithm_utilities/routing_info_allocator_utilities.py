@@ -17,7 +17,7 @@ from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
 
-# spinnmachine imports
+# spinn_machine imports
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 
@@ -144,7 +144,7 @@ def add_routing_key_entries(
     """
     path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
 
-    # iterate thoguh the entries in each path, adding a router entry if
+    # iterate through the entries in each path, adding a router entry if
     # required
     for path_entry in path_entries:
 
@@ -156,7 +156,7 @@ def add_routing_key_entries(
                 path_entry.router_x, path_entry.router_y)
             routing_tables.add_routing_table(router)
 
-        # add entries as required, or emrge them if entries alrteady exist
+        # add entries as required, or merge them if entries already exist
         for key_and_mask in subedge_routing_info.keys_and_masks:
             multicast_routing_entry = MulticastRoutingEntry(
                 routing_entry_key=key_and_mask.key_combo,

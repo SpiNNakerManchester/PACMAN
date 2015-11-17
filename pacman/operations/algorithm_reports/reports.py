@@ -24,7 +24,7 @@ def placer_reports_with_partitionable_graph(
     :param graph_mapper: the mapping between partitionable and partitioned \
                 graphs
     :param placements: the placements objects built by the placer.
-    :param machine: the python spinnmanchine object
+    :param machine: the python machine object
     :return None
     """
     placement_report_with_partitionable_graph_by_vertex(
@@ -39,11 +39,11 @@ def placer_reports_without_partitionable_graph(
         report_folder, hostname, sub_graph, placements, machine):
     """
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
-    :param machine: the python spinnmanchine object
-    :param sub_graph: the partitioned graph to which the reports are to operate
-    on
+    :param machine: the python machine object
+    :param sub_graph: the partitioned graph to which the reports are to\
+             operate on
     :return None
     """
     placement_report_without_partitionable_graph_by_vertex(
@@ -71,14 +71,10 @@ def partitioner_reports(report_folder, hostname, graph,
 
 
 def router_report_from_paths(report_folder, routing_paths, hostname):
-    """
-    reads the router paths and generates a text file sayign how everything fits
-    togehter
+    """ Generates a text file of routing paths
+
     :param routing_paths:
     :return:
-    """
-    """
-    Generate report on the routing of sub-edges across the machine.
     """
     file_name = os.path.join(report_folder, "edge_routing_info.rpt")
     f_routing = None
@@ -128,6 +124,7 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
 
         text = "{} has route length: {}\n".format(e.label, len(path_entries))
         f_routing.write(text)
+
         # End one entry:
         f_routing.write("\n")
     f_routing.flush()
@@ -135,10 +132,10 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
 
 
 def partitioner_report(report_folder, hostname, graph, graph_mapper):
+    """ Generate report on the placement of sub-vertices onto cores.
     """
-    Generate report on the placement of sub-vertices onto cores.
-    """
-    # Cycle through all vertices, and foreach cycle through its sub-vertices.
+
+    # Cycle through all vertices, and for each cycle through its sub-vertices.
     # For each sub-vertex, describe its core mapping.
     file_name = os.path.join(report_folder, "partitioned_by_vertex.rpt")
     f_place_by_vertex = None
@@ -182,22 +179,24 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
             f_place_by_vertex.write(my_string)
             f_place_by_vertex.flush()
         f_place_by_vertex.write("\n")
+
     # Close file:
     f_place_by_vertex.close()
 
 
 def placement_report_with_partitionable_graph_by_vertex(
         report_folder, hostname, graph, graph_mapper, placements):
-    """
-    Generate report on the placement of sub-vertices onto cores by vertex.
+    """ Generate report on the placement of sub-vertices onto cores by vertex.
+
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param graph: the partitionable graph to which placements were built
-    :param graph_mapper: the mapping between partitionable and partitioned
-    graphs
+    :param graph_mapper: the mapping between partitionable and partitioned\
+            graphs
     :param placements: the placements objects built by the placer.
     """
-    # Cycle through all vertices, and foreach cycle through its sub-vertices.
+
+    # Cycle through all vertices, and for each cycle through its sub-vertices.
     # For each sub-vertex, describe its core mapping.
     file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
     f_place_by_vertex = None
@@ -257,20 +256,21 @@ def placement_report_with_partitionable_graph_by_vertex(
                         .format(lo_atom, hi_atom, num_atoms, x, y, p)
             f_place_by_vertex.write(my_string)
         f_place_by_vertex.write("\n")
+
     # Close file:
     f_place_by_vertex.close()
 
 
 def placement_report_without_partitionable_graph_by_vertex(
         report_folder, hostname, placements, partitioned_graph):
-    """
-    Generate report on the placement of sub-vertices onto cores by vertex.
+    """ Generate report on the placement of sub-vertices onto cores by vertex.
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param partitioned_graph: the partitioned graph generated by the end user
     """
-    # Cycle through all vertices, and foreach cycle through its sub-vertices.
+
+    # Cycle through all vertices, and for each cycle through its sub-vertices.
     # For each sub-vertex, describe its core mapping.
     file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
     f_place_by_vertex = None
@@ -315,18 +315,18 @@ def placement_report_without_partitionable_graph_by_vertex(
         my_string = " Placed on core ({}, {}, {}) \n".format(x, y, p)
         f_place_by_vertex.write(my_string)
         f_place_by_vertex.write("\n")
+
     # Close file:
     f_place_by_vertex.close()
 
 
 def placement_report_with_partitionable_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper):
-    """
-    Generate report on the placement of sub-vertices onto cores by core.
+    """ Generate report on the placement of sub-vertices onto cores by core.
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machiens hostname to which the placer worked on
-    :param graph_mapper: the mapping between partitionable and partitioned
-    graphs
+    :param graph_mapper: the mapping between partitionable and partitioned\
+            graphs
     :param machine: the spinnaker machine object
     :param placements: the placements objects built by the placer.
     """
@@ -441,17 +441,18 @@ def placement_report_without_partitionable_graph_by_core(
                 p_str = "              Model: {}\n\n".format(vertex_model)
                 f_place_by_core.write(p_str)
                 f_place_by_core.write("\n")
+
     # Close file:
     f_place_by_core.close()
 
 
 def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
-    """
-    reports the sdram used per chip
+    """ Reports the SDRAM used per chip
+
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
-    :param machine: the python spinnmanchine object
+    :param machine: the python machine object
     :return None
     """
 
@@ -507,9 +508,8 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
 
 
 def routing_info_report(report_folder, subgraph, routing_infos):
-    """
-    generates a report whcih says which keys is being allocated to each
-    subvertex
+    """ Generates a report which says which keys is being allocated to each\
+        subvertex
     :param report_folder: the
     :param subgraph:
     :param routing_infos:
@@ -590,13 +590,9 @@ def _reduce_route_value(processors_ids, link_ids):
 
 
 def _uint_32_to_hex_string(number):
+    """ Convert a 32-bit unsigned number into a hex string.
     """
-    Convert a 32-bit unsigned number into a hex string.
-    """
-    bottom = number & 0xFFFF
-    top = (number >> 16) & 0xFFFF
-    hex_string = "{:x}{:x}".format(top, bottom)
-    return hex_string
+    return "0x{:08X}".format(number)
 
 
 def _expand_route_value(processors_ids, link_ids):

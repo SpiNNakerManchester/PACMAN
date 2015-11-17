@@ -103,7 +103,7 @@ class BasicDijkstraRouting(object):
         return {'routing_paths': self._routing_paths}
 
     def _initiate_node_info(self, machine):
-        """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
+        """ private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
         used for setting up a dictionary which contains data for each chip in \
         the machine
 
@@ -116,6 +116,7 @@ class BasicDijkstraRouting(object):
         nodes_info = dict()
         for chip in machine.chips:
             x, y = chip.x, chip.y
+
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
             nodes_info[(x, y)] = dict()
@@ -168,13 +169,13 @@ class BasicDijkstraRouting(object):
         return dijkstra_tables
 
     def _update_all_weights(self, nodes_info, machine):
-        """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used by the routing algorithum to change the weights of the nebourign \
-        nodes
+        """ private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
+            used by the routing algorithm to change the weights of the\
+            neighbouring nodes
 
-        :param nodes_info: the node info dictonary
+        :param nodes_info: the node info dictionary
         :param machine: the machine python object that represents the\
-                    strcuture of the machine
+                    structure of the machine
         :type nodes_info: dict
         :type machine 'py:class':spinn_machine.machine.Machine
         :return None
@@ -186,7 +187,7 @@ class BasicDijkstraRouting(object):
                 self._update_neighbour_weights(nodes_info, machine, key)
 
     def _update_neighbour_weights(self, nodes_info, machine, key):
-        """ Change the weights of the neighboring nodes
+        """ Change the weights of the neighbouring nodes
 
         :param nodes_info: the node info dictionary
         :param machine: the machine python object that represents the\
@@ -243,7 +244,7 @@ class BasicDijkstraRouting(object):
     def _reset_tables(dijkstra_tables):
         """ Reset the dijsktra tables for a new path search
 
-        :param dijkstra_tables: the dictory object for the dijkstra-tables
+        :param dijkstra_tables: the dictionary object for the dijkstra-tables
         :type dijkstra_tables: dict
         :return: None
         :rtype: None
@@ -273,7 +274,7 @@ class BasicDijkstraRouting(object):
          :return: None
          :rtype: None
          :raise PacmanRoutingException: when the destination node could not be\
-                    reached from this soruce node.
+                    reached from this source node.
         """
 
         dest_chips_to_find = set(dest_chips)
@@ -313,7 +314,7 @@ class BasicDijkstraRouting(object):
             #  a new partitionable_graph lowest cost cannot be found
 
             # This is the lowest cost across ALL
-            # unactivated nodes in the partitionable_graph.
+            # un-activated nodes in the partitionable_graph.
             graph_lowest_cost = None
 
             # Find the next node to be activated
@@ -328,14 +329,14 @@ class BasicDijkstraRouting(object):
                     graph_lowest_cost = dijkstra_tables[key]["lowest cost"]
                     x_current, y_current = int(key[0]), int(key[1])
 
-            # If there were no unactivated nodes with costs,
+            # If there were no un-activated nodes with costs,
             # but the destination was not reached this iteration,
             # raise an exception
             if graph_lowest_cost is None:
                 raise exceptions.PacmanRoutingException(
                     "Destination could not be activated, ending run")
 
-            # Set the next activated node as the unactivated node with the
+            # Set the next activated node as the un-activated node with the
             #  lowest current cost
             dijkstra_tables[(x_current, y_current)]["activated?"] = True
             try:
@@ -349,7 +350,7 @@ class BasicDijkstraRouting(object):
             dijkstra_tables, x_neighbour, y_neighbour, x_current, y_current,
             x_source, y_source, weight):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
-        used to update the lowest cost for each neigbhour of a node
+        used to update the lowest cost for each neighbour of a node
 
         :param dijkstra_tables:
         :param x_current:
@@ -370,7 +371,7 @@ class BasicDijkstraRouting(object):
         :return:
         :rtype:
         :raise PacmanRoutingException: when the algorithm goes to a node that\
-                    doesnt exist in the machine or the node's cost was set\
+                    doesn't exist in the machine or the node's cost was set\
                     too low.
         """
         neighbour_exists = (x_neighbour, y_neighbour) in dijkstra_tables
@@ -425,17 +426,17 @@ class BasicDijkstraRouting(object):
         :type processor_dest:
         :return: the next coords to look into
         :rtype: int int
-        :raise PacmanRoutingException: when the algorithum doesnt find a next\
+        :raise PacmanRoutingException: when the algorithm doesn't find a next\
                     point to search from. AKA, the neighbours of a chip do not\
-                    have a cheaper cost than the node itslef, but the node is\
-                    not the destination or when the algorithum goes to a node\
-                    that's not cosndiered in the weighted search
+                    have a cheaper cost than the node itself, but the node is\
+                    not the destination or when the algorithm goes to a node\
+                    that's not considered in the weighted search
         """
         # Set the tracking node to the destination to begin with
         x_current, y_current = x_destination, y_destination
         routing_entry_route_processors = []
 
-        # if the processor is None, dont add to router path entry
+        # if the processor is None, don't add to router path entry
         if processor_dest is not None:
             routing_entry_route_processors.append(processor_dest)
         routing_entry_route_links = None
@@ -561,19 +562,19 @@ class BasicDijkstraRouting(object):
 
             if (nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] <
                     0):
-                print ("Bandwidth overused from ({}, {}) in direction {}! to "
+                print ("Bandwidth over-used from ({}, {}) in direction {}! to "
                        "({}, {})".format(x_neighbour, y_neighbour,
                                          dec_direction, x_current, y_current))
 
                 raise exceptions.PacmanRoutingException(
-                    "Bandwidth overused as described above! Terminating...")
+                    "Bandwidth over-used as described above! Terminating...")
         return x_current, y_current, previous_routing_entry, made_an_entry
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
         """private method, do not call from outside dijskra routing\
 
-        used to detmerine the direction of a link to go down
+        used to determine the direction of a link to go down
 
         :param neighbour_position: the position the neighbour is at
         :type neighbour_position: int

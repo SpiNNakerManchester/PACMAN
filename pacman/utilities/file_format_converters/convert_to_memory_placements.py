@@ -38,7 +38,7 @@ class ConvertToMemoryPlacements(object):
             file_placements, core_allocations, constraints)
 
         # drop the type and allocations bit of core allocations
-        # (makes lower code simplier)
+        # (makes lower code simpler)
         core_allocations = core_allocations['allocations']
 
         memory_placements = Placements()
@@ -57,7 +57,7 @@ class ConvertToMemoryPlacements(object):
                             constraints_for_vertex)
                     if len(external_device_constraints) != 0:
 
-                        # get data for virutal chip
+                        # get data for virtual chip
                         route_constraint = \
                             external_device_constraints['end_point']
                         route_direction = constants.EDGES(

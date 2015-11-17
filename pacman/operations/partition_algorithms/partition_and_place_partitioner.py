@@ -146,16 +146,16 @@ class PartitionAndPlacePartitioner(object):
         """ Try to partition subvertices on how many atoms it can fit on\
             each subvert
 
-        :param vertices: the vertexes that need to be partitoned at the same \
+        :param vertices: the vertexes that need to be partitioned at the same \
                     time
         :type vertices: iterable list of\
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param n_atoms: the atoms of the first vertex
         :type n_atoms: int
-        :param max_atoms_per_core: the min max atoms from all the vertexes \
+        :param max_atoms_per_core: the max atoms from all the vertexes\
                     considered that have max_atom constraints
         :type max_atoms_per_core: int
-        :param subgraph: the partitioned_graph of the propblem space to put\
+        :param subgraph: the partitioned_graph of the problem space to put\
                     subverts in
         :type subgraph: :py:class:`pacman.model.subgraph.subgraph.Subgraph`
         :param graph: the partitionable_graph object
@@ -202,20 +202,20 @@ class PartitionAndPlacePartitioner(object):
     @staticmethod
     def _reallocate_resources(used_placements, resource_tracker,
                               lo_atom, hi_atom, graph):
-        """ readjusts resoruce allocation and updates the placement list to take
-            into account the new layout of the atoms
+        """ readjusts resource allocation and updates the placement list to\
+            take into account the new layout of the atoms
 
         :param used_placements: the original list of tuples containing\
                     placement data
         :type used_placements: iterable of tuples
-        :param resource_tracker: the tracker of resoruces
+        :param resource_tracker: the tracker of resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
         :param lo_atom: the lo atom of a slice to be considered
         :type lo_atom: int
         :param hi_atom: the hi atom of a slice to be considered
         :type hi_atom: int
-        :param graph: the partitionable graph used by the parititoner
+        :param graph: the partitionable graph used by the partitioner
         :type graph:
                     :py:class:`pacman.model.partitionable_graph.partitionable_graph.PartitionableGraph`
         :return: the new list of tuples containing placement data
@@ -226,7 +226,7 @@ class PartitionAndPlacePartitioner(object):
         for (placed_vertex, x, y, p, placed_resources,
                 ip_tags, reverse_ip_tags) in used_placements:
 
-            # Un-allocate the existing resources
+            # Deallocate the existing resources
             resource_tracker.unallocate_resources(
                 x, y, p, placed_resources, ip_tags, reverse_ip_tags)
 

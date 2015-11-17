@@ -43,7 +43,7 @@ def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
                 outgoing_partitions[outgoing_partition_identifier].edges
             for edge in out_edges:
 
-                # and create and store a new subedge for each postsubvertex
+                # and create and store a new subedge for each post-subvertex
                 post_vertex = edge.post_vertex
                 post_subverts = (graph_to_subgraph_mapper
                                  .get_subvertices_from_vertex(post_vertex))

@@ -1,7 +1,3 @@
-"""
-PartitionedGraph
-"""
-
 # pacman imports
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
@@ -92,12 +88,12 @@ class PartitionedGraph(object):
 
         self._subedges.add(subedge)
 
-        # if the partition id is none, make a unqiue one for storage
+        # if the partition id is none, make a unique one for storage
         if partition_id is None:
             partition_id = str(uuid.uuid4())
 
         if subedge.pre_subvertex in self._outgoing_subedges:
-            # if this partition id not been seen before, add a new parittion
+            # if this partition id not been seen before, add a new partition
             if (partition_id not in
                     self._outgoing_subedges[subedge.pre_subvertex]):
                 self._outgoing_subedges[subedge.pre_subvertex][partition_id] =\
@@ -219,7 +215,7 @@ class PartitionedGraph(object):
 
         :param label: the input label to search for.
         :param destination_sub_vertex: the subvertex to which this edge goes to
-        :return: the partitionedEdge or None if theres no vertex with this \
+        :return: the partitionedEdge or None if there's no vertex with this \
                     label
         """
         for subvertex in self._subvertices:
@@ -262,7 +258,7 @@ class PartitionedGraph(object):
     def label(self):
         """ The label of the partitioned_graph
 
-        :return: The label or None if there is no lable
+        :return: The label or None if there is no label
         :rtype: str
         :raise None: Raises no known exceptions
         """

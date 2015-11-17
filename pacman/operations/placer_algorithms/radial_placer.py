@@ -1,5 +1,5 @@
 
-# pacamn imports
+# pacman imports
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
