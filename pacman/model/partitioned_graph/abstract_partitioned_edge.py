@@ -97,6 +97,3 @@ class AbstractPartitionedEdge(AbstractConstrainedEdge):
     def __str__(self):
         return "PartitionedEdge:{}->{}".format(self._pre_subvertex,
                                                self._post_subvertex)
-
-    def __repr__(self):
-        return self.__str__()

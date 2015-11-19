@@ -1,40 +1,28 @@
-import logging
 
+# pacman imports
 from pacman.model.constraints.abstract_constraints.\
     abstract_placer_constraint import \
     AbstractPlacerConstraint
-from pacman.operations.abstract_algorithms.\
-    abstract_placer_algorithm import\
-    AbstractPlacerAlgorithm
 from pacman.model.constraints.placer_constraints.\
     placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.utilities import utility_calls
-from pacman.utilities.progress_bar import ProgressBar
-from pacman.utilities.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
-
+# general imports
+import logging
 logger = logging.getLogger(__name__)
 
 
-class BasicPlacer(AbstractPlacerAlgorithm):
+class BasicPlacer(object):
     """ A basic placement algorithm that can place a partitioned_graph onto\
         a machine using the chips as they appear in the machine
     """
 
-    def __init__(self):
-        """
-
-        :param machine: The machine on which the placement will take place
-        :type machine: :py:class:`spinn_machine.machine.Machine`
-        """
-        AbstractPlacerAlgorithm.__init__(self)
-
-        self._supported_constraints.append(PlacerChipAndCoreConstraint)
-
-    def place(self, partitioned_graph, machine):
+    def __call__(self, partitioned_graph, machine):
         """ Place a partitioned_graph so that each subvertex is placed on a\
                     core
 
@@ -50,7 +38,7 @@ class BasicPlacer(AbstractPlacerAlgorithm):
         # check that the algorithm can handle the constraints
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=partitioned_graph.subvertices,
-            supported_constraints=self._supported_constraints,
+            supported_constraints=[PlacerChipAndCoreConstraint],
             abstract_constraint_type=AbstractPlacerConstraint)
 
         placements = Placements()
@@ -70,4 +58,4 @@ class BasicPlacer(AbstractPlacerAlgorithm):
             placements.add_placement(placement)
             progress_bar.update()
         progress_bar.end()
-        return placements
+        return {'placements': placements}

@@ -25,7 +25,7 @@ class MulticastRoutingTable(object):
         self._x = x
         self._y = y
         self._multicast_routing_entries = set()
-        self._multicast_routing_entries_by_key_combo_mask = OrderedDict()
+        self._multicast_routing_entries_by_routing_entry_key = OrderedDict()
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
@@ -42,15 +42,15 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
         """
-        key_mask_combo, mask = \
-            multicast_routing_entry.key_combo, multicast_routing_entry.mask
+        routing_entry_key = multicast_routing_entry.routing_entry_key
+        mask = multicast_routing_entry.mask
 
-        tuple_key = (key_mask_combo, mask)
-        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
+        tuple_key = (routing_entry_key, mask)
+        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
             raise exceptions.PacmanAlreadyExistsException(
                 "Multicast_routing_entry", str(multicast_routing_entry))
 
-        self._multicast_routing_entries_by_key_combo_mask[tuple_key] =\
+        self._multicast_routing_entries_by_routing_entry_key[tuple_key] =\
             multicast_routing_entry
         self._multicast_routing_entries.add(multicast_routing_entry)
 
@@ -65,11 +65,12 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanNotExistException: If a routing\
                     entry with the same key-mask combination already exists
         """
-        key_mask_combo, mask = \
-            multicast_routing_entry.key_combo, multicast_routing_entry.mask
-        tuple_key = (key_mask_combo, mask)
-        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
-            del self._multicast_routing_entries_by_key_combo_mask[tuple_key]
+        routing_entry_key = multicast_routing_entry.routing_entry_key
+        mask = multicast_routing_entry.mask
+
+        tuple_key = (routing_entry_key, mask)
+        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
+            del self._multicast_routing_entries_by_routing_entry_key[tuple_key]
             self._multicast_routing_entries.remove(multicast_routing_entry)
         else:
             raise exceptions.PacmanNotExistException(
@@ -108,19 +109,19 @@ class MulticastRoutingTable(object):
 
     @property
     def number_of_entries(self):
-        """
-        returns the number of multi-cast routing entries there are in the
-        multicast routing table
+        """ The number of multi-cast routing entries there are in the\
+            multicast routing table
         :return:
         """
         return len(self._multicast_routing_entries)
 
-    def get_multicast_routing_entry_by_key_combo(self, key_combo, mask):
+    def get_multicast_routing_entry_by_routing_entry_key(
+            self, routing_entry_key, mask):
         """ Get the routing entry associated with the specified key_combo-mask\
             combination or None if the routing table does not match the\
             key_combo
 
-        :param key_combo: the routing key_combo to be searched
+        :param routing_entry_key: the routing key_combo to be searched
         key_combope key: int
         :param mask: the routing mask to be searched
         :type mask: int
@@ -130,13 +131,14 @@ class MulticastRoutingTable(object):
                     :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
-        if (key_combo & mask) != key_combo:
+        if (routing_entry_key & mask) != routing_entry_key:
             raise exceptions.PacmanRoutingException(
-                "The key combo {} is changed when masked with the mask {}. This"
-                " is determined to be an error in the tool chain. Please "
-                "correct this and try again.".format(key_combo, mask))
+                "The key {} is changed when masked with the mask {}."
+                " This is determined to be an error in the tool chain. Please "
+                "correct this and try again.".format(routing_entry_key, mask))
 
-        tuple_key = (key_combo, mask)
-        if tuple_key in self._multicast_routing_entries_by_key_combo_mask:
-            return self._multicast_routing_entries_by_key_combo_mask[tuple_key]
+        tuple_key = (routing_entry_key, mask)
+        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
+            return self._multicast_routing_entries_by_routing_entry_key[
+                tuple_key]
         return None

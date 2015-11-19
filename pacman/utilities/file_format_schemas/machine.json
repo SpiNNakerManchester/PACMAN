@@ -1,0 +1,115 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "A description of the resources available to a SpiNNaker machine.",
+    "type": "object",
+    "properties": {
+        "width":  {
+            "description": "The width of the system in chips",
+            "type": "integer",
+            "minimum": 1
+        },
+        "height":  {
+            "description": "The height of the system in chips",
+            "type": "integer",
+            "minimum": 1
+        },
+        "chip_resources": {
+            "description": "The resources available on chips not listed in chip_resource_exceptions. All resource types available on any chip must be enumerated, even if zero in the common case.",
+            "allOf": [
+                {"$ref": "#/resources/resourceSet"},
+                {"minProperties": 1}
+            ]
+        },
+        "chip_resource_exceptions": {
+            "description": "Exceptions to the resources listed in chip_resources.",
+            "type": "array",
+            "items": {
+                "type": "array",
+                "items": [
+                    {
+                        "description": "Exceptional chip X coordinate, 0-based.",
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    {
+                        "description": "Exceptional chip Y coordinate, 0-based.",
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    {
+                        "description": "The resources available to the exceptional chip. Must list a subset of the resources in chip_resources.",
+                        "allOf": [
+                            {"$ref": "#/resources/resourceSet"},
+                            {"minProperties": 1}
+                        ]
+                    }
+                ],
+                "additionalItems": false
+            },
+            "uniqueItems": true
+        },
+        "dead_chips": {
+            "description": "An enumeration of all dead/unavilable chips in the system.",
+            "type": "array",
+            "items": {
+                "description": "The position of a dead chip.",
+                "type": "array",
+                "items": [
+                    {"description": "X-coordinate of dead chip", "type": "integer", "minimum": 0},
+                    {"description": "Y-coordinate of dead chip", "type": "integer", "minimum": 0}
+                ],
+                "additionalItems": false
+            },
+            "uniqueItems": true
+        },
+        "dead_links": {
+            "description": "An enumeration of all dead/unavilable links in the system.",
+            "type": "array",
+            "items": {
+                "description": "The location of a dead link.",
+                "type": "array",
+                "items": [
+                    {
+                        "description": "X-coordinate of the sending-end of the dead link",
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    {
+                        "description": "Y-coordinate of the sending-end of the dead link",
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    {
+                        "description": "The dead link direction, from sender's perspective",
+                        "allOf": [{"$ref": "#/resources/link"}]
+                    }
+                ],
+                "additionalItems": false
+            },
+            "uniqueItems": true
+        }
+    },
+    "additionalProperties": false,
+    "required": ["width", "height", "chip_resources"],
+    
+    "resources": {
+        "resourceSet": {
+            "description": "Enumerates a set of on-chip resources available/required.",
+            "type": "object",
+            "additionalProperties": {
+                "description": "The quantity of a resource available.",
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "link": {
+            "description": "A chip-to-chip link.",
+            "type": "string",
+            "enum": [
+                "east", "north_east", "north",
+                "west", "south_west", "south"
+            ]
+        }
+    }
+}

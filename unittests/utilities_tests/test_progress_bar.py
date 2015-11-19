@@ -1,5 +1,4 @@
 import unittest
-from pacman.utilities.progress_bar import ProgressBar
 
 
 class MyTestCase(unittest.TestCase):

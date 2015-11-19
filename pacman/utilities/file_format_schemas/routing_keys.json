@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "For each edge, gives the list of routing keys and masks.",
+    "type": "object",
+    "additionalProperties": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "key": {"$ref": "#/resources/keyValue"},
+                "mask": {"$ref": "#/resources/keyValue"}
+            },
+            "additionalProperties": false,
+            "required": ["key", "mask"]
+        }
+    },
+    
+    "resources": {
+        "keyValue": {
+            "description": "A valid unsigned 32-bit value.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+        }
+    }
+}
+

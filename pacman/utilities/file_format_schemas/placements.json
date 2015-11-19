@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "For each vertex, gives the X, Y coordinates of the chip it is placed on.",
+    "type": "object",
+    "additionalProperties": {
+        "type": "array",
+        "items": [
+            {"type": "integer", "minimum": 0},
+            {"type": "integer", "minimum": 0}
+        ],
+        "additionalItems": false
+    }
+}

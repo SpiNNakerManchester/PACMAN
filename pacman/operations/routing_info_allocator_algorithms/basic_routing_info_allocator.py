@@ -1,18 +1,16 @@
-"""
-BasicRoutingInfoAllocator
-"""
 from pacman.model.data_request_interfaces.\
     abstract_requires_routing_info_partitioned_vertex import \
     RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.operations.abstract_algorithms.\
-    abstract_routing_info_allocator_algorithm import \
-    AbstractRoutingInfoAllocatorAlgorithm
+from pacman.model.routing_tables.multicast_routing_tables import \
+    MulticastRoutingTables
+from pacman.utilities.algorithm_utilities import \
+    routing_info_allocator_utilities
 from pacman.utilities import utility_calls
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
@@ -20,7 +18,7 @@ MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
 
 
-class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
+class BasicRoutingInfoAllocator(object):
     """ An basic algorithm that can produce routing keys and masks for\
         edges in a partitioned_graph based on the x,y,p of the placement\
         of the preceding partitioned vertex.
@@ -29,30 +27,45 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         out of a vertex will be given the same key/mask assignment.
     """
 
-    def __init__(self):
-        AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
-
-    def allocate_routing_info(self, subgraph, placements, n_keys_map):
+    def __call__(self, subgraph, placements, n_keys_map, routing_paths):
         """
-        executes the routing info alloc
-        :param subgraph:
-        :param placements:
-        :param n_keys_map:
-        :return:
+        Allocates routing information to the partitioned edges in a\
+        partitioned graph
+
+        :param subgraph: The partitioned graph to allocate the routing info for
+        :type subgraph:\
+                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
+        :param placements: The placements of the subvertices
+        :type placements:\
+                    :py:class:`pacman.model.placements.placements.Placements`
+        :param n_keys_map: A map between the partitioned edges and the number\
+                    of keys required by the edges
+        :type n_keys_map:\
+                    :py:class:`pacman.model.routing_info.abstract_partitioned_edge_n_keys_map.AbstractPartitionedEdgeNKeysMap`
+        :param routing_paths: the paths each partitioned edge takes to get\
+                from source to destination.
+        :type routing_paths:
+            :py:class:`pacman.model.routing_paths.multicast_routing_paths.MulticastRoutingPaths
+        :return: The routing information
+        :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`,
+                :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
+        :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
+                   something goes wrong with the allocation
         """
 
         # check that this algorithm supports the constraints put onto the
         # partitioned_edges
-        self._supported_constraints.append(RequiresRoutingInfoPartitionedVertex)
+        supported_constraints = [RequiresRoutingInfoPartitionedVertex]
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subedges,
-            supported_constraints=self._supported_constraints,
+            supported_constraints=supported_constraints,
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each subedge and create keys from its placement
         progress_bar = ProgressBar(len(subgraph.subvertices),
                                    "Allocating routing keys")
         routing_infos = RoutingInfo()
+        routing_tables = MulticastRoutingTables()
         for subvert in subgraph.subvertices:
             out_going_subedges = subgraph.outgoing_subedges_from_subvertex(
                 subvert)
@@ -68,28 +81,25 @@ class BasicRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 placement = placements.get_placement_of_subvertex(subvert)
                 if placement is not None:
                     key = self._get_key_from_placement(placement)
-                    keys_and_masks = list([KeyAndMask(key=key, mask=MASK)])
+                    keys_and_masks = list([BaseKeyAndMask(base_key=key,
+                                                          mask=MASK)])
                     subedge_routing_info = SubedgeRoutingInfo(
                         keys_and_masks, out_going_subedge)
                     routing_infos.add_subedge_info(subedge_routing_info)
-
-        # handle the request for all partitioned vertices which require the
-        # routing info for configuring their data.
-        for partitioned_vertex in subgraph.subvertices:
-            if isinstance(partitioned_vertex,
-                          RequiresRoutingInfoPartitionedVertex):
-                vertex_sub_edge_routing_infos = list()
-                outgoing_edges = subgraph.\
-                    outgoing_subedges_from_subvertex(partitioned_vertex)
-                for outgoing_edge in outgoing_edges:
-                    vertex_sub_edge_routing_infos.append(
-                        routing_infos.
-                        get_subedge_information_from_subedge(outgoing_edge))
-                partitioned_vertex.set_routing_infos(
-                    vertex_sub_edge_routing_infos)
+                else:
+                    raise PacmanRouteInfoAllocationException(
+                        "This subvertex '{}' has no placement! this should "
+                        "never occur, please fix and try again."
+                        .format(subvert))
+                # update routing tables with entries
+                routing_info_allocator_utilities.add_routing_key_entries(
+                    routing_paths, subedge_routing_info, out_going_subedge,
+                    routing_tables)
             progress_bar.update()
         progress_bar.end()
-        return routing_infos
+
+        return {'routing_infos': routing_infos,
+                'routing_tables': routing_tables}
 
     @staticmethod
     def _get_key_from_placement(placement):
