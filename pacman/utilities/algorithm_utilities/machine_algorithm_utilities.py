@@ -3,31 +3,13 @@ from spinn_machine.chip import Chip
 from spinn_machine.link import Link
 from spinn_machine.processor import Processor
 from spinn_machine.router import Router
-
-from pacman.operations.abstract_algorithms\
-    .abstract_element_allocator_algorithm \
-    import AbstractElementAllocatorAlgorithm
-
-from abc import abstractmethod
-from six import add_metaclass
-from abc import ABCMeta
 import sys
 
 
-@add_metaclass(ABCMeta)
-class AbstractChipIdAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
-
-    def __init__(self, size_begin, size_end):
-        AbstractElementAllocatorAlgorithm.__init__(self, size_begin, size_end)
-
-    @abstractmethod
-    def allocate_chip_ids(self, partitionable_graph, machine):
-        """ Allocates chip ids for AbstractVirtualVertices
-        """
-
-    def _create_virtual_chip(self, machine, virtual_vertex):
+def create_virtual_chip(machine, virtual_vertex):
         """ Create a virtual chip as a real chip in the machine
-        :param virtual_vertex: virutal vertex to convert into a real chip
+        :param virtual_vertex: virtual vertex to convert into a real chip
+        :param machine: the machine which will be adjusted
         :return: the real chip
         """
 
@@ -52,7 +34,7 @@ class AbstractChipIdAllocatorAlgorithm(AbstractElementAllocatorAlgorithm):
             destination_y=spinnaker_link_data.connected_chip_y,
             source_x=virtual_vertex.virtual_chip_x,
             source_y=virtual_vertex.virtual_chip_y,
-            multicast_default_from=(spinnaker_link_data.connected_link),
+            multicast_default_from=spinnaker_link_data.connected_link,
             multicast_default_to=spinnaker_link_data.connected_link,
             source_link_id=virtual_link_id)
 

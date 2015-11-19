@@ -1,20 +1,11 @@
-"""
-MallocBasedRoutingInfoAllocator
-"""
 
 # pacman imports
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_same_keys_constraint import KeyAllocatorSameKeysConstraint
-from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
-from pacman.model.data_request_interfaces.\
-    abstract_requires_routing_info_partitioned_vertex import \
-    RequiresRoutingInfoPartitionedVertex
-from pacman.operations.abstract_algorithms.\
-    abstract_routing_info_allocator_algorithm import \
-    AbstractRoutingInfoAllocatorAlgorithm
+from pacman.model.routing_tables.multicast_routing_tables import \
+    MulticastRoutingTables
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
@@ -25,13 +16,15 @@ from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
-from pacman.model.resources.element_free_space import ElementFreeSpace
 from pacman.utilities import utility_calls
-from pacman.exceptions import PacmanRouteInfoAllocationException, \
-    PacmanElementAllocationException
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.exceptions import PacmanRouteInfoAllocationException
+from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
+    ElementAllocatorAlgorithm
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.utilities.algorithm_utilities import \
+    routing_info_allocator_utilities
 
 # general imports
 import math
@@ -40,33 +33,30 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
+class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     """ A Routing Info Allocation Allocator algorithm that keeps track of
         free keys and attempts to allocate them as requested
     """
 
     def __init__(self):
-        AbstractRoutingInfoAllocatorAlgorithm.__init__(self)
-        self._supported_constraints.append(KeyAllocatorSameKeysConstraint)
-        self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
-        self._supported_constraints.append(
-            KeyAllocatorFixedKeyAndMaskConstraint)
-        self._supported_constraints.append(
-            KeyAllocatorContiguousRangeContraint)
+        ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
-        self._free_space_tracker = list()
-        self._free_space_tracker.append(ElementFreeSpace(0, math.pow(2, 32)))
-
-    def allocate_routing_info(self, subgraph, placements, n_keys_map):
+    def __call__(self, subgraph, n_keys_map, routing_paths):
 
         # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subedges,
-            supported_constraints=self._supported_constraints,
+            supported_constraints=[
+                KeyAllocatorFixedMaskConstraint,
+                KeyAllocatorFixedKeyAndMaskConstraint,
+                KeyAllocatorContiguousRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
+        routing_tables = MulticastRoutingTables()
+
         # Get the partitioned edges grouped by those that require the same key
-        same_key_groups = self._get_edge_groups(subgraph)
+        same_key_groups = \
+            routing_info_allocator_utilities.get_edge_groups(subgraph)
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(len(same_key_groups),
@@ -86,41 +76,31 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
-            keys_and_masks = self._get_fixed_key_and_mask(group)
-            fixed_mask, fields = self._get_fixed_mask(group)
+            keys_and_masks = routing_info_allocator_utilities.\
+                get_fixed_key_and_mask(group)
+            fixed_mask, fields = \
+                routing_info_allocator_utilities.get_fixed_mask(group)
 
             if keys_and_masks is not None:
 
                 self._allocate_fixed_keys_and_masks(keys_and_masks, fixed_mask)
             else:
-
                 keys_and_masks = self._allocate_keys_and_masks(
-                    fixed_mask, fields, edge_n_keys,
-                    self._is_contiguous_range(group))
+                    fixed_mask, fields, edge_n_keys)
 
             # Allocate the routing information
             for edge in group:
-                routing_infos.add_subedge_info(
-                    SubedgeRoutingInfo(keys_and_masks, edge))
+                subedge_info = SubedgeRoutingInfo(keys_and_masks, edge)
+                routing_infos.add_subedge_info(subedge_info)
+
+                # update routing tables with entries
+                routing_info_allocator_utilities.add_routing_key_entries(
+                    routing_paths, subedge_info, edge, routing_tables)
+
             progress_bar.update()
-
-        # handle the request for all partitioned vertices which require the
-        # routing info for configuring their data.
-        for partitioned_vertex in subgraph.subvertices:
-            if isinstance(partitioned_vertex,
-                          RequiresRoutingInfoPartitionedVertex):
-                vertex_sub_edge_routing_infos = list()
-                outgoing_edges = subgraph.\
-                    outgoing_subedges_from_subvertex(partitioned_vertex)
-                for outgoing_edge in outgoing_edges:
-                    vertex_sub_edge_routing_infos.append(
-                        routing_infos.
-                        get_subedge_information_from_subedge(outgoing_edge))
-                partitioned_vertex.set_routing_infos(
-                    vertex_sub_edge_routing_infos)
-
         progress_bar.end()
-        return routing_infos
+        return {'routing_infos': routing_infos,
+                'routing_tables': routing_tables}
 
     @staticmethod
     def _get_key_ranges(key, mask):
@@ -159,11 +139,10 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
             yield utility_calls.compress_from_bit_array(generated_key), n_keys
 
     @staticmethod
-    def _get_possible_masks(n_keys, is_contiguous):
+    def _get_possible_masks(n_keys):
         """ Get the possible masks given the number of keys
 
         :param n_keys: The number of keys to generate a mask for
-        :param is_contiguous: True if the keys should be contiguous
         """
 
         # TODO: Generate all the masks - currently only the obvious
@@ -188,15 +167,13 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                     key_and_mask.key, key_and_mask.mask):
                 self._allocate_elements(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, fields, edge_n_keys,
-                                 is_contiguous):
+    def _allocate_keys_and_masks(self, fixed_mask, fields, edge_n_keys):
 
         # If there isn't a fixed mask, generate a fixed mask based
         # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = self._get_possible_masks(edge_n_keys,
-                                                       is_contiguous)
+            masks_available = self._get_possible_masks(edge_n_keys)
 
         # For each usable mask, try all of the possible keys and
         # see if a match is possible
@@ -254,36 +231,9 @@ class MallocBasedRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
                 self._allocate_elements(base_key, n_keys)
 
             # If we get here, we can assign the keys to the edges
-            keys_and_masks = list([KeyAndMask(key=key_found,
-                                              mask=mask)])
+            keys_and_masks = list([BaseKeyAndMask(base_key=key_found,
+                                                  mask=mask)])
             return keys_and_masks
 
         raise PacmanRouteInfoAllocationException(
             "Could not find space to allocate keys")
-
-    def _check_allocation(self, index, base_element_id, n_elements):
-        """ Check if there is enough space for a given set of element ids
-            starting at a base element id inside a given slot
-
-        :param index: The index of the free space slot to check
-        :param base_element_id: The element id to start with -
-        must be inside the slot
-        :param n_elements: The number of elements to be allocated -\
-                       should be power of 2
-        """
-        free_space_slot = self._free_space_tracker[index]
-        space = (free_space_slot.size -
-                 (base_element_id - free_space_slot.start_address))
-
-        if free_space_slot.start_address > base_element_id:
-            raise PacmanElementAllocationException(
-                "Trying to allocate a element id in the wrong slot!")
-        if n_elements == 0 or (n_elements & (n_elements - 1)) != 0:
-            raise PacmanElementAllocationException(
-                "Trying to allocate {} elements, which is not a power of 2"
-                .format(n_elements))
-
-        # Check if there is enough space for the keys
-        if space < n_elements:
-            return None
-        return space

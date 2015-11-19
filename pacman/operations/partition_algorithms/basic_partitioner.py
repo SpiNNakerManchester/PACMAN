@@ -1,35 +1,28 @@
+import logging
+
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
 from pacman.model.graph_mapper.slice import Slice
-from pacman.operations.abstract_algorithms.abstract_partition_algorithm\
-    import AbstractPartitionAlgorithm
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanPartitionException
-
-import logging
-from pacman.utilities.resource_tracker import ResourceTracker
+from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 logger = logging.getLogger(__name__)
 
 
-class BasicPartitioner(AbstractPartitionAlgorithm):
+class BasicPartitioner(object):
     """ An basic algorithm that can partition a partitionable_graph based
         on the number of atoms in the vertices.
     """
-
-    def __init__(self):
-        """
-        """
-        AbstractPartitionAlgorithm.__init__(self)
-        self._supported_constraints.append(PartitionerMaximumSizeConstraint)
 
     @staticmethod
     def _get_ratio(top, bottom):
@@ -38,10 +31,11 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
         return top / bottom
 
     # inherited from AbstractPartitionAlgorithm
-    def partition(self, graph, machine):
+    def __call__(self, graph, machine):
+
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
-            supported_constraints=self._supported_constraints,
+            supported_constraints=[PartitionerMaximumSizeConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
@@ -111,8 +105,10 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
 
                 subvert = vertex.create_subvertex(
                     vertex_slice, subvertex_usage,
-                    "{}:{}:{}".format(vertex.label, counted, alloc - 1),
-                    self._get_remaining_constraints(vertex))
+                    "{}:{}:{}".format(vertex.label, counted,
+                                      (counted + (alloc - 1))),
+                    partition_algorithm_utilities.
+                    get_remaining_constraints(vertex))
                 subgraph.add_subvertex(subvert)
                 graph_to_subgraph_mapper.add_subvertex(
                     subvert, vertex_slice, vertex)
@@ -126,6 +122,8 @@ class BasicPartitioner(AbstractPartitionAlgorithm):
             progress_bar.update()
         progress_bar.end()
 
-        self._generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph)
+        partition_algorithm_utilities.generate_sub_edges(
+            subgraph, graph_to_subgraph_mapper, graph)
 
-        return subgraph, graph_to_subgraph_mapper
+        return {'Partitioned_graph': subgraph,
+                'Graph_mapper': graph_to_subgraph_mapper}

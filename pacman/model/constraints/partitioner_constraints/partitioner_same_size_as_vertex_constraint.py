@@ -1,7 +1,3 @@
-"""
-PartitionerSameSizeAsVertexConstraint
-"""
-
 # pacman imports
 from pacman.model.constraints.abstract_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
@@ -23,7 +19,7 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         """
         AbstractPartitionerConstraint.__init__(
             self, "partitioner same size as other vertex constraint with"
-                  " vertex {}".format(vertex))
+                  " vertex {}".format(vertex.label))
         self._vertex = vertex
 
     def is_partitioner_constraint(self):

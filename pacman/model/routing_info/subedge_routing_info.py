@@ -10,7 +10,7 @@ class SubedgeRoutingInfo(object):
         """
         :param keys_and_masks: The keys allocated to the partitioned edge
         :type keys_and_masks: iterable of\
-                    :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
+                    :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`
         :param subedge: The partitioned edge to which the keys and masks have\
                     been assigned
         :type subedge:\
@@ -24,7 +24,7 @@ class SubedgeRoutingInfo(object):
                     * A partitioned edge
                     * Number of keys to generate (may be None)
         :type key_list_function: (iterable of\
-                    :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`,\
+                    :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`,\
                     :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`,
                     int)\
                     -> iterable of int

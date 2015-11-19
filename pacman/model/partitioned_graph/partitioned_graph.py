@@ -1,24 +1,23 @@
+# pacman imports
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
+from pacman.utilities.utility_objs.ordered_set import OrderedSet
+from pacman.utilities.utility_objs.outgoing_edge_partition \
+    import OutgoingEdgePartition
 
-from pacman.utilities.ordered_set import OrderedSet
+# general imports
+import uuid
 
 
 class PartitionedGraph(object):
     """ Represents a partitioning of a partitionable_graph
     """
 
-    def __init__(self, label=None, subvertices=None, subedges=None):
+    def __init__(self, label=None):
         """
 
         :param label: an identifier for the partitioned_graph
         :type label: str
-        :param subvertices: an iterable of vertices in the partitionable_graph
-        :type subvertices: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.partitionable_vertex.PartitionedVertex`
-        :param subedges: an iterable of subedges in the partitionable_graph
-        :type subedges: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the subedges is not valid
                     * If one of the subvertices is not valid
@@ -30,8 +29,7 @@ class PartitionedGraph(object):
         self._outgoing_subedges = dict()
         self._incoming_subedges = dict()
 
-        self.add_subvertices(subvertices)
-        self.add_subedges(subedges)
+        self._id_to_object_mapping = dict()
 
     def add_subvertex(self, subvertex):
         """ Add a subvertex to this partitioned_graph
@@ -49,8 +47,10 @@ class PartitionedGraph(object):
         else:
             raise PacmanAlreadyExistsException("PartitionedVertex",
                                                str(subvertex))
-        self._outgoing_subedges[subvertex] = list()
+        self._outgoing_subedges[subvertex] = dict()
         self._incoming_subedges[subvertex] = list()
+        # update id mapping
+        self._id_to_object_mapping[str(id(subvertex))] = subvertex
 
     def add_subvertices(self, subvertices):
         """ Add some subvertices to this partitioned_graph
@@ -68,12 +68,15 @@ class PartitionedGraph(object):
             for next_subvertex in subvertices:
                 self.add_subvertex(next_subvertex)
 
-    def add_subedge(self, subedge):
+    def add_subedge(self, subedge, partition_id=None):
         """ Add a subedge to this partitioned_graph
 
         :param subedge: a subedge to be added to the partitioned_graph
         :type subedge:\
                     :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
+        :param partition_id: the id for the outgoing partition that this edge\
+                    is associated with
+        :type partition_id: str
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -85,8 +88,18 @@ class PartitionedGraph(object):
 
         self._subedges.add(subedge)
 
+        # if the partition id is none, make a unique one for storage
+        if partition_id is None:
+            partition_id = str(uuid.uuid4())
+
         if subedge.pre_subvertex in self._outgoing_subedges:
-            self._outgoing_subedges[subedge.pre_subvertex].append(subedge)
+            # if this partition id not been seen before, add a new partition
+            if (partition_id not in
+                    self._outgoing_subedges[subedge.pre_subvertex]):
+                self._outgoing_subedges[subedge.pre_subvertex][partition_id] =\
+                    OutgoingEdgePartition(partition_id)
+            self._outgoing_subedges[subedge.pre_subvertex][partition_id]\
+                .add_edge(subedge)
         else:
             raise PacmanInvalidParameterException(
                 "FixedRoutePartitionableEdge pre_subvertex",
@@ -101,13 +114,16 @@ class PartitionedGraph(object):
                 str(subedge.post_subvertex),
                 " Must exist in the partitioned_graph")
 
-    def add_subedges(self, subedges):
+    def add_subedges(self, subedges, partition_id=None):
         """ Add some subedges to this partitioned_graph
 
         :param subedges: an iterable of subedges to add to this\
                     partitioned_graph
         :type subedges: iterable of\
                     :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
+        :param partition_id: the id for the outgoing partition that this edge\
+                    is associated with
+        :type partition_id: str
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -115,24 +131,55 @@ class PartitionedGraph(object):
         """
         if subedges is not None:
             for next_subedge in subedges:
-                self.add_subedge(next_subedge)
+                self.add_subedge(next_subedge, partition_id)
 
-    def outgoing_subedges_from_subvertex(self, subvertex):
+    def outgoing_subedges_from_subvertex(
+            self, subvertex, partition_identifier=None):
         """ Locate the subedges for which subvertex is the pre_subvertex.\
             Can return an empty collection
 
         :param subvertex: the subvertex for which to find the outgoing subedges
         :type subvertex:\
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+        :param partition_identifier: the identifier for the partition that
+        the edges being returned should associate with. If set to None, returns
+        all edges from all partitions
+        :type partition_identifier: string or None
         :return: an iterable of subedges which have subvertex as their\
                     pre_subvertex
         :rtype: iterable of\
                     :py:class:`pacman.model.partitioned_graph.abstract_partitioned_edge.AbstractPartitionedEdge`
         :raise None: does not raise any known exceptions
         """
-        if subvertex in self._outgoing_subedges:
-            return self._outgoing_subedges[subvertex]
-        return None
+        if partition_identifier is None:
+            edges = list()
+            for partition_identifier in self._outgoing_subedges[subvertex]:
+                edges.extend(
+                    self._outgoing_subedges[subvertex][partition_identifier]
+                    .edges)
+            return edges
+        elif partition_identifier not in self._outgoing_subedges[subvertex]:
+            return ()
+        else:
+            return self._outgoing_subedges[subvertex][
+                partition_identifier].edges
+
+    def outgoing_edges_partitions_from_vertex(self, sub_vertex):
+        """ Locates all the outgoing edge partitions for a given vertex
+
+        :param sub_vertex: the vertex for which the outgoing edge partitions \
+                    are to be located for.
+         :type sub_vertex: \
+                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+        :return: iterable of\
+                     :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
+                     or a empty list if none are avilable
+        :raise None: does not raise any known exceptions
+        """
+        if sub_vertex in self._outgoing_subedges:
+            return self._outgoing_subedges[sub_vertex]
+        else:
+            return ()
 
     def incoming_subedges_from_subvertex(self, subvertex):
         """ Locate the subedges for which subvertex is the post_subvertex.\
@@ -149,6 +196,42 @@ class PartitionedGraph(object):
         """
         if subvertex in self._incoming_subedges:
             return self._incoming_subedges[subvertex]
+        return None
+
+    def get_subvertex_with_repr(self, label):
+        """ Locates the subvertex which has the same label of the input
+
+        :param label: the input label to search for.
+        :return: the partitionedVertex or None if there's no vertex with this\
+                    label
+        """
+        if label in self._id_to_object_mapping:
+            return self._id_to_object_mapping[label]
+        else:
+            return None
+
+    def get_subedge_with_label(self, label, destination_sub_vertex=None):
+        """ locates the subedge which has the same label of the input
+
+        :param label: the input label to search for.
+        :param destination_sub_vertex: the subvertex to which this edge goes to
+        :return: the partitionedEdge or None if there's no vertex with this \
+                    label
+        """
+        for subvertex in self._subvertices:
+            for edge_partition_id in self._outgoing_subedges[subvertex]:
+                vertex_and_partition_id = \
+                    "{}:{}".format(id(subvertex), edge_partition_id)
+                if vertex_and_partition_id == label:
+                    edge_partition = \
+                        self._outgoing_subedges[subvertex][edge_partition_id]
+                    edges = edge_partition.edges
+                    if destination_sub_vertex is None:
+                        return edges[0]
+                    else:
+                        for edge in edges:
+                            if edge.post_subvertex == destination_sub_vertex:
+                                return edge
         return None
 
     @property
@@ -175,7 +258,7 @@ class PartitionedGraph(object):
     def label(self):
         """ The label of the partitioned_graph
 
-        :return: The label or None if there is no lable
+        :return: The label or None if there is no label
         :rtype: str
         :raise None: Raises no known exceptions
         """

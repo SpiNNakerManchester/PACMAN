@@ -1,5 +1,4 @@
 import unittest
-from pacman.utilities.report_states import ReportState
 
 
 class MyTestCase(unittest.TestCase):
