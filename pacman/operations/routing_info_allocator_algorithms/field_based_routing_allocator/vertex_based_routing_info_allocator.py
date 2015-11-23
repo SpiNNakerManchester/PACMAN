@@ -101,7 +101,7 @@ class VertexBasedRoutingInfoAllocator(object):
                 'routing_tables': routing_tables}
 
     def _locate_application_field_space(self, seen_fields):
-        required_bits = math.ceil(math.log(len(seen_fields), 2))
+        required_bits = int(math.ceil(math.log(len(seen_fields), 2)))
         if TYPES_OF_FIELDS.FIXED_KEY.name in seen_fields:
             fixed_keys = seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name]
             # use yield and genrator here
@@ -111,11 +111,11 @@ class VertexBasedRoutingInfoAllocator(object):
                 fixed_mask_masks = seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name]
                 if len(fixed_mask_masks) > 1:
                     keys = list(fixed_mask_masks.keys)
-                    first = fixed_mask_masks[keys[0]]
+                    fields = fixed_mask_masks[keys[0]]
                     searching = True
-                    bits = None
-                    bit_generator = self._generate_bits_that_satisfy_contraints(
-                        first, required_bits)
+                    bit_generator = \
+                        self._generate_bits_that_satisfy_contraints(
+                            fields, required_bits)
                     while not searching:
                         searching = True
                         bits = bit_generator.next()
@@ -130,14 +130,36 @@ class VertexBasedRoutingInfoAllocator(object):
                                 if value_to_check_for != self._deduce_bit_value(
                                         fixed_mask_fields[0].mask, bits):
                                     searching = False
+                    print "AHHH"
+
                 else:
                     keys = list(fixed_mask_masks.keys())
-                    first = fixed_mask_masks[keys[0]]
-                    bit_generator = self._generate_bits_that_satisfy_contraints(
-                        first, required_bits)
+                    fields = fixed_mask_masks[keys[0]]
+                    bit_generator = \
+                        self._generate_bits_that_satisfy_contraints(
+                            fields, required_bits)
                     bits = bit_generator.next()
-                    bit_values = self._deduce_bit_value(first[0].value, bits)
+                    bit_values = self._deduce_bit_value(fields[0].value, bits)
+                    fields = self._reduce_fixed_field_scope(
+                        fields[0].value, bits, bit_values)
+                    distance_in_bits = bits[0] - bits[1]
+                    if distance_in_bits == 1:
+                        for field in fields:
+                            if field.hi == bits[0] and field.lo == bits[0]:
+                                field.value = bit_values
+                                field.tag = SUPPORTED_TAGS.ROUTING
+                    else:
+                        for field in fields:
+                            if field.hi == bits[0] and field.lo == bits[1]:
+                                field.value = bit_values
+                                field.tag = SUPPORTED_TAGS.ROUTING
+                    fixed_mask_masks[keys[0]] = fields
 
+    def _reduce_fixed_field_scope(self, fields_mask, bits, bit_values):
+        value = bit_values << bits[0]
+        inverted_value = ~value
+        new_mask = fields_mask & inverted_value
+        return self._convert_into_fields(new_mask)
 
     def _deduce_bit_value(self, mask, bits):
         bit_value = mask >> int(bits[1])
@@ -152,6 +174,7 @@ class VertexBasedRoutingInfoAllocator(object):
         generator for getting valid bits from the first fixed mask
         :param fixed_mask_fields: the fields from this fixed mask
         :param required_bits: the number of bits required to match the types
+        :type required_bits: int
         :return:
         """
         routing_fields = list()
@@ -284,14 +307,17 @@ class VertexBasedRoutingInfoAllocator(object):
 
         for field in fields:
             if field == TYPES_OF_FIELDS.FIXED_MASK.name:
-                for (position, length) in \
-                        fields[TYPES_OF_FIELDS.FIXED_MASK.name]:
-                    random_identifer = uuid.uuid4()
-                    field_mapper[
-                        "FIXED_MASK:{}:{}".format(position, length)] = \
-                        random_identifer
-                    bit_field_space.add_field(
-                        random_identifer, length, position)
+                fixed_fields = fields[TYPES_OF_FIELDS.FIXED_MASK.name]
+                for fixed_field_key in fixed_fields:
+                    fixed_feild_list = fixed_fields[fixed_field_key]
+                    for fixed_field in fixed_feild_list:
+                        length = fixed_field.hi - fixed_field.lo
+                        if length == 0:
+                            length = 1
+                        bit_field_space.add_field(
+                            fixed_field.name, length, fixed_field.lo)
+                        field_mapper["FIXED_MASK:{}:{}".format(
+                            fixed_field.lo, length)] = fixed_field.name
             elif field == TYPES_OF_FIELDS.FIXED_FIELD.name:
                 for fixed_field in fields[TYPES_OF_FIELDS.FIXED_FIELD.name]:
                     fields_data = self._convert_into_fields(fixed_field.mask)
@@ -362,37 +388,41 @@ class VertexBasedRoutingInfoAllocator(object):
         detected_last_state = expanded_mask[NUM_BITS_IN_ROUTING]
         # iterate up the key looking for fields
         for position in range(NUM_BITS_IN_ROUTING - 1,
-                              START_OF_ROUTING_KEY_POSITION, -1):
-            if (expanded_mask[position] != detected_last_state
-                    and detected_change):
-                detected_change = False
-                if detected_last_state == ROUTING_MASK_BIT:
-                    results.append(Field(
-                        NUM_BITS_IN_ROUTING - detected_change_position,
-                        (detected_change_position - position),
-                        entity, SUPPORTED_TAGS.ROUTING))
-                else:
-                    results.append(Field(
-                        NUM_BITS_IN_ROUTING - detected_change_position,
-                        (detected_change_position - position),
-                        entity, SUPPORTED_TAGS.APPLICATION))
-                detected_last_state = expanded_mask[position]
-                detected_change_position = position - 1
-            if (expanded_mask[position] != detected_last_state
-                    and not detected_change):
-                detected_change = True
-                detected_last_state = expanded_mask[position]
-                detected_change_position = position
-        if detected_change_position != START_OF_ROUTING_KEY_POSITION:
-            if detected_last_state == ROUTING_MASK_BIT:
-                results.append(
-                    Field(NUM_BITS_IN_ROUTING - detected_change_position,
-                          NUM_BITS_IN_ROUTING, entity, SUPPORTED_TAGS.ROUTING))
+                              START_OF_ROUTING_KEY_POSITION - 2, -1):
+            # check for last bit iteration
+            if position == -1:
+                # if last bit has changed, create new field
+                if detected_change_position != position:
+
+                    # create field with correct routing tag
+                    if detected_last_state == ROUTING_MASK_BIT:
+                        results.append(Field(
+                            NUM_BITS_IN_ROUTING - detected_change_position,
+                            NUM_BITS_IN_ROUTING, entity,
+                            SUPPORTED_TAGS.ROUTING))
+                    else:
+                        results.append(Field(
+                            NUM_BITS_IN_ROUTING - detected_change_position,
+                            NUM_BITS_IN_ROUTING, entity,
+                            SUPPORTED_TAGS.APPLICATION))
             else:
-                results.append(
-                    Field(NUM_BITS_IN_ROUTING - detected_change_position,
-                          NUM_BITS_IN_ROUTING, entity,
-                          SUPPORTED_TAGS.APPLICATION))
+                # check for bit iteration
+                if expanded_mask[position] != detected_last_state:
+                    # if changed state, a field needs to be created. check for
+                    # which type of field to support
+                    if detected_last_state == ROUTING_MASK_BIT:
+                        results.append(Field(
+                            NUM_BITS_IN_ROUTING - detected_change_position,
+                            NUM_BITS_IN_ROUTING - (position + 1),
+                            entity, SUPPORTED_TAGS.ROUTING))
+                    else:
+                        results.append(Field(
+                            NUM_BITS_IN_ROUTING - detected_change_position,
+                            NUM_BITS_IN_ROUTING - (position + 1),
+                            entity, SUPPORTED_TAGS.APPLICATION))
+                    # update positions
+                    detected_last_state = expanded_mask[position]
+                    detected_change_position = position
         return results
 
     def _deduce_types(self, subgraph):
