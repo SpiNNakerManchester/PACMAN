@@ -1,6 +1,8 @@
 """
-
+VertexBasedRoutingInfoAllocator
 """
+
+# pacman imports
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_contiguous_range_constraint import \
     KeyAllocatorContiguousRangeContraint
@@ -16,26 +18,31 @@ from pacman.model.constraints.key_allocator_constraints.\
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_flexi_field_constraint import \
     KeyAllocatorFlexiFieldConstraint
-# swiped from rig currently.
+
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.operations.routing_info_allocator_algorithms.\
-    field_based_routing_allocator.rigs_bitfield import \
-    RigsBitField
+
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 from pacman import exceptions
 from pacman.utilities.utility_objs.field import Field
-from pacman.utilities.utility_objs.flexi_field import FlexiField, SUPPORTED_TAGS
+from pacman.utilities.utility_objs.flexi_field \
+    import FlexiField, SUPPORTED_TAGS
+# swiped from rig currently.
+from pacman.operations.routing_info_allocator_algorithms.\
+    field_based_routing_allocator.rigs_bitfield import \
+    RigsBitField
 
+# general imports
 from enum import Enum
 import uuid
 import math
 
+# hard coded values
 NUM_BITS_IN_ROUTING = 31
 ROUTING_MASK_BIT = 1
 APPLICATION_MASK_BIT = 0
@@ -47,6 +54,8 @@ TYPES_OF_FIELDS = Enum(
            ("FIXED_KEY", 1),
            ("FIXED_FIELD", 2)])
 
+APPLICATION_DIVIDER_FIELD_NAME = "APPLICATION_DIVIDER"
+
 
 class VertexBasedRoutingInfoAllocator(object):
     """
@@ -55,6 +64,15 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def __call__(self, partitionable_graph, graph_mapper, subgraph, n_keys_map,
                  routing_paths):
+        """
+
+        :param partitionable_graph:
+        :param graph_mapper:
+        :param subgraph:
+        :param n_keys_map:
+        :param routing_paths:
+        :return:
+        """
 
         # ensure groups are stable and correct
         self._determine_groups(subgraph, graph_mapper, partitionable_graph,
@@ -118,18 +136,6 @@ class VertexBasedRoutingInfoAllocator(object):
                             fields, required_bits)
                     while not searching:
                         searching = True
-                        bits = bit_generator.next()
-                        value_to_check_for = None
-                        for fixed_mask_mask in fixed_mask_masks:
-                            fixed_mask_fields = \
-                                fixed_mask_masks[fixed_mask_mask]
-                            if value_to_check_for is None:
-                                value_to_check_for = self._deduce_bit_value(
-                                    fixed_mask_fields[0].mask, bits)
-                            else:
-                                if value_to_check_for != self._deduce_bit_value(
-                                        fixed_mask_fields[0].mask, bits):
-                                    searching = False
                     print "AHHH"
 
                 else:
@@ -138,30 +144,53 @@ class VertexBasedRoutingInfoAllocator(object):
                     bit_generator = \
                         self._generate_bits_that_satisfy_contraints(
                             fields, required_bits)
-                    bits = bit_generator.next()
-                    bit_values = self._deduce_bit_value(fields[0].value, bits)
-                    fields = self._reduce_fixed_field_scope(
-                        fields[0].value, bits, bit_values)
-                    distance_in_bits = bits[0] - bits[1]
-                    if distance_in_bits == 1:
-                        for field in fields:
-                            if field.hi == bits[0] and field.lo == bits[0]:
-                                field.value = bit_values
-                                field.tag = SUPPORTED_TAGS.ROUTING
-                    else:
-                        for field in fields:
-                            if field.hi == bits[0] and field.lo == bits[1]:
-                                field.value = bit_values
-                                field.tag = SUPPORTED_TAGS.ROUTING
-                    fixed_mask_masks[keys[0]] = fields
+                    self._deal_with_first_fixed_mask_fields(
+                        fixed_mask_masks, bit_generator)
+
+    def _deal_with_first_fixed_mask_fields(
+            self, fixed_mask_masks, bit_generator):
+        keys = list(fixed_mask_masks.keys())
+        fields = fixed_mask_masks[keys[0]]
+        bits = bit_generator.next()
+        bit_values = self._deduce_bit_value(fields[0].value, bits)
+        fields = self._reduce_fixed_field_scope(
+            fields[0].value, bits, bit_values)
+        distance_in_bits = bits[0] - bits[1]
+        if distance_in_bits == 1:
+            for field in fields:
+                if field.hi == bits[0] and field.lo == bits[0]:
+                    field.value = bit_values
+                    field.tag = SUPPORTED_TAGS.ROUTING
+                    field.name = APPLICATION_DIVIDER_FIELD_NAME
+        else:
+            for field in fields:
+                if field.hi == bits[0] and field.lo == bits[1]:
+                    field.value = bit_values
+                    field.tag = SUPPORTED_TAGS.ROUTING
+                    field.name = APPLICATION_DIVIDER_FIELD_NAME
+        fixed_mask_masks[keys[0]] = fields
 
     def _reduce_fixed_field_scope(self, fields_mask, bits, bit_values):
+        """
+
+        :param fields_mask:
+        :param bits:
+        :param bit_values:
+        :return:
+        """
         value = bit_values << bits[0]
         inverted_value = ~value
         new_mask = fields_mask & inverted_value
         return self._convert_into_fields(new_mask)
 
-    def _deduce_bit_value(self, mask, bits):
+    @staticmethod
+    def _deduce_bit_value(mask, bits):
+        """
+
+        :param mask:
+        :param bits:
+        :return:
+        """
         bit_value = mask >> int(bits[1])
         mask = int(math.pow((bits[0] - bits[1]), 2))
         bit_value &= mask
@@ -196,6 +225,13 @@ class VertexBasedRoutingInfoAllocator(object):
                     current_hi -= 1
 
     def _discover_keys_and_masks(self, partition, bit_field_space, n_keys_map):
+        """
+
+        :param partition:
+        :param bit_field_space:
+        :param n_keys_map:
+        :return:
+        """
         routing_keys_and_masks = list()
         application_keys_and_masks = list()
         fixed_key_constraints = utility_calls.locate_constraints_of_type(
@@ -217,18 +253,25 @@ class VertexBasedRoutingInfoAllocator(object):
             print "ah3"
         elif len(flexi_field_constraints) > 0:
             inputs = dict()
+
+            # collect flexi fields by group
             range_based_flexi_fields = list()
             for field in flexi_field_constraints[0].fields:
-                if field.instance_value is not None:
-                    inputs[field.id] = field.instance_value
+                if field.value is not None:
+                    inputs[field.name] = field.value
                 else:
                     range_based_flexi_fields.append(field)
+
+            # if the set contains a ranfe_based felxi field do search
             if len(range_based_flexi_fields) != 0:
                 routing_keys_and_masks, application_keys_and_masks = \
                     self._handle_recursive_range_fields(
                         range_based_flexi_fields, bit_field_space,
                         routing_keys_and_masks, application_keys_and_masks,
                         inputs, 0)
+
+                # if theres a continious constraint check, check the keys for
+                # continiouity
                 if len(continious_constraints) != 0:
                     are_continious = self._check_keys_are_continious(
                         application_keys_and_masks)
@@ -238,22 +281,31 @@ class VertexBasedRoutingInfoAllocator(object):
                             "not continous. Therefore cannot be used")
                     result = list()
                     result.append(routing_keys_and_masks[0])
+
+                # return keys and masks
                 return result
-            else:
+
+            else:  # no range, just grab the key and value
                 key = bit_field_space(**inputs).get_value()
                 mask = bit_field_space(**inputs).get_mask()
                 routing_keys_and_masks.append(BaseKeyAndMask(key, mask))
                 return routing_keys_and_masks
 
-        else:
+        else:  # field type not recongised
             raise exceptions.PacmanConfigurationException(
                 "Cant figure out what to do with a partition with no "
                 "constraints. exploded.")
 
+        # return keys and masks
         return routing_keys_and_masks
 
     @staticmethod
     def _check_keys_are_continious(keys_and_masks):
+        """
+
+        :param keys_and_masks:
+        :return:
+        """
         last_key = None
         for keys_and_mask in keys_and_masks:
             if last_key is None:
@@ -268,10 +320,20 @@ class VertexBasedRoutingInfoAllocator(object):
             self, range_based_flexi_fields, bit_field_space,
             routing_keys_and_masks, application_keys_and_masks, inputs,
             position):
+        """
+
+        :param range_based_flexi_fields:
+        :param bit_field_space:
+        :param routing_keys_and_masks:
+        :param application_keys_and_masks:
+        :param inputs:
+        :param position:
+        :return:
+        """
 
         for value in range(0,
                            range_based_flexi_fields[position].instance_n_keys):
-            inputs[range_based_flexi_fields[position].id] = value
+            inputs[range_based_flexi_fields[position].name] = value
             if position < len(range_based_flexi_fields):
                 # routing keys and masks
                 routing_key = bit_field_space(**inputs).get_value(
@@ -304,20 +366,54 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _handle_application_space(
             self, bit_field_space, fields, field_mapper, top_level_bit_field):
+        """
 
+        :param bit_field_space:
+        :param fields:
+        :param field_mapper:
+        :param top_level_bit_field:
+        :return:
+        """
+        # locate the application field if it exists
+        application_field, application_field_spare_values = \
+            self._locate_application_field(fields)
+
+        if application_field is not None:
+            # create the application basd field if its not none
+            length = application_field.hi - application_field.lo
+            if length == 0:
+                length = 1
+            bit_field_space.add_field(
+                application_field.name, length, application_field.lo)
+
+        # iterate though the fields, adding fields to the system
         for field in fields:
+            # handle fixed mask fields
             if field == TYPES_OF_FIELDS.FIXED_MASK.name:
                 fixed_fields = fields[TYPES_OF_FIELDS.FIXED_MASK.name]
                 for fixed_field_key in fixed_fields:
+
+                    # create the top level bt field space for this set
                     fixed_feild_list = fixed_fields[fixed_field_key]
+                    fixed_field_application_field = self._locate_field_by_name(
+                        fixed_feild_list, APPLICATION_DIVIDER_FIELD_NAME)
+                    internal_field_space = self._create_internal_field_space(
+                        bit_field_space, fixed_field_application_field.value,
+                        fixed_field_application_field)
+
+                    # iterate though rest of the fields adding them to the
+                    #  lower position field space
                     for fixed_field in fixed_feild_list:
-                        length = fixed_field.hi - fixed_field.lo
-                        if length == 0:
-                            length = 1
-                        bit_field_space.add_field(
-                            fixed_field.name, length, fixed_field.lo)
-                        field_mapper["FIXED_MASK:{}:{}".format(
-                            fixed_field.lo, length)] = fixed_field.name
+                        if fixed_field.name != APPLICATION_DIVIDER_FIELD_NAME:
+                            length = fixed_field.hi - fixed_field.lo
+                            if length == 0:
+                                length = 1
+                            internal_field_space.add_field(
+                                fixed_field.name, length, fixed_field.lo)
+                            field_mapper["FIXED_MASK:{}:{}".format(
+                                fixed_field.lo, length)] = fixed_field.name
+
+            # hnadle fixed field
             elif field == TYPES_OF_FIELDS.FIXED_FIELD.name:
                 for fixed_field in fields[TYPES_OF_FIELDS.FIXED_FIELD.name]:
                     fields_data = self._convert_into_fields(fixed_field.mask)
@@ -326,6 +422,8 @@ class VertexBasedRoutingInfoAllocator(object):
                         field_mapper[fixed_field] = random_identifer
                         bit_field_space.add_field(
                             random_identifer, length, position)
+
+            # handle fixed key fields
             elif field == TYPES_OF_FIELDS.FIXED_KEY.name:
                 for key_and_mask in fields[TYPES_OF_FIELDS.FIXED_KEY.name]:
                     random_identifer = uuid.uuid4()
@@ -336,11 +434,107 @@ class VertexBasedRoutingInfoAllocator(object):
                     inputs = dict()
                     inputs[random_identifer] = key_and_mask.key
                     top_level_bit_field(**inputs)
-            else:
-                self._handle_flexi_field_allocation(bit_field_space, field,
-                                                    fields)
 
-    def _handle_flexi_field_allocation(self, bit_field_space, field, fields):
+            else:  # handle flexi field stuff
+                if application_field is not None:
+
+                    # create a new bit field where everyhting is linked off a
+                    # sub internal app field
+                    internal_value = application_field_spare_values[0]
+                    application_field_spare_values.remove(internal_value)
+                    internal_bit_field_space = \
+                        self._create_internal_field_space(
+                            bit_field_space, internal_value, application_field)
+
+                    # handle the flexi fields
+                    self._handle_flexi_field_allocation(
+                        internal_bit_field_space, field, fields)
+                else:
+                    self._handle_flexi_field_allocation(
+                        bit_field_space, field, fields)
+
+    @staticmethod
+    def _create_internal_field_space(higher_space, field_value, field):
+        """
+
+        :param higher_space:
+        :param field_value:
+        :param field:
+        :return:
+        """
+        inputs = dict()
+        inputs[field.name] = field_value
+        return higher_space(**inputs)
+
+    @staticmethod
+    def _locate_field_by_name(feild_list, field_name):
+        """
+
+        :param feild_list:
+        :param field_name:
+        :return:
+        """
+        for field in feild_list:
+            if field.name == field_name:
+                return field
+        return None
+
+    def _locate_application_field(self, fields):
+        """
+
+        :param fields:
+        :return:
+        """
+        application_feild = None
+        application_field_spare_values = None
+        # search for the field with the correct tag
+        for field in fields:
+            # if a fixed mask field, locate correct application field and value
+            if field == TYPES_OF_FIELDS.FIXED_MASK.name:
+                fixed_fields = fields[TYPES_OF_FIELDS.FIXED_MASK.name]
+                for fixed_field_key in fixed_fields:
+                    fixed_feild_list = fixed_fields[fixed_field_key]
+                    for fixed_field in fixed_feild_list:
+                        # if the field is the correct field, mark and deduce
+                        # usable values
+                        if fixed_field.name == APPLICATION_DIVIDER_FIELD_NAME:
+                            if application_feild is None:
+                                application_feild = fixed_field
+                                application_field_spare_values = \
+                                    self._deduce_application_field_space(
+                                        application_feild)
+                            else:
+                                application_field_spare_values.remove(
+                                    fixed_field.value)
+            elif field == TYPES_OF_FIELDS.FIXED_KEY.name:
+                pass
+        return application_feild, application_field_spare_values
+
+    @staticmethod
+    def _deduce_application_field_space(application_feild):
+        """
+
+        :param application_feild:
+        :return:
+        """
+        length = application_feild.hi - application_feild.lo
+        application_field_spare_values = list()
+        if length == 0:
+            length = 1
+        for value in range(0, ((2 ^ length) -1)):
+            application_field_spare_values.append(value)
+        application_field_spare_values.remove(application_feild.value)
+        return application_field_spare_values
+
+    def _handle_flexi_field_allocation(
+            self, bit_field_space, field, fields):
+        """
+
+        :param bit_field_space:
+        :param field:
+        :param fields:
+        :return:
+        """
         # field must be a flexi field, work accordingly
         example_entry = self._check_entries_are_tag_consistent(fields, field)
         if example_entry.tag is None:
@@ -351,21 +545,31 @@ class VertexBasedRoutingInfoAllocator(object):
         for field_instance in fields[field]:
             # only carry on if theres more to create
             if len(fields[field][field_instance]) > 0:
-                inputs = dict()
-                inputs[field] = field_instance.instance_value
-                internal_bit_field = bit_field_space(**inputs)
+
+                # create next level
+                internal_bit_field = self._create_internal_field_space(
+                    bit_field_space, field_instance.value, field_instance)
+
+                # deal with next level hirarckhy
                 for nested_field in fields[field][field_instance]:
                     self._handle_flexi_field_allocation(
                         internal_bit_field, nested_field,
                         fields[field][field_instance])
+
+            # bottom level
             if field_instance.instance_n_keys is not None:
                 for value in range(0, field_instance.instance_n_keys):
-                    inputs = dict()
-                    inputs[field] = value
-                    bit_field_space(**inputs)
+                    self._create_internal_field_space(
+                        bit_field_space, value, field_instance)
 
     @staticmethod
     def _check_entries_are_tag_consistent(fields, field):
+        """
+
+        :param fields:
+        :param field:
+        :return:
+        """
         first = None
         for field_instance in fields[field]:
             if first is None:
@@ -380,6 +584,11 @@ class VertexBasedRoutingInfoAllocator(object):
 
     @staticmethod
     def _convert_into_fields(entity):
+        """
+
+        :param entity:
+        :return:
+        """
         results = list()
         expanded_mask = utility_calls.expand_to_bit_array(entity)
         # set up for first location
@@ -438,7 +647,7 @@ class VertexBasedRoutingInfoAllocator(object):
                 if not isinstance(constraint,
                                   KeyAllocatorContiguousRangeContraint):
                     if isinstance(constraint, KeyAllocatorFlexiFieldConstraint):
-                        self._handle_felxi_field(
+                        self._handle_flexi_field(
                             constraint, seen_fields, known_fields)
                     if isinstance(constraint,
                                   KeyAllocatorFixedKeyAndMaskConstraint):
@@ -476,7 +685,14 @@ class VertexBasedRoutingInfoAllocator(object):
         return seen_fields
 
     @staticmethod
-    def _handle_felxi_field(constraint, seen_fields, known_fields):
+    def _handle_flexi_field(constraint, seen_fields, known_fields):
+        """
+
+        :param constraint:
+        :param seen_fields:
+        :param known_fields:
+        :return:
+        """
         # set the level of search
         current_level = seen_fields
         for constraint_field in constraint.fields:
@@ -484,7 +700,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
             # try to locate field in level
             for seen_field in current_level:
-                if constraint_field.id == seen_field:
+                if constraint_field.name == seen_field:
                     found_field = seen_field
 
             # seen the field before but not at this level. error
@@ -494,21 +710,21 @@ class VertexBasedRoutingInfoAllocator(object):
                         .format(constraint_field))
 
             # if not seen the field before
-            if found_field is None and constraint_field.id not in known_fields:
+            if found_field is None and constraint_field.name not in known_fields:
                 next_level = dict()
                 instance_level = dict()
-                current_level[constraint_field.id] = instance_level
+                current_level[constraint_field.name] = instance_level
                 instance_level[constraint_field] = next_level
-                known_fields.append(constraint_field.id)
+                known_fields.append(constraint_field.name)
                 current_level = next_level
 
             # if found a field, check if its instance has indeed been put in
             # before
             if found_field is not None:
-                instances = current_level[constraint_field.id]
+                instances = current_level[constraint_field.name]
                 if constraint_field in instances:
                     current_level = instances[constraint_field]
-                elif constraint_field.instance_value not in instances:
+                elif constraint_field.value not in instances:
                     next_level = dict()
                     instance_level = dict()
                     instances[constraint_field] = instance_level
@@ -517,6 +733,14 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _determine_groups(self, subgraph, graph_mapper, partitionable_graph,
                           n_keys_map):
+        """
+
+        :param subgraph:
+        :param graph_mapper:
+        :param partitionable_graph:
+        :param n_keys_map:
+        :return:
+        """
 
         routing_info_allocator_utilities.check_types_of_edge_constraint(
             subgraph)
@@ -561,18 +785,18 @@ class VertexBasedRoutingInfoAllocator(object):
         subverts = list(graph_mapper.get_subvertices_from_vertex(vertex))
 
         # pop based flexi field
-        fields.append(FlexiField(flexi_field_id="Population",
-                                 instance_value=verts.index(vertex),
+        fields.append(FlexiField(flexi_field_name="Population",
+                                 value=verts.index(vertex),
                                  tag=SUPPORTED_TAGS.ROUTING.name))
 
         # subpop flexi field
         fields.append(FlexiField(
-            flexi_field_id="SubPopulation{}".format(verts.index(vertex)),
+            flexi_field_name="SubPopulation{}".format(verts.index(vertex)),
             tag=SUPPORTED_TAGS.ROUTING.name,
-            instance_value=subverts.index(subvert)))
+            value=subverts.index(subvert)))
 
         fields.append(FlexiField(
-            flexi_field_id="POP({}:{})Keys"
+            flexi_field_name="POP({}:{})Keys"
             .format(verts.index(vertex), subverts.index(subvert)),
             tag=SUPPORTED_TAGS.APPLICATION.name,
             instance_n_keys=n_keys_map.n_keys_for_partitioned_edge(

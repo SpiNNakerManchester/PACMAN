@@ -29,6 +29,10 @@ class Field(object):
     def name(self):
         return self._name
 
+    @name.setter
+    def name(self, new_value):
+        self._name = new_value
+
     @property
     def value(self):
         return self._value
