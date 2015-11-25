@@ -55,12 +55,17 @@ TYPES_OF_FIELDS = Enum(
            ("FIXED_FIELD", 2)])
 
 APPLICATION_DIVIDER_FIELD_NAME = "APPLICATION_DIVIDER"
+FLEXI_APP_FLAG = "FLEXI_APP_FIELD_VALUE"
+FIXED_MASK_APP_FLAG = "FIXED_MASK_APP_FIELD_VALUE"
+FIXED_KEY_APP_FLAG = ""
+FIXED_MASK_FLAG = "FIXED_MASK"
 
 
 class VertexBasedRoutingInfoAllocator(object):
     """
     VertexBasedRoutingInfoAllocator
     """
+
 
     def __call__(self, partitionable_graph, graph_mapper, subgraph, n_keys_map,
                  routing_paths):
@@ -84,8 +89,10 @@ class VertexBasedRoutingInfoAllocator(object):
         # locate however many types of constrants there are
         seen_fields = self._deduce_types(subgraph)
 
+        uses_application_field = False
         if len(seen_fields) > 1:
             self._locate_application_field_space(seen_fields)
+            uses_application_field = True
 
         field_mapper = dict()
         # handle the application space
@@ -100,11 +107,14 @@ class VertexBasedRoutingInfoAllocator(object):
         routing_info = RoutingInfo()
         routing_tables = MulticastRoutingTables()
 
+        seen_mask_instances = 0
+
         # extract keys and masks for each edge from the bitfield
         for partition in subgraph.partitions:
             # get keys and masks
-            keys_and_masks = self._discover_keys_and_masks(
-                partition, bit_field_space, n_keys_map)
+            keys_and_masks, seen_mask_instances = self._discover_keys_and_masks(
+                partition, bit_field_space, n_keys_map, uses_application_field,
+                field_mapper, seen_mask_instances)
 
             # update routing info for each edge in the partition
             for edge in partition.edges:
@@ -150,27 +160,26 @@ class VertexBasedRoutingInfoAllocator(object):
     def _deal_with_first_fixed_mask_fields(
             self, fixed_mask_masks, bit_generator):
         keys = list(fixed_mask_masks.keys())
-        fields = fixed_mask_masks[keys[0]]
-        bits = bit_generator.next()
-        bit_values = self._deduce_bit_value(fields[0].value, bits)
-        fields = self._reduce_fixed_field_scope(
-            fields[0].value, bits, bit_values)
-        distance_in_bits = bits[0] - bits[1]
+        (bit_hi, bit_lo, original_mask) = bit_generator.next()
+        bit_values = self._deduce_bit_value(original_mask, bit_hi, bit_lo)
+        fields = \
+            self._reduce_fixed_field_scope(original_mask, bit_hi, bit_values)
+        distance_in_bits = bit_hi - bit_lo
         if distance_in_bits == 1:
             for field in fields:
-                if field.hi == bits[0] and field.lo == bits[0]:
+                if field.hi == bit_hi and field.lo == bit_hi:
                     field.value = bit_values
-                    field.tag = SUPPORTED_TAGS.ROUTING
+                    field.tag = SUPPORTED_TAGS.ROUTING.name
                     field.name = APPLICATION_DIVIDER_FIELD_NAME
         else:
             for field in fields:
-                if field.hi == bits[0] and field.lo == bits[1]:
+                if field.hi == bit_hi and field.lo == bit_lo:
                     field.value = bit_values
-                    field.tag = SUPPORTED_TAGS.ROUTING
+                    field.tag = SUPPORTED_TAGS.ROUTING.name
                     field.name = APPLICATION_DIVIDER_FIELD_NAME
         fixed_mask_masks[keys[0]] = fields
 
-    def _reduce_fixed_field_scope(self, fields_mask, bits, bit_values):
+    def _reduce_fixed_field_scope(self, fields_mask, bit_hi, bit_values):
         """
 
         :param fields_mask:
@@ -178,21 +187,24 @@ class VertexBasedRoutingInfoAllocator(object):
         :param bit_values:
         :return:
         """
-        value = bit_values << bits[0]
+        value = bit_values << bit_hi
         inverted_value = ~value
         new_mask = fields_mask & inverted_value
-        return self._convert_into_fields(new_mask)
+        fields = self._convert_into_fields(new_mask)
+        for field in fields:
+            field.value = fields_mask
+        return fields
 
     @staticmethod
-    def _deduce_bit_value(mask, bits):
+    def _deduce_bit_value(mask, bit_hi, bit_lo):
         """
 
         :param mask:
         :param bits:
         :return:
         """
-        bit_value = mask >> int(bits[1])
-        mask = int(math.pow((bits[0] - bits[1]), 2))
+        bit_value = mask >> int(bit_lo)
+        mask = int(math.pow((bit_hi - bit_lo), 2))
         bit_value &= mask
         return bit_value
 
@@ -210,7 +222,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # locate fields valid for generating collections
         for field in fixed_mask_fields:
-            if field.tag == SUPPORTED_TAGS.ROUTING:
+            if field.tag == SUPPORTED_TAGS.ROUTING.name:
                 routing_fields.append(field)
 
         # sort fields based on hi
@@ -221,15 +233,19 @@ class VertexBasedRoutingInfoAllocator(object):
             if routing_field.hi - routing_field.lo >= required_bits:
                 current_hi = routing_field.hi
                 while (current_hi - required_bits) > routing_field.lo:
-                    yield (current_hi, current_hi - required_bits)
+                    yield (current_hi, current_hi - required_bits, field.value)
                     current_hi -= 1
 
-    def _discover_keys_and_masks(self, partition, bit_field_space, n_keys_map):
+    def _discover_keys_and_masks(
+            self, partition, bit_field_space, n_keys_map,
+            uses_application_space, field_mapper, seen_mask_instances):
         """
 
         :param partition:
         :param bit_field_space:
         :param n_keys_map:
+        :param uses_application_space:
+        :param seen_mask_instances:
         :return:
         """
         routing_keys_and_masks = list()
@@ -248,56 +264,108 @@ class VertexBasedRoutingInfoAllocator(object):
         if len(fixed_key_constraints) > 0:
             print "ah"
         elif len(fixed_mask_constraints) > 0:
-            print "ah2"
+            # get constraint and its fields
+            fixed_mask_constraint_mask = fixed_mask_constraints[0].mask
+            fixed_mask_fields = field_mapper[
+                "{}:{}".format(FIXED_MASK_FLAG, fixed_mask_constraint_mask)]
+            fixed_mask_app_field_value = \
+                field_mapper["{}".format(FIXED_MASK_APP_FLAG)]
+            # trakcer for iterator fields
+            range_based_fixed_mask_fields = list()
+
+            # add the app field (must exist in this situation)
+            inputs = dict()
+            inputs [APPLICATION_DIVIDER_FIELD_NAME] = fixed_mask_app_field_value
+
+            # handle the inotus for static parts of the mask
+            for fixed_mask_field in fixed_mask_fields:
+                app_field_space = bit_field_space(**inputs)
+                tag = list(app_field_space.get_tags(
+                    "{}".format(fixed_mask_field)))[0]
+                if tag == SUPPORTED_TAGS.ROUTING.name:
+                    inputs["{}".format(fixed_mask_field)] = seen_mask_instances
+                else:
+                    range_based_fixed_mask_fields.append(fixed_mask_field)
+
+            if len(range_based_fixed_mask_fields) > 1:
+                raise exceptions.PacmanConfigurationException(
+                    "Im not designed to work with multiple ranged based "
+                    "fields for a fixed mask. please fix and try again")
+
+            # get n keys from n_keys_map for the range based mask part
+            n_keys = n_keys_map.n_keys_for_partitioned_edge(partition.edges[0])
+
+            # generate keys
+            for key_index in range(0, n_keys):
+                inputs["{}".format(range_based_fixed_mask_fields[0])] = \
+                    key_index
+                # routing keys and masks
+                routing_key = bit_field_space(**inputs).get_value(
+                    tag=SUPPORTED_TAGS.ROUTING.name)
+                routing_mask = bit_field_space(**inputs).get_mask(
+                    tag=SUPPORTED_TAGS.ROUTING.name)
+                routing_keys_and_masks.append(BaseKeyAndMask(routing_key,
+                                                             routing_mask))
+
+                # application keys and masks
+                application_key = bit_field_space(**inputs).get_value(
+                    tag=SUPPORTED_TAGS.APPLICATION.name)
+                application_mask = bit_field_space(**inputs).get_mask(
+                    tag=SUPPORTED_TAGS.APPLICATION.name)
+                application_keys_and_masks.append(BaseKeyAndMask(
+                    application_key, application_mask))
+            seen_mask_instances += 1
+
         elif len(fixed_field_constraints) > 0:
             print "ah3"
         elif len(flexi_field_constraints) > 0:
             inputs = dict()
 
+            # if theres a application field, add the value
+            if uses_application_space:
+                inputs[APPLICATION_DIVIDER_FIELD_NAME] = \
+                    field_mapper["{}:{}".format(
+                        FLEXI_APP_FLAG,
+                        flexi_field_constraints[0].fields[0].name)]
+
             # collect flexi fields by group
-            range_based_flexi_fields = list()
+            range_based_fixed_mask_fields = list()
             for field in flexi_field_constraints[0].fields:
                 if field.value is not None:
                     inputs[field.name] = field.value
                 else:
-                    range_based_flexi_fields.append(field)
+                    range_based_fixed_mask_fields.append(field)
 
             # if the set contains a ranfe_based felxi field do search
-            if len(range_based_flexi_fields) != 0:
+            if len(range_based_fixed_mask_fields) != 0:
                 routing_keys_and_masks, application_keys_and_masks = \
                     self._handle_recursive_range_fields(
-                        range_based_flexi_fields, bit_field_space,
+                        range_based_fixed_mask_fields, bit_field_space,
                         routing_keys_and_masks, application_keys_and_masks,
                         inputs, 0)
-
-                # if theres a continious constraint check, check the keys for
-                # continiouity
-                if len(continious_constraints) != 0:
-                    are_continious = self._check_keys_are_continious(
-                        application_keys_and_masks)
-                    if not are_continious:
-                        raise exceptions.PacmanConfigurationException(
-                            "These keys returned from the bitfield are"
-                            "not continous. Therefore cannot be used")
-                    result = list()
-                    result.append(routing_keys_and_masks[0])
-
-                # return keys and masks
-                return result
 
             else:  # no range, just grab the key and value
                 key = bit_field_space(**inputs).get_value()
                 mask = bit_field_space(**inputs).get_mask()
                 routing_keys_and_masks.append(BaseKeyAndMask(key, mask))
-                return routing_keys_and_masks
 
-        else:  # field type not recongised
-            raise exceptions.PacmanConfigurationException(
-                "Cant figure out what to do with a partition with no "
-                "constraints. exploded.")
+        # if theres a continious constraint check, check the keys for
+        # continiouity
+        if len(continious_constraints) != 0:
+            are_continious = self._check_keys_are_continious(
+                application_keys_and_masks)
+            if not are_continious:
+                raise exceptions.PacmanConfigurationException(
+                    "These keys returned from the bitfield are"
+                    "not continous. Therefore cannot be used")
+            result = list()
+            result.append(routing_keys_and_masks[0])
+
+            # return keys and masks
+            return result, seen_mask_instances
 
         # return keys and masks
-        return routing_keys_and_masks
+        return routing_keys_and_masks, seen_mask_instances
 
     @staticmethod
     def _check_keys_are_continious(keys_and_masks):
@@ -384,7 +452,8 @@ class VertexBasedRoutingInfoAllocator(object):
             if length == 0:
                 length = 1
             bit_field_space.add_field(
-                application_field.name, length, application_field.lo)
+                application_field.name, length, application_field.lo,
+                tags=SUPPORTED_TAGS.ROUTING.name)
 
         # iterate though the fields, adding fields to the system
         for field in fields:
@@ -409,9 +478,16 @@ class VertexBasedRoutingInfoAllocator(object):
                             if length == 0:
                                 length = 1
                             internal_field_space.add_field(
-                                fixed_field.name, length, fixed_field.lo)
-                            field_mapper["FIXED_MASK:{}:{}".format(
-                                fixed_field.lo, length)] = fixed_field.name
+                                "{}".format(fixed_field.name), length,
+                                fixed_field.lo, fixed_field.tag)
+                            key = "{}:{}".format(
+                                FIXED_MASK_FLAG, fixed_field.value)
+                            if key not in field_mapper:
+                                field_mapper[key] = list()
+                            field_mapper[key].append(fixed_field.name)
+                        else:
+                            field_mapper[FIXED_MASK_APP_FLAG] = \
+                                fixed_field.value
 
             # hnadle fixed field
             elif field == TYPES_OF_FIELDS.FIXED_FIELD.name:
@@ -445,6 +521,8 @@ class VertexBasedRoutingInfoAllocator(object):
                     internal_bit_field_space = \
                         self._create_internal_field_space(
                             bit_field_space, internal_value, application_field)
+                    field_mapper["{}:{}".format(FLEXI_APP_FLAG, field)] = \
+                        internal_value
 
                     # handle the flexi fields
                     self._handle_flexi_field_allocation(
@@ -608,12 +686,12 @@ class VertexBasedRoutingInfoAllocator(object):
                         results.append(Field(
                             NUM_BITS_IN_ROUTING - detected_change_position,
                             NUM_BITS_IN_ROUTING, entity,
-                            SUPPORTED_TAGS.ROUTING))
+                            SUPPORTED_TAGS.ROUTING.name))
                     else:
                         results.append(Field(
                             NUM_BITS_IN_ROUTING - detected_change_position,
                             NUM_BITS_IN_ROUTING, entity,
-                            SUPPORTED_TAGS.APPLICATION))
+                            SUPPORTED_TAGS.APPLICATION.name))
             else:
                 # check for bit iteration
                 if expanded_mask[position] != detected_last_state:
@@ -623,12 +701,12 @@ class VertexBasedRoutingInfoAllocator(object):
                         results.append(Field(
                             NUM_BITS_IN_ROUTING - detected_change_position,
                             NUM_BITS_IN_ROUTING - (position + 1),
-                            entity, SUPPORTED_TAGS.ROUTING))
+                            entity, SUPPORTED_TAGS.ROUTING.name))
                     else:
                         results.append(Field(
                             NUM_BITS_IN_ROUTING - detected_change_position,
                             NUM_BITS_IN_ROUTING - (position + 1),
-                            entity, SUPPORTED_TAGS.APPLICATION))
+                            entity, SUPPORTED_TAGS.APPLICATION.name))
                     # update positions
                     detected_last_state = expanded_mask[position]
                     detected_change_position = position
