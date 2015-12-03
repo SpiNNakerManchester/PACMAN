@@ -98,9 +98,9 @@ class ConvertToFileMachine(object):
 
         return {'file_machine': file_path}
 
-    @staticmethod
+
     def _check_for_exceptions(
-            json_dictory_rep, x_coord, y_coord, machine,
+            self, json_dictory_rep, x_coord, y_coord, machine,
             chip_resource_exceptions):
         """
 
@@ -112,9 +112,9 @@ class ConvertToFileMachine(object):
         """
 
         no_processors = CHIP_HOMOGENIOUS_CORES
-        if (not machine.get_chip_at(x_coord, y_coord).
-                is_processor_with_id(no_processors - 1)):
+        chip = machine.get_chip_at(x_coord, y_coord)
 
+        if not chip.is_processor_with_id(no_processors - 1):
             # locate the highest core id
             has_processor = False
             while not has_processor and no_processors > 0:
@@ -122,13 +122,36 @@ class ConvertToFileMachine(object):
                 has_processor = machine.get_chip_at(x_coord, y_coord).\
                     is_processor_with_id(no_processors - 1)
 
+            # locate number of monitor cores
+            no_monitors= self._locate_no_monitors(chip)
+
             chip_exceptions = dict()
-            chip_exceptions["cores"] = no_processors
+            chip_exceptions["cores"] = no_processors - no_monitors
 
             chip_resource_exceptions[(x_coord, y_coord)] = chip_exceptions
 
+        else:
+            no_monitors = self._locate_no_monitors(chip)
+
+            # if montiors exist, remove them from top elvel
+            if no_monitors > 0:
+                chip_exceptions = dict()
+                chip_exceptions["cores"] = \
+                    CHIP_HOMOGENIOUS_CORES -1 - no_monitors
+                chip_resource_exceptions[(x_coord, y_coord)] = chip_exceptions
+
+        # search for etehrnet connected chips
         for chip in machine.ethernet_connected_chips:
             if (chip.x, chip.y) not in chip_resource_exceptions:
                 chip_resource_exceptions[(chip.x, chip.y)] = dict()
             chip_resource_exceptions[(chip.x, chip.y)]['tags'] = \
                 len(chip.tag_ids)
+
+    def _locate_no_monitors(self, chip):
+        no_monitors = 0
+        # search for montiors in the list of processors
+        for processor in range(0, CHIP_HOMOGENIOUS_CORES - 1):
+            if chip.is_processor_with_id(processor):
+                if chip.get_processor_with_id(processor).is_monitor:
+                    no_monitors += 1
+        return no_monitors
