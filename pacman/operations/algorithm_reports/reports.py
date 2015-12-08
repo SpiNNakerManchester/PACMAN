@@ -323,8 +323,9 @@ def placement_report_without_partitionable_graph_by_vertex(
 def placement_report_with_partitionable_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper):
     """ Generate report on the placement of sub-vertices onto cores by core.
+
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param graph_mapper: the mapping between partitionable and partitioned\
             graphs
     :param machine: the spinnaker machine object
