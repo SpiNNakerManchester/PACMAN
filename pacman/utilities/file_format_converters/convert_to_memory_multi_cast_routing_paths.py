@@ -110,7 +110,6 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                 placements, chip_coords, None, source_link_id,
                 partitioned_graph, edge_id, direction_data, next_hop, machine)
             memory_edges += local_memory_edges
-
         else:
 
             # none core level. keep searching
@@ -143,11 +142,13 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
         :param direction_data:
         :return:
         """
+
         # create list holder
         memory_edges = []
 
         # create correct entries
         if direction_data[0]:
+
             # locate edge this core is associated with
             subvertex = placements.get_subvertex_on_processor(
                 chip_coords[0], chip_coords[1], direction_data[1])

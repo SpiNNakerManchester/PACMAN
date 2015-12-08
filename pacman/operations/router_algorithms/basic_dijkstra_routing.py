@@ -103,7 +103,7 @@ class BasicDijkstraRouting(object):
         return {'routing_paths': self._routing_paths}
 
     def _initiate_node_info(self, machine):
-        """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
+        """ private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
         used for setting up a dictionary which contains data for each chip in \
         the machine
 
@@ -116,6 +116,7 @@ class BasicDijkstraRouting(object):
         nodes_info = dict()
         for chip in machine.chips:
             x, y = chip.x, chip.y
+
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
             nodes_info[(x, y)] = dict()
@@ -313,7 +314,7 @@ class BasicDijkstraRouting(object):
             #  a new partitionable_graph lowest cost cannot be found
 
             # This is the lowest cost across ALL
-            # unactivated nodes in the partitionable_graph.
+            # un-activated nodes in the partitionable_graph.
             graph_lowest_cost = None
 
             # Find the next node to be activated
@@ -328,14 +329,14 @@ class BasicDijkstraRouting(object):
                     graph_lowest_cost = dijkstra_tables[key]["lowest cost"]
                     x_current, y_current = int(key[0]), int(key[1])
 
-            # If there were no unactivated nodes with costs,
+            # If there were no un-activated nodes with costs,
             # but the destination was not reached this iteration,
             # raise an exception
             if graph_lowest_cost is None:
                 raise exceptions.PacmanRoutingException(
                     "Destination could not be activated, ending run")
 
-            # Set the next activated node as the unactivated node with the
+            # Set the next activated node as the un-activated node with the
             #  lowest current cost
             dijkstra_tables[(x_current, y_current)]["activated?"] = True
             try:
@@ -435,7 +436,7 @@ class BasicDijkstraRouting(object):
         x_current, y_current = x_destination, y_destination
         routing_entry_route_processors = []
 
-        # if the processor is None, dont add to router path entry
+        # if the processor is None, don't add to router path entry
         if processor_dest is not None:
             routing_entry_route_processors.append(processor_dest)
         routing_entry_route_links = None
@@ -561,19 +562,19 @@ class BasicDijkstraRouting(object):
 
             if (nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] <
                     0):
-                print ("Bandwidth overused from ({}, {}) in direction {}! to "
+                print ("Bandwidth over-used from ({}, {}) in direction {}! to "
                        "({}, {})".format(x_neighbour, y_neighbour,
                                          dec_direction, x_current, y_current))
 
                 raise exceptions.PacmanRoutingException(
-                    "Bandwidth overused as described above! Terminating...")
+                    "Bandwidth over-used as described above! Terminating...")
         return x_current, y_current, previous_routing_entry, made_an_entry
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
         """private method, do not call from outside dijskra routing\
 
-        used to detmerine the direction of a link to go down
+        used to determine the direction of a link to go down
 
         :param neighbour_position: the position the neighbour is at
         :type neighbour_position: int

@@ -116,7 +116,7 @@ class BaseKeyAndMask(object):
             numpy.asarray([self._base_key], dtype=">u4").view(dtype="uint8"))
 
         # for each key, create its key with the idea of a neuron id being
-        # continuous and live at a offset-able position from the bottom of
+        # continuous and live at a offsetable position from the bottom of
         # the key
         for value in range(n_keys):
             key = numpy.copy(unwrapped_key)

@@ -37,7 +37,7 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
             if not isinstance(keys_and_mask, BaseKeyAndMask):
                 raise exceptions.PacmanConfigurationException(
                     "the keys and masks object contains a object that is not"
-                    "a key_and_mask object. Please fix and try again. RTFD")
+                    "a key_and_mask object")
 
         self._keys_and_masks = keys_and_masks
         self._key_list_function = key_list_function

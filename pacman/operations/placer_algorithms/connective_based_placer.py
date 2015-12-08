@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class ConnectiveBasedPlacer(RadialPlacer):
     """ A radial algorithm that can place a partitioned_graph onto a\
-        machine using a circle out behaviour from a ethernet at a given point\
+        machine using a circle out behaviour from a Ethernet at a given point\
         and which will place things that are most connected closest to each\
         other
     """

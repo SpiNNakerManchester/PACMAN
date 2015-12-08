@@ -1,7 +1,3 @@
-"""
-MulticastRoutingPaths
-"""
-
 # pacman imports
 from pacman import exceptions
 
@@ -32,7 +28,7 @@ class MulticastRoutingPaths(object):
         self._router_to_entries_map[key].append(entry)
 
     def get_entries_for_router(self, router_x, router_y):
-        """ Get the set of mutlicast path entries assigned to this router
+        """ Get the set of multicast path entries assigned to this router
         :param router:
         :return:
         """

@@ -57,7 +57,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     def _set_up_pacman_algorthms_listings(self, algorithms, xml_paths, inputs,
                                           required_outputs):
-        """ translates the algorithm string and uses the config xml to create
+        """ translates the algorithm string and uses the config XML to create\
             algorithm objects
 
         :param algorithms: the string representation of the set of algorithms
@@ -66,7 +66,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param xml_paths: the list of paths for XML configuration data
         :type xml_paths: iterable of strings
         :param required_outputs: the set of outputs that this workflow is\
-                meant to generate
+                 meant to generate
         :type required_outputs: iterable of types as strings
         """
 
@@ -74,7 +74,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         algorithms_names = self._algorithms
         algorithms_names.extend(algorithms)
 
-        # set up xml reader for standard pacman algorithms XML file reader
+        # set up XML reader for standard PACMAN algorithms XML file reader
         # (used in decode_algorithm_data_objects function)
         xml_paths.append(os.path.join(os.path.dirname(operations.__file__),
                                       "algorithms_metadata.xml"))
@@ -103,14 +103,14 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     def _sort_out_order_of_algorithms(
             self, inputs, required_outputs, optional_converter_algorithms):
-        """ Takes the algorithms and determines which order they need to be\
-            executed in to generate the correct data objects
+        """ takes the algorithms and determines which order they need to be\
+            executed to generate the correct data objects
         :param inputs: list of input types
         :type inputs: iterable of str
         :param required_outputs: the set of outputs that this workflow is\
                 meant to generate
         :param optional_converter_algorithms: the set of optional converter\
-                algorithms from memory to file formats
+                algorithms which can be inserted automatically if required
         :return: None
         """
 
@@ -158,14 +158,11 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                         algorithms_used.append(algorithm.algorithm_id)
 
                     raise exceptions.PacmanConfigurationException(
-                        "I was not able to deduce a future algorithm to use as"
-                        "I only have the inputs \n{} \n and am missing the "
-                        "outputs \n {} \n from the requirements of the end "
-                        "user. The only available functions are \n {} \n, "
-                        "after I have ran functions \n {}\n. Please add a "
-                        "algorithm(s) which uses the defined inputs and "
-                        "generates the required outputs and rerun me."
-                        .format(
+                        "Unable to deduce a future algorithm to use.\n"
+                        "    Inputs: {}\n"
+                        "    Outputs: {}\n"
+                        "    Functions available: {}\n"
+                        "    Functions used: {}\n".format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
                             algorithums_left_names, algorithms_used))
@@ -179,8 +176,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         if not all_required_outputs_generated:
             raise exceptions.PacmanConfigurationException(
-                "I was not able to generate the outputs {}. Please rectify "
-                "this and try again".format(failed_to_generate_output_string))
+                "Unable to generate outputs {}".format(
+                    failed_to_generate_output_string))
 
         # iterate through the list removing algorithms which are obsolete
         self._prune_unnecessary_algorithms(allocated_algorithums)
@@ -249,7 +246,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         return suitable_algorithm
 
     def execute_mapping(self):
-        """ Executes the algorithms
+        """
+        executes the algorithms
         :param inputs: the inputs stated in setup function
         :return: None
         """
@@ -259,15 +257,19 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 input_parameter['value']
 
         for algorithm in self._algorithms:
-            # exeucte the algorithm and store outputs
-            if not algorithm.external:  # internal to pacman
+
+            # execute the algorithm and store outputs
+            if not algorithm.external:
+
+                # internal to pacman
                 self._handle_internal_algorithm(algorithm)
-            else:  # external to pacman
+            else:
+
+                # external to pacman
                 self._handle_external_algorithm(algorithm)
 
     def _handle_internal_algorithm(self, algorithm):
-        """ Creates the input files for the algorithm
-
+        """ creates the input files for the algorithm
         :param algorithm: the algorithm
         :return: None
         """
@@ -288,10 +290,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             results = python_algorithm(**inputs)
         except TypeError as type_error:
             raise exceptions.PacmanTypeError(
-                "The algorithm {} has crashed for some unknown reason. "
-                "Its inputs were {} and the error message was {} with stack {}"
-                "We refer to the developer for fixing this issue."
-                .format(
+                "Algorithm {} has crashed."
+                "    Inputs: {}\n"
+                "    Error: {}\n"
+                "    Stack: {}\n".format(
                     algorithm.algorithm_id, algorithm.inputs,
                     type_error.message, traceback.format_exc()))
         # handle_prov_data
@@ -303,7 +305,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     def _handle_external_algorithm(self, algorithm):
         """ Creates the input files for the algorithm
-        :param algorithm: the algorithm
+        :param algorithm: the algorthm
         :return: None
         """
         input_params = self._create_input_commands(algorithm)
@@ -340,13 +342,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             stdout, stderr = child.communicate()
             raise exceptions.\
                 PacmanAlgorithmFailedToCompleteException(
-                    "The algorithm {} failed to complete correctly, "
-                    "returning error code {}. \n The inputs to the "
-                    "algorithm were {}. \n The stdout from the algorithm "
-                    "were {}. \n The stderr from the algorithm were {}.\n"
-                    " Due to this algorithm being outside of the software "
-                    "stack's default supported algorithms, we refer to "
-                    "the algorithm builder to rectify this.".format(
+                    "Algorithm {} returned a non-zero error code {}\n"
+                    "    Inputs: {}\n"
+                    "    Output: {}\n"
+                    "    Error: {}\n".format(
                         algorithm.algorithm_id, child.returncode,
                         inputs, stdout, stderr))
 
@@ -354,9 +353,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         self._map_output_parameters(outputs, algorithm)
 
     def _sort_out_external_algorithm_outputs(self, algorithm):
-        """ All outputs from a external algorithm have to be files, these\
-            names have been handed to them via the inputs. So a mapping\
-            between them is needed
+        """ Get a map of output name to type for an external algorithm
+
         :param algorithm: the external algorithm
         :return: the list of mapped outputs
         """
@@ -367,10 +365,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         return outputs
 
     def _create_input_commands(self, algorithm):
-        """ Converts internal type mapping into a input dictionary for the\
-            algorithm
+        """ Get a map of input name to type for an algorithm
+
         :param algorithm: the algorithm in question
-        :return: a dictionary containing input names and the corresponding\
+        :return: a dictionary containing input names and the corresponding \
                 internal type mapping's object
         """
         params = dict()
@@ -380,40 +378,38 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         return params
 
     def _map_output_parameters(self, results, algorithm):
-        """ Translates the outputs results into the internal type mappings
+        """ Get a map of outputs from an algorithm
 
         :param results: the results from the algorithm
-        :param algorithm: the algorithm itself
+        :param algorithm: the algorithm description
         :return: None
         :raises PacmanAlgorithmFailedToCompleteException: when the algorithm\
                 returns no results
         """
         if results is not None:
+
             # update python data objects
             for result_name in results:
-                result_type = \
-                    algorithm.get_type_from_output_name(result_name)
+                result_type = algorithm.get_type_from_output_name(result_name)
                 if result_type is None:
                     raise exceptions.PacmanTypeError(
-                        "The result with name {} does not correspond to any of"
-                        "the outputs for algorithm {} which has outputs {}"
-                        .format(result_name, algorithm.algorithm_id,
-                                algorithm.outputs))
-                self._internal_type_mapping[result_type] = \
-                    results[result_name]
+                        "Unrecognised result name {} for algorithm {} with"
+                        "outputs {}".format(
+                            result_name, algorithm.algorithm_id,
+                            algorithm.outputs))
+                self._internal_type_mapping[result_type] = results[result_name]
         elif len(algorithm.outputs) != 0:
             raise exceptions.PacmanAlgorithmFailedToCompleteException(
-                "The algorithm did not generate any outputs. This is deemed to"
-                " be an error of some sort. Please fix and try again")
+                "Algorithm {} did not generate any outputs".format(
+                    algorithm.algorithm_id))
 
     @staticmethod
     def _create_python_object(algorithm):
-        """ Creates the python algorithm from the spec
+        """ Create a python object for an algorithm from a specification
 
-        :param algorithm: the algorithm spec
+        :param algorithm: the algorithm specification
         :return: an instantiated object for the algorithm
         """
-        # import the python module to run
         if (algorithm.python_class is not None and
                 algorithm.python_function is None):
 
@@ -421,14 +417,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             python_algorithm = getattr(
                 importlib.import_module(algorithm.python_module_import),
                 algorithm.python_class)
-
-            # create instantiation of the algorithm to run
             try:
                 python_algorithm = python_algorithm()
             except TypeError as type_error:
                 raise exceptions.PacmanConfigurationException(
-                    "The algorithm {} has failed to be instaiated due to {}"
+                    "Failed to create instance of algorithm {}: {}"
                     .format(algorithm.algorithm_id, type_error.message))
+
         elif (algorithm.python_function is not None and
                 algorithm.python_class is None):
 
@@ -436,13 +431,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             python_algorithm = getattr(
                 importlib.import_module(algorithm.python_module_import),
                 algorithm.python_function)
-        else:  # nither, but is a python object.... error
+
+        else:
+
+            # neither, but is a python object.... error
             raise exceptions.PacmanConfigurationException(
-                "The algorithm {}, was deduced to be a internal "
-                "algorithm and yet has resulted in no class or "
-                "function definition. This makes the auto exeuction "
-                "impossible. Please fix and try again."
-                .format(algorithm.algorithm_id))
+                "Internal algorithm {} must be either a function or a class"
+                "but not both".format(algorithm.algorithm_id))
         return python_algorithm
 
     def get_item(self, item_type):
@@ -463,7 +458,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param placement:
         :return:
         """
-
         # write xml form into file provided
         writer = open(file_path, "w")
         writer.write(etree.tostring(self._provanence_data, pretty_print=True))

@@ -1,6 +1,3 @@
-"""
-PartitionableGraph
-"""
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \

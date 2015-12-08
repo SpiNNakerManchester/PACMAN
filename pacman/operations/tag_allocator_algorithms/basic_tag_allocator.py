@@ -13,14 +13,14 @@ from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
-# spinnmachine imports
+# spinn_machine imports
 from spinn_machine.tags.iptag import IPTag
 from spinn_machine.tags.reverse_iptag import ReverseIPTag
 
 
 class BasicTagAllocator(object):
     """ Basic tag allocator that goes though the boards available and applies
-        the iptags and reverse iptags as needed.
+        the ip tags and reverse ip tags as needed.
 
     """
 

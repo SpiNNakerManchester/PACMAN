@@ -148,8 +148,8 @@ class MulticastRoutingPathEntry(object):
             self._out_going_processors.append(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
-                "the processor {} already exists in the mutli-cast-r"
-                "outing-apth-entry".format(direction), str(direction))
+                "the processor {} already exists in the mutlicast-"
+                "routing-path-entry".format(direction), str(direction))
 
     def add_in_coming_processor_direction(self, procesor_id):
         """ Add a processor to the incoming direction

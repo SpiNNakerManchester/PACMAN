@@ -109,6 +109,7 @@ class ConvertAlgorithmsMetadata(object):
     @staticmethod
     def _translate_parameters(parameters_element):
         """ Convert an XML parameter element into a dict
+
         :param parameters_element:
         :return:
         """

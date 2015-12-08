@@ -54,7 +54,7 @@ class ConvertToFilePartitionedGraph(object):
             elif len(utility_calls.locate_constraints_of_type(
                     vertex.constraints, AbstractTagAllocatorConstraint)) != 0:
 
-                # handle the edge between the tagable vertex and the fake
+                # handle the edge between the tag-able vertex and the fake
                 # vertex
                 hyper_edge_dict = dict()
                 edges_resources[hashlib.md5(vertex.label).hexdigest()] = \
@@ -65,7 +65,7 @@ class ConvertToFilePartitionedGraph(object):
                 hyper_edge_dict["weight"] = 1.0
                 hyper_edge_dict["type"] = "FAKE_TAG_EDGE"
 
-                # add the tagable vertex
+                # add the tag-able vertex
                 vertex_resources = dict()
                 vertices_resources[id(vertex)] = vertex_resources
                 vertex_resources["cores"] = \

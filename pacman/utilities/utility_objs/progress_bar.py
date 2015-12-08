@@ -28,6 +28,7 @@ class ProgressBar(object):
 
     def update(self, amount_to_add=1):
         """ Update the progress bar by a given amount
+
         :param amount_to_add:
         :return:
         """
@@ -59,6 +60,7 @@ class ProgressBar(object):
 
     def end(self):
         """ Close the progress bar, updating whatever is left if needed
+
         :return:
         """
         difference = \

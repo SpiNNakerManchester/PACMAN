@@ -18,7 +18,7 @@ EDGE_TYPES = Enum(
 
 
 class OutgoingEdgePartition(object):
-    """ A collection of egdes from a single vertex which have the same\
+    """ A collection of edges from a single vertex which have the same\
         semantics and so can share a single key
     """
 
@@ -70,16 +70,14 @@ class OutgoingEdgePartition(object):
 
     @property
     def edges(self):
-        """
-        returns the edges that are associated with this outgoing egde partition
+        """ The edges that are associated with this outgoing edge partition
         :return:
         """
         return self._edges
 
     @property
     def type(self):
-        """
-        returns the type of the partition
+        """ The type of the partition
         :return:
         """
         return self._type
