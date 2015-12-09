@@ -58,7 +58,6 @@ def create_virtual_chip(machine, virtual_vertex):
             spinnaker_link_data.connected_chip_y)
         connected_chip.router.add_link(to_virtual_chip_link)
 
-        # return new v chip
         machine.add_chip(Chip(
             processors=processors, router=router_object,
             sdram=SDRAM(
