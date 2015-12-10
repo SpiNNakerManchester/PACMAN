@@ -61,6 +61,7 @@ def create_virtual_chip(machine, virtual_vertex):
         # return new v chip
         machine.add_chip(Chip(
             processors=processors, router=router_object,
-            sdram=SDRAM(total_size=0),
+            sdram=SDRAM(
+                total_size=0, user_base_address=0, system_base_address=0),
             x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
             virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None))
