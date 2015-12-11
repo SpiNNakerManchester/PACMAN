@@ -11,7 +11,11 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint \
 class AbstractConstrainedObject(object):
 
     def __init__(self, constraints=None):
-        self._constraints = set()
+        # safety point for dimond inhirrtance
+        if not hasattr(self, 'constraints'):
+            self._constraints = set()
+
+        # add new constraints to the set
         self.add_constraints(constraints)
 
     def add_constraint(self, constraint):

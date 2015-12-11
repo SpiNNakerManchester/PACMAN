@@ -78,7 +78,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 "The subvertex {} has a set of edges {} "
                 "which has not been requested to have continous keys. The "
                 "algorithm will anyway allocate keys in a continious"
-                " manner.".format(group[0].pre_subvertex, group))
+                " manner.".format(group.edges[0].pre_subvertex, group))
             continious_groups.append(group)
 
         # Go through the groups and allocate keys
