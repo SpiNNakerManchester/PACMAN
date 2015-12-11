@@ -126,8 +126,16 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             allocated_a_algorithm = False
 
             # check each algorithm to see if its usable with current inputs
+            # and without its optional required inputs
             suitable_algorithm = self._locate_suitable_algorithm(
-                self._algorithms, input_names, generated_outputs, False)
+                self._algorithms, input_names, generated_outputs, False, True)
+
+            if suitable_algorithm is None:
+                suitable_algorithm = self._locate_suitable_algorithm(
+                    self._algorithms, input_names, generated_outputs, False,
+                    True)
+            # check each algorithm to see if its usable with current inputs and
+            # its optional required inputs
 
             # add the suitable algorithms to the list and take there outputs
             #  as new inputs
@@ -213,7 +221,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     @staticmethod
     def _locate_suitable_algorithm(
-            algorithm_list, inputs, generated_outputs, look_for_noval_output):
+            algorithm_list, inputs, generated_outputs, look_for_noval_output,
+            look_for_optional_required_inputs):
         """
         locates a suitable algorithm
         :param algorithm_list: the list of algorithms to choose from
@@ -221,6 +230,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param generated_outputs: the current outputs expected to be generated
         :param look_for_noval_output: bool which says that algorithms need\
                 to produce a novel output
+        :param look_for_optional_required_inputs: bool which states it should
+                look at the optional required inputs to verify a usable function
         :return: a suitable algorithm which uses the inputs
         """
         position = 0
@@ -228,19 +239,38 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         while (suitable_algorithm is None and
                 position < len(algorithm_list)):
             algorithm = algorithm_list[position]
+
+            # check all inputs
             all_inputs_avilable = True
             for input_parameter in algorithm.inputs:
                 if input_parameter['type'] not in inputs:
                     all_inputs_avilable = False
             adds_to_output = False
+
+            # check all ouputs
             if look_for_noval_output:
                 for output_parameter in algorithm.outputs:
                     if output_parameter['type'] not in generated_outputs:
                         adds_to_output = True
-            if (all_inputs_avilable and
-                    ((look_for_noval_output and adds_to_output) or
-                        (not look_for_noval_output)) and
-                    suitable_algorithm is None):
+
+            # check for optional required inputs
+            has_any_optional_required_inputs = False
+            if len(algorithm.requred_optional_inputs) == 0:
+                has_any_optional_required_inputs = True
+            else:
+                extra_inputs = algorithm.requred_optional_inputs
+                for optional_required_input in extra_inputs:
+                    if optional_required_input['type'] in inputs:
+                        has_any_optional_required_inputs = True
+
+            # check if all chekcs passed
+            if (all_inputs_avilable
+                and ((look_for_optional_required_inputs
+                      and has_any_optional_required_inputs)
+                     or not look_for_optional_required_inputs)
+                and ((look_for_noval_output and adds_to_output)
+                     or (not look_for_noval_output))
+                and suitable_algorithm is None):
                 suitable_algorithm = algorithm
             position += 1
         return suitable_algorithm
@@ -248,7 +278,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
     def execute_mapping(self):
         """
         executes the algorithms
-        :param inputs: the inputs stated in setup function
         :return: None
         """
 
@@ -372,9 +401,33 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 internal type mapping's object
         """
         params = dict()
+
+        # handle required inputs
         for input_param in algorithm.inputs:
             params[input_param['name']] = \
                 self._internal_type_mapping[input_param['type']]
+
+        # handle optional inputs
+        for input_param in algorithm.optional_inputs:
+            if input_param['type'] in self._internal_type_mapping:
+                params[input_param['name']] = \
+                    self._internal_type_mapping[input_param['type']]
+
+        # handle optional required inputs, only adding the first found param
+        #  and other params with that rank
+        requred_optional_inputs_list = list(algorithm.requred_optional_inputs)
+        sorted(requred_optional_inputs_list, key=lambda input: input['rank'])
+        located = False
+        located_rank = None
+        for input_param in requred_optional_inputs_list:
+            if (input_param['type'] in self._internal_type_mapping and
+                    (not located or
+                         (located and located_rank == input_param['rank']))):
+                params[input_param['name']] = \
+                    self._internal_type_mapping[input_param['type']]
+                located = True
+                located_rank = input_param['rank']
+
         return params
 
     def _map_output_parameters(self, results, algorithm):
