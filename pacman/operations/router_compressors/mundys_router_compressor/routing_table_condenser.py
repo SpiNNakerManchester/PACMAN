@@ -5,13 +5,20 @@ from pacman.model.routing_tables.multicast_routing_table import \
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman import exceptions
+from pacman.utilities.algorithm_utilities import feild_based_system_utilities\
+    as field_utilties
+from pacman.operations.router_compressors.mundys_router_compressor.\
+    complete_mask_generator import CompleteMaskGenerator
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+
+# spinnMachine imports
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 # general imports
 import collections
+import logging
 
-from pacman.operations.router_compressors.mundys_router_compressor.\
-    complete_mask_generator import CompleteMaskGenerator
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+logger = logging.getLogger(__name__)
 
 
 class MundyRouterCompressor(object):
@@ -20,24 +27,35 @@ class MundyRouterCompressor(object):
     RoutingEntry = collections.namedtuple('RoutingEntry',
                                           'key mask route defaultable')
 
-    def __call__(self, router_tables):
+    def __call__(self, router_tables, sub_graph):
+        # build storage
         compressed_pacman_router_tables = MulticastRoutingTables()
+
+        # create progress bar
+        progress_bar = ProgressBar(
+            len(router_tables.routing_tables), "Compressing routing Tables")
+
+        # compress each router
         for router_table in router_tables.routing_tables:
             entries, masks = \
-                self._convert_to_mundy_format(router_table)
+                self._convert_to_mundy_format(router_table, sub_graph)
             compressed_router_table_entries = \
                 self.reduce_routing_table(entries, masks)
             compressed_pacman_table = self._convert_to_pacman_router_table(
                 compressed_router_table_entries, router_table.x, router_table.y)
             compressed_pacman_router_tables.add_routing_table(
                 compressed_pacman_table)
+            progress_bar.update()
+        progress_bar.end()
 
+        # return
         return {'routing_tables': compressed_pacman_router_tables}
 
-    def _convert_to_mundy_format(self, pacman_router_table):
+    def _convert_to_mundy_format(self, pacman_router_table, sub_graph):
         """
 
         :param pacman_router_table:
+        :param sub_graph:
         :return:
         """
         entries = list()
@@ -63,6 +81,20 @@ class MundyRouterCompressor(object):
                 route_entry, router_entry.defaultable))
 
         # handle masks
+        seen_fields = field_utilties.deduce_types(sub_graph)
+        if len(seen_fields) == 0:
+            logger.warn(
+                "No fields were deducable from the partitions. Therefore i "
+                "will explore a exshastive search")
+            masks = list()
+            for position in range(0, field_utilties.NUM_BITS_IN_ROUTING):
+                for next_position in range(position,
+                                           field_utilties.NUM_BITS_IN_ROUTING):
+                    masks.append((position, next_position))
+
+        for field in seen_fields:
+            pass
+
         return entries, masks
 
     @staticmethod
@@ -100,18 +132,15 @@ class MundyRouterCompressor(object):
         """Generate a mask with the MSB-LSB bits set to 0."""
         return ~(int(2**(msb + 1 - lsb) - 1) << lsb)
 
-
     def generate_mask(self, msb, lsb):
         """:py:func:`create_mask` as a generator."""
         yield self.create_mask(msb, lsb)
-
 
     def generate_increasing_lsb_masks(self, msb, lsb):
         """Generate a series of masks with LSB increasing toward MSB."""
         while lsb > msb:
             lsb += 1
             yield self.create_mask(msb + 1, lsb)
-
 
     def generate_decreasing_msb_masks(self, msb, lsb):
         """Generate a series of masks with MSB decreasing toward LSB."""
