@@ -1,7 +1,3 @@
-"""
-PartitionerSameSizeAsVertexConstraint
-"""
-
 # pacman imports
 from pacman.model.constraints.abstract_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint

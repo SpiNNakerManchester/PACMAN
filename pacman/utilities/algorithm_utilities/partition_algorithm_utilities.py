@@ -28,8 +28,7 @@ def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
 
     # start progress bar
     progress_bar = ProgressBar(len(subgraph.subvertices),
-                               "on partitioning the partitionable_graph's "
-                               "edges")
+                               "Partitioning graph edges")
 
     # Partition edges according to vertex partitioning
     for src_sv in subgraph.subvertices:
@@ -44,7 +43,7 @@ def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
             partition_constraints = partition.constraints
             for edge in out_edges:
 
-                # and create and store a new subedge for each postsubvertex
+                # and create and store a new subedge for each post-subvertex
                 post_vertex = edge.post_vertex
                 post_subverts = (graph_to_subgraph_mapper
                                  .get_subvertices_from_vertex(post_vertex))

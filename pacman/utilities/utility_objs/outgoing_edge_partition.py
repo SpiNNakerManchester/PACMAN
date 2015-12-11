@@ -1,6 +1,3 @@
-"""
-OutgoingEdgePartition
-"""
 from enum import Enum
 from pacman.model.abstract_classes.abstract_constrained_object import \
     AbstractConstrainedObject
@@ -24,7 +21,8 @@ EDGE_TYPES = Enum(
 
 class OutgoingEdgePartition(AbstractConstrainedObject):
     """
-    A collection of egdes which have the same semantics
+    A collection of edges from a single vertex which have the same\
+        semantics and so can share a single key
     """
 
     def __init__(self, identifier, constraints=None, label=None):
@@ -34,8 +32,7 @@ class OutgoingEdgePartition(AbstractConstrainedObject):
         self._edges = list()
 
     def add_edge(self, edge):
-        """
-        adds a edge into this outgoing edge partition
+        """ Add an edge into this outgoing edge partition
         :param edge: the instance of abstract edge to add to the list
         :return:
         """
@@ -46,13 +43,12 @@ class OutgoingEdgePartition(AbstractConstrainedObject):
             raise exceptions.PacmanConfigurationException(
                 "The edge {} was trying to be added to a partition {} which "
                 "contains edges of type {}, yet the edge was of type {}. This"
-                " is deemed an error. Please rectify this and try again. "
-                "Thank you")
+                " is deemed an error. Please rectify this and try again.")
 
     @staticmethod
     def _deduce_type(edge):
-        """
-        deduces the enum from the edge type
+        """ Deduce the enum from the edge type
+
         :param edge: the edge to deduce the type of
         :return: a enum type of edge_types
         """
@@ -66,29 +62,26 @@ class OutgoingEdgePartition(AbstractConstrainedObject):
             return EDGE_TYPES.FIXED_ROUTE
         else:
             raise exceptions.PacmanConfigurationException(
-                "I dont reconise this type of edge, please rectify this and "
-                "try again. Thank you.")
+                "I don't recognise this type of edge, please rectify this and "
+                "try again.")
 
     @property
-    def identifer(self):
-        """
-        returns the indenfiter for this outgoing egde partition
+    def identifier(self):
+        """ The identifier for this outgoing edge partition
         :return:
         """
         return self._identifier
 
     @property
     def edges(self):
-        """
-        returns the edges that are associated with this outgoing egde partition
+        """ The edges that are associated with this outgoing edge partition
         :return:
         """
         return self._edges
 
     @property
     def type(self):
-        """
-        returns the type of the partition
+        """ The type of the partition
         :return:
         """
         return self._type

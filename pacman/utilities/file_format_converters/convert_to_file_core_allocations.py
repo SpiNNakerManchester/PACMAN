@@ -7,8 +7,7 @@ import jsonschema
 
 
 class ConvertToFileCoreAllocations(object):
-    """
-    ConvertToFileCoreAllocations: converts placements to core allocations
+    """ Converts placements to core allocations
     """
 
     def __call__(self, placements, file_path):
@@ -19,8 +18,8 @@ class ConvertToFileCoreAllocations(object):
         :return:
         """
 
-        progress_bar = ProgressBar( len(placements),
-                                    "Converting to json core allocations")
+        progress_bar = ProgressBar(
+            len(placements), "Converting to json core allocations")
 
         # write basic stuff
         json_core_allocations_dict = dict()

@@ -7,29 +7,29 @@ from pacman import exceptions
 
 
 class MulticastRoutingPathEntry(object):
-    """
-    a entry which defines the directions of a entry in a multi-cast routing path
+    """ An entry in a path of a multicast route
     """
 
     def __init__(self, router_x, router_y, edge, out_going_links,
                  outgoing_processors, incoming_processor=None,
                  incoming_link=None):
         """
-        builder for a MulticastRoutingPathEntry
+
         :param router_x: the x coord of the router this is associated with
         :type router_x: int
         :param router_y: the y coord of the router this is associated with
         :type router_y: int
         :param edge: the partitioned edge this entry is associated with
-        :type edge: pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge
+        :type edge: \
+                    :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
         :param out_going_links: the edges this path entry goes down
-        :type out_going_links: iterable of ints between 0 adn 5
+        :type out_going_links: iterable of ints between 0 and 5
         :param outgoing_processors: the processors this path entry goes to
-        :type outgoing_processors: iterable of itns between 0 and 17
+        :type outgoing_processors: iterable of ints between 0 and 17
         :param incoming_processor:  the direction this entry came from
         :type incoming_processor: int between 0 and 17
         :param incoming_link: the direction this entry came from in link
-        :type incoming_link: iint between 0 and 5
+        :type incoming_link: int between 0 and 5
         :return:
         """
         self._router_x = router_x
@@ -63,35 +63,30 @@ class MulticastRoutingPathEntry(object):
                 "one link or one processors, not both",
                 str(self._incoming_link), str(self._incoming_processor))
 
-
     @property
     def router_x(self):
-        """
-        property for router x coord
+        """ Router x coordinate
         :return:
         """
         return self._router_x
 
     @property
     def router_y(self):
-        """
-        property for router y coord
+        """ Router y coordinate
         :return:
         """
         return self._router_y
 
     @property
     def edge(self):
-        """
-        property for the parttyitioned edge
+        """ The partitioned edge of the entry
         :return:
         """
         return self._edge
 
     @property
     def out_going_processors(self):
-        """
-        property for the processors out of this router for this path entry
+        """ The destination processors of the entry
         :return:
         """
         if self._out_going_processors is None:
@@ -101,8 +96,7 @@ class MulticastRoutingPathEntry(object):
 
     @property
     def out_going_links(self):
-        """
-        property for the outgoibng links from this path entry
+        """ The destination links of the entry
         :return:
         """
         if self._out_going_links is None:
@@ -112,32 +106,28 @@ class MulticastRoutingPathEntry(object):
 
     @property
     def incoming_link(self):
-        """
-        the incoming link for this path entry
+        """ The source link for this path entry
         :return:
         """
         return self._incoming_link
 
     @property
     def incoming_processor(self):
-        """
-        property for the incoming processor
+        """ The source processor
         :return:
         """
         return self._incoming_processor
 
     @property
     def defaultable(self):
-        """
-        the proeprty method for defaultable
+        """ The defaultable status of the entry
         :return:
         """
         return self._is_defaultable()
 
     def add_out_going_direction_link(self, direction):
-        """
-        adds a new outgoing direction link into the mutlicast rouiting
-         path entry
+        """ Add a new outgoing direction link into the entry
+
         :param direction: the new outgoing direction
         :return:
         """
@@ -145,13 +135,12 @@ class MulticastRoutingPathEntry(object):
             self._out_going_links.append(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
-                "the link {} already exists in the mutli-cast-r"
-                "outing-apth-entry".format(direction), str(direction))
+                "the link {} already exists in the mutlicast-"
+                "routing-path-entry".format(direction), str(direction))
 
     def add_out_going_direction_processor(self, direction):
-        """
-        adds a new outgoing direction processor into the mutlicast rouiting path
-        entry
+        """ Add a new outgoing direction processor into the entry
+
         :param direction: the new outgoing direction
         :return:
         """
@@ -159,12 +148,12 @@ class MulticastRoutingPathEntry(object):
             self._out_going_processors.append(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
-                "the processor {} already exists in the mutli-cast-r"
-                "outing-apth-entry".format(direction), str(direction))
+                "the processor {} already exists in the mutlicast-"
+                "routing-path-entry".format(direction), str(direction))
 
     def add_in_coming_processor_direction(self, procesor_id):
-        """
-        adds a procesosr to the incoming direction if needed
+        """ Add a processor to the incoming direction
+
         :param procesor_id: the processor to add to the incoming list
         :return:
         """
@@ -182,13 +171,10 @@ class MulticastRoutingPathEntry(object):
             self._incoming_processor = procesor_id
 
     def _is_defaultable(self):
-        """private method, do not call from outside dijskra routing\
+        """
 
-        used to detmerine the direction of a link to go down
-
-        :return: if a entry is defaultable or not
+        :return: if this entry is defaultable or not
         :rtype: bool
-        :raise None: this method does not raise any known exceptions
         """
         if (isinstance(self._incoming_link, int) and
                 self._incoming_processor is None and

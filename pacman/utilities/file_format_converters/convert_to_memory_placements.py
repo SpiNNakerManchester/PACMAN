@@ -1,7 +1,3 @@
-"""
-ConvertToMemoryPlacements:  takes the fileplacemenmts, machine,
-    partitioned graph and constraints and builds a memory placements object
-"""
 
 # pacman imports
 from pacman.model.placements.placement import Placement
@@ -17,9 +13,8 @@ import jsonschema
 
 
 class ConvertToMemoryPlacements(object):
-    """
-    ConvertToMemoryPlacements: takes the fileplacemenmts, machine,
-    partitioned graph and constraints and builds a memory placements object
+    """ Takes the file-based placements, machine, partitioned graph and\
+        constraints and builds a memory placements object
     """
 
     def __call__(self, placements, allocations, partitioned_graph,
@@ -43,7 +38,7 @@ class ConvertToMemoryPlacements(object):
             file_placements, core_allocations, constraints)
 
         # drop the type and allocations bit of core allocations
-        # (makes lower code simplier)
+        # (makes lower code simpler)
         core_allocations = core_allocations['allocations']
 
         memory_placements = Placements()
@@ -54,6 +49,7 @@ class ConvertToMemoryPlacements(object):
                 partitioned_graph.get_subvertex_with_repr(vertex_repr)
             if vertex_repr not in core_allocations:
                 if subvertex is not None:
+
                     # virtual chip or tag chip
                     constraints_for_vertex = self._locate_constraints(
                         vertex_repr, constraints)
@@ -62,7 +58,7 @@ class ConvertToMemoryPlacements(object):
                             constraints_for_vertex)
                     if len(external_device_constraints) != 0:
 
-                        # get data for virutal chip
+                        # get data for virtual chip
                         route_constraint = \
                             external_device_constraints['end_point']
                         route_direction = constants.EDGES(
@@ -84,8 +80,8 @@ class ConvertToMemoryPlacements(object):
                             None))
                     else:
                         raise exceptions.PacmanConfigurationException(
-                            "I dont recongise this pattern of constraints for a"
-                            "vertex which does not have a placement")
+                            "I don't recognise this pattern of constraints for"
+                            " a vertex which does not have a placement")
             else:
                 if subvertex is None:
                     raise exceptions.PacmanConfigurationException(
@@ -135,8 +131,8 @@ class ConvertToMemoryPlacements(object):
                 found_placement_constraint = constraint
             if constraint['type'] == "route_endpoint":
                 found_route_end_point = constraint
-        if (found_placement_constraint is not None
-                and found_route_end_point is not None):
+        if (found_placement_constraint is not None and
+                found_route_end_point is not None):
             return {'end_point': found_route_end_point,
                     'placement': found_placement_constraint}
         else:
@@ -145,6 +141,7 @@ class ConvertToMemoryPlacements(object):
     @staticmethod
     def _validate_file_read_data(
             file_placements, file_allocations, constraints):
+
         # verify that the files meet the schema.
         # locate schemas
         file_placements_schema_file_path = os.path.join(

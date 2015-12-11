@@ -1,24 +1,15 @@
-"""
-ConvertAlgorithmsMetadata
-"""
-
-from pacman import operations
 from pacman.utilities.algorithm_utilities.algorithm_data import AlgorithmData
-from pacman import utilities
 from pacman import exceptions
 
 from lxml import etree
-import os
 
 
 class ConvertAlgorithmsMetadata(object):
-    """
-    ConvertAlgorithmsMetadata that converts a xml file into algorithm data
+    """ Converts an XML file into algorithm data
     """
 
     def __init__(self, xml_paths):
         """
-        constructor
         :param xml_paths: paths to extra metadata files
         :return:
         """
@@ -27,8 +18,8 @@ class ConvertAlgorithmsMetadata(object):
     def decode_algorithm_data_objects(self):
         """
 
-        :return: returns the algorithm data objects which represent all the
-        algorithms for inputs and outputs
+        :return: the algorithm data objects which represent all the\
+                    algorithm's inputs and outputs
         """
         # parse xmls
         xml_roots = list()
@@ -42,7 +33,7 @@ class ConvertAlgorithmsMetadata(object):
                 if element.get('name') in algorithm_data_objects:
                     raise exceptions.PacmanConfigurationException(
                         "There are two algorithms with the same name in these"
-                        "xml files {}. Please rectify and try again."
+                        " xml files {}. Please rectify and try again."
                         .format(self._xml_paths))
                 else:
                     algorithm_data_objects[element.get('name')] = \
@@ -50,15 +41,14 @@ class ConvertAlgorithmsMetadata(object):
         return algorithm_data_objects
 
     def _generate_algorithm_data(self, element):
-        """
-        takes the xml elements and translaters them into tuples for the
-        AlgorithmData object
+        """ Translates XML elements into tuples for the AlgorithmData object
+
         :param element: the lxml element to translate
         :return: a AlgorithmData
         """
-        # convert lxml elemtnts into dicts or strings
         external = False
-        # verify if its a internal or extenral via if it is import-able or
+
+        # determine if its a internal or external using if it is import-able or
         # command line based
         command_line_args = element.find("command_line_args")
         if command_line_args is not None:
@@ -81,7 +71,7 @@ class ConvertAlgorithmsMetadata(object):
                 (python_module is not None and command_line_args is not None)):
             raise exceptions.PacmanConfigurationException(
                 "Cannot deduce what to do when either both command line and "
-                "python mudle are none or are filled in. Please rectify and "
+                "python module are none or are filled in. Please rectify and "
                 "try again")
 
         # get other params
@@ -94,14 +84,13 @@ class ConvertAlgorithmsMetadata(object):
         return AlgorithmData(
             algorithm_id=element.get('name'),
             command_line_args=command_line_args, inputs=required_inputs,
-            optional_inputs=optional_inputs, outputs=outputs, external=external,
-            python_import=python_module, python_class=python_class,
-            python_function=python_function)
+            optional_inputs=optional_inputs, outputs=outputs,
+            external=external, python_import=python_module,
+            python_class=python_class, python_function=python_function)
 
     @staticmethod
     def _translate_args(args_element):
-        """
-        converts a xml arg element into a list of args
+        """ Convert an XML arg element into a list of args
         :param args_element:
         :return:
         """
@@ -110,6 +99,7 @@ class ConvertAlgorithmsMetadata(object):
             args = args_element.findall("arg")
             for arg in args:
                 translated_args.append(arg.text)
+
         # return none if empty
         if len(translated_args) == 0:
             return None
@@ -118,8 +108,8 @@ class ConvertAlgorithmsMetadata(object):
 
     @staticmethod
     def _translate_parameters(parameters_element):
-        """
-        converts a xml parameter element into a dict
+        """ Convert an XML parameter element into a dict
+
         :param parameters_element:
         :return:
         """

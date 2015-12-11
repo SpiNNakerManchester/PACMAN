@@ -22,7 +22,7 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman import exceptions
 
-# spinnmachine imports
+# spinn_machine imports
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 import logging
@@ -229,19 +229,22 @@ def get_fixed_mask(same_key_group):
 
 
 def add_routing_key_entries(
-        routing_paths, subedge_routing_info, out_going_subedge, routing_tables):
+        routing_paths, subedge_routing_info, out_going_subedge,
+        routing_tables):
     """
     creates and adds entries for routing tables as required for the path
-    :param routing_paths: the routing paths object generated from
-    routing info
+    :param routing_paths: the routing paths object generated from routing info
     :param subedge_routing_info: the subedge info object that contains keys
-    :param out_going_subedge: the edge this is aossicated with
+    :param out_going_subedge: the edge this is associated with
     :param routing_tables: the routing tables to adjust
     :return: None
     """
     path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
-    # iterate thoguh the entries in each path, adding a router entry if required
+
+    # iterate through the entries in each path, adding a router entry if
+    # required
     for path_entry in path_entries:
+
         # locate the router
         router = routing_tables.get_routing_table_for_chip(
             path_entry.router_x, path_entry.router_y)
@@ -250,7 +253,7 @@ def add_routing_key_entries(
                 path_entry.router_x, path_entry.router_y)
             routing_tables.add_routing_table(router)
 
-        # add entries as required, or emrge them if entries alrteady exist
+        # add entries as required, or merge them if entries already exist
         for key_and_mask in subedge_routing_info.keys_and_masks:
             multicast_routing_entry = MulticastRoutingEntry(
                 routing_entry_key=key_and_mask.key_combo,

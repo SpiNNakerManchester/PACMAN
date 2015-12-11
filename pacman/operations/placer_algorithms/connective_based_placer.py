@@ -1,14 +1,17 @@
 import logging
 
-from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint import \
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_radial_placement_from_chip_constraint import \
     PlacerRadialPlacementFromChipConstraint
 from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
-from pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint import \
+from pacman.model.constraints.tag_allocator_constraints\
+    .tag_allocator_require_iptag_constraint import \
     TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint import \
+from pacman.model.constraints.tag_allocator_constraints\
+    .tag_allocator_require_reverse_iptag_constraint import \
     TagAllocatorRequireReverseIptagConstraint
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
@@ -21,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class ConnectiveBasedPlacer(RadialPlacer):
     """ A radial algorithm that can place a partitioned_graph onto a\
-        machine using a circle out behaviour from a ethernet at a given point\
+        machine using a circle out behaviour from a Ethernet at a given point\
         and which will place things that are most connected closest to each\
         other
     """
@@ -98,6 +101,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                                  .outgoing_subedges_from_subvertex(vertex)):
                     if out_edge.post_subvertex in unconstrained_vertices:
                         next_vertices.add(out_edge.post_subvertex)
+
         # finished, so stop progress bar and return placements
         progress_bar.end()
         return {'placements': placements}

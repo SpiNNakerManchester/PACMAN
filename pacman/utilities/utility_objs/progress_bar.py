@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProgressBar(object):
-    """
-    progress bar for checking how quickly something has been done
+    """ Progress bar for telling the user where a task is up to
     """
     MAX_LENGTH_IN_CHARS = 60
 
@@ -28,8 +27,8 @@ class ProgressBar(object):
             string_describing_what_being_progressed)
 
     def update(self, amount_to_add=1):
-        """
-        updated the progress bar by a given amount
+        """ Update the progress bar by a given amount
+
         :param amount_to_add:
         :return:
         """
@@ -42,7 +41,7 @@ class ProgressBar(object):
             self._chars_per_thing = ProgressBar.MAX_LENGTH_IN_CHARS
         else:
             self._chars_per_thing = (float(ProgressBar.MAX_LENGTH_IN_CHARS) /
-                                    float(self._total_number_of_things_to_do))
+                                     float(self._total_number_of_things_to_do))
         print(string_describing_what_being_progressed, file=sys.stderr)
         print("|0                           50%                         100%|",
               file=sys.stderr)
@@ -60,8 +59,8 @@ class ProgressBar(object):
         sys.stderr.flush()
 
     def end(self):
-        """
-        closes the progress bar, updating whatever is left if needed
+        """ Close the progress bar, updating whatever is left if needed
+
         :return:
         """
         difference = \

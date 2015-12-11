@@ -5,18 +5,14 @@ from pacman.model.routing_paths.multicast_routing_path_entry import \
     MulticastRoutingPathEntry
 from pacman.model.routing_paths.multicast_routing_paths import \
     MulticastRoutingPaths
-from pacman.utilities import file_format_schemas
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 import json
-import os
-import jsonschema
 
 
 class ConvertToMemoryMultiCastRoutingPaths(object):
-    """
-    ConvertToMemoryMultiCastRoutingPaths: converts between file routing paths
-    and the pacman representation of the routing paths
+    """ Converts between file routing paths and the pacman representation of\
+        the routing paths
     """
 
     def __init__(self):
@@ -55,9 +51,11 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
         file_routing_paths = self._handle_json_files(file_routing_paths)
         progress_bar = ProgressBar(len(file_routing_paths),
                                    "Converting to PACMAN routing paths")
+
         # iterate though the path for each edge and create entries
         for edge_id in file_routing_paths:
             edge = partitioned_graph.get_subedge_with_label(edge_id)
+
             # if the vertex is none, its a vertex with the special skills of
             # needing no cores. therefore ignore
             if edge is not None:
@@ -87,7 +85,8 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
         chip_coords = edge_path['chip']
         memory_edges = []
         for child in edge_path['children']:
-            direction_data = self._direction_translation[child['route'].upper()]
+            direction_data = self._direction_translation[
+                child['route'].upper()]
             next_hop = child['next_hop']
             if source_p is None:
                 self._handle_none_core_level_entries(
@@ -105,12 +104,15 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
             self, direction_data, edge_id, next_hop, partitioned_graph,
             machine, placements, chip_coords, source_link_id, memory_edges):
         if direction_data[0]:
+
             # has a core level here. focus on core level entries
             local_memory_edges = self._handle_core_level_entry(
                 placements, chip_coords, None, source_link_id,
                 partitioned_graph, edge_id, direction_data, next_hop, machine)
             memory_edges += local_memory_edges
-        else: # none core level. keep searching
+        else:
+
+            # none core level. keep searching
             local_memory_edges = self._create_entries_for_path(
                 edge_id, next_hop, direction_data[1], None,
                 partitioned_graph, machine, placements)
@@ -122,6 +124,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                     out_going_links=direction_data[1],
                     outgoing_processors=None, incoming_processor=None,
                     incoming_link=source_link_id)
+
                 # add entry to system
                 self._multi_cast_routing_paths.add_path_entry(entry)
         return memory_edges
@@ -139,11 +142,13 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
         :param direction_data:
         :return:
         """
+
         # create list holder
         memory_edges = []
 
         # create correct entries
         if direction_data[0]:
+
             # locate edge this core is associated with
             subvertex = placements.get_subvertex_on_processor(
                 chip_coords[0], chip_coords[1], direction_data[1])
@@ -194,18 +199,20 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
         file_routing_paths_file = open(file_routing_paths, "r")
         file_routing_paths = json.load(file_routing_paths_file)
 
+        # TODO: Routing Path validation is currently not possible due to
+        #       recursion
         # validate the json files against the schemas
         # verify that the files meet the schema.
         # locate schemas
-        file_routing_paths_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "routes.json"
-        )
+        # file_routing_paths_schema_file_path = os.path.join(
+        #     os.path.dirname(file_format_schemas.__file__), "routes.json"
+        # )
         # open readers for schemas and read in schema
-        file_to_read = open(file_routing_paths_schema_file_path, "r")
-        routing_paths_schema = json.load(file_to_read)
+        # file_to_read = open(file_routing_paths_schema_file_path, "r")
+        # routing_paths_schema = json.load(file_to_read)
 
-        # vlaidate json file from json schema
-        #jsonschema.validate(
+        # validate json file from json schema
+        # jsonschema.validate(
         #    file_routing_paths, routing_paths_schema)
 
         return file_routing_paths

@@ -1,7 +1,3 @@
-"""
-
-"""
-
 from pacman.utilities import file_format_schemas
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
@@ -11,8 +7,7 @@ import jsonschema
 
 
 class ConvertToFilePlacement(object):
-    """
-
+    """ Converts memory placements to file placements
     """
 
     def __call__(self, placements, file_path):

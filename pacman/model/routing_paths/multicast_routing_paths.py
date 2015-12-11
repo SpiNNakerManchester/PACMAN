@@ -1,14 +1,9 @@
-"""
-MulticastRoutingPaths
-"""
-
 # pacman imports
 from pacman import exceptions
 
 
 class MulticastRoutingPaths(object):
-    """
-    a class that contains paths for edges though the machine via routers
+    """ A set of multicast routing path objects
     """
 
     def __init__(self):
@@ -16,7 +11,7 @@ class MulticastRoutingPaths(object):
         self._router_to_entries_map = dict()
 
     def add_path_entry(self, entry):
-        """ adds a multicast routing path entry to the paths
+        """ Adds a multicast routing path entry
 
         :param entry: the entry to add
         :return:
@@ -33,8 +28,7 @@ class MulticastRoutingPaths(object):
         self._router_to_entries_map[key].append(entry)
 
     def get_entries_for_router(self, router_x, router_y):
-        """
-        returns the set of mutlicast path entries assigned to this router
+        """ Get the set of multicast path entries assigned to this router
         :param router:
         :return:
         """
@@ -45,8 +39,7 @@ class MulticastRoutingPaths(object):
             return self._router_to_entries_map[key]
 
     def get_entries_for_edge(self, edge):
-        """
-        returns the netries for a given edge
+        """ Get the entry for a given edge
         :param edge:
         :return:
         """
@@ -57,8 +50,8 @@ class MulticastRoutingPaths(object):
             return self._edge_to_routing_path_map[edge]
 
     def get_entry_on_coords_for_edge(self, edge, router_x, router_y):
-        """
-        returns a entry from a spefici coord if possible
+        """ Get an entry from a specific coordinate
+
         :param edge:
         :param router_x
         :param router_y
@@ -71,8 +64,8 @@ class MulticastRoutingPaths(object):
         return None
 
     def all_subedges(self):
-        """
-        returns all the subedges contained within this multicast routing path
-        :return: a iterable of subedges
+        """ Get the edges which have entries
+
+        :return: an iterable of edges
         """
         return self._edge_to_routing_path_map.keys()

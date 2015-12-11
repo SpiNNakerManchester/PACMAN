@@ -289,6 +289,22 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="MallocBasedNoGraphChipIDAllocator">
+        <python_module>pacman.operations.chip_id_allocator_algorithms.malloc_based_chip_id_allocator</python_module>
+        <python_class>MallocBasedChipIdAllocator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryMachine</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="BasicTagAllocator">
         <python_module>pacman.operations.tag_allocator_algorithms.basic_tag_allocator</python_module>
         <python_class>BasicTagAllocator</python_class>

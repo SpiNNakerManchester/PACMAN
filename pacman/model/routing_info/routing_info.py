@@ -1,10 +1,6 @@
-"""
-object RoutingInfo
-"""
-
 # pacman imports
 from pacman import exceptions
-from pacman.utilities import utility_calls
+
 
 class RoutingInfo(object):
     """ An association of a set of subedges to a non-overlapping set of keys\
@@ -54,11 +50,13 @@ class RoutingInfo(object):
         self._subedge_info_by_subedge[subedge_info.subedge] = subedge_info
 
         for key_and_mask in subedge_info.keys_and_masks:
+
             # first time the key has been added
             if key_and_mask.key not in self._subedge_infos_by_key:
                 self._subedge_infos_by_key[key_and_mask.key] = list()
                 self._subedge_infos_by_key[key_and_mask.key]\
                     .append(subedge_info)
+
             # need to check that subedge infos are linked properly
             elif self._subedge_infos_by_key[key_and_mask.key] != subedge_info:
                 self._subedge_infos_by_key[key_and_mask.key]\

@@ -109,9 +109,8 @@ class MulticastRoutingTable(object):
 
     @property
     def number_of_entries(self):
-        """
-        returns the number of multi-cast routing entries there are in the
-        multicast routing table
+        """ The number of multi-cast routing entries there are in the\
+            multicast routing table
         :return:
         """
         return len(self._multicast_routing_entries)
@@ -134,8 +133,8 @@ class MulticastRoutingTable(object):
         """
         if (routing_entry_key & mask) != routing_entry_key:
             raise exceptions.PacmanRoutingException(
-                "The key combo {} is changed when masked with the mask {}. This"
-                " is determined to be an error in the tool chain. Please "
+                "The key {} is changed when masked with the mask {}."
+                " This is determined to be an error in the tool chain. Please "
                 "correct this and try again.".format(routing_entry_key, mask))
 
         tuple_key = (routing_entry_key, mask)

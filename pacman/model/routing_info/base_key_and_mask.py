@@ -36,8 +36,7 @@ class BaseKeyAndMask(object):
 
     @property
     def key_combo(self):
-        """
-        the key combo
+        """ The key combined with the mask
         :return:
         """
         return self._base_key & self._mask
@@ -75,10 +74,10 @@ class BaseKeyAndMask(object):
         unwrapped_mask = numpy.unpackbits(
             numpy.asarray([self._mask], dtype=">u4").view(dtype="uint8"))
 
-        # how many zeros are in the bit represetnation array
+        # how many zeros are in the bit representation array
         zeros = numpy.where(unwrapped_mask == 0)[0]
 
-        # number of keys avilable from this mask size
+        # number of keys available from this mask size
         return 2 ** len(zeros)
 
     def get_keys(self, key_array=None, offset=0, n_keys=None):
@@ -117,7 +116,7 @@ class BaseKeyAndMask(object):
             numpy.asarray([self._base_key], dtype=">u4").view(dtype="uint8"))
 
         # for each key, create its key with the idea of a neuron id being
-        # continious and live at a offsettable position from the bottom of
+        # continuous and live at a offsetable position from the bottom of
         # the key
         for value in range(n_keys):
             key = numpy.copy(unwrapped_key)

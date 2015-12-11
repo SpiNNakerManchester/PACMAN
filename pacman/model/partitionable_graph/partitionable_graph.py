@@ -1,6 +1,3 @@
-"""
-PartitionableGraph
-"""
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -8,7 +5,8 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.partitionable_graph.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.utilities.utility_objs.outgoing_edge_partition import OutgoingEdgePartition
+from pacman.utilities.utility_objs.outgoing_edge_partition \
+    import OutgoingEdgePartition
 
 # general imports
 import uuid
@@ -89,10 +87,12 @@ class PartitionableGraph(object):
         """
         if edge is not None and isinstance(edge, AbstractPartitionableEdge):
             self._edges.append(edge)
-            # if the partition id is none, make a unqiue one for storage
+
+            # if the partition id is none, make a unique one for storage
             if partition_id is None:
                 partition_id = str(uuid.uuid4())
-            # if this partition id not been seen beofre, add a new parittion
+
+            # if this partition id not been seen before, add a new partition
             if partition_id not in self._outgoing_edges[edge.pre_vertex]:
                 self._outgoing_edges[edge.pre_vertex][partition_id] = \
                     OutgoingEdgePartition(partition_id, partition_constraints)
@@ -110,8 +110,8 @@ class PartitionableGraph(object):
         :param edges: an iterable of edges to be added to the graph
         :type edges: iterable of\
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
-        :param partition_id: the id for the outgoing partition that this edge
-        is associated with
+        :param partition_id: the id for the outgoing partition that this edge\
+                    is associated with
         :type partition_id: str
         :param constraints: constraints added to a edge
         :type constraints: iterable of \
@@ -125,33 +125,33 @@ class PartitionableGraph(object):
             for next_edge in edges:
                 self.add_edge(next_edge, partition_id, constraints)
 
-    def outgoing_edges_from_vertex(self, vertex, partition_identifer=None):
+    def outgoing_edges_from_vertex(self, vertex, partition_identifier=None):
         """ Locate a collection of edges for which vertex is the pre_vertex.\
             Can return an empty collection.
 
         :param vertex: the vertex for which to find the outgoing edges
         :type vertex:\
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
-        :param partition_identifer: the identifer for the partition that
-        the edges being returned should associate with. If set to None, returns
-        all edges from all parititons
-        :type partition_identifer: string or None
+        :param partition_identifier: the identifier for the partition that\
+                   the edges being returned should associate with. If set to\
+                   None, returns all edges from all partitions
+        :type partition_identifier: string or None
         :return: an iterable of edges which have vertex as their pre_vertex
         :rtype: iterable of\
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
         :raise None: does not raise any known exceptions
         """
         # if no partition, given edges from all partitions
-        if partition_identifer is None:
+        if partition_identifier is None:
             edges = list()
             for partition in self._outgoing_edges[vertex]:
                 edges.extend(self._outgoing_edges[vertex][partition].edges)
             return edges
         # if no partition then return empty list
-        elif partition_identifer not in self._outgoing_edges[vertex]:
+        elif partition_identifier not in self._outgoing_edges[vertex]:
             return ()
         else:
-            return self._outgoing_edges[vertex][partition_identifer]
+            return self._outgoing_edges[vertex][partition_identifier]
 
     def outgoing_edges_partitions_from_vertex(self, vertex):
         """ Locates all the outgoing edge partitions for a given vertex
@@ -162,7 +162,7 @@ class PartitionableGraph(object):
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: iterable of\
                      :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
-                     or a empty list if none are avilable
+                     or a empty list if none are available
         :raise None: does not raise any known exceptions
         """
         if vertex in self._outgoing_edges:
