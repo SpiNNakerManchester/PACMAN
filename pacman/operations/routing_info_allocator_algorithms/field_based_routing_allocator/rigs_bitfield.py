@@ -347,6 +347,10 @@ class RigsBitField(object):
 
         return mask
 
+    def get_field(self, field_identifer):
+        internal_mapping = self._select_by_field_or_tag(field=field_identifer)
+        return internal_mapping[field_identifer]
+
     def _select_by_field_or_tag(self, tag=None, field=None):
         """For internal use only. Returns an OrderedDict of {identifier: field}
         representing fields which match the supplied field/tag.

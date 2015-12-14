@@ -27,7 +27,7 @@ class MundyRouterCompressor(object):
     RoutingEntry = collections.namedtuple('RoutingEntry',
                                           'key mask route defaultable')
 
-    def __call__(self, router_tables, sub_graph):
+    def __call__(self, router_tables, fields=None):
         # build storage
         compressed_pacman_router_tables = MulticastRoutingTables()
 
@@ -35,10 +35,12 @@ class MundyRouterCompressor(object):
         progress_bar = ProgressBar(
             len(router_tables.routing_tables), "Compressing routing Tables")
 
+        masks = self._deduce_usable_masks(router_tables, fields)
+
         # compress each router
         for router_table in router_tables.routing_tables:
-            entries, masks = \
-                self._convert_to_mundy_format(router_table, sub_graph)
+            entries = \
+                self._convert_to_mundy_format(router_table)
             compressed_router_table_entries = \
                 self.reduce_routing_table(entries, masks)
             compressed_pacman_table = self._convert_to_pacman_router_table(
@@ -51,15 +53,54 @@ class MundyRouterCompressor(object):
         # return
         return {'routing_tables': compressed_pacman_router_tables}
 
-    def _convert_to_mundy_format(self, pacman_router_table, sub_graph):
+    def _deduce_usable_masks(self, router_tables, fields):
+        """
+        returns the masks usable by the compressor
+        :param router_tables: the router tables
+        :param fields: either the fields (masks) that the comrpessor can
+        use, or None
+        :return: the masks used by the router compressor
+        """
+        if fields is None:
+            size_of_mask = 0
+            positions_of_mask = None
+            for router_table in router_tables.routing_tables:
+                for entry in router_table.multicast_routing_entries:
+                    mask_size, mask_position = \
+                        self._deduce_size_and_position_of_mask(entry.mask)
+                    if mask_size > size_of_mask:
+                        positions_of_mask =  mask_position
+                        size_of_mask = mask_size
+            masks = list()
+            masks.append(positions_of_mask)
+            return masks
+        else:
+            return list(fields)
+
+    def _deduce_size_and_position_of_mask(self, mask):
+        """
+        from a mask, deduce the
+        :param mask: the mask to deduce the size and position of mask to
+        use for compression
+        :return:
+        """
+        fields = field_utilties.convert_mask_into_fields(mask)
+        biggest_size = 0
+        positions = None
+        for field in fields:
+            if (field.tag == field_utilties.SUPPORTED_TAGS.ROUTING.name and
+                    (field.hi - field.lo) > biggest_size):
+                biggest_size = field.hi - field.lo
+                positions = (field.hi, field.lo)
+        return biggest_size, positions
+
+    def _convert_to_mundy_format(self, pacman_router_table):
         """
 
         :param pacman_router_table:
-        :param sub_graph:
         :return:
         """
         entries = list()
-        masks = None
 
         # handle entires
         for router_entry in pacman_router_table.multicast_routing_entries:
@@ -80,22 +121,7 @@ class MundyRouterCompressor(object):
                 router_entry.routing_entry_key, router_entry.mask,
                 route_entry, router_entry.defaultable))
 
-        # handle masks
-        seen_fields = field_utilties.deduce_types(sub_graph)
-        if len(seen_fields) == 0:
-            logger.warn(
-                "No fields were deducable from the partitions. Therefore i "
-                "will explore a exshastive search")
-            masks = list()
-            for position in range(0, field_utilties.NUM_BITS_IN_ROUTING):
-                for next_position in range(position,
-                                           field_utilties.NUM_BITS_IN_ROUTING):
-                    masks.append((position, next_position))
-
-        for field in seen_fields:
-            pass
-
-        return entries, masks
+        return entries
 
     @staticmethod
     def _convert_to_pacman_router_table(

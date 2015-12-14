@@ -87,6 +87,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # define the key space
         bit_field_space = RigsBitField(32)
+        field_positions = set()
 
         # locate however many types of constrants there are
         seen_fields = field_utilties.deduce_types(subgraph)
@@ -97,11 +98,15 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # handle the application space
         self._create_application_space_in_the_bit_field_space(
-            bit_field_space, seen_fields)
+            bit_field_space, seen_fields, field_positions)
 
         # assgin fields to positions in the space. if shits going to hit the
         # fan, its here
         bit_field_space.assign_fields()
+
+        # get positions of the flexi fields:
+        self._assign_flexi_field_poitions(
+            bit_field_space, seen_fields, field_positions)
 
         # create routing_info_allocator
         routing_info = RoutingInfo()
@@ -129,7 +134,49 @@ class VertexBasedRoutingInfoAllocator(object):
         progress_bar.end()
 
         return {'routing_infos': routing_info,
-                'routing_tables': routing_tables}
+                'routing_tables': routing_tables,
+                'fields': field_positions}
+
+    def _assign_flexi_field_poitions(
+            self, bit_field_space, seen_fields, field_positions):
+        """
+        searches though seen fields and if theres a flexi field
+        :param bit_field_space: the bit field space system
+        :param seen_fields: the fields been seen
+        :param field_positions: the set of fields that have been allocated
+        over the entire key space
+        :return: None
+        """
+        for field in seen_fields:
+            if (field != field_utilties.TYPES_OF_FIELDS.FIXED_MASK.name and
+                    field != field_utilties.TYPES_OF_FIELDS.FIXED_KEY.name and
+                    field != field_utilties.TYPES_OF_FIELDS.FIXED_FIELD.name):
+                field_positions = self._assign_flexi_field_positions_recursive(
+                        bit_field_space, field, seen_fields, field_positions)
+
+    def _assign_flexi_field_positions_recursive(
+            self, bit_field_space, field, fields, field_positions):
+        bit_field_field = bit_field_space.get_field(field)
+        low = bit_field_field.start_at
+        hi = low + bit_field_field.length
+        field_positions.add((hi, low))
+
+        for field_instance in fields[field]:
+            # only carry on if theres more to create
+            if len(fields[field][field_instance]) > 0:
+                inputs = dict()
+                inputs[field] = field_instance.value
+                this_bit_field_space = bit_field_space(**inputs)
+
+                # deal with next level hirarckhy
+                for nested_field in fields[field][field_instance]:
+                    new_field_positions = \
+                        self._assign_flexi_field_positions_recursive(
+                            this_bit_field_space, nested_field,
+                            fields[field][field_instance], field_positions)
+                    for field_position in new_field_positions:
+                        field_positions.add(field_position)
+        return field_positions
 
     def _adds_application_field_to_the_fields(self, seen_fields):
         """
@@ -720,13 +767,14 @@ class VertexBasedRoutingInfoAllocator(object):
         return routing_keys_and_masks, application_keys_and_masks
 
     def _create_application_space_in_the_bit_field_space(
-            self, bit_field_space, fields):
+            self, bit_field_space, fields, field_positions):
         """
         takes the fields seen and adjusted for bitfield and the bitfueidl
         object and builds the fields for being assigned to kys and masks
         :param bit_field_space: th bit field space
         :param fields: the fields which have been adjusted accordingly to
         work in the bit field scope
+        :param field_positions: The posiitons of all fields seen
         :return:
         """
         # locate the application field if it exists
@@ -736,6 +784,11 @@ class VertexBasedRoutingInfoAllocator(object):
         # create the application basd field if its not none
         if application_field is not None:
             length = (application_field.hi - application_field.lo) + 1
+
+            # add field to positions
+            field_positions.add((application_field.hi, application_field.lo))
+
+            # add field to bit field
             bit_field_space.add_field(
                 application_field.name, length, application_field.lo,
                 tags=SUPPORTED_TAGS.ROUTING.name)
@@ -762,6 +815,12 @@ class VertexBasedRoutingInfoAllocator(object):
                     for fixed_field in fixed_feild_list:
                         if fixed_field.name != APPLICATION_DIVIDER_FIELD_NAME:
                             length = (fixed_field.hi - fixed_field.lo) + 1
+
+                            # add to field positions
+                            field_positions.add((fixed_field.hi,
+                                                 fixed_field.lo))
+
+                            # add to bit field
                             internal_field_space.add_field(
                                 "{}".format(fixed_field.name), length,
                                 fixed_field.lo, fixed_field.tag)
@@ -802,6 +861,10 @@ class VertexBasedRoutingInfoAllocator(object):
                                 APPLICATION_DIVIDER_FIELD_NAME):
                             length = (fixed_key_field.hi -
                                       fixed_key_field.lo) + 1
+
+                            # add field to field positions
+                            field_positions.add((fixed_key_field.ki,
+                                                 fixed_key_field.lo))
 
                             # add field to bit field space
                             internal_bit_map_space.add_field(
