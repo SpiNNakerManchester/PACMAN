@@ -4,7 +4,7 @@ import logging
 
 from pacman.model.placements import placement
 from pacman import exceptions
-
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from spinn_machine.sdram import SDRAM
 
 logger = logging.getLogger(__name__)
@@ -92,7 +92,8 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
     f_routing.write("\n\n")
 
     link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
-
+    progress_bar = ProgressBar(len(routing_paths.all_subedges()),
+                               "Generating Routing path report")
     for e in routing_paths.all_subedges():
         text = "**** SubEdge '{}', from vertex: '{}' to vertex: '{}'".format(
             e.label, e.pre_subvertex.label, e.post_subvertex.label)
@@ -127,8 +128,10 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
 
         # End one entry:
         f_routing.write("\n")
+        progress_bar.update()
     f_routing.flush()
     f_routing.close()
+    progress_bar.end()
 
 
 def partitioner_report(report_folder, hostname, graph, graph_mapper):
@@ -154,6 +157,8 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
     f_place_by_vertex.write("\n\n")
 
     vertices = sorted(graph.vertices, key=lambda x: x.label)
+    progress_bar = ProgressBar(len(vertices),
+                               "Generating partitioner report")
     for v in vertices:
         vertex_name = v.label
         vertex_model = v.model_name
@@ -179,9 +184,11 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
             f_place_by_vertex.write(my_string)
             f_place_by_vertex.flush()
         f_place_by_vertex.write("\n")
+        progress_bar.update()
 
     # Close file:
     f_place_by_vertex.close()
+    progress_bar.end()
 
 
 def placement_report_with_partitionable_graph_by_vertex(
@@ -219,6 +226,8 @@ def placement_report_with_partitionable_graph_by_vertex(
     subvertex_by_processor = dict()
 
     vertices = sorted(graph.vertices, key=lambda x: x.label)
+    progress_bar = ProgressBar(len(vertices),
+                               "Generating placement report")
     for v in vertices:
         vertex_name = v.label
         vertex_model = v.model_name
@@ -256,9 +265,11 @@ def placement_report_with_partitionable_graph_by_vertex(
                         .format(lo_atom, hi_atom, num_atoms, x, y, p)
             f_place_by_vertex.write(my_string)
         f_place_by_vertex.write("\n")
+        progress_bar.update()
 
     # Close file:
     f_place_by_vertex.close()
+    progress_bar.end()
 
 
 def placement_report_without_partitionable_graph_by_vertex(
@@ -293,6 +304,8 @@ def placement_report_without_partitionable_graph_by_vertex(
     subvertex_by_processor = dict()
 
     vertices = sorted(partitioned_graph.subvertices, key=lambda sub: sub.label)
+    progress_bar = ProgressBar(len(vertices),
+                               "Generating placement report")
     for v in vertices:
         vertex_name = v.label
         vertex_model = v.model_name
@@ -315,9 +328,11 @@ def placement_report_without_partitionable_graph_by_vertex(
         my_string = " Placed on core ({}, {}, {}) \n".format(x, y, p)
         f_place_by_vertex.write(my_string)
         f_place_by_vertex.write("\n")
+        progress_bar.update()
 
     # Close file:
     f_place_by_vertex.close()
+    progress_bar.end()
 
 
 def placement_report_with_partitionable_graph_by_core(
@@ -349,7 +364,8 @@ def placement_report_with_partitionable_graph_by_core(
     f_place_by_core.write("Generated: {}".format(time_date_string))
     f_place_by_core.write(" for target machine '{}'".format(hostname))
     f_place_by_core.write("\n\n")
-
+    progress_bar = ProgressBar(len(list(machine.chips)),
+                               "Generating placement by core report")
     for chip in machine.chips:
         written_header = False
         for processor in chip.processors:
@@ -384,9 +400,11 @@ def placement_report_with_partitionable_graph_by_core(
                 p_str = "              Model: {}\n\n".format(vertex_model)
                 f_place_by_core.write(p_str)
                 f_place_by_core.write("\n")
+        progress_bar.update()
 
     # Close file:
     f_place_by_core.close()
+    progress_bar.end()
 
 
 def placement_report_without_partitionable_graph_by_core(
@@ -417,6 +435,8 @@ def placement_report_without_partitionable_graph_by_core(
     f_place_by_core.write(" for target machine '{}'".format(hostname))
     f_place_by_core.write("\n\n")
 
+    progress_bar = ProgressBar(len(list(machine.chips)),
+                               "Generating placement by core report")
     for chip in machine.chips:
         written_header = False
         for processor in chip.processors:
@@ -443,9 +463,11 @@ def placement_report_without_partitionable_graph_by_core(
                 p_str = "              Model: {}\n\n".format(vertex_model)
                 f_place_by_core.write(p_str)
                 f_place_by_core.write("\n")
+        progress_bar.update()
 
     # Close file:
     f_place_by_core.close()
+    progress_bar.end()
 
 
 def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
@@ -476,6 +498,8 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
 
     placements = sorted(placements.placements, key=lambda x: x.subvertex.label)
 
+    progress_bar = ProgressBar(len(placements) + len(list(machine.chips)),
+                               "Generating sdram usage report")
     for cur_placement in placements:
         subvert = cur_placement.subvertex
         requirements = subvert.resources_required
@@ -488,6 +512,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
             used_sdram_by_chip[(x, y)] = requirements.sdram.get_value()
         else:
             used_sdram_by_chip[(x, y)] += requirements.sdram.get_value()
+        progress_bar.update()
 
     for chip in machine.chips:
         try:
@@ -500,6 +525,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
                                         int(used_sdram / 1024.0),
                                         int(SDRAM.DEFAULT_SDRAM_BYTES /
                                             (1024.0 * 1024.0))))
+            progress_bar.update()
         except KeyError:
 
             # Do Nothing
@@ -507,6 +533,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
 
     # Close file:
     f_mem_used_by_core.close()
+    progress_bar.end()
 
 
 def routing_info_report(report_folder, subgraph, routing_infos):
@@ -524,7 +551,8 @@ def routing_info_report(report_folder, subgraph, routing_infos):
     except IOError:
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
-
+    progress_bar = ProgressBar(len(subgraph.subvertices),
+                               "Generating Routing info report")
     for subvert in subgraph.subvertices:
         output.write("Subvert: {} \n".format(subvert))
         outgoing_subedges = subgraph.outgoing_subedges_from_subvertex(subvert)
@@ -533,6 +561,8 @@ def routing_info_report(report_folder, subgraph, routing_infos):
                 get_subedge_information_from_subedge(outgoing_subedge)
             output.write("{} \n".format(subedge_routing_info))
         output.write("\n\n")
+        progress_bar.update()
+    progress_bar.end()
     output.flush()
     output.close()
 
@@ -541,6 +571,8 @@ def router_report_from_router_tables(report_folder, routing_tables):
     top_level_folder = os.path.join(report_folder, "routing_tables_generated")
     if not os.path.exists(top_level_folder):
         os.mkdir(top_level_folder)
+    progress_bar = ProgressBar(len(routing_tables.routing_tables),
+                               "Generating Router table report")
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
             file_sub_name = "routing_table_{}_{}.rpt"\
@@ -580,6 +612,8 @@ def router_report_from_router_tables(report_folder, routing_tables):
                 output.write(entry_str)
             output.flush()
             output.close()
+        progress_bar.update()
+    progress_bar.end()
 
 
 def _reduce_route_value(processors_ids, link_ids):
