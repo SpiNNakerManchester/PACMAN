@@ -416,7 +416,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # handle optional required inputs, only adding the first found param
         #  and other params with that rank
         requred_optional_inputs_list = list(algorithm.requred_optional_inputs)
-        sorted(requred_optional_inputs_list, key=lambda input: input['rank'])
+
+        requred_optional_inputs_list = \
+            sorted(requred_optional_inputs_list, key=lambda i: i['rank'],
+                   reverse=False)
+
+        # locate first param
         located = False
         located_rank = None
         for input_param in requred_optional_inputs_list:

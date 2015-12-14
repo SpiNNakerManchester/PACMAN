@@ -39,14 +39,21 @@ class MundyRouterCompressor(object):
 
         # compress each router
         for router_table in router_tables.routing_tables:
-            entries = \
-                self._convert_to_mundy_format(router_table)
+            # convert to mundy format
+            entries = self._convert_to_mundy_format(router_table)
+
+            # compress the router entries
             compressed_router_table_entries = \
                 self.reduce_routing_table(entries, masks)
+
+            # convert back to pacman model
             compressed_pacman_table = self._convert_to_pacman_router_table(
                 compressed_router_table_entries, router_table.x, router_table.y)
+
+            # add to new compressed routing tables
             compressed_pacman_router_tables.add_routing_table(
                 compressed_pacman_table)
+
             progress_bar.update()
         progress_bar.end()
 
@@ -77,7 +84,8 @@ class MundyRouterCompressor(object):
         else:
             return list(fields)
 
-    def _deduce_size_and_position_of_mask(self, mask):
+    @staticmethod
+    def _deduce_size_and_position_of_mask(mask):
         """
         from a mask, deduce the
         :param mask: the mask to deduce the size and position of mask to
