@@ -37,6 +37,8 @@ class MundyRouterCompressor(object):
 
         masks = self._deduce_usable_masks(router_tables, fields)
 
+        print masks
+
         # compress each router
         for router_table in router_tables.routing_tables:
             # convert to mundy format
@@ -44,7 +46,12 @@ class MundyRouterCompressor(object):
 
             # compress the router entries
             compressed_router_table_entries = \
-                self.reduce_routing_table(entries, masks)
+                self.reduce_routing_table(entries, masks, max_entries=1)
+
+            logger.info(
+                "reduced router table {}:{} from {} entries to {} entries"
+                .format(router_table.x, router_table.y, len(entries),
+                        len(compressed_router_table_entries)))
 
             # convert back to pacman model
             compressed_pacman_table = self._convert_to_pacman_router_table(
@@ -327,7 +334,7 @@ class MundyRouterCompressor(object):
                 # possible merge and perform it before regenerating the list.
                 try:
                     mkm, old_entries, new_entries =\
-                        get_best_merge(mask, entries, routing_entry_type)
+                        get_best_merge(self, mask, entries, routing_entry_type)
                 except exceptions.PacmanNoMergeException:
                     # If no merges are worth doing then move onto the next mask
                     break

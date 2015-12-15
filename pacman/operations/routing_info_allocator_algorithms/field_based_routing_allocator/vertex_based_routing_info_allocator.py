@@ -147,12 +147,29 @@ class VertexBasedRoutingInfoAllocator(object):
         over the entire key space
         :return: None
         """
+
+        # locate the application field if it exists
+        application_field, application_field_spare_values = \
+            self._locate_application_field(seen_fields)
+
         for field in seen_fields:
             if (field != field_utilties.TYPES_OF_FIELDS.FIXED_MASK.name and
                     field != field_utilties.TYPES_OF_FIELDS.FIXED_KEY.name and
                     field != field_utilties.TYPES_OF_FIELDS.FIXED_FIELD.name):
-                field_positions = self._assign_flexi_field_positions_recursive(
-                        bit_field_space, field, seen_fields, field_positions)
+                if application_field is None:
+                    field_positions = \
+                        self._assign_flexi_field_positions_recursive(
+                            bit_field_space, field, seen_fields,
+                            field_positions)
+                else:
+                    inputs = dict()
+                    inputs[APPLICATION_DIVIDER_FIELD_NAME] = \
+                        self._flexi_field_application_field_values[field]
+                    this_bit_field_space = bit_field_space(**inputs)
+                    field_positions = \
+                        self._assign_flexi_field_positions_recursive(
+                            this_bit_field_space, field, seen_fields,
+                            field_positions)
 
     def _assign_flexi_field_positions_recursive(
             self, bit_field_space, field, fields, field_positions):
@@ -996,8 +1013,7 @@ class VertexBasedRoutingInfoAllocator(object):
                     self._create_internal_field_space(
                         bit_field_space, value, field_instance)
 
-    @staticmethod
-    def _determine_groups(subgraph, graph_mapper, partitionable_graph,
+    def _determine_groups(self, subgraph, graph_mapper, partitionable_graph,
                           n_keys_map, progress_bar):
         """
 
@@ -1028,7 +1044,7 @@ class VertexBasedRoutingInfoAllocator(object):
             if (len(fixed_key_constraints) == 0
                     and len(fixed_mask_constraints) == 0
                     and len(fixed_field_constraints) == 0):
-                VertexBasedRoutingInfoAllocator.add_field_constraints(
+                self.add_field_constraints(
                     partition, graph_mapper, partitionable_graph, n_keys_map)
             progress_bar.update()
 
@@ -1130,15 +1146,15 @@ class VertexBasedRoutingInfoAllocator(object):
                     "trying again. thanks you")
         return first
 
-    @staticmethod
-    def add_field_constraints(partition, graph_mapper, partitionable_graph,
-                              n_keys_map):
+    def add_field_constraints(
+            self, partition, graph_mapper, partitionable_graph, n_keys_map):
         """
         searches though the subgraph adding field constraints for the key
          allocator
         :param partition:
         :param graph_mapper:
         :param partitionable_graph:
+        :param n_keys_map:
         :return:
         """
 
@@ -1150,22 +1166,23 @@ class VertexBasedRoutingInfoAllocator(object):
         subverts = list(graph_mapper.get_subvertices_from_vertex(vertex))
 
         # pop based flexi field
-        fields.append(FlexiField(flexi_field_name="Population",
-                                 value=verts.index(vertex),
-                                 tag=SUPPORTED_TAGS.ROUTING.name))
+        fields.append(FlexiField(
+            flexi_field_name="Population", value=verts.index(vertex),
+            tag=SUPPORTED_TAGS.ROUTING.name, nested_level=0))
 
         # subpop flexi field
         fields.append(FlexiField(
             flexi_field_name="SubPopulation{}".format(verts.index(vertex)),
-            tag=SUPPORTED_TAGS.ROUTING.name,
-            value=subverts.index(subvert)))
+            tag=SUPPORTED_TAGS.ROUTING.name, value=subverts.index(subvert),
+            nested_level=1))
 
         fields.append(FlexiField(
             flexi_field_name="POP({}:{})Keys"
             .format(verts.index(vertex), subverts.index(subvert)),
             tag=SUPPORTED_TAGS.APPLICATION.name,
             instance_n_keys=n_keys_map.n_keys_for_partitioned_edge(
-                partition.edges[0])))
+                partition.edges[0]),
+            nested_level=2))
 
         # add constraint to the subedge
         partition.add_constraint(KeyAllocatorFlexiFieldConstraint(fields))

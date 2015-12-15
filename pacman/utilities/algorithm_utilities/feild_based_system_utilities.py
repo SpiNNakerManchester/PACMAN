@@ -87,6 +87,7 @@ def handle_flexi_field(constraint, seen_fields, known_fields):
     """
     # set the level of search
     current_level = seen_fields
+
     for constraint_field in constraint.fields:
         found_field = None
 

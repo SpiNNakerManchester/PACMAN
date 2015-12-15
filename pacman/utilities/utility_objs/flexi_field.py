@@ -12,7 +12,8 @@ class FlexiField(object):
     """
 
     def __init__(
-            self, flexi_field_name, value=None, instance_n_keys=None, tag=None):
+            self, flexi_field_name, value=None, instance_n_keys=None, tag=None,
+            nested_level=0):
         self._flexi_field_name = flexi_field_name
         self._value = value
         self._tag = tag
@@ -20,6 +21,7 @@ class FlexiField(object):
             self._instance_n_keys = instance_n_keys
         else:
             self._instance_n_keys = None
+        self._nested_level = nested_level
 
     @property
     def name(self):
