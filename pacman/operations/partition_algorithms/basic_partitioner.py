@@ -31,8 +31,31 @@ class BasicPartitioner(object):
         return top / bottom
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine):
+    def __call__(self, graph, machine, take_into_account_runtime_sdram_usage,
+                 no_machine_time_steps):
+        """ Partition a partitionable_graph so that each subvertex will fit\
+            on a processor within the machine
 
+        :param graph: The partitionable_graph to partition
+        :type graph:\
+                    :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :param machine: The machine with respect to which to partition the\
+                    partitionable_graph
+        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param take_into_account_runtime_sdram_usage:
+            bool that tells the partitioner to take into account the runtime
+            sdram usage as well as the static sdram usage
+        :type take_into_account_runtime_sdram_usage: bool
+        :param no_machine_time_steps: the number of machine time steps that
+        the partitioner should partition the vertices for
+        :type no_machine_time_steps: int
+        :return: A partitioned_graph of partitioned vertices and partitioned\
+                    edges
+        :rtype:\
+                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
+        :raise pacman.exceptions.PacmanPartitionException: If something\
+                   goes wrong with the partitioning
+        """
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             supported_constraints=[PartitionerMaximumSizeConstraint],
@@ -52,8 +75,9 @@ class BasicPartitioner(object):
 
             # Get the usage of the first atom, then assume that this
             # will be the usage of all the atoms
-            requirements = vertex.get_resources_used_by_atoms(Slice(0, 1),
-                                                              graph)
+            requirements = vertex.get_resources_used_by_atoms(
+                Slice(0, 1), graph, take_into_account_runtime_sdram_usage,
+                no_machine_time_steps)
 
             # Locate the maximum resources available
             max_resources_available = \
@@ -101,7 +125,8 @@ class BasicPartitioner(object):
 
                 vertex_slice = Slice(counted, counted + (alloc - 1))
                 subvertex_usage = vertex.get_resources_used_by_atoms(
-                    vertex_slice, graph)
+                    vertex_slice, graph, take_into_account_runtime_sdram_usage,
+                    no_machine_time_steps)
 
                 subvert = vertex.create_subvertex(
                     vertex_slice, subvertex_usage,

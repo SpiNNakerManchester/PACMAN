@@ -17,6 +17,8 @@ from abc import abstractmethod
 from six import add_metaclass
 import logging
 
+from spynnaker.pyNN.models.common.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +63,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         self.add_constraint(max_atom_per_core_constraint)
 
     @abstractmethod
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         """ Get the SDRAM usage of a collection of atoms
 
         :param vertex_slice: the vertex vertex_slice which determines\
@@ -108,11 +110,18 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :raise None: does not raise any known exception
         """
 
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
+    def get_resources_used_by_atoms(
+            self, vertex_slice, graph, take_into_account_runtime_sdram_usage,
+            no_machine_time_steps):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
         :param graph: A reference to the graph containing this vertex.
+        :param take_into_account_runtime_sdram_usage: bool which states
+        if the vertex should be queried about its runtime sdram usage as well
+        as its static sdram usage
+        :param no_machine_time_steps: the number of machine time steps to
+        check the runtime sdram usage for
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return: a Resource container that contains a \
                     CPUCyclesPerTickResource, DTCMResource and SDRAMResource
@@ -121,12 +130,23 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         """
         cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
         dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
-        sdram_requirement = self.get_sdram_usage_for_atoms(vertex_slice, graph)
+        static_sdram_requirement = \
+            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
+
+        # set all to just static sdram for the time being
+        all_sdram_usage = static_sdram_requirement
+
+        # check runtime sdram usage if required
+        if (take_into_account_runtime_sdram_usage and
+                isinstance(self, AbstractRecordableVertex)):
+            runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
+                vertex_slice, graph, no_machine_time_steps)
+            all_sdram_usage += runtime_sdram_usage
 
         # noinspection PyTypeChecker
         resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                       dtcm=DTCMResource(dtcm_requirement),
-                                      sdram=SDRAMResource(sdram_requirement))
+                                      sdram=SDRAMResource(all_sdram_usage))
         return resources
 
     def get_max_atoms_per_core(self):

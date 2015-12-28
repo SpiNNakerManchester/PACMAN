@@ -30,8 +30,8 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     vertex = Vertex(1, None)
     cpu_cycles = vertex.get_cpu_usage_for_atoms(lo_atom, hi_atom)
     dtcm_requirement = vertex.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
-    sdram_requirement = \
-        vertex.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
+    sdram_requirement = vertex.get_static_sdram_usage_for_atoms(
+        lo_atom, hi_atom, vertex_in_edges)
     # noinspection PyTypeChecker
     resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                   dtcm=DTCMResource(dtcm_requirement),
@@ -55,8 +55,9 @@ class Vertex(AbstractPartitionableVertex):
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         return 200 * (hi_atom - lo_atom)
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
-        return 4000 + (50 * (hi_atom - lo_atom))
+    def get_static_sdram_usage_for_atoms(
+            self, vertex_slice, partitionable_graph):
+        return 4000 + (50 * (vertex_slice.hi_atom - vertex_slice.lo_atom))
 
 class Subvertex(PartitionedVertex):
 

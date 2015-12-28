@@ -11,6 +11,14 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>take_into_account_runtime_sdram_usage</param_name>
+                <param_type>TakeRuntimeSdramUsageIntoAccount</param_type>
+            </parameter>
+            <parameter>
+                <param_name>no_machine_time_steps</param_name>
+                <param_type>RunTimeMachineTimeSteps</param_type>
+            </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
@@ -34,6 +42,14 @@
             <parameter>
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>take_into_account_runtime_sdram_usage</param_name>
+                <param_type>TakeRuntimeSdramUsageIntoAccount</param_type>
+            </parameter>
+            <parameter>
+                <param_name>no_machine_time_steps</param_name>
+                <param_type>RunTimeMachineTimeSteps</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
