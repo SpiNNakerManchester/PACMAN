@@ -17,8 +17,8 @@ from abc import abstractmethod
 from six import add_metaclass
 import logging
 
-from spynnaker.pyNN.models.common.abstract_recordable_vertex import \
-    AbstractRecordableVertex
+from spinn_front_end_common.interface.abstract_recordable_interface import \
+    AbstractRecordableInterface
 
 logger = logging.getLogger(__name__)
 
@@ -111,13 +111,13 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         """
 
     def get_resources_used_by_atoms(
-            self, vertex_slice, graph, take_into_account_runtime_sdram_usage,
+            self, vertex_slice, graph, useing_auto_pause_and_resume,
             no_machine_time_steps):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
         :param graph: A reference to the graph containing this vertex.
-        :param take_into_account_runtime_sdram_usage: bool which states
+        :param useing_auto_pause_and_resume: bool which states
         if the vertex should be queried about its runtime sdram usage as well
         as its static sdram usage
         :param no_machine_time_steps: the number of machine time steps to
@@ -137,8 +137,8 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         all_sdram_usage = static_sdram_requirement
 
         # check runtime sdram usage if required
-        if (take_into_account_runtime_sdram_usage and
-                isinstance(self, AbstractRecordableVertex)):
+        if (not useing_auto_pause_and_resume and
+                isinstance(self, AbstractRecordableInterface)):
             runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
                 vertex_slice, graph, no_machine_time_steps)
             all_sdram_usage += runtime_sdram_usage

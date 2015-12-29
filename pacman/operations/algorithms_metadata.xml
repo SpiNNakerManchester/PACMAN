@@ -12,8 +12,8 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>take_into_account_runtime_sdram_usage</param_name>
-                <param_type>TakeRuntimeSdramUsageIntoAccount</param_type>
+                <param_name>useing_auto_pause_and_resume</param_name>
+                <param_type>UseAutoPauseAndResume</param_type>
             </parameter>
             <parameter>
                 <param_name>no_machine_time_steps</param_name>
@@ -44,8 +44,8 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>take_into_account_runtime_sdram_usage</param_name>
-                <param_type>TakeRuntimeSdramUsageIntoAccount</param_type>
+                <param_name>useing_auto_pause_and_resume</param_name>
+                <param_type>UseAutoPauseAndResume</param_type>
             </parameter>
             <parameter>
                 <param_name>no_machine_time_steps</param_name>

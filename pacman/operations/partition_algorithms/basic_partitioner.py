@@ -31,7 +31,7 @@ class BasicPartitioner(object):
         return top / bottom
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine, take_into_account_runtime_sdram_usage,
+    def __call__(self, graph, machine, useing_auto_pause_and_resume,
                  no_machine_time_steps):
         """ Partition a partitionable_graph so that each subvertex will fit\
             on a processor within the machine
@@ -76,7 +76,7 @@ class BasicPartitioner(object):
             # Get the usage of the first atom, then assume that this
             # will be the usage of all the atoms
             requirements = vertex.get_resources_used_by_atoms(
-                Slice(0, 1), graph, take_into_account_runtime_sdram_usage,
+                Slice(0, 1), graph, useing_auto_pause_and_resume,
                 no_machine_time_steps)
 
             # Locate the maximum resources available
@@ -125,7 +125,7 @@ class BasicPartitioner(object):
 
                 vertex_slice = Slice(counted, counted + (alloc - 1))
                 subvertex_usage = vertex.get_resources_used_by_atoms(
-                    vertex_slice, graph, take_into_account_runtime_sdram_usage,
+                    vertex_slice, graph, useing_auto_pause_and_resume,
                     no_machine_time_steps)
 
                 subvert = vertex.create_subvertex(

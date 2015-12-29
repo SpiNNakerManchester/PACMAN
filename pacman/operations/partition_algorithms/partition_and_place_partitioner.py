@@ -29,7 +29,7 @@ class PartitionAndPlacePartitioner(object):
     """
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine, take_into_account_runtime_sdram_usage,
+    def __call__(self, graph, machine, useing_auto_pause_and_resume,
                  no_machine_time_steps):
         """ Partition a partitionable_graph so that each subvertex will fit\
             on a processor within the machine
@@ -40,10 +40,10 @@ class PartitionAndPlacePartitioner(object):
         :param machine: The machine with respect to which to partition the\
                     partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param take_into_account_runtime_sdram_usage:
+        :param useing_auto_pause_and_resume:
             bool that tells the partitioner to take into account the runtime
             sdram usage as well as the static sdram usage
-        :type take_into_account_runtime_sdram_usage: bool
+        :type useing_auto_pause_and_resume: bool
         :param no_machine_time_steps: the number of machine time steps that
         the partitioner should partition the vertices for
         :type no_machine_time_steps: int
@@ -88,7 +88,7 @@ class PartitionAndPlacePartitioner(object):
             if subverts_from_vertex is None:
                 self._partition_vertex(
                     vertex, subgraph, graph_mapper, resource_tracker, graph,
-                    take_into_account_runtime_sdram_usage,
+                    useing_auto_pause_and_resume,
                     no_machine_time_steps)
             progress_bar.update(vertex.n_atoms)
         progress_bar.end()
@@ -103,7 +103,7 @@ class PartitionAndPlacePartitioner(object):
 
     def _partition_vertex(
             self, vertex, subgraph, graph_to_subgraph_mapper, resource_tracker,
-            graph, take_into_account_runtime_sdram_usage,
+            graph, useing_auto_pause_and_resume,
             no_machine_time_steps):
         """ Partition a single vertex
 
@@ -125,10 +125,10 @@ class PartitionAndPlacePartitioner(object):
         :type graph:\
                     :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
         :return: None
-        :param take_into_account_runtime_sdram_usage:
+        :param useing_auto_pause_and_resume:
             bool that tells the partitioner to take into account the runtime
             sdram usage as well as the static sdram usage
-        :type take_into_account_runtime_sdram_usage: bool
+        :type useing_auto_pause_and_resume: bool
         :param no_machine_time_steps: the number of machine time steps that
         the partitioner should partition the vertices for
         :type no_machine_time_steps: int
@@ -158,12 +158,12 @@ class PartitionAndPlacePartitioner(object):
         self._partition_by_atoms(
             partiton_together_vertices, vertex.n_atoms, max_atoms_per_core,
             subgraph, graph, graph_to_subgraph_mapper, resource_tracker,
-            take_into_account_runtime_sdram_usage, no_machine_time_steps)
+            useing_auto_pause_and_resume, no_machine_time_steps)
 
     def _partition_by_atoms(
             self, vertices, n_atoms, max_atoms_per_core, subgraph, graph,
             graph_to_subgraph_mapper, resource_tracker,
-            take_into_account_runtime_sdram_usage, no_machine_time_steps):
+            useing_auto_pause_and_resume, no_machine_time_steps):
         """ Try to partition subvertices on how many atoms it can fit on\
             each subvert
 
@@ -189,10 +189,10 @@ class PartitionAndPlacePartitioner(object):
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
-        :param take_into_account_runtime_sdram_usage:
+        :param useing_auto_pause_and_resume:
             bool that tells the partitioner to take into account the runtime
             sdram usage as well as the static sdram usage
-        :type take_into_account_runtime_sdram_usage: bool
+        :type useing_auto_pause_and_resume: bool
         :param no_machine_time_steps: the number of machine time steps that
         the partitioner should partition the vertices for
         :type no_machine_time_steps: int
@@ -209,7 +209,7 @@ class PartitionAndPlacePartitioner(object):
             used_placements, hi_atom = self._scale_down_resources(
                 lo_atom, hi_atom, vertices, resource_tracker,
                 max_atoms_per_core, graph,
-                take_into_account_runtime_sdram_usage, no_machine_time_steps)
+                useing_auto_pause_and_resume, no_machine_time_steps)
 
             # Update where we are
             n_atoms_placed = hi_atom + 1
@@ -231,7 +231,7 @@ class PartitionAndPlacePartitioner(object):
     @staticmethod
     def _reallocate_resources(
             used_placements, resource_tracker, lo_atom, hi_atom, graph,
-            take_into_account_runtime_sdram_usage, no_machine_time_steps):
+            useing_auto_pause_and_resume, no_machine_time_steps):
         """ readjusts resource allocation and updates the placement list to\
             take into account the new layout of the atoms
 
@@ -263,7 +263,7 @@ class PartitionAndPlacePartitioner(object):
             # Get the new resource usage
             vertex_slice = Slice(lo_atom, hi_atom)
             new_resources = placed_vertex.get_resources_used_by_atoms(
-                vertex_slice, graph, take_into_account_runtime_sdram_usage,
+                vertex_slice, graph, useing_auto_pause_and_resume,
                 no_machine_time_steps)
 
             # Re-allocate the existing resources
@@ -278,7 +278,7 @@ class PartitionAndPlacePartitioner(object):
     # noinspection PyUnusedLocal
     def _scale_down_resources(
             self, lo_atom, hi_atom, vertices, resource_tracker,
-            max_atoms_per_core, graph, take_into_account_runtime_sdram_usage,
+            max_atoms_per_core, graph, useing_auto_pause_and_resume,
             no_machine_time_steps):
         """ Reduce the number of atoms on a core so that it fits within the
             resources available.
@@ -299,10 +299,10 @@ class PartitionAndPlacePartitioner(object):
                     :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
         :param resource_tracker: Tracker of used resources
         :type resource_tracker: spinnmachine.machine.Machine object
-        :param take_into_account_runtime_sdram_usage:
+        :param useing_auto_pause_and_resume:
             bool that tells the partitioner to take into account the runtime
             sdram usage as well as the static sdram usage
-        :type take_into_account_runtime_sdram_usage: bool
+        :type useing_auto_pause_and_resume: bool
         :param no_machine_time_steps: the number of machine time steps that
         the partitioner should partition the vertices for
         :type no_machine_time_steps: int
@@ -327,7 +327,7 @@ class PartitionAndPlacePartitioner(object):
             # get resources used by vertex
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(
-                vertex_slice, graph, take_into_account_runtime_sdram_usage,
+                vertex_slice, graph, useing_auto_pause_and_resume,
                 no_machine_time_steps)
 
             # Work out the ratio of used to available resources
@@ -347,7 +347,7 @@ class PartitionAndPlacePartitioner(object):
                 hi_atom = lo_atom + new_n_atoms - 1
                 vertex_slice = Slice(lo_atom, hi_atom)
                 used_resources = vertex.get_resources_used_by_atoms(
-                    vertex_slice, graph, take_into_account_runtime_sdram_usage,
+                    vertex_slice, graph, useing_auto_pause_and_resume,
                     no_machine_time_steps)
                 ratio = self._find_max_ratio(used_resources, resources)
 
@@ -359,7 +359,7 @@ class PartitionAndPlacePartitioner(object):
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
                 used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
-                resources, ratio, graph, take_into_account_runtime_sdram_usage,
+                resources, ratio, graph, useing_auto_pause_and_resume,
                 no_machine_time_steps)
 
             # If this hi_atom is smaller than the current minimum, update the
@@ -368,7 +368,7 @@ class PartitionAndPlacePartitioner(object):
                 min_hi_atom = hi_atom
                 used_placements = self._reallocate_resources(
                     used_placements, resource_tracker, lo_atom, hi_atom, graph,
-                    take_into_account_runtime_sdram_usage,
+                    useing_auto_pause_and_resume,
                     no_machine_time_steps)
 
             # Attempt to allocate the resources for this vertex on the machine
@@ -394,7 +394,7 @@ class PartitionAndPlacePartitioner(object):
 
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
-            resources, ratio, graph, take_into_account_runtime_sdram_usage,
+            resources, ratio, graph, useing_auto_pause_and_resume,
             no_machine_time_steps):
         """ Try to push up the number of atoms in a subvertex to be as close\
             to the available resources as possible
@@ -418,10 +418,10 @@ class PartitionAndPlacePartitioner(object):
                     :py:class:`pacman.model.resources.resource.Resource`
         :param ratio: the ratio between max atoms and available resources
         :type ratio: int
-        :param take_into_account_runtime_sdram_usage:
+        :param useing_auto_pause_and_resume:
             bool that tells the partitioner to take into account the runtime
             sdram usage as well as the static sdram usage
-        :type take_into_account_runtime_sdram_usage: bool
+        :type useing_auto_pause_and_resume: bool
         :param no_machine_time_steps: the number of machine time steps that
         the partitioner should partition the vertices for
         :type no_machine_time_steps: int
@@ -450,7 +450,7 @@ class PartitionAndPlacePartitioner(object):
             previous_used_resources = used_resources
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(
-                vertex_slice, graph, take_into_account_runtime_sdram_usage,
+                vertex_slice, graph, useing_auto_pause_and_resume,
                 no_machine_time_steps)
             ratio = self._find_max_ratio(used_resources, resources)
 
