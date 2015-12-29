@@ -21,6 +21,7 @@ class Placements(object):
         """
         self._placements = dict()
         self._subvertices = dict()
+        self._placements_by_chip = dict()
         if placements is not None:
             self.add_placements(placements)
 
@@ -62,6 +63,12 @@ class Placements(object):
 
         self._placements[placement_id] = placement
         self._subvertices[placement.subvertex] = placement
+
+        # store chip based placements
+        chip_placement_id = (placement.x, placement.y)
+        if chip_placement_id not in self._placements_by_chip:
+            self._placements_by_chip[chip_placement_id] = list()
+        self._placements_by_chip[chip_placement_id].append(placement)
 
     def get_subvertex_on_processor(self, x, y, p):
         """ Return the subvertex on a specific processor or None if the\
@@ -129,6 +136,20 @@ class Placements(object):
         :raise None: does not raise any known exceptions
         """
         return self._placements.itervalues()
+
+    def get_placements_on_chip(self, x, y):
+        """ returns the placements placed on a specific chip
+
+        :param x: the x coord of the chip to locate placements of
+        :param y: the y coord of the chip to locate placements of
+        :return: a list of placement objects that reside on the chip, or a
+        empty list if none exist
+        """
+        placmeent_key = (x, y)
+        if placmeent_key not in self._placements_by_chip:
+            return []
+        else:
+            return self._placements_by_chip[placmeent_key]
 
     def __repr__(self):
         """ string representation
