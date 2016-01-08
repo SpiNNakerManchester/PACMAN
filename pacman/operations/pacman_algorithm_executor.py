@@ -404,7 +404,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 result_type = algorithm.get_type_from_output_name(result_name)
                 if result_type is None:
                     raise exceptions.PacmanTypeError(
-                        "Unrecognised result name {} for algorithm {} with"
+                        "Unrecognised result name {} for algorithm {} with "
                         "outputs {}".format(
                             result_name, algorithm.algorithm_id,
                             algorithm.outputs))
