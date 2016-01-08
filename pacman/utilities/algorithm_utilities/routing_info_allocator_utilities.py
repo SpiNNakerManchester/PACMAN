@@ -138,7 +138,7 @@ def add_routing_key_entries(
     creates and adds entries for routing tables as required for the path
     :param routing_paths: the routing paths object generated from routing info
     :param subedge_routing_info: the subedge info object that contains keys
-    :param out_going_subedge: the edge this is aossicated with
+    :param out_going_subedge: the edge this is associated with
     :param routing_tables: the routing tables to adjust
     :return: None
     """
