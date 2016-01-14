@@ -1,7 +1,3 @@
-"""
-PACMANAlgorithmExecutor
-"""
-
 # pacman imports
 from pacman import exceptions
 from pacman.interfaces.abstract_provides_provenance_data import \
@@ -38,7 +34,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         """
         AbstractProvidesProvenanceData.__init__(self)
 
-        # provanence data store
+        # provenance data store
         self._provanence_data = etree.Element("Provenance_data_from_PACMAN")
 
         # pacman mapping objects
@@ -59,7 +55,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
     def _set_up_pacman_algorthms_listings(
             self, algorithms, optional_algorithms, xml_paths, inputs,
             required_outputs):
-        """ translates the algorithm string and uses the config XML to create\
+        """ Translates the algorithm string and uses the config XML to create\
             algorithm objects
 
         :param algorithms: the string representation of the set of algorithms
@@ -115,7 +111,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     def _sort_out_order_of_algorithms(
             self, inputs, required_outputs, optional_algorithms):
-        """ takes the algorithms and determines which order they need to be\
+        """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
         :param inputs: list of input types
         :type inputs: iterable of str
@@ -227,8 +223,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
     @staticmethod
     def _locate_suitable_algorithm(
             algorithm_list, inputs, generated_outputs, look_for_noval_output):
-        """
-        locates a suitable algorithm
+        """ Locates a suitable algorithm
+
         :param algorithm_list: the list of algorithms to choose from
         :param inputs: the inputs available currently
         :param generated_outputs: the current outputs expected to be generated
@@ -259,8 +255,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         return suitable_algorithm
 
     def execute_mapping(self):
-        """
-        executes the algorithms
+        """ Executes the algorithms
+
         :param inputs: the inputs stated in setup function
         :return: None
         """
@@ -282,7 +278,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 self._handle_external_algorithm(algorithm)
 
     def _handle_internal_algorithm(self, algorithm):
-        """ creates the input files for the algorithm
+        """ Creates the input files for the algorithm
+
         :param algorithm: the algorithm
         :return: None
         """
@@ -318,7 +315,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     def _handle_external_algorithm(self, algorithm):
         """ Creates the input files for the algorithm
-        :param algorithm: the algorthm
+
+        :param algorithm: the algorithm
         :return: None
         """
         input_params = self._create_input_commands(algorithm)

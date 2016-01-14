@@ -99,8 +99,8 @@ class ConvertToMemoryPlacements(object):
 
     @staticmethod
     def _load_json_files(placements, allocations, constraints):
-        """
-        reads in the 3 json files needed for the conversion
+        """ Read in the 3 json files needed for the conversion
+
         :param placements:
         :param allocations:
         :param constraints:
@@ -119,8 +119,8 @@ class ConvertToMemoryPlacements(object):
 
     @staticmethod
     def _valid_constraints_for_external_device(constraints_for_vertex):
-        """
-        search for the constraint pattern which represetns a external device
+        """ Search for the constraint pattern which represents an external\
+            device
         :param constraints_for_vertex: constraints for a vertex
         :return: bool
         """

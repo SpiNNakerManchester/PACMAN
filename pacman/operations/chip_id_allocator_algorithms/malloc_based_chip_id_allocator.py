@@ -21,6 +21,9 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
+        # we only want one virtual chip per 'link'
+        self._virtual_chips = dict()
+
     def __call__(
             self, machine, partitionable_graph=None, partitioned_graph=None):
         """
@@ -57,10 +60,18 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             # allocate ids for virtual chips
             for vertex in partitionable_graph.vertices:
                 if isinstance(vertex, AbstractVirtualVertex):
-                    chip_id_x, chip_id_y = self._allocate_id()
-                    vertex.set_virtual_chip_coordinates(chip_id_x, chip_id_y)
-                    machine_algorithm_utilities.create_virtual_chip(
-                        machine, vertex)
+                    link = vertex.spinnaker_link_id
+                    if link not in self._virtual_chips:
+                        chip_id_x, chip_id_y = self._allocate_id()
+                        self._virtual_chips[link] = (chip_id_x, chip_id_y)
+                        vertex.set_virtual_chip_coordinates(
+                            chip_id_x, chip_id_y)
+                        machine_algorithm_utilities.create_virtual_chip(
+                            machine, vertex)
+                    else:
+                        chip_id_x, chip_id_y = self._virtual_chips[link]
+                        vertex.set_virtual_chip_coordinates(
+                            chip_id_x, chip_id_y)
                 progress_bar.update()
             progress_bar.end()
         elif partitioned_graph is not None:
@@ -68,10 +79,19 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             # allocate ids for virtual chips
             for vertex in partitioned_graph.subvertices:
                 if isinstance(vertex, AbstractVirtualVertex):
-                    chip_id_x, chip_id_y = self._allocate_id()
-                    vertex.set_virtual_chip_coordinates(chip_id_x, chip_id_y)
-                    machine_algorithm_utilities.create_virtual_chip(
-                        machine, vertex)
+                    link = vertex.spinnaker_link_id
+                    if link not in self._virtual_chips:
+                        chip_id_x, chip_id_y = self._allocate_id()
+                        self._virtual_chips[link] = (
+                            chip_id_x, chip_id_y)
+                        vertex.set_virtual_chip_coordinates(
+                            chip_id_x, chip_id_y)
+                        machine_algorithm_utilities.create_virtual_chip(
+                            machine, vertex)
+                    else:
+                        chip_id_x, chip_id_y = self._virtual_chips[link]
+                        vertex.set_virtual_chip_coordinates(
+                            chip_id_x, chip_id_y)
                 progress_bar.update()
             progress_bar.end()
 
