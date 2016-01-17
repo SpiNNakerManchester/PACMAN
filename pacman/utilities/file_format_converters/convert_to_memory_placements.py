@@ -49,6 +49,7 @@ class ConvertToMemoryPlacements(object):
                 partitioned_graph.get_subvertex_with_repr(vertex_repr)
             if vertex_repr not in core_allocations:
                 if subvertex is not None:
+
                     # virtual chip or tag chip
                     constraints_for_vertex = self._locate_constraints(
                         vertex_repr, constraints)
@@ -98,8 +99,8 @@ class ConvertToMemoryPlacements(object):
 
     @staticmethod
     def _load_json_files(placements, allocations, constraints):
-        """
-        reads in the 3 json files needed for the conversion
+        """ Read in the 3 json files needed for the conversion
+
         :param placements:
         :param allocations:
         :param constraints:
@@ -118,8 +119,8 @@ class ConvertToMemoryPlacements(object):
 
     @staticmethod
     def _valid_constraints_for_external_device(constraints_for_vertex):
-        """
-        search for the constraint pattern which represetns a external device
+        """ Search for the constraint pattern which represents an external\
+            device
         :param constraints_for_vertex: constraints for a vertex
         :return: bool
         """
@@ -140,6 +141,7 @@ class ConvertToMemoryPlacements(object):
     @staticmethod
     def _validate_file_read_data(
             file_placements, file_allocations, constraints):
+
         # verify that the files meet the schema.
         # locate schemas
         file_placements_schema_file_path = os.path.join(

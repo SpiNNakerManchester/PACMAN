@@ -1,7 +1,3 @@
-"""
-MulticastRoutingPathEntry
-"""
-
 # pacman imports
 from pacman import exceptions
 
@@ -135,8 +131,8 @@ class MulticastRoutingPathEntry(object):
             self._out_going_links.append(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
-                "the link {} already exists in the mutli-cast-r"
-                "outing-apth-entry".format(direction), str(direction))
+                "the link {} already exists in the mutlicast-"
+                "routing-path-entry".format(direction), str(direction))
 
     def add_out_going_direction_processor(self, direction):
         """ Add a new outgoing direction processor into the entry

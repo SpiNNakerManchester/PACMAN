@@ -10,8 +10,7 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint \
 @add_metaclass(ABCMeta)
 class AbstractConstrainedObject(object):
 
-    def __init__(self, label, constraints=None):
-        self._label = label
+    def __init__(self, constraints=None):
         self._constraints = list()
         self.add_constraints(constraints)
 
@@ -65,16 +64,6 @@ class AbstractConstrainedObject(object):
         """
         self._constraints = list()
         self.add_constraints(constraints)
-
-    @property
-    def label(self):
-        """ The label of the vertex
-
-        :return: The label
-        :rtype: str
-        :raise None: Raises no known exceptions
-        """
-        return self._label
 
     @property
     def constraints(self):

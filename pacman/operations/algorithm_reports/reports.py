@@ -323,8 +323,9 @@ def placement_report_without_partitionable_graph_by_vertex(
 def placement_report_with_partitionable_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper):
     """ Generate report on the placement of sub-vertices onto cores by core.
+
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param graph_mapper: the mapping between partitionable and partitioned\
             graphs
     :param machine: the spinnaker machine object
@@ -383,16 +384,17 @@ def placement_report_with_partitionable_graph_by_core(
                 p_str = "              Model: {}\n\n".format(vertex_model)
                 f_place_by_core.write(p_str)
                 f_place_by_core.write("\n")
+
     # Close file:
     f_place_by_core.close()
 
 
 def placement_report_without_partitionable_graph_by_core(
         report_folder, hostname, placements, machine):
-    """
-    Generate report on the placement of sub-vertices onto cores by core.
+    """ Generate report on the placement of sub-vertices onto cores by core.
+
     :param report_folder: the folder to which the reports are being written
-    :param hostname: the machiens hostname to which the placer worked on
+    :param hostname: the machine's hostname to which the placer worked on
     :param machine: the spinnaker machine object
     :param placements: the placements objects built by the placer.
     """
@@ -611,6 +613,7 @@ def _expand_route_value(processors_ids, link_ids):
             route_string += ", {}".format(processor)
 
     route_string += "] ["
+
     # Convert link targets to readable values:
     link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
 

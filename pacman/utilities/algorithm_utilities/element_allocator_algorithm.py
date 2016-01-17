@@ -1,7 +1,3 @@
-"""
-AbstractElementAllocatorAlgorithm
-"""
-
 # pacman imports
 from pacman.model.resources.element_free_space import ElementFreeSpace
 from pacman import exceptions
