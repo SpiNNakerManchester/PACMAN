@@ -165,16 +165,29 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     algorithms_used = list()
                     for algorithm in allocated_algorithums:
                         algorithms_used.append(algorithm.algorithm_id)
+                    algorithum_input_requirement_breakdown = ""
+                    for algorithm in self._algorithms:
+                        if algorithm.algorithm_id in algorithums_left_names:
+                            algorithum_input_requirement_breakdown += \
+                                self._deduce_inputs_required_to_run(
+                                    algorithm, input_names)
+                    for algorithm in optional_algorithms:
+                        if algorithm.algorithm_id in algorithums_left_names:
+                            algorithum_input_requirement_breakdown += \
+                                self._deduce_inputs_required_to_run(
+                                    algorithm, input_names)
 
                     raise exceptions.PacmanConfigurationException(
                         "Unable to deduce a future algorithm to use.\n"
                         "    Inputs: {}\n"
                         "    Outputs: {}\n"
                         "    Functions available: {}\n"
-                        "    Functions used: {}\n".format(
+                        "    Functions used: {}\n"
+                        "    Inputs required per function: \n{}\n".format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
-                            algorithums_left_names, algorithms_used))
+                            algorithums_left_names, algorithms_used,
+                            algorithum_input_requirement_breakdown))
 
         all_required_outputs_generated = True
         failed_to_generate_output_string = ""
@@ -192,6 +205,20 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         self._prune_unnecessary_algorithms(allocated_algorithums)
 
         self._algorithms = allocated_algorithums
+
+    def _deduce_inputs_required_to_run(self, algorithm, input_names):
+        inputs = algorithm.inputs
+        left_over_inputs = "            {}: ".format(algorithm.algorithm_id)
+        first = True
+        for input in inputs:
+            if input['type'] not in input_names:
+                if first:
+                    left_over_inputs += "['{}'".format(input['type'])
+                    first = False
+                else:
+                    left_over_inputs += ", '{}'".format(input['type'])
+        left_over_inputs += "]\n"
+        return left_over_inputs
 
     @staticmethod
     def _prune_unnecessary_algorithms(allocated_algorithums):
