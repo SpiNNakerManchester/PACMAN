@@ -101,6 +101,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             self, inputs, required_outputs, optional_converter_algorithms):
         """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
+
         :param inputs: list of input types
         :type inputs: iterable of str
         :param required_outputs: the set of outputs that this workflow is\
