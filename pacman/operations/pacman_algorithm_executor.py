@@ -46,8 +46,11 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # store timing request
         self._do_timing = do_timings
 
+        # protect the variable from refernce movement during usage
+        copy_of_xml_paths = list(xml_paths)
+
         self._set_up_pacman_algorthms_listings(
-            algorithms, optional_algorithms, xml_paths, inputs,
+            algorithms, optional_algorithms, copy_of_xml_paths, inputs,
             required_outputs)
 
         self._inputs = inputs
@@ -486,6 +489,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :return: the returned item
         """
         return self._internal_type_mapping[item_type]
+
+    def get_items(self):
+        """
+        supports processing of all the outptus from a execution
+        :return: dictonary of types as keys and values.
+        """
+        return self._internal_type_mapping
 
     def write_provenance_data_in_xml(self, file_path, transceiver,
                                      placement=None):
