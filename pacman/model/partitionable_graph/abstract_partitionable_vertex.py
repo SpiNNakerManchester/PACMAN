@@ -110,44 +110,19 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :raise None: does not raise any known exception
         """
 
+    @abstractmethod
     def get_resources_used_by_atoms(
-            self, vertex_slice, graph, useing_auto_pause_and_resume,
-            no_machine_time_steps):
+            self, vertex_slice, graph):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
         :param graph: A reference to the graph containing this vertex.
-        :param useing_auto_pause_and_resume: bool which states
-        if the vertex should be queried about its runtime sdram usage as well
-        as its static sdram usage
-        :param no_machine_time_steps: the number of machine time steps to
-        check the runtime sdram usage for
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
         :return: a Resource container that contains a \
                     CPUCyclesPerTickResource, DTCMResource and SDRAMResource
         :rtype: ResourceContainer
         :raise None: this method does not raise any known exception
         """
-        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
-        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
-        static_sdram_requirement = \
-            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
-
-        # set all to just static sdram for the time being
-        all_sdram_usage = static_sdram_requirement
-
-        # check runtime sdram usage if required
-        if (not useing_auto_pause_and_resume and
-                isinstance(self, AbstractRecordableInterface)):
-            runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
-                vertex_slice, graph, no_machine_time_steps)
-            all_sdram_usage += runtime_sdram_usage
-
-        # noinspection PyTypeChecker
-        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
-                                      dtcm=DTCMResource(dtcm_requirement),
-                                      sdram=SDRAMResource(all_sdram_usage))
-        return resources
 
     def get_max_atoms_per_core(self):
         """ Get the maximum number of atoms that can be run on a single core \
