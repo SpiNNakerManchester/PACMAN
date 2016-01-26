@@ -98,7 +98,6 @@ class ConvertToFileMachine(object):
 
         return {'file_machine': file_path}
 
-
     def _check_for_exceptions(
             self, json_dictory_rep, x_coord, y_coord, machine,
             chip_resource_exceptions):
@@ -115,6 +114,7 @@ class ConvertToFileMachine(object):
         chip = machine.get_chip_at(x_coord, y_coord)
 
         if not chip.is_processor_with_id(no_processors - 1):
+
             # locate the highest core id
             has_processor = False
             while not has_processor and no_processors > 0:
@@ -123,7 +123,7 @@ class ConvertToFileMachine(object):
                     is_processor_with_id(no_processors - 1)
 
             # locate number of monitor cores
-            no_monitors= self._locate_no_monitors(chip)
+            no_monitors = self._locate_no_monitors(chip)
 
             chip_exceptions = dict()
             chip_exceptions["cores"] = no_processors - no_monitors
@@ -133,14 +133,14 @@ class ConvertToFileMachine(object):
         else:
             no_monitors = self._locate_no_monitors(chip)
 
-            # if montiors exist, remove them from top elvel
+            # if monitors exist, remove them from top level
             if no_monitors > 0:
                 chip_exceptions = dict()
                 chip_exceptions["cores"] = \
-                    CHIP_HOMOGENIOUS_CORES -1 - no_monitors
+                    CHIP_HOMOGENIOUS_CORES - 1 - no_monitors
                 chip_resource_exceptions[(x_coord, y_coord)] = chip_exceptions
 
-        # search for etehrnet connected chips
+        # search for Ethernet connected chips
         for chip in machine.ethernet_connected_chips:
             if (chip.x, chip.y) not in chip_resource_exceptions:
                 chip_resource_exceptions[(chip.x, chip.y)] = dict()
@@ -149,7 +149,8 @@ class ConvertToFileMachine(object):
 
     def _locate_no_monitors(self, chip):
         no_monitors = 0
-        # search for montiors in the list of processors
+
+        # search for monitors in the list of processors
         for processor in range(0, CHIP_HOMOGENIOUS_CORES - 1):
             if chip.is_processor_with_id(processor):
                 if chip.get_processor_with_id(processor).is_monitor:
