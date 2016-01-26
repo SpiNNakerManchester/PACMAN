@@ -169,3 +169,9 @@ class MulticastRoutingTable(object):
         :return:
         """
         return not self.__eq__(other)
+
+    def __repr__(self):
+        entry_string = ""
+        for entry in self._multicast_routing_entries:
+            entry_string += "{}\n".format(entry)
+        return "{}:{}\n\n{}".format(self._x, self._y, entry_string)

@@ -39,7 +39,12 @@ class MundyRouterCompressor(object):
         # compress each router
         for router_table in router_tables.routing_tables:
             # convert to mundy format
+
+            #print "start \n {}".format(router_table)
+
             entries = self._convert_to_mundy_format(router_table)
+
+            #print "start after convert \n {}".format(entries)
 
             # compress the router entries
             compressed_router_table_entries = \
@@ -50,9 +55,15 @@ class MundyRouterCompressor(object):
                 .format(router_table.x, router_table.y, len(entries),
                         len(compressed_router_table_entries)))
 
+            #print "compressed before conversion \n {}"\
+            #    .format(compressed_router_table_entries)
+
             # convert back to pacman model
             compressed_pacman_table = self._convert_to_pacman_router_table(
                 compressed_router_table_entries, router_table.x, router_table.y)
+
+            #print "compressed after conversion \n{}"\
+            #    .format(compressed_pacman_table)
 
             # add to new compressed routing tables
             compressed_pacman_router_tables.add_routing_table(
@@ -75,9 +86,14 @@ class MundyRouterCompressor(object):
         # handle entries
         for router_entry in pacman_router_table.multicast_routing_entries:
             # Get the route for the entry
+            new_processor_ids = list()
+            for processor_id in router_entry.processor_ids:
+                new_processor_ids.append(processor_id + 6)
+
+
             route = set(rig_routing_table.Routes(i) for i in
                         itertools.chain(router_entry.link_ids,
-                                        router_entry.processor_ids))
+                                        new_processor_ids))
 
             # Get the source for the entry
             if router_entry.defaultable:
@@ -106,10 +122,11 @@ class MundyRouterCompressor(object):
 
         table = MulticastRoutingTable(router_x_coord, router_y_coord)
         for entry in mundy_compressed_router_table_entries:
+
             table.add_mutlicast_routing_entry(
                 MulticastRoutingEntry(
                     entry.key, entry.mask,  # Key and mask
+                    ((int(c) - 6) for c in entry.route if c.is_core),  # Cores
                     (int(l) for l in entry.route if l.is_link),  # Links
-                    (int(c) for c in entry.route if c.is_core),  # Cores
-                    False)) # NOT defaultable
+                    False))  # NOT defaultable
         return table
