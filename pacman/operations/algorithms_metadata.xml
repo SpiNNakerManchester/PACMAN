@@ -264,8 +264,9 @@
         </required_inputs>
         <optional_inputs>
             <parameter>
-                <param_name>fields</param_name>
-                <param_type>MemoryFields</param_type>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+                <param_rank>1</param_rank>
             </parameter>
         </optional_inputs>
         <produces_outputs>

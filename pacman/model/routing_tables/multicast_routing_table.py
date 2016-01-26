@@ -24,7 +24,7 @@ class MulticastRoutingTable(object):
         """
         self._x = x
         self._y = y
-        self._multicast_routing_entries = set()
+        self._multicast_routing_entries = list()
         self._multicast_routing_entries_by_routing_entry_key = OrderedDict()
 
         if multicast_routing_entries is not None:
@@ -52,7 +52,7 @@ class MulticastRoutingTable(object):
 
         self._multicast_routing_entries_by_routing_entry_key[tuple_key] =\
             multicast_routing_entry
-        self._multicast_routing_entries.add(multicast_routing_entry)
+        self._multicast_routing_entries.append(multicast_routing_entry)
 
     def remove_multicast_routing_entry(self, multicast_routing_entry):
         """removes a multicast entry from this table
@@ -142,3 +142,25 @@ class MulticastRoutingTable(object):
             return self._multicast_routing_entries_by_routing_entry_key[
                 tuple_key]
         return None
+
+    def __eq__(self, other):
+        """
+        comparision method for comparing router tables
+        :param other: isntance of pacman.model.router_table.RouterTable
+        :return:
+        """
+        if not isinstance(other, MulticastRoutingTable):
+            return False
+        else:
+            if self._x != other.x and self._y != other.y:
+                return False
+            else:
+                for this_entry, other_entry in zip(
+                        list(self._multicast_routing_entries),
+                        list(other.multicast_routing_entries)):
+                    if this_entry != other_entry:
+                        return False
+                return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
