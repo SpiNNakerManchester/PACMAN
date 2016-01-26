@@ -84,6 +84,14 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
                         return False
                 return True
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing constrains
+        :param other: instance of KeyAllocatorFixedKeyAndMaskConstraint
+        :return:
+        """
+        return not self.__eq__(other)
+
     def __hash__(self):
         frozen_elements = frozenset(self._keys_and_masks)
         return (frozen_elements, self._key_list_function).__hash__()

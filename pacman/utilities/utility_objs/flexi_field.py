@@ -62,6 +62,14 @@ class FlexiField(object):
             else:
                 return False
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing flexi fields
+        :param other: instance of FlexiField
+        :return:
+        """
+        return not self.__eq__(other)
+
     def __hash__(self):
         if self._instance_n_keys is not None:
             return (self._flexi_field_name, self._instance_n_keys,

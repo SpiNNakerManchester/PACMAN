@@ -480,6 +480,14 @@ class RigsBitField(object):
                 self.fields is other.fields and
                 self.field_values == other.field_values)
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing constrains
+        :param other: instance of BitField
+        :return:
+        """
+        return not self.__eq__(other)
+
     def __repr__(self):
         """Produce a human-readable representation of this bit field and its
         current value.

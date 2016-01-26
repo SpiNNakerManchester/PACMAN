@@ -31,6 +31,15 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
         else:
             return True
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing constrains
+        :param other: instance of KeyAllocatorContiguousRangeContraints
+        :return:
+        """
+        return not self.__eq__(other)
+
+
     def __hash__(self):
         """
 

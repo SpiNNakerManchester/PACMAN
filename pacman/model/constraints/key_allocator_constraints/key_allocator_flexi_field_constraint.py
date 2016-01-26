@@ -38,6 +38,14 @@ class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
                     return False
             return True
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing constrains
+        :param other: instance of KeyAllocatorFlexiFieldConstraint
+        :return:
+        """
+        return not self.__eq__(other)
+
     def __hash__(self):
         frozen_fields = frozenset(self._fields)
         return hash(frozen_fields)

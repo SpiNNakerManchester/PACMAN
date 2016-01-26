@@ -51,8 +51,19 @@ class BaseKeyAndMask(object):
         return self._mask
 
     def __eq__(self, key_and_mask):
-        return (self._base_key == key_and_mask.key and
-                self._mask == key_and_mask.mask)
+        if not isinstance(key_and_mask, BaseKeyAndMask):
+            return False
+        else:
+            return (self._base_key == key_and_mask.key and
+                    self._mask == key_and_mask.mask)
+
+    def __ne__(self, other):
+        """
+        comparison  method for comparing key_and_masks
+        :param other: instance of BaseKeyAndMask
+        :return:
+        """
+        return not self.__eq__(other)
 
     def __repr__(self):
         return "KeyAndMask:{}:{}".format(hex(self._base_key), hex(self._mask))

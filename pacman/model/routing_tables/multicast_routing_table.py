@@ -145,8 +145,8 @@ class MulticastRoutingTable(object):
 
     def __eq__(self, other):
         """
-        comparision method for comparing router tables
-        :param other: isntance of pacman.model.router_table.RouterTable
+        comparison method for comparing router tables
+        :param other: instance of pacman.model.router_table.RouterTable
         :return:
         """
         if not isinstance(other, MulticastRoutingTable):
@@ -163,4 +163,9 @@ class MulticastRoutingTable(object):
                 return True
 
     def __ne__(self, other):
+        """
+        comparison  method for comparing router tables
+        :param other: instance of pacman.model.router_table.RouterTable
+        :return:
+        """
         return not self.__eq__(other)

@@ -100,3 +100,11 @@ class OrderedSet(collections.MutableSet):
         if isinstance(other, OrderedSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
+
+    def __ne__(self, other):
+        """
+        comparison  method for comparing OrderedSet
+        :param other: instance of OrderedSet
+        :return:
+        """
+        return not self.__eq__(other)

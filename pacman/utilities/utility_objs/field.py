@@ -68,3 +68,11 @@ class Field(object):
                     and self._value == other_field.value
                     and self._tag == other_field.tag
                     and self._name == other_field.name)
+
+    def __ne__(self, other):
+        """
+        comparison  method for comparing fields
+        :param other: instance of Field
+        :return:
+        """
+        return not self.__eq__(other)

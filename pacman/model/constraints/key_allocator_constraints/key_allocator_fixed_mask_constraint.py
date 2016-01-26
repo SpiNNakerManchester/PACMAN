@@ -51,5 +51,13 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
             else:
                 return False
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing constrains
+        :param other: instance of KeyAllocatorFixedMaskConstraint
+        :return:
+        """
+        return not self.__eq__(other)
+
     def __hash__(self):
         return hash(self._mask)
