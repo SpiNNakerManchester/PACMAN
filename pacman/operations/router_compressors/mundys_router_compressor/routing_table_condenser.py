@@ -84,9 +84,9 @@ class MundyRouterCompressor(object):
 
             # Get the source for the entry
             if router_entry.defaultable:
-                source = set([next(iter(route)).opposite])
+                source = {next(iter(route)).opposite}
             else:
-                source = set([None])
+                source = {None}
 
             # Add the new entry
             entries.append(rig_routing_table.RoutingTableEntry(
