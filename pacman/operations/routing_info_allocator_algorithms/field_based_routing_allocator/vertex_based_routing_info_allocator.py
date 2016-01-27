@@ -33,11 +33,7 @@ from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import feild_based_system_utilities\
     as field_utilties
 
-# swiped from rig currently.
-from pacman.operations.routing_info_allocator_algorithms.\
-    field_based_routing_allocator.rigs_bitfield import \
-    RigsBitField
-
+from rig.bitfield import BitField
 
 # general imports
 import math
@@ -86,7 +82,7 @@ class VertexBasedRoutingInfoAllocator(object):
                                n_keys_map, progress_bar)
 
         # define the key space
-        bit_field_space = RigsBitField(32)
+        bit_field_space = BitField(32)
         field_positions = set()
 
         # locate however many types of constrants there are
