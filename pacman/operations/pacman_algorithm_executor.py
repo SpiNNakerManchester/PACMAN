@@ -28,7 +28,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
     """
 
     def __init__(self, algorithms, inputs, xml_paths,
-                 required_outputs, do_timings=True):
+                 required_outputs, do_timings=True, print_timings=False):
         """
         :return:
         """
@@ -45,6 +45,9 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         # store timing request
         self._do_timing = do_timings
+
+        # print timings as you go
+        self._print_timings = print_timings
 
         self._set_up_pacman_algorthms_listings(
             algorithms, xml_paths, inputs, required_outputs)
@@ -537,3 +540,5 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             provanence_data_timings,
             "algorithm_{}".format(algorithm.algorithm_id))
         algorithm_provanence_data.text = str(time_taken)
+        if self._print_timings:
+            logger.info("Time taken: {}".format(str(time_taken)))
