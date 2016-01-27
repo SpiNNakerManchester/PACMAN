@@ -61,11 +61,12 @@ class MundyRouterCompressor(object):
         # return
         return {'routing_tables': compressed_pacman_router_tables}
 
-    def _convert_to_mundy_format(self, pacman_router_table):
+    @staticmethod
+    def _convert_to_mundy_format(pacman_router_table):
         """
 
         :param pacman_router_table: pacman version of the routing table
-        :return: a version of the pacman routing table that mets with the rigs
+        :return: a version of the pacman routing table that meets with the rigs
         compressor.
         """
         entries = list()
@@ -101,7 +102,7 @@ class MundyRouterCompressor(object):
         """
 
         :param mundy_compressed_router_table_entries:
-        the comprssed routing entries in the form rig produces
+        the compressed routing entries in the form rig produces
         :param router_x_coord: the x coord of this routing table
         :param router_y_coord: the y coord of this routing table
         :return: a pacman routing table object with the routing entries
