@@ -557,17 +557,6 @@ class BasicDijkstraRouting(object):
             # Finally move the tracking node
             x_current, y_current = x_neighbour, y_neighbour
 
-            nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] -= \
-                self._bw_per_route_entry  # TODO arbitrary
-
-            if (nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] <
-                    0):
-                print ("Bandwidth over-used from ({}, {}) in direction {}! to "
-                       "({}, {})".format(x_neighbour, y_neighbour,
-                                         dec_direction, x_current, y_current))
-
-                raise exceptions.PacmanRoutingException(
-                    "Bandwidth over-used as described above! Terminating...")
         return x_current, y_current, previous_routing_entry, made_an_entry
 
     @staticmethod
