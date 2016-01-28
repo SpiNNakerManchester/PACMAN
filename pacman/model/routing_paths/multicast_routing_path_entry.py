@@ -6,18 +6,15 @@ class MulticastRoutingPathEntry(object):
     """ An entry in a path of a multicast route
     """
 
-    def __init__(self, router_x, router_y, edge, out_going_links,
+    def __init__(self, partition, out_going_links,
                  outgoing_processors, incoming_processor=None,
                  incoming_link=None):
         """
 
-        :param router_x: the x coord of the router this is associated with
-        :type router_x: int
-        :param router_y: the y coord of the router this is associated with
-        :type router_y: int
-        :param edge: the partitioned edge this entry is associated with
-        :type edge: \
-                    :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
+        :param partition: the partitioned edge's partition this entry is
+        associated with
+        :type partition: \
+                    :py:class:`pacman.utilities.utility_obs.outgoing_edge_partition.OutgoingEdgePartition`
         :param out_going_links: the edges this path entry goes down
         :type out_going_links: iterable of ints between 0 and 5
         :param outgoing_processors: the processors this path entry goes to
@@ -28,9 +25,7 @@ class MulticastRoutingPathEntry(object):
         :type incoming_link: int between 0 and 5
         :return:
         """
-        self._router_x = router_x
-        self._router_y = router_y
-        self._edge = edge
+        self._partition = partition
         if isinstance(out_going_links, int):
             self._out_going_links = list()
             self._out_going_links.append(out_going_links)
@@ -60,25 +55,11 @@ class MulticastRoutingPathEntry(object):
                 str(self._incoming_link), str(self._incoming_processor))
 
     @property
-    def router_x(self):
-        """ Router x coordinate
-        :return:
-        """
-        return self._router_x
-
-    @property
-    def router_y(self):
-        """ Router y coordinate
-        :return:
-        """
-        return self._router_y
-
-    @property
-    def edge(self):
+    def partition(self):
         """ The partitioned edge of the entry
         :return:
         """
-        return self._edge
+        return self._partition
 
     @property
     def out_going_processors(self):
@@ -131,7 +112,7 @@ class MulticastRoutingPathEntry(object):
             self._out_going_links.append(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
-                "the link {} already exists in the mutlicast-"
+                "the link {} already exists in the multicast-"
                 "routing-path-entry".format(direction), str(direction))
 
     def add_out_going_direction_processor(self, direction):
@@ -144,13 +125,13 @@ class MulticastRoutingPathEntry(object):
             self._out_going_processors.append(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
-                "the processor {} already exists in the mutlicast-"
+                "the processor {} already exists in the multicast-"
                 "routing-path-entry".format(direction), str(direction))
 
-    def add_in_coming_processor_direction(self, procesor_id):
+    def add_in_coming_processor_direction(self, processor_id):
         """ Add a processor to the incoming direction
 
-        :param procesor_id: the processor to add to the incoming list
+        :param processor_id: the processor to add to the incoming list
         :return:
         """
         if self._incoming_link is not None:
@@ -158,13 +139,13 @@ class MulticastRoutingPathEntry(object):
                 "there is already a link for incoming, you can only have one "
                 "incoming direction", str(self._incoming_link), "already set")
         if (self._incoming_processor is not None and
-                self._incoming_processor != procesor_id):
+                self._incoming_processor != processor_id):
             raise exceptions.PacmanInvalidParameterException(
                 "there is already a processor for incoming, you can only have "
                 "one incoming direction", str(self._incoming_processor),
                 "already set")
         else:
-            self._incoming_processor = procesor_id
+            self._incoming_processor = processor_id
 
     def _is_defaultable(self):
         """

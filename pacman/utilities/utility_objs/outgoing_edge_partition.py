@@ -87,3 +87,11 @@ class OutgoingEdgePartition(AbstractConstrainedObject, AbstractLabeled):
         :return:
         """
         return self._type
+
+    def __contains__(self, edge):
+        """
+        checks if the edge is contained within this partition
+        :param edge: the edge to search for.
+        :return: boolean of true of false otherwise
+        """
+        return edge in self._edges

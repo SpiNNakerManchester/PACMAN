@@ -1,3 +1,4 @@
+
 # pacman imports
 from pacman.model.routing_paths.multicast_routing_path_entry import \
     MulticastRoutingPathEntry
@@ -8,7 +9,7 @@ from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
     import MultiCastPartitionedEdge
 
-# genral imports
+# general imports
 import logging
 
 
@@ -73,9 +74,9 @@ class BasicDijkstraRouting(object):
             subedges_to_route = list()
 
             for subedge in out_going_sub_edges:
-                destination_subvetex = subedge.post_subvertex
+                destination_subvertex = subedge.post_subvertex
                 destination_placement = \
-                    placements.get_placement_of_subvertex(destination_subvetex)
+                    placements.get_placement_of_subvertex(destination_subvertex)
 
                 chip = machine.get_chip_at(destination_placement.x,
                                            destination_placement.y)
@@ -97,7 +98,8 @@ class BasicDijkstraRouting(object):
                 dest_placement = placements.get_placement_of_subvertex(dest)
                 self._retrace_back_to_source(
                     dest_placement.x, dest_placement.y, dijkstra_tables,
-                    dest_placement.p, subedge, nodes_info, placement.p)
+                    dest_placement.p, subedge, nodes_info, placement.p,
+                    partitioned_graph)
             progress.update()
         progress.end()
         return {'routing_paths': self._routing_paths}
@@ -242,7 +244,7 @@ class BasicDijkstraRouting(object):
 
     @staticmethod
     def _reset_tables(dijkstra_tables):
-        """ Reset the dijsktra tables for a new path search
+        """ Reset the dijkstra tables for a new path search
 
         :param dijkstra_tables: the dictionary object for the dijkstra-tables
         :type dijkstra_tables: dict
@@ -409,7 +411,8 @@ class BasicDijkstraRouting(object):
 
     def _retrace_back_to_source(
             self, x_destination, y_destination, dijkstra_tables,
-            processor_dest, subedge, nodes_info, source_processor):
+            processor_dest, subedge, nodes_info, source_processor,
+            partitioned_graph):
         """private method DO NOT CALL FROM OUTSIDE BASIC DIJKSTRA ROUTING. \
 
         :param x_destination:
@@ -424,6 +427,8 @@ class BasicDijkstraRouting(object):
         :type y_destination:
         :type dijkstra_tables:
         :type processor_dest:
+        :param partitioned_graph:
+        :type partitioned_graph:
         :return: the next coords to look into
         :rtype: int int
         :raise PacmanRoutingException: when the algorithm doesn't find a next\
@@ -441,16 +446,23 @@ class BasicDijkstraRouting(object):
             routing_entry_route_processors.append(processor_dest)
         routing_entry_route_links = None
 
-        entry = MulticastRoutingPathEntry(
-            router_x=x_destination, router_y=y_destination,
-            edge=subedge, out_going_links=routing_entry_route_links,
-            outgoing_processors=routing_entry_route_processors)
-        self._routing_paths.add_path_entry(entry)
+        # build the multicast entry
+        partitions = partitioned_graph.outgoing_edges_partitions_from_vertex(
+            subedge.pre_subvertex)
+        entry = None
+        for partition in partitions:
+            if subedge in partition:
+                entry = MulticastRoutingPathEntry(
+                    partition=partition,
+                    out_going_links=routing_entry_route_links,
+                    outgoing_processors=routing_entry_route_processors)
+
+        self._routing_paths.add_path_entry(entry, x_destination, y_destination)
         previous_routing_entry = entry
 
         while dijkstra_tables[(x_current, y_current)]["lowest cost"] != 0:
 
-            xcheck, ycheck = x_current, y_current
+            x_check, y_check = x_current, y_current
 
             neighbours = nodes_info[(x_current, y_current)]["neighbours"]
             neighbour_index = 0
@@ -482,7 +494,7 @@ class BasicDijkstraRouting(object):
                             " neighbours")
                 neighbour_index += 1
 
-            if x_current == xcheck and y_current == ycheck:
+            if x_current == x_check and y_current == y_check:
                 raise exceptions.PacmanRoutingException(
                     "Iterated through all neighbours of tracking node but"
                     " did not find a preceding node! Consider increasing "

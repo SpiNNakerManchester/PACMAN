@@ -78,6 +78,10 @@ class PartitionedGraph(object):
         :param partition_id: the id for the outgoing partition that this edge\
                     is associated with
         :type partition_id: str
+        :param partition_constraints: list of constraints to put onto the
+        partition
+        :type partition_constraints: iterable of
+                :py:class:`pacman.model.constraints.abstract_constraints.abstract_constraint.AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
@@ -174,7 +178,7 @@ class PartitionedGraph(object):
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: iterable of\
                      :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
-                     or a empty list if none are avilable
+                     or a empty list if none are available
         :raise None: does not raise any known exceptions
         """
         if sub_vertex in self._outgoing_subedges:
@@ -192,8 +196,8 @@ class PartitionedGraph(object):
         partitions = list()
         for sub_vertex in self._subvertices:
             partition = self.outgoing_edges_partitions_from_vertex(sub_vertex)
-            for partition_identifer in partition:
-                partitions.append(partition[partition_identifer])
+            for partition_identifier in partition:
+                partitions.append(partition[partition_identifier])
         return partitions
 
     def incoming_subedges_from_subvertex(self, subvertex):

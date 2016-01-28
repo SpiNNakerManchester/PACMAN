@@ -35,7 +35,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         AbstractProvidesProvenanceData.__init__(self)
 
         # provenance data store
-        self._provanence_data = etree.Element("Provenance_data_from_PACMAN")
+        self._provenance_data = etree.Element("Provenance_data_from_PACMAN")
 
         # pacman mapping objects
         self._algorithms = list()
@@ -49,12 +49,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # print timings as you go
         self._print_timings = print_timings
 
-        self._set_up_pacman_algorthms_listings(
+        self._set_up_pacman_algorithms_listings(
             algorithms, xml_paths, inputs, required_outputs)
 
         self._inputs = inputs
 
-    def _set_up_pacman_algorthms_listings(self, algorithms, xml_paths, inputs,
+    def _set_up_pacman_algorithms_listings(self, algorithms, xml_paths, inputs,
                                           required_outputs):
         """ Translates the algorithm string and uses the config XML to create\
             algorithm objects
@@ -117,7 +117,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         for input_item in inputs:
             input_names.add(input_item['type'])
 
-        allocated_algorithums = list()
+        allocated_algorithms = list()
         generated_outputs = set()
         generated_outputs.union(input_names)
         allocated_a_algorithm = True
@@ -139,7 +139,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             # add the suitable algorithms to the list and take there outputs
             #  as new inputs
             if suitable_algorithm is not None:
-                allocated_algorithums.append(suitable_algorithm)
+                allocated_algorithms.append(suitable_algorithm)
                 allocated_a_algorithm = True
                 self._remove_algorithm_and_update_outputs(
                     self._algorithms, suitable_algorithm, input_names,
@@ -147,21 +147,21 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             else:
                 suitable_algorithm = self._locate_suitable_algorithm(
                     optional_converter_algorithms, input_names,
-                    generated_outputs, True)
+                    generated_outputs, True, True)
                 if suitable_algorithm is not None:
-                    allocated_algorithums.append(suitable_algorithm)
+                    allocated_algorithms.append(suitable_algorithm)
                     allocated_a_algorithm = True
                     self._remove_algorithm_and_update_outputs(
                         optional_converter_algorithms, suitable_algorithm,
                         input_names, generated_outputs)
                 else:
-                    algorithums_left_names = list()
+                    algorithms_left_names = list()
                     for algorithm in self._algorithms:
-                        algorithums_left_names.append(algorithm.algorithm_id)
+                        algorithms_left_names.append(algorithm.algorithm_id)
                     for algorithm in optional_converter_algorithms:
-                        algorithums_left_names.append(algorithm.algorithm_id)
+                        algorithms_left_names.append(algorithm.algorithm_id)
                     algorithms_used = list()
-                    for algorithm in allocated_algorithums:
+                    for algorithm in allocated_algorithms:
                         algorithms_used.append(algorithm.algorithm_id)
 
                     raise exceptions.PacmanConfigurationException(
@@ -172,7 +172,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                         "    Functions used: {}\n".format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
-                            algorithums_left_names, algorithms_used))
+                            algorithms_left_names, algorithms_used))
 
         all_required_outputs_generated = True
         failed_to_generate_output_string = ""
@@ -187,15 +187,15 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     failed_to_generate_output_string))
 
         # iterate through the list removing algorithms which are obsolete
-        self._prune_unnecessary_algorithms(allocated_algorithums)
+        self._prune_unnecessary_algorithms(allocated_algorithms)
 
-        self._algorithms = allocated_algorithums
+        self._algorithms = allocated_algorithms
 
     @staticmethod
-    def _prune_unnecessary_algorithms(allocated_algorithums):
+    def _prune_unnecessary_algorithms(allocated_algorithms):
         """
 
-        :param allocated_algorithums:
+        :param allocated_algorithms:
         :return:
         """
         # TODO optimisations!
@@ -220,14 +220,14 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     @staticmethod
     def _locate_suitable_algorithm(
-            algorithm_list, inputs, generated_outputs, look_for_noval_output,
+            algorithm_list, inputs, generated_outputs, look_for_novel_output,
             look_for_optional_required_inputs):
         """ Locates a suitable algorithm
 
         :param algorithm_list: the list of algorithms to choose from
         :param inputs: the inputs available currently
         :param generated_outputs: the current outputs expected to be generated
-        :param look_for_noval_output: bool which says that algorithms need\
+        :param look_for_novel_output: bool which says that algorithms need\
                 to produce a novel output
         :param look_for_optional_required_inputs: bool which states it should
                 look at the optional required inputs to verify a usable function
@@ -240,14 +240,14 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             algorithm = algorithm_list[position]
 
             # check all inputs
-            all_inputs_avilable = True
+            all_inputs_available = True
             for input_parameter in algorithm.inputs:
                 if input_parameter['type'] not in inputs:
-                    all_inputs_avilable = False
+                    all_inputs_available = False
             adds_to_output = False
 
-            # check all ouputs
-            if look_for_noval_output:
+            # check all outputs
+            if look_for_novel_output:
                 for output_parameter in algorithm.outputs:
                     if output_parameter['type'] not in generated_outputs:
                         adds_to_output = True
@@ -262,13 +262,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     if optional_required_input['type'] in inputs:
                         has_any_optional_required_inputs = True
 
-            # check if all chekcs passed
-            if (all_inputs_avilable
+            # check if all check's passed
+            if (all_inputs_available
                 and ((look_for_optional_required_inputs
                       and has_any_optional_required_inputs)
                      or not look_for_optional_required_inputs)
-                and ((look_for_noval_output and adds_to_output)
-                     or (not look_for_noval_output))
+                and ((look_for_novel_output and adds_to_output)
+                     or (not look_for_novel_output))
                 and suitable_algorithm is None):
                 suitable_algorithm = algorithm
             position += 1
@@ -276,8 +276,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     def execute_mapping(self):
         """ Executes the algorithms
-
-        :param inputs: the inputs stated in setup function
         :return: None
         """
 
@@ -350,7 +348,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             .format(inputs))
 
         # create progress bar for external algorithm
-        algorithum_progress_bar = ProgressBar(
+        algorithm_progress_bar = ProgressBar(
             1, "Running external algorithm {}".format(algorithm.algorithm_id))
 
         timer = None
@@ -363,7 +361,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             inputs, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             stdin=subprocess.PIPE)
         child.wait()
-        algorithum_progress_bar.end()
+        algorithm_progress_bar.end()
 
         if self._do_timing:
             self._handle_prov(timer, algorithm)
@@ -417,16 +415,16 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         # handle optional required inputs, only adding the first found param
         #  and other params with that rank
-        requred_optional_inputs_list = list(algorithm.requred_optional_inputs)
+        required_optional_inputs_list = list(algorithm.requred_optional_inputs)
 
-        requred_optional_inputs_list = \
-            sorted(requred_optional_inputs_list, key=lambda i: i['rank'],
+        required_optional_inputs_list = \
+            sorted(required_optional_inputs_list, key=lambda i: i['rank'],
                    reverse=False)
 
         # locate first param
         located = False
         located_rank = None
-        for input_param in requred_optional_inputs_list:
+        for input_param in required_optional_inputs_list:
             if (input_param['type'] in self._internal_type_mapping and
                     (not located or
                          (located and located_rank == input_param['rank']))):
@@ -520,7 +518,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         """
         # write xml form into file provided
         writer = open(file_path, "w")
-        writer.write(etree.tostring(self._provanence_data, pretty_print=True))
+        writer.write(etree.tostring(self._provenance_data, pretty_print=True))
         writer.flush()
         writer.close()
 
@@ -528,17 +526,16 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         time_taken = timer.take_sample()
 
         # get timing element
-        provanence_data_timings = None
-        if len(self._provanence_data) == 0:
-            provanence_data_timings = etree.SubElement(
-                self._provanence_data, "algorithm_timings")
+        if len(self._provenance_data) == 0:
+            provenance_data_timings = etree.SubElement(
+                self._provenance_data, "algorithm_timings")
         else:
-            provanence_data_timings = self._provanence_data[0]
+            provenance_data_timings = self._provenance_data[0]
 
         # write timing element
-        algorithm_provanence_data = etree.SubElement(
-            provanence_data_timings,
+        algorithm_provence_data = etree.SubElement(
+            provenance_data_timings,
             "algorithm_{}".format(algorithm.algorithm_id))
-        algorithm_provanence_data.text = str(time_taken)
+        algorithm_provence_data.text = str(time_taken)
         if self._print_timings:
             logger.info("Time taken: {}".format(str(time_taken)))
