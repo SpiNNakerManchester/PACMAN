@@ -16,7 +16,9 @@ class GraphMapper(object):
         self._edge_from_subedge = dict()
 
         self._subvertices_from_vertex = dict()
+        self._subvertex_index = dict()
         self._subvertex_to_slice = dict()
+        self._subvertex_slices = dict()
         self._subedges_from_edge = dict()
         self._first_graph_label = first_graph_label
         self._second_graph_label = second_graph_label
@@ -57,7 +59,9 @@ class GraphMapper(object):
                 " pacman.model.partitioned_graph.subvertex.SubVertex")
 
         if vertex not in self._subvertices_from_vertex:
-            self._subvertices_from_vertex[vertex] = set()
+            self._subvertices_from_vertex[vertex] = list()
+        if vertex not in self._subvertex_slices:
+            self._subvertex_slices[vertex] = list()
 
         if vertex_slice.hi_atom >= vertex.n_atoms:
             raise PacmanValueError(
@@ -65,8 +69,11 @@ class GraphMapper(object):
                                                       vertex.n_atoms))
 
         self._vertex_from_subvertex[subvertex] = vertex
-        self._subvertices_from_vertex[vertex].add(subvertex)
+        subvertices = self._subvertices_from_vertex[vertex]
+        self._subvertex_index[subvertex] = len(subvertices)
+        subvertices.append(subvertex)
         self._subvertex_to_slice[subvertex] = vertex_slice
+        self._subvertex_slices[vertex].append(vertex_slice)
 
     def add_partitioned_edge(self, partitioned_edge, partitionable_edge):
         """ Add a partitioned_edge to this partitioned_graph
@@ -134,6 +141,11 @@ class GraphMapper(object):
             return self._subvertices_from_vertex[vertex]
         return None
 
+    def get_subvertex_index(self, subvertex):
+        """ Get the index of a subvertex within its list of vertices
+        """
+        return self._subvertex_index[subvertex]
+
     def get_partitioned_edges_from_partitionable_edge(self, edge):
         """ Get all partitioned edges associated with a partitionable edge
 
@@ -196,6 +208,11 @@ class GraphMapper(object):
         if subvertex in self._subvertex_to_slice:
             return self._subvertex_to_slice[subvertex]
         return None
+
+    def get_subvertex_slices(self, vertex):
+        """ Get all the slices of the subvertex
+        """
+        return self._subvertex_slices[vertex]
 
     def __repr__(self):
         return "graph_mapper object for between graphs \"{}\" and \"{}\""\

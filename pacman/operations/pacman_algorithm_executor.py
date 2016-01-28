@@ -541,4 +541,5 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             "algorithm_{}".format(algorithm.algorithm_id))
         algorithm_provanence_data.text = str(time_taken)
         if self._print_timings:
-            logger.info("Time taken: {}".format(str(time_taken)))
+            logger.info("Time {} taken by {}".format(
+                str(time_taken), algorithm.algorithm_id))
