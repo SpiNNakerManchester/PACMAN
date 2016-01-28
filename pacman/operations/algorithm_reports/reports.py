@@ -59,9 +59,14 @@ def router_reports(report_folder, routing_paths, hostname):
 
 
 def routing_info_reports(
-        report_folder, subgraph, routing_infos, routing_tables):
+        report_folder, subgraph, routing_infos):
     routing_info_report(report_folder, subgraph, routing_infos)
-    router_report_from_router_tables(report_folder, routing_tables)
+
+
+def routing_table_generation(
+        report_folder, routing_tables=None, compressed_routing_tables=None):
+    router_report_from_router_tables(
+        report_folder, routing_tables, compressed_routing_tables)
 
 
 def partitioner_reports(report_folder, hostname, graph,
@@ -243,8 +248,8 @@ def placement_report_with_partitionable_graph_by_vertex(
                    key=lambda vert: vert.label)
         partitioned_vertices = \
             sorted(partitioned_vertices,
-                   key=lambda pvert:
-                   graph_mapper.get_subvertex_slice(pvert).lo_atom)
+                   key=lambda vert:
+                   graph_mapper.get_subvertex_slice(vert).lo_atom)
         for sv in partitioned_vertices:
             lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
             hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
@@ -253,14 +258,14 @@ def placement_report_with_partitionable_graph_by_vertex(
             x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
             key = "{},{}".format(x, y)
             if key in used_processors_by_chip:
-                used_procs = used_processors_by_chip[key]
+                used_pros = used_processors_by_chip[key]
             else:
-                used_procs = list()
+                used_pros = list()
                 used_sdram_by_chip.update({key: 0})
             subvertex_by_processor["{},{},{}".format(x, y, p)] = sv
-            new_proc = [p, cur_placement]
-            used_procs.append(new_proc)
-            used_processors_by_chip.update({key: used_procs})
+            new_pro = [p, cur_placement]
+            used_pros.append(new_pro)
+            used_processors_by_chip.update({key: used_pros})
             my_string = "  Slice {}:{} ({} atoms) on core ({}, {}, {}) \n"\
                         .format(lo_atom, hi_atom, num_atoms, x, y, p)
             f_place_by_vertex.write(my_string)
@@ -317,14 +322,14 @@ def placement_report_without_partitionable_graph_by_vertex(
         x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
         key = "{},{}".format(x, y)
         if key in used_processors_by_chip:
-            used_procs = used_processors_by_chip[key]
+            used_pros = used_processors_by_chip[key]
         else:
-            used_procs = list()
+            used_pros = list()
             used_sdram_by_chip.update({key: 0})
         subvertex_by_processor["{},{},{}".format(x, y, p)] = v
-        new_proc = [p, cur_placement]
-        used_procs.append(new_proc)
-        used_processors_by_chip.update({key: used_procs})
+        new_pro = [p, cur_placement]
+        used_pros.append(new_pro)
+        used_processors_by_chip.update({key: used_pros})
         my_string = " Placed on core ({}, {}, {}) \n".format(x, y, p)
         f_place_by_vertex.write(my_string)
         f_place_by_vertex.write("\n")
@@ -377,7 +382,7 @@ def placement_report_with_partitionable_graph_by_core(
                     f_place_by_core.write("Application cores: {}\n"
                                           .format(len(list(chip.processors))))
                     written_header = True
-                proc_id = processor.processor_id
+                pro_id = processor.processor_id
                 subvertex = \
                     placements.get_subvertex_on_processor(
                         chip.x, chip.y, processor.processor_id)
@@ -392,7 +397,7 @@ def placement_report_with_partitionable_graph_by_core(
                 num_atoms = hi_atom - lo_atom + 1
                 p_str = ("  Processor {}: Vertex: '{}',"
                          " pop sz: {}\n".format(
-                             proc_id, vertex_label, vertex_atoms))
+                             pro_id, vertex_label, vertex_atoms))
                 f_place_by_core.write(p_str)
                 p_str = ("              Slice on this core: {}:{} ({} atoms)\n"
                          .format(lo_atom, hi_atom, num_atoms))
@@ -448,7 +453,7 @@ def placement_report_without_partitionable_graph_by_core(
                     f_place_by_core.write("Application cores: {}\n"
                                           .format(len(list(chip.processors))))
                     written_header = True
-                proc_id = processor.processor_id
+                pro_id = processor.processor_id
                 subvertex = \
                     placements.get_subvertex_on_processor(
                         chip.x, chip.y, processor.processor_id)
@@ -457,7 +462,7 @@ def placement_report_without_partitionable_graph_by_core(
                 vertex_model = subvertex.model_name
 
                 p_str = ("  Processor {}: AbstractConstrainedVertex: '{}' \n"
-                         .format(proc_id, vertex_label))
+                         .format(pro_id, vertex_label))
                 f_place_by_core.write(p_str)
                 f_place_by_core.write(p_str)
                 p_str = "              Model: {}\n\n".format(vertex_model)
@@ -568,52 +573,133 @@ def routing_info_report(report_folder, subgraph, routing_infos):
 
 
 def router_report_from_router_tables(report_folder, routing_tables):
+    """
+
+    :param report_folder:
+    :param routing_tables:
+    :return:
+    """
+
     top_level_folder = os.path.join(report_folder, "routing_tables_generated")
     if not os.path.exists(top_level_folder):
         os.mkdir(top_level_folder)
     progress_bar = ProgressBar(len(routing_tables.routing_tables),
                                "Generating Router table report")
+
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
-            file_sub_name = "routing_table_{}_{}.rpt"\
-                .format(routing_table.x, routing_table.y)
-            file_name = os.path.join(top_level_folder, file_sub_name)
-            try:
-                output = open(file_name, "w")
-            except IOError:
-                logger.error("Generate_placement_reports: Can't open file"
-                             " {} for writing.".format(file_name))
-
-            output.write("router contains {} entries \n "
-                         "\n".format(routing_table.number_of_entries))
-            output.write("  Index   Key(hex)    Mask(hex)    Route(hex)"
-                         "    Src. Core -> [Cores][Links]\n")
-            output.write("----------------------------------------------------"
-                         "--------------------------\n")
-
-            entry_count = 0
-            for entry in routing_table.multicast_routing_entries:
-                index = entry_count & 0xFFFF
-                key = entry.routing_entry_key
-                mask = entry.mask
-                hex_route = _reduce_route_value(entry.processor_ids,
-                                                entry.link_ids)
-                hex_key = _uint_32_to_hex_string(key)
-                hex_mask = _uint_32_to_hex_string(mask)
-                route_txt = _expand_route_value(entry.processor_ids,
-                                                entry.link_ids)
-                core_id = "({}, {}, {})"\
-                    .format((key >> 24 & 0xFF), (key >> 16 & 0xFF),
-                            (key >> 11 & 0xF))
-                entry_str = ("    {}     {}       {}      {}         {}     "
-                             " {}\n".format(index, hex_key, hex_mask,
-                                            hex_route, core_id, route_txt))
-                entry_count += 1
-                output.write(entry_str)
-            output.flush()
-            output.close()
+            _generate_routing_table(routing_table,  top_level_folder)
         progress_bar.update()
     progress_bar.end()
+
+
+def router_report_from_compressed_router_tables(report_folder, routing_tables):
+    """
+
+    :param report_folder:
+    :param routing_tables:
+    :return:
+    """
+
+    top_level_folder = os.path.join(report_folder,
+                                    "compressed_routing_tables_generated")
+    if not os.path.exists(top_level_folder):
+        os.mkdir(top_level_folder)
+    progress_bar = ProgressBar(len(routing_tables.routing_tables),
+                               "Generating compressed router table report")
+
+    for routing_table in routing_tables.routing_tables:
+        if routing_table.number_of_entries > 0:
+            _generate_routing_table(routing_table,  top_level_folder)
+        progress_bar.update()
+    progress_bar.end()
+
+
+def _generate_routing_table(routing_table,  top_level_folder):
+    file_sub_name = "routing_table_{}_{}.rpt".format(
+        routing_table.x, routing_table.y)
+    file_name = os.path.join(top_level_folder, file_sub_name)
+    output = None
+    try:
+        output = open(file_name, "w")
+    except IOError:
+        logger.error("Generate_placement_reports: Can't open file"
+                     " {} for writing.".format(file_name))
+
+    output.write("router contains {} entries \n "
+                 "\n".format(routing_table.number_of_entries))
+    output.write("  Index   Key(hex)    Mask(hex)    Route(hex)"
+                 "    Src. Core -> [Cores][Links]\n")
+    output.write("----------------------------------------------"
+                 "--------------------------------\n")
+
+    entry_count = 0
+    for entry in routing_table.multicast_routing_entries:
+        index = entry_count & 0xFFFF
+        key = entry.routing_entry_key
+        mask = entry.mask
+        hex_route = _reduce_route_value(entry.processor_ids,
+                                        entry.link_ids)
+        hex_key = _uint_32_to_hex_string(key)
+        hex_mask = _uint_32_to_hex_string(mask)
+        route_txt = _expand_route_value(entry.processor_ids,
+                                        entry.link_ids)
+        core_id = "({}, {}, {})"\
+            .format((key >> 24 & 0xFF), (key >> 16 & 0xFF),
+                    (key >> 11 & 0xF))
+        entry_str = ("    {}     {}       {}      {}         {}   "
+                     "   {}\n".format(
+                                index, hex_key, hex_mask,
+                                hex_route, core_id, route_txt))
+        entry_count += 1
+        output.write(entry_str)
+    output.flush()
+    output.close()
+
+
+def generate_comparison_router_report(
+        report_folder, routing_tables, compressed_routing_tables):
+    """
+    makes a report on comparision of the compressed and uncompressed
+    routing tables
+    :param report_folder:
+    :param routing_tables:
+    :param compressed_routing_tables:
+    :return:
+    """
+    file_name = os.path.join(
+        report_folder, "comparison_of_compressed_uncompressed_routing_tables")
+
+    output = None
+    try:
+        output = open(file_name, "w")
+    except IOError:
+        logger.error("Generate_router_comparison_reports: Can't open file"
+                     " {} for writing.".format(file_name))
+
+    progress_bar = ProgressBar(len(routing_tables.routing_tables),
+                               "Generating comparison of router table report")
+
+    for uncompressed_table in routing_tables.routing_tables:
+        x = uncompressed_table.x
+        y = uncompressed_table.y
+        compressed_table = compressed_routing_tables.\
+            get_routing_table_for_chip(x, y)
+
+        n_entries_un_compressed = uncompressed_table.number_of_entries
+        n_entries_compressed = compressed_table.number_of_entries
+        percentage = ((float(n_entries_un_compressed - n_entries_compressed))
+                      / float(n_entries_un_compressed)) * 100
+
+        output.write(
+            "Uncompressed table at {}:{} has {} entries whereas compressed "
+            "table has {} entries. This is a decrease of {} %\n".format(
+                x, y, n_entries_un_compressed, n_entries_compressed,
+                percentage))
+        progress_bar.update()
+    progress_bar.end()
+    output.flush()
+    output.close()
 
 
 def _reduce_route_value(processors_ids, link_ids):
