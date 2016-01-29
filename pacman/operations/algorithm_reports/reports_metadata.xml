@@ -69,7 +69,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_paths</param_name>
-                <param_type>MemoryRoutingPaths</param_type>
+                <param_type>MemoryRoutingTableByPartition</param_type>
             </parameter>
         </required_inputs>
     </algorithm>

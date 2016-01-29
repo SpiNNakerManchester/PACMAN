@@ -1,9 +1,14 @@
+"""
+basic dijkstra routing
+"""
 
 # pacman imports
-from pacman.model.routing_paths.multicast_routing_path_entry import \
-    MulticastRoutingPathEntry
-from pacman.model.routing_paths.multicast_routing_paths import \
-    MulticastRoutingPaths
+from pacman.model.routing_table_by_partition.\
+    multicast_routing_table_by_partition_entry \
+    import MulticastRoutingTableByPartitionEntry
+from pacman.model.routing_table_by_partition.\
+    multicast_routing_table_by_partition import \
+    MulticastRoutingTableByPartition
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
@@ -46,7 +51,7 @@ class BasicDijkstraRouting(object):
         """
 
         # set up basic data structures
-        self._routing_paths = MulticastRoutingPaths()
+        self._routing_paths = MulticastRoutingTableByPartition()
         self._k = k
         self._l = l
         self._m = m
@@ -449,16 +454,18 @@ class BasicDijkstraRouting(object):
         # build the multicast entry
         partitions = partitioned_graph.outgoing_edges_partitions_from_vertex(
             subedge.pre_subvertex)
-        entry = None
-        for partition in partitions:
+
+        previous_routing_entry = None
+        for partition_key in partitions:
+            partition = partitions[partition_key]
             if subedge in partition:
-                entry = MulticastRoutingPathEntry(
-                    partition=partition,
+                entry = MulticastRoutingTableByPartitionEntry(
                     out_going_links=routing_entry_route_links,
                     outgoing_processors=routing_entry_route_processors)
 
-        self._routing_paths.add_path_entry(entry, x_destination, y_destination)
-        previous_routing_entry = entry
+                self._routing_paths.add_path_entry(
+                    entry, x_destination, y_destination, partition)
+                previous_routing_entry = entry
 
         while dijkstra_tables[(x_current, y_current)]["lowest cost"] != 0:
 
@@ -486,7 +493,8 @@ class BasicDijkstraRouting(object):
                                     x_neighbour, y_neighbour, dijkstra_tables,
                                     neighbour_index, nodes_info,
                                     x_current, y_current,
-                                    previous_routing_entry, subedge)
+                                    previous_routing_entry, subedge,
+                                    partitioned_graph)
                     else:
                         raise exceptions.PacmanRoutingException(
                             "Tried to trace back to node not in "
@@ -504,10 +512,10 @@ class BasicDijkstraRouting(object):
             source_processor)
         return x_current, y_current
 
-    def _create_routing_entry(self, x_neighbour, y_neighbour, dijkstra_tables,
-                              neighbour_index, nodes_info,
-                              x_current, y_current, previous_routing_entry,
-                              subedge):
+    def _create_routing_entry(
+            self, x_neighbour, y_neighbour, dijkstra_tables, neighbour_index,
+            nodes_info, x_current, y_current, previous_routing_entry, subedge,
+            partitioned_graph):
         """ Create a new routing entry
 
         :param x_neighbour:
@@ -518,6 +526,7 @@ class BasicDijkstraRouting(object):
         :param x_current:
         :param y_current:
         :param previous_routing_entry:
+        :param partitioned_graph:
         :param subedge:
         :type subedge:
         :type x_neighbour:
@@ -527,6 +536,7 @@ class BasicDijkstraRouting(object):
         :type nodes_info:
         :type x_current:
         :type y_current:
+        :type partitioned_graph:
         :type previous_routing_entry:
         :return x_current, y_current, previous_routing_entry, made_an_entry
         :rtype: int, int, spinn_machine.multicast_routing_entry, bool
@@ -554,15 +564,21 @@ class BasicDijkstraRouting(object):
                 abs(neighbours_lowest_cost - chip_sought_cost) <
                 0.00000000001):
 
-            # create entry for next hop going backwards
-            entry = MulticastRoutingPathEntry(
-                router_x=x_neighbour, router_y=y_neighbour, edge=subedge,
-                incoming_link=None, out_going_links=dec_direction,
-                outgoing_processors=None)
-            previous_routing_entry.add_in_coming_processor_direction(
-                neighbour_index)
-            # add entry for next hop going backwards into path
-            self._routing_paths.add_path_entry(entry)
+            # build the multicast entry
+            partitions = partitioned_graph.\
+                outgoing_edges_partitions_from_vertex(subedge.pre_subvertex)
+            entry = None
+            for partition_key in partitions:
+                partition = partitions[partition_key]
+                if subedge in partition:
+                    entry = MulticastRoutingTableByPartitionEntry(
+                        incoming_link=None, out_going_links=dec_direction,
+                        outgoing_processors=None)
+                    previous_routing_entry.add_in_coming_processor_direction(
+                        neighbour_index)
+                    # add entry for next hop going backwards into path
+                    self._routing_paths.add_path_entry(
+                        entry, x_neighbour, y_neighbour, partition)
             previous_routing_entry = entry
             made_an_entry = True
 
@@ -573,7 +589,7 @@ class BasicDijkstraRouting(object):
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
-        """private method, do not call from outside dijskra routing\
+        """private method, do not call from outside dijkstra routing\
 
         used to determine the direction of a link to go down
 

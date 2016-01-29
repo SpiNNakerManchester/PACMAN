@@ -149,7 +149,7 @@
         <produces_outputs>
             <parameter>
                 <param_name>routing_paths</param_name>
-                <param_type>MemoryRoutingPaths</param_type>
+                <param_type>MemoryRoutingTableByPartition</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -166,10 +166,6 @@
                 <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
             </parameter>
             <parameter>
-                <param_name>routing_paths</param_name>
-                <param_type>MemoryRoutingPaths</param_type>
-            </parameter>
-            <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
             </parameter>
@@ -178,10 +174,6 @@
             <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -197,19 +189,11 @@
                 <param_name>n_keys_map</param_name>
                 <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
             </parameter>
-            <parameter>
-                <param_name>routing_paths</param_name>
-                <param_type>MemoryRoutingPaths</param_type>
-            </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -218,7 +202,7 @@
         <python_class>VertexBasedRoutingInfoAllocator</python_class>
         <required_inputs>
             <parameter>
-                <param_name>subgraph</param_name>
+                <param_name>partitioned_graph</param_name>
                 <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
@@ -233,10 +217,6 @@
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
-            <parameter>
-                <param_name>routing_paths</param_name>
-                <param_type>MemoryRoutingPaths</param_type>
-            </parameter>
         </required_inputs>
         <produces_outputs>
             <parameter>
@@ -244,12 +224,32 @@
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-            <parameter>
                 <param_name>fields</param_name>
                 <param_type>MemoryFields</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="BasicRoutingTableGenerator">
+        <python_module>pacman.operations.routing_table_generators.basic_routing_table_generator</python_module>
+        <python_class>BasicRoutingTableGenerator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_table_by_partitions</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>

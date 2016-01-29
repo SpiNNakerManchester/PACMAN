@@ -14,7 +14,7 @@ from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_flexi_field_constraint import \
     KeyAllocatorFlexiFieldConstraint
 from pacman import exceptions
-# the different tyes of field that this system supports
+# the different types of field that this system supports
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.field import Field
 from pacman.utilities.utility_objs.flexi_field import SUPPORTED_TAGS

@@ -1,20 +1,19 @@
+"""
+MulticastRoutingTableByPartitionEntry
+"""
+
 # pacman imports
 from pacman import exceptions
 
 
-class MulticastRoutingPathEntry(object):
+class MulticastRoutingTableByPartitionEntry(object):
     """ An entry in a path of a multicast route
     """
 
-    def __init__(self, partition, out_going_links,
-                 outgoing_processors, incoming_processor=None,
-                 incoming_link=None):
+    def __init__(self, out_going_links, outgoing_processors,
+                 incoming_processor=None, incoming_link=None):
         """
 
-        :param partition: the partitioned edge's partition this entry is
-        associated with
-        :type partition: \
-                    :py:class:`pacman.utilities.utility_obs.outgoing_edge_partition.OutgoingEdgePartition`
         :param out_going_links: the edges this path entry goes down
         :type out_going_links: iterable of ints between 0 and 5
         :param outgoing_processors: the processors this path entry goes to
@@ -25,18 +24,23 @@ class MulticastRoutingPathEntry(object):
         :type incoming_link: int between 0 and 5
         :return:
         """
-        self._partition = partition
         if isinstance(out_going_links, int):
-            self._out_going_links = list()
-            self._out_going_links.append(out_going_links)
+            self._out_going_links = set()
+            self._out_going_links.add(out_going_links)
         else:
-            self._out_going_links = out_going_links
+            if out_going_links is not None:
+                self._out_going_links = set(out_going_links)
+            else:
+                self._out_going_links = set()
 
         if isinstance(outgoing_processors, int):
-            self._out_going_processors = list()
-            self._out_going_processors.append(outgoing_processors)
+            self._out_going_processors = set()
+            self._out_going_processors.add(outgoing_processors)
         else:
-            self._out_going_processors = outgoing_processors
+            if outgoing_processors is not None:
+                self._out_going_processors = set(outgoing_processors)
+            else:
+                self._out_going_processors = set()
 
         self._incoming_link = incoming_link
         self._incoming_processor = incoming_processor
@@ -55,31 +59,18 @@ class MulticastRoutingPathEntry(object):
                 str(self._incoming_link), str(self._incoming_processor))
 
     @property
-    def partition(self):
-        """ The partitioned edge of the entry
-        :return:
-        """
-        return self._partition
-
-    @property
     def out_going_processors(self):
         """ The destination processors of the entry
         :return:
         """
-        if self._out_going_processors is None:
-            return ()
-        else:
-            return self._out_going_processors
+        return self._out_going_processors
 
     @property
     def out_going_links(self):
         """ The destination links of the entry
         :return:
         """
-        if self._out_going_links is None:
-            return ()
-        else:
-            return self._out_going_links
+        return self._out_going_links
 
     @property
     def incoming_link(self):
@@ -109,7 +100,7 @@ class MulticastRoutingPathEntry(object):
         :return:
         """
         if direction not in self._out_going_links and 0 < direction <= 5:
-            self._out_going_links.append(direction)
+            self._out_going_links.add(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
                 "the link {} already exists in the multicast-"
@@ -122,7 +113,7 @@ class MulticastRoutingPathEntry(object):
         :return:
         """
         if direction not in self._out_going_processors and 0 < direction <= 5:
-            self._out_going_processors.append(direction)
+            self._out_going_processors.add(direction)
         else:
             raise exceptions.PacmanAlreadyExistsException(
                 "the processor {} already exists in the multicast-"
@@ -147,6 +138,66 @@ class MulticastRoutingPathEntry(object):
         else:
             self._incoming_processor = processor_id
 
+    def merge_entry(self, other):
+        """
+        merges the results and returns a new
+        MulticastRoutingTableByPartitionEntry
+        :param other: the MulticastRoutingTableByPartitionEntry to merge into
+        this one
+        :return: a merged MulticastRoutingTableByPartitionEntry
+        """
+        if not isinstance(other, MulticastRoutingTableByPartitionEntry):
+            raise exceptions.PacmanInvalidParameterException(
+                "other", "type error",
+                "The other parameter is not a instance of "
+                "MulticastRoutingTableByPartitionEntry, and therefore cannot "
+                "be merged.")
+        else:
+            # validate fixed things
+            if (self._incoming_processor is None and
+                    other.incoming_processor is None):
+                valid_incoming_processor = None
+            elif (self._incoming_processor is not None and
+                    other._incoming_processor is None):
+                valid_incoming_processor = self._incoming_processor
+            elif (self._incoming_processor is None
+                    and other.incoming_processor is not None):
+                valid_incoming_processor = other.incoming_processor
+            elif self._incoming_processor == other._incoming_processor:
+                valid_incoming_processor = self._incoming_processor
+            else:
+                raise exceptions.PacmanInvalidParameterException(
+                    "incoming_processor", "invalid merge", 
+                    "The two MulticastRoutingTableByPartitionEntry have "
+                    "different incoming_processors, and so cant be merged")
+
+            if (self._incoming_link is None and
+                    other.incoming_link is None):
+                valid_incoming_link = None
+            elif (self._incoming_link is not None and
+                    other._incoming_link is None):
+                valid_incoming_link = self._incoming_link
+            elif (self._incoming_link is None
+                    and other.incoming_link is not None):
+                valid_incoming_link = other.incoming_link
+            elif self._incoming_link == other._incoming_link:
+                valid_incoming_link = self._incoming_link
+            else:
+                raise exceptions.PacmanInvalidParameterException(
+                    "incoming_link", "invalid merge", 
+                    "The two MulticastRoutingTableByPartitionEntry have "
+                    "different incoming_links, and so cant be merged")
+
+            # merge merge-able things
+            merged_outgoing_processors = \
+                self._out_going_processors.union(other._out_going_processors)
+            merged_outgoing_links = \
+                self._out_going_links.union(other._out_going_links)
+
+            return MulticastRoutingTableByPartitionEntry(
+                merged_outgoing_links, merged_outgoing_processors,
+                valid_incoming_processor, valid_incoming_link)
+
     def _is_defaultable(self):
         """
 
@@ -155,21 +206,28 @@ class MulticastRoutingPathEntry(object):
         """
         if (isinstance(self._incoming_link, int) and
                 self._incoming_processor is None and
-                isinstance(self._out_going_links, int) and
-                self._out_going_processors is None):
-            if self._incoming_link == 0 and self.out_going_links == 3:
+                len(self._out_going_links) == 1 and
+                len(self._out_going_processors) == 0):
+            outgoing_link = next(iter(self._out_going_links))
+            if self._incoming_link == 0 and outgoing_link == 3:
                 return True
-            elif self._incoming_link == 1 and self.out_going_links == 4:
+            elif self._incoming_link == 1 and outgoing_link == 4:
                 return True
-            elif self._incoming_link == 2 and self.out_going_links == 5:
+            elif self._incoming_link == 2 and outgoing_link == 5:
                 return True
-            elif self._incoming_link == 3 and self._out_going_links == 0:
+            elif self._incoming_link == 3 and outgoing_link == 0:
                 return True
-            elif self._incoming_link == 4 and self._out_going_links == 1:
+            elif self._incoming_link == 4 and outgoing_link == 1:
                 return True
-            elif self._incoming_link == 5 and self._out_going_links == 2:
+            elif self._incoming_link == 5 and outgoing_link == 2:
                 return True
             else:
                 return False
         else:
             return False
+
+    def __repr__(self):
+        return "{}:{}:{}:{}:{}".format(
+            self._incoming_link, self._incoming_processor,
+            self._is_defaultable(), self._out_going_links,
+            self._out_going_processors)

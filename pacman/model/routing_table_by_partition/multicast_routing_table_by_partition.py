@@ -1,28 +1,38 @@
-# pacman imports
-from pacman import exceptions
+"""
+MulticastRoutingTableByPartition
+"""
 
 
-class MulticastRoutingPaths(object):
+class MulticastRoutingTableByPartition(object):
     """ A set of multicast routing path objects
     """
 
     def __init__(self):
         self._router_to_entries_map = dict()
 
-    def add_path_entry(self, entry, router_x, router_y):
+    def add_path_entry(self, entry, router_x, router_y, partition):
         """ Adds a multicast routing path entry
 
         :param entry: the entry to add
         :param router_x: the x coord of the router
         :param router_y: the y coord of the router
+        :param partition: the partitioned edge's partition this entry is
+        associated with
+        :type partition: \
+                    :py:class:`pacman.utilities.utility_obs.outgoing_edge_partition.OutgoingEdgePartition`
         :return:
         """
 
         # update router_to_entries_map
         key = (router_x, router_y)
         if key not in self._router_to_entries_map:
-            self._router_to_entries_map[key] = list()
-        self._router_to_entries_map[key].append(entry)
+            self._router_to_entries_map[key] = dict()
+
+        if partition not in self._router_to_entries_map[key]:
+            self._router_to_entries_map[key][partition] = entry
+        else:
+            self._router_to_entries_map[key][partition] = entry.merge_entry(
+                self._router_to_entries_map[key][partition])
 
     def get_entries_for_router(self, router_x, router_y):
         """ Get the set of multicast path entries assigned to this router
@@ -45,7 +55,7 @@ class MulticastRoutingPaths(object):
         :return:
         """
         entries = self.get_entries_for_router(router_x, router_y)
-        for entry in entries:
-            if entry.partition == partition:
-                return entry
-        return None
+        if partition in entries:
+            return entries[partition]
+        else:
+            return None

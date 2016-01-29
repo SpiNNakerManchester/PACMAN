@@ -112,7 +112,7 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
                 text = "--->"
             else:
                 text = ""
-            if entry.incoming_processor is not None:
+            if len(entry.incoming_processor) != 0:
                 text = text + "P{}".format(entry.incoming_processor)
             else:
                 text = "(L:{}".format(link_labels[entry.incoming_link])

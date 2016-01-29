@@ -1,3 +1,8 @@
+"""
+basic routing info allocator
+"""
+
+# pacman imports
 from pacman.model.data_request_interfaces.\
     abstract_requires_routing_info_partitioned_vertex import \
     RequiresRoutingInfoPartitionedVertex
@@ -27,7 +32,7 @@ class BasicRoutingInfoAllocator(object):
         out of a vertex will be given the same key/mask assignment.
     """
 
-    def __call__(self, subgraph, placements, n_keys_map, routing_paths):
+    def __call__(self, subgraph, placements, n_keys_map):
         """
         Allocates routing information to the partitioned edges in a\
         partitioned graph
@@ -42,10 +47,6 @@ class BasicRoutingInfoAllocator(object):
                     of keys required by the edges
         :type n_keys_map:\
                     :py:class:`pacman.model.routing_info.abstract_partitioned_edge_n_keys_map.AbstractPartitionedEdgeNKeysMap`
-        :param routing_paths: the paths each partitioned edge takes to get\
-                from source to destination.
-        :type routing_paths:
-            :py:class:`pacman.model.routing_paths.multicast_routing_paths.MulticastRoutingPaths
         :return: The routing information
         :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`,
                 :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
@@ -65,7 +66,6 @@ class BasicRoutingInfoAllocator(object):
         progress_bar = ProgressBar(len(subgraph.subvertices),
                                    "Allocating routing keys")
         routing_infos = RoutingInfo()
-        routing_tables = MulticastRoutingTables()
         for subvert in subgraph.subvertices:
             out_going_subedges = subgraph.outgoing_subedges_from_subvertex(
                 subvert)
@@ -91,15 +91,11 @@ class BasicRoutingInfoAllocator(object):
                         "This subvertex '{}' has no placement! this should "
                         "never occur, please fix and try again."
                         .format(subvert))
-                # update routing tables with entries
-                routing_info_allocator_utilities.add_routing_key_entries(
-                    routing_paths, subedge_routing_info, out_going_subedge,
-                    routing_tables)
+
             progress_bar.update()
         progress_bar.end()
 
-        return {'routing_infos': routing_infos,
-                'routing_tables': routing_tables}
+        return {'routing_infos': routing_infos}
 
     @staticmethod
     def _get_key_from_placement(placement):

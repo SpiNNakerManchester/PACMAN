@@ -1,10 +1,10 @@
 """
 ConvertToMemoryMultiCastRoutingPaths
 """
-from pacman.model.routing_paths.multicast_routing_path_entry import \
-    MulticastRoutingPathEntry
-from pacman.model.routing_paths.multicast_routing_paths import \
-    MulticastRoutingPaths
+from pacman.model.routing_paths.multicast_routing_table_by_partition_entry import \
+    MulticastRoutingTableByPartitionEntry
+from pacman.model.routing_paths.multicast_routing_table_by_partition import \
+    MulticastRoutingTableByPartition
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 import json
@@ -16,7 +16,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
     """
 
     def __init__(self):
-        self._multi_cast_routing_paths = MulticastRoutingPaths()
+        self._multi_cast_routing_paths = MulticastRoutingTableByPartition()
         self._direction_translation = {
             "CORE_0": (True, 0),
             "CORE_1": (True, 1),
@@ -118,7 +118,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                 partitioned_graph, machine, placements)
             memory_edges += local_memory_edges
             for memory_edge in local_memory_edges:
-                entry = MulticastRoutingPathEntry(
+                entry = MulticastRoutingTableByPartitionEntry(
                     router_x=chip_coords[0], router_y=chip_coords[1],
                     edge=memory_edge,
                     out_going_links=direction_data[1],
@@ -154,7 +154,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                 chip_coords[0], chip_coords[1], direction_data[1])
             memory_edge = \
                 partitioned_graph.get_subedge_with_label(edge_id, subvertex)
-            entry = MulticastRoutingPathEntry(
+            entry = MulticastRoutingTableByPartitionEntry(
                 router_x=chip_coords[0], router_y=chip_coords[1],
                 edge=memory_edge, outgoing_processors=direction_data[1],
                 out_going_links=None, incoming_processor=source_p,
@@ -169,7 +169,7 @@ class ConvertToMemoryMultiCastRoutingPaths(object):
                 partitioned_graph, machine, placements)
             memory_edges += local_memory_edges
             for memory_edge in local_memory_edges:
-                entry = MulticastRoutingPathEntry(
+                entry = MulticastRoutingTableByPartitionEntry(
                     router_x=chip_coords[0], router_y=chip_coords[1],
                     edge=memory_edge, outgoing_processors=None,
                     out_going_links=direction_data[1],

@@ -3,9 +3,11 @@ AbstractRoutingInfoAllocatorAlgorithm
 """
 
 # pacman imports
-from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_field_constraint import \
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_fixed_field_constraint import \
     KeyAllocatorFixedFieldConstraint
-from pacman.model.constraints.key_allocator_constraints.key_allocator_flexi_field_constraint import \
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_flexi_field_constraint import \
     KeyAllocatorFlexiFieldConstraint
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
@@ -23,6 +25,7 @@ from pacman.model.constraints.key_allocator_constraints\
 from pacman import exceptions
 
 # spinn_machine imports
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 import logging
@@ -42,8 +45,8 @@ def get_edge_groups(partitioned_graph):
     fixed_mask_groups = list()
     fixed_field_groups = list()
     flexi_field_groups = list()
-    continious_groups = list()
-    none_continious_groups = list()
+    continuous_groups = list()
+    none_continuous_groups = list()
     for partitioned_vertex in partitioned_graph.subvertices:
         outgoing_edge_partitions = \
             partitioned_graph.outgoing_edges_partitions_from_vertex(
@@ -53,7 +56,7 @@ def get_edge_groups(partitioned_graph):
             # assume all edges have the same constraints in them. use first one
             # to deduce which group to place it into
             constraints = partition.constraints
-            is_continious = False
+            is_continuous = False
             for constraint in constraints:
                 if isinstance(constraint, KeyAllocatorFixedMaskConstraint):
                     fixed_mask_groups.append(partition)
@@ -66,12 +69,12 @@ def get_edge_groups(partitioned_graph):
                     fixed_field_groups.append(partition)
                 elif isinstance(constraint,
                                 KeyAllocatorContiguousRangeContraint):
-                    is_continious = True
-                    continious_groups.append(partition)
-            if not is_continious:
-                none_continious_groups.append(partition)
+                    is_continuous = True
+                    continuous_groups.append(partition)
+            if not is_continuous:
+                none_continuous_groups.append(partition)
     return (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-            flexi_field_groups, continious_groups, none_continious_groups)
+            flexi_field_groups, continuous_groups, none_continuous_groups)
 
 
 def check_n_keys_are_same_through_partition(partition_group, n_keys_map):
@@ -95,9 +98,9 @@ def check_n_keys_are_same_through_partition(partition_group, n_keys_map):
 
 def check_types_of_edge_constraint(sub_graph):
     """
-    goes through the supgraph for opartitions and checks that the constraints
+    goes through the subgraph for operations and checks that the constraints
     are compatible.
-    :param sub_graph: the subgraph to search throguh
+    :param sub_graph: the subgraph to search through
     :return:
     """
     for partition in sub_graph.partitions:
@@ -132,25 +135,25 @@ def check_types_of_edge_constraint(sub_graph):
                 "The partition {} with edges {} has a fixed key and fixed "
                 "mask constraint. These can be merged together, but is "
                 "deemed an error here"
-                    .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.edges))
 
         # check for a fixed key and fixed field, as these are incompatible
         if fixed_key and fixed_field:
             raise exceptions.PacmanConfigurationException(
                 "The partition {} for edges {} has a fixed key and fixed "
-                "field constraint. These may be mergeable together, but "
+                "field constraint. These may be merge-able together, but "
                 "is deemed an error here"
-                    .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.edges))
 
         # check that a fixed mask and fixed field have compatible masks
         if fixed_mask and fixed_field:
             _check_masks_are_correct(partition)
 
-        # check that if theres a flexi field, and somet else, throw error
+        # check that if there's a flexi field, and something else, throw error
         if flexi_field and (fixed_mask or fixed_key or fixed_field):
             raise exceptions.PacmanConfigurationException(
                 "The partition {} for edges {} has a flexi field and "
-                "another fixed constraint. These maybe be mergeable, but "
+                "another fixed constraint. These maybe be merge-able, but "
                 "is deemed an error here"
                 .format(partition.identifer, partition.edges))
 
@@ -174,7 +177,7 @@ def _check_masks_are_correct(partition):
     for field in fixed_field.fields:
         if field.mask & mask != field.mask:
             raise exceptions.PacmanInvalidParameterException(
-                "felid.mask, mask",
+                "field.mask, mask",
                 "The field mask {} is outside of the mask {}"
                 .format(field.mask, mask),
                 "{}:{}".format(field.mask, mask))
@@ -182,7 +185,7 @@ def _check_masks_are_correct(partition):
             if (other_field != field and
                     other_field.mask & field.mask != 0):
                 raise exceptions.PacmanInvalidParameterException(
-                    "felid.mask, mask",
+                    "field.mask, mask",
                     "Field masks {} and {} overlap".format(
                         field.mask, other_field.mask),
                     "{}:{}".format(field.mask, mask))
@@ -228,6 +231,15 @@ def get_fixed_mask(same_key_group):
     return mask, fields
 
 
+def create_routing_tables(
+        routing_info, routing_tables, routing_table_by_partitions,
+        partitioned_graph):
+
+    progress_bar = ProgressBar(partitioned_graph.partitions,
+                               "Creating Routing Tables")
+
+
+
 def add_routing_key_entries(
         routing_paths, subedge_routing_info, out_going_subedge,
         routing_tables):
@@ -239,6 +251,10 @@ def add_routing_key_entries(
     :param routing_tables: the routing tables to adjust
     :return: None
     """
+
+
+
+
     path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
 
     # iterate through the entries in each path, adding a router entry if
