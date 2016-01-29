@@ -2,6 +2,7 @@
 from pacman import exceptions
 from pacman.interfaces.abstract_provides_provenance_data import \
     AbstractProvidesProvenanceData
+from pacman.utilities.utility_objs.ordered_set import OrderedSet
 from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
 from pacman.utilities import file_format_converters
@@ -113,7 +114,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :return: None
         """
 
-        input_names = set()
+        input_names = OrderedSet()
         for input_item in inputs:
             input_names.add(input_item['type'])
 
@@ -147,7 +148,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             else:
                 suitable_algorithm = self._locate_suitable_algorithm(
                     optional_converter_algorithms, input_names,
-                    generated_outputs, True)
+                    generated_outputs, True, True)
                 if suitable_algorithm is not None:
                     allocated_algorithums.append(suitable_algorithm)
                     allocated_a_algorithm = True

@@ -100,10 +100,12 @@ class ConvertToFilePartitionedGraph(object):
                 hyper_edge_dict["source"] = str(id(vertex))
 
                 sinks_string = []
+                weight = 0
                 for edge in vertex_outgoing_partitions[vertex_partition].edges:
                     sinks_string.append(str(id(edge.post_subvertex)))
+                    weight += edge.weight
                 hyper_edge_dict['sinks'] = sinks_string
-                hyper_edge_dict["weight"] = 1.0
+                hyper_edge_dict["weight"] = weight
                 hyper_edge_dict["type"] = \
                     vertex_outgoing_partitions[vertex_partition]\
                     .type.name.lower()

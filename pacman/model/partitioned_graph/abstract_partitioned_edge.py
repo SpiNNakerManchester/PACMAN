@@ -9,7 +9,7 @@ class AbstractPartitionedEdge(object):
         vertices on either side of the edge
     """
 
-    def __init__(self, pre_subvertex, post_subvertex, label=None):
+    def __init__(self, pre_subvertex, post_subvertex, label=None, weight=1):
         """
 
         :param pre_subvertex: the subvertex at the start of the subedge
@@ -23,11 +23,14 @@ class AbstractPartitionedEdge(object):
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :param label: The name of the edge
         :type label: str
+        :param weight: an optional weight for the edge (default is 1)
+        :type weight: int
         :raise None: Raises no known exceptions
         """
         self._pre_subvertex = pre_subvertex
         self._post_subvertex = post_subvertex
         self._label = label
+        self._weight = weight
 
     @abstractmethod
     def is_partitioned_edge(self):
@@ -67,6 +70,16 @@ class AbstractPartitionedEdge(object):
         :raise None: Raises no known exceptions
         """
         return self._label
+
+    @property
+    def weight(self):
+        """ The weight of the edge in the graph relative to other weights; an
+            indication of the amount of traffic that might flow down the edge
+
+        :return: The weight of the edge
+        :rtype: int
+        """
+        return self._weight
 
     def __str__(self):
         return "PartitionedEdge:{}->{}".format(self._pre_subvertex,
