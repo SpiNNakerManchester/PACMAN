@@ -54,28 +54,8 @@ def placer_reports_without_partitionable_graph(
         report_folder, hostname, placements, machine)
 
 
-def router_reports(report_folder, routing_paths, hostname):
-    router_report_from_paths(report_folder, routing_paths, hostname)
-
-
-def routing_info_reports(
-        report_folder, subgraph, routing_infos):
-    routing_info_report(report_folder, subgraph, routing_infos)
-
-
-def routing_table_generation(
-        report_folder, routing_tables=None, compressed_routing_tables=None):
-    router_report_from_router_tables(
-        report_folder, routing_tables, compressed_routing_tables)
-
-
-def partitioner_reports(report_folder, hostname, graph,
-                        graph_to_subgraph_mapper):
-    partitioner_report(report_folder, hostname,
-                       graph, graph_to_subgraph_mapper)
-
-
-def router_report_from_paths(report_folder, routing_paths, hostname):
+def router_report_from_paths(
+        report_folder, routing_paths, hostname, partitioned_graph):
     """ Generates a text file of routing paths
 
     :param routing_paths:
@@ -97,13 +77,14 @@ def router_report_from_paths(report_folder, routing_paths, hostname):
     f_routing.write("\n\n")
 
     link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
-    progress_bar = ProgressBar(len(routing_paths.all_subedges()),
+    progress_bar = ProgressBar(len(partitioned_graph.subedges),
                                "Generating Routing path report")
-    for e in routing_paths.all_subedges():
+    for e in partitioned_graph.subedges:
         text = "**** SubEdge '{}', from vertex: '{}' to vertex: '{}'".format(
             e.label, e.pre_subvertex.label, e.post_subvertex.label)
         f_routing.write(text)
         f_routing.write("\n")
+
 
         path_entries = routing_paths.get_entries_for_edge(e)
         first = True

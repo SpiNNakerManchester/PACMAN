@@ -230,16 +230,6 @@ def get_fixed_mask(same_key_group):
 
     return mask, fields
 
-
-def create_routing_tables(
-        routing_info, routing_tables, routing_table_by_partitions,
-        partitioned_graph):
-
-    progress_bar = ProgressBar(partitioned_graph.partitions,
-                               "Creating Routing Tables")
-
-
-
 def add_routing_key_entries(
         routing_paths, subedge_routing_info, out_going_subedge,
         routing_tables):
@@ -251,9 +241,6 @@ def add_routing_key_entries(
     :param routing_tables: the routing tables to adjust
     :return: None
     """
-
-
-
 
     path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
 

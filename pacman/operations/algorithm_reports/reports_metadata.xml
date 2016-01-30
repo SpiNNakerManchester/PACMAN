@@ -57,7 +57,7 @@
     </algorithm>
     <algorithm name="RouterReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
-        <python_function>router_reports</python_function>
+        <python_function>router_report_from_paths</python_function>
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
@@ -68,6 +68,10 @@
                 <param_type>IPAddress</param_type>
             </parameter>
             <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
                 <param_name>routing_paths</param_name>
                 <param_type>MemoryRoutingTableByPartition</param_type>
             </parameter>
@@ -75,7 +79,7 @@
     </algorithm>
     <algorithm name="routingInfoReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
-        <python_function>routing_info_reports</python_function>
+        <python_function>routing_info_report</python_function>
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
@@ -139,7 +143,7 @@
     </algorithm>
     <algorithm name="PartitionerReport">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
-        <python_function>partitioner_reports</python_function>
+        <python_function>partitioner_report</python_function>
         <required_inputs>
             <parameter>
                 <param_name>report_folder</param_name>
