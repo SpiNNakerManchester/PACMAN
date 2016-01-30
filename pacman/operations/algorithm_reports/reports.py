@@ -59,6 +59,9 @@ def router_report_from_paths(
     """ Generates a text file of routing paths
 
     :param routing_paths:
+    :param report_folder:
+    :param hostname:
+    :param partitioned_graph:
     :return:
     """
     file_name = os.path.join(report_folder, "edge_routing_info.rpt")
@@ -79,13 +82,14 @@ def router_report_from_paths(
     link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
     progress_bar = ProgressBar(len(partitioned_graph.subedges),
                                "Generating Routing path report")
+    """
     for e in partitioned_graph.subedges:
         text = "**** SubEdge '{}', from vertex: '{}' to vertex: '{}'".format(
             e.label, e.pre_subvertex.label, e.post_subvertex.label)
         f_routing.write(text)
         f_routing.write("\n")
 
-
+        path_entries = locate_routing_table_entries()
         path_entries = routing_paths.get_entries_for_edge(e)
         first = True
         for entry in path_entries:
@@ -117,6 +121,7 @@ def router_report_from_paths(
         progress_bar.update()
     f_routing.flush()
     f_routing.close()
+    """
     progress_bar.end()
 
 

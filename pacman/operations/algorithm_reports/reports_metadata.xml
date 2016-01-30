@@ -158,7 +158,7 @@
                 <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_to_subgraph_mapper</param_name>
+                <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
