@@ -1,3 +1,4 @@
+
 from enum import Enum
 from pacman.model.abstract_classes.abstract_constrained_object import \
     AbstractConstrainedObject
@@ -15,7 +16,7 @@ from pacman import exceptions
 EDGE_TYPES = Enum(
     value="EDGE_TYPES",
     names=[("MULTI_CAST", 0),
-           ("NEAREST_NEIGBOUR", 1),
+           ("NEAREST_NEIGHBOUR", 1),
            ("PEER_TO_PEER", 2),
            ("FIXED_ROUTE", 3)])
 

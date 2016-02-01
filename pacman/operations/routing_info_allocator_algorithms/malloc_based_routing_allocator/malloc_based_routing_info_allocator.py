@@ -23,7 +23,7 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
+from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
@@ -88,10 +88,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # allocate the groups that have fixed keys
         for group in fixed_key_groups:  # fixed keys groups
 
-            # check n keys consistent through partition
-            routing_info_allocator_utilities.\
-                check_n_keys_are_same_through_partition(group, n_keys_map)
-
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
             fixed_mask = None
@@ -114,10 +110,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         for group in fixed_mask_groups:  # fixed mask groups
 
-            # check n keys consistent through partition
-            routing_info_allocator_utilities.\
-                check_n_keys_are_same_through_partition(group, n_keys_map)
-
             # get mask and fields if need be
             fixed_mask = utility_calls.locate_constraints_of_type(
                 group.constraints, KeyAllocatorFixedMaskConstraint)[0].mask
@@ -132,7 +124,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # try to allocate
             keys_and_masks = self._allocate_keys_and_masks(
                 fixed_mask, fields,
-                n_keys_map.n_keys_for_partitioned_edge(group.edges[0]))
+                n_keys_map.n_keys_for_partition(group))
 
             # update the pacman data objects
             self._update_routing_objects(keys_and_masks, routing_infos, group)
@@ -148,7 +140,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # try to allocate
             keys_and_masks = self._allocate_keys_and_masks(
                 None, fields,
-                n_keys_map.n_keys_for_partitioned_edge(group.edges[0]))
+                n_keys_map.n_keys_for_partition(group))
 
             # update the pacman data objects
             self._update_routing_objects(keys_and_masks, routing_infos, group)
@@ -163,8 +155,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         for group in continuous_groups:
             keys_and_masks = self._allocate_keys_and_masks(
-                None, None,
-                n_keys_map.n_keys_for_partitioned_edge(group.edges[0]))
+                None, None, n_keys_map.n_keys_for_partition(group))
 
             # update the pacman data objects
             self._update_routing_objects(keys_and_masks, routing_infos, group)
@@ -184,9 +175,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         """
 
         # Allocate the routing information
-        for edge in group.edges:
-            subedge_info = SubedgeRoutingInfo(keys_and_masks, edge)
-            routing_infos.add_subedge_info(subedge_info)
+        partition_info = PartitionRoutingInfo(keys_and_masks, group)
+        routing_infos.add_partition_info(partition_info)
 
     @staticmethod
     def _get_key_ranges(key, mask):
@@ -253,13 +243,13 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     key_and_mask.key, key_and_mask.mask):
                 self._allocate_elements(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, fields, edge_n_keys):
+    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys):
 
         # If there isn't a fixed mask, generate a fixed mask based
         # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = self._get_possible_masks(edge_n_keys)
+            masks_available = self._get_possible_masks(partition_n_keys)
 
         # For each usable mask, try all of the possible keys and
         # see if a match is possible
@@ -269,7 +259,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         for mask in masks_available:
 
             logger.debug("Trying mask {} for {} keys".format(hex(mask),
-                                                             edge_n_keys))
+                                                             partition_n_keys))
 
             key_found = None
             key_generator = KeyFieldGenerator(mask, fields,

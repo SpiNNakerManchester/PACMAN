@@ -36,37 +36,30 @@ def validate_routes(partitioned_graph, placements, routing_infos,
         len(list(placements.placements)),
         "Verifying the routes from each core travel to the correct locations")
     for placement in placements.placements:
-        outgoing_edges_for_partitioned_vertex = \
-            partitioned_graph.outgoing_subedges_from_subvertex(
-                placement.subvertex)
 
         # locate all placements to which this placement/subvertex will
         # communicate with for a given key_and_mask and search its
         # determined destinations
-        key_and_masks = \
-            routing_infos.get_key_and_masks_for_partitioned_vertex(
-                placement.subvertex)
 
-        # locate each set for a given key_and_mask
-        for key_and_mask in key_and_masks:
+        # gather keys and masks per partition
+        partitions = partitioned_graph.\
+            outgoing_edges_partitions_from_vertex(placement.subvertex)
+
+        for partition in partitions.values():
+            key_and_masks = \
+                routing_infos.get_keys_and_masks_from_partition(partition)
             destination_placements = list()
-            for outgoing_edge in outgoing_edges_for_partitioned_vertex:
-                edge_key_and_masks = \
-                    routing_infos.get_keys_and_masks_from_subedge(
-                        outgoing_edge)
-                for edge_key_and_mask in edge_key_and_masks:
-                    if edge_key_and_mask == key_and_mask:
-                        dest_placement = \
-                            placements.get_placement_of_subvertex(
-                                outgoing_edge.post_subvertex)
-                        dest_tuple = PlacementTuple(x=dest_placement.x,
-                                                    y=dest_placement.y,
-                                                    p=dest_placement.p)
-                        if dest_tuple not in destination_placements:
-                            destination_placements.append(dest_tuple)
+            for outgoing_edge in partition.edges:
+                dest_placement = placements.get_placement_of_subvertex(
+                    outgoing_edge.post_subvertex)
+                dest_tuple = PlacementTuple(x=dest_placement.x,
+                                            y=dest_placement.y,
+                                            p=dest_placement.p)
+                if dest_tuple not in destination_placements:
+                    destination_placements.append(dest_tuple)
 
             # search for these destinations
-            _search_route(placement, destination_placements, key_and_mask,
+            _search_route(placement, destination_placements, key_and_masks[0],
                           routing_tables, machine)
         progress.update()
     progress.end()

@@ -9,8 +9,6 @@ from pacman.model.constraints.key_allocator_constraints.\
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_flexi_field_constraint import \
     KeyAllocatorFlexiFieldConstraint
-from pacman.model.routing_tables.multicast_routing_table import \
-    MulticastRoutingTable
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.key_allocator_constraints\
@@ -23,10 +21,6 @@ from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman import exceptions
-
-# spinn_machine imports
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 import logging
 logger = logging.getLogger(__name__)
@@ -75,25 +69,6 @@ def get_edge_groups(partitioned_graph):
                 none_continuous_groups.append(partition)
     return (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
             flexi_field_groups, continuous_groups, none_continuous_groups)
-
-
-def check_n_keys_are_same_through_partition(partition_group, n_keys_map):
-    """
-    check that each edge in a partition has the same n_keys demands
-    :param partition_group:
-    :param n_keys_map:
-    :return:
-    """
-    # Check how many keys are needed for the edges of the group
-    edge_n_keys = None
-    for edge in partition_group.edges:
-        n_keys = n_keys_map.n_keys_for_partitioned_edge(edge)
-        if edge_n_keys is None:
-            edge_n_keys = n_keys
-        elif edge_n_keys != n_keys:
-            raise exceptions.PacmanRouteInfoAllocationException(
-                "Two edges require the same keys but request a"
-                " different number of keys")
 
 
 def check_types_of_edge_constraint(sub_graph):
@@ -230,50 +205,3 @@ def get_fixed_mask(same_key_group):
 
     return mask, fields
 
-def add_routing_key_entries(
-        routing_paths, subedge_routing_info, out_going_subedge,
-        routing_tables):
-    """
-    creates and adds entries for routing tables as required for the path
-    :param routing_paths: the routing paths object generated from routing info
-    :param subedge_routing_info: the subedge info object that contains keys
-    :param out_going_subedge: the edge this is associated with
-    :param routing_tables: the routing tables to adjust
-    :return: None
-    """
-
-    path_entries = routing_paths.get_entries_for_edge(out_going_subedge)
-
-    # iterate through the entries in each path, adding a router entry if
-    # required
-    for path_entry in path_entries:
-
-        # locate the router
-        router = routing_tables.get_routing_table_for_chip(
-            path_entry.router_x, path_entry.router_y)
-        if router is None:
-            router = MulticastRoutingTable(
-                path_entry.router_x, path_entry.router_y)
-            routing_tables.add_routing_table(router)
-
-        # add entries as required, or merge them if entries already exist
-        for key_and_mask in subedge_routing_info.keys_and_masks:
-            multicast_routing_entry = MulticastRoutingEntry(
-                routing_entry_key=key_and_mask.key_combo,
-                defaultable=path_entry.defaultable, mask=key_and_mask.mask,
-                link_ids=path_entry.out_going_links,
-                processor_ids=path_entry.out_going_processors)
-            stored_entry = \
-                router.get_multicast_routing_entry_by_routing_entry_key(
-                    key_and_mask.key_combo, key_and_mask.mask)
-            if stored_entry is None:
-                router.add_mutlicast_routing_entry(MulticastRoutingEntry(
-                    routing_entry_key=key_and_mask.key_combo,
-                    defaultable=path_entry.defaultable,
-                    mask=key_and_mask.mask,
-                    link_ids=path_entry.out_going_links,
-                    processor_ids=path_entry.out_going_processors))
-            else:
-                merged_entry = stored_entry.merge(multicast_routing_entry)
-                router.remove_multicast_routing_entry(stored_entry)
-                router.add_mutlicast_routing_entry(merged_entry)

@@ -6,7 +6,7 @@ from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
+from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 # general imports
@@ -25,7 +25,7 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
         keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
-        sri = SubedgeRoutingInfo(keys_and_masks, sube)
+        sri = PartitionRoutingInfo(keys_and_masks, sube)
         self.assertEqual(sri.subedge, sube)
         key_and_mask = sri.keys_and_masks
         self.assertEqual(key_and_mask[0].key, 0x0012)
@@ -41,7 +41,7 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
         keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
-        sri = SubedgeRoutingInfo(keys_and_masks, sube)
+        sri = PartitionRoutingInfo(keys_and_masks, sube)
         RoutingInfo([sri])
 
 if __name__ == '__main__':

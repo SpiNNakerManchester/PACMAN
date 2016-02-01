@@ -86,7 +86,7 @@
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>subgraph</param_name>
+                <param_name>partitioned_graph</param_name>
                 <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>

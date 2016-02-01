@@ -29,6 +29,8 @@ class PartitionedGraph(object):
         self._outgoing_subedges = dict()
         self._incoming_subedges = dict()
 
+        self._subedge_to_partition = dict()
+
         self._id_to_object_mapping = dict()
 
     def add_subvertex(self, subvertex):
@@ -102,9 +104,12 @@ class PartitionedGraph(object):
             if (partition_id not in
                     self._outgoing_subedges[subedge.pre_subvertex]):
                 self._outgoing_subedges[subedge.pre_subvertex][partition_id] =\
-                    OutgoingEdgePartition(partition_id)
+                    OutgoingEdgePartition(partition_id, partition_constraints)
             self._outgoing_subedges[subedge.pre_subvertex][partition_id]\
                 .add_edge(subedge)
+
+            self._subedge_to_partition[subedge] = \
+                self._outgoing_subedges[subedge.pre_subvertex][partition_id]
         else:
             raise PacmanInvalidParameterException(
                 "FixedRoutePartitionableEdge pre_subvertex",
@@ -185,6 +190,17 @@ class PartitionedGraph(object):
             return self._outgoing_subedges[sub_vertex]
         else:
             return ()
+
+    def get_partition_of_subedge(self, sub_edge):
+        """ Locates the partition associated with a given subedge
+
+        :param sub_edge: the subedge to locate the partition of
+        :return: the partition or None
+        """
+        if sub_edge in self._subedge_to_partition:
+            return self._subedge_to_partition[sub_edge]
+        else:
+            return None
 
     @property
     def partitions(self):

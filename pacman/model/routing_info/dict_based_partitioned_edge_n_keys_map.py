@@ -10,17 +10,23 @@ class DictBasedPartitionedEdgeNKeysMap(AbstractPartitionedEdgeNKeysMap):
     def __init__(self):
         self._n_keys_map = dict()
 
-    def set_n_keys_for_patitioned_edge(self, partitioned_edge, n_keys):
+    def set_n_keys_for_partition(self, partition, n_keys):
         """ Sets the number of keys required by a partitioned edge
 
-        :param partitioned_edge: The partitioned edge to set the number of\
-                    keys for
-        :type partitioned_edge:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
+        :param partition: The partition to set the number of keys for
+        :type partition:\
+                    :py:class:`pacman.utilities.utility_objs.outgoing_edge_partition.OutgoingEdgePartition`
         :param n_keys: The number of keys required by the edge
         :type n_keys: int
         """
-        self._n_keys_map[partitioned_edge] = n_keys
+        self._n_keys_map[partition] = n_keys
 
-    def n_keys_for_partitioned_edge(self, partitioned_edge):
-        return self._n_keys_map[partitioned_edge]
+    def n_keys_for_partition(self, partition):
+        """
+
+        :param partition: The partition to set the number of keys for
+        :type partition:\
+                    :py:class:`pacman.utilities.utility_objs.outgoing_edge_partition.OutgoingEdgePartition`
+        :return:
+        """
+        return self._n_keys_map[partition]

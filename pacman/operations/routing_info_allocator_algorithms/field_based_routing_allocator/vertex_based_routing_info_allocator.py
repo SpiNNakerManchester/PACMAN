@@ -19,7 +19,7 @@ from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_flexi_field_constraint import \
     KeyAllocatorFlexiFieldConstraint
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
+from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
@@ -118,9 +118,8 @@ class VertexBasedRoutingInfoAllocator(object):
                     partition, bit_field_space, n_keys_map, seen_mask_instances)
 
             # update routing info for each edge in the partition
-            for edge in partition.edges:
-                sub_edge_info = SubedgeRoutingInfo(keys_and_masks, edge)
-                routing_info.add_subedge_info(sub_edge_info)
+            partition_info = PartitionRoutingInfo(keys_and_masks, partition)
+            routing_info.add_partition_info(partition_info)
 
             # update the progress bar again
             progress_bar.update()
@@ -576,7 +575,7 @@ class VertexBasedRoutingInfoAllocator(object):
                     "fields for a fixed key. please fix and try again")
 
             # get n keys from n_keys_map for the range based mask part
-            n_keys = n_keys_map.n_keys_for_partitioned_edge(partition.edges[0])
+            n_keys = n_keys_map.n_keys_for_partition(partition)
 
             # generate keys
             for key_index in range(0, n_keys):
@@ -627,7 +626,7 @@ class VertexBasedRoutingInfoAllocator(object):
                     "fields for a fixed mask. please fix and try again")
 
             # get n keys from n_keys_map for the range based mask part
-            n_keys = n_keys_map.n_keys_for_partitioned_edge(partition.edges[0])
+            n_keys = n_keys_map.n_keys_for_partition(partition)
 
             # generate keys
             for key_index in range(0, n_keys):
@@ -1174,8 +1173,7 @@ class VertexBasedRoutingInfoAllocator(object):
             flexi_field_name="POP({}:{})Keys"
             .format(verts.index(vertex), subverts.index(subvert)),
             tag=SUPPORTED_TAGS.APPLICATION.name,
-            instance_n_keys=n_keys_map.n_keys_for_partitioned_edge(
-                partition.edges[0]),
+            instance_n_keys=n_keys_map.n_keys_for_partition(partition),
             nested_level=2))
 
         # add constraint to the subedge

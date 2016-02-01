@@ -527,11 +527,11 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
     progress_bar.end()
 
 
-def routing_info_report(report_folder, subgraph, routing_infos):
+def routing_info_report(report_folder, partitioned_graph, routing_infos):
     """ Generates a report which says which keys is being allocated to each\
         subvertex
     :param report_folder: the
-    :param subgraph:
+    :param partitioned_graph:
     :param routing_infos:
     """
     file_name = os.path.join(report_folder,
@@ -542,15 +542,18 @@ def routing_info_report(report_folder, subgraph, routing_infos):
     except IOError:
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
-    progress_bar = ProgressBar(len(subgraph.subvertices),
+    progress_bar = ProgressBar(len(partitioned_graph.subvertices),
                                "Generating Routing info report")
-    for subvert in subgraph.subvertices:
+    for subvert in partitioned_graph.subvertices:
         output.write("Subvert: {} \n".format(subvert))
-        outgoing_subedges = subgraph.outgoing_subedges_from_subvertex(subvert)
-        for outgoing_subedge in outgoing_subedges:
-            subedge_routing_info = routing_infos.\
-                get_subedge_information_from_subedge(outgoing_subedge)
-            output.write("{} \n".format(subedge_routing_info))
+        partitions = \
+            partitioned_graph.outgoing_edges_partitions_from_vertex(subvert)
+        for partition in partitions.values():
+            keys_and_masks = \
+                routing_infos.get_keys_and_masks_from_partition(partition)
+            for subedge in partition.edges:
+                output.write("subedge:{}, keys_and_masks:{} \n".format(
+                    subedge, keys_and_masks))
         output.write("\n\n")
         progress_bar.update()
     progress_bar.end()
