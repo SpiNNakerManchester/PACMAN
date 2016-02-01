@@ -5,6 +5,7 @@ from pacman.model.routing_tables.multicast_routing_table import \
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman import exceptions
 
 # spinnMachine imports
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
@@ -29,8 +30,9 @@ class MundyRouterCompressor(object):
     KeyMask = collections.namedtuple('KeyMask', 'key mask')
     RoutingEntry = collections.namedtuple('RoutingEntry',
                                           'key mask route defaultable')
+    max_supported_length = 1023
 
-    def __call__(self, router_tables, target_length=None):
+    def __call__(self, router_tables, target_length=max_supported_length):
         # build storage
         compressed_pacman_router_tables = MulticastRoutingTables()
 
@@ -95,9 +97,8 @@ class MundyRouterCompressor(object):
 
         return entries
 
-    @staticmethod
     def _convert_to_pacman_router_table(
-            mundy_compressed_router_table_entries, router_x_coord,
+            self, mundy_compressed_router_table_entries, router_x_coord,
             router_y_coord):
         """
 
@@ -110,6 +111,13 @@ class MundyRouterCompressor(object):
         """
 
         table = MulticastRoutingTable(router_x_coord, router_y_coord)
+        if (len(mundy_compressed_router_table_entries) >
+                self.max_supported_length):
+            raise exceptions.PacmanElementAllocationException(
+                "Th routing table {}:{} after compression will still not fit"
+                " within the machines router. therefore compression has "
+                "failed. Please fix and try again"
+                .format(router_x_coord, router_y_coord))
         for entry in mundy_compressed_router_table_entries:
 
             table.add_mutlicast_routing_entry(
