@@ -2,6 +2,7 @@
 from pacman import exceptions
 from pacman.interfaces.abstract_provides_provenance_data import \
     AbstractProvidesProvenanceData
+from pacman.utilities.utility_objs.ordered_set import OrderedSet
 from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
 from pacman.utilities import file_format_converters
@@ -113,7 +114,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :return: None
         """
 
-        input_names = set()
+        input_names = OrderedSet()
         for input_item in inputs:
             input_names.add(input_item['type'])
 
@@ -538,4 +539,5 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             "algorithm_{}".format(algorithm.algorithm_id))
         algorithm_provence_data.text = str(time_taken)
         if self._print_timings:
-            logger.info("Time taken: {}".format(str(time_taken)))
+            logger.info("Time {} taken by {}".format(
+                str(time_taken), algorithm.algorithm_id))
