@@ -360,7 +360,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>MemoryCompressedRoutingTables</param_type>
             </parameter>
         </required_inputs>
     </algorithm>
