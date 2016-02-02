@@ -72,7 +72,7 @@ class BasicRoutingInfoAllocator(object):
         for subvert in partitioned_graph.subvertices:
             partitions = partitioned_graph.\
                 outgoing_edges_partitions_from_vertex(subvert)
-            for partition in partitions:
+            for partition in partitions.values():
                 n_keys = n_keys_map.n_keys_for_partition(partition)
                 if n_keys > MAX_KEYS_SUPPORTED:
                     raise PacmanRouteInfoAllocationException(
