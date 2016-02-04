@@ -2,10 +2,9 @@ from pacman.model.routing_tables.multicast_routing_table\
     import MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables\
     import MulticastRoutingTables
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-
-import numpy
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
+
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 
 class BasicRouteMerger(object):
@@ -19,11 +18,9 @@ class BasicRouteMerger(object):
             "Compressing Routing Tables")
 
         # Create all masks without holes
-        last_mask = 0
         allowed_masks = [0xFFFFFFFFL - ((2 ** i) - 1) for i in range(33)]
 
-        # Check if all the keys have the same mask, and that none have holes
-        all_masks_same = False
+        # Check that none of the masks have "holes" e.g. 0xFFFF0FFF has a hole
         for router_table in router_tables.routing_tables:
             last_mask = None
             for entry in router_table.multicast_routing_entries:
@@ -32,16 +29,9 @@ class BasicRouteMerger(object):
                         "Only masks without holes are allowed in tables for"
                         " BasicRouteMerger (disallowed mask={})".format(
                             hex(entry.mask)))
-                if last_mask is None:
-                    last_mask = entry.mask
-                elif last_mask != entry.mask:
-                    all_masks_same = False
-            if not all_masks_same:
-                break
 
         for router_table in router_tables.routing_tables:
-            new_table = self._merge_routes(
-                router_table, previous_masks, all_masks_same)
+            new_table = self._merge_routes(router_table, previous_masks)
             if len(new_table.multicast_routing_entries) > 1023:
                 raise Exception("Could not compress table enough")
             tables.add_routing_table(new_table)
@@ -49,35 +39,21 @@ class BasicRouteMerger(object):
         progress.end()
         return {'routing_tables': tables}
 
-    def _get_merge_masks(self, mask, previous_masks, all_masks_same):
+    def _get_merge_masks(self, mask, previous_masks):
         if mask in previous_masks:
             return previous_masks[mask]
 
         last_one = 33 - bin(mask).rfind('1')
         n_bits = 16 - last_one
-        merge_masks = None
-
-        if all_masks_same:
-
-            merge_masks = numpy.array(
-                sorted(
-                    range(0, (1 << n_bits) - 1),
-                    key=lambda x: bin(x).count("1")),
-                dtype="uint32")
-            merge_masks = merge_masks << last_one
-
-        else:
-            merge_masks = sorted(
-                [0xFFFF - ((2 ** n) - 1) for n in range(n_bits - 1, 17)],
-                key=lambda x: bin(x).count("1"))
+        merge_masks = sorted(
+            [0xFFFF - ((2 ** n) - 1) for n in range(n_bits - 1, 17)],
+            key=lambda x: bin(x).count("1"))
 
         # print hex(mask), [hex(m) for m in merge_masks]
         previous_masks[mask] = merge_masks
         return merge_masks
 
-    def _merge_routes(self, router_table, previous_masks, all_masks_same):
-        if router_table.x != 0 or router_table.y != 0:
-            return router_table
+    def _merge_routes(self, router_table, previous_masks):
         merged_routes = MulticastRoutingTable(router_table.x, router_table.y)
         keys_merged = set()
 
@@ -92,8 +68,7 @@ class BasicRouteMerger(object):
             if mask & 0xFFFF0000 == 0xFFFF0000:
                 merge_done = False
 
-                for extra_bits in self._get_merge_masks(
-                        mask, previous_masks, all_masks_same):
+                for extra_bits in self._get_merge_masks(mask, previous_masks):
 
                     new_mask = 0xFFFF0000 | extra_bits
                     # print "trying mask =", hex(new_mask), hex(extra_bits)
