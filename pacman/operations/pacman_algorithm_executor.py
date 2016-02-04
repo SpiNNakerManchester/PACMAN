@@ -317,14 +317,9 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # execute algorithm
         try:
             results = python_algorithm(**inputs)
-        except TypeError as type_error:
-            raise exceptions.PacmanTypeError(
-                "Algorithm {} has crashed."
-                "    Inputs: {}\n"
-                "    Error: {}\n"
-                "    Stack: {}\n".format(
-                    algorithm.algorithm_id, algorithm.inputs,
-                    type_error.message, traceback.format_exc()))
+        except Exception as type_error:
+            raise exceptions.PacmanAlgorithmFailedToCompleteException(
+                algorithm, type_error, traceback)
         # handle_prov_data
         if self._do_timing:
             self._handle_prov(timer, algorithm)
@@ -371,7 +366,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         if child.returncode != 0:
             stdout, stderr = child.communicate()
             raise exceptions.\
-                PacmanAlgorithmFailedToCompleteException(
+                PacmanExternalAlgorithmFailedToCompleteException(
                     "Algorithm {} returned a non-zero error code {}\n"
                     "    Inputs: {}\n"
                     "    Output: {}\n"
@@ -458,7 +453,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                             algorithm.outputs))
                 self._internal_type_mapping[result_type] = results[result_name]
         elif len(algorithm.outputs) != 0:
-            raise exceptions.PacmanAlgorithmFailedToCompleteException(
+            raise exceptions.PacmanAlgorithmFailedToGenerateOutputsException(
                 "Algorithm {} did not generate any outputs".format(
                     algorithm.algorithm_id))
 

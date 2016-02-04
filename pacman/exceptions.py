@@ -142,17 +142,61 @@ class PacmanNotExistException(PacmanException):
 
 
 class PacmanAlgorithmFailedToCompleteException(PacmanException):
-    """ An exception that indicates that a pacman algorithm ran from outside\
+    """ An exception that indicates that a pacman algorithm ran from inside\
         the software stack has failed to complete for some unknown reason.
 
     """
 
-    def __init__(self, problem):
+    def __init__(self, algorithm, exception, traceback):
         """
         :param problem: The problem with the routing
         :type problem: str
         """
+        problem = \
+            "Algorithm {} has crashed.    Inputs: {}\n    Error: {}\n    " \
+            "Stack: {}\n".format(
+                algorithm.algorithm_id, algorithm.inputs, exception.message,
+                traceback.format_exc())
+
         PacmanException.__init__(self, problem)
+        self._exception = exception
+        self._algorithm = algorithm
+
+    @property
+    def exception(self):
+        """
+        property method to get access to the exception that raised this one
+        :return:
+        """
+        return self._exception
+
+    @property
+    def algorithm(self):
+        """
+        property method for returning the internal algorithm which raised
+        the exception
+        :return:
+        """
+        return self._algorithm
+
+    def __repr__(self):
+        return PacmanException.__repr__(self)
+
+
+class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
+    """ An exception that indicates that an algorithm ran from outside\
+        the software stack has failed to complete for some unknown reason.
+
+    """
+    pass
+
+
+class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
+    """ An exception that indicates that an algorithm has not generated the
+    correct outputs for some unknown reason
+
+    """
+    pass
 
 
 class PacmanSubvertexAlreadyPlacedError(ValueError):
