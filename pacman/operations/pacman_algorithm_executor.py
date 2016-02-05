@@ -55,8 +55,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         self._inputs = inputs
 
-    def _set_up_pacman_algorithms_listings(self, algorithms, xml_paths, inputs,
-                                          required_outputs):
+    def _set_up_pacman_algorithms_listings(
+            self, algorithms, xml_paths, inputs, required_outputs):
         """ Translates the algorithm string and uses the config XML to create\
             algorithm objects
 
@@ -503,13 +503,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         """
         return self._internal_type_mapping[item_type]
 
-    def write_provenance_data_in_xml(self, file_path, transceiver,
-                                     placement=None):
+    def write_provenance_data_in_xml(
+            self, file_path, transceiver, message_store, placement=None):
         """
-
-        :param file_path:
-        :param transceiver:
-        :param placement:
+        @implements pacman.interface.abstract_provides_provenance_data.AbstractProvidesProvenanceData.write_provenance_data_in_xml
         :return:
         """
         # write xml form into file provided
