@@ -146,3 +146,10 @@ class Placements(object):
         :return:
         """
         return iter(self.placements)
+
+    def __len__(self):
+        """
+        returns the number of placements in this placemnts object
+        :return:
+        """
+        return len(self._placements)
