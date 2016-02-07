@@ -32,7 +32,7 @@ class MundyRouterCompressor(object):
                                           'key mask route defaultable')
     max_supported_length = 1023
 
-    def __call__(self, router_tables, target_length=max_supported_length):
+    def __call__(self, router_tables, target_length=None):
         # build storage
         compressed_pacman_router_tables = MulticastRoutingTables()
 
@@ -114,9 +114,8 @@ class MundyRouterCompressor(object):
         if (len(mundy_compressed_router_table_entries) >
                 self.max_supported_length):
             raise exceptions.PacmanElementAllocationException(
-                "Th routing table {}:{} after compression will still not fit"
-                " within the machines router. therefore compression has "
-                "failed. Please fix and try again"
+                "The routing table {}:{} after compression will still not fit"
+                " within the machines router"
                 .format(router_x_coord, router_y_coord))
         for entry in mundy_compressed_router_table_entries:
 

@@ -79,7 +79,6 @@ def router_report_from_paths(
     f_routing.write(" for target machine '{}'".format(hostname))
     f_routing.write("\n\n")
 
-    link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
     progress_bar = ProgressBar(len(partitioned_graph.subedges),
                                "Generating Routing path report")
     """
@@ -577,7 +576,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
 
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
-            _generate_routing_table(routing_table,  top_level_folder)
+            _generate_routing_table(routing_table, top_level_folder)
         progress_bar.update()
     progress_bar.end()
 
@@ -599,12 +598,12 @@ def router_report_from_compressed_router_tables(report_folder, routing_tables):
 
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
-            _generate_routing_table(routing_table,  top_level_folder)
+            _generate_routing_table(routing_table, top_level_folder)
         progress_bar.update()
     progress_bar.end()
 
 
-def _generate_routing_table(routing_table,  top_level_folder):
+def _generate_routing_table(routing_table, top_level_folder):
     file_sub_name = "routing_table_{}_{}.rpt".format(
         routing_table.x, routing_table.y)
     file_name = os.path.join(top_level_folder, file_sub_name)
@@ -623,6 +622,7 @@ def _generate_routing_table(routing_table,  top_level_folder):
                  "--------------------------------\n")
 
     entry_count = 0
+    n_defaultable = 0
     for entry in routing_table.multicast_routing_entries:
         index = entry_count & 0xFFFF
         key = entry.routing_entry_key
@@ -633,15 +633,15 @@ def _generate_routing_table(routing_table,  top_level_folder):
         hex_mask = _uint_32_to_hex_string(mask)
         route_txt = _expand_route_value(entry.processor_ids,
                                         entry.link_ids)
-        core_id = "({}, {}, {})"\
-            .format((key >> 24 & 0xFF), (key >> 16 & 0xFF),
-                    (key >> 11 & 0xF))
-        entry_str = ("    {}     {}       {}      {}         {}   "
-                     "   {}\n".format(
-                                index, hex_key, hex_mask,
-                                hex_route, core_id, route_txt))
+        entry_str = (
+            "    {}     {}       {}      {}         {}        {}\n".format(
+                index, hex_key, hex_mask, hex_route, entry.defaultable,
+                route_txt))
         entry_count += 1
+        if entry.defaultable:
+            n_defaultable += 1
         output.write(entry_str)
+    output.write("{} Defaultable entries\n".format(n_defaultable))
     output.flush()
     output.close()
 
@@ -677,8 +677,8 @@ def generate_comparison_router_report(
 
         n_entries_un_compressed = uncompressed_table.number_of_entries
         n_entries_compressed = compressed_table.number_of_entries
-        percentage = ((float(n_entries_un_compressed - n_entries_compressed))
-                      / float(n_entries_un_compressed)) * 100
+        percentage = ((float(n_entries_un_compressed - n_entries_compressed)) /
+                      float(n_entries_un_compressed)) * 100
 
         output.write(
             "Uncompressed table at {}:{} has {} entries whereas compressed "

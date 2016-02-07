@@ -10,8 +10,6 @@ from pacman.model.constraints.key_allocator_constraints.\
     KeyAllocatorFixedFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
-from pacman.model.routing_tables.multicast_routing_tables import \
-    MulticastRoutingTables
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
@@ -23,7 +21,8 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
+from pacman.model.routing_info.partition_routing_info \
+    import PartitionRoutingInfo
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
@@ -36,6 +35,9 @@ from pacman import exceptions
 import math
 import numpy
 import logging
+import itertools
+from collections import defaultdict
+
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +49,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
-    def __call__(self, subgraph, n_keys_map):
+    def __call__(self, subgraph, n_keys_map, graph_mapper=None):
 
         # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
@@ -63,22 +65,15 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         routing_info_allocator_utilities.\
             check_types_of_edge_constraint(subgraph)
 
-        routing_tables = MulticastRoutingTables()
         routing_infos = RoutingInfo()
-        
+
         # Get the partitioned edges grouped by those that require the same key
         (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
          flexi_field_groups, continuous_groups, none_continuous_groups) = \
             routing_info_allocator_utilities.get_edge_groups(subgraph)
 
-        # warn users that none continuous keys are going to work in
-        # continuous mode
+        # Even non-continuous keys will be continuous
         for group in none_continuous_groups:
-            logger.warning(
-                "The subvertex {} has a set of edges {} "
-                "which has not been requested to have continuous keys. The "
-                "algorithm will anyway allocate keys in a continuous"
-                " manner.".format(group.edges[0].pre_subvertex, group))
             continuous_groups.append(group)
 
         # Go through the groups and allocate keys
@@ -93,7 +88,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             fixed_mask = None
             fixed_key_and_mask_constraint = \
                 utility_calls.locate_constraints_of_type(
-                    group.constraints, KeyAllocatorFixedKeyAndMaskConstraint)[0]
+                    group.constraints,
+                    KeyAllocatorFixedKeyAndMaskConstraint)[0]
 
             # attempt to allocate them
             self._allocate_fixed_keys_and_masks(
@@ -137,6 +133,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             fields = utility_calls.locate_constraints_of_type(
                 group.constraints,
                 KeyAllocatorFixedFieldConstraint)[0].fields
+
             # try to allocate
             keys_and_masks = self._allocate_keys_and_masks(
                 None, fields,
@@ -151,7 +148,30 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         if len(flexi_field_groups) != 0:
             raise exceptions.PacmanConfigurationException(
-                "I cant handle these. please fix and try again")
+                "MallocBasedRoutingInfoAllocator does not support FlexiField")
+
+        # If there is a graph, group by source vertex and sort by vertex slice
+        # (lo_atom)
+        if graph_mapper is not None:
+            vertex_groups = defaultdict(list)
+            for partition in continuous_groups:
+                vertex = graph_mapper.get_vertex_from_subvertex(
+                    partition.edges[0].pre_subvertex)
+                vertex_groups[vertex].append(partition)
+            vertex_partitions = list()
+            for vertex_group in vertex_groups.itervalues():
+                sorted_partitions = sorted(
+                    vertex_group,
+                    key=lambda part: graph_mapper.get_subvertex_slice(
+                        part.edges[0].pre_subvertex))
+                vertex_partitions.extend(sorted_partitions)
+            continuous_groups = vertex_partitions
+            print [(
+                graph_mapper.get_vertex_from_subvertex(
+                    partition.edges[0].pre_subvertex).label,
+                graph_mapper.get_subvertex_slice(
+                    partition.edges[0].pre_subvertex).lo_atom)
+                for partition in continuous_groups]
 
         for group in continuous_groups:
             keys_and_masks = self._allocate_keys_and_masks(

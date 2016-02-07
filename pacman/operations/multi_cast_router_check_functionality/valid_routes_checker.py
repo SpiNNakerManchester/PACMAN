@@ -211,17 +211,7 @@ def _start_trace_via_routing_tables(
     visited_routers.add(current_router_table_tuple)
 
     # get src router
-    entry = _locate_routing_entry(current_router_table, key_and_mask.key)
-
-    if is_continuous:
-        bad_entries = _check_all_keys_hit_entry(entry, n_atoms,
-                                                key_and_mask.key)
-        if len(bad_entries) > 0:
-            failed_to_cover_all_keys_routers.append(
-                {'router_x': current_router_table.x,
-                 'router_y': current_router_table.y,
-                 'keys': bad_entries,
-                 'source_mask': key_and_mask.mask})
+    entry = _locate_routing_entry(current_router_table, key_and_mask.key, n_atoms)
 
     _recursive_trace_to_destinations(
         entry, current_router_table, source_placement.x,
@@ -240,7 +230,7 @@ def _check_all_keys_hit_entry(entry, n_atoms, base_key):
     """
     bad_entries = list()
     for atom_id in range(0, n_atoms):
-        key = base_key + 1
+        key = base_key + atom_id
         key_combo = entry.mask & key
         if key_combo != entry.routing_entry_key:
             bad_entries.append(key)
@@ -313,7 +303,7 @@ def _recursive_trace_to_destinations(
                                    visited_routers)
 
             # locate next entry
-            entry = _locate_routing_entry(next_router, key_and_mask.key)
+            entry = _locate_routing_entry(next_router, key_and_mask.key, n_atoms)
 
             if is_continuous:
                 bad_entries = _check_all_keys_hit_entry(entry, n_atoms,
@@ -377,8 +367,9 @@ def _check_processor(processor_ids, current_router, reached_placements):
         reached_placements.add(PlacementTuple(dest_x, dest_y,
                                               processor_id))
 
+range_masks = {0xFFFFFFFFL - ((2 ** i) - 1) for i in range(33)}
 
-def _locate_routing_entry(current_router, key):
+def _locate_routing_entry(current_router, key, n_atoms):
     """ locate the entry from the router based off the subedge
 
     :param current_router: the current router being used in the trace
@@ -390,15 +381,55 @@ def _locate_routing_entry(current_router, key):
     found_entry = None
     for entry in current_router.multicast_routing_entries:
         key_combo = entry.mask & key
-        if key_combo == entry.routing_entry_key:
+        e_key = entry.routing_entry_key
+        if key_combo == e_key:
             if found_entry is None:
                 found_entry = entry
             else:
                 logger.warn(
                     "Found more than one entry for key {}. This could be "
                     "an error, as currently no router supports overloading"
-                    " of entries.")
+                    " of entries.".format(hex(key)))
+            if entry.mask in range_masks:
+                last_atom = key + n_atoms
+                last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
+                if last_key < last_atom:
+                    raise Exception("Full key range not covered")
+        elif entry.mask in range_masks:
+            last_atom = key + n_atoms
+            last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
+            if (min(last_key, last_atom) - max(e_key, key)) + 1 > 0:
+                raise Exception("Key range partially covered")
     if found_entry is not None:
         return found_entry
     else:
         raise exceptions.PacmanRoutingException("no entry located")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

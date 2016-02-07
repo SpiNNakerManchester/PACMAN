@@ -80,8 +80,8 @@ class BasicDijkstraRouting(object):
 
             for subedge in out_going_sub_edges:
                 destination_subvertex = subedge.post_subvertex
-                destination_placement = \
-                    placements.get_placement_of_subvertex(destination_subvertex)
+                destination_placement = placements.get_placement_of_subvertex(
+                    destination_subvertex)
 
                 chip = machine.get_chip_at(destination_placement.x,
                                            destination_placement.y)
@@ -508,8 +508,7 @@ class BasicDijkstraRouting(object):
                     " did not find a preceding node! Consider increasing "
                     "acceptable discrepancy between sought traceback cost"
                     " and actual cost at node. Terminating...")
-        previous_routing_entry.add_in_coming_processor_direction(
-            source_processor)
+        previous_routing_entry.incoming_processor = source_processor
         return x_current, y_current
 
     def _create_routing_entry(
@@ -572,10 +571,9 @@ class BasicDijkstraRouting(object):
                 partition = partitions[partition_key]
                 if subedge in partition:
                     entry = MulticastRoutingTableByPartitionEntry(
-                        incoming_link=None, out_going_links=dec_direction,
+                        out_going_links=dec_direction,
                         outgoing_processors=None)
-                    previous_routing_entry.add_in_coming_processor_direction(
-                        neighbour_index)
+                    previous_routing_entry.incoming_link = neighbour_index
                     # add entry for next hop going backwards into path
                     self._routing_paths.add_path_entry(
                         entry, x_neighbour, y_neighbour, partition)
