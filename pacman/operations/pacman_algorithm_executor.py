@@ -94,7 +94,15 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # filter for just algorithms we want to use
         self._algorithms = list()
         for algorithms_name in algorithms_names:
-            self._algorithms.append(algorithm_data_objects[algorithms_name])
+            if algorithms_name in algorithm_data_objects:
+                self._algorithms.append(
+                    algorithm_data_objects[algorithms_name])
+            elif algorithms_name in converter_algorithm_data_objects:
+                self._algorithms.append(
+                    converter_algorithm_data_objects[algorithms_name])
+            else:
+                raise exceptions.PacmanConfigurationException(
+                    "Cannot find algorithm {}".format(algorithms_name))
 
         # sort_out_order_of_algorithms for execution
         self._sort_out_order_of_algorithms(
