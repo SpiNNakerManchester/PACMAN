@@ -13,8 +13,7 @@ class AbstractProvidesProvenanceData(object):
 
     @abstractmethod
     def write_provenance_data_in_xml(
-            self, file_path, transceiver, message_store,
-            placement=None):
+            self, file_path, transceiver, message_store, placement=None):
         """ Write the provenance data using XML
         :param file_path: the file path to write the provenance data to
         :param transceiver: the SpinnMan interface object
