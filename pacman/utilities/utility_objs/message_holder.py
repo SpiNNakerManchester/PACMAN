@@ -9,7 +9,7 @@ class MessageHolder(object):
         self._cores_with_messages = dict()
         self._chips_with_messages = dict()
 
-    def add_core_message(self, x, y, p, message, trace):
+    def add_core_message(self, x, y, p, message, trace=None):
         """
         adds a core message to the pile
         :param x: x coord for message
@@ -21,6 +21,8 @@ class MessageHolder(object):
         """
         if (x, y, p) not in self._cores_with_messages:
             self._cores_with_messages[(x, y, p)] = list()
+        if trace is None:
+            trace = ""
         self._cores_with_messages[(x, y, p)].append(
             {'message': message, 'trace': trace})
 

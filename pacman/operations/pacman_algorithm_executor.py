@@ -17,6 +17,8 @@ import os
 import traceback
 from lxml import etree
 from collections import defaultdict
+from pacman.utilities.utility_objs.provenance_data_item import \
+    ProvenanceDataItem
 from pacman.utilities.utility_objs.timer import Timer
 
 logger = logging.getLogger(__name__)
@@ -36,7 +38,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         AbstractProvidesProvenanceData.__init__(self)
 
         # provenance data store
-        self._provenance_data = etree.Element("Provenance_data_from_PACMAN")
+        self._provenance_data = list()
 
         # pacman mapping objects
         self._algorithms = list()
@@ -503,33 +505,24 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         """
         return self._internal_type_mapping[item_type]
 
-    def write_provenance_data_in_xml(
-            self, file_path, transceiver, message_store, placement=None):
+    def get_provenance_data_items(self, transceiver, placement=None):
         """
-        @implements pacman.interface.abstract_provides_provenance_data.AbstractProvidesProvenanceData.write_provenance_data_in_xml
+        @implements pacman.interface.abstract_provides_provenance_data.AbstractProvidesProvenanceData.get_provenance_data_items
         :return:
         """
-        # write xml form into file provided
-        writer = open(file_path, "w")
-        writer.write(etree.tostring(self._provenance_data, pretty_print=True))
-        writer.flush()
-        writer.close()
+        return self._provenance_data
 
     def _handle_prov(self, timer, algorithm):
+        """
+        adds a piece of provenance data to the list
+        :param timer: the tracker of how long a algorithm has taken
+        :param algorithm: the algorithm in question
+        :return: None
+        """
         time_taken = timer.take_sample()
 
-        # get timing element
-        if len(self._provenance_data) == 0:
-            provenance_data_timings = etree.SubElement(
-                self._provenance_data, "algorithm_timings")
-        else:
-            provenance_data_timings = self._provenance_data[0]
-
-        # write timing element
-        algorithm_provence_data = etree.SubElement(
-            provenance_data_timings,
-            "algorithm_{}".format(algorithm.algorithm_id))
-        algorithm_provence_data.text = str(time_taken)
-        if self._print_timings:
-            logger.info("Time {} taken by {}".format(
-                str(time_taken), algorithm.algorithm_id))
+        # write timing element into provenance data item
+        self._provenance_data.append(ProvenanceDataItem(
+            name="algorithm_{}".format(algorithm.algorithm_id),
+            item=str(time_taken),
+            needs_reporting_to_end_user=False))
