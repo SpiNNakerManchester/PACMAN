@@ -15,7 +15,6 @@ import importlib
 import subprocess
 import os
 import traceback
-from lxml import etree
 from collections import defaultdict
 from pacman.utilities.utility_objs.provenance_data_item import \
     ProvenanceDataItem
