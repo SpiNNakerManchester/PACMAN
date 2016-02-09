@@ -8,6 +8,7 @@ class MessageHolder(object):
     def __init__(self):
         self._cores_with_messages = dict()
         self._chips_with_messages = dict()
+        self._operations_with_messages = dict()
 
     def add_core_message(self, x, y, p, message, trace=None):
         """
@@ -25,6 +26,17 @@ class MessageHolder(object):
             trace = ""
         self._cores_with_messages[(x, y, p)].append(
             {'message': message, 'trace': trace})
+
+    def add_operation_message(self, operation_id, message):
+        """
+        adds a operation message to the pile
+        :param operation_id: the id of the operation to add message from
+        :param message: the message
+        :return: None
+        """
+        if operation_id not in self._operations_with_messages:
+            self._operations_with_messages[operation_id] = list()
+        self._operations_with_messages[operation_id].append(message)
 
     def add_chip_message(self, x, y, message):
         """
@@ -76,3 +88,21 @@ class MessageHolder(object):
         :return: iterable tuple of (x, y)
         """
         return self._chips_with_messages.keys()
+
+    def get_operation_messages(self, operation_id):
+        """
+        returns the messages from a operation
+        :param operation_id: the operation to look for
+        :return: iterable of string
+        """
+        if operation_id not in self._operations_with_messages:
+            return []
+        else:
+            return self._operations_with_messages[operation_id]
+
+    def get_operations_with_messages(self):
+        """
+        returns the list of operation ids which have messages
+        :return: iterable of string
+        """
+        return self._operations_with_messages.keys()

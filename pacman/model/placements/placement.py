@@ -65,6 +65,39 @@ class Placement(object):
         """
         return self._p
 
+    def __eq__(self, other):
+        """
+
+        :param other: an other placement object
+        :return: if the other placement object is equal to this one
+        """
+        if not isinstance(other, Placement):
+            return False
+        return (self._x == other.x and self._y == other.y and
+                self._p == other.p and self._subvertex == other.subvertex)
+
+    def __hash__(self):
+        """
+        builds a hash of this object with logic for the Nones
+        :return: hash code
+        """
+        if self._subvertex is None and self._p is None:
+            return hash((self._x, self._y))
+        elif self._subvertex is None and self._p is not None:
+            return hash((self._x, self._y, self._p))
+        elif self._subvertex is not None and self._p is None:
+            return hash((self._x, self._y, self._subvertex))
+        else:
+            return hash((self._x, self._y, self._p, self._subvertex))
+
+    def __ne__(self, other):
+        """
+        checks if a placement is not equal to another placement
+        :param other: the other placement
+        :return: bool
+        """
+        return not self.__eq__(other)
+
     def __repr__(self):
         """ generates a human readable description of the placement object
 
