@@ -115,8 +115,10 @@ class MundyRouterCompressor(object):
                 self.max_supported_length):
             raise exceptions.PacmanElementAllocationException(
                 "The routing table {}:{} after compression will still not fit"
-                " within the machines router"
-                .format(router_x_coord, router_y_coord))
+                " within the machines router ({} entries)"
+                .format(
+                    router_x_coord, router_y_coord,
+                    len(mundy_compressed_router_table_entries)))
         for entry in mundy_compressed_router_table_entries:
 
             table.add_mutlicast_routing_entry(

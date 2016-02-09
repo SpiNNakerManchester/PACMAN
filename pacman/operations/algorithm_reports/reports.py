@@ -614,12 +614,15 @@ def _generate_routing_table(routing_table, top_level_folder):
         logger.error("Generate_placement_reports: Can't open file"
                      " {} for writing.".format(file_name))
 
-    output.write("router contains {} entries \n "
-                 "\n".format(routing_table.number_of_entries))
-    output.write("  Index   Key(hex)    Mask(hex)    Route(hex)"
-                 "    Src. Core -> [Cores][Links]\n")
-    output.write("----------------------------------------------"
-                 "--------------------------------\n")
+    output.write("Router contains {} entries\n".format(
+        routing_table.number_of_entries))
+
+    output.write("{: <5s} {: <10s} {: <10s} {: <10s} {: <7s} {}\n".format(
+        "Index", "Key", "Mask", "Route", "Default", "[Cores][Links]"))
+    output.write(
+        "{:-<5s} {:-<10s} {:-<10s} {:-<10s} {:-<7s} {:-<14s}\n".format(
+            "", "", "", "", "", ""))
+    line_format = "{: >5d} 0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}\n"
 
     entry_count = 0
     n_defaultable = 0
@@ -627,16 +630,12 @@ def _generate_routing_table(routing_table, top_level_folder):
         index = entry_count & 0xFFFF
         key = entry.routing_entry_key
         mask = entry.mask
-        hex_route = _reduce_route_value(entry.processor_ids,
-                                        entry.link_ids)
-        hex_key = _uint_32_to_hex_string(key)
-        hex_mask = _uint_32_to_hex_string(mask)
-        route_txt = _expand_route_value(entry.processor_ids,
-                                        entry.link_ids)
-        entry_str = (
-            "    {}     {}       {}      {}         {}        {}\n".format(
-                index, hex_key, hex_mask, hex_route, entry.defaultable,
-                route_txt))
+        route = _reduce_route_value(
+            entry.processor_ids, entry.link_ids)
+        route_txt = _expand_route_value(
+            entry.processor_ids, entry.link_ids)
+        entry_str = line_format.format(
+            index, key, mask, route, str(entry.defaultable), route_txt)
         entry_count += 1
         if entry.defaultable:
             n_defaultable += 1
@@ -697,13 +696,7 @@ def _reduce_route_value(processors_ids, link_ids):
         value += 1 << link
     for processor in processors_ids:
         value += 1 << (processor + 6)
-    return _uint_32_to_hex_string(value)
-
-
-def _uint_32_to_hex_string(number):
-    """ Convert a 32-bit unsigned number into a hex string.
-    """
-    return "0x{:08X}".format(number)
+    return value
 
 
 def _expand_route_value(processors_ids, link_ids):
