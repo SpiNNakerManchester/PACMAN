@@ -95,7 +95,15 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # filter for just algorithms we want to use
         self._algorithms = list()
         for algorithms_name in algorithms_names:
-            self._algorithms.append(algorithm_data_objects[algorithms_name])
+            if algorithms_name in algorithm_data_objects:
+                self._algorithms.append(
+                    algorithm_data_objects[algorithms_name])
+            elif algorithms_name in converter_algorithm_data_objects:
+                self._algorithms.append(
+                    converter_algorithm_data_objects[algorithms_name])
+            else:
+                raise exceptions.PacmanConfigurationException(
+                    "Cannot find algorithm {}".format(algorithms_name))
 
         # sort_out_order_of_algorithms for execution
         self._sort_out_order_of_algorithms(
@@ -122,9 +130,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         allocated_algorithms = list()
         generated_outputs = set()
         generated_outputs.union(input_names)
-        allocated_a_algorithm = True
-        while len(self._algorithms) != 0 and allocated_a_algorithm:
-            allocated_a_algorithm = False
+        all_required_outputs_generated = False
+        failed_to_generate_output_string = None
+        tried_optional_algorithms = False
+        while (len(self._algorithms) != 0 or
+                (not all_required_outputs_generated
+                 and not tried_optional_algorithms)):
 
             # check each algorithm to see if its usable with current inputs
             # and without its optional required inputs
@@ -142,7 +153,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             #  as new inputs
             if suitable_algorithm is not None:
                 allocated_algorithms.append(suitable_algorithm)
-                allocated_a_algorithm = True
                 self._remove_algorithm_and_update_outputs(
                     self._algorithms, suitable_algorithm, input_names,
                     generated_outputs)
@@ -150,9 +160,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 suitable_algorithm = self._locate_suitable_algorithm(
                     optional_converter_algorithms, input_names,
                     generated_outputs, True, True)
+
+                # verify that the optional algorithms have been searched
+                if suitable_algorithm is None:
+                    tried_optional_algorithms = True
+
                 if suitable_algorithm is not None:
                     allocated_algorithms.append(suitable_algorithm)
-                    allocated_a_algorithm = True
                     self._remove_algorithm_and_update_outputs(
                         optional_converter_algorithms, suitable_algorithm,
                         input_names, generated_outputs)
@@ -176,12 +190,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                             list(set(required_outputs) - set(input_names)),
                             algorithms_left_names, algorithms_used))
 
-        all_required_outputs_generated = True
-        failed_to_generate_output_string = ""
-        for output in required_outputs:
-            if output not in generated_outputs:
-                all_required_outputs_generated = False
-                failed_to_generate_output_string += ":{}".format(output)
+            all_required_outputs_generated = True
+            failed_to_generate_output_string = ""
+            for output in required_outputs:
+                if output not in generated_outputs:
+                    all_required_outputs_generated = False
+                    failed_to_generate_output_string += ":{}".format(output)
 
         if not all_required_outputs_generated:
             raise exceptions.PacmanConfigurationException(
