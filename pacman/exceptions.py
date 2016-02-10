@@ -161,6 +161,16 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
         PacmanException.__init__(self, problem)
         self._exception = exception
         self._algorithm = algorithm
+        self._traceback = traceback
+
+    @property
+    def traceback(self):
+        """
+        property method to get access to the exception's traceback that
+        raised this one
+        :return:
+        """
+        return self._traceback
 
     @property
     def exception(self):
