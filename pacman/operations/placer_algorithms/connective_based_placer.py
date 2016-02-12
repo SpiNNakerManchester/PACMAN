@@ -108,15 +108,19 @@ class ConnectiveBasedPlacer(RadialPlacer):
 
     def _find_max_connected_vertex(self, vertices, partitioned_graph):
         max_connected_vertex = None
-        max_n_edges = 0
+        max_weight = 0
         for vertex in vertices:
-            n_in_edges = len(
-                partitioned_graph.outgoing_subedges_from_subvertex(vertex))
-            n_out_edges = len(
-                partitioned_graph.incoming_subedges_from_subvertex(vertex))
-            n_edges = n_in_edges + n_out_edges
+            in_weight = sum([
+                edge.weight
+                for edge in partitioned_graph.outgoing_subedges_from_subvertex(
+                    vertex)])
+            out_weight = sum([
+                edge.weight
+                for edge in partitioned_graph.incoming_subedges_from_subvertex(
+                    vertex)])
+            weight = in_weight + out_weight
 
-            if max_connected_vertex is None or n_edges > max_n_edges:
+            if max_connected_vertex is None or weight > max_weight:
                 max_connected_vertex = vertex
-                max_n_edges = n_edges
+                max_weight = weight
         return max_connected_vertex

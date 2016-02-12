@@ -35,7 +35,6 @@ from pacman import exceptions
 import math
 import numpy
 import logging
-import itertools
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -166,12 +165,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                         part.edges[0].pre_subvertex))
                 vertex_partitions.extend(sorted_partitions)
             continuous_groups = vertex_partitions
-            print [(
-                graph_mapper.get_vertex_from_subvertex(
-                    partition.edges[0].pre_subvertex).label,
-                graph_mapper.get_subvertex_slice(
-                    partition.edges[0].pre_subvertex).lo_atom)
-                for partition in continuous_groups]
 
         for group in continuous_groups:
             keys_and_masks = self._allocate_keys_and_masks(

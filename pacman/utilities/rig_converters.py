@@ -7,15 +7,10 @@ from rig.place_and_route.constraints import \
 
 from collections import defaultdict
 from six import iteritems
-import hashlib
 
 from pacman.utilities import constants
-from pacman.utilities import utility_calls
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman.model.constraints.abstract_constraints.\
-    abstract_tag_allocator_constraint import \
-    AbstractTagAllocatorConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints\
@@ -122,34 +117,6 @@ def convert_to_rig_partitioned_graph(partitioned_graph):
             vertices_resources[vid] = vertex_resources
             vertex_resources["cores"] = 0
 
-        # handle tagged vertices
-        elif len(utility_calls.locate_constraints_of_type(
-                vertex.constraints, AbstractTagAllocatorConstraint)) != 0:
-
-            # handle the edge between the tag-able vertex and the fake
-            # vertex
-            hyper_edge_dict = dict()
-            edges_resources[hashlib.md5(vertex.label).hexdigest()] = \
-                hyper_edge_dict
-            hyper_edge_dict["source"] = vid
-            hyper_edge_dict['sinks'] = [hashlib.md5(vertex.label).hexdigest()]
-            hyper_edge_dict["weight"] = 1.0
-            hyper_edge_dict["type"] = "FAKE_TAG_EDGE"
-
-            # add the tag-able vertex
-            vertex_resources = dict()
-            vertices_resources[vid] = vertex_resources
-            vertex_resources["cores"] = N_CORES_PER_VERTEX
-            vertex_resources["sdram"] = int(
-                vertex.resources_required.sdram.get_value())
-
-            # add fake vertex
-            vertex_resources = dict()
-            vertices_resources[
-                hashlib.md5(vertex.label).hexdigest()] = vertex_resources
-            vertex_resources["cores"] = 0
-            vertex_resources["sdram"] = 0
-
         # handle standard vertices
         else:
             vertex_resources = dict()
@@ -225,7 +192,7 @@ def create_rig_machine_constraints(machine):
 def convert_to_rig_placements(placements):
     rig_placements = {
         str(id(placement.subvertex)): (placement.x, placement.y)
-        for placement in placement.placements}
+        for placement in placements.placements}
     core_allocations = {}
     for placement in placements:
         core_allocations[str(id(placement.subvertex))] = {

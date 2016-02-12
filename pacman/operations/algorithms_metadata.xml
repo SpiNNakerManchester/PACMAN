@@ -400,7 +400,7 @@
 
     </algorithm>
     <algorithm name="RigPlaceAndRoute">
-        <python_module>pacman.operations.rig_place_and_route</python_module>
+        <python_module>pacman.operations.rig_algorithms.rig_place_and_route</python_module>
         <python_class>RigPlaceAndRoute</python_class>
         <required_inputs>
             <parameter>
@@ -417,6 +417,30 @@
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
             </parameter>
+            <parameter>
+                <param_name>routing_paths</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="RigRoute">
+        <python_module>pacman.operations.rig_algorithms.rig_route</python_module>
+        <python_class>RigRoute</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
             <parameter>
                 <param_name>routing_paths</param_name>
                 <param_type>MemoryRoutingTableByPartition</param_type>
