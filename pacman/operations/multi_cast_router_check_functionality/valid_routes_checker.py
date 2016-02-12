@@ -61,8 +61,9 @@ def validate_routes(partitioned_graph, placements, routing_infos,
             if not is_continuous:
                 logger.warn(
                     "Due to the none continuous nature of the keys in this "
-                    "partition, we cannot check all atoms will be routed "
-                    "correctly, but will check the base key instead")
+                    "partition {}, we cannot check all atoms will be routed "
+                    "correctly, but will check the base key instead"
+                    .format(partition))
 
             destination_placements = list()
             for outgoing_edge in partition.edges:
