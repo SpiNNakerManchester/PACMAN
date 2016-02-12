@@ -26,9 +26,9 @@ def tag_allocator_report(report_folder, tag_infos):
         logger.error("Generate_tag_report: Can't open file {} for "
                      "writing.".format(file_name))
     for ip_tag in tag_infos.ip_tags:
-        f_routing.write(ip_tag)
+        f_routing.write("{}".format(ip_tag))
     for reverse_ip_tag in tag_infos.reverse_ip_tags:
-        f_routing.write(reverse_ip_tag)
+        f_routing.write("{}".format(reverse_ip_tag))
     f_routing.flush()
     f_routing.close()
 
