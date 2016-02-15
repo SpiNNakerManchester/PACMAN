@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+import copy
 
 from pacman.model.placements import placement
 from pacman import exceptions
@@ -74,13 +75,17 @@ def placer_reports_without_partitionable_graph(
 
 
 def router_report_from_paths(
-        report_folder, routing_paths, hostname, partitioned_graph):
+        report_folder, routing_tables, routing_infos, hostname,
+        partitioned_graph, placements, machine):
     """ Generates a text file of routing paths
 
-    :param routing_paths:
+    :param routing_tables:
     :param report_folder:
     :param hostname:
+    :param routing_infos:
     :param partitioned_graph:
+    :param placements:
+    :param machine:
     :return:
     """
     file_name = os.path.join(report_folder, "edge_routing_info.rpt")
@@ -100,38 +105,23 @@ def router_report_from_paths(
 
     progress_bar = ProgressBar(len(partitioned_graph.subedges),
                                "Generating Routing path report")
-    """
-    for e in partitioned_graph.subedges:
+    for edge in partitioned_graph.subedges:
+        source_placement = \
+            placements.get_placement_of_subvertex(edge.pre_subvertex)
+        destination_placement = \
+            placements.get_placement_of_subvertex(edge.post_subvertex)
+        partition = partitioned_graph.get_partition_of_subedge(edge)
+        key_and_mask =\
+            routing_infos.get_keys_and_masks_from_partition(partition)[0]
+        path, number_of_entries = _search_route(
+            source_placement, destination_placement, key_and_mask,
+            routing_tables, machine)
         text = "**** SubEdge '{}', from vertex: '{}' to vertex: '{}'".format(
-            e.label, e.pre_subvertex.label, e.post_subvertex.label)
+            edge.label, edge.pre_subvertex.label, edge.post_subvertex.label)
+        text += " Takes path \n {}".format(path)
         f_routing.write(text)
         f_routing.write("\n")
-
-        path_entries = locate_routing_table_entries()
-        path_entries = routing_paths.get_entries_for_edge(e)
-        first = True
-        for entry in path_entries:
-            if not first:
-                text = "--->"
-            else:
-                text = ""
-            if len(entry.incoming_processor) != 0:
-                text = text + "P{}".format(entry.incoming_processor)
-            else:
-                text = "(L:{}".format(link_labels[entry.incoming_link])
-            text += "->{}:{}".format(entry.router_x, entry.router_y)
-            if entry.defaultable:
-                text += ":D"
-            if len(entry.out_going_processors) != 0:
-                for processor in entry.out_going_processors:
-                    text = text + "->P{}".format(processor)
-            if len(entry.out_going_links) != 0:
-                for link in entry.out_going_links:
-                    text += "->{}".format(link_labels[link])
-            f_routing.write(text)
-        f_routing.write("\n")
-
-        text = "{} has route length: {}\n".format(e.label, len(path_entries))
+        text = "{} has route length: {}\n".format(edge.label, number_of_entries)
         f_routing.write(text)
 
         # End one entry:
@@ -139,7 +129,6 @@ def router_report_from_paths(
         progress_bar.update()
     f_routing.flush()
     f_routing.close()
-    """
     progress_bar.end()
 
 
@@ -548,7 +537,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
 def routing_info_report(report_folder, partitioned_graph, routing_infos):
     """ Generates a report which says which keys is being allocated to each\
         subvertex
-    :param report_folder: the
+    :param report_folder: the report folder to store this value
     :param partitioned_graph:
     :param routing_infos:
     """
@@ -667,12 +656,12 @@ def _generate_routing_table(routing_table, top_level_folder):
 def generate_comparison_router_report(
         report_folder, routing_tables, compressed_routing_tables):
     """
-    makes a report on comparision of the compressed and uncompressed
+    makes a report on comparison of the compressed and uncompressed
     routing tables
-    :param report_folder:
-    :param routing_tables:
-    :param compressed_routing_tables:
-    :return:
+    :param report_folder: the folder to store the resulting report
+    :param routing_tables: the original routing tables
+    :param compressed_routing_tables: the compressed routing tables
+    :return: None
     """
     file_name = os.path.join(
         report_folder, "comparison_of_compressed_uncompressed_routing_tables")
@@ -801,3 +790,149 @@ def _get_associated_routing_entries_from(
                 return associated_chips
             else:
                 return None
+
+
+def _search_route(source_placement, dest_placement, key_and_mask,
+                  routing_tables, machine):
+    text = ""
+    current_router_table = routing_tables.get_routing_table_for_chip(
+        source_placement.x, source_placement.y)
+    visited_routers = set()
+    current_router_table_tuple = (current_router_table.x,
+                                  current_router_table.y)
+    visited_routers.add(current_router_table_tuple)
+
+    text += "P{} -> ".format(source_placement.p)
+    text += "{}:{} -> ".format(current_router_table.x, current_router_table.y)
+    number_of_entries = 1
+
+    # get src router
+    entry = _locate_routing_entry(current_router_table, key_and_mask.key)
+    extra_text, total_number_of_entries = _recursive_trace_to_destinations(
+        entry, current_router_table, source_placement.x,
+        source_placement.y, key_and_mask, visited_routers,
+        dest_placement, machine, routing_tables, number_of_entries)
+    text += extra_text
+    return text, total_number_of_entries
+
+
+# locates the next dest pos to check
+def _recursive_trace_to_destinations(
+        entry, current_router, chip_x, chip_y, key_and_mask, visited_routers,
+        reached_placement, machine, routing_tables, number_of_entries):
+    """ recursively search though routing tables till no more entries are\
+        registered with this key
+
+    :param entry: the original entry used by the first router which\
+            resides on the source placement chip.
+    :param current_router: the router currently being visited during the\
+            trace
+    :param key_and_mask:
+        the key and mask being used by the partitioned_vertex which resides\
+            on the source placement
+    :param visited_routers: the list of routers which have been visited\
+            during this trace so far
+    :param reached_placement: the placement to reach during the trace
+    :param chip_x: the x coordinate of the chip being considered
+    :param chip_y: the y coordinate of the chip being considered
+
+    :type entry: spinnMachine.multicast_routing_entry.MulticastRoutingEntry
+    :type current_router:\
+            pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
+    :type chip_x: int
+    :type chip_y: int
+    :type key_and_mask:
+            pacman.model.routing_info.base_key_and_mask.BaseKeyAndMask
+    :type visited_routers: iterable of\
+            pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
+    :type reached_placement: iterable of placement_tuple
+    :return: None
+    :raise None: this method does not raise any known exceptions
+    """
+
+    # determine where the route takes us
+    chip_links = entry.link_ids
+    processor_values = entry.processor_ids
+
+    # if goes down a chip link
+    if len(chip_links) > 0:
+
+        located = False
+        # also goes to a processor
+        if len(processor_values) > 0:
+            result = _check_processor(
+                processor_values, current_router, reached_placement)
+            if result is not None:
+                return "P{}".format(reached_placement.p), number_of_entries
+
+        if not located:
+            # only goes to new chip
+            for link_id in chip_links:
+
+                # locate next chips router
+                machine_router = \
+                    machine.get_chip_at(chip_x, chip_y).router
+                link = machine_router.get_link(link_id)
+                next_router = \
+                    routing_tables.get_routing_table_for_chip(
+                        link.destination_x, link.destination_y)
+
+                # locate next entry
+                entry = _locate_routing_entry(next_router, key_and_mask.key)
+
+                # get next route value from the new router
+                new_hop = number_of_entries + 1
+                result = _recursive_trace_to_destinations(
+                    entry, next_router, link.destination_x, link.destination_y,
+                    key_and_mask, visited_routers, reached_placement, machine,
+                    routing_tables, new_hop)
+                if result is not None:
+                    direction_text = _add_direction(link_id)
+                    text = "{}:{} -> {} -> {}".format(
+                        current_router.x, current_router.y, direction_text,
+                        result)
+                    return text, number_of_entries + 1
+
+    # only goes to a processor
+    elif len(processor_values) > 0:
+        result = _check_processor(
+            processor_values, current_router, reached_placement)
+        if result is not None:
+                return "P{}".format(reached_placement.p), number_of_entries
+
+def _add_direction(link):
+     # Convert link targets to readable values:
+    link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
+    return "{}".format(link_labels[link])
+
+
+def _check_processor(processor_values, current_router, reached_placement):
+    if (current_router.x == reached_placement.x and
+            current_router.y == reached_placement.y):
+        for processor_id in processor_values:
+            if processor_id == reached_placement.p:
+                text = "{}:{}:{}".format(current_router.x, current_router.y,
+                                         reached_placement.p)
+                return text
+    return None
+
+def _locate_routing_entry(current_router, key):
+    """ locate the entry from the router based off the subedge
+
+    :param current_router: the current router being used in the trace
+    :param key: the key being used by the source placement
+    :return None:
+    :raise PacmanRoutingException: when there is no entry located on this\
+            router.
+    """
+    found_entry = None
+    for entry in current_router.multicast_routing_entries:
+        key_combo = entry.mask & key
+        e_key = entry.routing_entry_key
+        if key_combo == e_key:
+            if found_entry is None:
+                found_entry = entry
+    if found_entry is not None:
+        return found_entry
+    else:
+        raise exceptions.PacmanRoutingException("no entry located")
