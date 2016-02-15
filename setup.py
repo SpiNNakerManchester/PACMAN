@@ -49,5 +49,5 @@ setup(
                   'pacman.utilities.file_format_schemas': ['*.json']},
     install_requires=[
         'six', 'enum34', 'numpy', 'jsonschema', 'SpiNNMan == 2016.001.01',
-        'SpiNNMachine == 2016.001.01']
+        'SpiNNMachine == 2015.004.01']
 )
