@@ -61,8 +61,9 @@ def validate_routes(partitioned_graph, placements, routing_infos,
             if not is_continuous:
                 logger.warn(
                     "Due to the none continuous nature of the keys in this "
-                    "partition, we cannot check all atoms will be routed "
-                    "correctly, but will check the base key instead")
+                    "partition {}, we cannot check all atoms will be routed "
+                    "correctly, but will check the base key instead"
+                    .format(partition))
 
             destination_placements = list()
             for outgoing_edge in partition.edges:
@@ -369,6 +370,7 @@ def _check_processor(processor_ids, current_router, reached_placements):
 
 range_masks = {0xFFFFFFFFL - ((2 ** i) - 1) for i in range(33)}
 
+
 def _locate_routing_entry(current_router, key, n_atoms):
     """ locate the entry from the router based off the subedge
 
@@ -391,15 +393,23 @@ def _locate_routing_entry(current_router, key, n_atoms):
                     "an error, as currently no router supports overloading"
                     " of entries.".format(hex(key)))
             if entry.mask in range_masks:
-                last_atom = key + n_atoms
+                last_atom = key + n_atoms - 1
                 last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
                 if last_key < last_atom:
-                    raise Exception("Full key range not covered")
+                    raise Exception(
+                        "Full key range not covered: key:{} key_combo:{} "
+                        "mask:{}, last_key:{}, e_key:{}".format(
+                            hex(key), hex(key_combo), hex(entry.mask),
+                            hex(last_key), hex(e_key)))
         elif entry.mask in range_masks:
             last_atom = key + n_atoms
             last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
             if (min(last_key, last_atom) - max(e_key, key)) + 1 > 0:
-                raise Exception("Key range partially covered")
+                raise Exception(
+                    "Key range partially covered:  key:{} key_combo:{} "
+                    "mask:{}, last_key:{}, e_key:{}".format(
+                        hex(key), hex(key_combo), hex(entry.mask),
+                        hex(last_key), hex(e_key)))
     if found_entry is not None:
         return found_entry
     else:

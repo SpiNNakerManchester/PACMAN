@@ -405,14 +405,23 @@
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryCompressedRoutingTables</param_type>
-            </parameter>
-            <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
+        <required_optional_inputs>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+                <param_type>1</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+                <param_type>2</param_type>
+            </parameter>
+        </required_optional_inputs>
+
     </algorithm>
     <algorithm name="RigPlaceAndRoute">
         <python_module>pacman.operations.rig_algorithms.rig_place_and_route</python_module>
