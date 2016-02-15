@@ -34,6 +34,11 @@ class MulticastRoutingTableByPartition(object):
             self._router_to_entries_map[key][partition] = entry.merge_entry(
                 self._router_to_entries_map[key][partition])
 
+    def get_routers(self):
+        """ Get the coordinates of all stored routers
+        """
+        return self._router_to_entries_map.iterkeys()
+
     def get_entries_for_router(self, router_x, router_y):
         """ Get the set of multicast path entries assigned to this router
         :param router_x: the x coord of the router

@@ -48,6 +48,19 @@ class MallocBasedRouteMerger(object):
         progress.end()
         return {'routing_tables': tables}
 
+    @staticmethod
+    def _base_key_and_last_key(entries, base_key, next_pos):
+        entry_last_key = (
+            entries[next_pos].routing_entry_key +
+            (~entries[next_pos].mask & 0xFFFFFFFFL))
+        next_base_key = base_key & entries[next_pos].routing_entry_key
+        next_n_keys = (entry_last_key - next_base_key) + 1
+        next_log_n_keys = int(math.ceil(math.log(next_n_keys, 2)))
+        next_n_keys = (1 << next_log_n_keys)
+        next_mask = (~(next_n_keys - 1)) & 0xFFFFFFFFL
+        next_base_key = next_base_key & next_mask
+        return next_base_key, (next_base_key + next_n_keys) - 1
+
     def _merge_routes(self, router_table, previous_masks):
         merged_routes = MulticastRoutingTable(router_table.x, router_table.y)
 
@@ -58,7 +71,7 @@ class MallocBasedRouteMerger(object):
 
         # Find adjacent entries that can be merged
         pos = 0
-        last_key_added = 0
+        last_base_key = -1
         while pos < len(entries):
             links = entries[pos].link_ids
             processors = entries[pos].processor_ids
@@ -66,15 +79,32 @@ class MallocBasedRouteMerger(object):
 
             # Keep going until routes are not the same or too many keys are
             # generated
-            base_key = long(entries[pos].routing_entry_key)
-            while (next_pos < len(entries) and
-                    entries[next_pos].link_ids == links and
-                    entries[next_pos].processor_ids == processors and
-                    (base_key & entries[next_pos].routing_entry_key) >
-                    last_key_added):
-                base_key = (
-                    base_key & entries[next_pos].routing_entry_key)
+            base_key = entries[pos].routing_entry_key
+            last_key = base_key + (~entries[pos].mask & 0xFFFFFFFFL)
+
+            while True:
+                if next_pos >= len(entries):
+                    break
+
+                if (entries[next_pos].link_ids != links or
+                        entries[next_pos].processor_ids != processors):
+                    break
+
+                next_base_key, next_last_key = self._base_key_and_last_key(
+                    entries, base_key, next_pos)
+                if next_base_key <= last_base_key:
+                    break
+                if (next_pos + 1 < len(entries)):
+                    if (entries[next_pos + 1].link_ids != links or
+                            entries[next_pos + 1].processor_ids != processors):
+                        if (next_last_key >=
+                                entries[next_pos + 1].routing_entry_key):
+                            break
+
+                base_key = next_base_key
+                last_key = next_last_key
                 next_pos += 1
+
             next_pos -= 1
 
             # print "Pre decision", hex(base_key)
@@ -87,37 +117,25 @@ class MallocBasedRouteMerger(object):
 
                 # Find the next nearest power of 2 to the number of keys
                 # that will be covered
-                last_key = (
-                    entries[next_pos].routing_entry_key +
-                    (~entries[next_pos].mask & 0xFFFFFFFFL))
-                n_keys = (last_key - base_key) + 1
-                next_log_n_keys = int(math.ceil(math.log(n_keys, 2)))
-                n_keys = (1 << next_log_n_keys) - 1
-                n_keys_mask = ~n_keys & 0xFFFFFFFFL
-                base_key = base_key & n_keys_mask
-                if ((base_key + n_keys) >= last_key and
-                        base_key > last_key_added and
-                        (next_pos + 1 >= len(entries) or
-                         entries[pos].routing_entry_key + n_keys <
-                         entries[next_pos + 1].routing_entry_key)):
-                    # print "Merged into", hex(base_key), hex(n_keys_mask)
-                    # for i in range(pos, next_pos + 1):
-                    #     print "    ", hex(entries[i].routing_entry_key)
-                    last_key_added = base_key + n_keys
-                    # print "    Last key:", hex(last_key_added)
-                    merged_routes.add_mutlicast_routing_entry(
-                        MulticastRoutingEntry(
-                            base_key, n_keys_mask,
-                            processors, links, defaultable=False))
-                    pos = next_pos
-                    merge_done = True
+                n_keys_mask = ~(last_key - base_key) & 0xFFFFFFFFL
+
+                print "Merged into", hex(base_key), hex(n_keys_mask)
+                for i in range(pos, next_pos + 1):
+                    print "    ", hex(entries[i].routing_entry_key)
+                merged_routes.add_mutlicast_routing_entry(
+                    MulticastRoutingEntry(
+                        base_key, n_keys_mask,
+                        processors, links, defaultable=False))
+                pos = next_pos
+                merge_done = True
+                last_base_key = base_key
 
             if not merge_done:
+                last_base_key = entries[pos].routing_entry_key
                 merged_routes.add_mutlicast_routing_entry(entries[pos])
-                last_key_added = (
-                    entries[pos].routing_entry_key +
-                    (~entries[pos].mask & 0xFFFFFFFFL))
-                # print "Not Merged", hex(entries[pos].routing_entry_key), hex(entries[pos].mask)
+                print "Not Merged {} {}".format(
+                    hex(entries[pos].routing_entry_key),
+                    hex(entries[pos].mask))
             pos += 1
 
         return merged_routes

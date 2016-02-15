@@ -35,11 +35,11 @@ def get_edge_groups(partitioned_graph):
     """
 
     # Keep a dictionary of the group which contains an edge
-    fixed_key_groups = list()
-    fixed_mask_groups = list()
-    fixed_field_groups = list()
-    flexi_field_groups = list()
-    continuous_groups = list()
+    fixed_key_groups = set()
+    fixed_mask_groups = set()
+    fixed_field_groups = set()
+    flexi_field_groups = set()
+    continuous_groups = set()
     none_continuous_groups = list()
     for partitioned_vertex in partitioned_graph.subvertices:
         outgoing_edge_partitions = \
@@ -53,18 +53,18 @@ def get_edge_groups(partitioned_graph):
             is_continuous = False
             for constraint in constraints:
                 if isinstance(constraint, KeyAllocatorFixedMaskConstraint):
-                    fixed_mask_groups.append(partition)
+                    fixed_mask_groups.add(partition)
                 elif isinstance(constraint,
                                 KeyAllocatorFixedKeyAndMaskConstraint):
-                    fixed_key_groups.append(partition)
+                    fixed_key_groups.add(partition)
                 elif isinstance(constraint, KeyAllocatorFlexiFieldConstraint):
-                    flexi_field_groups.append(partition)
+                    flexi_field_groups.add(partition)
                 elif isinstance(constraint, KeyAllocatorFixedFieldConstraint):
-                    fixed_field_groups.append(partition)
+                    fixed_field_groups.add(partition)
                 elif isinstance(constraint,
                                 KeyAllocatorContiguousRangeContraint):
                     is_continuous = True
-                    continuous_groups.append(partition)
+                    continuous_groups.add(partition)
             if not is_continuous:
                 none_continuous_groups.append(partition)
     return (fixed_key_groups, fixed_mask_groups, fixed_field_groups,

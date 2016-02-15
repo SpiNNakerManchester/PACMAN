@@ -203,6 +203,30 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="CompressibleMallocBasedRoutingInfoAllocator">
+        <python_module>pacman.operations.routing_info_allocator_algorithms.malloc_based_routing_allocator.compressible_malloc_based_routing_info_allocator</python_module>
+        <python_class>CompressibleMallocBasedRoutingInfoAllocator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>subgraph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="VertexBasedRoutingInfoAllocator">
         <python_module>pacman.operations.routing_info_allocator_algorithms.field_based_routing_allocator.vertex_based_routing_info_allocator</python_module>
         <python_class>VertexBasedRoutingInfoAllocator</python_class>
