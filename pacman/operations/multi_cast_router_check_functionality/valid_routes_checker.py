@@ -402,7 +402,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
                             hex(key), hex(key_combo), hex(entry.mask),
                             hex(last_key), hex(e_key)))
         elif entry.mask in range_masks:
-            last_atom = key + n_atoms
+            last_atom = key + n_atoms - 1
             last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
             if (min(last_key, last_atom) - max(e_key, key)) + 1 > 0:
                 raise Exception(

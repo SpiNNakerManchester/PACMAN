@@ -86,7 +86,7 @@ class ResourceTracker(object):
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
-            # add area codes for Ethernets
+            # add area codes for Ethernet
             if (chip.nearest_ethernet_x is not None and
                     chip.nearest_ethernet_y is not None):
                 ethernet_connected_chip = machine.get_chip_at(
@@ -260,6 +260,44 @@ class ResourceTracker(object):
 
         return True
 
+    def total_free_processors(self):
+        """
+        exposed method for determining how many processors have not yet been
+        allocated
+        :return: the total number of processors allocated
+        """
+        total_cores = 0
+        for chip_key in self._chips_available:
+            if chip_key in self._core_tracker:
+                total_cores += len(self._core_tracker[chip_key])
+            else:
+                processors = self._machine.get_chip_at(chip_key[0],
+                                                       chip_key[1]).processors
+                for processor in processors:
+                    if not processor.is_monitor:
+                        total_cores += 1
+        return total_cores
+
+    def total_free_processors_on_chip(self, x, y):
+        """
+        returns the number of processors on a given chip
+        :param x: the x coord of the chip
+        :param y: the y coord of the chip.
+        :return: the number of processors on the chip
+        """
+        if (x, y) in self._chips_available:
+            if (x, y) in self._core_tracker:
+                return len(self._core_tracker[(x, y)])
+            else:
+                total_cores = 0
+                processors = self._machine.get_chip_at(x, y).processors
+                for processor in processors:
+                    if not processor.is_monitor:
+                        total_cores += 1
+                return total_cores
+        else:
+            return 0
+
     def _get_matching_ip_tag(self, board_address, tag, key):
         """ Locate a tag for a tag id on a board address for a given chip
 
@@ -314,7 +352,7 @@ class ResourceTracker(object):
 
     def _is_ip_tag_available(self, board_address, tag, ip_address, port,
                              strip_sdp):
-        """ Check if an iptag is available given the constraints
+        """ Check if an ip_tag is available given the constraints
         :param board_address: the board address to locate the chip on
         :type board_address: str or None
         :param tag: the tag id to locate
@@ -323,9 +361,9 @@ class ResourceTracker(object):
         :type ip_address: str
         :param port: the port number of the tag to be assigned
         :type port: int
-        :param strip_sdp: if the iptag has to be able to strip the SDP header
+        :param strip_sdp: if the ip_tag has to be able to strip the SDP header
         :type strip_sdp: bool
-        :return: True if a matching iptag is available, False otherwise
+        :return: True if a matching ip_tag is available, False otherwise
         :rtype: bool
         """
         # If something is already sending to the same ip address and port but
@@ -552,7 +590,7 @@ class ResourceTracker(object):
                 self._address_and_port_ip_tag[tag_key] = key
 
                 # Remember how many allocations are sharing this tag
-                # in case an deallocation is requested
+                # in case an de-allocation is requested
                 if tag_key not in self._n_ip_tag_allocations:
                     self._n_ip_tag_allocations[tag_key] = 1
                 else:
@@ -608,8 +646,8 @@ class ResourceTracker(object):
             return None
         return allocations
 
-    def allocate_constrained_resources(self, resources, constraints,
-                                       chips=None):
+    def allocate_constrained_resources(
+            self, resources, constraints, chips=None):
         """ Attempts to use the given resources of the machine, constrained\
             by the given placement constraints.
 
@@ -642,9 +680,9 @@ class ResourceTracker(object):
         return self.allocate_resources(resources, chips, p, board_address,
                                        ip_tags, reverse_ip_tags)
 
-    def allocate_resources(self, resources, chips=None,
-                           processor_id=None, board_address=None,
-                           ip_tags=None, reverse_ip_tags=None):
+    def allocate_resources(
+            self, resources, chips=None, processor_id=None, board_address=None,
+            ip_tags=None, reverse_ip_tags=None):
         """ Attempts to use the given resources of the machine.  Can be given\
             specific place to use the resources, or else it will allocate them\
             on the first place that the resources fit.
@@ -712,7 +750,9 @@ class ResourceTracker(object):
             if (x, y) in self._core_tracker:
                 n_cores += len(self._core_tracker[x, y])
             else:
-                n_cores += len(list(chip.processors))
+                for processor in chip.processors:
+                    if not processor.is_monitor:
+                        n_cores += 1
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:
                 max_sdram = sdram_available

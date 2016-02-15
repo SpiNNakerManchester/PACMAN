@@ -26,7 +26,7 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
 
     def is_partitioner_constraint(self):
         """
-        helper methof for isinistance
+        helper method for isinstance
         :return:
         """
         return True
