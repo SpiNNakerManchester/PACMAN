@@ -24,11 +24,12 @@ from pacman.model.graph_mapper.slice import Slice
 # extras
 from pacman import exceptions
 from pacman.utilities import utility_calls
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 import math
 import logging
 import sys
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,10 @@ class SpreaderPartitioner(object):
         :param done_vertices:
         :return:
         """
+        progress_bar = ProgressBar(
+            len(core_constrained_vertices),
+            "Partitioning vertices which require their own cores")
+
         for vertex in core_constrained_vertices:
             max_atom_constraint = \
                 utility_calls.locate_constraints_of_type(
@@ -137,6 +142,8 @@ class SpreaderPartitioner(object):
                 done_vertices.append(vertex)
                 resource_allocation.allocate_resources(
                     resources, vertex.get_constraints())
+            progress_bar.update()
+        progress_bar.end()
 
     def _partition_a_vertex_specific_chip(
             self, chip_constrained_vertices, graph_mapper, graph, subgraph,
@@ -150,6 +157,10 @@ class SpreaderPartitioner(object):
         :param done_vertices:
         :return:
         """
+        progress_bar = ProgressBar(
+            len(chip_constrained_vertices),
+            "Partitioning vertices which require their own chips")
+
         for vertex in chip_constrained_vertices.keys():
             if vertex not in done_vertices:
                 vertex_constraint = chip_constrained_vertices[vertex]
@@ -200,6 +211,8 @@ class SpreaderPartitioner(object):
                     self._deal_with_none_constrained_vertices(
                         current_vertex, done_vertices, min_max,
                         graph, subgraph, graph_mapper, resource_allocation)
+                progress_bar.update()
+        progress_bar.end()
 
     @staticmethod
     def _locate_placement_constrained_vertices(vertices):
@@ -246,13 +259,20 @@ class SpreaderPartitioner(object):
         for vertex in not_constrained_vertices:
             if vertex not in done_vertices:
                 total_atoms += vertex.n_atoms
-        min_per_core = int(math.floor(float(total_atoms) /
+        min_per_core = int(math.ceil(float(total_atoms) /
                                       float(free_processors)))
+        if min_per_core == 1:
+            min_per_core = 0
+
         if min_max > min_per_core:
+            progress_bar = ProgressBar(
+                total_atoms,
+                "Partitioning vertices which have no constraints")
             for vertex in not_constrained_vertices:
                 self._deal_with_none_constrained_vertices(
                     vertex, done_vertices, min_per_core, graph, subgraph,
-                    graph_mapper, resource_allocation)
+                    graph_mapper, resource_allocation, progress_bar)
+            progress_bar.end()
         else:
             raise exceptions.PacmanElementAllocationException(
                 "Cannot partition {} vertices, as they demand a max atom of {}"
@@ -279,7 +299,7 @@ class SpreaderPartitioner(object):
     @staticmethod
     def _deal_with_none_constrained_vertices(
             vertex, done_vertices, min_per_core, graph, subgraph, graph_mapper,
-            resource_allocation):
+            resource_allocation, progress_bar):
         """
 
         :param vertex:
@@ -317,6 +337,7 @@ class SpreaderPartitioner(object):
                     total_atoms += 1
                 else:
                     total_atoms += min_per_core
+                progress_bar.update(vertex_slice.n_atoms)
             done_vertices.append(vertex)
 
     def _determine_min_max_atoms(self, vertices, done_vertices):
