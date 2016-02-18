@@ -8,7 +8,7 @@ from pacman import exceptions
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_contiguous_range_constraint import \
     KeyAllocatorContiguousRangeContraint
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 
 logger = logging.getLogger(__name__)

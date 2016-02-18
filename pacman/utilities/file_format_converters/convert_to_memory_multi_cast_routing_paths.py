@@ -1,13 +1,13 @@
 """
 ConvertToMemoryMultiCastRoutingPaths
 """
+import json
+
 from pacman.model.routing_paths.multicast_routing_table_by_partition_entry import \
     MulticastRoutingTableByPartitionEntry
 from pacman.model.routing_paths.multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
-
-import json
+from spinn_machine.progress_bar import ProgressBar
 
 
 class ConvertToMemoryMultiCastRoutingPaths(object):

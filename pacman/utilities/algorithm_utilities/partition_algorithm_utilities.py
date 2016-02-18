@@ -6,7 +6,7 @@ import logging
 
 from pacman.model.constraints.abstract_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 

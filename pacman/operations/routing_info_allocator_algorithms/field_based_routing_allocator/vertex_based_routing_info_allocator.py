@@ -32,7 +32,7 @@ from pacman.operations.routing_info_allocator_algorithms\
     as BitField
 from pacman.utilities.utility_objs.flexi_field \
     import FlexiField, SUPPORTED_TAGS
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import feild_based_system_utilities\
     as field_utilities
 

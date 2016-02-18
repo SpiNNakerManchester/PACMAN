@@ -9,7 +9,7 @@ from pacman.model.routing_table_by_partition.\
 from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
     import MultiCastPartitionedEdge

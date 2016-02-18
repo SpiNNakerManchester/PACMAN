@@ -4,7 +4,7 @@ import logging
 
 from pacman.model.placements import placement
 from pacman import exceptions
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 from spinn_machine.sdram import SDRAM
 
 logger = logging.getLogger(__name__)

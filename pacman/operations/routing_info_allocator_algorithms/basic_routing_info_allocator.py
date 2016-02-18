@@ -8,12 +8,8 @@ from pacman.model.data_request_interfaces.\
     RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
-from pacman.model.routing_tables.multicast_routing_tables import \
-    MulticastRoutingTables
-from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.abstract_constraints\

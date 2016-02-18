@@ -1,3 +1,7 @@
+import json
+import os
+
+import jsonschema
 
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
@@ -28,11 +32,7 @@ from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
-
-import json
-import os
-import jsonschema
+from spinn_machine.progress_bar import ProgressBar
 
 
 class CreateConstraintsToFile(object):

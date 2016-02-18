@@ -1,9 +1,10 @@
-from pacman.utilities import file_format_schemas
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
-
 import os
 import json
+
 import jsonschema
+
+from pacman.utilities import file_format_schemas
+from spinn_machine.progress_bar import ProgressBar
 
 
 class ConvertToFilePlacement(object):

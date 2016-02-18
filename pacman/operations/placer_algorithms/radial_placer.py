@@ -18,7 +18,7 @@ from pacman.model.placements.placement import Placement
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.ordered_set import OrderedSet
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPlaceException
 
 # general imports
