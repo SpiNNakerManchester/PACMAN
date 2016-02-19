@@ -55,7 +55,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         copy_of_xml_paths = list(xml_paths)
 
         self._set_up_pacman_algorthms_listings(
-            algorithms, optional_algorithms, xml_paths, inputs, 
+            algorithms, optional_algorithms, copy_of_xml_paths, inputs,
             required_outputs)
 
         self._inputs = inputs
