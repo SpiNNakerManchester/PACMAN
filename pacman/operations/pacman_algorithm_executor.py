@@ -29,7 +29,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         algorithm
     """
 
-    def __init__(self, algorithms, inputs, xml_paths,
+    def __init__(self, algorithms, optional_algorithms, inputs, xml_paths,
                  required_outputs, do_timings=True, print_timings=False):
         """
         :return:
@@ -47,23 +47,31 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
         # store timing request
         self._do_timing = do_timings
-
+        
         # print timings as you go
         self._print_timings = print_timings
+        
+        # protect the variable from reference movement during usage
+        copy_of_xml_paths = list(xml_paths)
 
-        self._set_up_pacman_algorithms_listings(
-            algorithms, xml_paths, inputs, required_outputs)
+        self._set_up_pacman_algorthms_listings(
+            algorithms, optional_algorithms, xml_paths, inputs, 
+            required_outputs)
 
         self._inputs = inputs
 
-    def _set_up_pacman_algorithms_listings(
-            self, algorithms, xml_paths, inputs, required_outputs):
+    def _set_up_pacman_algorthms_listings(
+            self, algorithms, optional_algorithms, xml_paths, inputs,
+            required_outputs):
         """ Translates the algorithm string and uses the config XML to create\
             algorithm objects
 
         :param algorithms: the string representation of the set of algorithms
         :param inputs: list of input types
         :type inputs: iterable of str
+        :param optional_algorithms: list of algorithms which are optional
+        and dont nessarcily need to be ran to compete the logic flow
+        :type optional_algorithms: list of strings
         :param xml_paths: the list of paths for XML configuration data
         :type xml_paths: iterable of strings
         :param required_outputs: the set of outputs that this workflow is\
@@ -105,21 +113,29 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 raise exceptions.PacmanConfigurationException(
                     "Cannot find algorithm {}".format(algorithms_name))
 
-        # sort_out_order_of_algorithms for execution
-        self._sort_out_order_of_algorithms(
-            inputs, required_outputs,
+        optional_algorithms_datas = list()
+        for optional_algorithm in optional_algorithms:
+            optional_algorithms_datas.append(
+                algorithm_data_objects[optional_algorithm])
+
+        optional_algorithms_datas.extend(
             converter_algorithm_data_objects.values())
 
+        # sort_out_order_of_algorithms for execution
+        self._sort_out_order_of_algorithms(
+            inputs, required_outputs, optional_algorithms_datas)
+
     def _sort_out_order_of_algorithms(
-            self, inputs, required_outputs, optional_converter_algorithms):
+            self, inputs, required_outputs, optional_algorithms):
         """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
         :param inputs: list of input types
         :type inputs: iterable of str
         :param required_outputs: the set of outputs that this workflow is\
                 meant to generate
-        :param optional_converter_algorithms: the set of optional converter\
-                algorithms which can be inserted automatically if required
+        :param optional_algorithms: the set of optional algorithms which
+        include the converters for the file formats which can be inserted
+        automatically if required
         :return: None
         """
 
@@ -158,7 +174,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     generated_outputs)
             else:
                 suitable_algorithm = self._locate_suitable_algorithm(
-                    optional_converter_algorithms, input_names,
+                    optional_algorithms, input_names,
                     generated_outputs, True, True)
 
                 # verify that the optional algorithms have been searched
@@ -168,27 +184,40 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 if suitable_algorithm is not None:
                     allocated_algorithms.append(suitable_algorithm)
                     self._remove_algorithm_and_update_outputs(
-                        optional_converter_algorithms, suitable_algorithm,
+                        optional_algorithms, suitable_algorithm,
                         input_names, generated_outputs)
                 else:
                     algorithms_left_names = list()
                     for algorithm in self._algorithms:
                         algorithms_left_names.append(algorithm.algorithm_id)
-                    for algorithm in optional_converter_algorithms:
+                    for algorithm in optional_algorithms:
                         algorithms_left_names.append(algorithm.algorithm_id)
                     algorithms_used = list()
                     for algorithm in allocated_algorithms:
                         algorithms_used.append(algorithm.algorithm_id)
+                    algorithm_input_requirement_breakdown = ""
+                    for algorithm in self._algorithms:
+                        if algorithm.algorithm_id in algorithms_left_names:
+                            algorithm_input_requirement_breakdown += \
+                                self._deduce_inputs_required_to_run(
+                                    algorithm, input_names)
+                    for algorithm in optional_algorithms:
+                        if algorithm.algorithm_id in algorithms_left_names:
+                            algorithm_input_requirement_breakdown += \
+                                self._deduce_inputs_required_to_run(
+                                    algorithm, input_names)
 
                     raise exceptions.PacmanConfigurationException(
                         "Unable to deduce a future algorithm to use.\n"
                         "    Inputs: {}\n"
                         "    Outputs: {}\n"
                         "    Functions available: {}\n"
-                        "    Functions used: {}\n".format(
+                        "    Functions used: {}\n"
+                        "    Inputs required per function: \n{}\n".format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
-                            algorithms_left_names, algorithms_used))
+                            algorithms_left_names, algorithms_used,
+                            algorithm_input_requirement_breakdown))
 
             all_required_outputs_generated = True
             failed_to_generate_output_string = ""
@@ -206,6 +235,20 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         self._prune_unnecessary_algorithms(allocated_algorithms)
 
         self._algorithms = allocated_algorithms
+
+    def _deduce_inputs_required_to_run(self, algorithm, input_names):
+        inputs = algorithm.inputs
+        left_over_inputs = "            {}: ".format(algorithm.algorithm_id)
+        first = True
+        for input in inputs:
+            if input['type'] not in input_names:
+                if first:
+                    left_over_inputs += "['{}'".format(input['type'])
+                    first = False
+                else:
+                    left_over_inputs += ", '{}'".format(input['type'])
+        left_over_inputs += "]\n"
+        return left_over_inputs
 
     @staticmethod
     def _prune_unnecessary_algorithms(allocated_algorithms):
@@ -517,6 +560,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :return: the returned item
         """
         return self._internal_type_mapping[item_type]
+
+    def get_items(self):
+        """
+        supports processing of all the outptus from a execution
+        :return: dictonary of types as keys and values.
+        """
+        return self._internal_type_mapping
 
     def get_provenance_data_items(self, transceiver, placement=None):
         """

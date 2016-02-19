@@ -207,6 +207,17 @@ class ResourceTracker(object):
             return chip.sdram.size
         return chip.sdram.size - self._sdram_tracker[key]
 
+    def sdram_avilable_on_chip(self, chip_x, chip_y):
+        """
+        returns the avilable sdram on the chip at coords chip_x, chip_y
+        :param chip_x: x coord of the chip in question
+        :param chip_y: y coord of the chip in question
+        :return: the sdram allowance remaining
+        """
+        key = (chip_x, chip_y)
+        chip = self._machine.get_chip_at(chip_x, chip_y)
+        return self._sdram_available(chip, key)
+
     def _best_core_available(self, chip, key, processor_id):
         """ Locate the best core available on a chip
 

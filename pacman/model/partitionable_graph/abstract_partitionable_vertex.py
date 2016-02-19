@@ -17,6 +17,8 @@ from abc import abstractmethod
 from six import add_metaclass
 import logging
 
+from spinn_front_end_common.interface.abstract_recordable_interface import \
+    AbstractRecordableInterface
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +63,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         self.add_constraint(max_atom_per_core_constraint)
 
     @abstractmethod
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         """ Get the SDRAM usage of a collection of atoms
 
         :param vertex_slice: the vertex vertex_slice which determines\
@@ -108,7 +110,9 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :raise None: does not raise any known exception
         """
 
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
+    @abstractmethod
+    def get_resources_used_by_atoms(
+            self, vertex_slice, graph):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
@@ -119,15 +123,6 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :rtype: ResourceContainer
         :raise None: this method does not raise any known exception
         """
-        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
-        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
-        sdram_requirement = self.get_sdram_usage_for_atoms(vertex_slice, graph)
-
-        # noinspection PyTypeChecker
-        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
-                                      dtcm=DTCMResource(dtcm_requirement),
-                                      sdram=SDRAMResource(sdram_requirement))
-        return resources
 
     def get_max_atoms_per_core(self):
         """ Get the maximum number of atoms that can be run on a single core \
