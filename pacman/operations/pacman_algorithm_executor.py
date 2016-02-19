@@ -376,8 +376,12 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         try:
             results = python_algorithm(**inputs)
         except Exception as type_error:
-            raise exceptions.PacmanAlgorithmFailedToCompleteException(
-                algorithm, type_error, traceback)
+            if isinstance(type_error,
+                          exceptions.PacmanAlgorithmFailedToCompleteException):
+                raise type_error
+            else:
+                raise exceptions.PacmanAlgorithmFailedToCompleteException(
+                    algorithm, type_error, traceback)
         # handle_prov_data
         if self._do_timing:
             self._handle_prov(timer, algorithm)
