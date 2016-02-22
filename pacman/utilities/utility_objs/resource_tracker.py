@@ -190,7 +190,11 @@ class ResourceTracker(object):
                 reverse_ip_tags=reverse_ip_tag_constraints)
             max_cores = 0
             for chip in chips:
-                cores = self._core_tracker[chip]
+                if chip not in self._core_tracker:
+                    cores = len(list(self._machine.get_chip_at(
+                        chip[0], chip[1]).processors))
+                else:
+                    cores = len(self._core_tracker[chip])
                 if cores > max_cores:
                     max_cores = cores
             return max_cores
@@ -198,8 +202,6 @@ class ResourceTracker(object):
             cores = self._core_tracker[(placement_constraint.x,
                                         placement_constraint.y)]
             return len(cores)
-
-
 
     def _is_sdram_available(self, chip, key, resources):
         """ Check if the SDRAM available on a given chip is enough for the\

@@ -73,7 +73,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Even non-continuous keys will be continuous
         for group in none_continuous_groups:
-            continuous_groups.append(group)
+            continuous_groups.add(group)
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(

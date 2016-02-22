@@ -51,10 +51,8 @@ class OneToOnePlacer(RadialPlacer):
             abstract_constraint_type=AbstractPlacerConstraint)
 
         placements = Placements()
-        ordered_subverts = utility_calls.sort_objects_by_constraint_authority(
-            partitioned_graph.subvertices)
 
-        self._do_allocation(ordered_subverts, placements, machine)
+        self._do_allocation(sorted_vertices, placements, machine)
 
         return {'placements': placements}
 
@@ -77,7 +75,7 @@ class OneToOnePlacer(RadialPlacer):
 
                 # merge constraints
                 placement_constraint, ip_tag_constraints, \
-                reverse_ip_tag_constraints = \
+                    reverse_ip_tag_constraints = \
                     self._merge_constraints(subvertex_list)
                 # locate most cores on a chip
                 max_size_on_a_chip = resource_tracker.\
@@ -131,11 +129,11 @@ class OneToOnePlacer(RadialPlacer):
                         merged_placement = place_constraint
                     else:
                         x_level = merged_placement.x == \
-                                  place_constraint.x
+                            place_constraint.x
                         y_level = merged_placement.y == \
-                                  place_constraint.y
+                            place_constraint.y
                         p_level = merged_placement.p != \
-                                  place_constraint.p
+                            place_constraint.p
                         if not x_level or not y_level or not p_level:
                             raise exceptions.PacmanConfigurationException(
                                 "cant handle these conflicting constraints")
@@ -160,6 +158,7 @@ class OneToOnePlacer(RadialPlacer):
         :return: list of sorted vertices
         """
         sorted_vertices = list()
+        found_list = list()
 
         # order subverts based on constraint priority
         ordered_subverts = utility_calls.sort_objects_by_constraint_authority(
@@ -170,7 +169,7 @@ class OneToOnePlacer(RadialPlacer):
                 partitioned_graph.incoming_subedges_from_subvertex(vertex)
 
             # do search if not already added and has incoming edges
-            if vertex not in sorted_vertices and len(incoming_edges) != 0:
+            if vertex not in found_list and len(incoming_edges) != 0:
                 chip_constraint = utility_calls.locate_constraints_of_type(
                     vertex.constraints, PlacerChipAndCoreConstraint)
 
@@ -179,23 +178,29 @@ class OneToOnePlacer(RadialPlacer):
                     one_to_one_incoming_edges = list()
                     one_to_one_incoming_edges.append(vertex)
                     sorted_vertices.append(one_to_one_incoming_edges)
+                    found_list.append(vertex)
                     self.check_incoming_verts(
-                        one_to_one_incoming_edges, vertex, partitioned_graph)
-                else: # if no constraint add incoming then first
+                        one_to_one_incoming_edges, vertex, partitioned_graph,
+                        found_list)
+                else:  # if no constraint add incoming then first
                     one_to_one_incoming_edges = list()
                     sorted_vertices.append(one_to_one_incoming_edges)
                     self.check_incoming_verts(
-                        one_to_one_incoming_edges, vertex, partitioned_graph)
+                        one_to_one_incoming_edges, vertex, partitioned_graph,
+                        found_list)
                     one_to_one_incoming_edges.append(vertex)
+                    found_list.append(vertex)
         return sorted_vertices
 
     @staticmethod
-    def check_incoming_verts(sorted_vertices, vertex, partitioned_graph):
+    def check_incoming_verts(one_to_one_verts, vertex, partitioned_graph,
+                             found_list):
         """
         adds subverts which have a one to one connection
-        :param sorted_vertices: the list of sorted vertices
+        :param one_to_one_verts: the list of sorted vertices
         :param vertex: the destination vertex
         :param partitioned_graph: the partitioned graph
+        :param found_list: the list of found verts so far
         :return:
         """
 
@@ -209,28 +214,32 @@ class OneToOnePlacer(RadialPlacer):
 
         for incoming_edge in incoming_edges:
             incoming_vert = incoming_edge.pre_subvertex
-            number_of_outgoing_edges = incoming_vert.\
+            number_of_outgoing_edges = partitioned_graph.\
                 outgoing_subedges_from_subvertex(incoming_vert)
 
             # if only one outgoing edge, decide to put it in same chip pile
-            if len(number_of_outgoing_edges) == 1:
+            if (len(number_of_outgoing_edges) == 1 and
+                    incoming_vert not in found_list):
 
                 # if the vertex has no constraint, put in
                 if len(chip_constraint) != 0:
-                    sorted_vertices.append(incoming_vert)
-                else: # if constraint exists, try to satisfy constraints.
+                    one_to_one_verts.append(incoming_vert)
+                    found_list.append(incoming_vert)
+                else:  # if constraint exists, try to satisfy constraints.
                     chip_constraint_incoming = \
                         utility_calls.locate_constraints_of_type(
                             incoming_vert.constraints,
                             PlacerChipAndCoreConstraint)
                     if len(chip_constraint_incoming) == 0:
-                        sorted_vertices.append(incoming_vert)
+                        one_to_one_verts.append(incoming_vert)
+                        found_list.append(incoming_vert)
                     else:
                         x_level = chip_constraint[0].x == \
-                                  chip_constraint_incoming[0].x
+                            chip_constraint_incoming[0].x
                         y_level = chip_constraint[0].y == \
-                                  chip_constraint_incoming[0].y
+                            chip_constraint_incoming[0].y
                         p_level = chip_constraint[0].p != \
-                                  chip_constraint_incoming[0].p
+                            chip_constraint_incoming[0].p
                         if x_level and y_level and p_level:
-                            sorted_vertices.append(incoming_vert)
+                            one_to_one_verts.append(incoming_vert)
+                            found_list.append(incoming_vert)
