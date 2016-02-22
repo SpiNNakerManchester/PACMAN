@@ -173,6 +173,34 @@ class ResourceTracker(object):
             return self._get_usable_ip_tag_chips()
         return self._chips_available
 
+    def max_available_cores_on_chips_that_satisfy(
+            self, placement_constraint, ip_tag_constraints,
+            reverse_ip_tag_constraints):
+        """
+        returns the max number of cores on a chip that satisfy these constraints
+        :param placement_constraint: placement constraint
+        :param ip_tag_constraints:  ip_tag constraint
+        :param reverse_ip_tag_constraints:  reverse ip_tag constraints
+        :return: the max number of cores
+        :rtype: int
+        """
+        if placement_constraint is None:
+            chips = self._get_usable_chips(
+                ip_tags=ip_tag_constraints, chips=None, board_address=None,
+                reverse_ip_tags=reverse_ip_tag_constraints)
+            max_cores = 0
+            for chip in chips:
+                cores = self._core_tracker[chip]
+                if cores > max_cores:
+                    max_cores = cores
+            return max_cores
+        else:
+            cores = self._core_tracker[(placement_constraint.x,
+                                        placement_constraint.y)]
+            return len(cores)
+
+
+
     def _is_sdram_available(self, chip, key, resources):
         """ Check if the SDRAM available on a given chip is enough for the\
             given resources.
@@ -641,6 +669,43 @@ class ResourceTracker(object):
 
         return self.allocate_resources(resources, chips, p, board_address,
                                        ip_tags, reverse_ip_tags)
+
+    def allocate_group(
+            self, group_resources, placement_constraint, ip_tag_constraint,
+            reverse_ip_tag_constraint):
+        """
+        allocates a group of cores for these resources
+        :param group_resources: the groups resources
+        :param placement_constraint: placement constraint
+        :param ip_tag_constraint: ipt_tag constraint
+        :param reverse_ip_tag_constraint: reverse_ip_tag_constraint
+        :return: list of The x and y coordinates of the used chip,
+                    the processor_id, and the ip tag and reverse ip tag
+                    allocation tuples
+        :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
+        """
+        elements = list()
+        if placement_constraint is not None:
+            x = placement_constraint.x
+            y = placement_constraint.y
+            p = placement_constraint.p
+        else:
+            x = None
+            y = None
+            p = None
+
+        tag_constraints = ip_tag_constraint + reverse_ip_tag_constraint
+        (board_address, ip_tags, reverse_ip_tags) = \
+            utility_calls.get_ip_tag_info(tag_constraints)
+        chips = None
+        if x is not None and y is not None:
+            chips = [(x, y)]
+
+        for resources in group_resources:
+            element = self.allocate_resources(
+                resources, chips, p, board_address, ip_tags, reverse_ip_tags)
+            elements.append(element)
+        return elements
 
     def allocate_resources(self, resources, chips=None,
                            processor_id=None, board_address=None,
