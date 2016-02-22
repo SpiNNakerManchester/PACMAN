@@ -190,6 +190,14 @@ class OneToOnePlacer(RadialPlacer):
                         found_list)
                     one_to_one_incoming_edges.append(vertex)
                     found_list.append(vertex)
+
+        # locate vertices which have no output or input, and add them for
+        # placement
+        for vertex in ordered_subverts:
+            if vertex not in found_list:
+                listed_vertex = list()
+                listed_vertex.append(vertex)
+                sorted_vertices.append(listed_vertex)
         return sorted_vertices
 
     @staticmethod
