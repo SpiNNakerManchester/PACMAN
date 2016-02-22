@@ -304,15 +304,22 @@ class PartitionAndPlacePartitioner(object):
 
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
-                vertex_slice = Slice(lo_atom, hi_atom)
-                used_resources = \
-                    vertex.get_resources_used_by_atoms(vertex_slice, graph)
-                ratio = self._find_max_ratio(used_resources, resources)
+                if hi_atom >= lo_atom:
+                    vertex_slice = Slice(lo_atom, hi_atom)
+                    used_resources = \
+                        vertex.get_resources_used_by_atoms(vertex_slice, graph)
+                    ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
-                    "Vertex {} could not be partitioned".format(vertex.label))
+                    "No more of vertex {} would fit on the board:\n"
+                    "    Allocated so far: {} atoms\n"
+                    "    Request for SDRAM: {}\n"
+                    "    Largest SDRAM space: {}".format(
+                        vertex, lo_atom - 1,
+                        used_resources.sdram.get_value(),
+                        resources.sdram.get_value()))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
