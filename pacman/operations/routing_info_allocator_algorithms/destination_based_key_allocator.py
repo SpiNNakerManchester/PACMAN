@@ -1,6 +1,8 @@
-from pacman.model.constraints.abstract_constraints.abstract_key_allocator_constraint import \
+from pacman.model.constraints.abstract_constraints\
+    .abstract_key_allocator_constraint import \
     AbstractKeyAllocatorConstraint
-from pacman.model.data_request_interfaces.abstract_requires_routing_info_partitioned_vertex import \
+from pacman.model.data_request_interfaces\
+    .abstract_requires_routing_info_partitioned_vertex import \
     RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
@@ -20,7 +22,7 @@ class DestinationBasedRoutingInfoAllocator(object):
         of the receiving partitioned vertex.
         Note that no constraints are supported, and that the number of keys\
         required by each edge must be 2048 or less, and that all edges coming\
-        out of a vertex going to the same desitnation need to reside
+        out of a vertex going to the same destination need to reside\
         in the same partition.
     """
 
@@ -76,10 +78,8 @@ class DestinationBasedRoutingInfoAllocator(object):
             n_keys = n_keys_map.n_keys_for_partitioned_edge(subedge)
             if n_keys > self.MAX_KEYS_SUPPORTED:
                 raise exceptions.PacmanConfigurationException(
-                    "This edge demands more keys htat what i currently supprot."
-                    "Its very possible I can be reconfigured to support more "
-                    "keys, but this quick implemntation does not.Please fix and"
-                    "try again.")
+                    "Only edges which require less than {} keys are supported"
+                    .format(self.MAX_KEYS_SUPPORTED))
 
             subedge_info = SubedgeRoutingInfo(keys_and_masks, subedge)
             routing_infos.add_subedge_info(subedge_info)
