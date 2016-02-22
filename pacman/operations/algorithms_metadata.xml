@@ -87,6 +87,26 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="OneToOnePlacer">
+        <python_module>pacman.operations.placer_algorithms.one_to_one_placer</python_module>
+        <python_class>OneToOnePlacer</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="ConnectiveBasedPlacer">
         <python_module>pacman.operations.placer_algorithms.connective_based_placer</python_module>
         <python_class>ConnectiveBasedPlacer</python_class>
