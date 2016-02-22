@@ -1,7 +1,3 @@
-"""
-MulticastRoutingPathEntry
-"""
-
 # pacman imports
 from pacman import exceptions
 

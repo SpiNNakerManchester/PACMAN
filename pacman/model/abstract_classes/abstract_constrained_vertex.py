@@ -4,13 +4,13 @@ from six import add_metaclass
 
 from pacman.model.abstract_classes.abstract_constrained_object import \
     AbstractConstrainedObject
-from pacman.model.abstract_classes.abstract_labelled_vertex import \
-    AbstractLabelledVertex
+from pacman.model.abstract_classes.abstract_labeled import \
+    AbstractLabeled
 
 
 @add_metaclass(ABCMeta)
 class AbstractConstrainedVertex(AbstractConstrainedObject,
-                                AbstractLabelledVertex):
+                                AbstractLabeled):
     """ Represents a AbstractConstrainedVertex of a partitionable_graph, \
         which contains a number of atoms, and\
         which can be partitioned into a number of subvertices, such that the\
@@ -31,7 +31,7 @@ class AbstractConstrainedVertex(AbstractConstrainedObject,
                     * If the number of atoms is less than 1
         """
         AbstractConstrainedObject.__init__(self, constraints)
-        AbstractLabelledVertex.__init__(self, label)
+        AbstractLabeled.__init__(self, label)
 
     @classmethod
     def __subclasshook__(cls, othercls):
