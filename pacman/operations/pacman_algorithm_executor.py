@@ -101,6 +101,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             self, inputs, required_outputs, optional_converter_algorithms):
         """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
+
         :param inputs: list of input types
         :type inputs: iterable of str
         :param required_outputs: the set of outputs that this workflow is\
@@ -391,7 +392,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 result_type = algorithm.get_type_from_output_name(result_name)
                 if result_type is None:
                     raise exceptions.PacmanTypeError(
-                        "Unrecognised result name {} for algorithm {} with"
+                        "Unrecognised result name {} for algorithm {} with "
                         "outputs {}".format(
                             result_name, algorithm.algorithm_id,
                             algorithm.outputs))
