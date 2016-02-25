@@ -55,7 +55,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         self.add_constraint(max_atom_per_core_constraint)
 
     @abstractmethod
-    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """ Get the SDRAM usage of a collection of atoms
 
         :param vertex_slice: the vertex vertex_slice which determines\

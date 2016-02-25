@@ -67,5 +67,5 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
         return 0
 
     # overloaded method from partitionable vertex
-    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         return 0

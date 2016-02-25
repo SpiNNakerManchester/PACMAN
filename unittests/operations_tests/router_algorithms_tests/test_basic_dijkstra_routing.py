@@ -40,7 +40,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     cpu_cycles = vertex.get_cpu_usage_for_atoms(lo_atom, hi_atom)
     dtcm_requirement = vertex.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
     sdram_requirement = \
-        vertex.get_static_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
+        vertex.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
     # noinspection PyTypeChecker
     resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                   dtcm=DTCMResource(dtcm_requirement),
