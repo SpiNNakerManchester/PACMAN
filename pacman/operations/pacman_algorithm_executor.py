@@ -54,13 +54,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # protect the variable from reference movement during usage
         copy_of_xml_paths = list(xml_paths)
 
-        self._set_up_pacman_algorthms_listings(
+        self._set_up_pacman_algorithms_listings(
             algorithms, optional_algorithms, copy_of_xml_paths, inputs,
             required_outputs)
 
         self._inputs = inputs
 
-    def _set_up_pacman_algorthms_listings(
+    def _set_up_pacman_algorithms_listings(
             self, algorithms, optional_algorithms, xml_paths, inputs,
             required_outputs):
         """ Translates the algorithm string and uses the config XML to create\

@@ -1,4 +1,4 @@
-from pacman.model.abstract_classes.abstract_partitioned_edge_n_keys_map \
+from pacman.model.abstract_classes.abstract_partitioned_partition_n_keys_map \
     import AbstractPartitionedPartitionNKeysMap
 
 
