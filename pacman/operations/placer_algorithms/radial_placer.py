@@ -92,7 +92,7 @@ class RadialPlacer(object):
                                start_chip_x=0, start_chip_y=0):
         first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
         done_chips = set([first_chip])
-        found_chips = OrderedSet()
+        found_chips = OrderedSet([(start_chip_x, start_chip_y)])
         search = deque([first_chip])
         while len(search) > 0:
             chip = search.pop()
