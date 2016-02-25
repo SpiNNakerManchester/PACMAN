@@ -213,9 +213,9 @@ class PartitionAndPlacePartitioner(object):
         :param resource_tracker: the tracker of resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
-        :param lo_atom: the lo atom of a slice to be considered
+        :param lo_atom: the low atom of a slice to be considered
         :type lo_atom: int
-        :param hi_atom: the hi atom of a slice to be considered
+        :param hi_atom: the high atom of a slice to be considered
         :type hi_atom: int
         :param graph: the partitionable graph used by the partitioner
         :type graph:
@@ -404,7 +404,7 @@ class PartitionAndPlacePartitioner(object):
             ratio = self._find_max_ratio(used_resources, resources)
 
         # If we have managed to fit everything exactly (unlikely but possible),
-        # return the matched resources and hi atom count
+        # return the matched resources and high atom count
         if ratio == 1.0:
             return used_resources, hi_atom
 

@@ -21,7 +21,7 @@ class ResourceTracker(object):
                     instead of the list from the machine.  Note that the order\
                     will be maintained, so this can be used either to reduce\
                     the set of chips used, or to re-order the chips.  Note\
-                    also that on de-allocation, the order is no longer\
+                    also that on deallocation, the order is no longer\
                     guaranteed.
         :type chips: iterable of (x, y) tuples of coordinates of chips
         """
@@ -208,11 +208,11 @@ class ResourceTracker(object):
         return chip.sdram.size - self._sdram_tracker[key]
 
     def sdram_avilable_on_chip(self, chip_x, chip_y):
-        """
-        returns the avilable sdram on the chip at coords chip_x, chip_y
+        """ Get the available SDRAM on the chip at coordinates chip_x, chip_y
+
         :param chip_x: x coord of the chip in question
         :param chip_y: y coord of the chip in question
-        :return: the sdram allowance remaining
+        :return: the SDRAM remaining
         """
         key = (chip_x, chip_y)
         chip = self._machine.get_chip_at(chip_x, chip_y)

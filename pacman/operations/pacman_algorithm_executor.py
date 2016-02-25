@@ -46,7 +46,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # store timing request
         self._do_timing = do_timings
 
-        # protect the variable from refernce movement during usage
+        # protect the variable from reference movement during usage
         copy_of_xml_paths = list(xml_paths)
 
         self._set_up_pacman_algorthms_listings(
@@ -64,8 +64,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param algorithms: the string representation of the set of algorithms
         :param inputs: list of input types
         :type inputs: iterable of str
-        :param optional_algorithms: list of algorithms which are optional
-        and dont nessarcily need to be ran to compete the logic flow
+        :param optional_algorithms: list of algorithms which are optional\
+                and don't necessarily need to be ran to compete the logic flow
         :type optional_algorithms: list of strings
         :param xml_paths: the list of paths for XML configuration data
         :type xml_paths: iterable of strings
@@ -121,9 +121,9 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :type inputs: iterable of str
         :param required_outputs: the set of outputs that this workflow is\
                 meant to generate
-        :param optional_algorithms: the set of optional algorithms which
-        include the converters for the file formats which can be inserted
-        automatically if required
+        :param optional_algorithms: the set of optional algorithms which\
+                include the converters for the file formats which can be\
+                inserted automatically if required
         :return: None
         """
 
@@ -131,7 +131,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         for input_item in inputs:
             input_names.add(input_item['type'])
 
-        allocated_algorithums = list()
+        allocated_algorithms = list()
         generated_outputs = set()
         generated_outputs.union(input_names)
         allocated_a_algorithm = True
@@ -145,7 +145,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             # add the suitable algorithms to the list and take there outputs
             #  as new inputs
             if suitable_algorithm is not None:
-                allocated_algorithums.append(suitable_algorithm)
+                allocated_algorithms.append(suitable_algorithm)
                 allocated_a_algorithm = True
                 self._remove_algorithm_and_update_outputs(
                     self._algorithms, suitable_algorithm, input_names,
@@ -155,29 +155,29 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     optional_algorithms, input_names,
                     generated_outputs, True)
                 if suitable_algorithm is not None:
-                    allocated_algorithums.append(suitable_algorithm)
+                    allocated_algorithms.append(suitable_algorithm)
                     allocated_a_algorithm = True
                     self._remove_algorithm_and_update_outputs(
                         optional_algorithms, suitable_algorithm,
                         input_names, generated_outputs)
                 else:
-                    algorithums_left_names = list()
+                    algorithms_left_names = list()
                     for algorithm in self._algorithms:
-                        algorithums_left_names.append(algorithm.algorithm_id)
+                        algorithms_left_names.append(algorithm.algorithm_id)
                     for algorithm in optional_algorithms:
-                        algorithums_left_names.append(algorithm.algorithm_id)
+                        algorithms_left_names.append(algorithm.algorithm_id)
                     algorithms_used = list()
-                    for algorithm in allocated_algorithums:
+                    for algorithm in allocated_algorithms:
                         algorithms_used.append(algorithm.algorithm_id)
-                    algorithum_input_requirement_breakdown = ""
+                    algorithm_input_requirement_breakdown = ""
                     for algorithm in self._algorithms:
-                        if algorithm.algorithm_id in algorithums_left_names:
-                            algorithum_input_requirement_breakdown += \
+                        if algorithm.algorithm_id in algorithms_left_names:
+                            algorithm_input_requirement_breakdown += \
                                 self._deduce_inputs_required_to_run(
                                     algorithm, input_names)
                     for algorithm in optional_algorithms:
-                        if algorithm.algorithm_id in algorithums_left_names:
-                            algorithum_input_requirement_breakdown += \
+                        if algorithm.algorithm_id in algorithms_left_names:
+                            algorithm_input_requirement_breakdown += \
                                 self._deduce_inputs_required_to_run(
                                     algorithm, input_names)
 
@@ -190,8 +190,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                         "    Inputs required per function: \n{}\n".format(
                             input_names,
                             list(set(required_outputs) - set(input_names)),
-                            algorithums_left_names, algorithms_used,
-                            algorithum_input_requirement_breakdown))
+                            algorithms_left_names, algorithms_used,
+                            algorithm_input_requirement_breakdown))
 
         all_required_outputs_generated = True
         failed_to_generate_output_string = ""
@@ -206,29 +206,29 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     failed_to_generate_output_string))
 
         # iterate through the list removing algorithms which are obsolete
-        self._prune_unnecessary_algorithms(allocated_algorithums)
+        self._prune_unnecessary_algorithms(allocated_algorithms)
 
-        self._algorithms = allocated_algorithums
+        self._algorithms = allocated_algorithms
 
     def _deduce_inputs_required_to_run(self, algorithm, input_names):
         inputs = algorithm.inputs
         left_over_inputs = "            {}: ".format(algorithm.algorithm_id)
         first = True
-        for input in inputs:
-            if input['type'] not in input_names:
+        for an_input in inputs:
+            if an_input['type'] not in input_names:
                 if first:
-                    left_over_inputs += "['{}'".format(input['type'])
+                    left_over_inputs += "['{}'".format(an_input['type'])
                     first = False
                 else:
-                    left_over_inputs += ", '{}'".format(input['type'])
+                    left_over_inputs += ", '{}'".format(an_input['type'])
         left_over_inputs += "]\n"
         return left_over_inputs
 
     @staticmethod
-    def _prune_unnecessary_algorithms(allocated_algorithums):
+    def _prune_unnecessary_algorithms(allocated_algorithms):
         """
 
-        :param allocated_algorithums:
+        :param allocated_algorithms:
         :return:
         """
         # TODO optimisations!
@@ -361,7 +361,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             .format(inputs))
 
         # create progress bar for external algorithm
-        algorithum_progress_bar = ProgressBar(
+        algorithm_progress_bar = ProgressBar(
             1, "Running external algorithm {}".format(algorithm.algorithm_id))
 
         timer = None
@@ -374,7 +374,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
             inputs, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             stdin=subprocess.PIPE)
         child.wait()
-        algorithum_progress_bar.end()
+        algorithm_progress_bar.end()
 
         if self._do_timing:
             self._handle_prov(timer, algorithm)
@@ -493,8 +493,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
 
     def get_items(self):
         """
-        supports processing of all the outptus from a execution
-        :return: dictonary of types as keys and values.
+        supports processing of all the outputs from a execution
+        :return: dictionary of types as keys and values.
         """
         return self._internal_type_mapping
 

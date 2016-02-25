@@ -58,14 +58,14 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
         :return:
         """
 
-    # overlaoded method from partitionable vertex
+    # overloaded method from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
-    # overlaoded method from partitionable vertex
+    # overloaded method from partitionable vertex
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
-    # overlaoded method from partitionable vertex
+    # overloaded method from partitionable vertex
     def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         return 0

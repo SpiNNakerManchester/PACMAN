@@ -119,8 +119,8 @@ class Placements(object):
     def is_subvertex_on_processor(self, x, y, p):
         """Returns whether a subvertex is assigned to a processor.
 
-        :param int x: x co-ordinate of processor.
-        :param int y: y co-ordinate of processor.
+        :param int x: x coordinate of processor.
+        :param int y: y coordinate of processor.
         :param int p: Index of processor.
         :return bool: Whether the processor has an assigned subvertex.
         """
@@ -145,11 +145,11 @@ class Placements(object):
         :return: a list of placement objects that reside on the chip, or a
         empty list if none exist
         """
-        placmeent_key = (x, y)
-        if placmeent_key not in self._placements_by_chip:
+        placement_key = (x, y)
+        if placement_key not in self._placements_by_chip:
             return []
         else:
-            return self._placements_by_chip[placmeent_key]
+            return self._placements_by_chip[placement_key]
 
     def __repr__(self):
         """ string representation
