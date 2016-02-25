@@ -1,8 +1,8 @@
 from pacman.model.abstract_classes.abstract_partitioned_edge_n_keys_map \
-    import AbstractPartitionedEdgeNKeysMap
+    import AbstractPartitionedPartitionNKeysMap
 
 
-class DictBasedPartitionedEdgeNKeysMap(AbstractPartitionedEdgeNKeysMap):
+class DictBasedPartitionedPartitionNKeysMap(AbstractPartitionedPartitionNKeysMap):
     """ A python dict-based implementation of the\
         AbstractPartitionedEdgeNKeysMap
     """
