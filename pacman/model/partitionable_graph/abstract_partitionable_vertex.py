@@ -110,7 +110,6 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :raise None: does not raise any known exception
         """
 
-    @abstractmethod
     def get_resources_used_by_atoms(
             self, vertex_slice, graph):
         """ Get the separate resource requirements for a range of atoms
