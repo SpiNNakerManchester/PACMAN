@@ -202,6 +202,17 @@ class PartitionedGraph(object):
         else:
             return None
 
+    def partition_from_vertex(self, sub_vertex, partition_id):
+        """
+
+        :param sub_vertex:
+        :param partition_id:
+        :return:
+        """
+        if partition_id is None:
+            return None
+        return self._outgoing_subedges[sub_vertex][partition_id]
+
     @property
     def partitions(self):
         """
