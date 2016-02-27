@@ -1,10 +1,15 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.abstract_classes.abstract_constrained_vertex \
     import AbstractConstrainedVertex
 from pacman.model.constraints.partitioner_constraints\
     .partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.model.resources.resource_container import ResourceContainer
 
 
 from abc import ABCMeta
@@ -102,9 +107,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :raise None: does not raise any known exception
         """
 
-    @abstractmethod
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph):
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
@@ -115,6 +118,15 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :rtype: ResourceContainer
         :raise None: this method does not raise any known exception
         """
+        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
+        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
+        sdram_requirement = self.get_sdram_usage_for_atoms(vertex_slice, graph)
+
+        # noinspection PyTypeChecker
+        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                      dtcm=DTCMResource(dtcm_requirement),
+                                      sdram=SDRAMResource(sdram_requirement))
+        return resources
 
     def get_max_atoms_per_core(self):
         """ Get the maximum number of atoms that can be run on a single core \
