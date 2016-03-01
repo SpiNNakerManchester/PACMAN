@@ -540,6 +540,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 raise exceptions.PacmanConfigurationException(
                     "Failed to create instance of algorithm {}: {}"
                     .format(algorithm.algorithm_id, type_error.message))
+            except AttributeError as attribute_error:
+                raise exceptions.PacmanConfigurationException(
+                    "Failed to create instance of algorithm {}: {}"
+                    .format(algorithm.algorithm_id, attribute_error.message))
 
         elif (algorithm.python_function is not None and
                 algorithm.python_class is None):
