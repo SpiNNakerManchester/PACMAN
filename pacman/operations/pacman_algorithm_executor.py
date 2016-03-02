@@ -148,7 +148,9 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         generated_outputs.union(input_types)
         allocated_a_algorithm = True
         algorithms_to_find = list(algorithm_data)
-        outputs_to_find = set(required_outputs)
+        outputs_to_find = \
+            self._remove_outputs_which_are_inputs(required_outputs, inputs)
+
         while ((len(algorithms_to_find) > 0 or len(outputs_to_find) > 0) and
                 allocated_a_algorithm):
             allocated_a_algorithm = False
@@ -204,13 +206,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                         "    Functions used: {}\n"
                         "    Inputs required per function: \n{}\n".format(
                             input_types,
-                            list(set(required_outputs) - set(input_types)),
+                            list(set(outputs_to_find) - set(input_types)),
                             algorithms_left_names, algorithms_used,
                             algorithm_input_requirement_breakdown))
 
         all_required_outputs_generated = True
         failed_to_generate_output_string = ""
-        for output in required_outputs:
+        for output in outputs_to_find:
             if output not in generated_outputs:
                 all_required_outputs_generated = False
                 failed_to_generate_output_string += ":{}".format(output)
@@ -224,6 +226,21 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         self._prune_unnecessary_algorithms(allocated_algorithms)
 
         self._algorithms = allocated_algorithms
+
+    def _remove_outputs_which_are_inputs(self, required_outputs, inputs):
+        """
+        generates the output list which has pruned outputs which are already
+        in the input list
+        :param required_outputs: the original output listings
+        :param inputs: the inputs given to the executor
+        :return: new list of outputs
+        :rtype:  iterbale of str
+        """
+        copy_required_outputs = set(required_outputs)
+        for input_type in inputs:
+            if input_type in copy_required_outputs:
+                copy_required_outputs.remove(input_type)
+        return copy_required_outputs
 
     def _deduce_inputs_required_to_run(self, algorithm, input_names):
         inputs = algorithm.inputs
