@@ -234,7 +234,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param required_outputs: the original output listings
         :param inputs: the inputs given to the executor
         :return: new list of outputs
-        :rtype:  iterbale of str
+        :rtype:  iterable of str
         """
         copy_required_outputs = set(required_outputs)
         for input_type in inputs:
