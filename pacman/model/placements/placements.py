@@ -112,8 +112,8 @@ class Placements(object):
     def is_subvertex_on_processor(self, x, y, p):
         """Returns whether a subvertex is assigned to a processor.
 
-        :param int x: x co-ordinate of processor.
-        :param int y: y co-ordinate of processor.
+        :param int x: x coordinate of processor.
+        :param int y: y coordinate of processor.
         :param int p: Index of processor.
         :return bool: Whether the processor has an assigned subvertex.
         """

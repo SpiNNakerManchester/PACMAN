@@ -78,8 +78,8 @@ class PartitionAndPlacePartitioner(object):
 
             # if not, partition
             if subverts_from_vertex is None:
-                self._partition_vertex(vertex, subgraph, graph_mapper,
-                                       resource_tracker, graph)
+                self._partition_vertex(
+                    vertex, subgraph, graph_mapper, resource_tracker, graph)
             progress_bar.update(vertex.n_atoms)
         progress_bar.end()
 
@@ -91,8 +91,9 @@ class PartitionAndPlacePartitioner(object):
         results['graph_mapper'] = graph_mapper
         return results
 
-    def _partition_vertex(self, vertex, subgraph, graph_to_subgraph_mapper,
-                          resource_tracker, graph):
+    def _partition_vertex(
+            self, vertex, subgraph, graph_to_subgraph_mapper, resource_tracker,
+            graph):
         """ Partition a single vertex
 
         :param vertex: the vertex to partition
@@ -136,13 +137,13 @@ class PartitionAndPlacePartitioner(object):
         max_atoms_per_core = min(possible_max_atoms)
 
         # partition by atoms
-        self._partition_by_atoms(partiton_together_vertices, vertex.n_atoms,
-                                 max_atoms_per_core, subgraph, graph,
-                                 graph_to_subgraph_mapper, resource_tracker)
+        self._partition_by_atoms(
+            partiton_together_vertices, vertex.n_atoms, max_atoms_per_core,
+            subgraph, graph, graph_to_subgraph_mapper, resource_tracker)
 
-    def _partition_by_atoms(self, vertices, n_atoms, max_atoms_per_core,
-                            subgraph, graph, graph_to_subgraph_mapper,
-                            resource_tracker):
+    def _partition_by_atoms(
+            self, vertices, n_atoms, max_atoms_per_core, subgraph, graph,
+            graph_to_subgraph_mapper, resource_tracker):
         """ Try to partition subvertices on how many atoms it can fit on\
             each subvert
 
@@ -168,6 +169,7 @@ class PartitionAndPlacePartitioner(object):
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
+        :type no_machine_time_steps: int
         """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
@@ -200,8 +202,8 @@ class PartitionAndPlacePartitioner(object):
                     subvertex, vertex_slice, vertex)
 
     @staticmethod
-    def _reallocate_resources(used_placements, resource_tracker,
-                              lo_atom, hi_atom, graph):
+    def _reallocate_resources(
+            used_placements, resource_tracker, lo_atom, hi_atom, graph):
         """ readjusts resource allocation and updates the placement list to\
             take into account the new layout of the atoms
 
@@ -211,9 +213,9 @@ class PartitionAndPlacePartitioner(object):
         :param resource_tracker: the tracker of resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
-        :param lo_atom: the lo atom of a slice to be considered
+        :param lo_atom: the low atom of a slice to be considered
         :type lo_atom: int
-        :param hi_atom: the hi atom of a slice to be considered
+        :param hi_atom: the high atom of a slice to be considered
         :type hi_atom: int
         :param graph: the partitionable graph used by the partitioner
         :type graph:
@@ -245,8 +247,9 @@ class PartitionAndPlacePartitioner(object):
         return new_used_placements
 
     # noinspection PyUnusedLocal
-    def _scale_down_resources(self, lo_atom, hi_atom, vertices,
-                              resource_tracker, max_atoms_per_core, graph):
+    def _scale_down_resources(
+            self, lo_atom, hi_atom, vertices, resource_tracker,
+            max_atoms_per_core, graph):
         """ Reduce the number of atoms on a core so that it fits within the
             resources available.
 
@@ -286,8 +289,8 @@ class PartitionAndPlacePartitioner(object):
 
             # get resources used by vertex
             vertex_slice = Slice(lo_atom, hi_atom)
-            used_resources = vertex.get_resources_used_by_atoms(vertex_slice,
-                                                                graph)
+            used_resources = vertex.get_resources_used_by_atoms(
+                vertex_slice, graph)
 
             # Work out the ratio of used to available resources
             ratio = self._find_max_ratio(used_resources, resources)
@@ -306,8 +309,8 @@ class PartitionAndPlacePartitioner(object):
                 hi_atom = lo_atom + new_n_atoms - 1
                 if hi_atom >= lo_atom:
                     vertex_slice = Slice(lo_atom, hi_atom)
-                    used_resources = \
-                        vertex.get_resources_used_by_atoms(vertex_slice, graph)
+                    used_resources = vertex.get_resources_used_by_atoms(
+                        vertex_slice, graph)
                     ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
@@ -408,7 +411,7 @@ class PartitionAndPlacePartitioner(object):
             ratio = self._find_max_ratio(used_resources, resources)
 
         # If we have managed to fit everything exactly (unlikely but possible),
-        # return the matched resources and hi atom count
+        # return the matched resources and high atom count
         if ratio == 1.0:
             return used_resources, hi_atom
 
