@@ -18,17 +18,9 @@ class FixedRoutePartitionedEdge(AbstractPartitionedEdge):
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
         :param label: The name of the edge
         :type label: str
-        :param constraints: constraints for the partituioned edge
-        :type constraints: iterable of
-        pacman.model.constraints.abstract_constraints.abstract_Constraint.AbstractConstraint
-        :raise None: Raises no known exceptions
         """
         AbstractPartitionedEdge.__init__(self, pre_subvertex, post_subvertex,
                                          label)
 
     def is_partitioned_edge(self):
-        """ helper method for is instance
-
-        :return:
-        """
         return True

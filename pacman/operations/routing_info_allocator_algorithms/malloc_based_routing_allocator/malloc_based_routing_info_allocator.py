@@ -1,6 +1,3 @@
-"""
-MallocBasedRoutingInfoAllocator
-"""
 
 # pacman imports
 from pacman.model.constraints.abstract_constraints\
@@ -65,21 +62,15 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         routing_tables = MulticastRoutingTables()
         routing_infos = RoutingInfo()
-        
+
         # Get the partitioned edges grouped by those that require the same key
         (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-         flexi_field_groups, continious_groups, none_continious_groups) = \
+         flexi_field_groups, continuous_groups, none_continuous_groups) = \
             routing_info_allocator_utilities.get_edge_groups(subgraph)
 
-        # warn users that none continious keys are going to work in
-        # continious mode
-        for group in none_continious_groups:
-            logger.warning(
-                "The subvertex {} has a set of edges {} "
-                "which has not been requested to have continous keys. The "
-                "algorithm will anyway allocate keys in a continious"
-                " manner.".format(group.edges[0].pre_subvertex, group))
-            continious_groups.append(group)
+        # Even non-continuous keys will be continuous
+        for group in none_continuous_groups:
+            continuous_groups.append(group)
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(
@@ -97,7 +88,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             fixed_mask = None
             fixed_key_and_mask_constraint = \
                 utility_calls.locate_constraints_of_type(
-                    group.constraints, KeyAllocatorFixedKeyAndMaskConstraint)[0]
+                    group.constraints,
+                    KeyAllocatorFixedKeyAndMaskConstraint)[0]
 
             # attempt to allocate them
             self._allocate_fixed_keys_and_masks(
@@ -108,7 +100,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
                 routing_paths, group, routing_tables)
 
-            continious_groups.remove(group)
+            continuous_groups.remove(group)
 
             progress_bar.update()
 
@@ -139,7 +131,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 keys_and_masks, routing_infos, routing_paths, group,
                 routing_tables)
 
-            continious_groups.remove(group)
+            continuous_groups.remove(group)
 
             progress_bar.update()
 
@@ -157,15 +149,15 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 keys_and_masks, routing_infos, routing_paths, group,
                 routing_tables)
 
-            continious_groups.remove(group)
+            continuous_groups.remove(group)
 
             progress_bar.update()
 
         for group in flexi_field_groups:
             raise exceptions.PacmanConfigurationException(
-                "I cant handle these. please fix and try again")
+                "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
-        for group in continious_groups:
+        for group in continuous_groups:
             keys_and_masks = self._allocate_keys_and_masks(
                 None, None,
                 n_keys_map.n_keys_for_partitioned_edge(group.edges[0]))
@@ -174,7 +166,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._update_routing_objects(
                 keys_and_masks, routing_infos, routing_paths, group,
                 routing_tables)
-
 
         progress_bar.end()
         return {'routing_infos': routing_infos,
@@ -338,78 +329,3 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         raise exceptions.PacmanRouteInfoAllocationException(
             "Could not find space to allocate keys")
-
-    def _allocate_flexi_fields(self, fields, n_keys):
-        """
-
-        :param fields:
-        :param n_keys:
-        :return:
-        """
-        # If there isn't a fixed mask, generate a fixed mask based
-        # on the number of keys required
-        masks_available = self._get_possible_masks(n_keys)
-
-        # For each usable mask, try all of the possible keys and
-        # see if a match is possible
-        mask_found = None
-        key_found = None
-        mask = None
-        for mask in masks_available:
-
-            logger.debug(
-                "Trying mask {} for {} keys".format(hex(mask), n_keys))
-
-            key_found = None
-            key_generator = KeyFlexiFieldGenerator(mask, fields,
-                                                   self._free_space_tracker)
-            for key in key_generator:
-
-                logger.debug("Trying key {}".format(hex(key)))
-
-                # Check if all the key ranges can be allocated
-                matched_all = True
-                index = 0
-                for (base_key, n_keys) in self._get_key_ranges(key, mask):
-                    logger.debug("Finding slot for {}, n_keys={}".format(
-                        hex(base_key), n_keys))
-                    index = self._find_slot(base_key, lo=index)
-                    logger.debug("Slot for {} is {}".format(
-                        hex(base_key), index))
-                    if index is None:
-                        matched_all = False
-                        break
-                    space = self._check_allocation(index, base_key,
-                                                   n_keys)
-                    logger.debug("Space for {} is {}".format(
-                        hex(base_key), space))
-                    if space is None:
-                        matched_all = False
-                        break
-
-                if matched_all:
-                    logger.debug("Matched key {}".format(hex(key)))
-                    key_found = key
-                    break
-
-            # If we found a matching key, store the mask that worked
-            if key_found is not None:
-                logger.debug("Matched mask {}".format(hex(mask)))
-                mask_found = mask
-                break
-
-        # If we found a working key and mask that can be assigned,
-        # Allocate them
-        if key_found is not None and mask_found is not None:
-            for (base_key, n_keys) in self._get_key_ranges(
-                    key_found, mask):
-                self._allocate_elements(base_key, n_keys)
-
-            # If we get here, we can assign the keys to the edges
-            keys_and_masks = list([BaseKeyAndMask(base_key=key_found,
-                                                  mask=mask)])
-            return keys_and_masks
-
-        raise exceptions.PacmanRouteInfoAllocationException(
-            "Could not find space to allocate keys")
-

@@ -173,8 +173,8 @@ class PartitionedGraph(object):
          :type sub_vertex: \
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: iterable of\
-                     :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
-                     or a empty list if none are avilable
+                    :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
+                    or a empty list if none are available
         :raise None: does not raise any known exceptions
         """
         if sub_vertex in self._outgoing_subedges:
@@ -184,10 +184,9 @@ class PartitionedGraph(object):
 
     @property
     def partitions(self):
-        """
-        property method for all the partitions in the graph
+        """ Get all the partitions in the graph
         :return: iterable of\
-                     :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
         """
         partitions = list()
         for sub_vertex in self._subvertices:

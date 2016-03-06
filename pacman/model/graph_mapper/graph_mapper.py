@@ -7,8 +7,7 @@ from pacman.exceptions import (PacmanValueError,
 
 
 class GraphMapper(object):
-    """
-    a mapping object between graphs.
+    """ A mapping object between partitioned and partitionable graphs
     """
 
     def __init__(self, first_graph_label="", second_graph_label=""):
@@ -201,8 +200,8 @@ class GraphMapper(object):
         :param subvertex: the partitioned vertex to get the slice of
         :type subvertex:\
                     :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
-        :return: a slice object containing the lo and hi atom or None if the\
-                   partitioned vertex does not exist
+        :return: a slice object containing the low and high atom or None if\
+                   the partitioned vertex does not exist
         :rtype: :py:class:`pacman.model.graph_mapper.slice.Slice` or None
         """
         if subvertex in self._subvertex_to_slice:

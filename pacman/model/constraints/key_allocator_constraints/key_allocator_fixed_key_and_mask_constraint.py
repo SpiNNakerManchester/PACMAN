@@ -93,5 +93,6 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         return not self.__eq__(other)
 
     def __hash__(self):
-        frozen_elements = frozenset(self._keys_and_masks)
-        return (frozen_elements, self._key_list_function).__hash__()
+        return (
+            frozenset(self._keys_and_masks),
+            self._key_list_function).__hash__()

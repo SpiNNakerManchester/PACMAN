@@ -31,16 +31,11 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
             self, pre_vertex, post_vertex, label)
 
     def is_partitionable_edge(self):
-        """ helper method for is instance
-
-        :return:
-        """
         return True
 
     def create_subedge(self, pre_subvertex, post_subvertex, label=None):
-        """
-        method for creating a partitioned multicast edge
-        :param pre_subvertex: the soruce partitioned vertex
+        """ Create a partitioned multicast edge
+        :param pre_subvertex: the source partitioned vertex
         :param post_subvertex: the destination partitioned vertex
         :param label: the label of this partitioned edge
         :return:

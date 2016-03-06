@@ -171,7 +171,7 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
         f_place_by_vertex.write(
             "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
-        f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
+        f_place_by_vertex.write("Pop size: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
 
         partitioned_vertices = \
@@ -240,7 +240,7 @@ def placement_report_with_partitionable_graph_by_vertex(
         f_place_by_vertex.write(
             "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
-        f_place_by_vertex.write("Pop sz: {}\n".format(num_atoms))
+        f_place_by_vertex.write("Pop size: {}\n".format(num_atoms))
         f_place_by_vertex.write("Sub-vertices: \n")
 
         partitioned_vertices = \
@@ -396,7 +396,7 @@ def placement_report_with_partitionable_graph_by_core(
                 hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
                 num_atoms = hi_atom - lo_atom + 1
                 p_str = ("  Processor {}: Vertex: '{}',"
-                         " pop sz: {}\n".format(
+                         " pop size: {}\n".format(
                              pro_id, vertex_label, vertex_atoms))
                 f_place_by_core.write(p_str)
                 p_str = ("              Slice on this core: {}:{} ({} atoms)\n"
@@ -504,7 +504,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
     placements = sorted(placements.placements, key=lambda x: x.subvertex.label)
 
     progress_bar = ProgressBar(len(placements) + len(list(machine.chips)),
-                               "Generating sdram usage report")
+                               "Generating SDRAM usage report")
     for cur_placement in placements:
         subvert = cur_placement.subvertex
         requirements = subvert.resources_required
@@ -588,7 +588,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
 
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
-            _generate_routing_table(routing_table,  top_level_folder)
+            _generate_routing_table(routing_table, top_level_folder)
         progress_bar.update()
     progress_bar.end()
 
@@ -610,12 +610,12 @@ def router_report_from_compressed_router_tables(report_folder, routing_tables):
 
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
-            _generate_routing_table(routing_table,  top_level_folder)
+            _generate_routing_table(routing_table, top_level_folder)
         progress_bar.update()
     progress_bar.end()
 
 
-def _generate_routing_table(routing_table,  top_level_folder):
+def _generate_routing_table(routing_table, top_level_folder):
     file_sub_name = "routing_table_{}_{}.rpt".format(
         routing_table.x, routing_table.y)
     file_name = os.path.join(top_level_folder, file_sub_name)
@@ -644,13 +644,11 @@ def _generate_routing_table(routing_table,  top_level_folder):
         hex_mask = _uint_32_to_hex_string(mask)
         route_txt = _expand_route_value(entry.processor_ids,
                                         entry.link_ids)
-        core_id = "({}, {}, {})"\
-            .format((key >> 24 & 0xFF), (key >> 16 & 0xFF),
-                    (key >> 11 & 0xF))
-        entry_str = ("    {}     {}       {}      {}         {}   "
-                     "   {}\n".format(
-                                index, hex_key, hex_mask,
-                                hex_route, core_id, route_txt))
+        core_id = "({}, {}, {})".format(
+            (key >> 24 & 0xFF), (key >> 16 & 0xFF), (key >> 11 & 0xF))
+        entry_str = (
+            "    {}     {}       {}      {}         {}      {}\n".format(
+                index, hex_key, hex_mask, hex_route, core_id, route_txt))
         entry_count += 1
         output.write(entry_str)
     output.flush()
@@ -659,9 +657,8 @@ def _generate_routing_table(routing_table,  top_level_folder):
 
 def generate_comparison_router_report(
         report_folder, routing_tables, compressed_routing_tables):
-    """
-    makes a report on comparision of the compressed and uncompressed
-    routing tables
+    """ Make a comparison of the compressed and uncompressed routing tables
+
     :param report_folder:
     :param routing_tables:
     :param compressed_routing_tables:
@@ -688,8 +685,9 @@ def generate_comparison_router_report(
 
         n_entries_un_compressed = uncompressed_table.number_of_entries
         n_entries_compressed = compressed_table.number_of_entries
-        percentage = ((float(n_entries_un_compressed - n_entries_compressed))
-                      / float(n_entries_un_compressed)) * 100
+        percentage = (
+            (float(n_entries_un_compressed - n_entries_compressed)) /
+            float(n_entries_un_compressed)) * 100
 
         output.write(
             "Uncompressed table at {}:{} has {} entries whereas compressed "
