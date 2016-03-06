@@ -3,12 +3,12 @@ from pacman.model.constraints.abstract_constraints.\
     import AbstractKeyAllocatorConstraint
 
 
-class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
-    """ A key allocator that fixes the mask to be assigned to a partitioned\
-        edge
+class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
+    """ A key allocator that fixes the masks to be assigned to a partitioned\
+        edge using fields
     """
 
-    def __init__(self, mask):
+    def __init__(self, fields=None):
         """
 
         :param mask: the mask to be used during key allocation
@@ -24,40 +24,38 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
         AbstractKeyAllocatorConstraint.__init__(
             self, "key allocator constraint where subedges coming from the "
                   "vertex requires a specific mask")
-        self._mask = mask
+
+        self._fields = sorted(fields, key=lambda field: field.mask,
+                              reverse=True)
 
     def is_key_allocator_constraint(self):
-        """
-        helper method for isinstance
-        :return:
-        """
         return True
 
     @property
-    def mask(self):
-        """ The mask to be used
+    def fields(self):
+        """ Any fields in the mask - i.e. ranges of the mask that have\
+            further limitations
 
-        :return: The mask to be used
-        :rtype: int
+        :return: Iterable of fields, ordered by mask with the highest bit\
+                    range first
+        :rtype: iterable of :py:class:`pacman.utilities.field.Field`
         """
-        return self._mask
+        return self._fields
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorFixedMaskConstraint):
+        if not isinstance(other, KeyAllocatorFixedFieldConstraint):
             return False
         else:
-            if self._mask == other.mask:
-                return True
-            else:
+            if len(self._fields) != len(other.fields):
                 return False
+            else:
+                for field in self._fields:
+                    if field not in other.fields:
+                        return False
+                return True
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing constrains
-        :param other: instance of KeyAllocatorFixedMaskConstraint
-        :return:
-        """
         return not self.__eq__(other)
 
     def __hash__(self):
-        return hash(self._mask)
+        return hash(frozenset(self._fields))

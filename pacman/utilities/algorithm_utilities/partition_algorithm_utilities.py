@@ -37,9 +37,10 @@ def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
         vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(src_sv)
         outgoing_partitions = \
             graph.outgoing_edges_partitions_from_vertex(vertex)
-        for outgoing_partition_identifier in outgoing_partitions:
-            out_edges = \
-                outgoing_partitions[outgoing_partition_identifier].edges
+        for outgoing_partition_identifer in outgoing_partitions:
+            partition = outgoing_partitions[outgoing_partition_identifer]
+            out_edges = partition.edges
+            partition_constraints = partition.constraints
             for edge in out_edges:
 
                 # and create and store a new subedge for each post-subvertex
@@ -49,7 +50,8 @@ def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
                 for dst_sv in post_subverts:
                     subedge = edge.create_subedge(src_sv, dst_sv)
                     subgraph.add_subedge(subedge,
-                                         outgoing_partition_identifier)
+                                         outgoing_partition_identifer,
+                                         partition_constraints)
                     graph_to_subgraph_mapper.add_partitioned_edge(
                         subedge, edge)
         progress_bar.update()

@@ -77,6 +77,8 @@ class ConvertAlgorithmsMetadata(object):
         # get other params
         required_inputs = \
             self._translate_parameters(element.find("required_inputs"))
+        required_optional_inputs = \
+            self._translate_parameters(element.find("required_optional_inputs"))
         optional_inputs = \
             self._translate_parameters(element.find("optional_inputs"))
         outputs = \
@@ -84,7 +86,8 @@ class ConvertAlgorithmsMetadata(object):
         return AlgorithmData(
             algorithm_id=element.get('name'),
             command_line_args=command_line_args, inputs=required_inputs,
-            optional_inputs=optional_inputs, outputs=outputs,
+            optional_inputs=optional_inputs,
+            required_optional_inputs=required_optional_inputs, outputs=outputs,
             external=external, python_import=python_module,
             python_class=python_class, python_function=python_function)
 
@@ -117,7 +120,16 @@ class ConvertAlgorithmsMetadata(object):
         if parameters_element is not None:
             parameters = parameters_element.findall("parameter")
             for parameter in parameters:
-                translated_params.append(
-                    {'name': parameter.find("param_name").text,
-                     'type': parameter.find("param_type").text})
+                rank = parameter.find("param_rank")
+                if rank is None:
+                    translated_params.append(
+                        {'name': parameter.find("param_name").text,
+                         'type': parameter.find("param_type").text,
+                         'rank': 1})
+                else:
+                    translated_params.append(
+                        {'name': parameter.find("param_name").text,
+                         'type': parameter.find("param_type").text,
+                         'rank': int(rank.text)})
+
         return translated_params

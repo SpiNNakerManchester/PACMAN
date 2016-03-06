@@ -89,6 +89,48 @@
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
+        </required_inputs>
+    </algorithm>
+    <algorithm name="unCompressedRoutingTableReports">
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
+        <python_function>router_report_from_router_tables</python_function>
+        <required_inputs>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+        </required_inputs>
+    </algorithm>
+    <algorithm name="compressedRoutingTableReports">
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
+        <python_function>router_report_from_compressed_router_tables</python_function>
+        <required_inputs>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+            </parameter>
+        </required_inputs>
+    </algorithm>
+    <algorithm name="comparisonOfRoutingTablesReport">
+        <python_module>pacman.operations.algorithm_reports.reports</python_module>
+        <python_function>generate_comparison_router_report</python_function>
+        <required_inputs>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>compressed_routing_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+            </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>

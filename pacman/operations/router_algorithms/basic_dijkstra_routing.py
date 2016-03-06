@@ -8,7 +8,6 @@ from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
     import MultiCastPartitionedEdge
 
-# genral imports
 import logging
 
 
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 class BasicDijkstraRouting(object):
     """ An routing algorithm that can find routes for subedges between\
         subvertices in a partitioned_graph that have been placed on a
-        machine by the use of a dijkstra shortest path algorithm
+        machine by the use of a Dijkstra shortest path algorithm
     """
 
     BW_PER_ROUTE_ENTRY = 0.01
@@ -242,9 +241,9 @@ class BasicDijkstraRouting(object):
 
     @staticmethod
     def _reset_tables(dijkstra_tables):
-        """ Reset the dijsktra tables for a new path search
+        """ Reset the Dijkstra tables for a new path search
 
-        :param dijkstra_tables: the dictionary object for the dijkstra-tables
+        :param dijkstra_tables: the dictionary object for the Dijkstra-tables
         :type dijkstra_tables: dict
         :return: None
         :rtype: None
@@ -260,7 +259,7 @@ class BasicDijkstraRouting(object):
         """ Propagate the weights till the destination nodes of the source\
             nodes are retraced
 
-         :param dijkstra_tables: the dictionary object for the dijkstra-tables
+         :param dijkstra_tables: the dictionary object for the Dijkstra-tables
          :param nodes_info: the dictionary object for the nodes inside a route\
                     scope
          :param dest_chips:
@@ -314,7 +313,7 @@ class BasicDijkstraRouting(object):
             #  a new partitionable_graph lowest cost cannot be found
 
             # This is the lowest cost across ALL
-            # un-activated nodes in the partitionable_graph.
+            # deactivated nodes in the partitionable_graph.
             graph_lowest_cost = None
 
             # Find the next node to be activated
@@ -329,14 +328,14 @@ class BasicDijkstraRouting(object):
                     graph_lowest_cost = dijkstra_tables[key]["lowest cost"]
                     x_current, y_current = int(key[0]), int(key[1])
 
-            # If there were no un-activated nodes with costs,
+            # If there were no deactivated nodes with costs,
             # but the destination was not reached this iteration,
             # raise an exception
             if graph_lowest_cost is None:
                 raise exceptions.PacmanRoutingException(
                     "Destination could not be activated, ending run")
 
-            # Set the next activated node as the un-activated node with the
+            # Set the next activated node as the deactivated node with the
             #  lowest current cost
             dijkstra_tables[(x_current, y_current)]["activated?"] = True
             try:
@@ -397,7 +396,7 @@ class BasicDijkstraRouting(object):
                 (neighbour_lowest_cost is None or
                  new_weight < neighbour_lowest_cost)):
 
-            # update dijkstra table
+            # update Dijkstra table
             dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] =\
                 new_weight
 
@@ -424,7 +423,7 @@ class BasicDijkstraRouting(object):
         :type y_destination:
         :type dijkstra_tables:
         :type processor_dest:
-        :return: the next coords to look into
+        :return: the next coordinates to look into
         :rtype: int int
         :raise PacmanRoutingException: when the algorithm doesn't find a next\
                     point to search from. AKA, the neighbours of a chip do not\
@@ -557,24 +556,11 @@ class BasicDijkstraRouting(object):
             # Finally move the tracking node
             x_current, y_current = x_neighbour, y_neighbour
 
-            nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] -= \
-                self._bw_per_route_entry  # TODO arbitrary
-
-            if (nodes_info[(x_neighbour, y_neighbour)]["bws"][dec_direction] <
-                    0):
-                print ("Bandwidth over-used from ({}, {}) in direction {}! to "
-                       "({}, {})".format(x_neighbour, y_neighbour,
-                                         dec_direction, x_current, y_current))
-
-                raise exceptions.PacmanRoutingException(
-                    "Bandwidth over-used as described above! Terminating...")
         return x_current, y_current, previous_routing_entry, made_an_entry
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
-        """private method, do not call from outside dijskra routing\
-
-        used to determine the direction of a link to go down
+        """ used to determine the direction of a link to go down
 
         :param neighbour_position: the position the neighbour is at
         :type neighbour_position: int

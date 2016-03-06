@@ -71,7 +71,7 @@ class PartitionableGraph(object):
             for next_vertex in vertices:
                 self.add_vertex(next_vertex)
 
-    def add_edge(self, edge, partition_id=None):
+    def add_edge(self, edge, partition_id=None, partition_constraints=None):
         """ Add an edge to this partitionable_graph
 
         :param edge: an edge to be added to the partitionable_graph
@@ -95,7 +95,7 @@ class PartitionableGraph(object):
             # if this partition id not been seen before, add a new partition
             if partition_id not in self._outgoing_edges[edge.pre_vertex]:
                 self._outgoing_edges[edge.pre_vertex][partition_id] = \
-                    OutgoingEdgePartition(partition_id)
+                    OutgoingEdgePartition(partition_id, partition_constraints)
             self._outgoing_edges[edge.pre_vertex][partition_id].add_edge(edge)
             self._incoming_edges[edge.post_vertex].append(edge)
         else:
@@ -104,7 +104,7 @@ class PartitionableGraph(object):
                 "Must be an instance of pacman.model.partitionable_graph"
                 ".edge.AbstractPartitionableEdge")
 
-    def add_edges(self, edges, partition_id=None):
+    def add_edges(self, edges, partition_id=None, constraints=None):
         """ Add an iterable of edges to this partitionable_graph
 
         :param edges: an iterable of edges to be added to the graph
@@ -113,6 +113,9 @@ class PartitionableGraph(object):
         :param partition_id: the id for the outgoing partition that this edge\
                     is associated with
         :type partition_id: str
+        :param constraints: constraints added to a edge
+        :type constraints: iterable of \
+                :py:class:`pacman.model.constraints.abstract_constraints.abstract_constrant.AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If any edge\
@@ -120,7 +123,7 @@ class PartitionableGraph(object):
         """
         if edges is not None:
             for next_edge in edges:
-                self.add_edge(next_edge, partition_id)
+                self.add_edge(next_edge, partition_id, constraints)
 
     def outgoing_edges_from_vertex(self, vertex, partition_identifier=None):
         """ Locate a collection of edges for which vertex is the pre_vertex.\
@@ -166,6 +169,30 @@ class PartitionableGraph(object):
             return self._outgoing_edges[vertex]
         else:
             return ()
+
+    def partition_from_vertex(self, vertex, partition_id):
+        """
+
+        :param vertex:
+        :param partition_id:
+        :return:
+        """
+        if partition_id is None:
+            return None
+        return self._outgoing_edges[vertex][partition_id]
+
+    @property
+    def partitions(self):
+        """
+        property method for all the partitions in the graph
+        :return: iterable of\
+                     :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
+        """
+        partitions = list()
+        for vertex in self._vertices:
+            partitions.extend(
+                self.outgoing_edges_partitions_from_vertex(vertex))
+        return partitions
 
     def incoming_edges_to_vertex(self, vertex):
         """ Locate a collection of edges for which vertex is the post_vertex.\
