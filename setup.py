@@ -49,7 +49,7 @@ setup(
                   'pacman.utilities.file_format_schemas': ['*.json']},
     install_requires=[
         'six', 'enum34', 'numpy', 'jsonschema', 'SpiNNMan==2016.001',
-        'SpiNNMachine==2015.004.01']
+        'SpiNNMachine==2015.004.01'],
     dependency_links=['https://github.com/SpiNNakerManchester/SpiNNMan=SpiNNMan-2016.001', 
                       'https://github.com/SpiNNakerManchester/SpiNNMachine=SpiNNMachine-2015.004.01']
 )
