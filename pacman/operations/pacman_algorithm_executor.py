@@ -240,19 +240,16 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                 "Unable to generate outputs {}".format(
                     failed_to_generate_output_string))
 
-        # iterate through the list removing algorithms which are obsolete
-        self._prune_unnecessary_algorithms(allocated_algorithms)
-
         self._algorithms = allocated_algorithms
 
     def _remove_outputs_which_are_inputs(self, required_outputs, inputs):
-        """
-        generates the output list which has pruned outputs which are already
-        in the input list
+        """ Generates the output list which has pruned outputs which are\
+            already in the input list
+
         :param required_outputs: the original output listings
         :param inputs: the inputs given to the executor
         :return: new list of outputs
-        :rtype:  iterable of str
+        :rtype: iterable of str
         """
         copy_required_outputs = set(required_outputs)
         for input_type in inputs:
@@ -273,16 +270,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                     left_over_inputs += ", '{}'".format(an_input['type'])
         left_over_inputs += "]\n"
         return left_over_inputs
-
-    @staticmethod
-    def _prune_unnecessary_algorithms(allocated_algorithms):
-        """
-
-        :param allocated_algorithms:
-        :return:
-        """
-        # TODO optimisations!
-        pass
 
     @staticmethod
     def _remove_algorithm_and_update_outputs(

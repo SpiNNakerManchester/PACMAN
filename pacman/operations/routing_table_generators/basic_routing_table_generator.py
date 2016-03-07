@@ -1,6 +1,4 @@
-"""
-basic routing table allocator
-"""
+
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables import \
@@ -13,7 +11,6 @@ MASK = 0xFFFFF800
 
 class BasicRoutingTableGenerator(object):
     """ An basic algorithm that can produce routing tables
-
     """
 
     def __call__(
@@ -49,6 +46,3 @@ class BasicRoutingTableGenerator(object):
                 routing_tables.add_routing_table(routing_table)
 
         return {"router_tables": routing_tables}
-
-
-

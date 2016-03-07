@@ -117,7 +117,8 @@ class MallocBasedRouteMerger(object):
                 last_key_added = (
                     entries[pos].routing_entry_key +
                     (~entries[pos].mask & 0xFFFFFFFFL))
-                # print "Not Merged", hex(entries[pos].routing_entry_key), hex(entries[pos].mask)
+                # print "Not Merged", hex(entries[pos].routing_entry_key),\
+                # hex(entries[pos].mask)
             pos += 1
 
         return merged_routes

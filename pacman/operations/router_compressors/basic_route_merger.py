@@ -33,7 +33,8 @@ class BasicRouteMerger(object):
             new_table = self._merge_routes(router_table, previous_masks)
             tables.add_routing_table(new_table)
             n_entries = len([
-                entry for entry in new_table.multicast_routing_entries if not entry.defaultable])
+                entry for entry in new_table.multicast_routing_entries
+                if not entry.defaultable])
             print "Reduced from {} to {}".format(
                 len(router_table.multicast_routing_entries),
                 n_entries)
@@ -94,7 +95,8 @@ class BasicRouteMerger(object):
                         masked_key = (
                             router_entry_2.routing_entry_key & new_mask)
                         overlap = (
-                            min(new_last_key, last_key) - max(new_key, key)) > 0
+                            min(new_last_key, last_key) -
+                            max(new_key, key)) > 0
                         in_range = new_key <= key and new_last_key >= last_key
 
                         if (new_key == masked_key and (

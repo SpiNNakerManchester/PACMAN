@@ -43,7 +43,7 @@ class ConvertAlgorithmsMetadata(object):
     def _generate_algorithm_data(self, element):
         """ Translates XML elements into tuples for the AlgorithmData object
 
-        :param element: the lxml element to translate
+        :param element: the xml element to translate
         :return: a AlgorithmData
         """
         external = False
@@ -75,14 +75,14 @@ class ConvertAlgorithmsMetadata(object):
                 "try again")
 
         # get other params
-        required_inputs = \
-            self._translate_parameters(element.find("required_inputs"))
-        required_optional_inputs = \
-            self._translate_parameters(element.find("required_optional_inputs"))
-        optional_inputs = \
-            self._translate_parameters(element.find("optional_inputs"))
-        outputs = \
-            self._translate_parameters(element.find("produces_outputs"))
+        required_inputs = self._translate_parameters(
+            element.find("required_inputs"))
+        required_optional_inputs = self._translate_parameters(
+            element.find("required_optional_inputs"))
+        optional_inputs = self._translate_parameters(
+            element.find("optional_inputs"))
+        outputs = self._translate_parameters(
+            element.find("produces_outputs"))
         return AlgorithmData(
             algorithm_id=element.get('name'),
             command_line_args=command_line_args, inputs=required_inputs,
@@ -94,6 +94,7 @@ class ConvertAlgorithmsMetadata(object):
     @staticmethod
     def _translate_args(args_element):
         """ Convert an XML arg element into a list of args
+
         :param args_element:
         :return:
         """

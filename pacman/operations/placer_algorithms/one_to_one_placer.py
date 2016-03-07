@@ -25,9 +25,8 @@ from pacman import exceptions
 
 
 class OneToOnePlacer(RadialPlacer):
-    """
-    one to one placer puts vertices which are directly connected to only its
-    destination on the same chip
+    """ Placer that puts vertices which are directly connected to only its\
+        destination on the same chip
     """
 
     MAX_CORES_PER_CHIP_TO_CONSIDER = 16
@@ -37,7 +36,7 @@ class OneToOnePlacer(RadialPlacer):
 
     def __call__(self, partitioned_graph, machine):
 
-        sorted_vertices = self._sort_vertices_for_ease_of_one_to_one_connection(
+        sorted_vertices = self._sort_vertices_for_one_to_one_connection(
             partitioned_graph)
 
         # check that the algorithm can handle the constraints
@@ -57,6 +56,7 @@ class OneToOnePlacer(RadialPlacer):
         return {'placements': placements}
 
     def _do_allocation(self, ordered_subverts, placements, machine):
+
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
                                    "Placing graph vertices")
@@ -136,7 +136,7 @@ class OneToOnePlacer(RadialPlacer):
                             place_constraint.p
                         if not x_level or not y_level or not p_level:
                             raise exceptions.PacmanConfigurationException(
-                                "cant handle these conflicting constraints")
+                                "can't handle conflicting constraints")
         return merged_placement, ip_tag, reverse_ip_tags
 
     @staticmethod
@@ -150,7 +150,7 @@ class OneToOnePlacer(RadialPlacer):
         placements.add_placement(placement)
         progress_bar.update()
 
-    def _sort_vertices_for_ease_of_one_to_one_connection(
+    def _sort_vertices_for_one_to_one_connection(
             self, partitioned_graph):
         """
 
@@ -203,12 +203,11 @@ class OneToOnePlacer(RadialPlacer):
     @staticmethod
     def check_incoming_verts(one_to_one_verts, vertex, partitioned_graph,
                              found_list):
-        """
-        adds subverts which have a one to one connection
+        """ Adds subverts which have a one to one connection
         :param one_to_one_verts: the list of sorted vertices
         :param vertex: the destination vertex
         :param partitioned_graph: the partitioned graph
-        :param found_list: the list of found verts so far
+        :param found_list: the list of found vertices so far
         :return:
         """
 

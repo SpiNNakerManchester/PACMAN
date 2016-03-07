@@ -55,7 +55,7 @@ class MulticastRoutingTable(object):
         self._multicast_routing_entries.append(multicast_routing_entry)
 
     def remove_multicast_routing_entry(self, multicast_routing_entry):
-        """removes a multicast entry from this table
+        """ Remove a multicast entry from this table
 
         :param multicast_routing_entry: The route to remove
         :type multicast_routing_entry:\
@@ -121,15 +121,14 @@ class MulticastRoutingTable(object):
             combination or None if the routing table does not match the\
             key_combo
 
-        :param routing_entry_key: the routing key_combo to be searched
-        key_combope key: int
+        :param routing_entry_key: the routing key to be searched
+        :type routing_entry_key: int
         :param mask: the routing mask to be searched
         :type mask: int
         :return: the routing entry associated with the routing key_combo or\
                     None if no such entry exists
         :rtype:\
                     :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
-        :raise None: does not raise any known exceptions
         """
         if (routing_entry_key & mask) != routing_entry_key:
             raise exceptions.PacmanRoutingException(
@@ -144,11 +143,6 @@ class MulticastRoutingTable(object):
         return None
 
     def __eq__(self, other):
-        """
-        comparison method for comparing router tables
-        :param other: instance of pacman.model.router_table.RouterTable
-        :return:
-        """
         if not isinstance(other, MulticastRoutingTable):
             return False
         else:
@@ -163,11 +157,6 @@ class MulticastRoutingTable(object):
                 return True
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing router tables
-        :param other: instance of pacman.model.router_table.RouterTable
-        :return:
-        """
         return not self.__eq__(other)
 
     def __repr__(self):

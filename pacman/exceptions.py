@@ -189,6 +189,7 @@ class PacmanTypeError(TypeError, PacmanException):
     """Indicates that an object is of incorrect type."""
     pass
 
+
 class PacmanNoMergeException(PacmanException):
     """Exception to indicate that there are no merges worth performing."""
     pass

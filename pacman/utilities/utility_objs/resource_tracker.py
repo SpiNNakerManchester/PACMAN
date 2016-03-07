@@ -177,11 +177,12 @@ class ResourceTracker(object):
     def max_available_cores_on_chips_that_satisfy(
             self, placement_constraint, ip_tag_constraints,
             reverse_ip_tag_constraints):
-        """
-        returns the max number of cores on a chip that satisfy these constraints
+        """ Get the max number of cores on a chip that satisfy these\
+            constraints
+
         :param placement_constraint: placement constraint
-        :param ip_tag_constraints:  ip_tag constraint
-        :param reverse_ip_tag_constraints:  reverse ip_tag constraints
+        :param ip_tag_constraints: ip_tag constraint
+        :param reverse_ip_tag_constraints: reverse ip_tag constraints
         :return: the max number of cores
         :rtype: int
         """

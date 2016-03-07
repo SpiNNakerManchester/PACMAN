@@ -1,6 +1,3 @@
-"""
-AbstractRoutingInfoAllocatorAlgorithm
-"""
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints.\
@@ -47,6 +44,7 @@ def get_edge_groups(partitioned_graph):
                 partitioned_vertex)
         for partition_id in outgoing_edge_partitions:
             partition = outgoing_edge_partitions[partition_id]
+
             # assume all edges have the same constraints in them. use first one
             # to deduce which group to place it into
             constraints = partition.constraints
@@ -72,9 +70,9 @@ def get_edge_groups(partitioned_graph):
 
 
 def check_types_of_edge_constraint(sub_graph):
-    """
-    goes through the subgraph for operations and checks that the constraints
-    are compatible.
+    """ Go through the subgraph for operations and checks that the constraints\
+        are compatible.
+
     :param sub_graph: the subgraph to search through
     :return:
     """
@@ -91,8 +89,8 @@ def check_types_of_edge_constraint(sub_graph):
         flexi_field = utility_calls.locate_constraints_of_type(
             partition.constraints, KeyAllocatorFlexiFieldConstraint)
 
-        if (len(fixed_key) > 1 or len(fixed_field) > 1
-                or len(fixed_mask) > 1 or len(flexi_field) > 1):
+        if (len(fixed_key) > 1 or len(fixed_field) > 1 or
+                len(fixed_mask) > 1 or len(flexi_field) > 1):
             raise exceptions.PacmanConfigurationException(
                 "There are more than one of the same constraint type on "
                 "the partition {} for edges {}. Please fix and try again."
@@ -124,37 +122,36 @@ def check_types_of_edge_constraint(sub_graph):
         if fixed_mask and fixed_field:
             _check_masks_are_correct(partition)
 
-        # check that if there's a flexi field, and something else, throw error
+        # check that if there's a flexible field, and something else, throw
+        # error
         if flexi_field and (fixed_mask or fixed_key or fixed_field):
             raise exceptions.PacmanConfigurationException(
-                "The partition {} for edges {} has a flexi field and "
+                "The partition {} for edges {} has a flexible field and "
                 "another fixed constraint. These maybe be merge-able, but "
                 "is deemed an error here"
                 .format(partition.identifer, partition.edges))
 
 
 def _check_masks_are_correct(partition):
-    """
-    checks that the masks between a fixed mask constraint
-    and a fixed_field constraint. completes if its correct, raises error
-    otherwise
-    :param partition: the outgoing_edge_partition to search for these
-    constraints
+    """ Check that the masks between a fixed mask constraint\
+        and a fixed_field constraint. completes if its correct, raises error\
+        otherwise
+
+    :param partition: the outgoing_edge_partition to search for these\
+                constraints
     :return:
     """
-    fixed_mask = \
-        utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedMaskConstraint)[0]
-    fixed_field = \
-        utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedFieldConstraint)[0]
+    fixed_mask = utility_calls.locate_constraints_of_type(
+        partition.constraints, KeyAllocatorFixedMaskConstraint)[0]
+    fixed_field = utility_calls.locate_constraints_of_type(
+        partition.constraints, KeyAllocatorFixedFieldConstraint)[0]
     mask = fixed_mask.mask
     for field in fixed_field.fields:
         if field.mask & mask != field.mask:
             raise exceptions.PacmanInvalidParameterException(
                 "field.mask, mask",
-                "The field mask {} is outside of the mask {}"
-                .format(field.mask, mask),
+                "The field mask {} is outside of the mask {}".format(
+                    field.mask, mask),
                 "{}:{}".format(field.mask, mask))
         for other_field in fixed_field.fields:
             if (other_field != field and
@@ -204,4 +201,3 @@ def get_fixed_mask(same_key_group):
                 fields = fixed_mask_constraint.fields
 
     return mask, fields
-
