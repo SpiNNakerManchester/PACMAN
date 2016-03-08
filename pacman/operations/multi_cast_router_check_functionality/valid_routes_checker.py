@@ -289,7 +289,7 @@ def _recursive_trace_to_destinations(
 
         # also goes to a processor
         if len(processor_values) > 0:
-            _check_processor(processor_values, current_router,
+            _is_dest(processor_values, current_router,
                              reached_placements)
         # only goes to new chip
         for link_id in chip_links:
@@ -329,7 +329,7 @@ def _recursive_trace_to_destinations(
 
     # only goes to a processor
     elif len(processor_values) > 0:
-        _check_processor(processor_values, current_router, reached_placements)
+        _is_dest(processor_values, current_router, reached_placements)
 
 
 def _check_visited_routers(chip_x, chip_y, visited_routers):
@@ -356,7 +356,7 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
         visited_routers.add(visited_routers_router)
 
 
-def _check_processor(processor_ids, current_router, reached_placements):
+def _is_dest(processor_ids, current_router, reached_placements):
     """ Check for processors to be removed
 
     :param reached_placements: the placements to which the trace visited

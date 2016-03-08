@@ -2,9 +2,11 @@ import os
 import time
 import logging
 
-from pacman.model.placements import placement
 from pacman import exceptions
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.model.abstract_classes.virtual_partitioned_vertex \
+    import VirtualPartitionedVertex
+
 from spinn_machine.sdram import SDRAM
 
 logger = logging.getLogger(__name__)
@@ -105,13 +107,13 @@ def router_report_from_paths(
     progress_bar = ProgressBar(len(partitioned_graph.subedges),
                                "Generating Routing path report")
     for edge in partitioned_graph.subedges:
-        source_placement = \
-            placements.get_placement_of_subvertex(edge.pre_subvertex)
-        destination_placement = \
-            placements.get_placement_of_subvertex(edge.post_subvertex)
+        source_placement = placements.get_placement_of_subvertex(
+            edge.pre_subvertex)
+        destination_placement = placements.get_placement_of_subvertex(
+            edge.post_subvertex)
         partition = partitioned_graph.get_partition_of_subedge(edge)
-        key_and_mask =\
-            routing_infos.get_keys_and_masks_from_partition(partition)[0]
+        key_and_mask = routing_infos.get_keys_and_masks_from_partition(
+            partition)[0]
         path, number_of_entries = _search_route(
             source_placement, destination_placement, key_and_mask,
             routing_tables, machine)
@@ -120,8 +122,7 @@ def router_report_from_paths(
         text += " Takes path \n {}".format(path)
         f_routing.write(text)
         f_routing.write("\n")
-        text = "{} has route length: {}\n".format(
-            edge.label, number_of_entries)
+        text = "Route length: {}\n".format(number_of_entries)
         f_routing.write(text)
 
         # End one entry:
@@ -737,185 +738,88 @@ def _expand_route_value(processors_ids, link_ids):
     return route_string
 
 
-def _get_associated_routing_entries_from(
-        fr_placement, to_placement, routing_tables, routing_data, machine):
+def _search_route(
+        source_placement, dest_placement, key_and_mask, routing_tables,
+        machine):
 
-    routing_table = routing_tables.get_routing_table_for_chip(
-        to_placement.x, to_placement.y)
-    key_combo = routing_data.key_combo
-    mask = routing_data.mask
-    destinations = \
-        routing_table.get_multicast_routing_entry_by_routing_entry_key(
-            key_combo, mask)
-
-    if fr_placement.x == to_placement.x and fr_placement.y == to_placement.y:
-
-        # check that the last route matches the destination core in the
-        # to_placement add the destination core to the associated chips list
-        # and return the associated chip list
-        processors = destinations.processor_ids()
-        if to_placement.p in processors:
-            associated_chips = list()
-            step = dict()
-            step['x'] = fr_placement.x
-            step['y'] = fr_placement.y
-            associated_chips.append(step)
-            return associated_chips
-        else:
-            raise exceptions.PacmanRoutingException(
-                "Although routing path with key_combo {0:X} reaches chip"
-                " ({1:d}, {2:d}), it does not reach processor {3:d} as"
-                " requested by the destination placement".format(
-                    key_combo, to_placement.x, to_placement.y, to_placement.p))
-    else:
-        links = destinations.link_ids()
-        current_x = fr_placement.x
-        current_y = fr_placement.y
-        current_chip = machine.get_chip_at(current_x, current_y)
-        current_router = current_chip.router
-        for i in links:
-            next_link = current_router.get_link(i)
-            next_x = next_link.destination_x
-            next_y = next_link.destination_y
-            next_placement = placement.Placement(None, next_x, next_y, None)
-            associated_chips = _get_associated_routing_entries_from(
-                next_placement, to_placement, routing_tables, routing_data,
-                machine)
-            if associated_chips is not None:
-                step = dict()
-                step['x'] = current_x
-                step['y'] = current_y
-                associated_chips.insert(0, step)
-                return associated_chips
-            else:
-                return None
-
-
-def _search_route(source_placement, dest_placement, key_and_mask,
-                  routing_tables, machine):
+    # Create text for starting point
+    source_vertex = source_placement.subvertex
     text = ""
-    current_router_table = routing_tables.get_routing_table_for_chip(
-        source_placement.x, source_placement.y)
-    visited_routers = set()
-    current_router_table_tuple = (current_router_table.x,
-                                  current_router_table.y)
-    visited_routers.add(current_router_table_tuple)
+    if isinstance(source_vertex, VirtualPartitionedVertex):
+        text += "Virtual "
+    text += "{}:{}:{} -> ".format(
+        source_placement.x, source_placement.y, source_placement.p)
 
-    text += "P{} -> ".format(source_placement.p)
-    text += "{}:{} -> ".format(current_router_table.x, current_router_table.y)
-    number_of_entries = 1
+    # Start the search
+    number_of_entries = 0
 
-    # get src router
-    entry = _locate_routing_entry(current_router_table, key_and_mask.key)
+    # If the destination is virtual, replace with the real destination chip
     extra_text, total_number_of_entries = _recursive_trace_to_destinations(
-        entry, current_router_table, source_placement.x,
-        source_placement.y, key_and_mask, visited_routers,
-        dest_placement, machine, routing_tables, number_of_entries)
+        source_placement.x, source_placement.y, key_and_mask,
+        dest_placement.x, dest_placement.y, dest_placement.p, machine,
+        routing_tables, number_of_entries)
     text += extra_text
     return text, total_number_of_entries
 
 
 # locates the next dest position to check
 def _recursive_trace_to_destinations(
-        entry, current_router, chip_x, chip_y, key_and_mask, visited_routers,
-        reached_placement, machine, routing_tables, number_of_entries):
+        chip_x, chip_y, key_and_mask,
+        dest_chip_x, dest_chip_y, dest_p, machine, routing_tables,
+        number_of_entries):
     """ recursively search though routing tables till no more entries are\
         registered with this key
-
-    :param entry: the original entry used by the first router which\
-            resides on the source placement chip.
-    :param current_router: the router currently being visited during the\
-            trace
-    :param key_and_mask:
-        the key and mask being used by the partitioned_vertex which resides\
-            on the source placement
-    :param visited_routers: the list of routers which have been visited\
-            during this trace so far
-    :param reached_placement: the placement to reach during the trace
-    :param chip_x: the x coordinate of the chip being considered
-    :param chip_y: the y coordinate of the chip being considered
-
-    :type entry: spinnMachine.multicast_routing_entry.MulticastRoutingEntry
-    :type current_router:\
-            pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
-    :type chip_x: int
-    :type chip_y: int
-    :type key_and_mask:
-            pacman.model.routing_info.base_key_and_mask.BaseKeyAndMask
-    :type visited_routers: iterable of\
-            pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
-    :type reached_placement: iterable of placement_tuple
-    :return: None
-    :raise None: this method does not raise any known exceptions
     """
 
-    # determine where the route takes us
-    chip_links = entry.link_ids
-    processor_values = entry.processor_ids
+    chip = machine.get_chip_at(chip_x, chip_y)
 
-    # if goes down a chip link
-    if len(chip_links) > 0:
+    # If reached destination, return the core
+    if (chip_x == dest_chip_x and chip_y == dest_chip_y):
+        text = ""
+        if chip.virtual:
+            text += "Virtual "
+        text += "{}:{}:{}".format(dest_chip_x, dest_chip_y, dest_p)
+        return text, number_of_entries + 1
 
-        located = False
-        # also goes to a processor
-        if len(processor_values) > 0:
-            result = _check_processor(
-                processor_values, current_router, reached_placement)
+    link_id = None
+    result = None
+    new_n_entries = None
+    if chip.virtual:
+
+        # If the current chip is virtual, use link out
+        link_id, link = next(iter(chip.router))
+        result, new_n_entries = _recursive_trace_to_destinations(
+            link.destination_x, link.destination_y, key_and_mask,
+            dest_chip_x, dest_chip_y, dest_p, machine,
+            routing_tables, number_of_entries)
+    else:
+
+        # If the current chip is real, find the link to the destination
+        table = routing_tables.get_routing_table_for_chip(chip_x, chip_y)
+        entry = _locate_routing_entry(table, key_and_mask.key)
+        for link_id in entry.link_ids:
+            link = chip.router.get_link(link_id)
+            result, new_n_entries = _recursive_trace_to_destinations(
+                link.destination_x, link.destination_y, key_and_mask,
+                dest_chip_x, dest_chip_y, dest_p, machine,
+                routing_tables, number_of_entries)
             if result is not None:
-                return "P{}".format(reached_placement.p), number_of_entries
+                break
 
-        if not located:
-            # only goes to new chip
-            for link_id in chip_links:
+    if result is not None:
+        direction_text = _add_direction(link_id)
+        text = "{}:{}:{} -> {}".format(
+            chip_x, chip_y, direction_text, result)
+        return text, new_n_entries + 1
 
-                # locate next chips router
-                machine_router = \
-                    machine.get_chip_at(chip_x, chip_y).router
-                link = machine_router.get_link(link_id)
-                next_router = \
-                    routing_tables.get_routing_table_for_chip(
-                        link.destination_x, link.destination_y)
-
-                # locate next entry
-                entry = _locate_routing_entry(next_router, key_and_mask.key)
-
-                # get next route value from the new router
-                new_hop = number_of_entries + 1
-                result = _recursive_trace_to_destinations(
-                    entry, next_router, link.destination_x, link.destination_y,
-                    key_and_mask, visited_routers, reached_placement, machine,
-                    routing_tables, new_hop)
-                if result is not None:
-                    direction_text = _add_direction(link_id)
-                    text = "{}:{} -> {} -> {}".format(
-                        current_router.x, current_router.y, direction_text,
-                        result)
-                    return text, number_of_entries + 1
-
-    # only goes to a processor
-    elif len(processor_values) > 0:
-        result = _check_processor(
-            processor_values, current_router, reached_placement)
-        if result is not None:
-                return "P{}".format(reached_placement.p), number_of_entries
+    return None, None
 
 
 def _add_direction(link):
 
     # Convert link targets to readable values:
     link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
-    return "{}".format(link_labels[link])
-
-
-def _check_processor(processor_values, current_router, reached_placement):
-    if (current_router.x == reached_placement.x and
-            current_router.y == reached_placement.y):
-        for processor_id in processor_values:
-            if processor_id == reached_placement.p:
-                text = "{}:{}:{}".format(current_router.x, current_router.y,
-                                         reached_placement.p)
-                return text
-    return None
+    return link_labels[link]
 
 
 def _locate_routing_entry(current_router, key):

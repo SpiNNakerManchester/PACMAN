@@ -9,21 +9,21 @@ from collections import defaultdict
 from six import iteritems
 
 from pacman.utilities import constants
-from pacman.model.abstract_classes.abstract_virtual_vertex import \
-    AbstractVirtualVertex
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint import \
-    PlacerRadialPlacementFromChipConstraint
+    .placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.model.routing_table_by_partition\
-    .multicast_routing_table_by_partition import \
-    MulticastRoutingTableByPartition
+    .multicast_routing_table_by_partition \
+    import MulticastRoutingTableByPartition
 from pacman.model.routing_table_by_partition\
-    .multicast_routing_table_by_partition_entry import \
-    MulticastRoutingTableByPartitionEntry
+    .multicast_routing_table_by_partition_entry  \
+    import MulticastRoutingTableByPartitionEntry
+from pacman.model.abstract_classes.virtual_partitioned_vertex \
+    import VirtualPartitionedVertex
 
 
 # A lookup from link name (string) to Links enum entry.
@@ -112,7 +112,7 @@ def convert_to_rig_partitioned_graph(partitioned_graph):
         vid = str(id(vertex))
 
         # handle external devices
-        if isinstance(vertex, AbstractVirtualVertex):
+        if isinstance(vertex, VirtualPartitionedVertex):
             vertex_resources = dict()
             vertices_resources[vid] = vertex_resources
             vertex_resources["cores"] = 0
@@ -163,21 +163,16 @@ def create_rig_partitioned_graph_constraints(partitioned_graph, machine):
                 constraints.append(LocationConstraint(
                     str(id(vertex)), (constraint.x, constraint.y)))
 
-        if isinstance(vertex, AbstractVirtualVertex):
-            spinnaker_link = machine.get_spinnaker_link_with_id(
-                vertex.spinnaker_link_id)
+        if isinstance(vertex, VirtualPartitionedVertex):
             constraints.append(LocationConstraint(
-                str(id(vertex))),
-                (spinnaker_link.connected_chip_x,
-                 spinnaker_link.connected_chip_y))
+                str(id(vertex)), (vertex.real_chip_x, vertex.real_chip_y)))
             constraints.append(RouteEndpointConstraint(
                 str(id(vertex)),
-                LINK_LOOKUP[constants.EDGES(spinnaker_link.connected_link)]))
+                LINK_LOOKUP[constants.EDGES(vertex.real_link).name.lower()]))
     return constraints
 
 
 def create_rig_machine_constraints(machine):
-
     constraints = []
     for chip in machine.chips:
         for processor in chip.processors:
@@ -191,12 +186,16 @@ def create_rig_machine_constraints(machine):
 
 def convert_to_rig_placements(placements):
     rig_placements = {
-        str(id(placement.subvertex)): (placement.x, placement.y)
-        for placement in placements.placements}
-    core_allocations = {}
-    for placement in placements:
-        core_allocations[str(id(placement.subvertex))] = {
-            "cores": slice(placement.p, placement.p + 1)}
+        str(id(p.subvertex)): (p.x, p.y)
+        if not isinstance(p.subvertex, VirtualPartitionedVertex)
+        else (p.subvertex.real_chip_x, p.subvertex.real_chip_y)
+        for p in placements.placements}
+
+    core_allocations = {
+        str(id(p.subvertex)): {"cores": slice(p.p, p.p + 1)}
+        for p in placements.placements
+        if not isinstance(p.subvertex, VirtualPartitionedVertex)}
+
     return rig_placements, core_allocations
 
 
@@ -206,7 +205,7 @@ def convert_from_rig_placements(
     for vertex_id in rig_placements:
         vertex = partitioned_graph.get_subvertex_by_id(vertex_id)
         if vertex is not None:
-            if isinstance(vertex, AbstractVirtualVertex):
+            if isinstance(vertex, VirtualPartitionedVertex):
                 placements.add_placement(Placement(
                     vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
                     None))
