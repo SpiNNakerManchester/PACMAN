@@ -148,15 +148,13 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
     """
 
     def __init__(self, algorithm, exception, traceback):
-        """
-        :param problem: The problem with the routing
-        :type problem: str
-        """
-        problem = \
-            "Algorithm {} has crashed.    Inputs: {}\n    Error: {}\n    " \
-            "Stack: {}\n".format(
+        problem = (
+            "Algorithm {} has crashed.\n"
+            "    Inputs: {}\n"
+            "    Error: {}\n"
+            "    Stack: {}\n".format(
                 algorithm.algorithm_id, algorithm.inputs, exception.message,
-                traceback.format_exc())
+                traceback.format_exc()))
 
         PacmanException.__init__(self, problem)
         self._exception = exception

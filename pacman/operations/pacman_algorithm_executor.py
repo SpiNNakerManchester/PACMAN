@@ -1,15 +1,11 @@
 # pacman imports
 from pacman import exceptions
-from pacman.interfaces.abstract_provides_provenance_data import \
-    AbstractProvidesProvenanceData
 from pacman.operations import algorithm_reports
 from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
 from pacman.utilities import file_format_converters
 from pacman import operations
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
-from pacman.utilities.utility_objs.provenance_data_item import \
-    ProvenanceDataItem
 from pacman.utilities.utility_objs.timer import Timer
 
 # general imports
@@ -24,7 +20,7 @@ from collections import defaultdict
 logger = logging.getLogger(__name__)
 
 
-class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
+class PACMANAlgorithmExecutor(object):
     """ An executor of PACMAN algorithms where the order is deduced from the\
         input and outputs of the algorithm using an XML description of the\
         algorithm
@@ -44,10 +40,9 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param do_timings: True if timing information should be printed after\
                 each algorithm, False otherwise
         """
-        AbstractProvidesProvenanceData.__init__(self)
 
-        # provenance data store
-        self._provenance_data = list()
+        # algorithm timing information
+        self._algorithm_timings = list()
 
         # pacman mapping objects
         self._algorithms = list()
@@ -387,16 +382,16 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # execute algorithm
         try:
             results = python_algorithm(**inputs)
-        except Exception as type_error:
-            if isinstance(type_error,
-                          exceptions.PacmanAlgorithmFailedToCompleteException):
+        except Exception as e:
+            if isinstance(
+                    e, exceptions.PacmanAlgorithmFailedToCompleteException):
                 raise sys.exc_info[0], sys.exc_info[1], sys.exc_info[2]
             else:
                 raise exceptions.PacmanAlgorithmFailedToCompleteException(
-                    algorithm, type_error, traceback)
+                    algorithm, e, traceback)
         # handle_prov_data
         if self._do_timing:
-            self._handle_prov(timer, algorithm)
+            self._update_timings(timer, algorithm)
 
         # move outputs into internal data objects
         self._map_output_parameters(results, algorithm)
@@ -434,7 +429,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         algorithm_progress_bar.end()
 
         if self._do_timing:
-            self._handle_prov(timer, algorithm)
+            self._update_timings(timer, algorithm)
 
         # check the return code for a successful execution
         if child.returncode != 0:
@@ -510,8 +505,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param results: the results from the algorithm
         :param algorithm: the algorithm description
         :return: None
-        :raises PacmanAlgorithmFailedToCompleteException: when the algorithm\
-                returns no results
         """
         if results is not None:
 
@@ -583,20 +576,10 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         """
         return self._internal_type_mapping
 
-    def get_provenance_data_items(self, transceiver, placement=None):
-        return self._provenance_data
+    @property
+    def algorithm_timings(self):
+        return self._algorithm_timings
 
-    def _handle_prov(self, timer, algorithm):
-        """ Adds provenance data to the list
-
-        :param timer: the tracker of how long an algorithm has taken
-        :param algorithm: the algorithm in question
-        :return: None
-        """
+    def _update_timings(self, timer, algorithm):
         time_taken = timer.take_sample()
-
-        # write timing element into provenance data item
-        self._provenance_data.append(ProvenanceDataItem(
-            name="algorithm_{}".format(algorithm.algorithm_id),
-            item=str(time_taken),
-            needs_reporting_to_end_user=False))
+        self._algorithm_timings.append((algorithm.algorithm_id, time_taken))
