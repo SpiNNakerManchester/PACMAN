@@ -1,4 +1,8 @@
+
 from enum import Enum
+from pacman.model.abstract_classes.abstract_constrained_object import \
+    AbstractConstrainedObject
+from pacman.model.abstract_classes.abstract_labeled import AbstractLabeled
 from pacman.model.partitionable_graph.fixed_route_partitionable_edge import \
     FixedRoutePartitionableEdge
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
@@ -12,17 +16,20 @@ from pacman import exceptions
 EDGE_TYPES = Enum(
     value="EDGE_TYPES",
     names=[("MULTI_CAST", 0),
-           ("NEAREST_NEIGBOUR", 1),
+           ("NEAREST_NEIGHBOUR", 1),
            ("PEER_TO_PEER", 2),
            ("FIXED_ROUTE", 3)])
 
 
-class OutgoingEdgePartition(object):
-    """ A collection of edges from a single vertex which have the same\
+class OutgoingEdgePartition(AbstractConstrainedObject, AbstractLabeled):
+    """
+    A collection of edges from a single vertex which have the same\
         semantics and so can share a single key
     """
 
-    def __init__(self, identifier):
+    def __init__(self, identifier, constraints=None, label=None):
+        AbstractConstrainedObject.__init__(self, constraints)
+        AbstractLabeled.__init__(self, label)
         self._identifier = identifier
         self._type = None
         self._edges = list()
@@ -81,3 +88,18 @@ class OutgoingEdgePartition(object):
         :return:
         """
         return self._type
+
+    def __repr__(self):
+        """
+        returns a string representation of the partition
+        :return:
+        """
+        return "{}:{}:{}".format(self._identifier, self._edges, self._type)
+
+    def __contains__(self, edge):
+        """
+        checks if the edge is contained within this partition
+        :param edge: the edge to search for.
+        :return: boolean of true of false otherwise
+        """
+        return edge in self._edges

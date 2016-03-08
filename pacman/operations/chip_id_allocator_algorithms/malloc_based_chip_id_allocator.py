@@ -1,11 +1,14 @@
 
 # pacman imports
-from pacman.model.abstract_classes.abstract_virtual_vertex import \
-    AbstractVirtualVertex
-from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
-    ElementAllocatorAlgorithm
+from pacman.model.abstract_classes.abstract_virtual_vertex \
+    import AbstractVirtualVertex
+from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
+    import ElementAllocatorAlgorithm
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
+from pacman.model.abstract_classes.virtual_partitioned_vertex \
+    import VirtualPartitionedVertex
+
 
 # general imports
 import logging
@@ -40,14 +43,15 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                 (len(partitionable_graph.vertices) + len(list(machine.chips))),
                 "Allocating virtual identifiers")
         elif partitioned_graph is not None:
+
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
                 (len(partitioned_graph.subvertices) +
                  len(list(machine.chips))),
                 "Allocating virtual identifiers")
         else:
-            progress_bar = ProgressBar(len(list(machine.chips)),
-                                       "Allocating virtual identifiers")
+            progress_bar = ProgressBar(
+                len(list(machine.chips)), "Allocating virtual identifiers")
 
         # allocate standard ids for real chips
         for chip in machine.chips:
@@ -61,46 +65,47 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             for vertex in partitionable_graph.vertices:
                 if isinstance(vertex, AbstractVirtualVertex):
                     link = vertex.spinnaker_link_id
-                    if link not in self._virtual_chips:
-                        chip_id_x, chip_id_y = self._allocate_id()
-                        self._virtual_chips[link] = (chip_id_x, chip_id_y)
-                        vertex.set_virtual_chip_coordinates(
-                            chip_id_x, chip_id_y)
-                        machine_algorithm_utilities.create_virtual_chip(
-                            machine, vertex)
-                    else:
-                        chip_id_x, chip_id_y = self._virtual_chips[link]
-                        vertex.set_virtual_chip_coordinates(
-                            chip_id_x, chip_id_y)
+                    virtual_x, virtual_y, real_x, real_y, real_link = \
+                        self._assign_virtual_chip_info(machine, link)
+                    vertex.set_virtual_chip_coordinates(
+                        virtual_x, virtual_y, real_x, real_y, real_link)
                 progress_bar.update()
             progress_bar.end()
         elif partitioned_graph is not None:
 
             # allocate ids for virtual chips
             for vertex in partitioned_graph.subvertices:
-                if isinstance(vertex, AbstractVirtualVertex):
+                if isinstance(vertex, VirtualPartitionedVertex):
                     link = vertex.spinnaker_link_id
-                    if link not in self._virtual_chips:
-                        chip_id_x, chip_id_y = self._allocate_id()
-                        self._virtual_chips[link] = (
-                            chip_id_x, chip_id_y)
-                        vertex.set_virtual_chip_coordinates(
-                            chip_id_x, chip_id_y)
-                        machine_algorithm_utilities.create_virtual_chip(
-                            machine, vertex)
-                    else:
-                        chip_id_x, chip_id_y = self._virtual_chips[link]
-                        vertex.set_virtual_chip_coordinates(
-                            chip_id_x, chip_id_y)
+                    virtual_x, virtual_y, real_x, real_y, real_link = \
+                        self._assign_virtual_chip_info(machine, link)
+                    vertex.set_virtual_chip_coordinates(
+                        virtual_x, virtual_y, real_x, real_y, real_link)
                 progress_bar.update()
             progress_bar.end()
 
         return {"machine": machine}
 
+    def _assign_virtual_chip_info(self, machine, link):
+        if link not in self._virtual_chips:
+            chip_id_x, chip_id_y = self._allocate_id()
+            link_data = machine_algorithm_utilities.create_virtual_chip(
+                machine, link, chip_id_x, chip_id_y)
+            self._virtual_chips[link] = (chip_id_x, chip_id_y, link_data)
+
+            return (
+                chip_id_x, chip_id_y, link_data.connected_chip_x,
+                link_data.connected_chip_y, link_data.connected_link
+            )
+
+        chip_id_x, chip_id_y, link_data = self._virtual_chips[link]
+        return (
+            chip_id_x, chip_id_y, link_data.connected_chip_x,
+            link_data.connected_chip_y, link_data.connected_link
+        )
+
     def _allocate_id(self):
         """ Allocate a chip id from the free space
-
-        :return:
         """
 
         # can always assume there's at least one element in the free space,

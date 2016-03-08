@@ -51,8 +51,14 @@ class BaseKeyAndMask(object):
         return self._mask
 
     def __eq__(self, key_and_mask):
-        return (self._base_key == key_and_mask.key and
-                self._mask == key_and_mask.mask)
+        if not isinstance(key_and_mask, BaseKeyAndMask):
+            return False
+        else:
+            return (self._base_key == key_and_mask.key and
+                    self._mask == key_and_mask.mask)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def __repr__(self):
         return "KeyAndMask:{}:{}".format(hex(self._base_key), hex(self._mask))
@@ -60,7 +66,7 @@ class BaseKeyAndMask(object):
     def __str__(self):
         return self.__repr__()
 
-    def __hash__(self, key_and_mask):
+    def __hash__(self):
         return self.__repr__().__hash__()
 
     @property
@@ -116,7 +122,7 @@ class BaseKeyAndMask(object):
             numpy.asarray([self._base_key], dtype=">u4").view(dtype="uint8"))
 
         # for each key, create its key with the idea of a neuron id being
-        # continuous and live at a offsetable position from the bottom of
+        # continuous and live at an offset position from the bottom of
         # the key
         for value in range(n_keys):
             key = numpy.copy(unwrapped_key)

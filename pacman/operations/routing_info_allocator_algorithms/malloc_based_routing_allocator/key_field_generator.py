@@ -35,7 +35,7 @@ class KeyFieldGenerator(object):
                             field.mask, other_field.mask))
 
         # Sort the fields by highest bit range first
-        self._fields = sorted(the_fields, key=lambda field: field.mask,
+        self._fields = sorted(the_fields, key=lambda field: field.value,
                               reverse=True)
 
         self._update_next_valid_fields()
@@ -64,10 +64,10 @@ class KeyFieldGenerator(object):
         self._field_ones = dict()
         self._field_value = dict()
         for field in self._fields:
-            expanded_mask = utility_calls.expand_to_bit_array(field.mask)
+            expanded_mask = utility_calls.expand_to_bit_array(field.value)
             field_ones = numpy.where(expanded_mask == 1)[0]
             self._field_ones[field] = field_ones
-            field_min_key = min_key & field.mask
+            field_min_key = min_key & field.value
             field_min_value = utility_calls.compress_bits_from_bit_array(
                 utility_calls.expand_to_bit_array(field_min_key), field_ones)
             self._field_value[field] = field_min_value

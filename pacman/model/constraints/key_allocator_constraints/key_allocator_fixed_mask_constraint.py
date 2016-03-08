@@ -1,5 +1,5 @@
-from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.constraints.abstract_constraints.abstract_key_allocator_constraint \
+from pacman.model.constraints.abstract_constraints.\
+    abstract_key_allocator_constraint \
     import AbstractKeyAllocatorConstraint
 
 
@@ -8,7 +8,7 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
         edge
     """
 
-    def __init__(self, mask, fields=None):
+    def __init__(self, mask):
         """
 
         :param mask: the mask to be used during key allocation
@@ -25,21 +25,6 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
             self, "key allocator constraint where subedges coming from the "
                   "vertex requires a specific mask")
         self._mask = mask
-        self._fields = None
-        if fields is not None:
-            for field in fields:
-                if field.mask & mask != field.mask:
-                    raise PacmanInvalidParameterException(
-                        "The field mask {} is outside of the mask {}"
-                        .format(field.mask, mask))
-                for other_field in fields:
-                    if (other_field != field and
-                            other_field.mask & field.mask != 0):
-                        raise PacmanInvalidParameterException(
-                            "Field masks {} and {} overlap".format(
-                                field.mask, other_field.mask))
-            self._fields = sorted(fields, key=lambda field: field.mask,
-                                  reverse=True)
 
     def is_key_allocator_constraint(self):
         return True
@@ -53,13 +38,17 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
         """
         return self._mask
 
-    @property
-    def fields(self):
-        """ Any fields in the mask - i.e. ranges of the mask that have\
-            further limitations
+    def __eq__(self, other):
+        if not isinstance(other, KeyAllocatorFixedMaskConstraint):
+            return False
+        else:
+            if self._mask == other.mask:
+                return True
+            else:
+                return False
 
-        :return: Iterable of fields, ordered by mask with the highest bit\
-                    range first
-        :rtype: iterable of :py:class:`pacman.utilities.field.Field`
-        """
-        return self._fields
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._mask)

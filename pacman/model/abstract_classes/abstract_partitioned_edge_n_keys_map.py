@@ -10,12 +10,12 @@ class AbstractPartitionedEdgeNKeysMap(object):
     """
 
     @abstractmethod
-    def n_keys_for_partitioned_edge(self, partitioned_edge):
+    def n_keys_for_partition(self, partition):
         """ The number of keys required by the given partitioned edge
 
-        :param partitioned_edge: A paritioned edge
-        :type partitioned_edge:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
+        :param partition: The partition to set the number of keys for
+        :type partition:\
+                    :py:class:`pacman.utilities.utility_objs.outgoing_edge_partition.OutgoingEdgePartition`
         :return: The number of keys required by the partitioned edge
         :rtype: int
         """

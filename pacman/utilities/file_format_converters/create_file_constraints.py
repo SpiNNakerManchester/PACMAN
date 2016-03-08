@@ -47,8 +47,7 @@ class CreateConstraintsToFile(object):
         """
 
         progress_bar = ProgressBar(
-            (len(partitioned_graph.subvertices) +
-             len(partitioned_graph.subedges)) + 2,
+            (len(partitioned_graph.subvertices)) + 2,
             "creating json constraints")
 
         json_constraints_dictory_rep = list()
@@ -91,10 +90,6 @@ class CreateConstraintsToFile(object):
             if isinstance(vertex, AbstractVirtualVertex):
                 self._handle_virtual_vertex(
                     vertex, json_constraints_dictory_rep, machine)
-
-        for edge in partitioned_graph.subedges:
-            for constraint in edge.constraints:
-                progress_bar.update()
 
     def _handle_virtual_vertex(self, vertex, json_constraints_dictory_rep,
                                machine):

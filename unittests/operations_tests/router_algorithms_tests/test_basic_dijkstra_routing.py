@@ -10,7 +10,7 @@ from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
+from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
 from pacman.model.partitionable_graph.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph \
@@ -94,9 +94,9 @@ class MyTestCase(unittest.TestCase):
         # sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         # create machine
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -237,9 +237,9 @@ class MyTestCase(unittest.TestCase):
         # sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
 
         self.set_up_4_node_board()
 
@@ -287,11 +287,11 @@ class MyTestCase(unittest.TestCase):
         routing_info = RoutingInfo()
         subedge_routing_info = list()
         for i in range(len(subedges)):
-            subedge_routing_info.append(SubedgeRoutingInfo(
+            subedge_routing_info.append(PartitionRoutingInfo(
                 subedges[i], i<<11, constants.DEFAULT_MASK))
 
         for subedge_info in subedge_routing_info:
-            routing_info.add_subedge_info(subedge_info)
+            routing_info.add_partition_info(subedge_info)
 
 
         self.set_up_4_node_board()

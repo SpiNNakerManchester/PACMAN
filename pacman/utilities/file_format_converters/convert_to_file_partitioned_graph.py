@@ -88,25 +88,26 @@ class ConvertToFilePartitionedGraph(object):
                     DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX
                 vertex_resources["sdram"] = \
                     int(vertex.resources_required.sdram.get_value())
+
             vertex_outgoing_partitions = \
                 partitioned_graph.outgoing_edges_partitions_from_vertex(vertex)
 
             # handle the vertex edges
-            for vertex_partition in vertex_outgoing_partitions:
+            for partition_id in vertex_outgoing_partitions:
+                partition = vertex_outgoing_partitions[partition_id]
                 hyper_edge_dict = dict()
-                edges_resources[
-                    "{}:{}".format(id(vertex), vertex_partition)] = \
-                    hyper_edge_dict
+                edges_resources[str(id(partition))] = hyper_edge_dict
                 hyper_edge_dict["source"] = str(id(vertex))
 
                 sinks_string = []
-                for edge in vertex_outgoing_partitions[vertex_partition].edges:
+                weight = 0
+
+                for edge in partition.edges:
                     sinks_string.append(str(id(edge.post_subvertex)))
+                    weight += edge.weight
                 hyper_edge_dict['sinks'] = sinks_string
-                hyper_edge_dict["weight"] = 1.0
-                hyper_edge_dict["type"] = \
-                    vertex_outgoing_partitions[vertex_partition]\
-                    .type.name.lower()
+                hyper_edge_dict["weight"] = weight
+                hyper_edge_dict["type"] = partition.type.name.lower()
             progress_bar.update()
 
         file_to_write = open(file_path, "w")

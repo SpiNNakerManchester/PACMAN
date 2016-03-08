@@ -1,5 +1,5 @@
-from pacman.model.constraints.abstract_constraints.abstract_key_allocator_constraint \
-    import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.abstract_constraints\
+    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
@@ -14,3 +14,15 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
 
     def is_key_allocator_constraint(self):
         return True
+
+    def __eq__(self, other):
+        if not isinstance(other, KeyAllocatorContiguousRangeContraint):
+            return False
+        else:
+            return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash("KeyAllocatorContiguousRangeContraint")

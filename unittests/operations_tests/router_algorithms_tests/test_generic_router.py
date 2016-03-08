@@ -12,7 +12,7 @@ from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
+from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
 from spinn_machine.virutal_machine import VirtualMachine
 from pacman.utilities import constants
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
@@ -71,9 +71,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -93,9 +93,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -115,9 +115,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -136,9 +136,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -157,9 +157,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -178,9 +178,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -199,9 +199,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -220,9 +220,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -242,9 +242,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -264,9 +264,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()
@@ -308,9 +308,9 @@ class TestRouter(unittest.TestCase):
         #sort out routing infos
         self.routing_info = RoutingInfo()
         self.subedge_routing_info1 = \
-            SubedgeRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
+            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
                                subedge=self.subedge)
-        self.routing_info.add_subedge_info(self.subedge_routing_info1)
+        self.routing_info.add_partition_info(self.subedge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)
         self.routing = BasicDijkstraRouting()

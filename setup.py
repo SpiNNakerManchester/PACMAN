@@ -48,8 +48,6 @@ setup(
                   'pacman.utilities.file_format_converters': ['*.xml'],
                   'pacman.utilities.file_format_schemas': ['*.json']},
     install_requires=[
-        'six', 'enum34', 'numpy', 'jsonschema', 'SpiNNMan==2016.001',
-        'SpiNNMachine==2015.004.01'],
-    dependency_links=['https://github.com/SpiNNakerManchester/SpiNNMan/tarball/master#egg=SpiNNMan-2016.001', 
-                      'https://github.com/SpiNNakerManchester/SpiNNMachine/tarball/master#egg=SpiNNMachine-2015.004.01']
+        'six', 'enum34', 'numpy', 'jsonschema', 'rig >= 0.13.2'
+        'SpiNNMachine == 2016.001']
 )

@@ -11,7 +11,7 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
         vertices on either side of the edge
     """
 
-    def __init__(self, pre_vertex, post_vertex, constraints=None, label=None):
+    def __init__(self, pre_vertex, post_vertex, label=None):
         """
 
         :param pre_subvertex: the subvertex at the start of the subedge
@@ -27,25 +27,18 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
         :type label: str
         :raise None: Raises no known exceptions
         """
-        AbstractPartitionableEdge.__init__(self, pre_vertex, post_vertex,
-                                           constraints, label)
+        AbstractPartitionableEdge.__init__(
+            self, pre_vertex, post_vertex, label)
 
     def is_partitionable_edge(self):
-        """ helper method for is instance
-
-        :return:
-        """
         return True
 
-    def create_subedge(self, pre_subvertex, post_subvertex, label=None,
-                       constraints=None):
-        """
-        method for creating a partitioned multicast edge
-        :param pre_subvertex: the soruce partitioned vertex
+    def create_subedge(self, pre_subvertex, post_subvertex, label=None):
+        """ Create a partitioned multicast edge
+
+        :param pre_subvertex: the source partitioned vertex
         :param post_subvertex: the destination partitioned vertex
         :param label: the label of this partitioned edge
-        :param constraints: the constraints wnated to be put on this
-        partitioned edge
         :return:
         """
         if not isinstance(pre_subvertex, PartitionedVertex):
@@ -59,5 +52,4 @@ class MultiCastPartitionableEdge(AbstractPartitionableEdge):
         if label is None and self.label is not None:
             label = self.label
 
-        return MultiCastPartitionedEdge(pre_subvertex, post_subvertex, label,
-                                        constraints)
+        return MultiCastPartitionedEdge(pre_subvertex, post_subvertex, label)

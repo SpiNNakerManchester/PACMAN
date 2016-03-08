@@ -43,7 +43,7 @@ class OrderedSet(collections.MutableSet):
         # key --> _Node
         self._map = dict()
 
-        # ior is overridden in mutable set; calls add on each element
+        # or is overridden in mutable set; calls add on each element
         if iterable is not None:
             self |= iterable
 
@@ -100,3 +100,6 @@ class OrderedSet(collections.MutableSet):
         if isinstance(other, OrderedSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
