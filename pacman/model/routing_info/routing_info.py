@@ -55,7 +55,7 @@ class RoutingInfo(object):
                 self._partition_infos_by_key[key_and_mask.key]\
                     .append(partition_info)
 
-            # need to check that subedge infos are linked properly
+            # need to check that subedge information is linked properly
             elif (self._partition_infos_by_key[key_and_mask.key] !=
                     partition_info):
                 self._partition_infos_by_key[key_and_mask.key]\
@@ -117,8 +117,8 @@ class RoutingInfo(object):
         return None
 
     def __iter__(self):
-        """ returns a iterator for the subedge routing infos
+        """ returns a iterator for the subedge routing information
 
-        :return: a iterator of subedge routing infos
+        :return: a iterator of subedge routing information
         """
         return iter(self._partition_infos_by_key)

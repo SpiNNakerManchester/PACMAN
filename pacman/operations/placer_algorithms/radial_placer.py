@@ -91,22 +91,22 @@ class RadialPlacer(object):
     def _generate_radial_chips(self, machine, resource_tracker=None,
                                start_chip_x=0, start_chip_y=0):
         first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
-        done_chips = set()
-        found_chips = OrderedSet()
+        done_chips = set([first_chip])
+        found_chips = OrderedSet([(start_chip_x, start_chip_y)])
         search = deque([first_chip])
         while len(search) > 0:
             chip = search.pop()
             if (resource_tracker is None or
                     resource_tracker.is_chip_available(chip.x, chip.y)):
                 found_chips.add((chip.x, chip.y))
-            done_chips.add(chip)
 
             # Examine the links of the chip to find the next chips
             for link in chip.router.links:
                 next_chip = machine.get_chip_at(link.destination_x,
                                                 link.destination_y)
 
-                # Don't search found chips again
+                # Don't search done chips again
                 if next_chip not in done_chips:
                     search.appendleft(next_chip)
+                    done_chips.add(next_chip)
         return found_chips

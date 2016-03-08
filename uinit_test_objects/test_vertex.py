@@ -35,7 +35,7 @@ class TestVertex(AbstractPartitionableVertex):
         """
         return ResourceContainer(
             sdram=SDRAMResource(
-                self.get_static_sdram_usage_for_atoms(vertex_slice, None)),
+                self.get_sdram_usage_for_atoms(vertex_slice, None)),
             cpu=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice, None)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice,
@@ -66,7 +66,7 @@ class TestVertex(AbstractPartitionableVertex):
         """
         return 1 * vertex_slice.n_atoms
 
-    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         :param vertex_slice: the atoms being considered
         :param graph: the partitionable graph

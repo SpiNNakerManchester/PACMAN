@@ -4,8 +4,7 @@ from pacman.model.constraints.abstract_constraints.\
 
 
 class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
-    """ A key allocator that fixes the mask to be assigned to a partitioned\
-        edge
+    """ Constraint that indicates fields in the mask of a key
     """
 
     def __init__(self, fields=None):
@@ -59,16 +58,8 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
                 return True
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing constrains
-        :param other: instance of KeyAllocatorFixedFieldConstraint
-        :return:
-        """
         return not self.__eq__(other)
 
     def __hash__(self):
         frozen_fields = frozenset(self._fields)
         return hash(frozen_fields)
-
-
-
