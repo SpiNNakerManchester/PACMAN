@@ -383,12 +383,13 @@ class PACMANAlgorithmExecutor(object):
         try:
             results = python_algorithm(**inputs)
         except Exception as e:
+            exc_info = sys.exc_info()
             if isinstance(
                     e, exceptions.PacmanAlgorithmFailedToCompleteException):
-                raise sys.exc_info[0], sys.exc_info[1], sys.exc_info[2]
+                raise exc_info[0], exc_info[1], exc_info[2]
             else:
                 raise exceptions.PacmanAlgorithmFailedToCompleteException(
-                    algorithm, e, traceback)
+                    algorithm, e, exc_info[2])
         # handle_prov_data
         if self._do_timing:
             self._update_timings(timer, algorithm)
