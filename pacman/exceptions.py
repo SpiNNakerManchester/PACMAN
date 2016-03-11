@@ -166,27 +166,19 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
 
     @property
     def traceback(self):
-        """
-        property method to get access to the exception's traceback that
-        raised this one
-        :return:
+        """ The traceback of the exception that caused this exception
         """
         return self._traceback
 
     @property
     def exception(self):
-        """
-        property method to get access to the exception that raised this one
-        :return:
+        """ The exception that caused this exception
         """
         return self._exception
 
     @property
     def algorithm(self):
-        """
-        property method for returning the internal algorithm which raised
-        the exception
-        :return:
+        """ The algorithm that raised the exception
         """
         return self._algorithm
 
@@ -203,8 +195,8 @@ class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
 
 
 class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
-    """ An exception that indicates that an algorithm has not generated the
-    correct outputs for some unknown reason
+    """ An exception that indicates that an algorithm has not generated the\
+        correct outputs for some unknown reason
 
     """
     pass

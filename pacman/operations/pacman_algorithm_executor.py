@@ -13,7 +13,6 @@ import logging
 import importlib
 import subprocess
 import os
-import traceback
 import sys
 from collections import defaultdict
 
@@ -583,4 +582,7 @@ class PACMANAlgorithmExecutor(object):
 
     def _update_timings(self, timer, algorithm):
         time_taken = timer.take_sample()
+        if self._print_timings:
+            logger.info("Time {} taken by {}".format(
+                str(time_taken), algorithm.algorithm_id))
         self._algorithm_timings.append((algorithm.algorithm_id, time_taken))

@@ -1,7 +1,3 @@
-"""
-Placement file
-"""
-
 
 class Placement(object):
     """ Represents a placement of a subvertex on a specific processor on a\
@@ -85,9 +81,4 @@ class Placement(object):
         return not self.__eq__(other)
 
     def __repr__(self):
-        """ generates a human readable description of the placement object
-
-        :return: string representation of the placement object
-        """
-        return "placement object for core {}:{}:{}".format(self._x, self._y,
-                                                           self._p)
+        return "Placement on core {}:{}:{}".format(self._x, self._y, self._p)
