@@ -1,4 +1,3 @@
-
 from pacman.model.routing_tables.multicast_routing_table\
     import MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables\
