@@ -633,7 +633,7 @@ class ResourceTracker(object):
                 self._address_and_port_ip_tag[tag_key] = key
 
                 # Remember how many allocations are sharing this tag
-                # in case an de-allocation is requested
+                # in case an deallocation is requested
                 if tag_key not in self._n_ip_tag_allocations:
                     self._n_ip_tag_allocations[tag_key] = 1
                 else:
