@@ -48,5 +48,5 @@ class PartitionRoutingInfo(object):
         return self._partition
 
     def __repr__(self):
-        return "partition:{}, keys_and_masks:{}"\
-            .format(self._partition, self._keys_and_masks)
+        return "partition:{}, keys_and_masks:{}".format(
+            self._partition, self._keys_and_masks)

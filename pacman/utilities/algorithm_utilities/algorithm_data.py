@@ -13,8 +13,8 @@ class AlgorithmData(object):
         :param optional_inputs:
         :param outputs:
         :param external:
-        :param required_optional_inputs: inputs which at least one of is needed,
-          but not all
+        :param required_optional_inputs: inputs which at least one of is\
+                    needed, but not all
         :return:
         """
         self._id = algorithm_id
@@ -115,6 +115,6 @@ class AlgorithmData(object):
     def __str__(self):
         return "{}:{}:{}:{}:{}:{}:{}:{}:{}:{}".format(
             self._id, self._command_line_args, self._python_import_string,
-            self._inputs, self._optional_inputs, self._required_optional_inputs,
-            self._outputs, self._external, self._python_class,
-            self._python_function)
+            self._inputs, self._optional_inputs,
+            self._required_optional_inputs, self._outputs, self._external,
+            self._python_class, self._python_function)

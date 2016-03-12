@@ -17,7 +17,6 @@ from abc import abstractmethod
 from six import add_metaclass
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +38,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :type n_atoms: int
         :param label: the label of the vertex
         :type label: str
-        :param max_atoms_per_core: the max atoms that cna be supported by a \
+        :param max_atoms_per_core: the max atoms that can be supported by a \
                     core. Note that this is translated into a partitioner max \
                     size constraint
         :type max_atoms_per_core: int
@@ -68,7 +67,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for sdram usage
+        :return a int value for SDRAM usage
         :rtype: int
         :raise None: this method raises no known exception
         """
@@ -81,9 +80,9 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for sdram usage
+        :return a int value for SDRAM usage
         :rtype: int
-        :raise None: this emthod raises no known exception
+        :raise None: this method raises no known exception
         """
 
     @abstractmethod
@@ -94,7 +93,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for sdram usage
+        :return a int value for SDRAM usage
         :rtype: int
         :raise None: this method raises no known exception
         """

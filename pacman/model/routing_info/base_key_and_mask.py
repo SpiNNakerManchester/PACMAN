@@ -58,11 +58,6 @@ class BaseKeyAndMask(object):
                     self._mask == key_and_mask.mask)
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing key_and_masks
-        :param other: instance of BaseKeyAndMask
-        :return:
-        """
         return not self.__eq__(other)
 
     def __repr__(self):
@@ -127,7 +122,7 @@ class BaseKeyAndMask(object):
             numpy.asarray([self._base_key], dtype=">u4").view(dtype="uint8"))
 
         # for each key, create its key with the idea of a neuron id being
-        # continuous and live at a offsetable position from the bottom of
+        # continuous and live at an offset position from the bottom of
         # the key
         for value in range(n_keys):
             key = numpy.copy(unwrapped_key)

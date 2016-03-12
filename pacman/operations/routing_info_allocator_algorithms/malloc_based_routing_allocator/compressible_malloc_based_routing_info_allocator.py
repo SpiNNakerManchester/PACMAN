@@ -1,4 +1,3 @@
-
 # pacman imports
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
@@ -18,12 +17,13 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.utilities.utility_objs.ordered_set import OrderedSet
 from pacman.model.routing_info.partition_routing_info \
     import PartitionRoutingInfo
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
-from spinn_machine.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 from pacman import exceptions
@@ -33,19 +33,21 @@ import math
 import numpy
 import logging
 from collections import defaultdict
+from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
 
-class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
+class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     """ A Routing Info Allocation Allocator algorithm that keeps track of
-        free keys and attempts to allocate them as requested
+        free keys and attempts to allocate them as requested, but that also
+        looks at routing tables in an attempt to make things more compressible
     """
 
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
-    def __call__(self, subgraph, n_keys_map, graph_mapper=None):
+    def __call__(self, subgraph, n_keys_map, routing_tables):
 
         # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
@@ -146,29 +148,72 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             raise exceptions.PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
-        # If there is a graph, group by source vertex and sort by vertex slice
-        # (lo_atom)
-        if graph_mapper is not None:
-            vertex_groups = defaultdict(list)
-            for partition in continuous_groups:
-                vertex = graph_mapper.get_vertex_from_subvertex(
-                    partition.edges[0].pre_subvertex)
-                vertex_groups[vertex].append(partition)
-            vertex_partitions = list()
-            for vertex_group in vertex_groups.itervalues():
-                sorted_partitions = sorted(
-                    vertex_group,
-                    key=lambda part: graph_mapper.get_subvertex_slice(
-                        part.edges[0].pre_subvertex))
-                vertex_partitions.extend(sorted_partitions)
-            continuous_groups = vertex_partitions
+        # Sort the rest of the groups, using the routing tables for guidance
+        # Group partitions by those which share routes in any table
+        partition_groups = OrderedDict()
+        routers = reversed(sorted(
+            routing_tables.get_routers(),
+            key=lambda item: len(routing_tables.get_entries_for_router(
+                item[0], item[1]))))
+        for x, y in routers:
+
+            # Find all partitions that share a route in this table
+            partitions_by_route = defaultdict(OrderedSet)
+            routing_table = routing_tables.get_entries_for_router(x, y)
+            for partition, entry in routing_table.iteritems():
+                if partition in continuous_groups:
+                    entry_hash = sum(
+                        [1 << i for i in entry.out_going_links])
+                    entry_hash += sum(
+                        [1 << (i + 6) for i in entry.out_going_processors])
+                    partitions_by_route[entry_hash].add(partition)
+
+            for entry_hash, partitions in partitions_by_route.iteritems():
+
+                found_groups = list()
+                for partition in partitions:
+                    if partition in partition_groups:
+                        found_groups.append(partition_groups[partition])
+
+                if len(found_groups) == 0:
+
+                    # If no group was found, create a new one
+                    for partition in partitions:
+                        partition_groups[partition] = partitions
+
+                elif len(found_groups) == 1:
+
+                    # If a single other group was found, merge it
+                    for partition in partitions:
+                        found_groups[0].add(partition)
+                        partition_groups[partition] = found_groups[0]
+
+                else:
+
+                    # Merge the groups
+                    new_group = partitions
+                    for group in found_groups:
+                        for partition in group:
+                            new_group.add(partition)
+                    for partition in new_group:
+                        partition_groups[partition] = new_group
+
+        # Sort partitions by largest group
+        continuous_groups = OrderedSet(
+            tuple(group) for group in partition_groups.itervalues())
+        continuous_groups = reversed(sorted(
+            [group for group in continuous_groups],
+            key=lambda group: len(group)))
 
         for group in continuous_groups:
-            keys_and_masks = self._allocate_keys_and_masks(
-                None, None, n_keys_map.n_keys_for_partition(group))
+            for partition in group:
+                keys_and_masks = self._allocate_keys_and_masks(
+                    None, None, n_keys_map.n_keys_for_partition(partition))
 
-            # update the pacman data objects
-            self._update_routing_objects(keys_and_masks, routing_infos, group)
+                # update the pacman data objects
+                self._update_routing_objects(
+                    keys_and_masks, routing_infos, partition)
+                progress_bar.update()
 
         progress_bar.end()
         return {'routing_infos': routing_infos}

@@ -32,7 +32,22 @@ class BasicPartitioner(object):
 
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine):
+        """ Partition a partitionable_graph so that each subvertex will fit\
+            on a processor within the machine
 
+        :param graph: The partitionable_graph to partition
+        :type graph:\
+                    :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :param machine: The machine with respect to which to partition the\
+                    partitionable_graph
+        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :return: A partitioned_graph of partitioned vertices and partitioned\
+                    edges
+        :rtype:\
+                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
+        :raise pacman.exceptions.PacmanPartitionException: If something\
+                   goes wrong with the partitioning
+        """
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             supported_constraints=[PartitionerMaximumSizeConstraint],
@@ -52,8 +67,8 @@ class BasicPartitioner(object):
 
             # Get the usage of the first atom, then assume that this
             # will be the usage of all the atoms
-            requirements = vertex.get_resources_used_by_atoms(Slice(0, 1),
-                                                              graph)
+            requirements = vertex.get_resources_used_by_atoms(
+                Slice(0, 1), graph)
 
             # Locate the maximum resources available
             max_resources_available = \

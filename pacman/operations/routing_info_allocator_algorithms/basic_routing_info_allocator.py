@@ -1,20 +1,20 @@
-"""
-basic routing info allocator
-"""
 
 # pacman imports
 from pacman.model.data_request_interfaces.\
     abstract_requires_routing_info_partitioned_vertex import \
     RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
+from pacman.model.routing_info.partition_routing_info \
+    import PartitionRoutingInfo
 from pacman.utilities import utility_calls
 from spinn_machine.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.constraints.key_allocator_constraints.key_allocator_contiguous_range_constraint import KeyAllocatorContiguousRangeContraint
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint\
+    import KeyAllocatorContiguousRangeContraint
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
@@ -34,7 +34,8 @@ class BasicRoutingInfoAllocator(object):
         Allocates routing information to the partitioned edges in a\
         partitioned graph
 
-        :param partitioned_graph: The partitioned graph to allocate the routing info for
+        :param partitioned_graph: The partitioned graph to allocate the \
+                    outing info for
         :type partitioned_graph:\
                     :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
         :param placements: The placements of the subvertices
