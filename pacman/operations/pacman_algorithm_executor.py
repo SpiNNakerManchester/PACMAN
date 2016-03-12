@@ -1,28 +1,25 @@
 # pacman imports
 from pacman import exceptions
-from pacman.interfaces.abstract_provides_provenance_data import \
-    AbstractProvidesProvenanceData
 from pacman.operations import algorithm_reports
 from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
 from pacman.utilities import file_format_converters
 from pacman import operations
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.timer import Timer
 
 # general imports
 import logging
 import importlib
 import subprocess
 import os
-import traceback
-from lxml import etree
+import sys
 from collections import defaultdict
-from pacman.utilities.utility_objs.timer import Timer
 
 logger = logging.getLogger(__name__)
 
 
-class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
+class PACMANAlgorithmExecutor(object):
     """ An executor of PACMAN algorithms where the order is deduced from the\
         input and outputs of the algorithm using an XML description of the\
         algorithm
@@ -42,10 +39,9 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param do_timings: True if timing information should be printed after\
                 each algorithm, False otherwise
         """
-        AbstractProvidesProvenanceData.__init__(self)
 
-        # provenance data store
-        self._provenance_data = etree.Element("Provenance_data_from_PACMAN")
+        # algorithm timing information
+        self._algorithm_timings = list()
 
         # pacman mapping objects
         self._algorithms = list()
@@ -77,7 +73,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param inputs: list of input types
         :type inputs: iterable of str
         :param optional_algorithms: list of algorithms which are optional\
-                and don't necessarily need to be ran to compete the logic flow
+                and don't necessarily need to be ran to complete the logic flow
         :type optional_algorithms: list of strings
         :param xml_paths: the list of paths for XML configuration data
         :type xml_paths: iterable of strings
@@ -164,8 +160,8 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         generated_outputs.union(input_types)
         allocated_a_algorithm = True
         algorithms_to_find = list(algorithm_data)
-        outputs_to_find = \
-            self._remove_outputs_which_are_inputs(required_outputs, inputs)
+        outputs_to_find = self._remove_outputs_which_are_inputs(
+            required_outputs, inputs)
 
         while ((len(algorithms_to_find) > 0 or len(outputs_to_find) > 0) and
                 allocated_a_algorithm):
@@ -224,7 +220,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                         "    Functions used: {}\n"
                         "    Inputs required per function: \n{}\n".format(
                             input_types,
-                            list(set(outputs_to_find) - set(input_types)),
+                            outputs_to_find,
                             algorithms_left_names, algorithms_used,
                             algorithm_input_requirement_breakdown))
 
@@ -385,17 +381,17 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         # execute algorithm
         try:
             results = python_algorithm(**inputs)
-        except TypeError as type_error:
-            raise exceptions.PacmanTypeError(
-                "Algorithm {} has crashed."
-                "    Inputs: {}\n"
-                "    Error: {}\n"
-                "    Stack: {}\n".format(
-                    algorithm.algorithm_id, algorithm.inputs,
-                    type_error.message, traceback.format_exc()))
+        except Exception as e:
+            exc_info = sys.exc_info()
+            if isinstance(
+                    e, exceptions.PacmanAlgorithmFailedToCompleteException):
+                raise exc_info[0], exc_info[1], exc_info[2]
+            else:
+                raise exceptions.PacmanAlgorithmFailedToCompleteException(
+                    algorithm, e, exc_info[2])
         # handle_prov_data
         if self._do_timing:
-            self._handle_prov(timer, algorithm)
+            self._update_timings(timer, algorithm)
 
         # move outputs into internal data objects
         self._map_output_parameters(results, algorithm)
@@ -433,13 +429,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         algorithm_progress_bar.end()
 
         if self._do_timing:
-            self._handle_prov(timer, algorithm)
+            self._update_timings(timer, algorithm)
 
         # check the return code for a successful execution
         if child.returncode != 0:
             stdout, stderr = child.communicate()
             raise exceptions.\
-                PacmanAlgorithmFailedToCompleteException(
+                PacmanExternalAlgorithmFailedToCompleteException(
                     "Algorithm {} returned a non-zero error code {}\n"
                     "    Inputs: {}\n"
                     "    Output: {}\n"
@@ -509,8 +505,6 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         :param results: the results from the algorithm
         :param algorithm: the algorithm description
         :return: None
-        :raises PacmanAlgorithmFailedToCompleteException: when the algorithm\
-                returns no results
         """
         if results is not None:
 
@@ -525,7 +519,7 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
                             algorithm.outputs))
                 self._internal_type_mapping[result_type] = results[result_name]
         elif len(algorithm.outputs) != 0:
-            raise exceptions.PacmanAlgorithmFailedToCompleteException(
+            raise exceptions.PacmanAlgorithmFailedToGenerateOutputsException(
                 "Algorithm {} did not generate any outputs".format(
                     algorithm.algorithm_id))
 
@@ -582,36 +576,13 @@ class PACMANAlgorithmExecutor(AbstractProvidesProvenanceData):
         """
         return self._internal_type_mapping
 
-    def write_provenance_data_in_xml(self, file_path, transceiver,
-                                     placement=None):
-        """
+    @property
+    def algorithm_timings(self):
+        return self._algorithm_timings
 
-        :param file_path:
-        :param transceiver:
-        :param placement:
-        :return:
-        """
-        # write xml form into file provided
-        writer = open(file_path, "w")
-        writer.write(etree.tostring(self._provenance_data, pretty_print=True))
-        writer.flush()
-        writer.close()
-
-    def _handle_prov(self, timer, algorithm):
+    def _update_timings(self, timer, algorithm):
         time_taken = timer.take_sample()
-
-        # get timing element
-        if len(self._provenance_data) == 0:
-            provenance_data_timings = etree.SubElement(
-                self._provenance_data, "algorithm_timings")
-        else:
-            provenance_data_timings = self._provenance_data[0]
-
-        # write timing element
-        algorithm_provence_data = etree.SubElement(
-            provenance_data_timings,
-            "algorithm_{}".format(algorithm.algorithm_id))
-        algorithm_provence_data.text = str(time_taken)
         if self._print_timings:
             logger.info("Time {} taken by {}".format(
                 str(time_taken), algorithm.algorithm_id))
+        self._algorithm_timings.append((algorithm.algorithm_id, time_taken))

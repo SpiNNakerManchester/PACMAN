@@ -33,8 +33,8 @@ class Placements(object):
     def add_placements(self, placements):
         """
         :param placements: The list of placements
-        :type placements: iterable of :py:class:`pacman.model.placements\
-        .placement.Placement`
+        :type placements: iterable of\
+                    :py:class:`pacman.model.placements.placement.Placement`
         :return: None
         :rtype: None
         """
@@ -89,11 +89,11 @@ class Placements(object):
 
         :param subvertex: The subvertex to find the placement of
         :type subvertex:
-            :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: The placement
         :rtype: :py:class:`pacman.model.placements.placement.Placement`
-        :raise PacmanSubvertexNotPlacedError: If the subvertex has not been
-            placed.
+        :raise PacmanSubvertexNotPlacedError: If the subvertex has not been\
+                    placed.
         """
         try:
             return self._subvertices[subvertex]
@@ -110,7 +110,7 @@ class Placements(object):
         return self._placements.iterkeys()
 
     def is_subvertex_on_processor(self, x, y, p):
-        """Returns whether a subvertex is assigned to a processor.
+        """ Determine if a subvertex is assigned to a processor.
 
         :param int x: x coordinate of processor.
         :param int y: y coordinate of processor.
@@ -131,18 +131,17 @@ class Placements(object):
         return self._placements.itervalues()
 
     def __repr__(self):
-        """ string representation
-
-        :return:
-        """
         output = ""
         for placement in self._placements:
             output += placement.__repr__()
         return output
 
     def __iter__(self):
-        """ returns a iterator for the placements object within
+        """ An iterator for the placements object within
 
         :return:
         """
         return iter(self.placements)
+
+    def __len__(self):
+        return len(self._placements)
