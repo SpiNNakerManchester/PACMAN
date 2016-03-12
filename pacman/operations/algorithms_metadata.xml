@@ -111,6 +111,26 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="OneToOnePlacer">
+        <python_module>pacman.operations.placer_algorithms.one_to_one_placer</python_module>
+        <python_class>OneToOnePlacer</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="ConnectiveBasedPlacer">
         <python_module>pacman.operations.placer_algorithms.connective_based_placer</python_module>
         <python_class>ConnectiveBasedPlacer</python_class>
@@ -201,6 +221,38 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="DestinationBasedRoutingInfoAllocator">
+        <python_module>pacman.operations.routing_info_allocator_algorithms.destination_based_key_allocator</python_module>
+        <python_class>DestinationBasedRoutingInfoAllocator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>subgraph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_paths</param_name>
+                <param_type>MemoryRoutingPaths</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="MallocBasedRoutingInfoAllocator">
         <python_module>pacman.operations.routing_info_allocator_algorithms.malloc_based_routing_allocator.malloc_based_routing_info_allocator</python_module>
         <python_class>MallocBasedRoutingInfoAllocator</python_class>
@@ -220,6 +272,30 @@
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </optional_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="CompressibleMallocBasedRoutingInfoAllocator">
+        <python_module>pacman.operations.routing_info_allocator_algorithms.malloc_based_routing_allocator.compressible_malloc_based_routing_info_allocator</python_module>
+        <python_class>CompressibleMallocBasedRoutingInfoAllocator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>subgraph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+        </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>routing_infos</param_name>

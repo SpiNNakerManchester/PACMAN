@@ -1,6 +1,3 @@
-"""
-MulticastRoutingTableByPartitionEntry
-"""
 
 # pacman imports
 from pacman import exceptions
@@ -95,7 +92,6 @@ class MulticastRoutingTableByPartitionEntry(object):
     @property
     def incoming_processor(self):
         """ The source processor
-        :return:
         """
         return self._incoming_processor
 
@@ -173,7 +169,7 @@ class MulticastRoutingTableByPartitionEntry(object):
                 raise exceptions.PacmanInvalidParameterException(
                     "incoming_link", "invalid merge",
                     "The two MulticastRoutingTableByPartitionEntry have "
-                    "different incoming_links, and so cant be merged")
+                    "different incoming_links, and so can't be merged")
 
             # merge merge-able things
             merged_outgoing_processors = self._out_going_processors.union(

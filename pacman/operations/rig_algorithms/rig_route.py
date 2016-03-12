@@ -8,7 +8,7 @@ class RigRoute(object):
     """
 
     def __call__(self, partitioned_graph, machine, placements):
-        progress_bar = ProgressBar(7, "Routing")
+        progress_bar = ProgressBar(8, "Routing")
 
         vertices_resources, nets, net_names = \
             rig_converters.convert_to_rig_partitioned_graph(

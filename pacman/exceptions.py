@@ -1,3 +1,6 @@
+import traceback
+
+
 class PacmanException(Exception):
     """ Indicates a general exception from Pacman
     """
@@ -142,17 +145,61 @@ class PacmanNotExistException(PacmanException):
 
 
 class PacmanAlgorithmFailedToCompleteException(PacmanException):
-    """ An exception that indicates that a pacman algorithm ran from outside\
+    """ An exception that indicates that a pacman algorithm ran from inside\
         the software stack has failed to complete for some unknown reason.
 
     """
 
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the routing
-        :type problem: str
-        """
+    def __init__(self, algorithm, exception, tb):
+        problem = (
+            "Algorithm {} has crashed.\n"
+            "    Inputs: {}\n"
+            "    Error: {}\n"
+            "    Stack: {}\n".format(
+                algorithm.algorithm_id, algorithm.inputs, exception.message,
+                traceback.format_exc(tb)))
+
         PacmanException.__init__(self, problem)
+        self._exception = exception
+        self._algorithm = algorithm
+        self._traceback = tb
+
+    @property
+    def traceback(self):
+        """ The traceback of the exception that caused this exception
+        """
+        return self._traceback
+
+    @property
+    def exception(self):
+        """ The exception that caused this exception
+        """
+        return self._exception
+
+    @property
+    def algorithm(self):
+        """ The algorithm that raised the exception
+        """
+        return self._algorithm
+
+    def __repr__(self):
+        return PacmanException.__repr__(self)
+
+
+class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
+    """ An exception that indicates that an algorithm ran from outside\
+        the software stack has failed to complete for some unknown reason.
+
+    """
+    pass
+
+
+class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
+    """ An exception that indicates that an algorithm has not generated the\
+        correct outputs for some unknown reason
+
+    """
+    pass
 
 
 class PacmanSubvertexAlreadyPlacedError(ValueError):
@@ -188,6 +235,7 @@ class PacmanNotFoundError(KeyError, PacmanException):
 class PacmanTypeError(TypeError, PacmanException):
     """Indicates that an object is of incorrect type."""
     pass
+
 
 class PacmanNoMergeException(PacmanException):
     """Exception to indicate that there are no merges worth performing."""
