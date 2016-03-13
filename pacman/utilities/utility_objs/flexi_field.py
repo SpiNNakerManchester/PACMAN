@@ -7,9 +7,6 @@ SUPPORTED_TAGS = Enum(
 
 
 class FlexiField(object):
-    """
-    FlexiField
-    """
 
     def __init__(
             self, flexi_field_name, value=None, instance_n_keys=None, tag=None,
@@ -25,18 +22,13 @@ class FlexiField(object):
 
     @property
     def name(self):
-        """
-        property method for getting the flexi_field_id for this Flexi field
+        """ The name for this Flexible field
         :return:
         """
         return self._flexi_field_name
 
     @property
     def value(self):
-        """
-
-        :return:
-        """
         return self._value
 
     @property
@@ -45,29 +37,20 @@ class FlexiField(object):
 
     @property
     def instance_n_keys(self):
-        """
-
-        :return:
-        """
         return self._instance_n_keys
 
     def __eq__(self, other):
         if not isinstance(other, FlexiField):
             return False
         else:
-            if (self._flexi_field_name == other.name
-                    and self._instance_n_keys == other.instance_n_keys
-                    and self._tag == other.tag):
+            if (self._flexi_field_name == other.name and
+                    self._instance_n_keys == other.instance_n_keys and
+                    self._tag == other.tag):
                 return True
             else:
                 return False
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing flexi fields
-        :param other: instance of FlexiField
-        :return:
-        """
         return not self.__eq__(other)
 
     def __hash__(self):

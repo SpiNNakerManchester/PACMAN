@@ -1,7 +1,3 @@
-"""
-MulticastRoutingTableByPartition
-"""
-
 
 class MulticastRoutingTableByPartition(object):
     """ A set of multicast routing path objects
@@ -16,11 +12,10 @@ class MulticastRoutingTableByPartition(object):
         :param entry: the entry to add
         :param router_x: the x coord of the router
         :param router_y: the y coord of the router
-        :param partition: the partitioned edge's partition this entry is
-        associated with
+        :param partition: the partitioned edge's partition this entry is\
+                    associated with
         :type partition: \
                     :py:class:`pacman.utilities.utility_obs.outgoing_edge_partition.OutgoingEdgePartition`
-        :return:
         """
 
         # update router_to_entries_map
@@ -34,8 +29,14 @@ class MulticastRoutingTableByPartition(object):
             self._router_to_entries_map[key][partition] = entry.merge_entry(
                 self._router_to_entries_map[key][partition])
 
+    def get_routers(self):
+        """ Get the coordinates of all stored routers
+        """
+        return self._router_to_entries_map.iterkeys()
+
     def get_entries_for_router(self, router_x, router_y):
         """ Get the set of multicast path entries assigned to this router
+
         :param router_x: the x coord of the router
         :param router_y: the y coord of the router
         :return: return all router_path_entries for the router.
@@ -50,8 +51,8 @@ class MulticastRoutingTableByPartition(object):
         """ Get an entry from a specific coordinate
 
         :param partition:
-        :param router_x
-        :param router_y
+        :param router_x:
+        :param router_y:
         :return:
         """
         entries = self.get_entries_for_router(router_x, router_y)

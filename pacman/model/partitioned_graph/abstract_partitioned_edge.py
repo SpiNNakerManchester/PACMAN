@@ -73,7 +73,7 @@ class AbstractPartitionedEdge(object):
 
     @property
     def weight(self):
-        """ The weight of the edge in the graph relative to other weights; an
+        """ The weight of the edge in the graph relative to other weights; an\
             indication of the amount of traffic that might flow down the edge
 
         :return: The weight of the edge

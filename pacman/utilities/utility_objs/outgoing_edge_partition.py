@@ -89,6 +89,13 @@ class OutgoingEdgePartition(AbstractConstrainedObject, AbstractLabeled):
         """
         return self._type
 
+    def __repr__(self):
+        """
+        returns a string representation of the partition
+        :return:
+        """
+        return "{}:{}:{}".format(self._identifier, self._edges, self._type)
+
     def __contains__(self, edge):
         """
         checks if the edge is contained within this partition

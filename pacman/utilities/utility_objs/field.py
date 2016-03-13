@@ -3,8 +3,7 @@ import uuid
 
 
 class Field(object):
-    """
-    field object used primiarilly at the field constraint for key allocation
+    """ Field object used in a field constraint for key allocation
     """
 
     def __init__(self, lo, hi, value, tag=SUPPORTED_TAGS.ROUTING, name=None):
@@ -64,15 +63,11 @@ class Field(object):
         if not isinstance(other_field, Field):
             return False
         else:
-            return (self._lo == other_field.lo and self._hi == other_field.hi
-                    and self._value == other_field.value
-                    and self._tag == other_field.tag
-                    and self._name == other_field.name)
+            return (
+                self._lo == other_field.lo and self._hi == other_field.hi and
+                self._value == other_field.value and
+                self._tag == other_field.tag and
+                self._name == other_field.name)
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing fields
-        :param other: instance of Field
-        :return:
-        """
         return not self.__eq__(other)

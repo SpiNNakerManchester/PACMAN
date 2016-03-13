@@ -28,20 +28,15 @@ class FixedRoutePartitionableEdge(AbstractPartitionableEdge):
                                            label)
 
     def is_partitionable_edge(self):
-        """ helper method for is instance
-
-        :return:
-        """
         return True
 
     def create_subedge(self, pre_subvertex, post_subvertex, label=None):
-        """
-        method to create a fixed route partitioned edge from a fixed route
-         partitionable edge
-        :param pre_subvertex: the soruce subvertex
+        """ Create a fixed route partitioned edge
+
+        :param pre_subvertex: the source subvertex
         :param post_subvertex: the destination partitioned subvertex
         :param label: the label associated with the partitioned edge
-        :param constraints: any contraints needed for the partitioned edge
+        :param constraints: any constraints needed for the partitioned edge
         :return: the FixedRoutePartitionedEdge
         """
         if not isinstance(pre_subvertex, PartitionedVertex):
