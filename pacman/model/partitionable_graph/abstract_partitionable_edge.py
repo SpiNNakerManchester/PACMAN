@@ -81,7 +81,7 @@ class AbstractPartitionableEdge(object):
 
     @abstractmethod
     def is_partitionable_edge(self):
-        """helper method for is instance
+        """ Helper method for isinstance
 
         :return:
         """

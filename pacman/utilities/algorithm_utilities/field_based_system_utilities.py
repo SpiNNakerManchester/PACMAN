@@ -14,6 +14,7 @@ from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_flexi_field_constraint import \
     KeyAllocatorFlexiFieldConstraint
 from pacman import exceptions
+
 # the different types of field that this system supports
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.field import Field
@@ -99,8 +100,8 @@ def handle_flexi_field(constraint, seen_fields, known_fields):
         # seen the field before but not at this level. error
         if found_field is None and constraint_field in known_fields:
             raise exceptions.PacmanConfigurationException(
-                "Cant find the field {} in the expected position"
-                    .format(constraint_field))
+                "Can't find the field {} in the expected position".format(
+                    constraint_field))
 
         # if not seen the field before
         if found_field is None and constraint_field.name not in known_fields:
@@ -133,15 +134,17 @@ def convert_mask_into_fields(entity):
     """
     results = list()
     expanded_mask = utility_calls.expand_to_bit_array(entity)
+
     # set up for first location
-    detected_change = True
     detected_change_position = NUM_BITS_IN_ROUTING
     detected_last_state = expanded_mask[NUM_BITS_IN_ROUTING]
+
     # iterate up the key looking for fields
     for position in range(NUM_BITS_IN_ROUTING - 1,
                           START_OF_ROUTING_KEY_POSITION - 2, -1):
         # check for last bit iteration
         if position == -1:
+
             # if last bit has changed, create new field
             if detected_change_position != position:
 
@@ -157,8 +160,10 @@ def convert_mask_into_fields(entity):
                         NUM_BITS_IN_ROUTING, entity,
                         SUPPORTED_TAGS.APPLICATION.name))
         else:
+
             # check for bit iteration
             if expanded_mask[position] != detected_last_state:
+
                 # if changed state, a field needs to be created. check for
                 # which type of field to support
                 if detected_last_state == ROUTING_MASK_BIT:
@@ -171,6 +176,7 @@ def convert_mask_into_fields(entity):
                         NUM_BITS_IN_ROUTING - detected_change_position,
                         NUM_BITS_IN_ROUTING - (position + 1),
                         entity, SUPPORTED_TAGS.APPLICATION.name))
+
                 # update positions
                 detected_last_state = expanded_mask[position]
                 detected_change_position = position

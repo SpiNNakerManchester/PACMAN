@@ -87,6 +87,26 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="OneToOnePlacer">
+        <python_module>pacman.operations.placer_algorithms.one_to_one_placer</python_module>
+        <python_class>OneToOnePlacer</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="ConnectiveBasedPlacer">
         <python_module>pacman.operations.placer_algorithms.connective_based_placer</python_module>
         <python_class>ConnectiveBasedPlacer</python_class>
@@ -222,6 +242,36 @@
                 <param_type>MemoryPartitionedPartitionNKeysMap</param_type>
             </parameter>
         </required_inputs>
+        <optional_inputs>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+        </optional_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="CompressibleMallocBasedRoutingInfoAllocator">
+        <python_module>pacman.operations.routing_info_allocator_algorithms.malloc_based_routing_allocator.compressible_malloc_based_routing_info_allocator</python_module>
+        <python_class>CompressibleMallocBasedRoutingInfoAllocator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>subgraph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+        </required_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>routing_infos</param_name>
@@ -324,6 +374,22 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="MallocBasedRouteMerger">
+        <python_module>pacman.operations.router_compressors.malloc_based_route_merger</python_module>
+        <python_class>MallocBasedRouteMerger</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="MallocBasedChipIDAllocator">
         <python_module>pacman.operations.chip_id_allocator_algorithms.malloc_based_chip_id_allocator</python_module>
         <python_class>MallocBasedChipIdAllocator</python_class>
@@ -391,13 +457,70 @@
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryCompressedRoutingTables</param_type>
-            </parameter>
-            <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
+        <required_optional_inputs>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+                <param_type>1</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+                <param_type>2</param_type>
+            </parameter>
+        </required_optional_inputs>
+
+    </algorithm>
+    <algorithm name="RigPlaceAndRoute">
+        <python_module>pacman.operations.rig_algorithms.rig_place_and_route</python_module>
+        <python_class>RigPlaceAndRoute</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_paths</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="RigRoute">
+        <python_module>pacman.operations.rig_algorithms.rig_route</python_module>
+        <python_class>RigRoute</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>routing_paths</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+        </produces_outputs>
     </algorithm>
 </algorithms>

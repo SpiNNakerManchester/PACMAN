@@ -43,10 +43,6 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         self._key_list_function = key_list_function
 
     def is_key_allocator_constraint(self):
-        """
-        helper method for isinstance
-        :return:
-        """
         return True
 
     @property
@@ -85,13 +81,9 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
                 return True
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing constrains
-        :param other: instance of KeyAllocatorFixedKeyAndMaskConstraint
-        :return:
-        """
         return not self.__eq__(other)
 
     def __hash__(self):
-        frozen_elements = frozenset(self._keys_and_masks)
-        return (frozen_elements, self._key_list_function).__hash__()
+        return (
+            frozenset(self._keys_and_masks),
+            self._key_list_function).__hash__()

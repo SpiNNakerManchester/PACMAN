@@ -77,11 +77,11 @@ class PartitionableGraph(object):
         :param edge: an edge to be added to the partitionable_graph
         :type edge:\
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
-        :param partition_id: the id for the outgoing partition that this edge
-        is associated with
+        :param partition_id: the id for the outgoing partition that this edge\
+                    is associated with
         :type partition_id: str
-        :param partition_constraints: list of constraints to put onto the
-        partition
+        :param partition_constraints: list of constraints to put onto the\
+                    partition
         :type partition_constraints: iterable of
                 :py:class:`pacman.model.constraints.abstract_constraints.abstract_constraint.AbstractConstraint`
         :return: None
@@ -145,12 +145,14 @@ class PartitionableGraph(object):
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
         :raise None: does not raise any known exceptions
         """
+
         # if no partition, given edges from all partitions
         if partition_identifier is None:
             edges = list()
             for partition in self._outgoing_edges[vertex]:
                 edges.extend(self._outgoing_edges[vertex][partition].edges)
             return edges
+
         # if no partition then return empty list
         elif partition_identifier not in self._outgoing_edges[vertex]:
             return ()
@@ -187,10 +189,9 @@ class PartitionableGraph(object):
 
     @property
     def partitions(self):
-        """
-        property method for all the partitions in the graph
+        """ All the partitions in the graph
         :return: iterable of\
-                     :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
         """
         partitions = list()
         for vertex in self._vertices:

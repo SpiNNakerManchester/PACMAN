@@ -213,9 +213,9 @@ class PartitionAndPlacePartitioner(object):
         :param resource_tracker: the tracker of resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
-        :param lo_atom: the lo atom of a slice to be considered
+        :param lo_atom: the low atom of a slice to be considered
         :type lo_atom: int
-        :param hi_atom: the hi atom of a slice to be considered
+        :param hi_atom: the high atom of a slice to be considered
         :type hi_atom: int
         :param graph: the partitionable graph used by the partitioner
         :type graph:
@@ -307,15 +307,22 @@ class PartitionAndPlacePartitioner(object):
 
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
-                vertex_slice = Slice(lo_atom, hi_atom)
-                used_resources = vertex.get_resources_used_by_atoms(
-                    vertex_slice, graph)
-                ratio = self._find_max_ratio(used_resources, resources)
+                if hi_atom >= lo_atom:
+                    vertex_slice = Slice(lo_atom, hi_atom)
+                    used_resources = vertex.get_resources_used_by_atoms(
+                        vertex_slice, graph)
+                    ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
-                    "Vertex {} could not be partitioned".format(vertex.label))
+                    "No more of vertex {} would fit on the board:\n"
+                    "    Allocated so far: {} atoms\n"
+                    "    Request for SDRAM: {}\n"
+                    "    Largest SDRAM space: {}".format(
+                        vertex, lo_atom - 1,
+                        used_resources.sdram.get_value(),
+                        resources.sdram.get_value()))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
@@ -404,7 +411,7 @@ class PartitionAndPlacePartitioner(object):
             ratio = self._find_max_ratio(used_resources, resources)
 
         # If we have managed to fit everything exactly (unlikely but possible),
-        # return the matched resources and hi atom count
+        # return the matched resources and high atom count
         if ratio == 1.0:
             return used_resources, hi_atom
 

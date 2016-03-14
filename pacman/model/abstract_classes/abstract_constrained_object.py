@@ -11,7 +11,8 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint \
 class AbstractConstrainedObject(object):
 
     def __init__(self, constraints=None):
-        # safety point for dimond inhirrtance
+
+        # safety point for diamond inheritance
         if not hasattr(self, 'constraints'):
             self._constraints = set()
 

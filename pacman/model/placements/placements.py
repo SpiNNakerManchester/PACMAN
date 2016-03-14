@@ -21,7 +21,6 @@ class Placements(object):
         """
         self._placements = dict()
         self._subvertices = dict()
-        self._placements_by_chip = dict()
         if placements is not None:
             self.add_placements(placements)
 
@@ -34,8 +33,8 @@ class Placements(object):
     def add_placements(self, placements):
         """
         :param placements: The list of placements
-        :type placements: iterable of :py:class:`pacman.model.placements\
-        .placement.Placement`
+        :type placements: iterable of\
+                    :py:class:`pacman.model.placements.placement.Placement`
         :return: None
         :rtype: None
         """
@@ -64,12 +63,6 @@ class Placements(object):
         self._placements[placement_id] = placement
         self._subvertices[placement.subvertex] = placement
 
-        # store chip based placements
-        chip_placement_id = (placement.x, placement.y)
-        if chip_placement_id not in self._placements_by_chip:
-            self._placements_by_chip[chip_placement_id] = list()
-        self._placements_by_chip[chip_placement_id].append(placement)
-
     def get_subvertex_on_processor(self, x, y, p):
         """ Return the subvertex on a specific processor or None if the\
             processor has not been allocated
@@ -96,11 +89,11 @@ class Placements(object):
 
         :param subvertex: The subvertex to find the placement of
         :type subvertex:
-            :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.subgraph.subvertex.PartitionedVertex`
         :return: The placement
         :rtype: :py:class:`pacman.model.placements.placement.Placement`
-        :raise PacmanSubvertexNotPlacedError: If the subvertex has not been
-            placed.
+        :raise PacmanSubvertexNotPlacedError: If the subvertex has not been\
+                    placed.
         """
         try:
             return self._subvertices[subvertex]
@@ -117,10 +110,10 @@ class Placements(object):
         return self._placements.iterkeys()
 
     def is_subvertex_on_processor(self, x, y, p):
-        """Returns whether a subvertex is assigned to a processor.
+        """ Determine if a subvertex is assigned to a processor.
 
-        :param int x: x co-ordinate of processor.
-        :param int y: y co-ordinate of processor.
+        :param int x: x coordinate of processor.
+        :param int y: y coordinate of processor.
         :param int p: Index of processor.
         :return bool: Whether the processor has an assigned subvertex.
         """
@@ -137,40 +130,18 @@ class Placements(object):
         """
         return self._placements.itervalues()
 
-    def get_placements_on_chip(self, x, y):
-        """ returns the placements placed on a specific chip
-
-        :param x: the x coord of the chip to locate placements of
-        :param y: the y coord of the chip to locate placements of
-        :return: a list of placement objects that reside on the chip, or a
-        empty list if none exist
-        """
-        placmeent_key = (x, y)
-        if placmeent_key not in self._placements_by_chip:
-            return []
-        else:
-            return self._placements_by_chip[placmeent_key]
-
     def __repr__(self):
-        """ string representation
-
-        :return:
-        """
         output = ""
         for placement in self._placements:
             output += placement.__repr__()
         return output
 
     def __iter__(self):
-        """ returns a iterator for the placements object within
+        """ An iterator for the placements object within
 
         :return:
         """
         return iter(self.placements)
 
     def __len__(self):
-        """
-        returns the number of placements in this placemnts object
-        :return:
-        """
         return len(self._placements)

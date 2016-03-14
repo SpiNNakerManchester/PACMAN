@@ -34,7 +34,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :type n_atoms: int
         :param label: the label of the vertex
         :type label: str
-        :param max_atoms_per_core: the max atoms that cna be supported by a \
+        :param max_atoms_per_core: the max atoms that can be supported by a \
                     core. Note that this is translated into a partitioner max \
                     size constraint
         :type max_atoms_per_core: int
@@ -56,14 +56,14 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         self.add_constraint(max_atom_per_core_constraint)
 
     @abstractmethod
-    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """ Get the SDRAM usage of a collection of atoms
 
         :param vertex_slice: the vertex vertex_slice which determines\
                     which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for sdram usage
+        :return a int value for SDRAM usage
         :rtype: int
         :raise None: this method raises no known exception
         """
@@ -76,9 +76,9 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for sdram usage
+        :return a int value for SDRAM usage
         :rtype: int
-        :raise None: this emthod raises no known exception
+        :raise None: this method raises no known exception
         """
 
     @abstractmethod
@@ -89,7 +89,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     which atoms are being represented by this vertex
         :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for sdram usage
+        :return a int value for SDRAM usage
         :rtype: int
         :raise None: this method raises no known exception
         """
@@ -103,8 +103,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :raise None: does not raise any known exception
         """
 
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph):
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
@@ -115,6 +114,15 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :rtype: ResourceContainer
         :raise None: this method does not raise any known exception
         """
+        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
+        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
+        sdram_requirement = self.get_sdram_usage_for_atoms(vertex_slice, graph)
+
+        # noinspection PyTypeChecker
+        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                      dtcm=DTCMResource(dtcm_requirement),
+                                      sdram=SDRAMResource(sdram_requirement))
+        return resources
 
     def get_max_atoms_per_core(self):
         """ Get the maximum number of atoms that can be run on a single core \
