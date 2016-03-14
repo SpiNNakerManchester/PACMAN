@@ -2,7 +2,8 @@ from pacman.utilities import rig_converters
 from rig.place_and_route.place.sa import place
 from rig.place_and_route.allocate.greedy import allocate
 from rig.place_and_route.route.ner import route
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+
+from spinn_machine.progress_bar import ProgressBar
 
 
 class RigPlaceAndRoute(object):
