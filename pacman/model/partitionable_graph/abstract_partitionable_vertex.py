@@ -1,9 +1,5 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.abstract_classes.abstract_constrained_vertex \
     import AbstractConstrainedVertex
 from pacman.model.constraints.partitioner_constraints\
@@ -16,9 +12,6 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 import logging
-
-from spinn_front_end_common.interface.abstract_recordable_interface import \
-    AbstractRecordableInterface
 
 logger = logging.getLogger(__name__)
 
