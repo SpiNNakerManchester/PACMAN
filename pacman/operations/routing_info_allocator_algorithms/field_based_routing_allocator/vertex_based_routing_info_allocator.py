@@ -25,7 +25,7 @@ from pacman.utilities.algorithm_utilities import \
 from pacman import exceptions
 from pacman.utilities.utility_objs.flexi_field import FlexiField
 from pacman.utilities.utility_objs.flexi_field import SUPPORTED_TAGS
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import field_based_system_utilities as field_utilities
     as field_utilities
 

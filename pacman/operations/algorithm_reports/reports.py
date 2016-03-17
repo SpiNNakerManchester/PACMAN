@@ -3,10 +3,9 @@ import time
 import logging
 
 from pacman import exceptions
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.model.abstract_classes.virtual_partitioned_vertex \
     import VirtualPartitionedVertex
-
 from spinn_machine.sdram import SDRAM
 
 logger = logging.getLogger(__name__)
