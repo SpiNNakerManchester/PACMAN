@@ -1,12 +1,12 @@
+from collections import defaultdict
+import json
+import os
+
+import jsonschema
+
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
-
-from collections import defaultdict
-
-import json
-import jsonschema
-import os
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 CHIP_HOMOGENIOUS_CORES = 18
 CHIP_HOMOGENIOUS_SDRAM = 119275520

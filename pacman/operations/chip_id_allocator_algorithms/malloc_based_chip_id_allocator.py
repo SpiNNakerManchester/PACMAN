@@ -4,7 +4,7 @@ from pacman.model.abstract_classes.abstract_virtual_vertex \
     import AbstractVirtualVertex
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.model.abstract_classes.virtual_partitioned_vertex \
     import VirtualPartitionedVertex

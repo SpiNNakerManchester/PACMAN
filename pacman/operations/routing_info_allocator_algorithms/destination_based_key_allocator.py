@@ -10,7 +10,7 @@ from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities

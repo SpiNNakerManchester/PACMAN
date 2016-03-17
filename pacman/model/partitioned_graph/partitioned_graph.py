@@ -1,9 +1,9 @@
 # pacman imports
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.utilities.utility_objs.ordered_set import OrderedSet
 from pacman.utilities.utility_objs.outgoing_edge_partition import \
     OutgoingEdgePartition
+from spinn_machine.utilities.ordered_set import OrderedSet
 
 # general imports
 import uuid
