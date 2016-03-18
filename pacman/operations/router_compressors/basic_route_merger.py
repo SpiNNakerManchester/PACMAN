@@ -3,8 +3,8 @@ from pacman.model.routing_tables.multicast_routing_table\
 from pacman.model.routing_tables.multicast_routing_tables\
     import MulticastRoutingTables
 
+from spinn_machine.utilities.progress_bar import ProgressBar
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-from spinn_machine.progress_bar import ProgressBar
 
 
 class BasicRouteMerger(object):

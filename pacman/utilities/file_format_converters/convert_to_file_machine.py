@@ -1,6 +1,6 @@
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 from collections import defaultdict
 

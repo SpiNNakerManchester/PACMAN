@@ -1,12 +1,12 @@
-from spinn_machine.progress_bar import ProgressBar
+import json
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition_entry import \
     MulticastRoutingTableByPartitionEntry
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
-
-import json
 
 
 class ConvertToMemoryMultiCastRoutes(object):

@@ -14,7 +14,7 @@ from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker

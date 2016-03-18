@@ -5,7 +5,7 @@ from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
 from pacman.utilities import file_format_converters
 from pacman import operations
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.timer import Timer
 
 # general imports

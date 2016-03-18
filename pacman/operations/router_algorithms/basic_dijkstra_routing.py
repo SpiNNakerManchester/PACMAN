@@ -6,10 +6,11 @@ from pacman.model.routing_table_by_partition.\
 from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
-from spinn_machine.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
     import MultiCastPartitionedEdge
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 # general imports
 import logging

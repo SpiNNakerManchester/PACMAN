@@ -14,7 +14,7 @@ from pacman import exceptions
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class DestinationBasedRoutingInfoAllocator(object):

@@ -23,7 +23,7 @@ from pacman.model.routing_info.partition_routing_info \
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 from pacman import exceptions

@@ -1,3 +1,4 @@
+
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from pacman.model.constraints.abstract_constraints.\
@@ -27,7 +28,8 @@ from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
-from spinn_machine.progress_bar import ProgressBar
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 import json
 import os
