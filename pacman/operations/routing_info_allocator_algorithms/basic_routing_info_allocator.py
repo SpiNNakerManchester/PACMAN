@@ -7,7 +7,7 @@ from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info \
     import PartitionRoutingInfo
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.abstract_constraints\

@@ -6,14 +6,14 @@ from pacman.model.data_request_interfaces\
     RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
+from pacman.model.routing_info.partition_routing_info \
+    import PartitionRoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman import exceptions
-from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class DestinationBasedRoutingInfoAllocator(object):
@@ -81,12 +81,9 @@ class DestinationBasedRoutingInfoAllocator(object):
                     "Only edges which require less than {} keys are supported"
                     .format(self.MAX_KEYS_SUPPORTED))
 
-            subedge_info = SubedgeRoutingInfo(keys_and_masks, subedge)
-            routing_infos.add_subedge_info(subedge_info)
+            partition_info = PartitionRoutingInfo(keys_and_masks, subedge)
+            routing_infos.add_partition_info(partition_info)
 
-            # update routing tables with entries
-            routing_info_allocator_utilities.add_routing_key_entries(
-                routing_paths, subedge_info, subedge, routing_tables)
             progress_bar.update()
         progress_bar.end()
 

@@ -17,16 +17,17 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.utilities.utility_objs.ordered_set import OrderedSet
 from pacman.model.routing_info.partition_routing_info \
     import PartitionRoutingInfo
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 from pacman import exceptions
+
+from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_machine.utilities.ordered_set import OrderedSet
 
 # general imports
 import math

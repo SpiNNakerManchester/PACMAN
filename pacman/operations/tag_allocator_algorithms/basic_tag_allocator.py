@@ -11,7 +11,7 @@ from pacman.model.constraints.tag_allocator_constraints.\
 from pacman.model.tags.tags import Tags
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 # spinn_machine imports
 from spinn_machine.tags.iptag import IPTag
