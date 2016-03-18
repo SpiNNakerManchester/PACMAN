@@ -15,7 +15,7 @@ class ConvertToFileCoreAllocations(object):
         """
 
         :param placements:
-        :param folder_path:
+        :param file_path:
         :return:
         """
 
