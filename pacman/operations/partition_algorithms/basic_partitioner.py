@@ -1,5 +1,3 @@
-import logging
-
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
@@ -10,11 +8,14 @@ from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanPartitionException
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+
+from spinn_machine.utilities.progress_bar import ProgressBar
+
+import logging
 
 logger = logging.getLogger(__name__)
 

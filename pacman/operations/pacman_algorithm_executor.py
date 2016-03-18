@@ -567,7 +567,10 @@ class PACMANAlgorithmExecutor(object):
                     returned
         :return: the returned item
         """
-        return self._internal_type_mapping[item_type]
+        if item_type not in self._internal_type_mapping:
+            return None
+        else:
+            return self._internal_type_mapping[item_type]
 
     def get_items(self):
         """ Get all the outputs from a execution

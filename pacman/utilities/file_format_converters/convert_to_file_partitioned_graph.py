@@ -1,18 +1,19 @@
-from collections import defaultdict
-import os
-import json
-import hashlib
-
-import jsonschema
-
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from pacman.model.constraints.abstract_constraints.\
     abstract_tag_allocator_constraint import \
     AbstractTagAllocatorConstraint
 from pacman.utilities import utility_calls
-from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
+
+from spinn_machine.utilities.progress_bar import ProgressBar
+
+from collections import defaultdict
+
+import os
+import json
+import jsonschema
+import hashlib
 
 DEFAULT_NOUMBER_OF_CORES_USED_PER_PARTITIONED_VERTEX = 1
 
