@@ -5,7 +5,11 @@ from pacman.model.abstract_classes.abstract_constrained_vertex \
 from pacman.model.constraints.partitioner_constraints\
     .partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
 
 
 from abc import ABCMeta
@@ -150,6 +154,10 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     subvertex.  If not given and the vertex has a label, a\
                     default label will be given to the subvertex
         :type label: str
+        :param resources_required: the sdram, dtcm, and ITCM used by this
+        partitioned vertex
+        :type resources_required:
+            pacman.model.resources_resource_container.ResourceContainer
         :param vertex_slice: the slice of the partitionable vertex that this\
                     partitioned vertex will cover
         :type vertex_slice: pacman.model.graph_mapper.vertex_slice.VertexSlice
