@@ -142,4 +142,5 @@ class BasicPartitioner(object):
             subgraph, graph_to_subgraph_mapper, graph)
 
         return {'Partitioned_graph': subgraph,
-                'Graph_mapper': graph_to_subgraph_mapper}
+                'Graph_mapper': graph_to_subgraph_mapper,
+                'nChips': len(resource_tracker.keys)}
