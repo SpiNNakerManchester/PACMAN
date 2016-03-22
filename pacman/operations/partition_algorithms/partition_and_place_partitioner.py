@@ -89,6 +89,7 @@ class PartitionAndPlacePartitioner(object):
         results = dict()
         results['partitioned_graph'] = subgraph
         results['graph_mapper'] = graph_mapper
+        results['nChips'] = len(resource_tracker.keys)
         return results
 
     def _partition_vertex(
