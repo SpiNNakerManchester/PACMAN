@@ -21,6 +21,10 @@
                 <param_name>Graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
+            <parameter>
+                <param_name>nChips</param_name>
+                <param_type>NChipsRequired</param_type>
+            </parameter>
         </produces_outputs>
     </algorithm>
     <algorithm name="PartitionAndPlacePartitioner">
@@ -44,6 +48,10 @@
             <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>nChips</param_name>
+                <param_type>NChipsRequired</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
