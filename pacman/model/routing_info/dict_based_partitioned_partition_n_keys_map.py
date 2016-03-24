@@ -2,9 +2,10 @@ from pacman.model.abstract_classes.abstract_partitioned_partition_n_keys_map \
     import AbstractPartitionedPartitionNKeysMap
 
 
-class DictBasedPartitionedPartitionNKeysMap(AbstractPartitionedPartitionNKeysMap):
+class DictBasedPartitionedPartitionNKeysMap(
+        AbstractPartitionedPartitionNKeysMap):
     """ A python dict-based implementation of the\
-        AbstractPartitionedEdgeNKeysMap
+        AbstractPartitionedPartitionNKeysMap
     """
 
     def __init__(self):

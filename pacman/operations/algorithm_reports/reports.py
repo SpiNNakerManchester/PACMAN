@@ -543,6 +543,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
 def routing_info_report(report_folder, partitioned_graph, routing_infos):
     """ Generates a report which says which keys is being allocated to each\
         subvertex
+
     :param report_folder: the report folder to store this value
     :param partitioned_graph:
     :param routing_infos:
@@ -661,9 +662,9 @@ def _generate_routing_table(routing_table, top_level_folder):
 
 def generate_comparison_router_report(
         report_folder, routing_tables, compressed_routing_tables):
-    """
-    makes a report on comparison of the compressed and uncompressed
-    routing tables
+    """ Make a report on comparison of the compressed and uncompressed \
+        routing tables
+
     :param report_folder: the folder to store the resulting report
     :param routing_tables: the original routing tables
     :param compressed_routing_tables: the compressed routing tables

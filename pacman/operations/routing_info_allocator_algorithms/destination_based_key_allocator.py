@@ -1,9 +1,6 @@
 from pacman.model.constraints.abstract_constraints\
     .abstract_key_allocator_constraint import \
     AbstractKeyAllocatorConstraint
-from pacman.model.data_request_interfaces\
-    .abstract_requires_routing_info_partitioned_vertex import \
-    RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info \
@@ -57,7 +54,7 @@ class DestinationBasedRoutingInfoAllocator(object):
 
         # check that this algorithm supports the constraints put onto the
         # partitioned_edges
-        supported_constraints = [RequiresRoutingInfoPartitionedVertex]
+        supported_constraints = []
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=subgraph.subedges,
             supported_constraints=supported_constraints,

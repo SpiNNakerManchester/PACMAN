@@ -154,10 +154,10 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     subvertex.  If not given and the vertex has a label, a\
                     default label will be given to the subvertex
         :type label: str
-        :param resources_required: the sdram, dtcm, and ITCM used by this
-        partitioned vertex
-        :type resources_required:
-            pacman.model.resources_resource_container.ResourceContainer
+        :param resources_required: the SDRAM, DTCM, and ITCM used by this\
+                    partitioned vertex
+        :type resources_required:\
+                    :py:class:`pacman.model.resources_resource_container.ResourceContainer`
         :param vertex_slice: the slice of the partitionable vertex that this\
                     partitioned vertex will cover
         :type vertex_slice: pacman.model.graph_mapper.vertex_slice.VertexSlice

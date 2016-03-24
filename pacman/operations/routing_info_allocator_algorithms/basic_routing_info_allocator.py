@@ -1,8 +1,5 @@
 
 # pacman imports
-from pacman.model.data_request_interfaces.\
-    abstract_requires_routing_info_partitioned_vertex import \
-    RequiresRoutingInfoPartitionedVertex
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info \
     import PartitionRoutingInfo
@@ -55,7 +52,6 @@ class BasicRoutingInfoAllocator(object):
         # check that this algorithm supports the constraints put onto the
         # partitioned_edges
         supported_constraints = [
-            RequiresRoutingInfoPartitionedVertex,
             KeyAllocatorContiguousRangeContraint]
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=partitioned_graph.partitions,
