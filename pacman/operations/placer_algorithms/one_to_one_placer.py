@@ -19,9 +19,10 @@ from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from pacman import exceptions
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class OneToOnePlacer(RadialPlacer):

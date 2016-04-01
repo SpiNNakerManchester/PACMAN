@@ -1,9 +1,11 @@
 # pacman imports
-from pacman.exceptions import PacmanInvalidParameterException
-from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.utilities.utility_objs.ordered_set import OrderedSet
+from pacman import exceptions
+from pacman.model.partitioned_graph.abstract_partitioned_edge import \
+    AbstractPartitionedEdge
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from pacman.utilities.utility_objs.outgoing_edge_partition import \
     OutgoingEdgePartition
+from spinn_machine.utilities.ordered_set import OrderedSet
 
 # general imports
 import uuid
@@ -45,11 +47,17 @@ class PartitionedGraph(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subvertex is not valid
         """
+        if not isinstance(subvertex, PartitionedVertex):
+            raise exceptions.PacmanInvalidParameterException(
+                "subvertex", str(subvertex),
+                "This vertex is not a partitioned vertex, yet you are trying "
+                "to add it to a partitioned graph.")
+
         if subvertex not in self._subvertices:
             self._subvertices.add(subvertex)
         else:
-            raise PacmanAlreadyExistsException("PartitionedVertex",
-                                               str(subvertex))
+            raise exceptions.PacmanAlreadyExistsException(
+                "PartitionedVertex", str(subvertex))
         self._outgoing_subedges[subvertex] = dict()
         self._incoming_subedges[subvertex] = list()
 
@@ -91,8 +99,14 @@ class PartitionedGraph(object):
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     subedge is not valid
         """
+
+        if not isinstance(subedge, AbstractPartitionedEdge):
+            exceptions.PacmanInvalidParameterException(
+                "subedge", str(subedge),
+                "subedge must be a instance of a abstractPartitionedEdge.")
+
         if subedge in self._subedges:
-            raise PacmanAlreadyExistsException(
+            raise exceptions.PacmanAlreadyExistsException(
                 "FixedRoutePartitionableEdge", str(subedge))
 
         self._subedges.add(subedge)
@@ -118,7 +132,7 @@ class PartitionedGraph(object):
             self._subedge_to_partition[subedge] = \
                 self._outgoing_subedges[subedge.pre_subvertex][partition_id]
         else:
-            raise PacmanInvalidParameterException(
+            raise exceptions.PacmanInvalidParameterException(
                 "FixedRoutePartitionableEdge pre_subvertex",
                 str(subedge.pre_subvertex),
                 " Must exist in the partitioned_graph")
@@ -126,7 +140,7 @@ class PartitionedGraph(object):
         if subedge.post_subvertex in self._incoming_subedges:
             self._incoming_subedges[subedge.post_subvertex].append(subedge)
         else:
-            raise PacmanInvalidParameterException(
+            raise exceptions.PacmanInvalidParameterException(
                 "FixedRoutePartitionableEdge post_subvertex",
                 str(subedge.post_subvertex),
                 " Must exist in the partitioned_graph")
@@ -208,6 +222,17 @@ class PartitionedGraph(object):
             return self._subedge_to_partition[sub_edge]
         else:
             return None
+
+    def partition_from_vertex(self, sub_vertex, partition_id):
+        """
+
+        :param sub_vertex:
+        :param partition_id:
+        :return:
+        """
+        if partition_id is None:
+            return None
+        return self._outgoing_subedges[sub_vertex][partition_id]
 
     @property
     def partitions(self):

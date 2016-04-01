@@ -4,11 +4,11 @@ from pacman.model.abstract_classes.abstract_virtual_vertex \
     import AbstractVirtualVertex
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.model.abstract_classes.virtual_partitioned_vertex \
     import VirtualPartitionedVertex
-
+from pacman import exceptions
 
 # general imports
 import logging
@@ -88,15 +88,21 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
     def _assign_virtual_chip_info(self, machine, link):
         if link not in self._virtual_chips:
-            chip_id_x, chip_id_y = self._allocate_id()
-            link_data = machine_algorithm_utilities.create_virtual_chip(
-                machine, link, chip_id_x, chip_id_y)
-            self._virtual_chips[link] = (chip_id_x, chip_id_y, link_data)
+            try:
+                chip_id_x, chip_id_y = self._allocate_id()
+                link_data = machine_algorithm_utilities.create_virtual_chip(
+                    machine, link, chip_id_x, chip_id_y)
+                self._virtual_chips[link] = (chip_id_x, chip_id_y, link_data)
 
-            return (
-                chip_id_x, chip_id_y, link_data.connected_chip_x,
-                link_data.connected_chip_y, link_data.connected_link
-            )
+                return (
+                    chip_id_x, chip_id_y, link_data.connected_chip_x,
+                    link_data.connected_chip_y, link_data.connected_link
+                )
+            except KeyError:
+                raise exceptions.PacmanElementAllocationException(
+                    "The machine in use does not have a spinnaker link"
+                    " {}.  Please ensure that you are using a single physical"
+                    " board.".format(link))
 
         chip_id_x, chip_id_y, link_data = self._virtual_chips[link]
         return (

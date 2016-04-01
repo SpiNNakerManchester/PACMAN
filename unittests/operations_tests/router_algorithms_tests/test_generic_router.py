@@ -13,7 +13,7 @@ from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
-from spinn_machine.virutal_machine import VirtualMachine
+from spinn_machine.virtual_machine import VirtualMachine
 from pacman.utilities import constants
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex

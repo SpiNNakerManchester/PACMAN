@@ -25,3 +25,23 @@ class MultiCastPartitionedEdge(AbstractPartitionedEdge):
 
     def is_partitioned_edge(self):
         return True
+
+    def __eq__(self, other):
+        if not isinstance(other, MultiCastPartitionedEdge):
+            return False
+        else:
+            if (self._pre_subvertex == other.pre_subvertex and
+                    self._post_subvertex == other.post_subvertex and
+                    self._label == other.label):
+                return True
+            else:
+                return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        if self._label is None:
+            return hash((self._pre_subvertex, self._post_subvertex))
+        return hash((self._pre_subvertex, self._post_subvertex, self._label))
+

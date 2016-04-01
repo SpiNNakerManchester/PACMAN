@@ -22,19 +22,18 @@ class ConvertAlgorithmsMetadata(object):
                     algorithm's inputs and outputs
         """
         # parse xmls
-        xml_roots = list()
-        for xml_path in self._xml_paths:
-            xml_roots.append(etree.parse(xml_path))
-
         algorithm_data_objects = dict()
-        for xml_root in xml_roots:
+        files_read_so_far = list()
+        for xml_path in self._xml_paths:
+            xml_root = etree.parse(xml_path)
+            files_read_so_far.append(xml_path)
             elements = xml_root.findall(".//algorithm")
             for element in elements:
                 if element.get('name') in algorithm_data_objects:
                     raise exceptions.PacmanConfigurationException(
-                        "There are two algorithms with the same name in these"
-                        " xml files {}. Please rectify and try again."
-                        .format(self._xml_paths))
+                        "There are two algorithms with the same name {}"
+                        " in these xml files {}. Please rectify and try again."
+                        .format(element.get("name"), files_read_so_far))
                 else:
                     algorithm_data_objects[element.get('name')] = \
                         self._generate_algorithm_data(element)
