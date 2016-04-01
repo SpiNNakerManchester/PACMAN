@@ -50,14 +50,14 @@ class Tags(object):
 
         if (ip_tag.board_address, ip_tag.tag) in self._reverse_ip_tags:
             raise PacmanInvalidParameterException(
-                "ip_tag", ip_tag,
+                "ip_tag", str(ip_tag),
                 "The tag has already been assigned to a reverse IP tag on"
                 " the given board")
 
         self._ip_tags[(ip_tag.board_address, ip_tag.tag)] = ip_tag
         if partitioned_vertex not in self._ip_tags_by_vertex:
-            self._ip_tags_by_vertex[partitioned_vertex] = list()
-        self._ip_tags_by_vertex[partitioned_vertex].append(ip_tag)
+            self._ip_tags_by_vertex[partitioned_vertex] = set()
+        self._ip_tags_by_vertex[partitioned_vertex].add(ip_tag)
 
     def add_reverse_ip_tag(self, reverse_ip_tag, partitioned_vertex):
         """ Add a reverse iptag
@@ -93,8 +93,8 @@ class Tags(object):
         self._reverse_ip_tags[(reverse_ip_tag.board_address,
                                reverse_ip_tag.tag)] = reverse_ip_tag
         if partitioned_vertex not in self._reverse_ip_tags_by_vertex:
-            self._reverse_ip_tags_by_vertex[partitioned_vertex] = list()
-        self._reverse_ip_tags_by_vertex[partitioned_vertex].append(
+            self._reverse_ip_tags_by_vertex[partitioned_vertex] = set()
+        self._reverse_ip_tags_by_vertex[partitioned_vertex].add(
             reverse_ip_tag)
         self._ports_assigned.add(
             (reverse_ip_tag.board_address, reverse_ip_tag.port))
@@ -129,7 +129,7 @@ class Tags(object):
         """
         if partitioned_vertex not in self._ip_tags_by_vertex:
             return None
-        return self._ip_tags_by_vertex[partitioned_vertex]
+        return list(self._ip_tags_by_vertex[partitioned_vertex])
 
     def get_reverse_ip_tags_for_vertex(self, partitioned_vertex):
         """ Get the Reverse IP Tags assigned to a given partitioned vertex
@@ -143,4 +143,4 @@ class Tags(object):
         """
         if partitioned_vertex not in self._reverse_ip_tags_by_vertex:
             return None
-        return self._reverse_ip_tags_by_vertex[partitioned_vertex]
+        return list(self._reverse_ip_tags_by_vertex[partitioned_vertex])

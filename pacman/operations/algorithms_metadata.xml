@@ -191,7 +191,7 @@
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryPartitionedPartitionNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
@@ -247,7 +247,7 @@
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryPartitionedPartitionNKeysMap</param_type>
             </parameter>
         </required_inputs>
         <optional_inputs>
@@ -297,7 +297,7 @@
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryPartitionedPartitionNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>partitionable_graph</param_name>
