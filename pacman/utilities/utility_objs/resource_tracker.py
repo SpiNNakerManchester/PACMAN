@@ -22,7 +22,7 @@ class ResourceTracker(object):
                     instead of the list from the machine.  Note that the order\
                     will be maintained, so this can be used either to reduce\
                     the set of chips used, or to re-order the chips.  Note\
-                    also that on deallocation, the order is no longer\
+                    also that on de-allocation, the order is no longer\
                     guaranteed.
         :type chips: iterable of (x, y) tuples of coordinates of chips
         """
@@ -87,7 +87,7 @@ class ResourceTracker(object):
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
-            # add area codes for Ethernets
+            # add area codes for Ethernet
             if (chip.nearest_ethernet_x is not None and
                     chip.nearest_ethernet_y is not None):
                 ethernet_connected_chip = machine.get_chip_at(

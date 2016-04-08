@@ -107,7 +107,7 @@ class PartitionAndPlacePartitioner(object):
                     partitionable_graph to partitioned_graph which needs to be\
                     updated with new subverts
         :type graph_to_subgraph_mapper:\
-                    py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
+                    py:class:'pacman.model.graph_subgraph_mapper.graph_mapper.GraphMapper'
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
@@ -121,14 +121,14 @@ class PartitionAndPlacePartitioner(object):
                     atoms than its counterpart.
         """
 
-        partiton_together_vertices = \
+        partition_together_vertices = \
             self._locate_vertices_to_partition_now(vertex)
 
         # locate max atoms per core
         possible_max_atoms = list()
         possible_max_atoms.append(vertex.get_max_atoms_per_core())
 
-        for other_partitionable_vertex in partiton_together_vertices:
+        for other_partitionable_vertex in partition_together_vertices:
             max_atom_constraints =\
                 utility_calls.locate_constraints_of_type(
                     other_partitionable_vertex.constraints,
@@ -139,7 +139,7 @@ class PartitionAndPlacePartitioner(object):
 
         # partition by atoms
         self._partition_by_atoms(
-            partiton_together_vertices, vertex.n_atoms, max_atoms_per_core,
+            partition_together_vertices, vertex.n_atoms, max_atoms_per_core,
             subgraph, graph, graph_to_subgraph_mapper, resource_tracker)
 
     def _partition_by_atoms(
@@ -166,7 +166,7 @@ class PartitionAndPlacePartitioner(object):
         :param graph_to_subgraph_mapper: the mapper from\
                     partitionable_graph to partitioned_graph
         :type graph_to_subgraph_mapper:\
-                    py:class:'pacman.modelgraph_subgraph_mapper.graph_mapper.GraphMapper'
+                    py:class:'pacman.model.graph_subgraph_mapper.graph_mapper.GraphMapper'
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
                     :py:class:`pacman.utilities.resource_tracker.ResourceTracker`
@@ -269,7 +269,7 @@ class PartitionAndPlacePartitioner(object):
         :type graph:\
                     :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
         :param resource_tracker: Tracker of used resources
-        :type resource_tracker: spinnmachine.machine.Machine object
+        :type resource_tracker: SpiNNMachine.machine.Machine object
         :return: the list of placements made by this method and the new amount\
                     of atoms partitioned
         :rtype: tuple of (iterable of tuples, int)
