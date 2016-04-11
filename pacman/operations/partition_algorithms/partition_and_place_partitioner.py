@@ -1,4 +1,6 @@
 import logging
+from pacman.interface.abstract_atom_splittable_interface import \
+    AbstractAtomSplittableInterface
 
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
@@ -316,14 +318,26 @@ class PartitionAndPlacePartitioner(object):
 
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
-                raise exceptions.PacmanPartitionException(
-                    "No more of vertex {} would fit on the board:\n"
-                    "    Allocated so far: {} atoms\n"
-                    "    Request for SDRAM: {}\n"
-                    "    Largest SDRAM space: {}".format(
-                        vertex, lo_atom - 1,
-                        used_resources.sdram.get_value(),
-                        resources.sdram.get_value()))
+                if not isinstance(vertex, AbstractAtomSplittableInterface):
+                    bandwidth_requested = (
+                        used_resources.multicast_payload_packets_per_tic +
+                        used_resources.multicast_no_payload_packets_per_tic +
+                        used_resources.fixed_route_packets_per_tic)
+
+                    raise exceptions.PacmanPartitionException(
+                        "No more of vertex {} would fit on the board:\n"
+                        "    Allocated so far: {} atoms\n"
+                        "    Request for SDRAM: {}\n"
+                        "    Request for bandwidth: {} \n"
+                        "    Largest SDRAM space: {}\n"
+                        "    Largest Bandwidth left: {}\n".format(
+                            vertex, lo_atom - 1,
+                            used_resources.sdram.get_value(),
+                            bandwidth_requested, resources.sdram.get_value(),
+                            resources.bandwidth.get_value()))
+                else:
+                    hi_atom = self._scale_down_below_atoms(
+                        vertex, lo_atom, used_resources, graph, used_placements)
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
@@ -357,6 +371,22 @@ class PartitionAndPlacePartitioner(object):
             final_placements.append((vertex, used_resources))
 
         return final_placements, min_hi_atom
+
+    def _scale_down_below_atoms(
+            self, vertex, lo_atom, used_resources, graph, used_placements):
+        """
+
+        :param vertex: partitionable vertex to partition
+        :param lo_atom: the atom to consider reducing below atom level
+        :param used_resources: the total resources used by the
+        :param graph: partitionable graph
+        :param used_placements: placements and resources used
+        :return: the hi atom being considered
+        :raises: PacmanPartitionException when the atom cannot be partitioned
+        on the machine.
+        """
+
+
 
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
