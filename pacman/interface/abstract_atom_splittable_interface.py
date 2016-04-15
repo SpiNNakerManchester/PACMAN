@@ -21,7 +21,7 @@ class AbstractAtomSplittableInterface(object):
         """
 
     @abstractmethod
-    def split_atom_due_to_cpu(self, atom_id, max_cpu):
+    def split_unallocated_atom_due_to_cpu(self, atom_id, max_cpu):
         """
         splits a atom based off its cpu usage
         :param atom_id: the atom to split
@@ -30,7 +30,7 @@ class AbstractAtomSplittableInterface(object):
         """
 
     @abstractmethod
-    def split_atom_due_to_dtcm(self, atom_id, max_dtcm):
+    def split_unallocated_atom_due_to_dtcm(self, atom_id, max_dtcm):
         """
         splits a atom based off its dtcm usage
         :param atom_id: the atom to split
@@ -39,7 +39,7 @@ class AbstractAtomSplittableInterface(object):
         """
 
     @abstractmethod
-    def split_atom_due_to_sdram(self, atom_id, max_sdram):
+    def split_unallocated_atom_due_to_sdram(self, atom_id, max_sdram):
         """
         splits a atom based off its sdram usage
         :param atom_id: the atom to split
