@@ -1,4 +1,6 @@
 import logging
+from pacman.interface.abstract_atom_splittable_interface import \
+    AbstractAtomSplittableInterface
 
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
@@ -29,7 +31,7 @@ class PartitionAndPlacePartitioner(object):
     """
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine):
+    def __call__(self, graph, machine, wall_clock_timer_tick_in_millisecond):
         """ Partition a partitionable_graph so that each subvertex will fit\
             on a processor within the machine
 
@@ -39,6 +41,10 @@ class PartitionAndPlacePartitioner(object):
         :param machine: The machine with respect to which to partition the\
                     partitionable_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param wall_clock_timer_tick_in_millisecond:
+            the timer tick period in milliseconds that the simulation will need
+            per timer tick
+        :type float
         :return: A partitioned_graph of partitioned vertices and partitioned\
                     edges
         :rtype:\
@@ -67,7 +73,8 @@ class PartitionAndPlacePartitioner(object):
             n_atoms += vertex.n_atoms
         progress_bar = ProgressBar(n_atoms, "Partitioning graph vertices")
 
-        resource_tracker = ResourceTracker(machine)
+        resource_tracker = ResourceTracker(
+            machine, wall_clock_timer_tick_in_millisecond)
 
         # Partition one vertex at a time
         for vertex in vertices:
@@ -316,14 +323,17 @@ class PartitionAndPlacePartitioner(object):
 
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
-                raise exceptions.PacmanPartitionException(
-                    "No more of vertex {} would fit on the board:\n"
-                    "    Allocated so far: {} atoms\n"
-                    "    Request for SDRAM: {}\n"
-                    "    Largest SDRAM space: {}".format(
-                        vertex, lo_atom - 1,
-                        used_resources.sdram.get_value(),
-                        resources.sdram.get_value()))
+                if not isinstance(vertex, AbstractAtomSplittableInterface):
+                    raise exceptions.PacmanPartitionException(
+                        "No more of vertex {} would fit on the board:\n"
+                        "    Allocated so far: {} atoms\n"
+                        "    Request for SDRAM: {}\n"
+                        "    Largest SDRAM space: {}".format(
+                            vertex, lo_atom - 1,
+                            used_resources.sdram.get_value(),
+                            resources.sdram.get_value()))
+                else:
+                    
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(

@@ -13,11 +13,15 @@ class ResourceTracker(object):
     """ Tracks the usage of resources of a machine
     """
 
-    def __init__(self, machine, chips=None):
+    def __init__(self, machine, wall_clock_timer_tick_in_millisecond,
+                 chips=None):
         """
 
         :param machine: The machine to track the usage of
         :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param wall_clock_timer_tick_in_millisecond: the timer tick scope
+        for the simulation.
+        :type: float
         :param chips: If specified, this list of chips will be used\
                     instead of the list from the machine.  Note that the order\
                     will be maintained, so this can be used either to reduce\
@@ -73,6 +77,17 @@ class ResourceTracker(object):
         # (x, y) tuple of coordinates of Ethernet connected chip indexed by
         # board address
         self._ethernet_chips = dict()
+
+        # set of (x, y, p) tuples of coordinates of procesosr to cpu
+        # cycles avilable
+        self._cpu_ticks = dict()
+        for chip in machine.chips:
+            for processor in chip.processors:
+                if not processor.is_monitor:
+                    self._cpu_ticks[
+                        (chip.x, chip.y, processor.processor_id)] = \
+                        processor.cpu_cycles_available * \
+                        wall_clock_timer_tick_in_millisecond
 
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors
@@ -863,7 +878,8 @@ class ResourceTracker(object):
                                                               processor_id)
                 processor = chip.get_processor_with_id(best_processor_id)
                 max_dtcm_available = processor.dtcm_available
-                max_cpu_available = processor.cpu_cycles_available
+                max_cpu_available = \
+                    self._cpu_ticks[chip_x, chip_y, processor.processor_id]
 
             # If all the SDRAM on the chip is available,
             # this chip is unallocated, so the max must be the max

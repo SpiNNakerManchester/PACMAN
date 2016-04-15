@@ -46,36 +46,3 @@ class AbstractAtomSplittableInterface(object):
         :param max_sdram: the sdram point which it needs to split to.
         :return: resource used which meets the max
         """
-
-    @abstractmethod
-    def split_atom_due_to_multi_cast_payload(
-            self, atom_id, max_multi_cast_payload):
-        """
-        splits a atom based off its multi_cast_payload usage
-        :param atom_id: the atom to split
-        :param max_multi_cast_payload:
-        The number of multicast packets with payload that can be supported
-        :return:resource used which meets the max
-        """
-
-    @abstractmethod
-    def split_atom_due_to_multi_cast_no_payload(
-            self, atom_id, max_multi_cast_no_payload):
-        """
-        splits a atom based off its multi_cast_no_payload usage
-        :param atom_id: the atom to split
-        :param max_multi_cast_no_payload: The number of multicast packets
-        without payload that can be supported
-        :return:resource used which meets the max
-        """
-
-    @abstractmethod
-    def split_atom_due_to_fixed_route_packets(
-            self, atom_id, max_fixed_route_packets):
-        """
-        splits a atom based off its multi_cast_no_payload usage
-        :param atom_id: the atom to split
-        :param max_fixed_route_packets: The number of fixed route packets
-        that can be supported
-        :return:resource used which meets the max
-        """

@@ -8,12 +8,6 @@ from pacman.model.constraints.partitioner_constraints\
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.fixed_route_packets_per_tic import \
-    FixedRoutePacketsPerTic
-from pacman.model.resources.multi_cast_no_payload_packets_per_tic import \
-    MultiCastNoPayloadPacketsPerTic
-from pacman.model.resources.multi_cast_payload_packets_per_tic import \
-    MultiCastPayloadPacketsPerTic
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 
@@ -105,50 +99,6 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         """
 
     @abstractmethod
-    def get_multi_cast_payload_packets_per_tick_requirement(
-            self, vertex_slice, graph):
-        """ Get the number of multicast packets with payloads per timestep
-        for a range of atoms
-
-        :param vertex_slice: the vertex vertex_slice which determines\
-                    which atoms are being represented by this vertex
-        :param graph: A reference to the graph containing this vertex.
-        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for SDRAM usage
-        :rtype: int
-        :raise None: this method raises no known exception
-        """
-
-    @abstractmethod
-    def get_multi_cast_no_payload_packets_per_tick_requirement(
-            self, vertex_slice, graph):
-        """ Get the number of multicast packets without payloads per timestep
-        for a range of atoms
-
-        :param vertex_slice: the vertex vertex_slice which determines\
-                    which atoms are being represented by this vertex
-        :param graph: A reference to the graph containing this vertex.
-        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for SDRAM usage
-        :rtype: int
-        :raise None: this method raises no known exception
-        """
-
-    @abstractmethod
-    def get_fixed_route_packets_per_tick_requirement(self, vertex_slice, graph):
-        """ Get the number of fixed route packets per timestep for a range of
-         atoms
-
-        :param vertex_slice: the vertex vertex_slice which determines\
-                    which atoms are being represented by this vertex
-        :param graph: A reference to the graph containing this vertex.
-        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return a int value for SDRAM usage
-        :rtype: int
-        :raise None: this method raises no known exception
-        """
-
-    @abstractmethod
     def model_name(self):
         """ Get the type of model is being used in a human readable form
 
@@ -171,29 +121,11 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
         dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
         sdram_requirement = self.get_sdram_usage_for_atoms(vertex_slice, graph)
-        multi_cast_payload_packets_per_tick_requirement = \
-            self.get_multi_cast_payload_packets_per_tick_requirement(
-                vertex_slice, graph)
-        multi_cast_no_payload_packets_per_tick_requirement = \
-            self.get_multi_cast_no_payload_packets_per_tick_requirement(
-                vertex_slice, graph)
-        fixed_route_packets_per_tick_requirement = \
-            self.get_fixed_route_packets_per_tick_requirement(
-                vertex_slice, graph)
 
         # noinspection PyTypeChecker
-        resources = ResourceContainer(
-            cpu=CPUCyclesPerTickResource(cpu_cycles),
-            dtcm=DTCMResource(dtcm_requirement),
-            sdram=SDRAMResource(sdram_requirement),
-            multicast_no_payload_packets_per_tic=
-            MultiCastNoPayloadPacketsPerTic(
-                multi_cast_no_payload_packets_per_tick_requirement),
-            multicast_payload_packets_per_tic=
-            MultiCastPayloadPacketsPerTic(
-                multi_cast_payload_packets_per_tick_requirement),
-            fixed_route_packets_per_tic=FixedRoutePacketsPerTic(
-                fixed_route_packets_per_tick_requirement))
+        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                      dtcm=DTCMResource(dtcm_requirement),
+                                      sdram=SDRAMResource(sdram_requirement))
         return resources
 
     def get_max_atoms_per_core(self):
