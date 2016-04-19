@@ -1,6 +1,4 @@
 import logging
-from pacman.interface.abstract_atom_splittable_interface import \
-    AbstractAtomSplittableInterface
 
 from pacman.model.constraints.abstract_constraints.\
     abstract_partitioner_constraint import \
@@ -74,7 +72,8 @@ class PartitionAndPlacePartitioner(object):
         progress_bar = ProgressBar(n_atoms, "Partitioning graph vertices")
 
         resource_tracker = ResourceTracker(
-            machine, wall_clock_timer_tick_in_millisecond)
+            machine, wall_clock_timer_tick_in_millisecond=
+            wall_clock_timer_tick_in_millisecond)
 
         # Partition one vertex at a time
         for vertex in vertices:
@@ -323,7 +322,6 @@ class PartitionAndPlacePartitioner(object):
 
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
-                if not isinstance(vertex, AbstractAtomSplittableInterface):
                     raise exceptions.PacmanPartitionException(
                         "No more of vertex {} would fit on the board:\n"
                         "    Allocated so far: {} atoms\n"
@@ -332,8 +330,6 @@ class PartitionAndPlacePartitioner(object):
                             vertex, lo_atom - 1,
                             used_resources.sdram.get_value(),
                             resources.sdram.get_value()))
-                else:
-                    
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(

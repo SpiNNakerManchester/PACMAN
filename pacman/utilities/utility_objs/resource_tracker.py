@@ -13,8 +13,8 @@ class ResourceTracker(object):
     """ Tracks the usage of resources of a machine
     """
 
-    def __init__(self, machine, wall_clock_timer_tick_in_millisecond,
-                 chips=None):
+    def __init__(self, machine, chips=None,
+                 wall_clock_timer_tick_in_millisecond=None):
         """
 
         :param machine: The machine to track the usage of
@@ -78,16 +78,21 @@ class ResourceTracker(object):
         # board address
         self._ethernet_chips = dict()
 
-        # set of (x, y, p) tuples of coordinates of procesosr to cpu
-        # cycles avilable
+        # set of (x, y, p) tuples of coordinates of processor to cpu
+        # cycles available
         self._cpu_ticks = dict()
         for chip in machine.chips:
             for processor in chip.processors:
                 if not processor.is_monitor:
-                    self._cpu_ticks[
-                        (chip.x, chip.y, processor.processor_id)] = \
-                        processor.cpu_cycles_available * \
-                        wall_clock_timer_tick_in_millisecond
+                    if wall_clock_timer_tick_in_millisecond is not None:
+                        self._cpu_ticks[
+                            (chip.x, chip.y, processor.processor_id)] = \
+                            processor.cpu_cycles_available * \
+                            wall_clock_timer_tick_in_millisecond
+                    else:
+                        self._cpu_ticks[
+                            (chip.x, chip.y, processor.processor_id)] = \
+                            processor.cpu_cycles_available
 
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors
