@@ -289,20 +289,41 @@ class ResourceTracker(object):
                     False otherwise
         :rtype: bool
         """
+        return self._n_cores_available(chip, key, processor_id, resources) > 0
+
+    def _n_cores_available(self, chip, key, processor_id, resources):
+        """ Get the number of cores available on the given chip given the\
+            constraints
+
+        :param chip: The chip to check the resources of
+        :type chip: :py:class:`spinn_machine.chip.Chip`
+        :param key: The (x, y) coordinates of the chip
+        :type key: tuple of (int, int)
+        :param processor_id: A constraining fixed processor id
+        :type processor_id: int or None
+        :param resources: The resources to be allocated
+        :type resources:\
+                    :py:class:`pacman.model.resources.resource_container.ResourceContainer`
+        :return: The number of cores that meet the given constraints
+        :rtype: int
+        """
+
         # TODO: Check the resources can be met with the processor
         # Currently assumes all processors are equal and that resources
         # haven't been over allocated
         if processor_id is not None:
             if (key in self._core_tracker and
                     processor_id not in self._core_tracker[key]):
-                return False
+                return 0
             elif key not in self._core_tracker:
                 processor = chip.get_processor_with_id(processor_id)
-                return processor is not None and not processor.is_monitor
+                if processor is not None and not processor.is_monitor:
+                    return 1
+                return 0
         elif key in self._core_tracker:
-            return len(self._core_tracker[key]) != 0
+            return len(self._core_tracker[key])
 
-        return True
+        return len(chip.processor_ids)
 
     def _get_matching_ip_tag(self, board_address, tag, key):
         """ Locate a tag for a tag id on a board address for a given chip
@@ -686,42 +707,148 @@ class ResourceTracker(object):
         return self.allocate_resources(resources, chips, p, board_address,
                                        ip_tags, reverse_ip_tags)
 
-    def allocate_group(
-            self, group_resources, placement_constraint, ip_tag_constraint,
-            reverse_ip_tag_constraint):
-        """
-        allocates a group of cores for these resources
-        :param group_resources: the groups resources
-        :param placement_constraint: placement constraint
-        :param ip_tag_constraint: ipt_tag constraint
-        :param reverse_ip_tag_constraint: reverse_ip_tag_constraint
+    def allocate_constrained_group_resources(
+            self, group_resources, group_constraints, chips=None):
+        """ Allocates a group of cores on the same chip for these resources
+
+        :param group_resources: a list of resources in the group
+        :param group_constraints: a list of constraints in the group, one for\
+                    each of the group_resources (in the same order)
+        :param chips: a list of chips that can be used
         :return: list of The x and y coordinates of the used chip,
                     the processor_id, and the ip tag and reverse ip tag
                     allocation tuples
         :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
         """
-        elements = list()
-        if placement_constraint is not None:
-            x = placement_constraint.x
-            y = placement_constraint.y
-            p = placement_constraint.p
-        else:
-            x = None
-            y = None
-            p = None
 
-        tag_constraints = ip_tag_constraint + reverse_ip_tag_constraint
-        (board_address, ip_tags, reverse_ip_tags) = \
-            utility_calls.get_ip_tag_info(tag_constraints)
+        x = None
+        y = None
+        processor_ids = list()
+        board_address = None
+        all_ip_tags = list()
+        all_reverse_ip_tags = list()
+        for constraints in group_constraints:
+            (this_x, this_y, this_p) = utility_calls.get_chip_and_core(
+                constraints, chips)
+            (this_board_address, this_ip_tags, this_reverse_ip_tags) = \
+                utility_calls.get_ip_tag_info(constraints)
+            if ((x is not None and this_x is not None and this_x != x) or
+                    (y is not None and this_y is not None and this_y != y) or
+                    (this_p is not None and this_p in processor_ids) or
+                    (board_address is not None and
+                        this_board_address is not None and
+                        board_address != this_board_address)):
+                raise exceptions.PacmanException(
+                    "Cannot merge conflicting constraints")
+            if this_x is not None:
+                x = this_x
+            if this_y is not None:
+                y = this_y
+            if this_board_address is not None:
+                board_address = this_board_address
+            processor_ids.append(this_p)
+            all_ip_tags.append(this_ip_tags)
+            all_reverse_ip_tags.append(this_reverse_ip_tags)
+
         chips = None
         if x is not None and y is not None:
             chips = [(x, y)]
 
+    def allocate_group_resources(
+            self, group_resources, chips=None, processor_ids=None,
+            board_address=None, group_ip_tags=None,
+            group_reverse_ip_tags=None):
+        """ Attempts to use the given group of resources on a single chip of\
+            the machine.  Can be given specific place to use the resources,\
+            or else it will allocate them on the first place that the\
+            resources of the group fit together.
+
+        :param group_resources: The resources to be allocated
+        :type group_resources: list of\
+                    :py:class:`pacman.model.resources.resource_container.ResourceContainer`
+        :param chips: An iterable of (x, y) tuples of chips that are to be used
+        :type chips: iterable of (int, int)
+        :param processor_ids: The specific processor to use on any chip for\
+                    each resource of the group
+        :type processor_ids: list of (int or None)
+        :param board_address: the board address to allocate resources of a chip
+        :type board_address: str
+        :param group_ip_tags: list of lists of ip tag constraints
+        :type ip_tags: list of lists of\
+                    :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint.TagAllocatorRequireIptagConstraint`
+        :param reverse_ip_tags: list of lists of reverse ip tag constraints
+        :type reverse_ip_tags: list of lists of\
+                    :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint.TagAllocatorRequireReverseIptagConstraint`
+        :return: An iterable of tuples of the x and y coordinates of the used\
+                     chip, the processor_id, and the ip tag and reverse ip tag\
+                     allocation tuples
+        :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
+        """
+
+        usable_chips = chips
+        for ip_tags, reverse_ip_tags in zip(
+                group_ip_tags, group_reverse_ip_tags):
+            usable_chips = self._get_usable_chips(
+                usable_chips, board_address, ip_tags, reverse_ip_tags)
+
+        total_sdram = 0
         for resources in group_resources:
-            element = self.allocate_resources(
-                resources, chips, p, board_address, ip_tags, reverse_ip_tags)
-            elements.append(element)
-        return elements
+            total_sdram += resources.sdram.get_value()
+
+        # Find the first usable chip which fits all the group resources
+        for (chip_x, chip_y) in usable_chips:
+            chip = self._machine.get_chip_at(chip_x, chip_y)
+            key = (chip_x, chip_y)
+
+            # No point in continuing if the chip doesn't have space for
+            # everything
+            if (self._n_cores_available(chip, key, None, None) >=
+                    len(group_resources) and
+                    self._sdram_available(chip, key) >= total_sdram):
+
+                # Check that the constraints of all the resources can be met
+                is_available = True
+                for resources, processor_id, ip_tags, reverse_ip_tags in zip(
+                        group_resources, processor_ids, group_ip_tags,
+                        group_reverse_ip_tags):
+                    if (not self._is_core_available(
+                            chip, key, processor_id, resources) or
+                            not self._are_ip_tags_available(
+                                chip, board_address, ip_tags) or
+                            not self._are_reverse_ip_tags_available(
+                                chip, board_address, reverse_ip_tags)):
+                        is_available = False
+                        break
+
+                # If everything is good, do the allocation
+                if is_available:
+                    results = list()
+                    for resources, proc_id, ip_tags, reverse_ip_tags in zip(
+                            group_resources, processor_ids, group_ip_tags,
+                            group_reverse_ip_tags):
+                        processor_id = self._allocate_core(
+                            chip, key, proc_id, resources)
+                        self._allocate_sdram(chip, key, resources)
+                        ip_tags_allocated = self._allocate_ip_tags(
+                            board_address, ip_tags)
+                        reverse_ip_tags_allocated = \
+                            self._allocate_reverse_ip_tags(
+                                board_address, reverse_ip_tags)
+                        results.append((
+                            chip.x, chip.y, processor_id, ip_tags_allocated,
+                            reverse_ip_tags_allocated))
+                    return results
+
+        # If no chip is available, raise an exception
+        n_cores, n_chips, max_sdram = self._available_resources(usable_chips)
+        raise exceptions.PacmanValueError(
+            "No resources available to allocate the given group resources"
+            " within the given constraints:\n"
+            "    Request for {} cores on a single chip with SDRAM: {}\n"
+            "    Resources available which meet constraints:"
+            "        {} Cores on {} chips, largest SDRAM space: {}".format(
+                len(group_resources), total_sdram, n_cores, n_chips,
+                max_sdram))
 
     def allocate_resources(self, resources, chips=None,
                            processor_id=None, board_address=None,
@@ -780,7 +907,7 @@ class ResourceTracker(object):
             " within the given constraints:\n"
             "    Request for CPU: {}, DTCM: {}, SDRAM: {}\n"
             "    Resources available which meet constraints:"
-            " {} Cores on {} chips, largest SDRAM space: {}".format(
+            "        {} Cores on {} chips, largest SDRAM space: {}".format(
                 resources.cpu.get_value(), resources.dtcm.get_value(),
                 resources.sdram.get_value(), n_cores, n_chips, max_sdram))
 
