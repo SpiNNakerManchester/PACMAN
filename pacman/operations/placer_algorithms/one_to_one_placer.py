@@ -22,6 +22,7 @@ from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 from spinn_machine.utilities.progress_bar import ProgressBar
+import traceback
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -91,6 +92,7 @@ class OneToOnePlacer(RadialPlacer):
                         placements.add_placement(placement)
                         progress_bar.update()
                 except:
+                    traceback.print_exc()
 
                     # If something goes wrong, try to allocate each
                     # individually
@@ -127,94 +129,88 @@ class OneToOnePlacer(RadialPlacer):
             partitioned_graph.subvertices)
 
         for vertex in ordered_subverts:
-            incoming_edges = \
-                partitioned_graph.incoming_subedges_from_subvertex(vertex)
-
-            # do search if not already added and has incoming edges
-            if vertex not in found_list and len(incoming_edges) != 0:
-                chip_constraint = utility_calls.locate_constraints_of_type(
-                    vertex.constraints, PlacerChipAndCoreConstraint)
-
-                if len(chip_constraint) != 0:
-
-                    # if has constraint, add first then add incoming
-                    one_to_one_incoming_edges = list()
-                    one_to_one_incoming_edges.append(vertex)
-                    sorted_vertices.append(one_to_one_incoming_edges)
-                    found_list.append(vertex)
-                    self.check_incoming_verts(
-                        one_to_one_incoming_edges, vertex, partitioned_graph,
-                        found_list)
-                else:
-
-                    # if no constraint add incoming then first
-                    one_to_one_incoming_edges = list()
-                    sorted_vertices.append(one_to_one_incoming_edges)
-                    self.check_incoming_verts(
-                        one_to_one_incoming_edges, vertex, partitioned_graph,
-                        found_list)
-                    one_to_one_incoming_edges.append(vertex)
-                    found_list.append(vertex)
+            if vertex not in found_list:
+                connected_vertices = self._find_one_to_one_vertices(
+                    vertex, partitioned_graph)
+                new_list = [
+                    v for v in connected_vertices if v not in found_list]
+                sorted_vertices.append(new_list)
+                found_list.update(set(new_list))
 
         # locate vertices which have no output or input, and add them for
         # placement
         for vertex in ordered_subverts:
             if vertex not in found_list:
-                listed_vertex = list()
-                listed_vertex.append(vertex)
-                sorted_vertices.append(listed_vertex)
+                sorted_vertices.append([vertex])
         return sorted_vertices
 
-    @staticmethod
-    def check_incoming_verts(one_to_one_verts, vertex, partitioned_graph,
-                             found_list):
-        """ Adds subverts which have a one to one connection
-        :param one_to_one_verts: the list of sorted vertices
-        :param vertex: the destination vertex
-        :param partitioned_graph: the partitioned graph
-        :param found_list: the list of found vertices so far
-        :return:
-        """
+    def _find_one_to_one_vertices(self, vertex, partitioned_graph):
+        print "Finding vertices 1-1 connected to", vertex
+        x, y, _ = utility_calls.get_chip_and_core(vertex.constraints)
+        found_vertices = [vertex]
+        vertices_seen = set([vertex])
 
-        # locate incoming edges for this vertex
-        incoming_edges = \
-            partitioned_graph.incoming_subedges_from_subvertex(vertex)
+        outgoing = partitioned_graph.outgoing_subedges_from_subvertex(vertex)
+        vertices_to_try = [edge.post_subvertex for edge in outgoing]
+        while len(vertices_to_try) != 0:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen:
+                vertices_seen.add(next_vertex)
+                post_x, post_y, _ = utility_calls.get_chip_and_core(
+                    next_vertex.constraints)
+                conflict = False
+                if x is not None and post_x is not None and x != post_x:
+                    conflict = True
+                if y is not None and post_y is not None and y != post_y:
+                    conflict = True
+                edges = partitioned_graph.incoming_subedges_from_subvertex(
+                    next_vertex)
+                print next_vertex, "has", len(edges), "incoming edges"
+                if len(edges) == 1 and not conflict:
+                    print "    ", next_vertex, "only has one incoming edge"
+                    found_vertices.append(next_vertex)
+                    if post_x is not None:
+                        x = post_x
+                    if post_y is not None:
+                        y = post_y
+                    outgoing = \
+                        partitioned_graph.outgoing_subedges_from_subvertex(
+                            next_vertex)
+                    vertices_to_try.extend([
+                        edge.post_subvertex for edge in outgoing
+                        if edge.post_subvertex not in vertices_seen])
 
-        # locate constraints of chip and core for this vertex
-        chip_constraint = utility_calls.locate_constraints_of_type(
-            vertex.constraints, PlacerChipAndCoreConstraint)
+        incoming = partitioned_graph.incoming_subedges_from_subvertex(
+            vertex)
+        vertices_to_try = [
+            edge.pre_subvertex for edge in incoming
+            if edge.pre_subvertex not in vertices_seen]
+        while len(vertices_to_try) != 0:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen:
+                vertices_seen.add(next_vertex)
+                pre_x, pre_y, _ = utility_calls.get_chip_and_core(
+                    next_vertex.constraints)
+                conflict = False
+                if x is not None and pre_x is not None and x != pre_x:
+                    conflict = True
+                if y is not None and pre_y is not None and y != pre_y:
+                    conflict = True
+                edges = partitioned_graph.outgoing_subedges_from_subvertex(
+                    next_vertex)
+                print next_vertex, "has", len(edges), "outgoing edges"
+                if len(edges) == 1 and not conflict:
+                    print "    ", next_vertex, "connects only to", vertex
+                    found_vertices.append(next_vertex)
+                    if pre_x is not None:
+                        x = pre_x
+                    if pre_y is not None:
+                        y = pre_y
+                    incoming = \
+                        partitioned_graph.incoming_subedges_from_subvertex(
+                            next_vertex)
+                    vertices_to_try.extend([
+                        edge.pre_subvertex for edge in incoming
+                        if edge.pre_subvertex not in vertices_seen])
 
-        for incoming_edge in incoming_edges:
-            incoming_vert = incoming_edge.pre_subvertex
-            number_of_outgoing_edges = partitioned_graph.\
-                outgoing_subedges_from_subvertex(incoming_vert)
-
-            # if only one outgoing edge, decide to put it in same chip pile
-            if (len(number_of_outgoing_edges) == 1 and
-                    incoming_vert not in found_list):
-
-                if len(chip_constraint) != 0:
-
-                    # if the vertex has no constraint, put in
-                    one_to_one_verts.append(incoming_vert)
-                    found_list.append(incoming_vert)
-                else:
-
-                    # if constraint exists, try to satisfy constraints.
-                    chip_constraint_incoming = \
-                        utility_calls.locate_constraints_of_type(
-                            incoming_vert.constraints,
-                            PlacerChipAndCoreConstraint)
-                    if len(chip_constraint_incoming) == 0:
-                        one_to_one_verts.append(incoming_vert)
-                        found_list.append(incoming_vert)
-                    else:
-                        x_level = chip_constraint[0].x == \
-                            chip_constraint_incoming[0].x
-                        y_level = chip_constraint[0].y == \
-                            chip_constraint_incoming[0].y
-                        p_level = chip_constraint[0].p != \
-                            chip_constraint_incoming[0].p
-                        if x_level and y_level and p_level:
-                            one_to_one_verts.append(incoming_vert)
-                            found_list.append(incoming_vert)
+        return found_vertices

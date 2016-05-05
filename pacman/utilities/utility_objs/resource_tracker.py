@@ -311,6 +311,7 @@ class ResourceTracker(object):
         # TODO: Check the resources can be met with the processor
         # Currently assumes all processors are equal and that resources
         # haven't been over allocated
+        n_cores = 0
         if processor_id is not None:
             if (key in self._core_tracker and
                     processor_id not in self._core_tracker[key]):
@@ -321,9 +322,11 @@ class ResourceTracker(object):
                     return 1
                 return 0
         elif key in self._core_tracker:
-            return len(self._core_tracker[key])
-
-        return len(chip.processor_ids)
+            n_cores = len(self._core_tracker[key])
+        else:
+            n_cores = len([
+                proc for proc in chip.processors if not proc.is_monitor])
+        return n_cores
 
     def _get_matching_ip_tag(self, board_address, tag, key):
         """ Locate a tag for a tag id on a board address for a given chip
@@ -725,8 +728,8 @@ class ResourceTracker(object):
         y = None
         processor_ids = list()
         board_address = None
-        all_ip_tags = list()
-        all_reverse_ip_tags = list()
+        group_ip_tags = list()
+        group_reverse_ip_tags = list()
         for constraints in group_constraints:
             (this_x, this_y, this_p) = utility_calls.get_chip_and_core(
                 constraints, chips)
@@ -747,12 +750,16 @@ class ResourceTracker(object):
             if this_board_address is not None:
                 board_address = this_board_address
             processor_ids.append(this_p)
-            all_ip_tags.append(this_ip_tags)
-            all_reverse_ip_tags.append(this_reverse_ip_tags)
+            group_ip_tags.append(this_ip_tags)
+            group_reverse_ip_tags.append(this_reverse_ip_tags)
 
         chips = None
         if x is not None and y is not None:
             chips = [(x, y)]
+
+        return self.allocate_group_resources(
+            group_resources, chips, processor_ids, board_address,
+            group_ip_tags, group_reverse_ip_tags)
 
     def allocate_group_resources(
             self, group_resources, chips=None, processor_ids=None,
@@ -784,6 +791,8 @@ class ResourceTracker(object):
                      allocation tuples
         :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
         """
+
+        print "Allocating group of", len(group_resources)
 
         usable_chips = chips
         for ip_tags, reverse_ip_tags in zip(
