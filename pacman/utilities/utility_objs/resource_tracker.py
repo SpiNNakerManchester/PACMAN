@@ -76,31 +76,42 @@ class ResourceTracker(object):
 
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors
-        self._chips_available = OrderedSet(chips)
+        self._chips_available = OrderedSet()
         if chips is None:
             for chip in machine.chips:
-                key = (chip.x, chip.y)
-                self._chips_available.add(key)
+                n_processors = len(
+                    [p for p in chip.processors if not p.is_monitor])
+                if n_processors > 0:
+                    key = (chip.x, chip.y)
+                    self._chips_available.add(key)
+        else:
+            for x, y in chips:
+                chip = machine.get_chip_at(x, y)
+                n_processors = len(
+                    [p for p in chip.processors if not p.is_monitor])
+                if n_processors > 0:
+                    self._chips_available.add((x, y))
 
         # Initialise the Ethernet area codes
         for (chip_x, chip_y) in self._chips_available:
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
+            if key in self._chips_available:
 
-            # add area codes for Ethernets
-            if (chip.nearest_ethernet_x is not None and
-                    chip.nearest_ethernet_y is not None):
-                ethernet_connected_chip = machine.get_chip_at(
-                    chip.nearest_ethernet_x, chip.nearest_ethernet_y)
-                if ethernet_connected_chip is not None:
-                    ethernet_area_code = ethernet_connected_chip.ip_address
-                    if ethernet_area_code not in self._ethernet_area_codes:
-                        self._ethernet_area_codes[
-                            ethernet_area_code] = OrderedSet()
-                        self._boards_with_ip_tags.add(ethernet_area_code)
-                        self._ethernet_chips[ethernet_area_code] = (
-                            chip.nearest_ethernet_x, chip.nearest_ethernet_y)
-                    self._ethernet_area_codes[ethernet_area_code].add(key)
+                # add area codes for Ethernets
+                if (chip.nearest_ethernet_x is not None and
+                        chip.nearest_ethernet_y is not None):
+                    ethernet_connected_chip = machine.get_chip_at(
+                        chip.nearest_ethernet_x, chip.nearest_ethernet_y)
+                    if ethernet_connected_chip is not None:
+                        ethernet_area_code = ethernet_connected_chip.ip_address
+                        if ethernet_area_code not in self._ethernet_area_codes:
+                            self._ethernet_area_codes[
+                                ethernet_area_code] = OrderedSet()
+                            self._boards_with_ip_tags.add(ethernet_area_code)
+                            self._ethernet_chips[ethernet_area_code] = (
+                                chip.nearest_ethernet_x, chip.nearest_ethernet_y)
+                        self._ethernet_area_codes[ethernet_area_code].add(key)
 
     def _get_usable_ip_tag_chips(self):
         """ Get the coordinates of any chips that have available ip tags
