@@ -90,10 +90,14 @@ class RadialPlacer(object):
         placements.add_placement(placement)
 
     def _generate_radial_chips(self, machine, resource_tracker=None,
-                               start_chip_x=0, start_chip_y=0):
-        first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
+                               start_chip_x=None, start_chip_y=None):
+        first_chip = None
+        if start_chip_x is None or start_chip_y is None:
+            first_chip = machine.boot_chip
+        else:
+            first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
         done_chips = set([first_chip])
-        found_chips = OrderedSet([(start_chip_x, start_chip_y)])
+        found_chips = OrderedSet([(first_chip.x, first_chip.y)])
         search = deque([first_chip])
         while len(search) > 0:
             chip = search.pop()
