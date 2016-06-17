@@ -181,6 +181,52 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="NoDeadLockDijkstraRouting">
+        <python_module>pacman.operations.router_algorithms.no_dead_lock_dijkstra_router</python_module>
+        <python_class>NoDeadLockDijkstraRouter</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+        </required_inputs>
+        <optional_inputs>
+            <parameter>
+                <param_name>k</param_name>
+                <param_type>int</param_type>
+            </parameter>
+            <parameter>
+                <param_name>l</param_name>
+                <param_type>int</param_type>
+            </parameter>
+            <parameter>
+                <param_name>m</param_name>
+                <param_type>int</param_type>
+            </parameter>
+            <parameter>
+                <param_name>bw_per_route_entry</param_name>
+                <param_type>int</param_type>
+            </parameter>
+            <parameter>
+                <param_name>max_bw</param_name>
+                <param_type>int</param_type>
+            </parameter>
+        </optional_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>routing_paths</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="BasicRoutingInfoAllocator">
         <python_module>pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator</python_module>
         <python_class>BasicRoutingInfoAllocator</python_class>
