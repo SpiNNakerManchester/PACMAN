@@ -324,8 +324,9 @@ class ResourceTracker(object):
         # haven't been over allocated
         n_cores = 0
         if processor_id is not None:
-            if (key in self._core_tracker and
-                    processor_id not in self._core_tracker[key]):
+            if key in self._core_tracker:
+                if processor_id in self._core_tracker[key]:
+                    return 1
                 return 0
             elif key not in self._core_tracker:
                 processor = chip.get_processor_with_id(processor_id)

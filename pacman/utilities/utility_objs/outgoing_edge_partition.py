@@ -12,6 +12,10 @@ from pacman.model.partitioned_graph.fixed_route_partitioned_edge import \
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
 from pacman import exceptions
+from pacman.model.partitioned_graph.abstract_partitioned_edge \
+    import AbstractPartitionedEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge \
+    import AbstractPartitionableEdge
 
 EDGE_TYPES = Enum(
     value="EDGE_TYPES",
@@ -33,20 +37,40 @@ class OutgoingEdgePartition(AbstractConstrainedObject, AbstractLabeled):
         self._identifier = identifier
         self._type = None
         self._edges = list()
+        self._pre_vertex = None
 
     def add_edge(self, edge):
         """ Add an edge into this outgoing edge partition
         :param edge: the instance of abstract edge to add to the list
         :return:
         """
-        self._edges.append(edge)
         if self._type is None:
             self._type = self._deduce_type(edge)
         elif self._type != self._deduce_type(edge):
             raise exceptions.PacmanConfigurationException(
                 "The edge {} was trying to be added to a partition {} which "
-                "contains edges of type {}, yet the edge was of type {}. This"
-                " is deemed an error. Please rectify this and try again.")
+                "contains edges of type {}, yet the edge was of type {}."
+                .format(edge, self, self._type, self._deduce_type(edge)))
+        if self._pre_vertex is None:
+            if isinstance(edge, AbstractPartitionedEdge):
+                self._pre_vertex = edge.pre_subvertex
+            elif isinstance(edge, AbstractPartitionableEdge):
+                self._pre_vertex = edge.pre_vertex
+            else:
+                raise exceptions.PacmanConfigurationException(
+                    "Unknown edge type {}".format(edge))
+        else:
+            if (isinstance(edge, AbstractPartitionedEdge) and
+                    edge._pre_subvertex != self._pre_vertex):
+                raise exceptions.PacmanConfigurationException(
+                    "A partition can only contain edges with the same"
+                    "pre_vertex")
+            elif (isinstance(edge, AbstractPartitionableEdge) and
+                    edge._pre_vertex != self._pre_vertex):
+                raise exceptions.PacmanConfigurationException(
+                    "A partition can only contain edges with the same"
+                    "pre_vertex")
+        self._edges.append(edge)
 
     @staticmethod
     def _deduce_type(edge):
@@ -88,6 +112,10 @@ class OutgoingEdgePartition(AbstractConstrainedObject, AbstractLabeled):
         :return:
         """
         return self._type
+
+    @property
+    def pre_vertex(self):
+        return self._pre_vertex
 
     def __repr__(self):
         """

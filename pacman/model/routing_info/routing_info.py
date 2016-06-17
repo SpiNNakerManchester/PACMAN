@@ -1,5 +1,9 @@
 # pacman imports
 from pacman import exceptions
+from pacman.model.partitionable_graph.abstract_partitionable_edge \
+    import AbstractPartitionableEdge
+from pacman.model.partitioned_graph.abstract_partitioned_edge \
+    import AbstractPartitionedEdge
 
 
 class RoutingInfo(object):
@@ -18,11 +22,15 @@ class RoutingInfo(object):
                     two subedge information objects with the same edge
         """
 
-        # List of subedge information indexed by routing key (int)
-        self._partition_infos_by_key = dict()
-
-        # Subedge information indexed by subedge
+        # Partition information indexed by partition
         self._partition_info_by_partition = dict()
+
+        # Partition information indexed by edge pre vertex and partition id
+        # name
+        self._partition_info_by_pre_vertex = dict()
+
+        # Partition informations indexed by edge post vertex and partition id
+        self._partition_infos_by_post_vertex = dict()
 
         if partition_info_items is not None:
             for partition_info_item in partition_info_items:
@@ -39,27 +47,35 @@ class RoutingInfo(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If the subedge\
                     is already in the set of subedges
         """
+        partition = partition_info.partition
 
-        if partition_info.partition in self._partition_info_by_partition:
+        if partition in self._partition_info_by_partition:
             raise exceptions.PacmanAlreadyExistsException(
                 "Partition", str(partition_info))
 
-        self._partition_info_by_partition[partition_info.partition] =\
-            partition_info
+        if ((partition.pre_vertex, partition.identifier)
+                in self._partition_info_by_pre_vertex):
+            raise exceptions.PacmanAlreadyExistsException(
+                "Partition", str(partition_info))
 
-        for key_and_mask in partition_info.keys_and_masks:
+        self._partition_info_by_partition[partition] = partition_info
+        self._partition_info_by_pre_vertex[
+            partition.pre_vertex, partition.identifier] = partition_info
 
-            # first time the key has been added
-            if key_and_mask.key not in self._partition_infos_by_key:
-                self._partition_infos_by_key[key_and_mask.key] = list()
-                self._partition_infos_by_key[key_and_mask.key]\
-                    .append(partition_info)
+        for edge in partition.edges:
+            post_vertex = None
+            if isinstance(edge, AbstractPartitionableEdge):
+                post_vertex = edge.post_vertex
+            elif isinstance(edge, AbstractPartitionedEdge):
+                post_vertex = edge.post_subvertex
 
-            # need to check that subedge information is linked properly
-            elif (self._partition_infos_by_key[key_and_mask.key] !=
-                    partition_info):
-                self._partition_infos_by_key[key_and_mask.key]\
-                    .append(partition_info)
+            if ((post_vertex, partition.identifier)
+                    not in self._partition_infos_by_post_vertex):
+                self._partition_infos_by_post_vertex[
+                    post_vertex, partition.identifier] = list()
+
+            self._partition_infos_by_post_vertex[
+                post_vertex, partition.identifier].append(partition_info)
 
     @property
     def all_partition_info(self):
@@ -71,25 +87,6 @@ class RoutingInfo(object):
         :raise None: does not raise any known exceptions
         """
         return self._partition_info_by_partition.itervalues()
-
-    def get_partition_infos_by_key(self, key, mask):
-        """ Get the routing information associated with a particular key, once\
-            the mask has been applied
-
-        :param key: The routing key
-        :type key: int
-        :param mask: The routing mask
-        :type mask: int
-        :return: a routing information associated with the\
-                    specified routing key or None if no such key exists
-        :rtype:\
-                    :py:class:`pacman.model.routing_info.subedge_routing_info.PartitionRoutingInfo`
-        :raise None: does not raise any known exceptions
-        """
-        key_mask_combo = key & mask
-        if key_mask_combo in self._partition_infos_by_key:
-            return self._partition_infos_by_key[key_mask_combo]
-        return None
 
     def get_keys_and_masks_from_partition(self, partition):
         """ Get the key associated with a particular partition
@@ -116,9 +113,33 @@ class RoutingInfo(object):
             return self._partition_info_by_partition[partition]
         return None
 
-    def __iter__(self):
-        """ returns a iterator for the subedge routing information
+    def get_routing_info_from_pre_vertex(self, vertex, partition_id):
+        """ Get routing information for edges with a given partition_id from\
+            a pre vertex
 
-        :return: a iterator of subedge routing information
+        :param vertex: The pre_vertex to search for
+        :param partition_id: The id of the partition for which to get\
+                    the routing information
+        """
+        if (vertex, partition_id) in self._partition_info_by_pre_vertex:
+            return self._partition_info_by_pre_vertex[vertex, partition_id]
+        return None
+
+    def get_routing_infos_to_post_vertex(self, vertex, partition_id):
+        """ Get a list of routing information for edges with a given\
+            partition_id to a post vertex
+
+        :param vertex: The post_vertex to search for
+        :param partition_id: The id of the partition for which to get\
+                    the routing information
+        """
+        if (vertex, partition_id) in self._partition_infos_by_post_vertex:
+            return self._partition_infos_by_post_vertex[vertex, partition_id]
+        return None
+
+    def __iter__(self):
+        """ returns a iterator for the partition routing information
+
+        :return: a iterator of partition routing information
         """
         return iter(self._partition_infos_by_key)
