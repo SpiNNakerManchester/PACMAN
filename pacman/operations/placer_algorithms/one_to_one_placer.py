@@ -145,7 +145,6 @@ class OneToOnePlacer(RadialPlacer):
         return sorted_vertices
 
     def _find_one_to_one_vertices(self, vertex, partitioned_graph):
-        print "Finding vertices 1-1 connected to", vertex
         x, y, _ = utility_calls.get_chip_and_core(vertex.constraints)
         found_vertices = [vertex]
         vertices_seen = set([vertex])
@@ -165,9 +164,7 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 edges = partitioned_graph.incoming_subedges_from_subvertex(
                     next_vertex)
-                print next_vertex, "has", len(edges), "incoming edges"
                 if len(edges) == 1 and not conflict:
-                    print "    ", next_vertex, "only has one incoming edge"
                     found_vertices.append(next_vertex)
                     if post_x is not None:
                         x = post_x
@@ -198,9 +195,7 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 edges = partitioned_graph.outgoing_subedges_from_subvertex(
                     next_vertex)
-                print next_vertex, "has", len(edges), "outgoing edges"
                 if len(edges) == 1 and not conflict:
-                    print "    ", next_vertex, "connects only to", vertex
                     found_vertices.append(next_vertex)
                     if pre_x is not None:
                         x = pre_x
