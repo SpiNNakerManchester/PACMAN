@@ -110,7 +110,8 @@ class ResourceTracker(object):
                                 ethernet_area_code] = OrderedSet()
                             self._boards_with_ip_tags.add(ethernet_area_code)
                             self._ethernet_chips[ethernet_area_code] = (
-                                chip.nearest_ethernet_x, chip.nearest_ethernet_y)
+                                chip.nearest_ethernet_x,
+                                chip.nearest_ethernet_y)
                         self._ethernet_area_codes[ethernet_area_code].add(key)
 
     def _get_usable_ip_tag_chips(self):
@@ -802,8 +803,6 @@ class ResourceTracker(object):
                      allocation tuples
         :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
         """
-
-        print "Allocating group of", len(group_resources)
 
         usable_chips = chips
         for ip_tags, reverse_ip_tags in zip(
