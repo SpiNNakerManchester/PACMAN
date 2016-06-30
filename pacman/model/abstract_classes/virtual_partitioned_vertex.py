@@ -1,14 +1,14 @@
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
 
-class VirtualPartitionedVertex(PartitionedVertex):
+class VirtualPartitionedVertex(SimplePartitionedVertex):
 
     def __init__(
             self, resources_required, label, spinnaker_link_id,
             constraints=None):
-        PartitionedVertex.__init__(
+        SimplePartitionedVertex.__init__(
             self, resources_required, label, constraints=constraints)
 
         self._spinnaker_link_id = spinnaker_link_id

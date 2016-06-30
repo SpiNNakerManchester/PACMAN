@@ -4,7 +4,7 @@ tests for placement
 # pacman imports
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman import exceptions
 
 # general imports
@@ -21,7 +21,7 @@ class TestPlacement(unittest.TestCase):
         test that creating a new placement puts stuff in the right place
         :return:
         """
-        subv = PartitionedVertex(None, "")
+        subv = SimplePartitionedVertex(None, "")
         pl = Placement(subv, 0, 0, 1)
         self.assertEqual(pl.x, 0)
         self.assertEqual(pl.y, 0)
@@ -33,7 +33,7 @@ class TestPlacement(unittest.TestCase):
         check that you cant put a subvertex in multiple placements
         :return:
         """
-        subv = PartitionedVertex(None, "")
+        subv = SimplePartitionedVertex(None, "")
         pl = list()
         for i in range(4):
             pl.append(Placement(subv, 0, 0, i))

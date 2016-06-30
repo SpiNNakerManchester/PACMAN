@@ -9,8 +9,8 @@ from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.partitioned_graph.partitioned_vertex \
-    import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex \
+    import SimplePartitionedVertex
 from pacman.model.graph_mapper.graph_mapper import GraphMapper
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.partitionable_graph.partitionable_graph \
@@ -84,14 +84,14 @@ class TestBasicPlacer(unittest.TestCase):
         # Setting up subgraph and graph_mapper                                 #
         ########################################################################
         self.subvertices = list()
-        self.subvertex1 = PartitionedVertex(
+        self.subvertex1 = SimplePartitionedVertex(
             0, 1, self.vert1.get_resources_used_by_atoms(0, 1, []),
             "First subvertex")
-        self.subvertex2 = PartitionedVertex(
+        self.subvertex2 = SimplePartitionedVertex(
             1, 5, get_resources_used_by_atoms(1, 5, []), "Second subvertex")
-        self.subvertex3 = PartitionedVertex(
+        self.subvertex3 = SimplePartitionedVertex(
             5, 10, get_resources_used_by_atoms(5, 10, []), "Third subvertex")
-        self.subvertex4 = PartitionedVertex(
+        self.subvertex4 = SimplePartitionedVertex(
             10, 100, get_resources_used_by_atoms(10, 100, []),
             "Fourth subvertex")
         self.subvertices.append(self.subvertex1)
@@ -132,7 +132,7 @@ class TestBasicPlacer(unittest.TestCase):
     def test_place_subvertex_too_big_with_vertex(self):
         large_vertex = TestVertex(500, "Large vertex 500")
         large_subvertex = large_vertex.create_subvertex(
-            0, 499, get_resources_used_by_atoms(0, 499, []))#PartitionedVertex(0, 499, "Large subvertex")
+            0, 499, get_resources_used_by_atoms(0, 499, []))#SimplePartitionedVertex(0, 499, "Large subvertex")
         self.graph.add_vertex(large_vertex)
         self.graph = PartitionableGraph("Graph",[large_vertex])
         self.graph_mapper = GraphMapper()
@@ -210,7 +210,7 @@ class TestBasicPlacer(unittest.TestCase):
         for i in range(20 * 17): #50 atoms per each processor on 20 chips
             subvertices.append(PartitionedTestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "PartitionedVertex " + str(i)))
+                "SimplePartitionedVertex " + str(i)))
 
         self.graph = PartitionableGraph("Graph",subvertices)
         self.graph_mapper = GraphMapper()
@@ -228,7 +228,7 @@ class TestBasicPlacer(unittest.TestCase):
         for i in range(100 * 17): #50 atoms per each processor on 20 chips
             subvertices.append(PartitionedTestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "PartitionedVertex " + str(i)))
+                "SimplePartitionedVertex " + str(i)))
 
         self.graph = PartitionableGraph("Graph",subvertices)
         self.graph_mapper = GraphMapper()
@@ -244,7 +244,7 @@ class TestBasicPlacer(unittest.TestCase):
         for i in range(99 * 17): #50 atoms per each processor on 20 chips
             subvertices.append(PartitionedTestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "PartitionedVertex " + str(i)))
+                "SimplePartitionedVertex " + str(i)))
 
         self.graph = PartitionableGraph("Graph",subvertices)
         self.graph_mapper = GraphMapper()

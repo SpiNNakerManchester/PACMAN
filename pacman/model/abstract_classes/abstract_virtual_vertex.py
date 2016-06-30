@@ -1,6 +1,6 @@
 
 # pacman imports
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.model.abstract_classes.virtual_partitioned_vertex import \
     VirtualPartitionedVertex

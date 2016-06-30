@@ -8,13 +8,13 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.model.graph_mapper.graph_mapper import GraphMapper
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.partitionable_graph.abstract_partitionable_edge\
     import AbstractPartitionableEdge
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from spinn_machine.chip import Chip
@@ -58,11 +58,11 @@ class Vertex(AbstractPartitionableVertex):
             self, vertex_slice, partitionable_graph):
         return 4000 + (50 * (vertex_slice.hi_atom - vertex_slice.lo_atom))
 
-class Subvertex(PartitionedVertex):
+class Subvertex(SimplePartitionedVertex):
 
     def __init__(self, lo_atom, hi_atom, resources_required, label=None,
                  constraints=None):
-        PartitionedVertex.__init__(self, lo_atom, hi_atom, resources_required,
+        SimplePartitionedVertex.__init__(self, lo_atom, hi_atom, resources_required,
                                    label=label, constraints=constraints)
         self._model_based_max_atoms_per_core = 256
 
@@ -240,7 +240,7 @@ class TestRadialPlacer(unittest.TestCase):
     def test_many_subvertices(self):
         subvertices = list()
         for i in range(20 * 17): #51 atoms per each processor on 20 chips
-            subvertices.append(PartitionedVertex(
+            subvertices.append(SimplePartitionedVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "Subvertex " + str(i)))
 
@@ -271,7 +271,7 @@ class TestRadialPlacer(unittest.TestCase):
     def test_too_many_subvertices(self):
         subvertices = list()
         for i in range(100 * 17): #50 atoms per each processor on 20 chips
-            subvertices.append(PartitionedVertex(
+            subvertices.append(SimplePartitionedVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "Subvertex " + str(i)))
 
@@ -287,7 +287,7 @@ class TestRadialPlacer(unittest.TestCase):
     def test_fill_machine(self):
         subvertices = list()
         for i in range(99 * 17): #50 atoms per each processor on 20 chips
-            subvertices.append(PartitionedVertex(
+            subvertices.append(SimplePartitionedVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "Subvertex " + str(i)))
 

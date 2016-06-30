@@ -3,7 +3,7 @@ TestTagsModel
 """
 
 # pacman imports
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.model.tags.tags import Tags
 
 # spinnmachine imports
@@ -33,7 +33,7 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         iptag = IPTag("", 1, "122.2.2.2", 1, False)
-        parttiioned_vertex = PartitionedVertex(None, "")
+        parttiioned_vertex = SimplePartitionedVertex(None, "")
         tag_info.add_ip_tag(iptag, parttiioned_vertex)
 
     def test_adding_a_reverse_iptag(self):
@@ -43,7 +43,7 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
-        parttiioned_vertex = PartitionedVertex(None, "")
+        parttiioned_vertex = SimplePartitionedVertex(None, "")
         tag_info.add_reverse_ip_tag(reverse_iptag, parttiioned_vertex)
 
     def test_add_iptag_then_locate_tag(self):
@@ -53,7 +53,7 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         iptag = IPTag("", 1, "122.2.2.2", 1, False)
-        parttiioned_vertex = PartitionedVertex(None, "")
+        parttiioned_vertex = SimplePartitionedVertex(None, "")
         tag_info.add_ip_tag(iptag, parttiioned_vertex)
 
         gotton_tag = tag_info.get_ip_tags_for_vertex(parttiioned_vertex)
@@ -66,8 +66,8 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         iptag = IPTag("", 1, "122.2.2.2", 1, False)
-        parttiioned_vertex = PartitionedVertex(None, "")
-        parttiioned_vertex_2 = PartitionedVertex(None, "")
+        parttiioned_vertex = SimplePartitionedVertex(None, "")
+        parttiioned_vertex_2 = SimplePartitionedVertex(None, "")
         tag_info.add_ip_tag(iptag, parttiioned_vertex)
 
         gotton_tag = tag_info.get_ip_tags_for_vertex(parttiioned_vertex_2)
@@ -81,7 +81,7 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
-        parttiioned_vertex = PartitionedVertex(None, "")
+        parttiioned_vertex = SimplePartitionedVertex(None, "")
         tag_info.add_reverse_ip_tag(reverse_iptag, parttiioned_vertex)
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(parttiioned_vertex)
         self.assertEqual(gotton_tag[0], reverse_iptag)
@@ -94,8 +94,8 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
-        parttiioned_vertex = PartitionedVertex(None, "")
-        parttiioned_vertex2 = PartitionedVertex(None, "")
+        parttiioned_vertex = SimplePartitionedVertex(None, "")
+        parttiioned_vertex2 = SimplePartitionedVertex(None, "")
         tag_info.add_reverse_ip_tag(reverse_iptag, parttiioned_vertex2)
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(parttiioned_vertex)
         self.assertEqual(gotton_tag, None)

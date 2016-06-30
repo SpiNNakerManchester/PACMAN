@@ -1,6 +1,6 @@
 from pacman.model.partitioned_graph.fixed_route_partitioned_edge import \
     FixedRoutePartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.model.partitionable_graph.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman import exceptions
@@ -16,10 +16,10 @@ class FixedRoutePartitionableEdge(AbstractPartitionableEdge):
 
         :param pre_subvertex: the subvertex at the start of the subedge
         :type pre_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.subvertex.SimplePartitionedVertex`
         :param post_subvertex: the subvertex at the end of the subedge
         :type post_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
+                    :py:class:`pacman.model.partitioned_graph.subvertex.SimplePartitionedVertex`
         :param label: The name of the edge
         :type label: str
         :raise None: Raises no known exceptions
@@ -39,14 +39,14 @@ class FixedRoutePartitionableEdge(AbstractPartitionableEdge):
         :param constraints: any constraints needed for the partitioned edge
         :return: the FixedRoutePartitionedEdge
         """
-        if not isinstance(pre_subvertex, PartitionedVertex):
+        if not isinstance(pre_subvertex, SimplePartitionedVertex):
             raise exceptions.PacmanInvalidParameterException(
                 "pre_subvertex", str(pre_subvertex),
-                "Must be a PartitionedVertex")
-        if not isinstance(post_subvertex, PartitionedVertex):
+                "Must be a SimplePartitionedVertex")
+        if not isinstance(post_subvertex, SimplePartitionedVertex):
             raise exceptions.PacmanInvalidParameterException(
                 "post_subvertex", str(post_subvertex),
-                "Must be a PartitionedVertex")
+                "Must be a SimplePartitionedVertex")
 
         if label is None and self.label is not None:
             label = self.label

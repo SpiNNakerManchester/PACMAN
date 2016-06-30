@@ -14,10 +14,10 @@ class AbstractPartitionableEdge(object):
 
         :param pre_vertex: the vertex at the start of the edge
         :type pre_vertex: \
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param post_vertex: the vertex at the end of the edge
         :type post_vertex: \
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param label: The name of the edge
         :type label: str
         :raise None: Raises no known exceptions
@@ -32,10 +32,10 @@ class AbstractPartitionableEdge(object):
 
         :param pre_subvertex: The subvertex at the start of the subedge
         :type pre_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :param post_subvertex: The subvertex at the end of the subedge
         :type post_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :param label: The label to give the edge.  If not specified, and the\
                     edge has no label, the subedge will have no label.  If not\
                     specified and the edge has a label, a label will be\
@@ -53,7 +53,7 @@ class AbstractPartitionableEdge(object):
 
         :return: A vertex
         :rtype:\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :raise None: Raises no known exceptions
         """
         return self._pre_vertex
@@ -64,7 +64,7 @@ class AbstractPartitionableEdge(object):
 
         :return: A vertex
         :rtype:\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :raise None: Raises no known exceptions
         """
         return self._post_vertex

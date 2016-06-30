@@ -12,7 +12,7 @@ from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.exceptions import (PacmanNotFoundError)
 
 # general imports
@@ -38,8 +38,8 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         """
         subvertices = list()
         subedges = list()
-        subvertices.append(PartitionedVertex(None, ""))
-        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
         subedges.append(MultiCastPartitionedEdge(subvertices[0],
                                                  subvertices[1]))
         subedges.append(MultiCastPartitionedEdge(subvertices[1],
@@ -63,10 +63,10 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         :return:
         """
         subvertices = list()
-        subvertices.append(PartitionedVertex(None, ""))
-        subvertices.append(PartitionedVertex(None, ""))
-        subvert1 = PartitionedVertex(None, "")
-        subvert2 = PartitionedVertex(None, "")
+        subvertices.append(SimplePartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
+        subvert1 = SimplePartitionedVertex(None, "")
+        subvert2 = SimplePartitionedVertex(None, "")
 
         subedges = list()
         subedges.append(MultiCastPartitionedEdge(subvertices[0],
@@ -95,11 +95,11 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         :return:
         """
         subvertices = list()
-        subvertices.append(PartitionedVertex(None, ""))
-        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
 
-        subvert1 = PartitionedVertex(None, "")
-        subvert2 = PartitionedVertex(None, "")
+        subvert1 = SimplePartitionedVertex(None, "")
+        subvert2 = SimplePartitionedVertex(None, "")
 
         graph_mapper = GraphMapper()
         vert = TestVertex(10, "Some testing vertex")
@@ -124,8 +124,8 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         :return:
         """
         subvertices = list()
-        subvertices.append(PartitionedVertex(None, ""))
-        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
 
         subedges = list()
         subedges.append(MultiCastPartitionedEdge(subvertices[0],

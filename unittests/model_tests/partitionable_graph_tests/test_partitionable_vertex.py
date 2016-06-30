@@ -8,7 +8,7 @@ from pacman.model.constraints.partitioner_constraints\
     .partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.graph_mapper.slice import Slice
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 
 # unit tests imports
 from uinit_test_objects.test_vertex import TestVertex
@@ -116,7 +116,7 @@ class TestPartitionableGraphModel(unittest.TestCase):
         subvertex = vert.create_subvertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
-        self.assertIsInstance(subvertex, PartitionedVertex)
+        self.assertIsInstance(subvertex, SimplePartitionedVertex)
 
     def test_new_create_subvertex_from_vertex_check_resources(self):
         """ check that the creation of a subvertex means that the reosurces

@@ -93,7 +93,7 @@ class RoutingInfo(object):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.utilities.utility_objs.outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.model.graph.outgoing_edge_partition.OutgoingEdgePartition`
         :return: The routing key or None if the subedge does not exist
         :rtype: int
         :raise None: does not raise any known exceptions
@@ -106,7 +106,7 @@ class RoutingInfo(object):
         """
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.utilities.utility_objs.outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.model.graph.outgoing_edge_partition.OutgoingEdgePartition`
         :return: the partition_routing_info for the partition
         """
         if partition in self._partition_info_by_partition:

@@ -13,7 +13,7 @@ class PartitionRoutingInfo(object):
                     :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.utilities.utility_objs.outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.model.graph.outgoing_edge_partition.OutgoingEdgePartition`
         """
         self._keys_and_masks = keys_and_masks
         self._partition = partition

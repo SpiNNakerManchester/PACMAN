@@ -1,16 +1,14 @@
 from abc import ABCMeta
 from six import add_metaclass
+from abc import abstractproperty
 
 
 @add_metaclass(ABCMeta)
-class AbstractLabeled(object):
+class AbstractHasLabel(object):
     """ Represents an item with a label
     """
 
-    def __init__(self, label):
-        self._label = label
-
-    @property
+    @abstractproperty
     def label(self):
         """ The label of the item
 
@@ -18,4 +16,3 @@ class AbstractLabeled(object):
         :rtype: str
         :raise None: Raises no known exceptions
         """
-        return self._label

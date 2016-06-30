@@ -1,9 +1,10 @@
 from pacman.model.abstract_classes.abstract_constrained_vertex import \
     AbstractConstrainedVertex
+from pacman.model.graph.abstract_vertex import AbstractVertex
 
 
-class PartitionedVertex(AbstractConstrainedVertex):
-    """ Represents a sub-set of atoms from a AbstractConstrainedVertex
+class SimplePartitionedVertex(AbstractVertex):
+    """ Represents a vertex of a graph with a given set of resources
     """
 
     def __init__(self, resources_required, label, constraints=None):

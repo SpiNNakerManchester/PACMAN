@@ -1,7 +1,7 @@
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.model.abstract_classes.abstract_constrained_vertex \
-    import AbstractConstrainedVertex
+from pacman.model.graph.simple_partitioned_vertex \
+    import SimplePartitionedVertex
+from pacman.model.graph.abstract_vertex import AbstractVertex
 from pacman.model.constraints.partitioner_constraints\
     .partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
@@ -21,14 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPartitionableVertex(AbstractConstrainedVertex):
-    """ The abstract partitionable vertex is a type of vertex that is
-        recognised by the pacman partitioners. Due to this, it is recommended
-        that front end developers inherit from this class when creating new
-        neural models.
-
-        This class enforces methods for supporting the partitioning of a vertex
-        based on cost metrics.
+class AbstractPartitionableVertex(AbstractVertex):
+    """ A vertex that can be broken down into a number of smaller vertices\
+        based on the resources that the vertex requires
     """
 
     def __init__(self, n_atoms, label, max_atoms_per_core, constraints=None):
@@ -46,7 +41,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
         :type constraints: iterable of\
                     :py:class:`pacman.model.constraints.abstract_contraints.abstract_constraint.AbstractConstraint`
         """
-        AbstractConstrainedVertex.__init__(self, label, constraints)
+        AbstractVertex.__init__(self, label, constraints)
         if n_atoms < 1:
             raise PacmanInvalidParameterException(
                 "n_atoms", str(n_atoms),
@@ -170,7 +165,7 @@ class AbstractPartitionableVertex(AbstractConstrainedVertex):
                     * If lo_atom or hi_atom are out of range
                     * If one of the constraints is invalid
         """
-        return PartitionedVertex(label=label,
+        return SimplePartitionedVertex(label=label,
                                  resources_required=resources_required,
                                  constraints=constraints)
 

@@ -12,10 +12,10 @@ class FixedRoutePartitionedEdge(AbstractPartitionedEdge):
 
         :param pre_subvertex: the subvertex at the start of the subedge
         :type pre_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :param post_subvertex: the subvertex at the end of the subedge
         :type post_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :param label: The name of the edge
         :type label: str
         :raise None: Raises no known exceptions

@@ -2,15 +2,15 @@ from abc import ABCMeta
 from six import add_metaclass
 
 
-from pacman.model.abstract_classes.abstract_constrained_object import \
-    AbstractConstrainedObject
-from pacman.model.abstract_classes.abstract_labeled import \
-    AbstractLabeled
+from pacman.model.abstract_classes.abstract_has_constraints import \
+    AbstractHasConstraints
+from pacman.model.abstract_classes.simple_labeled_object import \
+    SimpleLabeledObject
 
 
 @add_metaclass(ABCMeta)
-class AbstractConstrainedVertex(AbstractConstrainedObject,
-                                AbstractLabeled):
+class AbstractConstrainedVertex(AbstractHasConstraints,
+                                SimpleLabeledObject):
     """ Represents a AbstractConstrainedVertex of a partitionable_graph, \
         which contains a number of atoms, and\
         which can be partitioned into a number of subvertices, such that the\
@@ -30,5 +30,5 @@ class AbstractConstrainedVertex(AbstractConstrainedObject,
                     * If one of the constraints is not valid
                     * If the number of atoms is less than 1
         """
-        AbstractConstrainedObject.__init__(self, constraints)
-        AbstractLabeled.__init__(self, label)
+        AbstractHasConstraints.__init__(self, constraints)
+        SimpleLabeledObject.__init__(self, label)

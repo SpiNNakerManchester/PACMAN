@@ -1,8 +1,8 @@
 
 from enum import Enum
-from pacman.model.abstract_classes.abstract_constrained_object import \
-    AbstractConstrainedObject
-from pacman.model.abstract_classes.abstract_labeled import AbstractLabeled
+from pacman.model.abstract_classes.abstract_has_constraints import \
+    AbstractHasConstraints
+from pacman.model.abstract_classes.simple_labeled_object import SimpleLabeledObject
 from pacman.model.partitionable_graph.fixed_route_partitionable_edge import \
     FixedRoutePartitionableEdge
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
@@ -25,15 +25,15 @@ EDGE_TYPES = Enum(
            ("FIXED_ROUTE", 3)])
 
 
-class OutgoingEdgePartition(AbstractConstrainedObject, AbstractLabeled):
+class OutgoingEdgePartition(AbstractHasConstraints, SimpleLabeledObject):
     """
     A collection of edges from a single vertex which have the same\
         semantics and so can share a single key
     """
 
     def __init__(self, identifier, constraints=None, label=None):
-        AbstractConstrainedObject.__init__(self, constraints)
-        AbstractLabeled.__init__(self, label)
+        AbstractHasConstraints.__init__(self, constraints)
+        SimpleLabeledObject.__init__(self, label)
         self._identifier = identifier
         self._type = None
         self._edges = list()

@@ -1,6 +1,6 @@
 from pacman.model.partitioned_graph.abstract_partitioned_edge \
     import AbstractPartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.exceptions import (PacmanValueError,
                                PacmanNotFoundError,
                                PacmanTypeError)
@@ -36,7 +36,7 @@ class GraphMapper(object):
 
         :param subvertex: a subvertex to be added to the partitionable_graph
         :type subvertex:
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.SimplePartitionedVertex`
         :param vertex_slice: the chunk of atoms from the partitionable vertex
         that the partitioned vertex is going to represent
         :type vertex_slice:
@@ -52,7 +52,7 @@ class GraphMapper(object):
         :raise pacman.exceptions.PacmanTypeError: If the subvertex is of an\
                     inappropriate type.
         """
-        if not isinstance(subvertex, PartitionedVertex):
+        if not isinstance(subvertex, SimplePartitionedVertex):
             raise PacmanTypeError(
                 "subvertex", str(subvertex),
                 "Must be an instance of"
@@ -129,11 +129,11 @@ class GraphMapper(object):
         :param vertex: the partitionable vertex for which to find the\
                     associated partitioned vertices
         :type vertex:\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: An iterable of partitioned vertices, or None if the vertex \
                     does not exist
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`\
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.SimplePartitionedVertex`\
                     or None
         :raise None: Raises no known exceptions
         """
@@ -168,11 +168,11 @@ class GraphMapper(object):
         :param subvertex: The partitioned vertex to get the partitionable\
                     of
         :type subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.SimplePartitionedVertex`
         :return: a partitionable vertex or None if the partitionable vertex\
                     does not exist
         :rtype:\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         """
         if subvertex in self._vertex_from_subvertex:
             return self._vertex_from_subvertex[subvertex]
@@ -200,7 +200,7 @@ class GraphMapper(object):
 
         :param subvertex: the partitioned vertex to get the slice of
         :type subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.SimplePartitionedVertex`
         :return: a slice object containing the low and high atom or None if\
                    the partitioned vertex does not exist
         :rtype: :py:class:`pacman.model.graph_mapper.slice.Slice` or None

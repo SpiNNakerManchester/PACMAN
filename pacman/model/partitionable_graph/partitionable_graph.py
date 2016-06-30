@@ -1,11 +1,11 @@
 
 # pacman imports
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.partitionable_graph.abstract_partitionable_edge \
     import AbstractPartitionableEdge
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.utilities.utility_objs.outgoing_edge_partition \
+from pacman.model.graph.outgoing_edge_partition \
     import OutgoingEdgePartition
 
 # general imports
@@ -39,7 +39,7 @@ class PartitionableGraph(object):
 
         :param vertex: a vertex to be added to the partitionable graph
         :type vertex:\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: \
@@ -61,7 +61,7 @@ class PartitionableGraph(object):
 
         :param vertices: an iterable of vertices to be added to the graph
         :type vertices: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: \
@@ -135,7 +135,7 @@ class PartitionableGraph(object):
 
         :param vertex: the vertex for which to find the outgoing edges
         :type vertex:\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :param partition_identifier: the identifier for the partition that\
                    the edges being returned should associate with. If set to\
                    None, returns all edges from all partitions
@@ -165,7 +165,7 @@ class PartitionableGraph(object):
         :param vertex: the vertex for which the outgoing edge partitions are to
          be located for.
          :type vertex: \
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: iterable of\
                      :py:class:`pacman.utilities.outgoing_edge_partition.OutgoingEdgePartition`
                      or a empty list if none are available
@@ -205,7 +205,7 @@ class PartitionableGraph(object):
 
         :param vertex: the vertex for which to find the incoming edges
         :type vertex:\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         :return: an iterable of edges which have vertex as their post_vertex
         :rtype: iterable of\
                     :py:class:`pacman.model.partitionable_graph.abstract_partitionable_edge.AbstractPartitionableEdge`
@@ -229,7 +229,7 @@ class PartitionableGraph(object):
 
         :return: an iterable of vertices
         :rtype: iterable of\
-                    :py:class:`pacman.model.partitionable_graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
         """
         return self._vertices
 

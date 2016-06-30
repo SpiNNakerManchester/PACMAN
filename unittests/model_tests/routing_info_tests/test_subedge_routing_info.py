@@ -7,7 +7,7 @@ from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 
 # general imports
 import unittest
@@ -20,8 +20,8 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
          right places
         :return:
         """
-        subv1 = PartitionedVertex(None, "")
-        subv2 = PartitionedVertex(None, "")
+        subv1 = SimplePartitionedVertex(None, "")
+        subv2 = SimplePartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
         keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
@@ -36,8 +36,8 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
         checks that creating a routing works on its own
         :return:
         """
-        subv1 = PartitionedVertex(None, "")
-        subv2 = PartitionedVertex(None, "")
+        subv1 = SimplePartitionedVertex(None, "")
+        subv2 = SimplePartitionedVertex(None, "")
         sube = MultiCastPartitionedEdge(subv1, subv2)
         keys_and_masks = list()
         keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))

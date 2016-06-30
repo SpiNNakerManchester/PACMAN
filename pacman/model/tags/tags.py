@@ -30,7 +30,7 @@ class Tags(object):
         :param partitioned_vertex: The partitioned vertex by which the tag\
                     is to be used
         :type partitioned_vertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :raises PacmanInvalidParameterException:
                     * If the combination of (board-address, tag) has already\
                       been assigned to an IP tag with different properties
@@ -68,7 +68,7 @@ class Tags(object):
         :param partitioned_vertex: The partitioned vertex by which the tag\
                     is to be used
         :type partitioned_vertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :raises PacmanInvalidParameterException:
                     * If the combination of (board-address, tag) has already\
                       been assigned to an IP tag or Reverse IP tag
@@ -123,7 +123,7 @@ class Tags(object):
 
         :param partitioned_vertex: The partitioned vertex to get the tags for
         :type partitioned_vertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :return: An iterable of IPTag or None if the vertex has no tags
         :rtype: iterable of :py:class:`spinn_machine.tags.iptag.IPTag`
         """
@@ -136,7 +136,7 @@ class Tags(object):
 
         :param partitioned_vertex: The partitioned vertex to get the tags for
         :type partitioned_vertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :return: An iterable of ReverseIPTag or None if the vertex has no tags
         :rtype: iterable of \
                     :py:class:`spinn_machine.tags.reverse_iptag.ReverseIPTag`

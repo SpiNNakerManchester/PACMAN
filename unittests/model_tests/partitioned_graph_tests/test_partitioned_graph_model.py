@@ -5,7 +5,7 @@ TestPartitionedGraphModel
 # pacman imports
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
@@ -24,7 +24,7 @@ class TestPartitionedGraphModel(unittest.TestCase):
         test the creation of a partitioned vertex
         :return:
         """
-        PartitionedVertex(None, "")
+        SimplePartitionedVertex(None, "")
 
     def test_new_empty_subgraph(self):
         """
@@ -42,7 +42,7 @@ class TestPartitionedGraphModel(unittest.TestCase):
         subvertices = list()
         subedges = list()
         for i in range(10):
-            subvertices.append(PartitionedVertex(None, ""))
+            subvertices.append(SimplePartitionedVertex(None, ""))
         for i in range(5):
             subedges.append(MultiCastPartitionedEdge(subvertices[0],
                                                      subvertices[(i + 1)]))
@@ -85,9 +85,9 @@ class TestPartitionedGraphModel(unittest.TestCase):
         """
         subvertices = list()
         subedges = list()
-        subv = PartitionedVertex(None, "")
+        subv = SimplePartitionedVertex(None, "")
         subvertices.append(subv)
-        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
         subvertices.append(subv)
         subedges.append(MultiCastPartitionedEdge(subvertices[0],
                                                  subvertices[1]))
@@ -104,8 +104,8 @@ class TestPartitionedGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             subvertices = list()
             subedges = list()
-            subvertices.append(PartitionedVertex(None, ""))
-            subvertices.append(PartitionedVertex(None, ""))
+            subvertices.append(SimplePartitionedVertex(None, ""))
+            subvertices.append(SimplePartitionedVertex(None, ""))
             sube = MultiCastPartitionedEdge(subvertices[0], subvertices[1])
             subedges.append(sube)
             subedges.append(sube)
@@ -119,12 +119,12 @@ class TestPartitionedGraphModel(unittest.TestCase):
         """
         subvertices = list()
         subedges = list()
-        subvertices.append(PartitionedVertex(None, ""))
-        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
         subedges.append(MultiCastPartitionedEdge(subvertices[0],
                                                  subvertices[1]))
         subedges.append(MultiCastPartitionedEdge(
-            PartitionedVertex(None, ""), subvertices[0]))
+            SimplePartitionedVertex(None, ""), subvertices[0]))
         with self.assertRaises(PacmanInvalidParameterException):
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 
@@ -136,12 +136,12 @@ class TestPartitionedGraphModel(unittest.TestCase):
         """
         subvertices = list()
         subedges = list()
-        subvertices.append(PartitionedVertex(None, ""))
-        subvertices.append(PartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
+        subvertices.append(SimplePartitionedVertex(None, ""))
         subedges.append(MultiCastPartitionedEdge(subvertices[0],
                                                  subvertices[1]))
         subedges.append(MultiCastPartitionedEdge(
-            subvertices[0], PartitionedVertex(None, "")))
+            subvertices[0], SimplePartitionedVertex(None, "")))
         with self.assertRaises(PacmanInvalidParameterException):
             PartitionedGraph(subvertices=subvertices, subedges=subedges)
 

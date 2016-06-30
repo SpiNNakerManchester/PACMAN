@@ -6,7 +6,7 @@ from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.routing_info import RoutingInfo
@@ -31,7 +31,7 @@ from spinn_machine.machine import Machine
 
 import unittest
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 
 
@@ -77,9 +77,9 @@ class MyTestCase(unittest.TestCase):
         self.graph = PartitionableGraph("Graph", self.verts, self.edges)
         # sort out subgraph
         self.subgraph = PartitionedGraph()
-        self.subvert1 = PartitionedVertex(
+        self.subvert1 = SimplePartitionedVertex(
             0, 10, get_resources_used_by_atoms(0, 10, []))
-        self.subvert2 = PartitionedVertex(
+        self.subvert2 = SimplePartitionedVertex(
             0, 5, get_resources_used_by_atoms(0, 10, []))
         self.subedge = AbstractPartitionedEdge(self.subvert1, self.subvert2)
         self.subgraph.add_subvertex(self.subvert1)
@@ -263,7 +263,7 @@ class MyTestCase(unittest.TestCase):
         self.placement2 = Placement(x=1, y=0, p=3, subvertex=self.subvert2)
         subvertices = list()
         for i in range(4 * 17): #51 atoms per each processor on 20 chips
-            subvertices.append(PartitionedVertex(
+            subvertices.append(SimplePartitionedVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "Subvertex " + str(i)))
         subedges = list()

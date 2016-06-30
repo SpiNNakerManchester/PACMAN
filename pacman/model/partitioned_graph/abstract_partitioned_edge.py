@@ -14,10 +14,10 @@ class AbstractPartitionedEdge(object):
 
         :param pre_subvertex: the subvertex at the start of the subedge
         :type pre_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :param post_subvertex: the subvertex at the end of the subedge
         :type post_subvertex:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :param constraints: The constraints of the vertex
         :type constraints: list of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
@@ -45,7 +45,7 @@ class AbstractPartitionedEdge(object):
 
         :return: the incoming partitioned vertex
         :rtype:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :raise None: Raises no known exceptions
         """
         return self._pre_subvertex
@@ -56,7 +56,7 @@ class AbstractPartitionedEdge(object):
 
         :return: the outgoing partitioned vertex
         :rtype:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_vertex.PartitionedVertex`
+                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
         :raise None: Raises no known exceptions
         """
         return self._post_subvertex

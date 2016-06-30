@@ -5,7 +5,7 @@ tests for placements
 # pacman imports
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 
 # general imports
 import unittest
@@ -21,7 +21,7 @@ class TestPlacements(unittest.TestCase):
         test creating a placements object
         :return:
         """
-        subv = PartitionedVertex(None, "")
+        subv = SimplePartitionedVertex(None, "")
         pl = Placement(subv, 0, 0, 1)
         Placements([pl])
 
@@ -41,7 +41,7 @@ class TestPlacements(unittest.TestCase):
         """
         subv = list()
         for i in range(5):
-            subv.append(PartitionedVertex(None, ""))
+            subv.append(SimplePartitionedVertex(None, ""))
 
         pl = list()
         for i in range(4):
@@ -59,7 +59,7 @@ class TestPlacements(unittest.TestCase):
         """
         subv = list()
         for i in range(5):
-            subv.append(PartitionedVertex(None, ""))
+            subv.append(SimplePartitionedVertex(None, ""))
 
         pl = list()
         for i in range(4):
@@ -78,7 +78,7 @@ class TestPlacements(unittest.TestCase):
         """
         subv = list()
         for i in range(5):
-            subv.append(PartitionedVertex(None, ""))
+            subv.append(SimplePartitionedVertex(None, ""))
 
         pl = list()
         for i in range(4):

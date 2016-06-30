@@ -2,7 +2,7 @@ import unittest
 
 from pacman.model.partitioned_graph.abstract_partitioned_edge import \
     AbstractPartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
 from pacman.operations.router_algorithms import BasicDijkstraRouting
 from pacman.model.partitionable_graph.abstract_partitionable_edge \
     import AbstractPartitionableEdge
@@ -15,7 +15,7 @@ from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
 from spinn_machine.virtual_machine import VirtualMachine
 from pacman.utilities import constants
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 
 
@@ -51,9 +51,9 @@ class TestRouter(unittest.TestCase):
         self.graph = PartitionableGraph("Graph", self.verts, self.edges)
         #sort out subgraph
         self.subgraph = PartitionedGraph()
-        self.subvert1 = PartitionedVertex(
+        self.subvert1 = SimplePartitionedVertex(
             0, 10, self.vert1.get_resources_used_by_atoms(0, 10, []))
-        self.subvert2 = PartitionedVertex(
+        self.subvert2 = SimplePartitionedVertex(
             0, 5, self.vert2.get_resources_used_by_atoms(0, 10, []))
         self.subedge = AbstractPartitionedEdge(self.subvert1, self.subvert2)
         self.subgraph.add_subvertex(self.subvert1)
