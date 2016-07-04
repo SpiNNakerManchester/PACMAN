@@ -89,9 +89,24 @@ class RadialPlacer(object):
         placement = Placement(vertex, x, y, p)
         placements.add_placement(placement)
 
-    def _generate_radial_chips(self, machine, resource_tracker=None,
-                               start_chip_x=None, start_chip_y=None):
-        first_chip = None
+    @staticmethod
+    def _generate_radial_chips(
+            machine, resource_tracker=None, start_chip_x=None,
+            start_chip_y=None):
+        """ Generates the list of chips from a given starting point in a radial
+         format.
+
+        :param machine: the spinnaker machine object
+        :param resource_tracker:
+        the resource tracker object which contains what resoruces of the
+        machine have currently been used
+        :param start_chip_x: The chip x coordinate to start with for
+        radial iteration
+        :param start_chip_y: the chip y coordinate to start with for radial
+        iteration
+        :return: list of chips.
+        """
+
         if start_chip_x is None or start_chip_y is None:
             first_chip = machine.boot_chip
         else:
