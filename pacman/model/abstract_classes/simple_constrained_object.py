@@ -1,7 +1,7 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.abstract_classes.abstract_has_constraints\
     import AbstractHasConstraints
-from pacman.model.abstract_classes.overrides import overrides
+from pacman.model.decorators import overrides.overrides
 from pacman.model.constraints.abstract_constraints.abstract_constraint \
     import AbstractConstraint
 

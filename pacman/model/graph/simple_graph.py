@@ -1,5 +1,5 @@
 from pacman.model.graph.abstract_graph import AbstractGraph
-from pacman.model.abstract_classes.overrides import overrides
+from pacman.model.decorators import overrides.overrides
 from pacman.exceptions import PacmanInvalidParameterException
 from collections import defaultdict
 from pacman.model.graph.outgoing_edge_partition import OutgoingEdgePartition

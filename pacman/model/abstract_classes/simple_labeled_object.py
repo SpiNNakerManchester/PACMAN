@@ -1,5 +1,5 @@
 from pacman.model.abstract_classes.abstract_has_label import AbstractHasLabel
-from pacman.model.abstract_classes.overrides import overrides
+from pacman.model.decorators.overrides import overrides
 
 
 class SimpleLabeledObject(AbstractHasLabel):
@@ -12,6 +12,6 @@ class SimpleLabeledObject(AbstractHasLabel):
         self._label = label
 
     @property
-    @overrides(AbstractHasLabel)
+    @overrides(AbstractHasLabel.label)
     def label(self):
         return self._label

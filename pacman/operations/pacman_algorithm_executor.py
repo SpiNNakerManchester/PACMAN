@@ -1,6 +1,7 @@
 # pacman imports
 from pacman import exceptions
 from pacman.operations import algorithm_reports
+from pacman.model.decorators import injection
 from pacman.utilities.file_format_converters.convert_algorithms_metadata \
     import ConvertAlgorithmsMetadata
 from pacman.utilities import file_format_converters
@@ -26,7 +27,8 @@ class PACMANAlgorithmExecutor(object):
     """
 
     def __init__(self, algorithms, optional_algorithms, inputs, xml_paths,
-                 required_outputs, do_timings=True, print_timings=False):
+                 required_outputs, do_timings=True, print_timings=False,
+                 do_immediate_injection=False, do_post_run_injection=False):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -38,6 +40,11 @@ class PACMANAlgorithmExecutor(object):
         :param required_outputs: A list of output types that must be generated
         :param do_timings: True if timing information should be printed after\
                 each algorithm, False otherwise
+        :param do_immediate_injection: Perform injection with objects as they\
+                are created; can result in multiple calls to the same inject-\
+                annotated methods
+        :param do_post_run_injection: Perform injection at the end of the run.\
+                This will only set the last object of any type created.
         """
 
         # algorithm timing information
@@ -55,6 +62,10 @@ class PACMANAlgorithmExecutor(object):
 
         # print timings as you go
         self._print_timings = print_timings
+
+        # injection
+        self._do_immediate_injection = do_immediate_injection
+        self._do_post_run_injection = do_post_run_injection
 
         # protect the variable from reference movement during usage
         copy_of_xml_paths = list(xml_paths)
@@ -360,6 +371,10 @@ class PACMANAlgorithmExecutor(object):
                 # external to pacman
                 self._handle_external_algorithm(algorithm)
 
+        # Do injection with all the outputs
+        if self._do_post_run_injection:
+            injection.do_injection(self._internal_type_mapping)
+
     def _handle_internal_algorithm(self, algorithm):
         """ Creates the input files for the algorithm
 
@@ -518,6 +533,10 @@ class PACMANAlgorithmExecutor(object):
                             result_name, algorithm.algorithm_id,
                             algorithm.outputs))
                 self._internal_type_mapping[result_type] = results[result_name]
+
+                # Do injection with just the output produced
+                if self._do_immediate_injection:
+                    injection.do_injection({result_type: results[result_name]})
         elif len(algorithm.outputs) != 0:
             raise exceptions.PacmanAlgorithmFailedToGenerateOutputsException(
                 "Algorithm {} did not generate any outputs".format(
