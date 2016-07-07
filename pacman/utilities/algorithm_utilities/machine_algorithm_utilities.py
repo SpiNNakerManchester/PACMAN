@@ -56,8 +56,7 @@ def create_virtual_chip(
     # create the processors
     processors = list()
     for virtual_core_id in range(0, 128):
-        processors.append(Processor(
-            virtual_core_id, Processor.CPU_AVAILABLE, virtual_core_id == 0))
+        processors.append(Processor(virtual_core_id))
 
     # connect the real chip with the virtual one
     connected_chip = machine.get_chip_at(
@@ -67,7 +66,7 @@ def create_virtual_chip(
 
     machine.add_chip(Chip(
         processors=processors, router=router_object,
-        sdram=SDRAM(total_size=0, user_base_address=0, system_base_address=0),
+        sdram=SDRAM(size=0),
         x=virtual_chip_x, y=virtual_chip_y,
         virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None))
 

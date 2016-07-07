@@ -527,7 +527,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
                     " {} KB out of a max of "
                     "{} MB \n\n".format(chip.x, chip.y,
                                         int(used_sdram / 1024.0),
-                                        int(SDRAM.DEFAULT_SDRAM_BYTES /
+                                        int(chip.sdram.size /
                                             (1024.0 * 1024.0))))
             progress_bar.update()
         except KeyError:
