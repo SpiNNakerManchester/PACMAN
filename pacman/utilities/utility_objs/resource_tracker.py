@@ -347,6 +347,9 @@ class ResourceTracker(object):
             if (key in self._core_tracker and
                     processor_id not in self._core_tracker[key]):
                 return 0
+            elif (key in self._core_tracker and
+                    processor_id in self._core_tracker[key]):
+                return 1
             elif key not in self._core_tracker:
                 processor = chip.get_processor_with_id(processor_id)
                 if processor is not None and not processor.is_monitor:
