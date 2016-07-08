@@ -1,5 +1,6 @@
 
 # pacman imports
+from pacman import exceptions
 from pacman.model.constraints.abstract_constraints.\
     abstract_placer_constraint import \
     AbstractPlacerConstraint
@@ -29,8 +30,6 @@ class OneToOnePlacer(RadialPlacer):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
     """
-
-    MAX_CORES_PER_CHIP_TO_CONSIDER = 16
 
     def __init__(self):
         RadialPlacer.__init__(self)
@@ -67,8 +66,15 @@ class OneToOnePlacer(RadialPlacer):
         # iterate over subverts
         for subvertex_list in ordered_subverts:
 
+            # ensure largest cores per chip is a devisional by 2 number
+            # (for one to one placement)
+            max_cores_on_chip = \
+                resource_tracker.most_avilable_cores_on_a_chip()
+            if max_cores_on_chip % 2 != 0:
+                max_cores_on_chip -= 1
+
             # if too many one to ones to fit on a chip, allocate individually
-            if len(subvertex_list) > self.MAX_CORES_PER_CHIP_TO_CONSIDER:
+            if len(subvertex_list) > max_cores_on_chip:
                 for subvertex in subvertex_list:
                     self._allocate_individual(
                         subvertex, placements, progress_bar, resource_tracker)
@@ -91,7 +97,9 @@ class OneToOnePlacer(RadialPlacer):
                         placement = Placement(subvert, x, y, p)
                         placements.add_placement(placement)
                         progress_bar.update()
-                except:
+                except exceptions.PacmanValueError or \
+                        exceptions.PacmanException or \
+                        exceptions.PacmanInvalidParameterException:
                     traceback.print_exc()
 
                     # If something goes wrong, try to allocate each
@@ -144,11 +152,20 @@ class OneToOnePlacer(RadialPlacer):
                 sorted_vertices.append([vertex])
         return sorted_vertices
 
-    def _find_one_to_one_vertices(self, vertex, partitioned_graph):
+    @staticmethod
+    def _find_one_to_one_vertices(vertex, partitioned_graph):
+        """
+        find vertices which have one to one connections with the given vertex,
+        and where their constraints dont force them onto different chips.
+        :param vertex:  the vertex to use as a basis for one to one connections
+        :param partitioned_graph: the graph to look for other one to one verts
+        :return:  set of one to one vertices
+        """
         x, y, _ = utility_calls.get_chip_and_core(vertex.constraints)
         found_vertices = [vertex]
-        vertices_seen = set([vertex])
+        vertices_seen = {vertex}
 
+        #look for one to ones leaving this vertex
         outgoing = partitioned_graph.outgoing_subedges_from_subvertex(vertex)
         vertices_to_try = [edge.post_subvertex for edge in outgoing]
         while len(vertices_to_try) != 0:
@@ -177,6 +194,7 @@ class OneToOnePlacer(RadialPlacer):
                         edge.post_subvertex for edge in outgoing
                         if edge.post_subvertex not in vertices_seen])
 
+        #look for one to ones entering this vertex
         incoming = partitioned_graph.incoming_subedges_from_subvertex(
             vertex)
         vertices_to_try = [
