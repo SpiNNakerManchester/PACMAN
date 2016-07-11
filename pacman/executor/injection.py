@@ -1,7 +1,13 @@
 from collections import defaultdict
+from functools import wraps
 
 _instances = list()
 _methods = defaultdict(dict)
+
+
+class InjectionException(Exception):
+    """ Raised when there is an error with injection
+    """
 
 
 def supports_injection(injectable_class):
@@ -28,8 +34,43 @@ def inject(type_to_inject):
     :param type_to_inject: The type to be injected using this method
     """
     def wrap(method):
-        method._type_to_inject = type_to_inject
-        return method
+
+        @wraps(method)
+        def wrapper(obj, arg):
+            method(obj, arg)
+            if arg is not None:
+                wrapper._called = True
+
+        wrapper._type_to_inject = type_to_inject
+        wrapper._called = False
+        return wrapper
+    return wrap
+
+
+def requires_injection(types_required):
+    """ Indicates that injection of the given types is required before this\
+        method is called; an Exception is raised if the types have not been\
+        injected
+
+    :param types_required: A list of types that must have been injected
+    :type types_required: list of str
+    """
+    def wrap(wrapped_method):
+
+        @wraps(wrapped_method)
+        def wrapper(obj, *args, **kwargs):
+            methods = _methods.get(obj.__class__, None)
+            for object_type in types_required:
+                method = methods.get(object_type, None)
+                if method is None:
+                    raise InjectionException("No injector for type {}".format(
+                        object_type))
+                if not method._called:
+                    raise InjectionException(
+                        "Type {} has not been injected".format(
+                            object_type))
+            return wrapped_method(obj, *args, **kwargs)
+        return wrapper
     return wrap
 
 

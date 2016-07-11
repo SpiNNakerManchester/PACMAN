@@ -1,10 +1,10 @@
-from pacman.utilities.algorithm_utilities.algorithm_data import AlgorithmData
+from pacman.executor.algorithm_data import AlgorithmMetadata
 from pacman import exceptions
 
 from lxml import etree
 
 
-class ConvertAlgorithmsMetadata(object):
+class AlgorithmMetadataXmlReader(object):
     """ Converts an XML file into algorithm data
     """
 
@@ -40,10 +40,10 @@ class ConvertAlgorithmsMetadata(object):
         return algorithm_data_objects
 
     def _generate_algorithm_data(self, element):
-        """ Translates XML elements into tuples for the AlgorithmData object
+        """ Translates XML elements into tuples for the AlgorithmMetadata object
 
         :param element: the xml element to translate
-        :return: a AlgorithmData
+        :return: a AlgorithmMetadata
         """
         external = False
 
@@ -82,7 +82,7 @@ class ConvertAlgorithmsMetadata(object):
             element.find("optional_inputs"))
         outputs = self._translate_parameters(
             element.find("produces_outputs"))
-        return AlgorithmData(
+        return AlgorithmMetadata(
             algorithm_id=element.get('name'),
             command_line_args=command_line_args, inputs=required_inputs,
             optional_inputs=optional_inputs,

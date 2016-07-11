@@ -1,5 +1,5 @@
-class AlgorithmData(object):
-    """ Data object for reading in XML and locations
+class AlgorithmMetadata(object):
+    """ Represents the metadata for an algorithm referring to input
     """
 
     def __init__(self, algorithm_id, command_line_args, python_import, inputs,
@@ -7,7 +7,7 @@ class AlgorithmData(object):
                  python_class, python_function):
         """
 
-        :param algorithm_id:
+        :param algorithm_id: The unique id of the algorithm
         :param command_line_args:
         :param inputs:
         :param optional_inputs:
@@ -31,63 +31,54 @@ class AlgorithmData(object):
     @property
     def algorithm_id(self):
         """ The id for this algorithm
-        :return:
         """
         return self._id
 
     @property
     def python_class(self):
         """ The python class if it has one
-        :return:
         """
         return self._python_class
 
     @property
     def python_function(self):
         """ The python function if it has one
-        :return:
         """
         return self._python_function
 
     @property
     def inputs(self):
         """ The dict of inputs and type
-        :return:
         """
         return self._inputs
 
     @property
     def outputs(self):
         """ The dict of outputs and type
-        :return:
         """
         return self._outputs
 
     @property
     def optional_inputs(self):
         """ The dict of optional inputs and type
-        :return:
         """
         return self._optional_inputs
 
     @property
     def requred_optional_inputs(self):
         """ The dict of required optional inputs and type
-        :return:
         """
         return self._required_optional_inputs
 
     @property
     def command_line_args(self):
         """ The string which is to be the command line to call if external call
-        :return:
         """
         return self._command_line_args
 
     @property
     def external(self):
         """ Boolean that says if this algorithm is external
-        :return:
         """
         return self._external
 

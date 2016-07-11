@@ -1,9 +1,9 @@
 # pacman imports
 from pacman import exceptions
 from pacman.operations import algorithm_reports
-from pacman.model.decorators import injection
-from pacman.utilities.file_format_converters.convert_algorithms_metadata \
-    import ConvertAlgorithmsMetadata
+from pacman.executor import injection
+from pacman.executor.algorithm_metadata_xml_reader \
+    import AlgorithmMetadataXmlReader
 from pacman.utilities import file_format_converters
 from pacman import operations
 from spinn_machine.utilities.progress_bar import ProgressBar
@@ -111,9 +111,9 @@ class PACMANAlgorithmExecutor(object):
             "converter_algorithms_metadata.xml"))
 
         # decode the algorithms specs
-        xml_decoder = ConvertAlgorithmsMetadata(xml_paths)
+        xml_decoder = AlgorithmMetadataXmlReader(xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
-        xml_decoder = ConvertAlgorithmsMetadata(converter_xml_path)
+        xml_decoder = AlgorithmMetadataXmlReader(converter_xml_path)
         converter_algorithm_data_objects = \
             xml_decoder.decode_algorithm_data_objects()
 
