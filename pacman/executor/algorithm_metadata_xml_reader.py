@@ -59,10 +59,9 @@ class AlgorithmMetadataXmlReader(object):
         # get other params
         required_inputs = self._translate_inputs(
             algorithm_id, element.find("required_inputs"), input_definitions)
-        optional_inputs = self._translate_parameters(
+        optional_inputs = self._translate_inputs(
             algorithm_id, element.find("optional_inputs"), input_definitions)
-        outputs = self._translate_parameters(
-            element.find("produces_outputs"))
+        outputs = self._translate_outputs(element.find("outputs"))
 
         # Determine the type of the algorithm and return the appropriate type
         command_line_args = element.find("command_line_args")
@@ -147,7 +146,9 @@ class AlgorithmMetadataXmlReader(object):
                     param_type.text
                     for param_type in parameter.findall("param_type")
                 ]
-                definitions[param_name] = SingleInput(param_name, param_types)
+                is_file = bool(parameter.get("is_file", default="False"))
+                definitions[param_name] = SingleInput(
+                    param_name, param_types, is_file)
         return definitions
 
     @staticmethod
@@ -177,3 +178,9 @@ class AlgorithmMetadataXmlReader(object):
                         algorithm_id, alg_input, definitions)
                     inputs.append(AllOfInput(children))
         return inputs
+
+    @staticmethod
+    def _translate_outputs(outputs_element):
+        """ Convert an XML outputs section into a list of str
+        """
+        return [elem.text for elem in outputs_element.findall("param_type")]
