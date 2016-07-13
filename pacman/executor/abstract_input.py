@@ -27,3 +27,11 @@ class AbstractInput(object):
         :return: A dict of parameter name to value
         :rtype: dict
         """
+
+    @abstractmethod
+    def input_matches(self, inputs):
+        """ Determine if this input is in the set of inputs
+
+        :param inputs: A set of input types
+        :return: True if this input type is in the list
+        """

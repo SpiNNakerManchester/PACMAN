@@ -59,3 +59,7 @@ class SingleInput(AbstractInput):
                             os.path.isfile(param_value))):
                     return {self._name: param_value}
         return None
+
+    @overrides(AbstractInput.input_matches)
+    def input_matches(self, inputs):
+        return any([param_type in inputs for param_type in self._param_types])

@@ -42,3 +42,10 @@ class AllOfInput(AbstractInput):
                 return None
             matches.update(match)
         return matches
+
+    @overrides(AbstractInput.input_matches)
+    def input_matches(self, inputs):
+        return all([
+            input_param.input_matches(inputs)
+            for input_param in self._inputs
+        ])

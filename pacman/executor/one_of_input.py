@@ -40,3 +40,10 @@ class OneOfInput(AbstractInput):
             if match is not None:
                 return match
         return None
+
+    @overrides(AbstractInput.input_matches)
+    def input_matches(self, inputs):
+        return any([
+            input_param.input_matches(inputs)
+            for input_param in self._inputs
+        ])
