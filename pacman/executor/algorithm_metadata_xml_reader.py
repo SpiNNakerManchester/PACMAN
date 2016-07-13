@@ -1,5 +1,10 @@
-from pacman.executor.algorithm_data import AlgorithmMetadata
 from pacman import exceptions
+from pacman.executor.single_input import SingleInput
+from pacman.executor.one_of_input import OneOfInput
+from pacman.executor.all_of_input import AllOfInput
+from pacman.executor.external_algorithm import ExternalAlgorithm
+from pacman.executor.python_function_algorithm import PythonFunctionAlgorithm
+from pacman.executor.python_class_algorithm import PythonClassAlgorithm
 
 from lxml import etree
 
@@ -40,15 +45,26 @@ class AlgorithmMetadataXmlReader(object):
         return algorithm_data_objects
 
     def _generate_algorithm_data(self, element):
-        """ Translates XML elements into tuples for the AlgorithmMetadata object
+        """ Translates XML elements into tuples for the AbstractAlgorithm object
 
         :param element: the xml element to translate
-        :return: a AlgorithmMetadata
+        :return: a AbstractAlgorithm
         """
-        external = False
+        algorithm_id = element.get('name')
 
-        # determine if its a internal or external using if it is import-able or
-        # command line based
+        # Get the input definitions
+        input_definitions = self._translate_input_definitions(
+            element.find("input_definitions"))
+
+        # get other params
+        required_inputs = self._translate_inputs(
+            algorithm_id, element.find("required_inputs"), input_definitions)
+        optional_inputs = self._translate_parameters(
+            algorithm_id, element.find("optional_inputs"), input_definitions)
+        outputs = self._translate_parameters(
+            element.find("produces_outputs"))
+
+        # Determine the type of the algorithm and return the appropriate type
         command_line_args = element.find("command_line_args")
         if command_line_args is not None:
             command_line_args = self._translate_args(command_line_args)
@@ -61,34 +77,42 @@ class AlgorithmMetadataXmlReader(object):
         python_function = element.find("python_function")
         if python_function is not None:
             python_function = python_function.text
+        python_method = element.find("python_method")
+        if python_method is not None:
+            python_method = python_method.text
 
-        if python_module is None and command_line_args is not None:
-            external = True
-        elif python_module is not None and command_line_args is None:
-            external = False
-        elif ((python_module is None and command_line_args is None) or
-                (python_module is not None and command_line_args is not None)):
-            raise exceptions.PacmanConfigurationException(
-                "Cannot deduce what to do when either both command line and "
-                "python module are none or are filled in. Please rectify and "
-                "try again")
+        if command_line_args is not None:
+            if (python_module is not None or python_class is not None or
+                    python_function is not None or python_method is not None):
+                raise exceptions.PacmanConfigurationException(
+                    "Error in algorithm {} specification: command_line_args"
+                    " can not be specified with python_module, python_class,"
+                    " python_function or python_method".format(
+                        algorithm_id))
+            return ExternalAlgorithm(
+                algorithm_id, required_inputs, optional_inputs, outputs,
+                command_line_args)
 
-        # get other params
-        required_inputs = self._translate_parameters(
-            element.find("required_inputs"))
-        required_optional_inputs = self._translate_parameters(
-            element.find("required_optional_inputs"))
-        optional_inputs = self._translate_parameters(
-            element.find("optional_inputs"))
-        outputs = self._translate_parameters(
-            element.find("produces_outputs"))
-        return AlgorithmMetadata(
-            algorithm_id=element.get('name'),
-            command_line_args=command_line_args, inputs=required_inputs,
-            optional_inputs=optional_inputs,
-            required_optional_inputs=required_optional_inputs, outputs=outputs,
-            external=external, python_import=python_module,
-            python_class=python_class, python_function=python_function)
+        if python_module is not None and python_function is not None:
+            if (python_class is not None or python_method is not None):
+                raise exceptions.PacmanConfigurationException(
+                    "Error in algorithm {} specification: python_function can"
+                    " not be specified with python_class or python_method"
+                    .format(algorithm_id))
+            return PythonFunctionAlgorithm(
+                algorithm_id, required_inputs, optional_inputs, outputs,
+                python_module, python_function)
+
+        if python_module is not None and python_class is not None:
+            return PythonClassAlgorithm(
+                algorithm_id, required_inputs, optional_inputs, outputs,
+                python_module, python_class, python_method)
+
+        raise exceptions.PacmanConfigurationException(
+            "Error in algorithm {} specification: One of command_line_args,"
+            " [python_module, python_function] or"
+            " [python_module, python_class, [python_method]]"
+            " must be specified".format(algorithm_id))
 
     @staticmethod
     def _translate_args(args_element):
@@ -110,26 +134,46 @@ class AlgorithmMetadataXmlReader(object):
             return translated_args
 
     @staticmethod
-    def _translate_parameters(parameters_element):
-        """ Convert an XML parameter element into a dict
-
-        :param parameters_element:
-        :return:
+    def _translate_input_definitions(defs_element):
+        """ Convert the XML input definitions section into a dict of\
+            name to AbstractInput
         """
-        translated_params = list()
-        if parameters_element is not None:
-            parameters = parameters_element.findall("parameter")
+        definitions = dict()
+        if defs_element is not None:
+            parameters = defs_element.findall("parameter")
             for parameter in parameters:
-                rank = parameter.find("param_rank")
-                if rank is None:
-                    translated_params.append(
-                        {'name': parameter.find("param_name").text,
-                         'type': parameter.find("param_type").text,
-                         'rank': 1})
-                else:
-                    translated_params.append(
-                        {'name': parameter.find("param_name").text,
-                         'type': parameter.find("param_type").text,
-                         'rank': int(rank.text)})
+                param_name = parameter.find("param_name").text
+                param_types = [
+                    param_type.text
+                    for param_type in parameter.findall("param_type")
+                ]
+                definitions[param_name] = SingleInput(param_name, param_types)
+        return definitions
 
-        return translated_params
+    @staticmethod
+    def _translate_inputs(algorithm_id, inputs_element, definitions):
+        """ Convert an XML inputs section (required or optional) into a list\
+            of AbstractInput
+        """
+        inputs = list()
+        if inputs_element is not None:
+            for alg_input in inputs_element.iterchildren():
+                if alg_input.tag == "param_name":
+                    definition = definitions.get(alg_input.text, None)
+                    if definition is None:
+                        raise exceptions.PacmanConfigurationException(
+                            "Error in XML for algorithm {}: {} section"
+                            " references the parameter {} but this was not"
+                            " defined in input_definitions".format(
+                                algorithm_id, inputs_element.tag,
+                                alg_input.text))
+                    inputs.append(definition)
+                elif alg_input.tag == "one_of":
+                    children = AlgorithmMetadataXmlReader._translate_inputs(
+                        algorithm_id, alg_input, definitions)
+                    inputs.append(OneOfInput(children))
+                elif alg_input.tag == "all_of":
+                    children = AlgorithmMetadataXmlReader._translate_inputs(
+                        algorithm_id, alg_input, definitions)
+                    inputs.append(AllOfInput(children))
+        return inputs
