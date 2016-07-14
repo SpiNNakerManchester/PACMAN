@@ -187,6 +187,28 @@ class ResourceTracker(object):
             return self._get_usable_ip_tag_chips()
         return self._chips_available
 
+    def most_avilable_cores_on_a_chip(self):
+        """
+        returns the number of cores on the chip which has the most cores.
+        :return: int
+        """
+        size = 0
+        for chip in self._chips_available:
+            if chip not in self._core_tracker:
+                processors = self._machine.get_chip_at(
+                    chip[0], chip[1]).processors
+                chip_size = 0
+                for processor in processors:
+                    if not processor.is_monitor:
+                        chip_size += 1
+                if chip_size > size:
+                    size = chip_size
+            else:
+                cores = self._core_tracker[chip]
+                if len(cores) > size:
+                    size = len(cores)
+        return size
+
     def max_available_cores_on_chips_that_satisfy(
             self, placement_constraint, ip_tag_constraints,
             reverse_ip_tag_constraints):
@@ -284,7 +306,7 @@ class ResourceTracker(object):
                     return processor.processor_id
         return iter(self._core_tracker[key]).next()
 
-    def _is_core_available(self, chip, key, processor_id, resources):
+    def _is_core_available(self, chip, key, processor_id):
         """ Check if there is a core available on a given chip given the\
             constraints
 
@@ -294,16 +316,13 @@ class ResourceTracker(object):
         :type key: tuple of (int, int)
         :param processor_id: A constraining fixed processor id
         :type processor_id: int or None
-        :param resources: The resources to be allocated
-        :type resources:\
-                    :py:class:`pacman.model.resources.resource_container.ResourceContainer`
         :return: True if there is a core available given the constraints, or\
                     False otherwise
         :rtype: bool
         """
-        return self._n_cores_available(chip, key, processor_id, resources) > 0
+        return self._n_cores_available(chip, key, processor_id) > 0
 
-    def _n_cores_available(self, chip, key, processor_id, resources):
+    def _n_cores_available(self, chip, key, processor_id):
         """ Get the number of cores available on the given chip given the\
             constraints
 
@@ -329,6 +348,9 @@ class ResourceTracker(object):
                 if processor_id in self._core_tracker[key]:
                     return 1
                 return 0
+            elif (key in self._core_tracker and
+                    processor_id in self._core_tracker[key]):
+                return 1
             elif key not in self._core_tracker:
                 processor = chip.get_processor_with_id(processor_id)
                 if processor is not None and not processor.is_monitor:
@@ -744,9 +766,9 @@ class ResourceTracker(object):
         group_ip_tags = list()
         group_reverse_ip_tags = list()
         for constraints in group_constraints:
-            (this_x, this_y, this_p) = utility_calls.get_chip_and_core(
+            this_x, this_y, this_p = utility_calls.get_chip_and_core(
                 constraints, chips)
-            (this_board_address, this_ip_tags, this_reverse_ip_tags) = \
+            this_board_address, this_ip_tags, this_reverse_ip_tags = \
                 utility_calls.get_ip_tag_info(constraints)
             if ((x is not None and this_x is not None and this_x != x) or
                     (y is not None and this_y is not None and this_y != y) or
@@ -794,10 +816,10 @@ class ResourceTracker(object):
         :param board_address: the board address to allocate resources of a chip
         :type board_address: str
         :param group_ip_tags: list of lists of ip tag constraints
-        :type ip_tags: list of lists of\
+        :type group_ip_tags: list of lists of\
                     :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint.TagAllocatorRequireIptagConstraint`
-        :param reverse_ip_tags: list of lists of reverse ip tag constraints
-        :type reverse_ip_tags: list of lists of\
+        :param group_reverse_ip_tags: list of lists of reverse ip tag constraints
+        :type group_reverse_ip_tags: list of lists of\
                     :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint.TagAllocatorRequireReverseIptagConstraint`
         :return: An iterable of tuples of the x and y coordinates of the used\
                      chip, the processor_id, and the ip tag and reverse ip tag\
@@ -822,7 +844,7 @@ class ResourceTracker(object):
 
             # No point in continuing if the chip doesn't have space for
             # everything
-            if (self._n_cores_available(chip, key, None, None) >=
+            if (self._n_cores_available(chip, key, None) >=
                     len(group_resources) and
                     self._sdram_available(chip, key) >= total_sdram):
 
@@ -832,7 +854,7 @@ class ResourceTracker(object):
                         group_resources, processor_ids, group_ip_tags,
                         group_reverse_ip_tags):
                     if (not self._is_core_available(
-                            chip, key, processor_id, resources) or
+                            chip, key, processor_id) or
                             not self._are_ip_tags_available(
                                 chip, board_address, ip_tags) or
                             not self._are_reverse_ip_tags_available(
@@ -904,7 +926,7 @@ class ResourceTracker(object):
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
-            if (self._is_core_available(chip, key, processor_id, resources) and
+            if (self._is_core_available(chip, key, processor_id) and
                     self._is_sdram_available(chip, key, resources) and
                     self._are_ip_tags_available(chip, board_address,
                                                 ip_tags) and

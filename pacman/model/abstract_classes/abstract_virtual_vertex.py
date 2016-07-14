@@ -16,10 +16,11 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
     """ A class that allows models to define that they are virtual
     """
 
-    def __init__(self, n_atoms, spinnaker_link_id, label, max_atoms_per_core):
+    def __init__(self, n_atoms, spinnaker_link_id, label, max_atoms_per_core,
+                 constraints=None):
 
         AbstractPartitionableVertex.__init__(
-            self, n_atoms, label, max_atoms_per_core)
+            self, n_atoms, label, max_atoms_per_core, constraints)
 
         # set up virtual data structures
         self._virtual_chip_x = None
