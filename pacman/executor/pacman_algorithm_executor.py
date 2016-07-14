@@ -1,7 +1,7 @@
 # pacman imports
 from pacman import exceptions
 from pacman.operations import algorithm_reports
-from pacman.executor import injection
+from pacman.executor import injection_decorator
 from pacman.executor.algorithm_metadata_xml_reader \
     import AlgorithmMetadataXmlReader
 from pacman.utilities import file_format_converters
@@ -386,11 +386,11 @@ class PACMANAlgorithmExecutor(object):
             # Do injection with the outputs produced
             if self._do_immediate_injection:
                 for result_type, result in results.iteritems():
-                    injection.do_injection({result_type: result})
+                    injection_decorator.do_injection({result_type: result})
 
         # Do injection with all the outputs
         if self._do_post_run_injection:
-            injection.do_injection(self._internal_type_mapping)
+            injection_decorator.do_injection(self._internal_type_mapping)
 
     def get_item(self, item_type):
         """ Get an item from the outputs of the execution

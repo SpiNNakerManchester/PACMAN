@@ -1,5 +1,7 @@
 from pacman.executor.abstract_algorithm import AbstractAlgorithm
 from pacman.model.decorators.overrides import overrides
+from pacman import exceptions
+
 import importlib
 
 
@@ -39,6 +41,10 @@ class PythonFunctionAlgorithm(AbstractAlgorithm):
         results = function(**func_inputs)
 
         # Return the results processed into a dict
+        if len(self._outputs) != len(results):
+            raise exceptions.PacmanAlgorithmFailedToGenerateOutputsException(
+                "Algorithm {} returned {} items but specified {} output types"
+                .format(self._algorithm_id, len(results), len(self._outputs)))
         return {
             output_type: result
             for (output_type, result) in zip(self._outputs, results)
