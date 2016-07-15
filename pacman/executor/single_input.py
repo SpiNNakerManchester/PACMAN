@@ -63,3 +63,7 @@ class SingleInput(AbstractInput):
     @overrides(AbstractInput.input_matches)
     def input_matches(self, inputs):
         return any([param_type in inputs for param_type in self._param_types])
+
+    def __repr__(self):
+        return "SingleInput(name={}, param_types={}, is_file={})".format(
+            self._name, self._param_types, self._is_file)

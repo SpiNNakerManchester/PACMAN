@@ -1,11 +1,10 @@
-from pacman.executor.abstract_algorithm import AbstractAlgorithm
+from pacman.executor.abstract_python_algorithm import AbstractPythonAlgorithm
 from pacman.model.decorators.overrides import overrides
-from pacman import exceptions
 
 import importlib
 
 
-class PythonClassAlgorithm(AbstractAlgorithm):
+class PythonClassAlgorithm(AbstractPythonAlgorithm):
     """ An algorithm that is a class
     """
 
@@ -21,17 +20,23 @@ class PythonClassAlgorithm(AbstractAlgorithm):
         "_python_method"
     ]
 
+    @overrides(AbstractPythonAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             python_module, python_class, python_method=None):
-        AbstractAlgorithm.__init__(
-            self, algorithm_id, required_inputs, optional_inputs, outputs)
-        self._python_module = python_module
+        """
+        :param python_class: The class of the algorithm
+        :param python_method:\
+            The method of the algorithm, or None if the class is callable
+        """
+        AbstractPythonAlgorithm.__init__(
+            self, algorithm_id, required_inputs, optional_inputs, outputs,
+            python_module)
         self._python_class = python_class
         self._python_method = python_method
 
-    @overrides(AbstractAlgorithm.call)
-    def call(self, inputs):
+    @overrides(AbstractPythonAlgorithm.call_python)
+    def call_python(self, inputs):
 
         # Get the class to use
         cls = getattr(
@@ -44,20 +49,15 @@ class PythonClassAlgorithm(AbstractAlgorithm):
         # Get the method to call (or use the class as a callable if None)
         method = instance
         if self._python_method is not None:
-            method = getattr(instance, method)
+            method = getattr(instance, self._python_method)
 
-        # Get the inputs to pass to the function
-        method_inputs = self._get_inputs(inputs)
+        return method(**inputs)
 
-        # Run the algorithm and get the results
-        results = method(**method_inputs)
-
-        # Return the results processed into a dict
-        if len(self._outputs) != len(results):
-            raise exceptions.PacmanAlgorithmFailedToGenerateOutputsException(
-                "Algorithm {} returned {} items but specified {} output types"
-                .format(self._algorithm_id, len(results), len(self._outputs)))
-        return {
-            output_type: result
-            for (output_type, result) in zip(self._outputs, results)
-        }
+    def __repr__(self):
+        return (
+            "PythonClassAlgorithm(algorithm_id={},"
+            " required_inputs={}, optional_inputs={}, outputs={}"
+            " python_module={}, python_class={}, python_method={})".format(
+                self._algorithm_id, self._required_inputs,
+                self._optional_inputs, self._outputs, self._python_module,
+                self._python_class, self._python_method))

@@ -341,15 +341,18 @@ class PACMANAlgorithmExecutor(object):
                 for output in algorithm.outputs:
                     if output not in generated_outputs:
                         adds_to_output = True
+                        break
 
             # check for optional inputs
             optional_inputs_available = False
-            if len(algorithm.optional_inputs) == 0:
-                optional_inputs_available = True
-            else:
-                for optional_input in algorithm.optional_inputs:
-                    if optional_input.input_matches(inputs):
-                        optional_inputs_available = True
+            if look_for_optional_inputs:
+                if len(algorithm.optional_inputs) == 0:
+                    optional_inputs_available = True
+                else:
+                    for optional_input in algorithm.optional_inputs:
+                        if optional_input.input_matches(inputs):
+                            optional_inputs_available = True
+                            break
 
             # check if all checks passed
             if (all_inputs_available and

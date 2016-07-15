@@ -1,11 +1,10 @@
-from pacman.executor.abstract_algorithm import AbstractAlgorithm
+from pacman.executor.abstract_python_algorithm import AbstractPythonAlgorithm
 from pacman.model.decorators.overrides import overrides
-from pacman import exceptions
 
 import importlib
 
 
-class PythonFunctionAlgorithm(AbstractAlgorithm):
+class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
     """ An algorithm that is a function
     """
 
@@ -18,34 +17,34 @@ class PythonFunctionAlgorithm(AbstractAlgorithm):
         "_python_function"
     ]
 
+    @overrides(AbstractPythonAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             python_module, python_function):
-        AbstractAlgorithm.__init__(
-            self, algorithm_id, required_inputs, optional_inputs, outputs)
-        self._python_module = python_module
+        """
+        :python_function: The name of the function to call
+        """
+        AbstractPythonAlgorithm.__init__(
+            self, algorithm_id, required_inputs, optional_inputs, outputs,
+            python_module)
         self._python_function = python_function
 
-    @overrides(AbstractAlgorithm.call)
-    def call(self, inputs):
+    @overrides(AbstractPythonAlgorithm.call_python)
+    def call_python(self, inputs):
 
         # Get the function to call
         function = getattr(
             importlib.import_module(self._python_module),
             self._python_function)
 
-        # Get the inputs to pass to the function
-        func_inputs = self._get_inputs(inputs)
-
         # Run the algorithm and get the results
-        results = function(**func_inputs)
+        return function(**inputs)
 
-        # Return the results processed into a dict
-        if len(self._outputs) != len(results):
-            raise exceptions.PacmanAlgorithmFailedToGenerateOutputsException(
-                "Algorithm {} returned {} items but specified {} output types"
-                .format(self._algorithm_id, len(results), len(self._outputs)))
-        return {
-            output_type: result
-            for (output_type, result) in zip(self._outputs, results)
-        }
+    def __repr__(self):
+        return (
+            "PythonFunctionAlgorithm(algorithm_id={},"
+            " required_inputs={}, optional_inputs={}, outputs={}"
+            " python_module={},  python_function={})".format(
+                self._algorithm_id, self._required_inputs,
+                self._optional_inputs, self._outputs, self._python_module,
+                self._python_function))

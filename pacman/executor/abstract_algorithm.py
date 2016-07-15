@@ -97,4 +97,7 @@ class AbstractAlgorithm(object):
     @abstractmethod
     def call(self, inputs):
         """ Call the algorithm with the given inputs and return the outputs
+
+        :param inputs: A dict of input type -> value
+        :return: A dict of output type -> value
         """

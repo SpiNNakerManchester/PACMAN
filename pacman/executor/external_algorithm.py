@@ -59,3 +59,12 @@ class ExternalAlgorithm(AbstractAlgorithm):
         return {
             output_type: inputs[output_type] for output_type in self._outputs
         }
+
+    def __repr__(self):
+        return (
+            "PythonFunctionAlgorithm(algorithm_id={},"
+            " required_inputs={}, optional_inputs={}, outputs={}"
+            " command_line_arguments={})".format(
+                self._algorithm_id, self._required_inputs,
+                self._optional_inputs, self._outputs,
+                self._command_line_arguments))

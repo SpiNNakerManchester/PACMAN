@@ -49,3 +49,6 @@ class AllOfInput(AbstractInput):
             input_param.input_matches(inputs)
             for input_param in self._inputs
         ])
+
+    def __repr__(self):
+        return "AllOfInput(inputs={})".format(self._inputs)
