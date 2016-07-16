@@ -64,7 +64,7 @@ class ConvertToMemoryMultiCastRoutes(object):
             progress_bar.update()
         progress_bar.end()
 
-        return {'routing_paths': routing_tables}
+        return routing_tables
 
     @staticmethod
     def _convert_next_route(

@@ -127,4 +127,4 @@ class ConvertToFilePartitionedGraph(object):
 
         progress_bar.end()
 
-        return {"partitioned_graph": file_path}
+        return file_path

@@ -36,8 +36,9 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
 
         # Run the algorithm and get the results
         results = self.call_python(method_inputs)
-        if results is not None and not hasattr(results, "__len__"):
-            results = [results]
+
+        if results is not None and not isinstance(results, tuple):
+            results = (results,)
 
         # If there are no results and there are not meant to be, return
         if results is None and len(self._outputs) == 0:

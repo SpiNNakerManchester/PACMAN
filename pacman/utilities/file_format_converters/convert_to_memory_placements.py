@@ -94,7 +94,7 @@ class ConvertToMemoryPlacements(object):
                                   subvertex=subvertex))
 
         # return the file format
-        return {"placements": memory_placements}
+        return memory_placements
 
     @staticmethod
     def _load_json_files(placements, allocations, constraints):

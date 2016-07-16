@@ -96,7 +96,7 @@ class ConvertToFileMachine(object):
         progress_bar.update()
         progress_bar.end()
 
-        return {'file_machine': file_path}
+        return file_path
 
     def _check_for_exceptions(
             self, json_dictory_rep, x_coord, y_coord, machine,

@@ -51,4 +51,4 @@ class ConvertToFilePlacement(object):
         progress_bar.end()
 
         # return the file format
-        return {"FilePlacements": file_path}
+        return file_path

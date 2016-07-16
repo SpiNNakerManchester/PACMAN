@@ -78,7 +78,7 @@ class CreateConstraintsToFile(object):
         # complete progress bar
         progress_bar.end()
 
-        return {'constraints': file_path}
+        return file_path
 
     def _search_graph_for_placement_constraints(
             self, json_constraints_dictory_rep, partitioned_graph, machine,
