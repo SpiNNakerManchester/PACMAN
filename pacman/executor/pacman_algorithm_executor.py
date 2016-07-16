@@ -361,7 +361,7 @@ class PACMANAlgorithmExecutor(object):
         for output in algorithm.outputs:
             inputs.add(output.output_type)
             generated_outputs.add(output.output_type)
-            if output in outputs_to_find:
+            if output.output_type in outputs_to_find:
                 outputs_to_find.remove(output.output_type)
 
     @staticmethod
