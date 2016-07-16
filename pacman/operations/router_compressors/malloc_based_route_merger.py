@@ -45,7 +45,7 @@ class MallocBasedRouteMerger(object):
                         n_entries))
             progress.update()
         progress.end()
-        return {'routing_tables': tables}
+        return tables
 
     def _merge_routes(self, router_table, previous_masks):
         merged_routes = MulticastRoutingTable(router_table.x, router_table.y)

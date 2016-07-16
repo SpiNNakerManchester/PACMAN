@@ -104,7 +104,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
 
         # finished, so stop progress bar and return placements
         progress_bar.end()
-        return {'placements': placements}
+        return placements
 
     def _find_max_connected_vertex(self, vertices, partitioned_graph):
         max_connected_vertex = None

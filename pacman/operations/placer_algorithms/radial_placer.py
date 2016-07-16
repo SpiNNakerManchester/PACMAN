@@ -60,7 +60,7 @@ class RadialPlacer(object):
             self._place_vertex(vertex, resource_tracker, machine, placements)
             progress_bar.update()
         progress_bar.end()
-        return {'placements': placements}
+        return placements
 
     def _place_vertex(self, vertex, resource_tracker, machine, placements):
 

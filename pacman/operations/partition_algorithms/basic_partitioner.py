@@ -141,6 +141,4 @@ class BasicPartitioner(object):
         partition_algorithm_utilities.generate_sub_edges(
             subgraph, graph_to_subgraph_mapper, graph)
 
-        return {'Partitioned_graph': subgraph,
-                'Graph_mapper': graph_to_subgraph_mapper,
-                'nChips': len(resource_tracker.keys)}
+        return subgraph, graph_to_subgraph_mapper, len(resource_tracker.keys)

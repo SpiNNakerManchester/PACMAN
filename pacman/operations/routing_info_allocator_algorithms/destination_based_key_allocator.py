@@ -84,8 +84,7 @@ class DestinationBasedRoutingInfoAllocator(object):
             progress_bar.update()
         progress_bar.end()
 
-        return {'routing_infos': routing_infos,
-                'routing_tables': routing_tables}
+        return routing_infos, routing_tables
 
     @staticmethod
     def _get_key_from_placement(placement):

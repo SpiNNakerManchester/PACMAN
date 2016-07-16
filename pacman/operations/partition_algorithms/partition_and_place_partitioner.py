@@ -86,11 +86,7 @@ class PartitionAndPlacePartitioner(object):
         partition_algorithm_utilities.generate_sub_edges(
             subgraph, graph_mapper, graph)
 
-        results = dict()
-        results['partitioned_graph'] = subgraph
-        results['graph_mapper'] = graph_mapper
-        results['nChips'] = len(resource_tracker.keys)
-        return results
+        return subgraph, graph_mapper, len(resource_tracker.keys)
 
     def _partition_vertex(
             self, vertex, subgraph, graph_to_subgraph_mapper, resource_tracker,

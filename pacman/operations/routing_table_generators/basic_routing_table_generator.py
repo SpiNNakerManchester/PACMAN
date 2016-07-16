@@ -50,4 +50,4 @@ class BasicRoutingTableGenerator(object):
             progress_bar.update()
         progress_bar.end()
 
-        return {"router_tables": routing_tables}
+        return routing_tables

@@ -171,7 +171,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._update_routing_objects(keys_and_masks, routing_infos, group)
 
         progress_bar.end()
-        return {'routing_infos': routing_infos}
+        return routing_infos
 
     @staticmethod
     def _update_routing_objects(

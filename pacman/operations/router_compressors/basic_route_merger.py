@@ -44,7 +44,7 @@ class BasicRouteMerger(object):
                         n_entries))
             progress.update()
         progress.end()
-        return {'routing_tables': tables}
+        return tables
 
     def _get_merge_masks(self, mask, previous_masks):
         if mask in previous_masks:

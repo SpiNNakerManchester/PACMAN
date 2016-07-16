@@ -105,7 +105,7 @@ class BasicDijkstraRouting(object):
                     partitioned_graph)
             progress.update()
         progress.end()
-        return {'routing_paths': self._routing_paths}
+        return self._routing_paths
 
     def _initiate_node_info(self, machine):
         """ Set up a dictionary which contains data for each chip in the\

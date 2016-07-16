@@ -46,4 +46,4 @@ class RigRoute(object):
         progress_bar.update()
         progress_bar.end()
 
-        return {"routing_paths": routes}
+        return routes

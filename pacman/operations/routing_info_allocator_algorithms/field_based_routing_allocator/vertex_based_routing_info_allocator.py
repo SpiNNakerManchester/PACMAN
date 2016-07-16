@@ -123,8 +123,7 @@ class VertexBasedRoutingInfoAllocator(object):
             progress_bar.update()
         progress_bar.end()
 
-        return {'routing_infos': routing_info,
-                'fields': field_positions}
+        return routing_info, field_positions
 
     def _assign_flexi_field_positions(
             self, bit_field_space, seen_fields, field_positions):

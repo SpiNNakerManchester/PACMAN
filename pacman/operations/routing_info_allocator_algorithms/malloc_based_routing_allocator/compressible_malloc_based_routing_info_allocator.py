@@ -217,7 +217,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 progress_bar.update()
 
         progress_bar.end()
-        return {'routing_infos': routing_infos}
+        return routing_infos
 
     @staticmethod
     def _update_routing_objects(

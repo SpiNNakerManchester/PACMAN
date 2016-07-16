@@ -84,7 +84,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                 progress_bar.update()
             progress_bar.end()
 
-        return {"machine": machine}
+        return machine
 
     def _assign_virtual_chip_info(self, machine, link):
         if link not in self._virtual_chips:

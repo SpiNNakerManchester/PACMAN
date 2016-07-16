@@ -53,7 +53,7 @@ class OneToOnePlacer(RadialPlacer):
 
         self._do_allocation(sorted_vertices, placements, machine)
 
-        return {'placements': placements}
+        return placements
 
     def _do_allocation(self, ordered_subverts, placements, machine):
 

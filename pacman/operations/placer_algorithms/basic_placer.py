@@ -58,4 +58,4 @@ class BasicPlacer(object):
             placements.add_placement(placement)
             progress_bar.update()
         progress_bar.end()
-        return {'placements': placements}
+        return placements

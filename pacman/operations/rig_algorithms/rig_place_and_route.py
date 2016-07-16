@@ -54,4 +54,4 @@ class RigPlaceAndRoute(object):
         progress_bar.update()
         progress_bar.end()
 
-        return {"placements": placements, "routing_paths": routes}
+        return placements, routes
