@@ -37,7 +37,7 @@ class AbstractAlgorithm(object):
             when available
         :type optional_inputs: list of AbstractInput
         :param outputs: The output types of the algorithm
-        :type outputs: list of str
+        :type outputs: list of Output
         """
         self._algorithm_id = algorithm_id
         self._required_inputs = required_inputs
@@ -64,14 +64,14 @@ class AbstractAlgorithm(object):
 
     @property
     def outputs(self):
-        """ The output types of the algorithm
+        """ The outputs of the algorithm
         """
         return self._outputs
 
     def _get_inputs(self, inputs):
         """ Get the required and optional inputs out of the inputs
 
-        :param inputs: A dict of type to value
+        :param inputs: A dict of input type to value
         :return: A dict of parameter name to value
         """
         matches = dict()
@@ -93,6 +93,20 @@ class AbstractAlgorithm(object):
             if match is not None:
                 matches.update(match)
         return matches
+
+    def _get_outputs(self, inputs, outputs):
+        """ Get the outputs as a dictionary from the given return values
+
+        :param inputs: A dict of input type to value
+        :param outputs: A list of values of length equal to self._outputs
+        :return: A dict of output type to value
+        """
+        return {
+            output_def.output_type: output
+            if output_def.file_name_type is None
+            else inputs[output_def.file_name_type]
+            for output_def, output in zip(self._outputs, outputs)
+        }
 
     @abstractmethod
     def call(self, inputs):

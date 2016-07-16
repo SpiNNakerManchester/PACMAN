@@ -56,9 +56,9 @@ class ExternalAlgorithm(AbstractAlgorithm):
                         inputs, stdout, stderr))
 
         # Return the results processed into a dict
-        return {
-            output_type: inputs[output_type] for output_type in self._outputs
-        }
+        # Use None here as the results don't actually exist, and are expected
+        # to be obtained from a file, whose name is in inputs
+        return self._get_outputs(inputs, [None] * len(self._outputs))
 
     def __repr__(self):
         return (

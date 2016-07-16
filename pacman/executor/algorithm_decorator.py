@@ -2,6 +2,7 @@ import inspect
 import pkgutil
 import os
 import importlib
+from threading import RLock
 
 from spinn_machine.utilities.ordered_set import OrderedSet
 
@@ -11,9 +12,13 @@ from pacman.executor.all_of_input import AllOfInput
 from pacman.executor.one_of_input import OneOfInput
 from pacman.executor.python_class_algorithm import PythonClassAlgorithm
 from pacman.executor.python_function_algorithm import PythonFunctionAlgorithm
+from pacman.executor.output import Output
 
-# The list of algorithms found
-_algorithms = list()
+# The dict of algorithm name to algorithm description
+_algorithms = dict()
+
+# A lock of the algorithms
+_algorithm_lock = RLock()
 
 
 class AllOf(object):
@@ -92,7 +97,7 @@ def _decode_inputs(input_defs, inputs):
 
 def _decode_algorithm_details(
         input_definitions, required_inputs, optional_inputs,
-        file_inputs, function, has_self=False):
+        function, has_self=False):
     """ Convert the algorithm annotation inputs to input classes
 
     :param input_definitions: dict of algorithm parameter name to list of types
@@ -100,7 +105,6 @@ def _decode_algorithm_details(
     :type required_inputs: list of str, OneOf, AllOf
     :param optional_inputs: List of optional algorithm parameter names
     :type optional_inputs: list of str, OneOf, AllOf
-    :param file_inputs: set of algorithm parameter names that are files
     :param function: The function to be called by the algorithm
     :param has_self: True if the self parameter is expected
     """
@@ -118,16 +122,12 @@ def _decode_algorithm_details(
             raise exceptions.PacmanConfigurationException(
                 "No parameter named {} but found one"
                 " in the input_definitions".format(input_name))
-        is_file = False
-        if file_inputs is not None:
-            is_file = input_name in file_inputs
         if not isinstance(input_types, list):
             input_types = [input_types]
-        input_defs[input_name] = SingleInput(
-            input_name, input_types, is_file)
+        input_defs[input_name] = SingleInput(input_name, input_types)
 
-    # Check that there is a definition for every argument
-    for arg in function_args.args:
+    # Check that there is a definition for every required argument
+    for arg in required_args:
         if arg not in input_defs and (not has_self or arg != "self"):
             raise exceptions.PacmanConfigurationException(
                 "No input_definition for the argument {}".format(arg))
@@ -147,7 +147,7 @@ def _decode_algorithm_details(
     if optional_inputs is None:
         final_optional_inputs = [
             input_defs[arg] for arg in optional_args
-            if (not has_self or arg != "self")
+            if (not has_self or arg != "self") and arg in input_defs
         ]
     else:
         final_optional_inputs = _decode_inputs(input_defs, optional_inputs)
@@ -157,7 +157,7 @@ def _decode_algorithm_details(
 
 def algorithm(
         input_definitions, outputs, algorithm_id=None, required_inputs=None,
-        optional_inputs=None, method=None, file_inputs=None):
+        optional_inputs=None, method=None):
     """ Define an object to be a PACMAN algorithm that can be executed by\
         the PacmanAlgorithmExecutor.
 
@@ -171,7 +171,8 @@ def algorithm(
 
     :param input_definitions:\
         dict of algorithm parameter name to list of types, one for each\
-        algorithm parameter
+        required algorithm parameter, and one for each optional parameter\
+        that is used in this algorithm call
     :type input_definitions: dict of str -> (str or list of str)
     :param outputs:\
         A list of types output from the algorithm that must match the order in\
@@ -193,7 +194,6 @@ def algorithm(
         The optional name of the method to call if decorating a class; if not\
         specified, __call__ is used (i.e. it is assumed to be callable).  Must\
         not be used if decorating a function
-    :param file_inputs: set of algorithm parameter names that are file names
     """
 
     def wrap(algorithm):
@@ -202,6 +202,11 @@ def algorithm(
         final_algorithm_id = algorithm_id
         if algorithm_id is None:
             final_algorithm_id = algorithm.__name__
+
+        if algorithm_id in _algorithms:
+            raise exceptions.PacmanConfigurationException(
+                "Multiple algorithms with id {} found: {} and {}".format(
+                    algorithm_id, algorithm, _algorithms[algorithm_id]))
 
         # Get the details of the method or function
         function = None
@@ -233,32 +238,93 @@ def algorithm(
         final_required_inputs, final_optional_inputs = \
             _decode_algorithm_details(
                 input_definitions, required_inputs, optional_inputs,
-                file_inputs, function, has_self=is_class_method)
+                function, has_self=is_class_method)
+
+        # Get the outputs
+        # TODO: Support file name type outputs - is there a use case? Note
+        # that python algorithms can output the actual file name in the
+        # variable
+        final_outputs = [Output(output_type) for output_type in outputs]
 
         # Add the algorithm
         if is_class_method:
-            _algorithms.append(PythonClassAlgorithm(
-                final_algorithm_id, final_required_inputs,
-                final_optional_inputs, outputs, module,
-                algorithm_class, function_name))
+            with _algorithm_lock:
+                _algorithms[final_algorithm_id] = PythonClassAlgorithm(
+                    final_algorithm_id, final_required_inputs,
+                    final_optional_inputs, final_outputs, module,
+                    algorithm_class, function_name)
         else:
-            _algorithms.append(PythonFunctionAlgorithm(
-                final_algorithm_id, final_required_inputs,
-                final_optional_inputs, outputs, module,
-                function_name))
+            with _algorithm_lock:
+                _algorithms[final_algorithm_id] = PythonFunctionAlgorithm(
+                    final_algorithm_id, final_required_inputs,
+                    final_optional_inputs, final_outputs, module,
+                    function_name)
 
         return algorithm
     return wrap
 
 
+def algorithms(algorithms):
+    """ Specify multiple algorithms for a single class or function
+
+    :param algorithms: A list of algorithm definitions
+    """
+
+    def wrap(alg):
+        for alg_def in algorithms:
+            alg_def(alg)
+        return alg
+
+    return wrap
+
+
 def reset_algorithms():
-    """ Reset the list of known algorithms
+    """ Reset the known algorithms
     """
     global _algorithms
-    _algorithms = list()
+    with _algorithm_lock:
+        _algorithms = dict()
 
 
 def get_algorithms():
-    """ Get the list of known algorithms
+    """ Get the dict of known algorithm id -> algorithm data
     """
     return _algorithms
+
+
+def scan_packages(packages, recursive=True):
+    """ Scan packages for algorithms
+
+    :param packages:\
+        The names of the packages to scan (using dotted notation),
+        or the actual package modules
+    :param recursive: True if sub-packages should be examined
+    :return: A dict of algorithm name -> algorithm data
+    """
+    global _algorithms
+    with _algorithm_lock:
+        current_algorithms = _algorithms
+        _algorithms = dict()
+
+        # Go through the packages
+        for package_name in packages:
+
+            # Import the package
+            package = package_name
+            if not inspect.ismodule(package_name):
+                package = importlib.import_module(package_name, "")
+            pkg_path = os.path.dirname(package.__file__)
+
+            # Go through the modules and import them
+            for _, name, is_pkg in pkgutil.iter_modules([pkg_path]):
+
+                # If recursive and this is a package, recurse
+                if is_pkg and recursive:
+                    scan_packages([package.__name__ + "." + name], recursive)
+
+                else:
+                    importlib.import_module("." + name, package.__name__)
+
+        new_algorithms = _algorithms
+        _algorithms = current_algorithms
+        return new_algorithms

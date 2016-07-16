@@ -2,6 +2,7 @@
 from pacman import exceptions
 from pacman.operations import algorithm_reports
 from pacman.executor import injection_decorator
+from pacman.executor import algorithm_decorator
 from pacman.executor.algorithm_metadata_xml_reader \
     import AlgorithmMetadataXmlReader
 from pacman.utilities import file_format_converters
@@ -22,25 +23,71 @@ class PACMANAlgorithmExecutor(object):
         algorithm
     """
 
-    def __init__(self, algorithms, optional_algorithms, inputs, xml_paths,
-                 required_outputs, do_timings=True, print_timings=False,
-                 do_immediate_injection=False, do_post_run_injection=False):
+    __slots__ = [
+
+        # The timing of algorithms
+        "_algorithm_timings",
+
+        # The algorithms to run
+        "_algorithms",
+
+        # The inputs passed in from the user
+        "_inputs",
+
+        # The type mapping as things flow from input to output
+        "_internal_type_mapping",
+
+        # True if timing is to be done
+        "_do_timing",
+
+        # True if timing is to be printed
+        "_print_timings",
+
+        # True if injection is to be done during the run
+        "_do_immediate_injection",
+
+        # True if injection is to be done after the run
+        "_do_post_run_injection",
+
+        # True if the inputs are to be injected
+        "_inject_inputs"
+    ]
+
+    def __init__(
+            self, algorithms, optional_algorithms, inputs, required_outputs,
+            xml_paths=None, packages=None, do_timings=True,
+            print_timings=False, do_immediate_injection=False,
+            do_post_run_injection=False, inject_inputs=False):
         """
 
         :param algorithms: A list of algorithms that must all be run
-        :param optional_algorithms: A list of algorithms that must be run if\
-                their inputs are available
+        :param optional_algorithms:\
+            A list of algorithms that must be run if their inputs are available
         :param inputs: A dict of input type to value
-        :param xml_paths: A list of paths to XML files containing algorithm\
-                descriptions
         :param required_outputs: A list of output types that must be generated
-        :param do_timings: True if timing information should be printed after\
-                each algorithm, False otherwise
-        :param do_immediate_injection: Perform injection with objects as they\
-                are created; can result in multiple calls to the same inject-\
-                annotated methods
-        :param do_post_run_injection: Perform injection at the end of the run.\
-                This will only set the last object of any type created.
+        :param xml_paths:\
+            An optional list of paths to XML files containing algorithm\
+            descriptions; if not specified, only detected algorithms will be\
+            used (or else those found in packages)
+        :param packages:\
+            An optional list of packages to scan for decorated algorithms; if\
+            not specified, only detected algorithms will be used (or else\
+            those specified in packages
+        :param do_timings:\
+            True if timing information should be printed after each algorithm,\
+            False otherwise
+        :param do_immediate_injection:\
+            Perform injection with objects as they are created; can result in\
+            multiple calls to the same inject-annotated methods
+        :param do_post_run_injection:\
+            Perform injection at the end of the run. This will only set the\
+            last object of any type created.
+        :param inject_inputs:\
+            True if inputs should be injected; only active if one of\
+            do_immediate_injection or do_post_run_injection is True.  These\
+            variables define when the injection of inputs is done; if\
+            immediate injection is True, injection of inputs is done at the\
+            start of the run, otherwise it is done at the end.
         """
 
         # algorithm timing information
@@ -62,16 +109,14 @@ class PACMANAlgorithmExecutor(object):
         # injection
         self._do_immediate_injection = do_immediate_injection
         self._do_post_run_injection = do_post_run_injection
-
-        # protect the variable from reference movement during usage
-        copy_of_xml_paths = list(xml_paths)
+        self._inject_inputs = inject_inputs
 
         self._set_up_pacman_algorithm_listings(
-            algorithms, optional_algorithms, copy_of_xml_paths, inputs,
-            required_outputs)
+            algorithms, optional_algorithms, xml_paths,
+            packages, inputs, required_outputs)
 
     def _set_up_pacman_algorithm_listings(
-            self, algorithms, optional_algorithms, xml_paths, inputs,
+            self, algorithms, optional_algorithms, xml_paths, packages, inputs,
             required_outputs):
         """ Translates the algorithm string and uses the config XML to create\
             algorithm objects
@@ -92,36 +137,59 @@ class PACMANAlgorithmExecutor(object):
         # deduce if the algorithms are internal or external
         algorithms_names = list(algorithms)
 
+        # protect the variable from reference movement during usage
+        copy_of_xml_paths = []
+        if xml_paths is not None:
+            copy_of_xml_paths = list(xml_paths)
+        copy_of_packages = []
+        if packages is not None:
+            copy_of_packages = list(packages)
+        copy_of_optional_algorithms = []
+        if optional_algorithms is not None:
+            copy_of_optional_algorithms = list(optional_algorithms)
+
         # set up XML reader for standard PACMAN algorithms XML file reader
         # (used in decode_algorithm_data_objects function)
-        xml_paths.append(os.path.join(
+        copy_of_xml_paths.append(os.path.join(
             os.path.dirname(operations.__file__),
             "algorithms_metadata.xml"))
-        xml_paths.append(os.path.join(
+        copy_of_xml_paths.append(os.path.join(
+            os.path.dirname(operations.__file__),
+            "rigs_algorithm_metadata.xml"))
+        copy_of_xml_paths.append(os.path.join(
             os.path.dirname(algorithm_reports.__file__),
             "reports_metadata.xml"))
 
-        converter_xml_path = list()
-        converter_xml_path.append(os.path.join(
-            os.path.dirname(file_format_converters.__file__),
-            "converter_algorithms_metadata.xml"))
-
         # decode the algorithms specs
-        xml_decoder = AlgorithmMetadataXmlReader(xml_paths)
+        xml_decoder = AlgorithmMetadataXmlReader(copy_of_xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
-        xml_decoder = AlgorithmMetadataXmlReader(converter_xml_path)
-        converter_algorithm_data_objects = \
-            xml_decoder.decode_algorithm_data_objects()
+        converter_decoder = AlgorithmMetadataXmlReader([
+            os.path.join(
+                os.path.dirname(file_format_converters.__file__),
+                "converter_algorithms_metadata.xml")
+        ])
+        converters = converter_decoder.decode_algorithm_data_objects()
+        algorithm_data_objects.update(converters)
+
+        # Scan for annotated algorithms
+        copy_of_packages.append(operations.__name__)
+        copy_of_packages.append(algorithm_reports.__name__)
+        converters.update(algorithm_decorator.scan_packages(
+            [file_format_converters.__name__]))
+        algorithm_data_objects.update(
+            algorithm_decorator.scan_packages(copy_of_packages))
+        algorithm_data_objects.update(converters)
+
+        # Add converters to the optional algorithms
+        copy_of_optional_algorithms.extend([
+            converter for converter in converters.iterkeys()
+        ])
 
         # filter for just algorithms we want to use
         algorithm_data = self._get_algorithm_data(
-            algorithms_names, algorithm_data_objects,
-            converter_algorithm_data_objects)
+            algorithms_names, algorithm_data_objects)
         optional_algorithms_datas = self._get_algorithm_data(
-            optional_algorithms, algorithm_data_objects,
-            converter_algorithm_data_objects)
-        optional_algorithms_datas.extend(
-            converter_algorithm_data_objects.values())
+            copy_of_optional_algorithms, algorithm_data_objects)
 
         # sort_out_order_of_algorithms for execution
         self._sort_out_order_of_algorithms(
@@ -129,16 +197,11 @@ class PACMANAlgorithmExecutor(object):
             optional_algorithms_datas)
 
     def _get_algorithm_data(
-            self, algorithm_names, algorithm_data_objects,
-            converter_algorithm_data_objects):
+            self, algorithm_names, algorithm_data_objects):
         algorithms = list()
         for algorithm_name in algorithm_names:
             if algorithm_name in algorithm_data_objects:
                 algorithms.append(algorithm_data_objects[algorithm_name])
-
-            elif algorithm_name in converter_algorithm_data_objects:
-                algorithms.append(
-                    converter_algorithm_data_objects[algorithm_name])
             else:
                 raise exceptions.PacmanConfigurationException(
                     "Cannot find algorithm {}".format(algorithm_name))
@@ -146,7 +209,7 @@ class PACMANAlgorithmExecutor(object):
 
     def _sort_out_order_of_algorithms(
             self, inputs, required_outputs, algorithm_data,
-            optional_algorithms):
+            optional_algorithm_data):
         """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
 
@@ -167,6 +230,7 @@ class PACMANAlgorithmExecutor(object):
         generated_outputs.union(input_types)
         allocated_a_algorithm = True
         algorithms_to_find = list(algorithm_data)
+        optionals_to_use = list(optional_algorithm_data)
         outputs_to_find = self._remove_outputs_which_are_inputs(
             required_outputs, inputs)
 
@@ -174,32 +238,23 @@ class PACMANAlgorithmExecutor(object):
                 allocated_a_algorithm):
             allocated_a_algorithm = False
 
-            # check each algorithm to see if its usable with current inputs
-            # and without its optional inputs
+            # Find a usable algorithm
             suitable_algorithm = self._locate_suitable_algorithm(
-                algorithms_to_find, input_types, generated_outputs,
-                look_for_novel_output=False, look_for_optional_inputs=False)
+                algorithms_to_find, input_types, generated_outputs)
+            if suitable_algorithm is not None:
+                self._remove_algorithm_and_update_outputs(
+                    algorithms_to_find, suitable_algorithm, input_types,
+                    generated_outputs, outputs_to_find)
 
-            # If there isn't an algorithm, check for one with novel outputs
-            # but not optional inputs
-            if suitable_algorithm is None:
-                suitable_algorithm = self._locate_suitable_algorithm(
-                    algorithms_to_find, input_types, generated_outputs,
-                    look_for_novel_output=True, look_for_optional_inputs=False)
+            else:
 
-            # If there isn't an algorithm, check for one with no novel
-            # outputs but with optional inputs
-            if suitable_algorithm is None:
+                # If no algorithm, find a usable optional algorithm
                 suitable_algorithm = self._locate_suitable_algorithm(
-                    algorithms_to_find, input_types, generated_outputs,
-                    look_for_novel_output=False, look_for_optional_inputs=True)
-
-            # If still no algorithm, check for one with novel outputs and
-            # optional inputs
-            if suitable_algorithm is None:
-                suitable_algorithm = self._locate_suitable_algorithm(
-                    algorithms_to_find, input_types, generated_outputs,
-                    look_for_novel_output=True, look_for_optional_inputs=True)
+                    optionals_to_use, input_types, generated_outputs)
+                if suitable_algorithm is not None:
+                    self._remove_algorithm_and_update_outputs(
+                        optionals_to_use, suitable_algorithm, input_types,
+                        generated_outputs, outputs_to_find)
 
             if suitable_algorithm is not None:
 
@@ -207,16 +262,13 @@ class PACMANAlgorithmExecutor(object):
                 # as new inputs
                 allocated_algorithms.append(suitable_algorithm)
                 allocated_a_algorithm = True
-                self._remove_algorithm_and_update_outputs(
-                    algorithms_to_find, suitable_algorithm, input_types,
-                    generated_outputs, outputs_to_find)
             else:
 
                 # Failed to find an algorithm to run!
                 algorithms_left_names = list()
                 for algorithm in algorithms_to_find:
                     algorithms_left_names.append(algorithm.algorithm_id)
-                for algorithm in optional_algorithms:
+                for algorithm in optional_algorithm_data:
                     algorithms_left_names.append(algorithm.algorithm_id)
                 algorithms_used = list()
                 for algorithm in allocated_algorithms:
@@ -227,7 +279,7 @@ class PACMANAlgorithmExecutor(object):
                         algorithm_input_requirement_breakdown += \
                             self._deduce_inputs_required_to_run(
                                 algorithm, input_types)
-                for algorithm in optional_algorithms:
+                for algorithm in optionals_to_use:
                     if algorithm.algorithm_id in algorithms_left_names:
                         algorithm_input_requirement_breakdown += \
                             self._deduce_inputs_required_to_run(
@@ -307,66 +359,90 @@ class PACMANAlgorithmExecutor(object):
         """
         algorithm_list.remove(algorithm)
         for output in algorithm.outputs:
-            inputs.add(output)
-            generated_outputs.add(output)
+            inputs.add(output.output_type)
+            generated_outputs.add(output.output_type)
             if output in outputs_to_find:
-                outputs_to_find.remove(output)
+                outputs_to_find.remove(output.output_type)
 
     @staticmethod
-    def _locate_suitable_algorithm(
-            algorithm_list, inputs, generated_outputs, look_for_novel_output,
-            look_for_optional_inputs):
+    def _locate_suitable_algorithm(algorithm_list, inputs, generated_outputs):
         """ Locates a suitable algorithm
 
         :param algorithm_list: the list of algorithms to choose from
         :param inputs: the inputs available currently
         :param generated_outputs: the current outputs expected to be generated
-        :param look_for_novel_output: bool which says that algorithms need\
-                to produce a novel output
-        :param look_for_optional_inputs: bool which states it should\
-                look at the optional inputs
         :return: a suitable algorithm which uses the inputs
         """
+
+        # Find all algorithms which *can* run now and rank them using the
+        # number of unavailable optional inputs
+        algorithms_available = list()
         for algorithm in algorithm_list:
 
             # check all inputs
-            all_inputs_available = True
+            all_inputs_match = True
             for input_parameter in algorithm.required_inputs:
                 if not input_parameter.input_matches(inputs):
-                    all_inputs_available = False
+                    all_inputs_match = False
+                    break
 
-            # check all outputs
-            adds_to_output = False
-            if look_for_novel_output:
-                for output in algorithm.outputs:
-                    if output not in generated_outputs:
-                        adds_to_output = True
-                        break
+            if all_inputs_match:
 
-            # check for optional inputs
-            optional_inputs_available = False
-            if look_for_optional_inputs:
-                if len(algorithm.optional_inputs) == 0:
-                    optional_inputs_available = True
-                else:
-                    for optional_input in algorithm.optional_inputs:
-                        if optional_input.input_matches(inputs):
-                            optional_inputs_available = True
-                            break
+                # check for optional inputs
+                n_optional_inputs_unavailable = 0
+                for optional_input in algorithm.optional_inputs:
+                    if not optional_input.input_matches(inputs):
+                        n_optional_inputs_unavailable += 1
 
-            # check if all checks passed
-            if (all_inputs_available and
-                    (not look_for_optional_inputs or
-                        optional_inputs_available) and
-                    (not look_for_novel_output or adds_to_output)):
-                return algorithm
-        return None
+                algorithms_available.append(
+                    (algorithm, n_optional_inputs_unavailable))
+
+        # If no algorithms are available, return None
+        if len(algorithms_available) == 0:
+            return None
+
+        # Find the algorithm with the least unavailable optional inputs
+        algorithms_available.sort(key=lambda (x, y): y)
+        algorithm, n_optional_inputs_unavailable = algorithms_available[0]
+
+        # Find any other algorithms with the same ranking; if None return this
+        other_algorithms = filter(
+            lambda (x, y): y == n_optional_inputs_unavailable,
+            algorithms_available)
+        if len(other_algorithms) == 1:
+            return algorithm
+
+        # If there are other algorithms, rank by the number of non-novel
+        # outputs
+        boring_algorithms = list()
+        for algorithm, _ in other_algorithms:
+
+            # Count the number of non-novel outputs
+            n_boring_outputs = 0
+            for output in algorithm.outputs:
+                if output in generated_outputs:
+                    n_boring_outputs += 1
+
+            # If any, add to the list
+            if n_boring_outputs > 0:
+                boring_algorithms.append(algorithm)
+
+        # If all return something novel, return the first
+        if len(boring_algorithms) == 0:
+            return algorithm
+
+        # Otherwise return the most non-novel
+        boring_algorithms.sort(key=lambda (x, y): y, reverse=True)
+        return boring_algorithms[0]
 
     def execute_mapping(self):
         """ Executes the algorithms
         :return: None
         """
+        if self._inject_inputs and self._do_immediate_injection:
+            injection_decorator.do_injection(self._inputs)
         self._internal_type_mapping.update(self._inputs)
+        new_outputs = dict()
 
         for algorithm in self._algorithms:
 
@@ -385,15 +461,19 @@ class PACMANAlgorithmExecutor(object):
 
             if results is not None:
                 self._internal_type_mapping.update(results)
+                if self._do_immediate_injection and not self._inject_inputs:
+                    new_outputs.update(results)
 
             # Do injection with the outputs produced
             if self._do_immediate_injection:
-                for result_type, result in results.iteritems():
-                    injection_decorator.do_injection({result_type: result})
+                injection_decorator.do_injection(results)
 
         # Do injection with all the outputs
         if self._do_post_run_injection:
-            injection_decorator.do_injection(self._internal_type_mapping)
+            if self._inject_inputs:
+                injection_decorator.do_injection(self._internal_type_mapping)
+            else:
+                injection_decorator.do_injection(new_outputs)
 
     def get_item(self, item_type):
         """ Get an item from the outputs of the execution

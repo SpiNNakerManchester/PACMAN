@@ -51,7 +51,4 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
                 .format(self._algorithm_id, results, len(self._outputs)))
 
         # Return the results processed into a dict
-        return {
-            output_type: result
-            for (output_type, result) in zip(self._outputs, results)
-        }
+        return self._get_outputs(inputs, results)
