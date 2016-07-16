@@ -109,10 +109,19 @@ def _decode_algorithm_details(
     :param has_self: True if the self parameter is expected
     """
     function_args = inspect.getargspec(function)
-    required_args = OrderedSet(
-        function_args.args[:-len(function_args.defaults)])
-    optional_args = OrderedSet(
-        function_args.args[-len(function_args.defaults):])
+    required_args = None
+    optional_args = None
+    if function_args.defaults is not None:
+        n_defaults = len(function_args.defaults)
+        required_args = OrderedSet(
+            function_args.args[:-n_defaults])
+        optional_args = OrderedSet(
+            function_args.args[-n_defaults:])
+    else:
+        required_args = OrderedSet(function_args.args)
+        optional_args = OrderedSet()
+
+    print required_args, optional_args
 
     # Parse the input definitions
     input_defs = dict()
@@ -215,6 +224,20 @@ def algorithm(
         is_class_method = False
         module = None
         if inspect.isclass(algorithm):
+            if hasattr(algorithm, "__init__"):
+                init = getattr(algorithm, "__init__")
+                try:
+                    init_args = inspect.getargspec(init)
+                    n_init_defaults = 0
+                    if init_args.defaults is not None:
+                        n_init_defaults = len(init_args.defaults)
+                    if (len(init_args.args) - n_init_defaults) != 1:
+                        raise exceptions.PacmanConfigurationException(
+                            "Algorithm class initialiser cannot take"
+                            " arguments")
+                except TypeError:
+                    # Occurs if no __init__ is defined in class
+                    pass
             function_name = method
             if method is None:
                 function_name = "__call__"
