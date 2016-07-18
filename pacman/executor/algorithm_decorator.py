@@ -121,8 +121,6 @@ def _decode_algorithm_details(
         required_args = OrderedSet(function_args.args)
         optional_args = OrderedSet()
 
-    print required_args, optional_args
-
     # Parse the input definitions
     input_defs = dict()
     for (input_name, input_types) in input_definitions.iteritems():
