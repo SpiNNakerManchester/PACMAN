@@ -3,15 +3,16 @@ from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
 
-class VirtualPartitionedVertex(PartitionedVertex):
+class VirtualSpinnakerLinkPartitionedVertex(PartitionedVertex):
 
     def __init__(
             self, resources_required, label, spinnaker_link_id,
-            constraints=None):
+            constraints=None, board_address=None):
         PartitionedVertex.__init__(
             self, resources_required, label, constraints=constraints)
 
         self._spinnaker_link_id = spinnaker_link_id
+        self._board_address = board_address
         self._virtual_chip_x = None
         self._virtual_chip_y = None
         self._real_chip_x = None
@@ -55,3 +56,7 @@ class VirtualPartitionedVertex(PartitionedVertex):
         """ The id of the spinnaker link being used
         """
         return self._spinnaker_link_id
+
+    @property
+    def board_address(self):
+        return self._board_address

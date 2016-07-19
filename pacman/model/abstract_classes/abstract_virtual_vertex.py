@@ -2,8 +2,7 @@
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
-from pacman.model.abstract_classes.virtual_partitioned_vertex import \
-    VirtualPartitionedVertex
+from pacman import exceptions
 
 # general imports
 from abc import ABCMeta
@@ -16,7 +15,7 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
     """ A class that allows models to define that they are virtual
     """
 
-    def __init__(self, n_atoms, spinnaker_link_id, label, max_atoms_per_core,
+    def __init__(self, n_atoms, label, max_atoms_per_core, board_address,
                  constraints=None):
 
         AbstractPartitionableVertex.__init__(
@@ -28,18 +27,7 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
         self._real_chip_x = None
         self._real_chip_y = None
         self._real_link = None
-        self._spinnaker_link_id = spinnaker_link_id
-
-    def create_subvertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        subvertex = VirtualPartitionedVertex(
-            resources_required, label, self._spinnaker_link_id,
-            constraints=constraints)
-        subvertex.set_virtual_chip_coordinates(
-            self._virtual_chip_x, self._virtual_chip_y, self._real_chip_x,
-            self._real_chip_y, self._real_link)
-        return subvertex
+        self._board_address = board_address
 
     @property
     def virtual_chip_x(self):
@@ -61,6 +49,19 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
     def real_link(self):
         return self._real_link
 
+    @property
+    def board_address(self):
+        return self._board_address
+
+    @board_address.setter
+    def board_address(self, new_value):
+        if self._board_address is None:
+            self._board_address = new_value
+        else:
+            raise exceptions.PacmanConfigurationException(
+                "The board address of the virutal vertex has already been "
+                "configured. Overiding at this point is deemed an error.")
+
     def set_virtual_chip_coordinates(
             self, virtual_chip_x, virtual_chip_y, real_chip_x, real_chip_y,
             real_link):
@@ -69,13 +70,6 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
         self._real_chip_x = real_chip_x
         self._real_chip_y = real_chip_y
         self._real_link = real_link
-
-    @property
-    def spinnaker_link_id(self):
-        """ property for returning the spinnaker link being used
-        :return:
-        """
-        return self._spinnaker_link_id
 
     @abstractmethod
     def is_virtual_vertex(self):

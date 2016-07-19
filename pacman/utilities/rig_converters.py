@@ -1,30 +1,31 @@
-from rig.netlist import Net
+from collections import defaultdict
+
 from rig.machine import Machine, Links
-from rig.routing_table import Routes
-from rig.place_and_route.routing_tree import RoutingTree
+from rig.netlist import Net
 from rig.place_and_route.constraints import \
     LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint
-
-from collections import defaultdict
+from rig.place_and_route.routing_tree import RoutingTree
+from rig.routing_table import Routes
 from six import iteritems
 
-from pacman.utilities import constants
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_radial_placement_from_chip_constraint \
     import PlacerRadialPlacementFromChipConstraint
-from pacman.model.placements.placements import Placements
+from pacman.model.partitioned_graph.virtual_sata_partitioned_vertex import\
+    VirtualSataLinkPartitionedVertex
+from pacman.model.partitioned_graph.virtual_spinnaker_link_partitioned_vertex \
+    import VirtualSpinnakerLinkPartitionedVertex
 from pacman.model.placements.placement import Placement
+from pacman.model.placements.placements import Placements
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition \
     import MulticastRoutingTableByPartition
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition_entry  \
     import MulticastRoutingTableByPartitionEntry
-from pacman.model.abstract_classes.virtual_partitioned_vertex \
-    import VirtualPartitionedVertex
-
+from pacman.utilities import constants
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
@@ -112,7 +113,8 @@ def convert_to_rig_partitioned_graph(partitioned_graph):
         vid = str(id(vertex))
 
         # handle external devices
-        if isinstance(vertex, VirtualPartitionedVertex):
+        if (isinstance(vertex, VirtualSataLinkPartitionedVertex) or
+                isinstance(vertex, VirtualSpinnakerLinkPartitionedVertex)):
             vertex_resources = dict()
             vertices_resources[vid] = vertex_resources
             vertex_resources["cores"] = 0
@@ -163,7 +165,8 @@ def create_rig_partitioned_graph_constraints(partitioned_graph, machine):
                 constraints.append(LocationConstraint(
                     str(id(vertex)), (constraint.x, constraint.y)))
 
-        if isinstance(vertex, VirtualPartitionedVertex):
+        if (isinstance(vertex, VirtualSpinnakerLinkPartitionedVertex) or
+                isinstance(vertex, VirtualSataLinkPartitionedVertex)):
             constraints.append(LocationConstraint(
                 str(id(vertex)), (vertex.real_chip_x, vertex.real_chip_y)))
             constraints.append(RouteEndpointConstraint(
@@ -187,14 +190,18 @@ def create_rig_machine_constraints(machine):
 def convert_to_rig_placements(placements):
     rig_placements = {
         str(id(p.subvertex)): (p.x, p.y)
-        if not isinstance(p.subvertex, VirtualPartitionedVertex)
+        if not (isinstance(p.subvertex,
+                           VirtualSpinnakerLinkPartitionedVertex) or
+                isinstance(p.subvertex, VirtualSataLinkPartitionedVertex))
         else (p.subvertex.real_chip_x, p.subvertex.real_chip_y)
         for p in placements.placements}
 
     core_allocations = {
         str(id(p.subvertex)): {"cores": slice(p.p, p.p + 1)}
         for p in placements.placements
-        if not isinstance(p.subvertex, VirtualPartitionedVertex)}
+        if (not isinstance(p.subvertex,
+                           VirtualSpinnakerLinkPartitionedVertex) or
+                isinstance(p.subvertex, VirtualSataLinkPartitionedVertex))}
 
     return rig_placements, core_allocations
 
@@ -205,7 +212,8 @@ def convert_from_rig_placements(
     for vertex_id in rig_placements:
         vertex = partitioned_graph.get_subvertex_by_id(vertex_id)
         if vertex is not None:
-            if isinstance(vertex, VirtualPartitionedVertex):
+            if (isinstance(vertex, VirtualSataLinkPartitionedVertex) or
+                    isinstance(vertex, VirtualSpinnakerLinkPartitionedVertex)):
                 placements.add_placement(Placement(
                     vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
                     None))

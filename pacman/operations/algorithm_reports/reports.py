@@ -1,12 +1,13 @@
+import logging
 import os
 import time
-import logging
 
 from pacman import exceptions
+from pacman.model.partitioned_graph.virtual_spinnaker_link_partitioned_vertex \
+    import VirtualSpinnakerLinkPartitionedVertex
+from pacman.model.partitioned_graph.virtual_sata_partitioned_vertex \
+    import VirtualSataLinkPartitionedVertex
 from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman.model.abstract_classes.virtual_partitioned_vertex \
-    import VirtualPartitionedVertex
-from spinn_machine.sdram import SDRAM
 
 logger = logging.getLogger(__name__)
 
@@ -752,8 +753,10 @@ def _search_route(
     # Create text for starting point
     source_vertex = source_placement.subvertex
     text = ""
-    if isinstance(source_vertex, VirtualPartitionedVertex):
-        text += "Virtual "
+    if isinstance(source_vertex, VirtualSpinnakerLinkPartitionedVertex):
+        text += "Virtual SpiNNaker Link"
+    if isinstance(source_vertex, VirtualSataLinkPartitionedVertex):
+        text += "Virtual SATA Link"
     text += "{}:{}:{} -> ".format(
         source_placement.x, source_placement.y, source_placement.p)
 
