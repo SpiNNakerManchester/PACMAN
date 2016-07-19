@@ -6,9 +6,17 @@ class SimpleLabeledObject(AbstractHasLabel):
     """ Implementation of an item with a label
     """
 
-    __slots__ = ("_label")
+    __slots__ = [
+
+        # The label of the object
+        "_label"
+    ]
 
     def __init__(self, label):
+        """
+
+        :param label: The label of the object
+        """
         self._label = label
 
     @property

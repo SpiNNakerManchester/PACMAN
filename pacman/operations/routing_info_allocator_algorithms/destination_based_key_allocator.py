@@ -1,6 +1,5 @@
-from pacman.model.constraints.abstract_constraints\
-    .abstract_key_allocator_constraint import \
-    AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info \

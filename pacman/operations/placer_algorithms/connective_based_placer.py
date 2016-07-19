@@ -1,18 +1,8 @@
 import logging
+from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 
-from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint import \
-    PlacerRadialPlacementFromChipConstraint
-from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
+from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
-from pacman.model.constraints.tag_allocator_constraints\
-    .tag_allocator_require_iptag_constraint import \
-    TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints\
-    .tag_allocator_require_reverse_iptag_constraint import \
-    TagAllocatorRequireReverseIptagConstraint
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
@@ -37,14 +27,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
     def __call__(self, partitioned_graph, machine):
 
         # check that the algorithm can handle the constraints
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=partitioned_graph.subvertices,
-            supported_constraints=[
-                PlacerRadialPlacementFromChipConstraint,
-                TagAllocatorRequireIptagConstraint,
-                TagAllocatorRequireReverseIptagConstraint,
-                PlacerChipAndCoreConstraint],
-            abstract_constraint_type=AbstractPlacerConstraint)
+        self._check_constraints(partitioned_graph.vertices)
 
         # Sort the vertices into those with and those without
         # placement constraints
@@ -64,6 +47,9 @@ class ConnectiveBasedPlacer(RadialPlacer):
                                    "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
+        constrained_vertices = \
+            placer_algorithm_utilities.sort_vertices_by_known_constraints(
+                constrained_vertices)
         for vertex in constrained_vertices:
             self._place_vertex(vertex, resource_tracker, machine, placements)
             progress_bar.update()

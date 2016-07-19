@@ -1,6 +1,6 @@
 import logging
 
-from pacman.model.constraints.abstract_constraints.\
+from pacman.model.constraints.partitioner_constraints.\
     abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.constraints.partitioner_constraints.\
@@ -18,6 +18,7 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ class PartitionAndPlacePartitioner(object):
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
+        ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             abstract_constraint_type=AbstractPartitionerConstraint,
@@ -58,8 +60,9 @@ class PartitionAndPlacePartitioner(object):
             label="partitioned graph for {}".format(graph.label))
         graph_mapper = GraphMapper(graph.label, subgraph.label)
 
-        # sort out vertex's by constraints
-        vertices = utility_calls.sort_objects_by_constraint_authority(vertices)
+        # sort out vertex's by placement constraints
+        vertices = placer_algorithm_utilities\
+            .sort_vertices_by_known_constraints(vertices)
 
         # Set up the progress
         n_atoms = 0
@@ -125,10 +128,9 @@ class PartitionAndPlacePartitioner(object):
         possible_max_atoms.append(vertex.get_max_atoms_per_core())
 
         for other_partitionable_vertex in partiton_together_vertices:
-            max_atom_constraints =\
-                utility_calls.locate_constraints_of_type(
-                    other_partitionable_vertex.constraints,
-                    PartitionerMaximumSizeConstraint)
+            max_atom_constraints = utility_calls.locate_constraints_of_type(
+                other_partitionable_vertex.constraints,
+                PartitionerMaximumSizeConstraint)
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
         max_atoms_per_core = min(possible_max_atoms)

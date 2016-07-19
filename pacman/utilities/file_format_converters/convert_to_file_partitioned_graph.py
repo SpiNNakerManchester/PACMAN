@@ -1,8 +1,7 @@
-from pacman.model.abstract_classes.abstract_virtual_vertex import \
+from pacman.model.graph.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman.model.constraints.abstract_constraints.\
-    abstract_tag_allocator_constraint import \
-    AbstractTagAllocatorConstraint
+from pacman.model.constraints.tag_allocator_constraints.\
+    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 from pacman.utilities import utility_calls
 from pacman.utilities import file_format_schemas
 

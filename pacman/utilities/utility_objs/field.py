@@ -49,8 +49,8 @@ class Field(object):
         self._tag = new_value
 
     def __repr__(self):
-        return "Field with ranges {}:{} and value {} and tag {} and name {}"\
-            .format(self.lo, self.hi, self.value, self._value, self._name)
+        return "Field(lo={}, hi={}, value={}, tag={}, name={})".format(
+            self.lo, self.hi, self.value, self._value, self._name)
 
     def __str__(self):
         return self.__repr__()

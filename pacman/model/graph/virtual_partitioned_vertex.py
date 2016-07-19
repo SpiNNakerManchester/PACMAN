@@ -1,4 +1,5 @@
-from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
+from pacman.model.graph.simple_partitioned_vertex \
+    import SimplePartitionedVertex
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 

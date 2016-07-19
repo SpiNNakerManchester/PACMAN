@@ -4,7 +4,7 @@ import logging
 
 from pacman import exceptions
 from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman.model.abstract_classes.virtual_partitioned_vertex \
+from pacman.model.graph.virtual_partitioned_vertex \
     import VirtualPartitionedVertex
 from spinn_machine.sdram import SDRAM
 
@@ -297,7 +297,7 @@ def placement_report_without_partitionable_graph_by_vertex(
                      " writing.".format(file_name))
 
     f_place_by_vertex.write(
-        "        Placement Information by AbstractConstrainedVertex\n")
+        "        Placement Information by Vertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -315,7 +315,7 @@ def placement_report_without_partitionable_graph_by_vertex(
         vertex_name = v.label
         vertex_model = v.model_name
         f_place_by_vertex.write(
-            "**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
+            "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
 
         cur_placement = placements.get_placement_of_subvertex(v)
@@ -460,7 +460,7 @@ def placement_report_without_partitionable_graph_by_core(
                 vertex_label = subvertex.label
                 vertex_model = subvertex.model_name
 
-                p_str = ("  Processor {}: AbstractConstrainedVertex: '{}' \n"
+                p_str = ("  Processor {}: Vertex: '{}' \n"
                          .format(pro_id, vertex_label))
                 f_place_by_core.write(p_str)
                 f_place_by_core.write(p_str)

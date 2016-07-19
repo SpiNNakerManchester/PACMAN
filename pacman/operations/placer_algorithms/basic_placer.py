@@ -1,14 +1,8 @@
 
 # pacman imports
-from pacman.model.constraints.abstract_constraints.\
-    abstract_placer_constraint import \
-    AbstractPlacerConstraint
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
+from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
-from pacman.utilities import utility_calls
 from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
@@ -36,14 +30,12 @@ class BasicPlacer(object):
         """
 
         # check that the algorithm can handle the constraints
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=partitioned_graph.subvertices,
-            supported_constraints=[PlacerChipAndCoreConstraint],
-            abstract_constraint_type=AbstractPlacerConstraint)
+        ResourceTracker.check_constraints(partitioned_graph.vertices)
 
         placements = Placements()
-        ordered_subverts = utility_calls.sort_objects_by_constraint_authority(
-            partitioned_graph.subvertices)
+        ordered_subverts = \
+            placer_algorithm_utilities.sort_vertices_by_known_constraints(
+                partitioned_graph.vertices)
 
         # Iterate over subvertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),

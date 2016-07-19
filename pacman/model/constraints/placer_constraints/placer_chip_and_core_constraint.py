@@ -1,12 +1,10 @@
-import sys
-
-from pacman.model.constraints.abstract_constraints.abstract_placer_constraint \
+from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
 
 
 class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
     """ Creates a constraint object to place a vertex or a subvertex on a\
-        specific chip, and optionally a specific core on that chip
+        specific chip and, optionally, a specific core on that chip
     """
 
     def __init__(self, x, y, p=None):
@@ -20,21 +18,9 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         :type p: int
         :raise None: does not raise any known exceptions
         """
-        AbstractPlacerConstraint.__init__(
-            self, label="placer chip and core constraint at coords "
-                        "{},{},{}".format(x, y, p))
         self._x = x
         self._y = y
         self._p = p
-
-    def is_placer_constraint(self):
-        return True
-
-    def get_rank(self):
-        if self.p is not None:
-            return sys.maxint
-        else:
-            return sys.maxint - 1
 
     @property
     def x(self):
@@ -75,3 +61,7 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         :raise None: does not raise any known exceptions
         """
         return {"x": self._x, "y": self._y, "p": self._p}
+
+    def __repr__(self):
+        return "PlacerChipAndCoreConstraint(x={}, y={}, p={})".format(
+            self._x, self._y, self._p)

@@ -83,7 +83,7 @@ class PartitionableGraph(object):
         :param partition_constraints: list of constraints to put onto the\
                     partition
         :type partition_constraints: iterable of
-                :py:class:`pacman.model.constraints.abstract_constraints.abstract_constraint.AbstractConstraint`
+                :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the edge\

@@ -1,7 +1,5 @@
-import sys
-
-from pacman.model.constraints.abstract_constraints.\
-    abstract_placer_constraint import AbstractPlacerConstraint
+from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
+    import AbstractPlacerConstraint
 
 
 class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
@@ -18,10 +16,6 @@ class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
         :type y: int
         :raise None: does not raise any known exceptions
         """
-        AbstractPlacerConstraint.__init__(
-            self, label="placer radial placement from chip and core "
-                        "constraint at coords {},{}".format(x, y))
-
         self._x = x
         self._y = y
 
@@ -32,9 +26,3 @@ class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     @property
     def y(self):
         return self._y
-
-    def get_rank(self):
-        return sys.maxint - 10
-
-    def is_placer_constraint(self):
-        return True

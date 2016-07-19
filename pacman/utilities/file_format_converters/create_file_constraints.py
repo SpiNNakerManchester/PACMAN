@@ -1,12 +1,10 @@
 
-from pacman.model.abstract_classes.abstract_virtual_vertex import \
+from pacman.model.graph.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman.model.constraints.abstract_constraints.\
+from pacman.model.constraints.key_allocator_constraints.\
     abstract_key_allocator_constraint import \
     AbstractKeyAllocatorConstraint
-from pacman.model.constraints.abstract_constraints.\
-    abstract_placer_constraint import AbstractPlacerConstraint
-from pacman.model.constraints.abstract_constraints.\
+from pacman.model.constraints.tag_allocator_constraints.\
     abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_contiguous_range_constraint import \
@@ -18,6 +16,8 @@ from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.model.constraints.placer_constraints.\
     placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints.abstract_placer_constraint\
+    import AbstractPlacerConstraint
 from pacman.model.constraints.tag_allocator_constraints.\
     tag_allocator_require_iptag_constraint import \
     TagAllocatorRequireIptagConstraint
@@ -142,40 +142,44 @@ class CreateConstraintsToFile(object):
     def _handle_vertex_constraint(
             constraint, json_constraints_dictory_rep, vertex):
         if not isinstance(vertex, AbstractVirtualVertex):
-            if (isinstance(constraint, AbstractPlacerConstraint) and
-                    not isinstance(constraint,
-                                   AbstractTagAllocatorConstraint)):
-                chip_loc_constraint = dict()
-                chip_loc_constraint['type'] = "location"
-                chip_loc_constraint['vertex'] = str(id(vertex))
-                chip_loc_constraint['location'] = [constraint.x, constraint.y]
-                json_constraints_dictory_rep.append(chip_loc_constraint)
-            if (isinstance(constraint, PlacerChipAndCoreConstraint) and
-                    constraint.p is not None):
-                chip_loc_constraint = dict()
-                chip_loc_constraint['type'] = "resource"
-                chip_loc_constraint['vertex'] = str(id(vertex))
-                chip_loc_constraint['resource'] = "cores"
-                chip_loc_constraint['range'] = \
-                    "[{}, {}]".format(constraint.p, constraint.p + 1)
-                json_constraints_dictory_rep.append(chip_loc_constraint)
-        if isinstance(constraint, AbstractTagAllocatorConstraint):
-            tag_constraint = dict()
-            tag_constraint['type'] = "resource"
-            tag_constraint['vertex'] = str(id(vertex))
-            if isinstance(constraint,
-                          TagAllocatorRequireIptagConstraint):
-                tag_constraint['resource'] = "iptag"
-                tag_constraint['range'] = [0, 1]
-            elif isinstance(constraint,
-                            TagAllocatorRequireReverseIptagConstraint):
-                tag_constraint['resource'] = "reverse_iptag"
-                tag_constraint['range'] = [0, 1]
-            else:
-                raise exceptions.PacmanConfigurationException(
-                    "Converter does not recognise this tag constraint."
-                    "Please update this algorithm and try again.")
-            json_constraints_dictory_rep.append(tag_constraint)
+            if isinstance(constraint, AbstractPlacerConstraint):
+                if isinstance(constraint, PlacerChipAndCoreConstraint):
+                    chip_loc_constraint = dict()
+                    chip_loc_constraint['type'] = "location"
+                    chip_loc_constraint['vertex'] = str(id(vertex))
+                    chip_loc_constraint['location'] = [
+                        constraint.x, constraint.y]
+                    json_constraints_dictory_rep.append(chip_loc_constraint)
+                    if constraint.p is not None:
+                        chip_loc_constraint = dict()
+                        chip_loc_constraint['type'] = "resource"
+                        chip_loc_constraint['vertex'] = str(id(vertex))
+                        chip_loc_constraint['resource'] = "cores"
+                        chip_loc_constraint['range'] = \
+                            "[{}, {}]".format(constraint.p, constraint.p + 1)
+                        json_constraints_dictory_rep.append(
+                            chip_loc_constraint)
+                else:
+                    raise exceptions.PacmanConfigurationException(
+                        "Converter does not recognise placer constraint {}"
+                        .format(constraint))
+            if isinstance(constraint, AbstractTagAllocatorConstraint):
+                tag_constraint = dict()
+                tag_constraint['type'] = "resource"
+                tag_constraint['vertex'] = str(id(vertex))
+                if isinstance(constraint,
+                              TagAllocatorRequireIptagConstraint):
+                    tag_constraint['resource'] = "iptag"
+                    tag_constraint['range'] = [0, 1]
+                elif isinstance(constraint,
+                                TagAllocatorRequireReverseIptagConstraint):
+                    tag_constraint['resource'] = "reverse_iptag"
+                    tag_constraint['range'] = [0, 1]
+                else:
+                    raise exceptions.PacmanConfigurationException(
+                        "Converter does not recognise tag constraint {}"
+                        .format(constraint))
+                json_constraints_dictory_rep.append(tag_constraint)
 
     @staticmethod
     def _handle_edge_constraint(

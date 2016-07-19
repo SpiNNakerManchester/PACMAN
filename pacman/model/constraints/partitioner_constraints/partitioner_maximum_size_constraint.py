@@ -1,9 +1,5 @@
-"""
-PartitionerMaximumSizeConstraint
-"""
-
 # pacman import
-from pacman.model.constraints.abstract_constraints\
+from pacman.model.constraints.partitioner_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
@@ -19,17 +15,7 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
         :type size: int
         :raise None: does not raise any known exceptions
         """
-        AbstractPartitionerConstraint.__init__(
-            self, "partitioner max atom per core constraint with size {}"
-                  .format(size))
         self._size = size
-
-    def is_partitioner_constraint(self):
-        """
-        helper methof for isinistance
-        :return:
-        """
-        return True
 
     @property
     def size(self):

@@ -1,4 +1,4 @@
-from pacman.model.abstract_classes.abstract_resource import AbstractResource
+from pacman.model.resources.abstract_resource import AbstractResource
 
 
 class SDRAMResource(AbstractResource):

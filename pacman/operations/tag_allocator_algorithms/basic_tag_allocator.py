@@ -1,13 +1,7 @@
 
 # pacman imports
-from pacman.model.constraints.abstract_constraints.\
+from pacman.model.constraints.tag_allocator_constraints.\
     abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_iptag_constraint import \
-    TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_reverse_iptag_constraint import \
-    TagAllocatorRequireReverseIptagConstraint
 from pacman.model.tags.tags import Tags
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
@@ -35,13 +29,7 @@ class BasicTagAllocator(object):
                                    "Allocating tags")
         placements_with_tags = list()
         for placement in placements.placements:
-            utility_calls.check_algorithm_can_support_constraints(
-                constrained_vertices=[placement.subvertex],
-                supported_constraints=[
-                    TagAllocatorRequireIptagConstraint,
-                    TagAllocatorRequireReverseIptagConstraint
-                ],
-                abstract_constraint_type=AbstractTagAllocatorConstraint)
+            ResourceTracker.check_constraints([placement.subvertex])
             if len(utility_calls.locate_constraints_of_type(
                     placement.subvertex.constraints,
                     AbstractTagAllocatorConstraint)):
@@ -55,7 +43,7 @@ class BasicTagAllocator(object):
 
             # Get the constraint details for the tags
             (board_address, ip_tags, reverse_ip_tags) =\
-                utility_calls.get_ip_tag_info(vertex.constraints)
+                ResourceTracker.get_ip_tag_info(vertex.constraints)
 
             # Allocate the tags, first-come, first-served, using the
             # fixed placement of the vertex, and the required resources

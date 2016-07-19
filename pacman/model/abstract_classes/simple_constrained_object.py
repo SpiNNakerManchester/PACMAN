@@ -1,8 +1,8 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.abstract_classes.abstract_has_constraints\
     import AbstractHasConstraints
-from pacman.model.decorators import overrides.overrides
-from pacman.model.constraints.abstract_constraints.abstract_constraint \
+from pacman.model.decorators.overrides import overrides
+from pacman.model.constraints.abstract_constraint \
     import AbstractConstraint
 
 
@@ -10,7 +10,11 @@ class SimpleConstrainedObject(AbstractHasConstraints):
     """ An implementation of an object which holds constraints
     """
 
-    __slots__ = ("_constraints")
+    __slots__ = [
+
+        # The constraints of the object
+        "_constraints"
+    ]
 
     def __init__(self, constraints=None):
         """
@@ -25,7 +29,7 @@ class SimpleConstrainedObject(AbstractHasConstraints):
         # add new constraints to the set
         self.add_constraints(constraints)
 
-    @overrides(AbstractHasConstraints)
+    @overrides(AbstractHasConstraints.add_constraint)
     def add_constraint(self, constraint):
         if (constraint is None or
                 not isinstance(constraint, AbstractConstraint)):
@@ -35,13 +39,13 @@ class SimpleConstrainedObject(AbstractHasConstraints):
                                           "AbstractConstraint")
         self._constraints.add(constraint)
 
-    @overrides(AbstractHasConstraints)
+    @overrides(AbstractHasConstraints.add_constraints)
     def add_constraints(self, constraints):
         if constraints is not None:
             for next_constraint in constraints:
                 self.add_constraint(next_constraint)
 
     @property
-    @overrides(AbstractHasConstraints)
+    @overrides(AbstractHasConstraints.constraints)
     def constraints(self):
         return self._constraints

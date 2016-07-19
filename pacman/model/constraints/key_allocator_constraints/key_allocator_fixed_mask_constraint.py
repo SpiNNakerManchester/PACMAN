@@ -1,6 +1,5 @@
-from pacman.model.constraints.abstract_constraints.\
-    abstract_key_allocator_constraint \
-    import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
@@ -21,13 +20,7 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
                     or if any of the field masks overlap i.e.\
                     field.mask & other_field.mask != 0
         """
-        AbstractKeyAllocatorConstraint.__init__(
-            self, "key allocator constraint where subedges coming from the "
-                  "vertex requires a specific mask")
         self._mask = mask
-
-    def is_key_allocator_constraint(self):
-        return True
 
     @property
     def mask(self):

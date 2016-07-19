@@ -1,29 +1,14 @@
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.constraints.abstract_constraints.\
-    abstract_placer_constraint import \
-    AbstractPlacerConstraint
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints.\
-    placer_radial_placement_from_chip_constraint import \
-    PlacerRadialPlacementFromChipConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_iptag_constraint import \
-    TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_reverse_iptag_constraint import \
-    TagAllocatorRequireReverseIptagConstraint
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.operations.placer_algorithms import RadialPlacer
-from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 from spinn_machine.utilities.progress_bar import ProgressBar
 import traceback
+from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -37,14 +22,7 @@ class OneToOnePlacer(RadialPlacer):
     def __call__(self, partitioned_graph, machine):
 
         # check that the algorithm can handle the constraints
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=partitioned_graph.subvertices,
-            supported_constraints=[
-                PlacerRadialPlacementFromChipConstraint,
-                TagAllocatorRequireIptagConstraint,
-                TagAllocatorRequireReverseIptagConstraint,
-                PlacerChipAndCoreConstraint],
-            abstract_constraint_type=AbstractPlacerConstraint)
+        self._check_constraints(partitioned_graph.vertices)
 
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
             partitioned_graph)
@@ -66,7 +44,7 @@ class OneToOnePlacer(RadialPlacer):
         # iterate over subverts
         for subvertex_list in ordered_subverts:
 
-            # ensure largest cores per chip is a devisional by 2 number
+            # ensure largest cores per chip is divisible by 2
             # (for one to one placement)
             max_cores_on_chip = \
                 resource_tracker.most_avilable_cores_on_a_chip()
@@ -133,8 +111,8 @@ class OneToOnePlacer(RadialPlacer):
         found_list = set()
 
         # order subverts based on constraint priority
-        ordered_subverts = utility_calls.sort_objects_by_constraint_authority(
-            partitioned_graph.subvertices)
+        ordered_subverts = placer_algorithm_utilities\
+            .sort_vertices_by_known_constraints(partitioned_graph.subvertices)
 
         for vertex in ordered_subverts:
             if vertex not in found_list:
@@ -154,25 +132,27 @@ class OneToOnePlacer(RadialPlacer):
 
     @staticmethod
     def _find_one_to_one_vertices(vertex, partitioned_graph):
-        """
-        find vertices which have one to one connections with the given vertex,
-        and where their constraints dont force them onto different chips.
+        """ Find vertices which have one to one connections with the given\
+            vertex, and where their constraints don't force them onto\
+            different chips.
+
         :param vertex:  the vertex to use as a basis for one to one connections
-        :param partitioned_graph: the graph to look for other one to one verts
-        :return:  set of one to one vertices
+        :param partitioned_graph: \
+            the graph to look for other one to one vertices
+        :return: set of one to one vertices
         """
-        x, y, _ = utility_calls.get_chip_and_core(vertex.constraints)
+        x, y, _ = ResourceTracker.get_chip_and_core(vertex.constraints)
         found_vertices = [vertex]
         vertices_seen = {vertex}
 
-        #look for one to ones leaving this vertex
+        # look for one to ones leaving this vertex
         outgoing = partitioned_graph.outgoing_subedges_from_subvertex(vertex)
         vertices_to_try = [edge.post_subvertex for edge in outgoing]
         while len(vertices_to_try) != 0:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
                 vertices_seen.add(next_vertex)
-                post_x, post_y, _ = utility_calls.get_chip_and_core(
+                post_x, post_y, _ = ResourceTracker.get_chip_and_core(
                     next_vertex.constraints)
                 conflict = False
                 if x is not None and post_x is not None and x != post_x:
@@ -194,7 +174,7 @@ class OneToOnePlacer(RadialPlacer):
                         edge.post_subvertex for edge in outgoing
                         if edge.post_subvertex not in vertices_seen])
 
-        #look for one to ones entering this vertex
+        # look for one to ones entering this vertex
         incoming = partitioned_graph.incoming_subedges_from_subvertex(
             vertex)
         vertices_to_try = [
@@ -204,7 +184,7 @@ class OneToOnePlacer(RadialPlacer):
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
                 vertices_seen.add(next_vertex)
-                pre_x, pre_y, _ = utility_calls.get_chip_and_core(
+                pre_x, pre_y, _ = ResourceTracker.get_chip_and_core(
                     next_vertex.constraints)
                 conflict = False
                 if x is not None and pre_x is not None and x != pre_x:

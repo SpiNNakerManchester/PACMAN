@@ -1,36 +1,29 @@
-from pacman.model.constraints.abstract_constraints.\
-    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
-import sys
+from pacman.model.constraints.tag_allocator_constraints\
+    .abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 
 
 class TagAllocatorRequireIptagConstraint(AbstractTagAllocatorConstraint):
-    """ Constraint that indicates that an IP tag is required, and the\
-        constraints of the tag required, if any.  Note that simply requiring\
-        an IP tag creates a placement constraint, since only a fixed number\
-        of tags are available on each board
+    """ Constraint that indicates that an IP tag is required
     """
 
-    def __init__(self, ip_address, port, strip_sdp, board_address=None,
-                 tag_id=None):
+    def __init__(self, ip_address, port, strip_sdp, tag=None):
         """
 
         :param ip_address: The IP address that the tag will cause data to be\
                     sent to
         :type ip_address: str
-        :param port: The port that the tag will cause data to be sent to
+        :param port: The target port of the tag
         :type port: int
         :param strip_sdp: Whether the tag requires that SDP headers are\
                     stripped before transmission of data
         :type strip_sdp: bool
-        :param board_address: Optional fixed board ip address
-        :type board_address: str
-        :param tag_id: Optional fixed tag id required
-        :type tag_id: int
+        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :type tag: int
         """
-        AbstractTagAllocatorConstraint.__init__(self, board_address, tag_id,
-                                                port)
         self._ip_address = ip_address
+        self._port = port
         self._strip_sdp = strip_sdp
+        self._tag = tag
 
     @property
     def ip_address(self):
@@ -42,6 +35,15 @@ class TagAllocatorRequireIptagConstraint(AbstractTagAllocatorConstraint):
         return self._ip_address
 
     @property
+    def port(self):
+        """ The port of the tag
+
+        :return: The port of the tag
+        :rtype: int
+        """
+        return self._port
+
+    @property
     def strip_sdp(self):
         """ Whether SDP headers should be stripped for this tag
 
@@ -50,14 +52,11 @@ class TagAllocatorRequireIptagConstraint(AbstractTagAllocatorConstraint):
         """
         return self._strip_sdp
 
-    def is_tag_allocator_constraint(self):
-        return True
+    @property
+    def tag(self):
+        """ The tag required, or None if any tag is OK
 
-    def get_rank(self):
-        if self._tag is not None and self._board_address is not None:
-            return sys.maxint - 2
-        elif self._tag is not None:
-            return sys.maxint - 3
-        elif self._board_address is not None:
-            return sys.maxint - 5
-        return sys.maxint - 7
+        :return: The tag or None
+        :rtype: int
+        """
+        return self._tag

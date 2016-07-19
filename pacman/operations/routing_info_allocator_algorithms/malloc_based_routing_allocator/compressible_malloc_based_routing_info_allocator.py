@@ -1,5 +1,5 @@
 # pacman imports
-from pacman.model.constraints.abstract_constraints\
+from pacman.model.constraints.key_allocator_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_field_constraint import \

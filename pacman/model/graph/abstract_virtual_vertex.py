@@ -2,7 +2,7 @@
 # pacman imports
 from pacman.model.graph.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
-from pacman.model.abstract_classes.virtual_partitioned_vertex import \
+from pacman.model.graph.virtual_partitioned_vertex import \
     VirtualPartitionedVertex
 
 # general imports

@@ -289,8 +289,7 @@ def _recursive_trace_to_destinations(
 
         # also goes to a processor
         if len(processor_values) > 0:
-            _is_dest(processor_values, current_router,
-                             reached_placements)
+            _is_dest(processor_values, current_router, reached_placements)
         # only goes to new chip
         for link_id in chip_links:
 

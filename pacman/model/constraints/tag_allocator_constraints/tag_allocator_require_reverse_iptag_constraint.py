@@ -1,33 +1,38 @@
-import sys
-from pacman.model.constraints.abstract_constraints.\
-    abstract_tag_allocator_constraint import \
-    AbstractTagAllocatorConstraint
+from pacman.model.constraints.tag_allocator_constraints.\
+    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 
 
 class TagAllocatorRequireReverseIptagConstraint(
         AbstractTagAllocatorConstraint):
-    """ Constraint that indicates that a Reverse IP tag is required, and the\
-        constraints of the tag required, if any.  Note that simply requiring\
-        an IP tag creates a placement constraint, since only a fixed number\
-        of tags are available on each board
+    """ Constraint that indicates that a Reverse IP tag is required
     """
 
-    def __init__(self, port, sdp_port=1, board_address=None, tag_id=None):
+    def __init__(self, port, sdp_port=1, tag=None):
         """
 
+        :param port: The target port of the tag
+        :type port: int
         :param port: The UDP port to listen to on the board for this tag
         :type port: int
-        :param sdp_port: The SDP port number to be used when constructing SDP\
-                    packets from the received UDP packets for this tag
+        :param sdp_port:\
+            The SDP port number to be used when constructing SDP packets from\
+            the received UDP packets for this tag
         :type sdp_port: int
-        :param board_address: Optional fixed board ip address
-        :type board_address: str
-        :param tag_id: Optional fixed tag id required
-        :type tag_id: int
+        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :type tag: int
         """
-        AbstractTagAllocatorConstraint.__init__(self, board_address, tag_id,
-                                                port)
+        self._port = port
         self._sdp_port = sdp_port
+        self._tag = tag
+
+    @property
+    def port(self):
+        """ The port of the tag
+
+        :return: The port of the tag
+        :rtype: int
+        """
+        return self._port
 
     @property
     def sdp_port(self):
@@ -36,14 +41,11 @@ class TagAllocatorRequireReverseIptagConstraint(
         """
         return self._sdp_port
 
-    def is_tag_allocator_constraint(self):
-        return True
+    @property
+    def tag(self):
+        """ The tag required, or None if any tag is OK
 
-    def get_rank(self):
-        if self._tag is not None and self._board_address is not None:
-            return sys.maxint - 2
-        elif self._tag is not None:
-            return sys.maxint - 3
-        elif self._board_address is not None:
-            return sys.maxint - 4
-        return sys.maxint - 6
+        :return: The tag or None
+        :rtype: int
+        """
+        return self._tag

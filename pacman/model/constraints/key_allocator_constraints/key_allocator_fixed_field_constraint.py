@@ -1,6 +1,5 @@
-from pacman.model.constraints.abstract_constraints.\
-    abstract_key_allocator_constraint \
-    import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
@@ -10,8 +9,6 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
     def __init__(self, fields=None):
         """
 
-        :param mask: the mask to be used during key allocation
-        :type mask: int
         :param fields: any fields that define regions in the mask with further\
                     limitations
         :type fields: iterable of :py:class:`pacman.utilities.field.Field`
@@ -20,19 +17,8 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
                     or if any of the field masks overlap i.e.\
                     field.mask & other_field.mask != 0
         """
-        AbstractKeyAllocatorConstraint.__init__(
-            self, "key allocator constraint where subedges coming from the "
-                  "vertex requires a specific mask")
-
         self._fields = sorted(fields, key=lambda field: field.mask,
                               reverse=True)
-
-    def is_key_allocator_constraint(self):
-        """
-        helper method for isinstance
-        :return:
-        """
-        return True
 
     @property
     def fields(self):
@@ -63,3 +49,7 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
     def __hash__(self):
         frozen_fields = frozenset(self._fields)
         return hash(frozen_fields)
+
+    def __repr__(self):
+        return "KeyAllocatorFixedFieldConstraint(fields={})".format(
+            self._fields)

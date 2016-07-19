@@ -1,7 +1,7 @@
 """
 test constraint
 """
-from pacman.model.constraints.abstract_constraints\
+from pacman.model.constraints.partitioner_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 

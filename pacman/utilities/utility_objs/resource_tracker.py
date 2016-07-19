@@ -3,6 +3,21 @@ from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.utilities import utility_calls
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.exceptions import PacmanInvalidParameterException
+from pacman.model.constraints.placer_constraints.placer_board_constraint \
+    import PlacerBoardConstraint
+from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
+    import AbstractPlacerConstraint
+from pacman.model.constraints.tag_allocator_constraints\
+    .tag_allocator_require_iptag_constraint \
+    import TagAllocatorRequireIptagConstraint
+from pacman.model.constraints.tag_allocator_constraints\
+    .tag_allocator_require_reverse_iptag_constraint \
+    import TagAllocatorRequireReverseIptagConstraint
+from pacman.model.constraints.tag_allocator_constraints\
+    .abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 from pacman.model.resources.cpu_cycles_per_tick_resource \
     import CPUCyclesPerTickResource
 
@@ -113,6 +128,113 @@ class ResourceTracker(object):
                                 chip.nearest_ethernet_x,
                                 chip.nearest_ethernet_y)
                         self._ethernet_area_codes[ethernet_area_code].add(key)
+
+    @staticmethod
+    def check_constraints(
+            vertices, additional_placement_constraints=None,
+            additional_tag_allocator_constraints=None):
+        """ Check that the constraints on the given vertices are supported\
+            by the resource tracker
+
+        :param vertices: The vertices to check the constraints of
+        :param additional_placement_constraints:\
+            Additional placement constraints supported by the algorithm doing\
+            this check
+        :param additional_tag_allocator_constraints:\
+            Additional tag allocator constraints supported by the
+        """
+
+        # These placement constraints are supported by the resource tracker
+        placement_constraints = {
+            PlacerChipAndCoreConstraint, PlacerBoardConstraint
+        }
+        if additional_placement_constraints is not None:
+            placement_constraints.update(additional_placement_constraints)
+
+        # Check the placement constraints
+        utility_calls.check_algorithm_can_support_constraints(
+            constrained_vertices=vertices,
+            supported_constraints=placement_constraints,
+            abstract_constraint_type=AbstractPlacerConstraint)
+
+        # These tag allocator constraints are supported by the resource tracker
+        tag_allocator_constraints = {
+            TagAllocatorRequireIptagConstraint,
+            TagAllocatorRequireReverseIptagConstraint
+        }
+        if additional_tag_allocator_constraints is not None:
+            tag_allocator_constraints.update(
+                additional_tag_allocator_constraints)
+
+        # Check the tag allocator constraints
+        utility_calls.check_algorithm_can_support_constraints(
+            constrained_vertices=vertices,
+            supported_constraints=tag_allocator_constraints,
+            abstract_constraint_type=AbstractTagAllocatorConstraint)
+
+    @staticmethod
+    def get_ip_tag_info(constraints):
+        """ Get the ip tag constraint information from the constraints
+
+        :param constraints: The set of constraints to get the values from. \
+            Note that any type of constraint can be in the list but only those\
+            relevant will be used
+        :type constraints: iterable of\
+            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+        :return: A tuple of board address, iterable of ip tag constraints and \
+            iterable of reverse ip tag constraints
+        :rtype: (str, iterable of\
+                    :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint.TagAllocatorRequireIptagConstraint`,
+                    iterable of\
+                    :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint.TagAllocatorRequireReverseIptagConstraint`)
+        """
+        board_address = None
+        ip_tags = list()
+        reverse_ip_tags = list()
+        for constraint in constraints:
+            if isinstance(
+                    constraint, TagAllocatorRequireIptagConstraint):
+                ip_tags.append(constraint)
+            elif isinstance(
+                    constraint, TagAllocatorRequireReverseIptagConstraint):
+                reverse_ip_tags.append(constraint)
+            elif isinstance(constraint, PlacerBoardConstraint):
+                board_address = utility_calls.check_constrained_value(
+                    constraint.board_address, board_address)
+        return board_address, ip_tags, reverse_ip_tags
+
+    @staticmethod
+    def get_chip_and_core(constraints, chips=None):
+        """ Get an assigned chip and core from a set of constraints
+
+        :param constraints: The set of constraints to get the values from.\
+            Note that any type of constraint can be in the list but only those\
+            relevant will be used
+        :type constraints: iterable of\
+            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+        :param chips: Optional list of tuples of (x, y) coordinates of chips,\
+            restricting the allowed chips
+        :type chips: iterable of (int, int)
+        :return: tuple of a chip x and y coordinates, and processor id, any of\
+             which might be None
+        :rtype: (tuple of (int, int, int)
+        """
+        x = None
+        y = None
+        p = None
+        for constraint in constraints:
+            if isinstance(constraint, PlacerChipAndCoreConstraint):
+                x = utility_calls.check_constrained_value(constraint.x, x)
+                y = utility_calls.check_constrained_value(constraint.y, y)
+                p = utility_calls.check_constrained_value(constraint.p, p)
+
+        if chips is not None and x is not None and y is not None:
+            if (x, y) not in chips:
+                raise PacmanInvalidParameterException(
+                    "x, y and chips",
+                    "{}, {} and {}".format(x, y, chips),
+                    "The constraint cannot be met with the given chips")
+        return x, y, p
 
     def _get_usable_ip_tag_chips(self):
         """ Get the coordinates of any chips that have available ip tags
@@ -719,12 +841,9 @@ class ResourceTracker(object):
         :param resources: The resources to be allocated
         :type resources:\
                     :py:class:`pacman.model.resources.resource_container.ResourceContainer`
-        :param constraints: An iterable of constraints containing the\
-                    :py:class:`pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint.PlacerChipAndCoreConstraint`;\
-                    note that other types are ignored and no exception will be\
-                    thrown
+        :param constraints: An iterable of constraints on the vertices
         :type constraints: iterable of \
-                    :py:class:`pacman.model.constraints.abstract_constraints.abstract_constraint.AbstractConstraint`
+                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :param chips: The optional list of (x, y) tuples of chip coordinates\
                     of chips that can be used.  Note that any chips passed in\
                     previously will be ignored
@@ -735,9 +854,9 @@ class ResourceTracker(object):
         :raise PacmanValueError: If the constraints cannot be met given the\
                     current allocation of resources
         """
-        (x, y, p) = utility_calls.get_chip_and_core(constraints, chips)
+        (x, y, p) = self.get_chip_and_core(constraints, chips)
         (board_address, ip_tags, reverse_ip_tags) = \
-            utility_calls.get_ip_tag_info(constraints)
+            self.get_ip_tag_info(constraints)
         chips = None
         if x is not None and y is not None:
             chips = [(x, y)]
@@ -766,10 +885,10 @@ class ResourceTracker(object):
         group_ip_tags = list()
         group_reverse_ip_tags = list()
         for constraints in group_constraints:
-            this_x, this_y, this_p = utility_calls.get_chip_and_core(
+            this_x, this_y, this_p = self.get_chip_and_core(
                 constraints, chips)
             this_board_address, this_ip_tags, this_reverse_ip_tags = \
-                utility_calls.get_ip_tag_info(constraints)
+                self.get_ip_tag_info(constraints)
             if ((x is not None and this_x is not None and this_x != x) or
                     (y is not None and this_y is not None and this_y != y) or
                     (this_p is not None and this_p in processor_ids) or
@@ -818,7 +937,8 @@ class ResourceTracker(object):
         :param group_ip_tags: list of lists of ip tag constraints
         :type group_ip_tags: list of lists of\
                     :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint.TagAllocatorRequireIptagConstraint`
-        :param group_reverse_ip_tags: list of lists of reverse ip tag constraints
+        :param group_reverse_ip_tags: list of lists of reverse ip tag \
+                    constraints
         :type group_reverse_ip_tags: list of lists of\
                     :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint.TagAllocatorRequireReverseIptagConstraint`
         :return: An iterable of tuples of the x and y coordinates of the used\
@@ -979,9 +1099,9 @@ class ResourceTracker(object):
         :param chips: the chips to locate the max available resources of
         :type chips: iterable of spinnmachine.chip.Chip
         """
-        (x, y, p) = utility_calls.get_chip_and_core(constraints, chips)
-        (board_address, ip_tags, reverse_ip_tags) = \
-            utility_calls.get_ip_tag_info(constraints)
+        (x, y, p) = self.get_chip_and_core(constraints, chips)
+        (board_address, ip_tags, reverse_ip_tags) = self.get_ip_tag_info(
+            constraints)
         chips = None
         if x is not None and y is not None:
             chips = [(x, y)]

@@ -1,16 +1,17 @@
 
 from enum import Enum
-from pacman.model.abstract_classes.abstract_has_constraints import \
-    AbstractHasConstraints
-from pacman.model.abstract_classes.simple_labeled_object import SimpleLabeledObject
-from pacman.model.partitionable_graph.fixed_route_partitionable_edge import \
-    FixedRoutePartitionableEdge
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
-    MultiCastPartitionableEdge
-from pacman.model.partitioned_graph.fixed_route_partitioned_edge import \
-    FixedRoutePartitionedEdge
-from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
-    MultiCastPartitionedEdge
+from pacman.model.abstract_classes.abstract_has_constraints\
+    import AbstractHasConstraints
+from pacman.model.abstract_classes.simple_labeled_object\
+    import SimpleLabeledObject
+from pacman.model.partitionable_graph.fixed_route_partitionable_edge \
+    import FixedRoutePartitionableEdge
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
+    import MultiCastPartitionableEdge
+from pacman.model.partitioned_graph.fixed_route_partitioned_edge \
+    import FixedRoutePartitionedEdge
+from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
+    import MultiCastPartitionedEdge
 from pacman import exceptions
 from pacman.model.partitioned_graph.abstract_partitioned_edge \
     import AbstractPartitionedEdge

@@ -1,6 +1,5 @@
-from pacman.model.constraints.abstract_constraints.\
-    abstract_partitioner_constraint import \
-    AbstractPartitionerConstraint
+from pacman.model.constraints.partitioner_constraints.\
+    abstract_partitioner_constraint import AbstractPartitionerConstraint
 from pacman.model.graph_mapper.graph_mapper import \
     GraphMapper
 from pacman.model.graph_mapper.slice import Slice
@@ -49,6 +48,7 @@ class BasicPartitioner(object):
         :raise pacman.exceptions.PacmanPartitionException: If something\
                    goes wrong with the partitioning
         """
+        ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             supported_constraints=[PartitionerMaximumSizeConstraint],
