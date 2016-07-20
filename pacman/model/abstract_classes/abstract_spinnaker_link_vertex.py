@@ -3,13 +3,13 @@
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from pacman import exceptions
+from pacman.model.partitioned_graph.\
+    virtual_spinnaker_link_partitioned_vertex import \
+    VirtualSpinnakerLinkPartitionedVertex
 
 # general imports
 from abc import ABCMeta
 from six import add_metaclass
-
-from pacman.model.partitioned_graph.virtual_spinnaker_link_partitioned_vertex import \
-    VirtualSpinnakerLinkPartitionedVertex
 
 
 @add_metaclass(ABCMeta)
@@ -21,7 +21,8 @@ class AbstractSpiNNakerLinkVertex(AbstractVirtualVertex):
                  spinnaker_link_id=None, constraints=None):
 
         AbstractVirtualVertex.__init__(
-            n_atoms, label, max_atoms_per_core, board_address, constraints)
+            self, n_atoms, label, max_atoms_per_core, board_address,
+            constraints)
 
         self._spinnaker_link_id = spinnaker_link_id
 

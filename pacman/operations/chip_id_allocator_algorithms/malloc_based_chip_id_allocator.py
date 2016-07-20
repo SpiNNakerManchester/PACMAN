@@ -1,8 +1,8 @@
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.abstract_classes.abstract_sata_vertex import \
-    AbstractSATAVertex
+from pacman.model.abstract_classes.abstract_fpga_vertex import \
+    AbstractFPGAVertex
 from pacman.model.abstract_classes.abstract_spinnaker_link_vertex import \
     AbstractSpiNNakerLinkVertex
 from pacman.model.partitioned_graph.virtual_sata_partitioned_vertex \
@@ -69,7 +69,9 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             # allocate ids for virtual chips
             for vertex in partitionable_graph.vertices:
 
-                board_address = vertex.board_address
+                if (isinstance(vertex, AbstractSpiNNakerLinkVertex) or
+                        isinstance(vertex, AbstractFPGAVertex)):
+                    board_address = vertex.board_address
                 if board_address is None:
                     board_address = self._get_boot_ip(machine)
                     vertex.board_address = board_address
@@ -81,7 +83,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                             machine, link, board_address)
                     vertex.set_virtual_chip_coordinates(
                         virtual_x, virtual_y, real_x, real_y, real_link)
-                elif isinstance(vertex, AbstractSATAVertex):
+                elif isinstance(vertex, AbstractFPGAVertex):
                     fpga_link = vertex.fpga_link_id
                     fpga_id = vertex.fpga_id
                     virtual_x, virtual_y, real_x, real_y, real_link = \
@@ -96,10 +98,12 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             # allocate ids for virtual chips
             for vertex in partitioned_graph.subvertices:
 
-                board_address = vertex.board_address
-                if board_address is None:
-                    board_address = self._get_boot_ip(machine)
-                    vertex.board_address = board_address
+                if (isinstance(vertex, VirtualSpinnakerLinkPartitionedVertex) or
+                        isinstance(vertex, VirtualSataLinkPartitionedVertex)):
+                    board_address = vertex.board_address
+                    if board_address is None:
+                        board_address = self._get_boot_ip(machine)
+                        vertex.board_address = board_address
 
                 if isinstance(vertex, VirtualSpinnakerLinkPartitionedVertex):
                     link = vertex.spinnaker_link_id

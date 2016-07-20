@@ -24,7 +24,7 @@ def create_virtual_chip(
     if spinnaker_link_id is not None:
         # Get the spinnaker link from the machine
         link_data = machine.get_spinnaker_link_with_id(
-            board_address, spinnaker_link_id)
+            spinnaker_link_id, board_address)
     else:
         link_data = machine.get_sata_link_with_id(
             board_address, fpga_link_id, fpga_id)

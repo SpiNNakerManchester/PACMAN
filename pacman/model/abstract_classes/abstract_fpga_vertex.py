@@ -11,7 +11,7 @@ from pacman.model.partitioned_graph.virtual_sata_partitioned_vertex import \
 
 
 @add_metaclass(ABCMeta)
-class AbstractSATAVertex(AbstractVirtualVertex):
+class AbstractFPGAVertex(AbstractVirtualVertex):
 
     def __init__(
             self, n_neurons, fpga_link_id, fpga_id, machine_time_step,

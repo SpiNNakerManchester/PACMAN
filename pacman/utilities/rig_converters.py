@@ -209,14 +209,20 @@ def convert_to_rig_placements(placements):
 def convert_from_rig_placements(
         rig_placements, rig_allocations, partitioned_graph):
     placements = Placements()
+    core_ids_for_virutal_chips = dict()
     for vertex_id in rig_placements:
         vertex = partitioned_graph.get_subvertex_by_id(vertex_id)
         if vertex is not None:
             if (isinstance(vertex, VirtualSataLinkPartitionedVertex) or
                     isinstance(vertex, VirtualSpinnakerLinkPartitionedVertex)):
+                id = (vertex.virtual_chip_x, vertex.virtual_chip_y)
+                if id not in core_ids_for_virutal_chips:
+                    core_ids_for_virutal_chips[id] = 0
+                else:
+                    core_ids_for_virutal_chips[id] += 1
                 placements.add_placement(Placement(
                     vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
-                    None))
+                    core_ids_for_virutal_chips[id]))
             else:
                 x, y = rig_placements[vertex_id]
                 p = rig_allocations[vertex_id]["cores"].start
