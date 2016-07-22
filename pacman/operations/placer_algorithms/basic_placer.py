@@ -33,15 +33,15 @@ class BasicPlacer(object):
         ResourceTracker.check_constraints(machine_graph.vertices)
 
         placements = Placements()
-        ordered_subverts = \
+        vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(len(ordered_subverts),
+        progress_bar = ProgressBar(len(vertices),
                                    "Placing graph vertices")
         resource_tracker = ResourceTracker(machine)
-        for vertex in ordered_subverts:
+        for vertex in vertices:
 
             # Create and store a new placement anywhere on the board
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(

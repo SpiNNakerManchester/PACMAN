@@ -1,4 +1,5 @@
-from pacman.model.graph.machine.abstract_machine_edge import AbstractMachineEdge
+from pacman.model.graph.machine.abstract_machine_edge \
+    import AbstractMachineEdge
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graph.edge_traffic_type import EdgeTrafficType
 

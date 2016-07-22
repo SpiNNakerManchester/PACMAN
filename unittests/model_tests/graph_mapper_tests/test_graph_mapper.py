@@ -19,7 +19,7 @@ from pacman.exceptions import (PacmanNotFoundError)
 import unittest
 
 
-class TestGraphSubgraphMapper(unittest.TestCase):
+class TestGraphMapper(unittest.TestCase):
     """
     graph mapper tests
     """
@@ -58,14 +58,14 @@ class TestGraphSubgraphMapper(unittest.TestCase):
 
     def test_get_vertices_from_vertex(self):
         """
-        test getting the subvertex from a graph mappert via the vertex
+        test getting the vertex from a graph mapper via the vertex
         :return:
         """
         vertices = list()
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
-        subvert1 = SimpleMachineVertex(None, "")
-        subvert2 = SimpleMachineVertex(None, "")
+        vertex1 = SimpleMachineVertex(None, "")
+        vertex2 = SimpleMachineVertex(None, "")
 
         edges = list()
         edges.append(SimpleMachineEdge(vertices[0],
@@ -77,49 +77,49 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         vert = TestVertex(4, "Some testing vertex")
 
         vertex_slice = Slice(0, 1)
-        graph_mapper.add_vertex_mapping(subvert1, vertex_slice, vert)
+        graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
         vertex_slice = Slice(2, 3)
-        graph_mapper.add_vertex_mapping(subvert2, vertex_slice, vert)
+        graph_mapper.add_vertex_mapping(vertex2, vertex_slice, vert)
 
-        returned_subverts = graph_mapper.get_machine_vertices(vert)
+        returned_vertices = graph_mapper.get_machine_vertices(vert)
 
-        self.assertIn(subvert1, returned_subverts)
-        self.assertIn(subvert2, returned_subverts)
-        for sub in vertices:
-            self.assertNotIn(sub, returned_subverts)
+        self.assertIn(vertex1, returned_vertices)
+        self.assertIn(vertex2, returned_vertices)
+        for v in vertices:
+            self.assertNotIn(v, returned_vertices)
 
-    def test_get_vertex_from_subvertex(self):
+    def test_get_vertex_from_vertex(self):
         """
-        test that the graph mapper can retribve a vertex froma  given subvertex
+        test that the graph mapper can retrieve a vertex from a given vertex
         :return:
         """
         vertices = list()
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
 
-        subvert1 = SimpleMachineVertex(None, "")
-        subvert2 = SimpleMachineVertex(None, "")
+        vertex1 = SimpleMachineVertex(None, "")
+        vertex2 = SimpleMachineVertex(None, "")
 
         graph_mapper = GraphMapper()
         vert = TestVertex(10, "Some testing vertex")
 
         vertex_slice = Slice(0, 1)
-        graph_mapper.add_vertex_mapping(subvert1, vertex_slice, vert)
+        graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
         vertex_slice = Slice(2, 3)
-        graph_mapper.add_vertex_mapping(subvert2, vertex_slice, vert)
+        graph_mapper.add_vertex_mapping(vertex2, vertex_slice, vert)
 
         self.assertEqual(
-            vert, graph_mapper.get_application_vertex(subvert1))
+            vert, graph_mapper.get_application_vertex(vertex1))
         self.assertEqual(
-            vert, graph_mapper.get_application_vertex(subvert2))
+            vert, graph_mapper.get_application_vertex(vertex2))
         self.assertEqual(
             None, graph_mapper.get_application_vertex(vertices[0]))
         self.assertEqual(
             None, graph_mapper.get_application_vertex(vertices[1]))
 
-    def test_get_edge_from_subedge(self):
+    def test_get_edge_from_machine_edge(self):
         """
-        test that tests getting a edge from a graph mapper based off its subedge
+        test that tests getting a edge from a graph mapper
         :return:
         """
         vertices = list()
@@ -142,10 +142,10 @@ class TestGraphSubgraphMapper(unittest.TestCase):
         graph.add_edge_mapping(sube, edge)
         graph.add_edge_mapping(edges[0], edge)
 
-        edge_from_subedge = \
+        edge_from_machine_edge = \
             graph.get_application_edge(sube)
 
-        self.assertEqual(edge_from_subedge, edge)
+        self.assertEqual(edge_from_machine_edge, edge)
         self.assertEqual(
             graph.get_application_edge(edges[0]),
             edge

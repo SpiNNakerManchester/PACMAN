@@ -42,8 +42,8 @@ class BasicRoutingInfoAllocator(object):
         :type n_keys_map:\
             :py:class:`pacman.model.routing_info.abstract_machine_partition_n_keys_map.AbstractMachinePartitionNKeysMap`
         :return: The routing information
-        :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`,
-            :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
+        :rtype:\
+            :py:class:`pacman.model.routing_info.partition_routing_info.PartitionRoutingInfo`
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
@@ -57,34 +57,32 @@ class BasicRoutingInfoAllocator(object):
             supported_constraints=supported_constraints,
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-        # take each subedge and create keys from its placement
+        # take each edge and create keys from its placement
         progress_bar = ProgressBar(len(machine_graph.vertices),
                                    "Allocating routing keys")
         routing_infos = RoutingInfo()
-        for subvert in machine_graph.vertices:
+        for vertex in machine_graph.vertices:
             partitions = machine_graph.\
-                get_outgoing_edge_partitions_starting_at_vertex(subvert)
+                get_outgoing_edge_partitions_starting_at_vertex(vertex)
             for partition in partitions:
                 n_keys = n_keys_map.n_keys_for_partition(partition)
                 if n_keys > MAX_KEYS_SUPPORTED:
                     raise PacmanRouteInfoAllocationException(
                         "This routing info allocator can only support up to {}"
-                        " keys for any given subedge; cannot therefore"
+                        " keys for any given edge; cannot therefore"
                         " allocate keys to {}, which is requesting {} keys"
                         .format(MAX_KEYS_SUPPORTED, partition, n_keys))
-                placement = placements.get_placement_of_vertex(subvert)
+                placement = placements.get_placement_of_vertex(vertex)
                 if placement is not None:
                     key = self._get_key_from_placement(placement)
                     keys_and_masks = list([BaseKeyAndMask(base_key=key,
                                                           mask=MASK)])
-                    subedge_routing_info = PartitionRoutingInfo(
+                    routing_info = PartitionRoutingInfo(
                         keys_and_masks, partition)
-                    routing_infos.add_partition_info(subedge_routing_info)
+                    routing_infos.add_partition_info(routing_info)
                 else:
                     raise PacmanRouteInfoAllocationException(
-                        "This subvertex '{}' has no placement! this should "
-                        "never occur, please fix and try again."
-                        .format(subvert))
+                        "The vertex '{}' has no placement".format(vertex))
 
             progress_bar.update()
         progress_bar.end()

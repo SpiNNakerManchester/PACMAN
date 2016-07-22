@@ -32,8 +32,7 @@ class BasicPartitioner(object):
 
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine):
-        """ Partition a application_graph so that each subvertex will fit\
-            on a processor within the machine
+        """
 
         :param graph: The application_graph to partition
         :type graph:\
@@ -100,38 +99,37 @@ class BasicPartitioner(object):
             counted = 0
             while counted < vertex.n_atoms:
 
-                # Determine subvertex size
+                # Determine vertex size
                 remaining = vertex.n_atoms - counted
                 if remaining > atoms_per_core:
                     alloc = atoms_per_core
                 else:
                     alloc = remaining
 
-                # Create and store new subvertex, and increment elements
+                # Create and store new vertex, and increment elements
                 #  counted
                 if counted < 0 or counted + alloc - 1 < 0:
-                    raise PacmanPartitionException("Not enough resources"
-                                                   " available to create"
-                                                   " subvertex")
+                    raise PacmanPartitionException(
+                        "Not enough resources available to create vertex")
 
                 vertex_slice = Slice(counted, counted + (alloc - 1))
-                subvertex_usage = vertex.get_resources_used_by_atoms(
+                resources = vertex.get_resources_used_by_atoms(
                     vertex_slice, graph)
 
-                subvert = vertex.create_machine_vertex(
-                    vertex_slice, subvertex_usage,
+                machine_vertex = vertex.create_machine_vertex(
+                    vertex_slice, resources,
                     "{}:{}:{}".format(vertex.label, counted,
                                       (counted + (alloc - 1))),
                     partition_algorithm_utilities.
                     get_remaining_constraints(vertex))
-                machine_graph.add_vertex(subvert)
+                machine_graph.add_vertex(machine_vertex)
                 graph_mapper.add_vertex_mapping(
-                    subvert, vertex_slice, vertex)
+                    machine_vertex, vertex_slice, vertex)
                 counted = counted + alloc
 
                 # update allocated resources
                 resource_tracker.allocate_constrained_resources(
-                    subvertex_usage, vertex.constraints)
+                    resources, vertex.constraints)
 
             # update and end progress bars as needed
             progress_bar.update()

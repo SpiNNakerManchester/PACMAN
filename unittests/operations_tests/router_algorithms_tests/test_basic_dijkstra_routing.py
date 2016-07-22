@@ -75,28 +75,28 @@ class MyTestCase(unittest.TestCase):
         self.verts = [self.vert1, self.vert2]
         self.edges = [self.edge1]
         self.graph = ApplicationGraph("Graph", self.verts, self.edges)
-        # sort out subgraph
-        self.subgraph = MachineGraph()
-        self.subvert1 = SimpleMachineVertex(
+        # sort out graph
+        self.graph = MachineGraph()
+        self.vertex1 = SimpleMachineVertex(
             0, 10, get_resources_used_by_atoms(0, 10, []))
-        self.subvert2 = SimpleMachineVertex(
+        self.vertex2 = SimpleMachineVertex(
             0, 5, get_resources_used_by_atoms(0, 10, []))
-        self.subedge = SimpleMachineEdge(self.subvert1, self.subvert2)
-        self.subgraph.add_vertex(self.subvert1)
-        self.subgraph.add_vertex(self.subvert2)
-        self.subgraph.add_edge(self.subedge, "TEST")
+        self.edge = SimpleMachineEdge(self.vertex1, self.vertex2)
+        self.graph.add_vertex(self.vertex1)
+        self.graph.add_vertex(self.vertex2)
+        self.graph.add_edge(self.edge, "TEST")
         # sort out placements
         self.placements = Placements()
-        self.placement1 = Placement(x=0, y=0, p=2, vertex=self.subvert1)
-        self.placement2 = Placement(x=1, y=1, p=2, vertex=self.subvert2)
+        self.placement1 = Placement(x=0, y=0, p=2, vertex=self.vertex1)
+        self.placement2 = Placement(x=1, y=1, p=2, vertex=self.vertex2)
         self.placements.add_placement(self.placement1)
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.subedge_routing_info1 = \
+        self.edge_routing_info1 = \
             PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               subedge=self.subedge)
-        self.routing_info.add_partition_info(self.subedge_routing_info1)
+                               edge=self.edge)
+        self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -165,7 +165,7 @@ class MyTestCase(unittest.TestCase):
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=self.placements,
-            machine_graph=self.subgraph,
+            machine_graph=self.graph,
             routing_info_allocation=self.routing_info)
         for entry in routing_tables.routing_tables:
             print entry.x, entry.y
@@ -180,7 +180,7 @@ class MyTestCase(unittest.TestCase):
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=self.placements,
-            machine_graph=self.subgraph,
+            machine_graph=self.graph,
             routing_info_allocation=self.routing_info)
 
         for entry in routing_tables.routing_tables:
@@ -224,29 +224,29 @@ class MyTestCase(unittest.TestCase):
         with self.assertRaises(PacmanRoutingException):
             dijkstra_router.route(
                 machine=self.machine, placements=self.placements,
-                machine_graph=self.subgraph,
+                machine_graph=self.graph,
                 routing_info_allocation=self.routing_info)
 
     @unittest.skip("demonstrating skipping")
     def test_routing_on_chip_custom_4_node_machine(self):
         self.placements = Placements()
-        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.subvert1)
-        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.subvert2)
+        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
+        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
         self.placements.add_placement(self.placement1)
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.subedge_routing_info1 = \
+        self.edge_routing_info1 = \
             PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               subedge=self.subedge)
-        self.routing_info.add_partition_info(self.subedge_routing_info1)
+                               edge=self.edge)
+        self.routing_info.add_partition_info(self.edge_routing_info1)
 
         self.set_up_4_node_board()
 
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=self.placements,
-            machine_graph=self.subgraph,
+            machine_graph=self.graph,
             routing_info_allocation=self.routing_info)
 
         for entry in routing_tables.routing_tables:
@@ -259,23 +259,23 @@ class MyTestCase(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_full_machine_routing(self):
         placements = Placements()
-        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.subvert1)
-        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.subvert2)
+        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
+        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
         vertices = list()
         for i in range(4 * 17): #51 atoms per each processor on 20 chips
             vertices.append(SimpleMachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "Subvertex " + str(i)))
+                "vertex " + str(i)))
         edges = list()
         for i in range(len(vertices)):
             edges.append(SimpleMachineEdge(
                 vertices[i], vertices[(i + 1)%len(vertices)]))
-        subgraph = MachineGraph("Subgraph", vertices, edges)
+        graph = MachineGraph(vertices, edges)
         p = 1
         x = 0
         y = 0
-        for subvert in vertices:
-            placements.add_placement(Placement(subvert, x, y, p))
+        for vertex in vertices:
+            placements.add_placement(Placement(vertex, x, y, p))
             p = (p + 1) % 18
             if p == 0:
                 p += 1
@@ -285,13 +285,13 @@ class MyTestCase(unittest.TestCase):
                     x += 1
 
         routing_info = RoutingInfo()
-        subedge_routing_info = list()
+        edge_routing_info = list()
         for i in range(len(edges)):
-            subedge_routing_info.append(PartitionRoutingInfo(
+            edge_routing_info.append(PartitionRoutingInfo(
                 edges[i], i<<11, constants.DEFAULT_MASK))
 
-        for subedge_info in subedge_routing_info:
-            routing_info.add_partition_info(subedge_info)
+        for edge_info in edge_routing_info:
+            routing_info.add_partition_info(edge_info)
 
 
         self.set_up_4_node_board()
@@ -299,7 +299,7 @@ class MyTestCase(unittest.TestCase):
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=placements,
-            machine_graph=subgraph,
+            machine_graph=graph,
             routing_info_allocation=routing_info)
 
         for entry in routing_tables.routing_tables:

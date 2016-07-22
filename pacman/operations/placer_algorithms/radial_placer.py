@@ -32,16 +32,15 @@ class RadialPlacer(object):
         self._check_constraints(machine_graph.vertices)
 
         placements = Placements()
-        ordered_subverts = \
+        vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(len(ordered_subverts),
-                                   "Placing graph vertices")
+        progress_bar = ProgressBar(len(vertices), "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
-        for vertex in ordered_subverts:
+        for vertex in vertices:
             self._place_vertex(vertex, resource_tracker, machine, placements)
             progress_bar.update()
         progress_bar.end()

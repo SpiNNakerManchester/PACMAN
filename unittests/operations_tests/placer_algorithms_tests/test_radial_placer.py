@@ -58,7 +58,7 @@ class Vertex(AbstractApplicationVertex):
             self, vertex_slice, graph):
         return 4000 + (50 * (vertex_slice.hi_atom - vertex_slice.lo_atom))
 
-class Subvertex(SimpleMachineVertex):
+class MachineVertex(SimpleMachineVertex):
 
     def __init__(self, lo_atom, hi_atom, resources_required, label=None,
                  constraints=None):
@@ -114,25 +114,24 @@ class TestRadialPlacer(unittest.TestCase):
 
         self.machine = Machine(chips)
         ########################################################################
-        #Setting up subgraph and graph_mapper                                  #
+        #Setting up graph and graph_mapper                                  #
         ########################################################################
         self.vertices = list()
-        self.subvertex1 = Subvertex(
+        self.vertex1 = MachineVertex(
             0, 1, get_resources_used_by_atoms(0, 1, []), "First vertex")
-        self.subvertex2 = Subvertex(
+        self.vertex2 = MachineVertex(
             1, 5, get_resources_used_by_atoms(1, 5, []), "Second vertex")
-        self.subvertex3 = Subvertex(
+        self.vertex3 = MachineVertex(
             5, 10, get_resources_used_by_atoms(5, 10, []), "Third vertex")
-        self.subvertex4 = Subvertex(
+        self.vertex4 = MachineVertex(
             10, 100, get_resources_used_by_atoms(10, 100, []),
             "Fourth vertex")
-        self.vertices.append(self.subvertex1)
-        self.vertices.append(self.subvertex2)
-        self.vertices.append(self.subvertex3)
-        self.vertices.append(self.subvertex4)
+        self.vertices.append(self.vertex1)
+        self.vertices.append(self.vertex2)
+        self.vertices.append(self.vertex3)
+        self.vertices.append(self.vertex4)
         self.edges = list()
-        self.subgraph = MachineGraph("Subgraph", self.vertices,
-                                         self.edges)
+        self.graph = MachineGraph(self.vertices, self.edges)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(self.vertices)
 
@@ -145,7 +144,7 @@ class TestRadialPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_place_where_vertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
-        placements = self.bp.place(self.subgraph, self.graph_mapper)
+        placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
@@ -155,24 +154,24 @@ class TestRadialPlacer(unittest.TestCase):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(self.vertices, self.vert1)
-        placements = self.bp.place(self.subgraph, self.graph_mapper)
+        placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     @unittest.skip("demonstrating skipping")
-    def test_place_subvertex_too_big_with_vertex(self):
+    def test_place_vertex_too_big_with_vertex(self):
         large_vertex = Vertex(500, "Large vertex 500")
-        large_subvertex = large_vertex.create_machine_vertex(
-            0, 499, get_resources_used_by_atoms(0, 499, []))#Subvertex(0, 499, "Large vertex")
+        large_machine_vertex = large_vertex.create_machine_vertex(
+            0, 499, get_resources_used_by_atoms(0, 499, []))
         self.graph.add_vertex(large_vertex)
         self.graph = ApplicationGraph("Graph",[large_vertex])
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices([large_subvertex], large_vertex)
+        self.graph_mapper.add_vertices([large_machine_vertex], large_vertex)
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.subgraph = MachineGraph(vertices=[large_subvertex])
+        self.graph = MachineGraph(vertices=[large_machine_vertex])
         with self.assertRaises(PacmanPlaceException):
-            placements = self.bp.place(self.subgraph, self.graph_mapper)
+            placements = self.bp.place(self.graph, self.graph_mapper)
 
     @unittest.skip("demonstrating skipping")
     def test_try_to_place(self):
@@ -181,22 +180,21 @@ class TestRadialPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.subvertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
-        self.assertIsInstance(self.subvertex1.constraints[0], PlacerChipAndCoreConstraint)
-        self.subvertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
-        self.subvertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
-        self.subvertex4.add_constraint(PlacerChipAndCoreConstraint(6, 4, 16))
+        self.vertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
+        self.assertIsInstance(self.vertex1.constraints[0], PlacerChipAndCoreConstraint)
+        self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
+        self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
+        self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 4, 16))
         self.vertices = list()
-        self.vertices.append(self.subvertex1)
-        self.vertices.append(self.subvertex2)
-        self.vertices.append(self.subvertex3)
-        self.vertices.append(self.subvertex4)
+        self.vertices.append(self.vertex1)
+        self.vertices.append(self.vertex2)
+        self.vertices.append(self.vertex3)
+        self.vertices.append(self.vertex4)
         self.edges = list()
-        self.subgraph = MachineGraph("Subgraph", self.vertices,
-                                         self.edges)
+        self.graph = MachineGraph(self.vertices, self.edges)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(self.vertices)
-        placements = self.bp.place(self.subgraph, self.graph_mapper)
+        placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
@@ -204,22 +202,21 @@ class TestRadialPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_have_vertices(self):
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.subvertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
-        self.assertIsInstance(self.subvertex1.constraints[0], PlacerChipAndCoreConstraint)
-        self.subvertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
-        self.subvertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
-        self.subvertex4.add_constraint(PlacerChipAndCoreConstraint(6, 7, 16))
+        self.vertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
+        self.assertIsInstance(self.vertex1.constraints[0], PlacerChipAndCoreConstraint)
+        self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
+        self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
+        self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 7, 16))
         self.vertices = list()
-        self.vertices.append(self.subvertex1)
-        self.vertices.append(self.subvertex2)
-        self.vertices.append(self.subvertex3)
-        self.vertices.append(self.subvertex4)
+        self.vertices.append(self.vertex1)
+        self.vertices.append(self.vertex2)
+        self.vertices.append(self.vertex3)
+        self.vertices.append(self.vertex4)
         self.edges = list()
-        self.subgraph = MachineGraph("Subgraph", self.vertices,
-                                         self.edges)
+        self.graph = MachineGraph(self.vertices, self.edges)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(self.vertices, self.vert1)
-        placements = self.bp.place(self.subgraph, self.graph_mapper)
+        placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
@@ -242,14 +239,14 @@ class TestRadialPlacer(unittest.TestCase):
         for i in range(20 * 17): #51 atoms per each processor on 20 chips
             vertices.append(SimpleMachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "Subvertex " + str(i)))
+                "vertex " + str(i)))
 
         self.graph = ApplicationGraph("Graph",vertices)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(vertices)
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.subgraph = MachineGraph(vertices=vertices)
-        placements = self.bp.place(self.subgraph, self.graph_mapper)
+        self.graph = MachineGraph(vertices=vertices)
+        placements = self.bp.place(self.graph, self.graph_mapper)
         unorderdered_info = list()
         for placement in placements.placements:
             unorderdered_info.append(
@@ -273,15 +270,15 @@ class TestRadialPlacer(unittest.TestCase):
         for i in range(100 * 17): #50 atoms per each processor on 20 chips
             vertices.append(SimpleMachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "Subvertex " + str(i)))
+                "vertex " + str(i)))
 
         self.graph = ApplicationGraph("Graph",vertices)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(vertices)
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.subgraph = MachineGraph(vertices=vertices)
+        self.graph = MachineGraph(vertices=vertices)
         with self.assertRaises(PacmanPlaceException):
-            placements = self.bp.place(self.subgraph, self.graph_mapper)
+            placements = self.bp.place(self.graph, self.graph_mapper)
 
     @unittest.skip("demonstrating skipping")
     def test_fill_machine(self):
@@ -289,14 +286,14 @@ class TestRadialPlacer(unittest.TestCase):
         for i in range(99 * 17): #50 atoms per each processor on 20 chips
             vertices.append(SimpleMachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "Subvertex " + str(i)))
+                "vertex " + str(i)))
 
         self.graph = ApplicationGraph("Graph",vertices)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(vertices)
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.subgraph = MachineGraph(vertices=vertices)
-        placements = self.bp.place(self.subgraph, self.graph_mapper)
+        self.graph = MachineGraph(vertices=vertices)
+        placements = self.bp.place(self.graph, self.graph_mapper)
 
 if __name__ == '__main__':
     unittest.main()

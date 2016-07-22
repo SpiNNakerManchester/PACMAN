@@ -19,7 +19,7 @@ class PartitionRoutingInfo(object):
         self._partition = partition
 
     def get_keys(self, n_keys=None):
-        """ Get the ordered list of individual keys allocated to the subedge
+        """ Get the ordered list of individual keys allocated to the edge
 
         :param n_keys: Optional limit on the number of keys to return
         :type n_keys: int

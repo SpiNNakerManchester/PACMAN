@@ -33,16 +33,16 @@ class OneToOnePlacer(RadialPlacer):
 
         return placements
 
-    def _do_allocation(self, ordered_subverts, placements, machine):
+    def _do_allocation(self, vertices, placements, machine):
 
         # Iterate over vertices and generate placements
         progress_bar = ProgressBar(
-            len(ordered_subverts), "Placing graph vertices")
+            len(vertices), "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
 
-        # iterate over subverts
-        for subvertex_list in ordered_subverts:
+        # iterate over vertices
+        for vertex_list in vertices:
 
             # ensure largest cores per chip is divisible by 2
             # (for one to one placement)
@@ -52,27 +52,27 @@ class OneToOnePlacer(RadialPlacer):
                 max_cores_on_chip -= 1
 
             # if too many one to ones to fit on a chip, allocate individually
-            if len(subvertex_list) > max_cores_on_chip:
-                for vertex in subvertex_list:
+            if len(vertex_list) > max_cores_on_chip:
+                for vertex in vertex_list:
                     self._allocate_individual(
                         vertex, placements, progress_bar, resource_tracker)
             else:
 
                 # try to allocate in one block
                 group_resources = [
-                    subvert.resources_required for subvert in subvertex_list]
+                    vertex.resources_required for vertex in vertex_list]
                 group_constraints = [
-                    subvert.constraints for subvert in subvertex_list]
+                    vertex.constraints for vertex in vertex_list]
 
                 try:
                     allocations = \
                         resource_tracker.allocate_constrained_group_resources(
                             group_resources, group_constraints)
 
-                    # allocate cores to subverts
-                    for subvert, (x, y, p, _, _) in zip(
-                            subvertex_list, allocations):
-                        placement = Placement(subvert, x, y, p)
+                    # allocate cores to vertices
+                    for vertex, (x, y, p, _, _) in zip(
+                            vertex_list, allocations):
+                        placement = Placement(vertex, x, y, p)
                         placements.add_placement(placement)
                         progress_bar.update()
                 except exceptions.PacmanValueError or \
@@ -82,7 +82,7 @@ class OneToOnePlacer(RadialPlacer):
 
                     # If something goes wrong, try to allocate each
                     # individually
-                    for vertex in subvertex_list:
+                    for vertex in vertex_list:
                         self._allocate_individual(
                             vertex, placements, progress_bar,
                             resource_tracker)
@@ -110,11 +110,11 @@ class OneToOnePlacer(RadialPlacer):
         sorted_vertices = list()
         found_list = set()
 
-        # order subverts based on constraint priority
-        ordered_subverts = placer_algorithm_utilities\
+        # order vertices based on constraint priority
+        vertices = placer_algorithm_utilities\
             .sort_vertices_by_known_constraints(machine_graph.vertices)
 
-        for vertex in ordered_subverts:
+        for vertex in vertices:
             if vertex not in found_list:
                 connected_vertices = self._find_one_to_one_vertices(
                     vertex, machine_graph)
@@ -125,7 +125,7 @@ class OneToOnePlacer(RadialPlacer):
 
         # locate vertices which have no output or input, and add them for
         # placement
-        for vertex in ordered_subverts:
+        for vertex in vertices:
             if vertex not in found_list:
                 sorted_vertices.append([vertex])
         return sorted_vertices

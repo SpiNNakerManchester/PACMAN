@@ -34,7 +34,7 @@ class TestPlacements(unittest.TestCase):
         self.assertEqual(pls._placements, dict())
         self.assertEqual(pls._machine_vertices, dict())
 
-    def test_get_placement_of_subvertex(self):
+    def test_get_placement_of_vertex(self):
         """
         checks the placements get placement method
         :return:
@@ -51,10 +51,10 @@ class TestPlacements(unittest.TestCase):
         for i in range(4):
             self.assertEqual(pls.get_placement_of_vertex(subv[i]), pl[i])
 
-    def test_get_subvertex_on_processor(self):
+    def test_get_vertex_on_processor(self):
         """
         checks that from a placements object, you can get to the correct
-        subvertex using the get_vertex_on_processor() method
+        vertex using the get_vertex_on_processor() method
         :return:
         """
         subv = list()

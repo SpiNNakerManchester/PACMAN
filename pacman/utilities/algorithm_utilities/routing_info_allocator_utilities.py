@@ -28,7 +28,7 @@ def get_edge_groups(machine_graph):
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
-    :param machine_graph: the subgraph
+    :param machine_graph: the machine graph
     """
 
     # Keep a dictionary of the group which contains an edge
@@ -68,14 +68,14 @@ def get_edge_groups(machine_graph):
             flexi_field_groups, continuous_groups, none_continuous_groups)
 
 
-def check_types_of_edge_constraint(sub_graph):
-    """ Go through the subgraph for operations and checks that the constraints\
+def check_types_of_edge_constraint(machine_graph):
+    """ Go through the graph for operations and checks that the constraints\
         are compatible.
 
-    :param sub_graph: the subgraph to search through
+    :param machine_graph: the graph to search through
     :return:
     """
-    for partition in sub_graph.outgoing_edge_partitions:
+    for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = utility_calls.locate_constraints_of_type(
             partition.constraints, KeyAllocatorFixedKeyAndMaskConstraint)
 

@@ -30,25 +30,25 @@ def generate_machine_edges(machine_graph, graph_mapper, graph):
                                "Partitioning graph edges")
 
     # Partition edges according to vertex partitioning
-    for src_sv in machine_graph.vertices:
+    for source_vertex in machine_graph.vertices:
 
         # For each out edge of the parent vertex...
-        vertex = graph_mapper.get_application_vertex(src_sv)
+        vertex = graph_mapper.get_application_vertex(source_vertex)
         outgoing_partitions = \
             graph.get_outgoing_edge_partitions_starting_at_vertex(vertex)
         for partition in outgoing_partitions:
             out_edges = partition.edges
             for edge in out_edges:
 
-                # and create and store a new subedge for each post-subvertex
+                # and create and store a new edge for each post-vertex
                 post_vertex = edge.post_vertex
-                post_subverts = (graph_mapper
-                                 .get_machine_vertices(post_vertex))
-                for dst_sv in post_subverts:
-                    subedge = edge.create_machine_edge(src_sv, dst_sv)
-                    machine_graph.add_edge(subedge, partition.identifier)
+                post_vertices = graph_mapper.get_machine_vertices(post_vertex)
+                for dest_vertex in post_vertices:
+                    machine_edge = edge.create_machine_edge(
+                        source_vertex, dest_vertex)
+                    machine_graph.add_edge(machine_edge, partition.identifier)
                     graph_mapper.add_edge_mapping(
-                        subedge, edge)
+                        machine_edge, edge)
         progress_bar.update()
     progress_bar.end()
 

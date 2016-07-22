@@ -31,8 +31,7 @@ class PartitionAndPlacePartitioner(object):
 
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine):
-        """ Partition a application_graph so that each subvertex will fit\
-            on a processor within the machine
+        """
 
         :param graph: The application_graph to partition
         :type graph:\
@@ -76,11 +75,10 @@ class PartitionAndPlacePartitioner(object):
         for vertex in vertices:
 
             # check that the vertex hasn't already been partitioned
-            subverts_from_vertex = \
-                graph_mapper.get_machine_vertices(vertex)
+            machine_vertices = graph_mapper.get_machine_vertices(vertex)
 
             # if not, partition
-            if subverts_from_vertex is None:
+            if machine_vertices is None:
                 self._partition_vertex(
                     vertex, machine_graph, graph_mapper, resource_tracker,
                     graph)
@@ -143,7 +141,7 @@ class PartitionAndPlacePartitioner(object):
             self, vertices, n_atoms, max_atoms_per_core, machine_graph, graph,
             graph_mapper, resource_tracker):
         """ Try to partition vertices on how many atoms it can fit on\
-            each subvert
+            each vertex
 
         :param vertices:\
             the vertexes that need to be partitioned at the same time
@@ -188,16 +186,16 @@ class PartitionAndPlacePartitioner(object):
             # Create the vertices
             for (vertex, used_resources) in used_placements:
                 vertex_slice = Slice(lo_atom, hi_atom)
-                subvertex = vertex.create_machine_vertex(
+                machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, used_resources,
                     "{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
                     partition_algorithm_utilities.get_remaining_constraints(
                         vertex))
 
                 # update objects
-                machine_graph.add_vertex(subvertex)
+                machine_graph.add_vertex(machine_vertex)
                 graph_mapper.add_vertex_mapping(
-                    subvertex, vertex_slice, vertex)
+                    machine_vertex, vertex_slice, vertex)
 
     @staticmethod
     def _reallocate_resources(
@@ -360,7 +358,7 @@ class PartitionAndPlacePartitioner(object):
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
             resources, ratio, graph):
-        """ Try to push up the number of atoms in a subvertex to be as close\
+        """ Try to push up the number of atoms in a vertex to be as close\
             to the available resources as possible
 
         :param used_resources: the resources used by the machine so far

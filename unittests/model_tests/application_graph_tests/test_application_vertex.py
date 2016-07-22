@@ -87,7 +87,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         for constraint in constr:
             self.assertIn(constraint, vert.constraints)
 
-    def test_create_subvertex_from_vertex_with_previous_constraints(self):
+    def test_create_vertex_from_vertex_with_previous_constraints(self):
         """
         test the create vertex command given by the
         vertex actually works and generates a vertex
@@ -101,7 +101,7 @@ class TestApplicationGraphModel(unittest.TestCase):
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
         self.assertNotIn(constraint1, subv_from_vert.constraints)
 
-    def test_new_create_subvertex_from_vertex_no_constraints(self):
+    def test_new_create_vertex_from_vertex_no_constraints(self):
         """
         test the creating of a vertex by the
         create vertex method will actually create a vertex of the
@@ -114,7 +114,7 @@ class TestApplicationGraphModel(unittest.TestCase):
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
         self.assertIsInstance(vertex, SimpleMachineVertex)
 
-    def test_new_create_subvertex_from_vertex_check_resources(self):
+    def test_new_create_vertex_from_vertex_check_resources(self):
         """ check that the creation of a vertex means that the reosurces
         calcualted by the vertex is the same as what the
         vertex says (given same sizes)
@@ -127,7 +127,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertEqual(subv_from_vert.resources_required, resources)
 
     @unittest.skip("demonstrating skipping")
-    def test_create_new_subvertex_from_vertex_with_additional_constraints(
+    def test_create_new_vertex_from_vertex_with_additional_constraints(
             self):
         """
         test that a vertex created from a vertex with

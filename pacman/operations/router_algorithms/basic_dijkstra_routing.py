@@ -66,25 +66,25 @@ class BasicDijkstraRouting(object):
                                "Creating routing entries")
 
         for placement in placements.placements:
-            subvert = placement.vertex
-            out_going_sub_edges = \
-                machine_graph.get_edges_starting_at_vertex(subvert)
-            out_going_sub_edges = filter(
+            vertex = placement.vertex
+            out_going_edges = \
+                machine_graph.get_edges_starting_at_vertex(vertex)
+            out_going_edges = filter(
                 lambda edge: isinstance(edge, SimpleMachineEdge),
-                out_going_sub_edges)
+                out_going_edges)
 
             dest_chips = set()
             edges_to_route = list()
 
-            for subedge in out_going_sub_edges:
-                destination_subvertex = subedge.post_vertex
+            for edge in out_going_edges:
+                destination = edge.post_vertex
                 destination_placement = placements.get_placement_of_vertex(
-                    destination_subvertex)
+                    destination)
 
                 chip = machine.get_chip_at(destination_placement.x,
                                            destination_placement.y)
                 dest_chips.add((chip.x, chip.y))
-                edges_to_route.append(subedge)
+                edges_to_route.append(edge)
 
             if len(dest_chips) != 0:
                 self._update_all_weights(nodes_info, machine)
@@ -96,12 +96,12 @@ class BasicDijkstraRouting(object):
                     dijkstra_tables, nodes_info, dest_chips, placement.x,
                     placement.y)
 
-            for subedge in edges_to_route:
-                dest = subedge.post_vertex
+            for edge in edges_to_route:
+                dest = edge.post_vertex
                 dest_placement = placements.get_placement_of_vertex(dest)
                 self._retrace_back_to_source(
                     dest_placement.x, dest_placement.y, dijkstra_tables,
-                    dest_placement.p, subedge, nodes_info, placement.p,
+                    dest_placement.p, edge, nodes_info, placement.p,
                     machine_graph)
             progress.update()
         progress.end()
@@ -406,7 +406,7 @@ class BasicDijkstraRouting(object):
 
     def _retrace_back_to_source(
             self, x_destination, y_destination, dijkstra_tables,
-            processor_dest, subedge, nodes_info, source_processor,
+            processor_dest, edge, nodes_info, source_processor,
             graph):
         """
 
@@ -414,10 +414,10 @@ class BasicDijkstraRouting(object):
         :param y_destination:
         :param dijkstra_tables:
         :param processor_dest:
-        :param subedge:
+        :param edge:
         :param nodes_info:
         :type nodes_info:
-        :type subedge:
+        :type edge:
         :type x_destination:
         :type y_destination:
         :type dijkstra_tables:
@@ -444,11 +444,11 @@ class BasicDijkstraRouting(object):
         # build the multicast entry
         partitions = \
             graph.get_outgoing_edge_partitions_starting_at_vertex(
-                subedge.pre_vertex)
+                edge.pre_vertex)
 
         previous_routing_entry = None
         for partition in partitions:
-            if subedge in partition:
+            if edge in partition:
                 entry = MulticastRoutingTableByPartitionEntry(
                     out_going_links=routing_entry_route_links,
                     outgoing_processors=routing_entry_route_processors)
@@ -483,7 +483,7 @@ class BasicDijkstraRouting(object):
                                     x_neighbour, y_neighbour, dijkstra_tables,
                                     neighbour_index, nodes_info,
                                     x_current, y_current,
-                                    previous_routing_entry, subedge,
+                                    previous_routing_entry, edge,
                                     graph)
                     else:
                         raise exceptions.PacmanRoutingException(
@@ -503,7 +503,7 @@ class BasicDijkstraRouting(object):
 
     def _create_routing_entry(
             self, x_neighbour, y_neighbour, dijkstra_tables, neighbour_index,
-            nodes_info, x_current, y_current, previous_routing_entry, subedge,
+            nodes_info, x_current, y_current, previous_routing_entry, edge,
             graph):
         """ Create a new routing entry
 
@@ -516,8 +516,8 @@ class BasicDijkstraRouting(object):
         :param y_current:
         :param previous_routing_entry:
         :param graph:
-        :param subedge:
-        :type subedge:
+        :param edge:
+        :type edge:
         :type x_neighbour:
         :type y_neighbour:
         :type dijkstra_tables:
@@ -556,10 +556,10 @@ class BasicDijkstraRouting(object):
             # build the multicast entry
             partitions = graph.\
                 get_outgoing_edge_partitions_starting_at_vertex(
-                    subedge.pre_vertex)
+                    edge.pre_vertex)
             entry = None
             for partition in partitions:
-                if subedge in partition:
+                if edge in partition:
                     entry = MulticastRoutingTableByPartitionEntry(
                         out_going_links=dec_direction,
                         outgoing_processors=None)

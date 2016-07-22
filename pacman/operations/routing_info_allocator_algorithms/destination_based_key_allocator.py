@@ -49,28 +49,28 @@ class DestinationBasedRoutingInfoAllocator(object):
             supported_constraints=supported_constraints,
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-        # take each subedge and create keys from its placement
+        # take each edge and create keys from its placement
         progress_bar = ProgressBar(len(machine_graph.edges),
                                    "Allocating routing keys")
         routing_infos = RoutingInfo()
         routing_tables = MulticastRoutingTables()
 
-        for subedge in machine_graph.edges:
-            destination = subedge.post_vertex
+        for edge in machine_graph.edges:
+            destination = edge.post_vertex
             placement = placements.get_placement_of_vertex(destination)
             key = self._get_key_from_placement(placement)
             keys_and_masks = list([BaseKeyAndMask(base_key=key,
                                                   mask=self.MASK)])
             partition = machine_graph\
                 .get_outgoing_edge_partition_starting_at_vertex(
-                    subedge.pre_vertex)
+                    edge.pre_vertex)
             n_keys = n_keys_map.n_keys_for_partition(partition)
             if n_keys > self.MAX_KEYS_SUPPORTED:
                 raise exceptions.PacmanConfigurationException(
                     "Only edges which require less than {} keys are supported"
                     .format(self.MAX_KEYS_SUPPORTED))
 
-            partition_info = PartitionRoutingInfo(keys_and_masks, subedge)
+            partition_info = PartitionRoutingInfo(keys_and_masks, edge)
             routing_infos.add_partition_info(partition_info)
 
             progress_bar.update()

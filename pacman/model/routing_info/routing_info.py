@@ -10,12 +10,12 @@ class RoutingInfo(object):
     def __init__(self, partition_info_items=None):
         """
 
-        :param partition_info_items: The subedge information items to add
+        :param partition_info_items: The partition information items to add
         :type partition_info_items: iterable of\
-                    :py:class:`pacman.model.routing_info.subedge_routing_info.PartitionRoutingInfo`
+                    :py:class:`pacman.model.routing_info.partition_routing_info.PartitionRoutingInfo`
                     or none
         :raise pacman.exceptions.PacmanAlreadyExistsException: If there are \
-                    two subedge information objects with the same edge
+                    two partition information objects with the same partition
         """
 
         # Partition information indexed by partition
@@ -33,15 +33,15 @@ class RoutingInfo(object):
                 self.add_partition_info(partition_info_item)
 
     def add_partition_info(self, partition_info):
-        """ Add a subedge information item
+        """ Add a partition information item
 
-        :param partition_info: The subedge information item to add
+        :param partition_info: The partition information item to add
         :type partition_info:\
-                    :py:class:`pacman.model.routing_info.subedge_routing_info.PartitionRoutingInfo`
+            :py:class:`pacman.model.routing_info.partition_routing_info.PartitionRoutingInfo`
         :return: None
         :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If the subedge\
-                    is already in the set of edges
+        :raise pacman.exceptions.PacmanAlreadyExistsException:\
+            If the partition is already in the set of edges
         """
         partition = partition_info.partition
 
@@ -66,8 +66,8 @@ class RoutingInfo(object):
 
         :param partition: The partition to get the first key of
         :type partition:\
-                    :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
-        :return: The routing key or None if the subedge does not exist
+                :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
+        :return: The routing key or None if the partition does not exist
         :rtype: int
         :raise None: does not raise any known exceptions
         """

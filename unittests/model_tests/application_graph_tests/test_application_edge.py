@@ -92,61 +92,61 @@ class TestApplicationEdgeModel(unittest.TestCase):
         for constraint in constr:
             self.assertIn(constraint, edge1.constraints)
 
-    def test_create_subvertex_from_vertex_with_previous_constraints(self):
+    def test_create_machine_vertex_from_vertex_with_previous_constraints(self):
         """
-        test the create subedge command given by the
-        TestEdge actually works and generates a subedge
+        test the create edge command given by the
+        TestEdge actually works and generates a edge
         with the same constraints mapped over
         :return:
         """
         constraint1 = KeyAllocatorContiguousRangeContraint()
         vert1 = TestVertex(10, "New AbstractConstrainedVertex", 256)
-        subv_from_vert1 = vert1.create_machine_vertex(
+        v_from_vert1 = vert1.create_machine_vertex(
             Slice(0, 9),
             vert1.get_resources_used_by_atoms(Slice(0, 9), None))
         vert2 = TestVertex(10, "New AbstractConstrainedVertex", 256)
-        subv_from_vert2 = vert2.create_machine_vertex(
+        v_from_vert2 = vert2.create_machine_vertex(
             Slice(0, 9),
             vert2.get_resources_used_by_atoms(Slice(0, 9), None))
         edge1 = TestEdge(vert1, vert2, "edge 1")
         edge1.add_constraint(constraint1)
 
-        subedge = edge1.create_machine_edge(subv_from_vert1, subv_from_vert2)
-        self.assertIn(constraint1, subedge.constraints)
+        edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2)
+        self.assertIn(constraint1, edge.constraints)
 
-    def test_new_create_subvertex_from_vertex_no_constraints(self):
+    def test_new_create_machine_vertex_from_vertex_no_constraints(self):
         """
-        test the creating of a subedge by the TestEdge
-        create subedge method will actually create a subedge of the
+        test the creating of a edge by the TestEdge
+        create edge method will actually create a edge of the
         edge type.
         :return:
         """
         vert1 = TestVertex(10, "New AbstractConstrainedVertex", 256)
-        subv_from_vert1 = vert1.create_machine_vertex(
+        v_from_vert1 = vert1.create_machine_vertex(
             Slice(0, 9),
             vert1.get_resources_used_by_atoms(Slice(0, 9), None))
         vert2 = TestVertex(10, "New AbstractConstrainedVertex", 256)
-        subv_from_vert2 = vert2.create_machine_vertex(
+        v_from_vert2 = vert2.create_machine_vertex(
             Slice(0, 9),
             vert2.get_resources_used_by_atoms(Slice(0, 9), None))
         edge1 = TestEdge(vert1, vert2, "edge 1")
 
-        subedge = edge1.create_machine_edge(subv_from_vert1, subv_from_vert2)
-        self.assertIsInstance(subedge, SimpleMachineEdge)
+        edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2)
+        self.assertIsInstance(edge, SimpleMachineEdge)
 
-    def test_create_new_subedge_from_edge(self):
+    def test_create_new_machine_edge_from_edge(self):
         """
-        test that you can use the TestEdge.create-subedge
+        test that you can use the TestEdge.create-edge
         method and not cause errors
         :return:
         """
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
-        subv_from_vert1 = vert1.create_machine_vertex(
+        v_from_vert1 = vert1.create_machine_vertex(
             Slice(0, 9), vert1.get_resources_used_by_atoms(Slice(0, 9), None))
         vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
-        subv_from_vert2 = vert2.create_machine_vertex(
+        v_from_vert2 = vert2.create_machine_vertex(
             Slice(0, 4), vert2.get_resources_used_by_atoms(Slice(0, 4), None))
         edge1 = TestEdge(vert1, vert2, "First edge")
-        subedge1 = edge1.create_machine_edge(subv_from_vert1, subv_from_vert2,
-                                        None, "First sub edge")
-        self.assertEqual(subedge1.label, "First sub edge")
+        edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2,
+                                        None, "First edge")
+        self.assertEqual(edge.label, "First edge")

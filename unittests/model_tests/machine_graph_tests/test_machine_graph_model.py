@@ -23,14 +23,14 @@ class TestMachineGraphModel(unittest.TestCase):
         """
         SimpleMachineVertex(None, "")
 
-    def test_new_empty_subgraph(self):
+    def test_new_empty_graph(self):
         """
         test that the creation of a empty machine graph works
         :return:
         """
         MachineGraph()
 
-    def test_new_subgraph(self):
+    def test_new_graph(self):
         """
         tests that after building a machine graph, all partitined vertices
         and partitioend edges are in existance
@@ -46,8 +46,8 @@ class TestMachineGraphModel(unittest.TestCase):
         for i in range(5, 10):
             edges.append(SimpleMachineEdge(
                 vertices[5], vertices[(i + 1) % 10]))
-        subgraph = MachineGraph(vertices=vertices, edges=edges)
-        outgoing = subgraph.get_edges_starting_at_vertex(vertices[0])
+        graph = MachineGraph(vertices=vertices, edges=edges)
+        outgoing = graph.get_edges_starting_at_vertex(vertices[0])
         for i in range(5):
             if edges[i] not in outgoing:
                 raise AssertionError(
@@ -57,7 +57,7 @@ class TestMachineGraphModel(unittest.TestCase):
                 raise AssertionError(
                     "edges[" + str(i) + "] is in outgoing and shouldn't be")
 
-        incoming = subgraph.get_edges_ending_at_vertex(vertices[0])
+        incoming = graph.get_edges_ending_at_vertex(vertices[0])
 
         if edges[9] not in incoming:
             raise AssertionError(
@@ -67,14 +67,14 @@ class TestMachineGraphModel(unittest.TestCase):
                 raise AssertionError(
                     "edges[" + str(i) + "] is in incoming and shouldn't be")
 
-        vertices_from_subgraph = list(subgraph.vertices)
-        for subvert in vertices_from_subgraph:
-            self.assertIn(subvert, vertices)
-        subvedges_from_subgraph = list(subgraph.edges)
-        for subedge in subvedges_from_subgraph:
-            self.assertIn(subedge, edges)
+        vertices_from_graph = list(graph.vertices)
+        for vert in vertices_from_graph:
+            self.assertIn(vert, vertices)
+        edges_from_graph = list(graph.edges)
+        for edge in edges_from_graph:
+            self.assertIn(edge, edges)
 
-    def test_add_duplicate_subvertex(self):
+    def test_add_duplicate_vertex(self):
         """
         testing that adding the same machine vertex twice will cause an
         error
@@ -93,7 +93,7 @@ class TestMachineGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             MachineGraph(vertices=vertices, edges=edges)
 
-    def test_add_duplicate_subedge(self):
+    def test_add_duplicate_edge(self):
         """
         test that adding the same machine edge will cause an error
         :return:
@@ -103,12 +103,12 @@ class TestMachineGraphModel(unittest.TestCase):
             edges = list()
             vertices.append(SimpleMachineVertex(None, ""))
             vertices.append(SimpleMachineVertex(None, ""))
-            sube = SimpleMachineEdge(vertices[0], vertices[1])
-            edges.append(sube)
-            edges.append(sube)
+            edge = SimpleMachineEdge(vertices[0], vertices[1])
+            edges.append(edge)
+            edges.append(edge)
             MachineGraph(vertices=vertices, edges=edges)
 
-    def test_add_edge_with_no_existing_pre_subvertex_in_subgraph(self):
+    def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
         test that adding a edge where the pre vertex has not been added
         to the machine graph coauses ane rror
@@ -125,7 +125,7 @@ class TestMachineGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanInvalidParameterException):
             MachineGraph(vertices=vertices, edges=edges)
 
-    def test_add_edge_with_no_existing_post_subvertex_in_subgraph(self):
+    def test_add_edge_with_no_existing_post_vertex_in_graph(self):
         """
         test that adding a edge where the post vertex has not been added
         to the machine graph coauses ane rror

@@ -908,7 +908,7 @@ class VertexBasedRoutingInfoAllocator(object):
                 if application_field is not None:
 
                     # create a new bit field where everything is linked off a
-                    # sub internal app field
+                    # internal app field
                     internal_value = application_field_spare_values[0]
                     application_field_spare_values.remove(internal_value)
                     internal_bit_field_space = \
@@ -1018,11 +1018,11 @@ class VertexBasedRoutingInfoAllocator(object):
                     self._create_internal_field_space(
                         bit_field_space, value, field_instance)
 
-    def _determine_groups(self, subgraph, graph_mapper, graph,
+    def _determine_groups(self, machine_graph, graph_mapper, graph,
                           n_keys_map, progress_bar):
         """
 
-        :param subgraph:
+        :param machine_graph:
         :param graph_mapper:
         :param graph:
         :param n_keys_map:
@@ -1030,9 +1030,9 @@ class VertexBasedRoutingInfoAllocator(object):
         """
 
         routing_info_allocator_utilities.check_types_of_edge_constraint(
-            subgraph)
+            machine_graph)
 
-        for partition in subgraph.outgoing_edge_partitions:
+        for partition in machine_graph.outgoing_edge_partitions:
             fixed_key_constraints = \
                 utility_calls.locate_constraints_of_type(
                     partition.constraints,
@@ -1154,7 +1154,7 @@ class VertexBasedRoutingInfoAllocator(object):
     @staticmethod
     def add_field_constraints(
             partition, graph_mapper, graph, n_keys_map):
-        """ Search though the subgraph adding field constraints for the key\
+        """ Search though the graph adding field constraints for the key\
                     allocator
 
         :param partition:
@@ -1167,29 +1167,30 @@ class VertexBasedRoutingInfoAllocator(object):
         fields = list()
 
         verts = list(graph.vertices)
-        subvert = partition.edges[0].pre_vertex
-        vertex = graph_mapper.get_application_vertex(subvert)
-        subverts = list(graph_mapper.get_machine_vertices(vertex))
+        vertex = partition.edges[0].pre_vertex
+        app_vertex = graph_mapper.get_application_vertex(vertex)
+        vertices = list(graph_mapper.get_machine_vertices(app_vertex))
 
         # pop based flexible field
         fields.append(FlexiField(
-            flexi_field_name="Population", value=verts.index(vertex),
+            flexi_field_name="Population", value=verts.index(app_vertex),
             tag=SUPPORTED_TAGS.ROUTING.name, nested_level=0))
 
-        # sub pop flexible field
+        # part-population flexible field
         fields.append(FlexiField(
-            flexi_field_name="SubPopulation{}".format(verts.index(vertex)),
-            tag=SUPPORTED_TAGS.ROUTING.name, value=subverts.index(subvert),
+            flexi_field_name="PartPopulation{}".format(
+                verts.index(app_vertex)),
+            tag=SUPPORTED_TAGS.ROUTING.name, value=vertices.index(vertex),
             nested_level=1))
 
         fields.append(FlexiField(
-            flexi_field_name="POP({}:{})Keys"
-            .format(verts.index(vertex), subverts.index(subvert)),
+            flexi_field_name="POP({}:{})Keys".format(
+                verts.index(app_vertex), vertices.index(vertex)),
             tag=SUPPORTED_TAGS.APPLICATION.name,
             instance_n_keys=n_keys_map.n_keys_for_partition(partition),
             nested_level=2))
 
-        # add constraint to the subedge
+        # add constraint to the edge
         partition.add_constraint(KeyAllocatorFlexiFieldConstraint(fields))
 
     @staticmethod
