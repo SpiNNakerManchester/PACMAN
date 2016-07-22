@@ -12,6 +12,8 @@ class AbstractGraph(AbstractHasConstraints):
     """ A graph
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def add_vertex(self, vertex):
         """ Add a vertex to the graph

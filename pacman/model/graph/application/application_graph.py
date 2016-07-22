@@ -9,6 +9,8 @@ class ApplicationGraph(SimpleGraph):
     """ An application-level abstraction of a graph
     """
 
+    __slots__ = ()
+
     def __init__(self):
         SimpleGraph.__init__(
             self, AbstractApplicationVertex, AbstractApplicationEdge)

@@ -9,6 +9,8 @@ class AbstractHasConstraints(object):
     """ Represents an object with constraints
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def add_constraint(self, constraint):
         """ Add a new constraint to the collection of constraints

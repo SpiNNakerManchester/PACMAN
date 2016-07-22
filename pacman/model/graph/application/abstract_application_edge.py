@@ -4,6 +4,8 @@ from abc import abstractmethod
 
 class AbstractApplicationEdge(AbstractEdge):
 
+    __slots__ = ()
+
     @abstractmethod
     def create_machine_edge(self, pre_vertex, post_vertex):
         """ Create a machine edge between two machine vertices

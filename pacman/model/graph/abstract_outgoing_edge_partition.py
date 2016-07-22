@@ -14,6 +14,8 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
         semantics; used to group edges that can use the same multicast key
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def add_edge(self, edge):
         """ Add an edge to the partition

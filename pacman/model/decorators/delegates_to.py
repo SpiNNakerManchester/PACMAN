@@ -7,6 +7,15 @@ class delegates_to(object):
 
     """
 
+    __slots__ = [
+
+        # The name of the delegate variable in the class
+        "_variable_name",
+
+        # The method to call on the delegate
+        "_method_to_call"
+    ]
+
     def __init__(self, variable_name, method_to_call):
         """
         :param variable_name:\

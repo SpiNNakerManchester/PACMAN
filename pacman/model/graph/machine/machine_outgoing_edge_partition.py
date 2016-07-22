@@ -8,6 +8,8 @@ class MachineOutgoingEdgePartition(SimpleOutgoingEdgePartition):
     """ An outgoing edge partition for a Machine Graph
     """
 
+    __slots__ = ()
+
     def __init__(self, identifier, constraints=None, label=None):
         """
 

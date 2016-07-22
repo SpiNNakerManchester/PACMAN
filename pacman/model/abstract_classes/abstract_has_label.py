@@ -8,6 +8,8 @@ class AbstractHasLabel(object):
     """ Represents an item with a label
     """
 
+    __slots__ = ()
+
     @abstractproperty
     def label(self):
         """ The label of the item

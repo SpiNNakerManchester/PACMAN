@@ -10,6 +10,8 @@ class AbstractEdge(AbstractHasLabel):
     """ A directed edge in a graph between two vertices
     """
 
+    __slots__ = ()
+
     @abstractproperty
     def pre_vertex(self):
         """ The vertex at the start of the edge

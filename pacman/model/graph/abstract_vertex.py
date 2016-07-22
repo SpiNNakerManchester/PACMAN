@@ -11,3 +11,5 @@ from pacman.model.abstract_classes.abstract_has_label \
 class AbstractVertex(AbstractHasConstraints, AbstractHasLabel):
     """ A vertex in a graph
     """
+
+    __slots__ = ()

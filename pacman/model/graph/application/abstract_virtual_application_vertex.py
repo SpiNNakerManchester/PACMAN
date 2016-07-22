@@ -11,6 +11,8 @@ class AbstractVirtualApplicationVertex(
     """ An application vertex that is virtual
     """
 
+    __slots__ = ()
+
     @overrides(AbstractApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer(resources=list())
