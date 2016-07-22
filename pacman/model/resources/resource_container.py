@@ -1,36 +1,26 @@
-
-
 class ResourceContainer(object):
+    """ A container of resources that might be used by a vertex in a graph
+    """
 
-    def __init__(self, dtcm, sdram, cpu):
-        """container object for the 3 types of resources so that ordering is no
-        longer a risk
+    def __init__(self, resources):
+        """
 
-        :param dtcm: the amount of dtcm used
-        :param sdram: the amount of sdram used
-        :param cpu: the amount of cpu used
-        :type dtcm:\
-                    :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
-        :type sdram:\
-                    :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
-        :type cpu:\
-                    :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
-        :rtype: pacman.models.resources.resource_container.ResourceContainer
-        :raise None: does not raise any known exception
+        :param resources: The resources used
+        :type resources: list of AbstractResource
 
         """
-        self._dtcm_usage = dtcm
-        self._sdram_usage = sdram
-        self._cpu = cpu
 
-    @property
-    def dtcm(self):
-        return self._dtcm_usage
+        # Store the resources by class of resource
+        self._resources = {
+            resource.__class__: resource for resource in resources
+        }
 
-    @property
-    def cpu(self):
-        return self._cpu
+    def get_resource_by_type(self, resource_type):
+        """ Get a resource based on the type of the resource
+        """
+        if resource_type in self._resources:
+            return self._resources[resource_type]
+        return None
 
-    @property
-    def sdram(self):
-        return self._sdram_usage
+    def __getitem__(self, resource_type):
+        return self.get_resource_by_type[resource_type]
