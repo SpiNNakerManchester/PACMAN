@@ -5,8 +5,7 @@ from pacman import exceptions
 
 
 class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
-    """ Key allocator constraint that fixes the key and mask of a partitioned\
-        edge
+    """ Key allocator constraint that fixes the key and mask of an edge
     """
 
     def __init__(self, keys_and_masks, key_list_function=None):
@@ -21,11 +20,11 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
                     through the keys_and_masks list directly.  The function\
                     parameters are:
                     * An iterable of keys and masks
-                    * A partitioned edge
+                    * A machine edge
                     * Number of keys to generate (may be None)
         :type key_list_function: (iterable of\
                     :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`,\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`,
+                    :py:class:`pacman.model.graph.machine.abstract_machine_edge.AbstractMachineEdge`,
                     int)\
                     -> iterable of int
         """

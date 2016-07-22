@@ -1,9 +1,9 @@
 from pacman.model.constraints.partitioner_constraints.\
     abstract_partitioner_constraint import AbstractPartitionerConstraint
-from pacman.model.graph_mapper.graph_mapper import \
+from pacman.model.graph.graph_mapper import \
     GraphMapper
-from pacman.model.graph_mapper.slice import Slice
-from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
+from pacman.model.graph.slice import Slice
+from pacman.model.graph.machine.machine_graph import MachineGraph
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class BasicPartitioner(object):
-    """ An basic algorithm that can partition a partitionable_graph based
+    """ An basic algorithm that can partition an application graph based\
         on the number of atoms in the vertices.
     """
 
@@ -32,21 +32,21 @@ class BasicPartitioner(object):
 
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine):
-        """ Partition a partitionable_graph so that each subvertex will fit\
+        """ Partition a application_graph so that each subvertex will fit\
             on a processor within the machine
 
-        :param graph: The partitionable_graph to partition
+        :param graph: The application_graph to partition
         :type graph:\
-                    :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
-        :param machine: The machine with respect to which to partition the\
-                    partitionable_graph
+            :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
+        :param machine:\
+            The machine with respect to which to partition the application\
+            graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :return: A partitioned_graph of partitioned vertices and partitioned\
-                    edges
+        :return: A machine graph
         :rtype:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-        :raise pacman.exceptions.PacmanPartitionException: If something\
-                   goes wrong with the partitioning
+            :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+        :raise pacman.exceptions.PacmanPartitionException:\
+            If something goes wrong with the partitioning
         """
         ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(
@@ -58,9 +58,8 @@ class BasicPartitioner(object):
         progress_bar = ProgressBar(len(graph.vertices),
                                    "Partitioning graph vertices")
         vertices = graph.vertices
-        subgraph = PartitionedGraph(label="partitioned_graph for partitionable"
-                                          "_graph {}".format(graph.label))
-        graph_to_subgraph_mapper = GraphMapper(graph.label, subgraph.label)
+        machine_graph = MachineGraph()
+        graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine)
 
         # Partition one vertex at a time
@@ -97,7 +96,7 @@ class BasicPartitioner(object):
 
             atoms_per_core = min(max_atom_values)
 
-            # Partition into subvertices
+            # Partition into vertices
             counted = 0
             while counted < vertex.n_atoms:
 
@@ -119,14 +118,14 @@ class BasicPartitioner(object):
                 subvertex_usage = vertex.get_resources_used_by_atoms(
                     vertex_slice, graph)
 
-                subvert = vertex.create_subvertex(
+                subvert = vertex.create_machine_vertex(
                     vertex_slice, subvertex_usage,
                     "{}:{}:{}".format(vertex.label, counted,
                                       (counted + (alloc - 1))),
                     partition_algorithm_utilities.
                     get_remaining_constraints(vertex))
-                subgraph.add_subvertex(subvert)
-                graph_to_subgraph_mapper.add_subvertex(
+                machine_graph.add_vertex(subvert)
+                graph_mapper.add_vertex_mapping(
                     subvert, vertex_slice, vertex)
                 counted = counted + alloc
 
@@ -138,7 +137,7 @@ class BasicPartitioner(object):
             progress_bar.update()
         progress_bar.end()
 
-        partition_algorithm_utilities.generate_sub_edges(
-            subgraph, graph_to_subgraph_mapper, graph)
+        partition_algorithm_utilities.generate_machine_edges(
+            machine_graph, graph_mapper, graph)
 
-        return subgraph, graph_to_subgraph_mapper, len(resource_tracker.keys)
+        return machine_graph, graph_mapper, len(resource_tracker.keys)

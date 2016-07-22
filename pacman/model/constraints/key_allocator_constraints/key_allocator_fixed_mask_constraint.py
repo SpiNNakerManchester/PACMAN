@@ -3,8 +3,7 @@ from pacman.model.constraints.key_allocator_constraints.\
 
 
 class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
-    """ A key allocator that fixes the mask to be assigned to a partitioned\
-        edge
+    """ A key allocator that fixes the mask to be assigned to an edge
     """
 
     def __init__(self, mask):

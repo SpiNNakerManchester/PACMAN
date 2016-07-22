@@ -12,10 +12,9 @@ class MulticastRoutingTableByPartition(object):
         :param entry: the entry to add
         :param router_x: the x coord of the router
         :param router_y: the y coord of the router
-        :param partition: the partitioned edge's partition this entry is\
-                    associated with
+        :param partition: the partition containing the machine edge
         :type partition: \
-                    :py:class:`pacman.utilities.utility_obs.outgoing_edge_partition.OutgoingEdgePartition`
+            :py:class:`pacman.utilities.utility_obs.outgoing_edge_partition.OutgoingEdgePartition`
         """
 
         # update router_to_entries_map

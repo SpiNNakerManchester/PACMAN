@@ -3,18 +3,18 @@ test basic placer
 """
 
 # pacman imports
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
-    MultiCastPartitionableEdge
+from pacman.model.graph.application.simple_application_edge import \
+    SimpleApplicationEdge
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.graph.simple_partitioned_vertex \
-    import SimplePartitionedVertex
-from pacman.model.graph_mapper.graph_mapper import GraphMapper
-from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
-from pacman.model.partitionable_graph.partitionable_graph \
-    import PartitionableGraph
+from pacman.model.graph.machine.simple_machine_vertex \
+    import SimpleMachineVertex
+from pacman.model.graph.graph_mapper import GraphMapper
+from pacman.model.graph.machine.machine_graph import MachineGraph
+from pacman.model.graph.application.application_graph \
+    import ApplicationGraph
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 
 # spinn machine imports
@@ -41,15 +41,15 @@ class TestBasicPlacer(unittest.TestCase):
         self.vert1 = TestVertex(100, "New AbstractConstrainedTestVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedTestVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedTestVertex 3")
-        self.edge1 = MultiCastPartitionableEdge(self.vert1, self.vert2, 
+        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2,
                                                 "First edge")
-        self.edge2 = MultiCastPartitionableEdge(self.vert2, self.vert1, 
+        self.edge2 = SimpleApplicationEdge(self.vert2, self.vert1,
                                                 "Second edge")
-        self.edge3 = MultiCastPartitionableEdge(self.vert1, self.vert3, 
+        self.edge3 = SimpleApplicationEdge(self.vert1, self.vert3,
                                                 "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
-        self.graph = PartitionableGraph("Graph", self.verts, self.edges)
+        self.graph = ApplicationGraph("Graph", self.verts, self.edges)
 
         ########################################################################
         # Setting up machine                                                   #
@@ -83,26 +83,26 @@ class TestBasicPlacer(unittest.TestCase):
         ########################################################################
         # Setting up subgraph and graph_mapper                                 #
         ########################################################################
-        self.subvertices = list()
-        self.subvertex1 = SimplePartitionedVertex(
+        self.vertices = list()
+        self.subvertex1 = SimpleMachineVertex(
             0, 1, self.vert1.get_resources_used_by_atoms(0, 1, []),
-            "First subvertex")
-        self.subvertex2 = SimplePartitionedVertex(
-            1, 5, get_resources_used_by_atoms(1, 5, []), "Second subvertex")
-        self.subvertex3 = SimplePartitionedVertex(
-            5, 10, get_resources_used_by_atoms(5, 10, []), "Third subvertex")
-        self.subvertex4 = SimplePartitionedVertex(
+            "First vertex")
+        self.subvertex2 = SimpleMachineVertex(
+            1, 5, get_resources_used_by_atoms(1, 5, []), "Second vertex")
+        self.subvertex3 = SimpleMachineVertex(
+            5, 10, get_resources_used_by_atoms(5, 10, []), "Third vertex")
+        self.subvertex4 = SimpleMachineVertex(
             10, 100, get_resources_used_by_atoms(10, 100, []),
-            "Fourth subvertex")
-        self.subvertices.append(self.subvertex1)
-        self.subvertices.append(self.subvertex2)
-        self.subvertices.append(self.subvertex3)
-        self.subvertices.append(self.subvertex4)
-        self.subedges = list()
-        self.subgraph = PartitionedGraph("Subgraph", self.subvertices,
-                                         self.subedges)
+            "Fourth vertex")
+        self.vertices.append(self.subvertex1)
+        self.vertices.append(self.subvertex2)
+        self.vertices.append(self.subvertex3)
+        self.vertices.append(self.subvertex4)
+        self.edges = list()
+        self.subgraph = MachineGraph("Subgraph", self.vertices,
+                                         self.edges)
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices(self.subvertices)
+        self.graph_mapper.add_vertices(self.vertices)
 
     @unittest.skip("demonstrating skipping")
     def test_new_basic_placer(self):
@@ -111,34 +111,34 @@ class TestBasicPlacer(unittest.TestCase):
         self.assertEqual(self.bp._graph, self.graph)
 
     @unittest.skip("demonstrating skipping")
-    def test_place_where_subvertices_dont_have_vertex(self):
+    def test_place_where_vertices_dont_have_vertex(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.subvertex.label, placement.subvertex.n_atoms, \
+            print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     @unittest.skip("demonstrating skipping")
-    def test_place_where_subvertices_have_vertices(self):
+    def test_place_where_vertices_have_vertices(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices(self.subvertices, self.vert1)
+        self.graph_mapper.add_vertices(self.vertices, self.vert1)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.subvertex.label, placement.subvertex.n_atoms, \
+            print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     @unittest.skip("demonstrating skipping")
     def test_place_subvertex_too_big_with_vertex(self):
         large_vertex = TestVertex(500, "Large vertex 500")
-        large_subvertex = large_vertex.create_subvertex(
-            0, 499, get_resources_used_by_atoms(0, 499, []))#SimplePartitionedVertex(0, 499, "Large subvertex")
+        large_subvertex = large_vertex.create_machine_vertex(
+            0, 499, get_resources_used_by_atoms(0, 499, []))#SimpleMachineVertex(0, 499, "Large vertex")
         self.graph.add_vertex(large_vertex)
-        self.graph = PartitionableGraph("Graph",[large_vertex])
+        self.graph = ApplicationGraph("Graph",[large_vertex])
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices([large_subvertex], large_vertex)
+        self.graph_mapper.add_vertices([large_subvertex], large_vertex)
         self.bp = BasicPlacer(self.machine, self.graph)
-        self.subgraph = PartitionedGraph(subvertices=[large_subvertex])
+        self.subgraph = MachineGraph(vertices=[large_subvertex])
         with self.assertRaises(PacmanPlaceException):
             placements = self.bp.place(self.subgraph, self.graph_mapper)
 
@@ -147,49 +147,49 @@ class TestBasicPlacer(unittest.TestCase):
         self.assertEqual(True, False, "Test not implemented yet")
 
     @unittest.skip("demonstrating skipping")
-    def test_deal_with_constraint_placement_subvertices_dont_have_vertex(self):
+    def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         self.subvertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
         self.assertIsInstance(self.subvertex1.constraints[0], PlacerChipAndCoreConstraint)
         self.subvertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
         self.subvertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
         self.subvertex4.add_constraint(PlacerChipAndCoreConstraint(6, 4, 16))
-        self.subvertices = list()
-        self.subvertices.append(self.subvertex1)
-        self.subvertices.append(self.subvertex2)
-        self.subvertices.append(self.subvertex3)
-        self.subvertices.append(self.subvertex4)
-        self.subedges = list()
-        self.subgraph = PartitionedGraph("Subgraph", self.subvertices,
-                                         self.subedges)
+        self.vertices = list()
+        self.vertices.append(self.subvertex1)
+        self.vertices.append(self.subvertex2)
+        self.vertices.append(self.subvertex3)
+        self.vertices.append(self.subvertex4)
+        self.edges = list()
+        self.subgraph = MachineGraph("Subgraph", self.vertices,
+                                         self.edges)
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices(self.subvertices)
+        self.graph_mapper.add_vertices(self.vertices)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.subvertex.label, placement.subvertex.n_atoms, \
+            print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     @unittest.skip("demonstrating skipping")
-    def test_deal_with_constraint_placement_subvertices_have_vertices(self):
+    def test_deal_with_constraint_placement_vertices_have_vertices(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         self.subvertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
         self.assertIsInstance(self.subvertex1.constraints[0], PlacerChipAndCoreConstraint)
         self.subvertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
         self.subvertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
         self.subvertex4.add_constraint(PlacerChipAndCoreConstraint(6, 7, 16))
-        self.subvertices = list()
-        self.subvertices.append(self.subvertex1)
-        self.subvertices.append(self.subvertex2)
-        self.subvertices.append(self.subvertex3)
-        self.subvertices.append(self.subvertex4)
-        self.subedges = list()
-        self.subgraph = PartitionedGraph("Subgraph", self.subvertices,
-                                         self.subedges)
+        self.vertices = list()
+        self.vertices.append(self.subvertex1)
+        self.vertices.append(self.subvertex2)
+        self.vertices.append(self.subvertex3)
+        self.vertices.append(self.subvertex4)
+        self.edges = list()
+        self.subgraph = MachineGraph("Subgraph", self.vertices,
+                                         self.edges)
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices(self.subvertices, self.vert1)
+        self.graph_mapper.add_vertices(self.vertices, self.vert1)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.subvertex.label, placement.subvertex.n_atoms, \
+            print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     @unittest.skip("demonstrating skipping")
@@ -205,53 +205,53 @@ class TestBasicPlacer(unittest.TestCase):
         self.assertEqual(True, False, "Test not implemented yet")
 
     @unittest.skip("demonstrating skipping")
-    def test_many_subvertices(self):
-        subvertices = list()
+    def test_many_vertices(self):
+        vertices = list()
         for i in range(20 * 17): #50 atoms per each processor on 20 chips
-            subvertices.append(PartitionedTestVertex(
+            vertices.append(TestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "SimplePartitionedVertex " + str(i)))
+                "SimpleMachineVertex " + str(i)))
 
-        self.graph = PartitionableGraph("Graph",subvertices)
+        self.graph = ApplicationGraph("Graph",vertices)
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices(subvertices)
+        self.graph_mapper.add_vertices(vertices)
         self.bp = BasicPlacer(self.machine, self.graph)
-        self.subgraph = PartitionedGraph(subvertices=subvertices)
+        self.subgraph = MachineGraph(vertices=vertices)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.subvertex.label, placement.subvertex.n_atoms, \
+            print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
     @unittest.skip("demonstrating skipping")
-    def test_too_many_subvertices(self):
-        subvertices = list()
+    def test_too_many_vertices(self):
+        vertices = list()
         for i in range(100 * 17): #50 atoms per each processor on 20 chips
-            subvertices.append(PartitionedTestVertex(
+            vertices.append(TestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "SimplePartitionedVertex " + str(i)))
+                "SimpleMachineVertex " + str(i)))
 
-        self.graph = PartitionableGraph("Graph",subvertices)
+        self.graph = ApplicationGraph("Graph",vertices)
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices(subvertices)
+        self.graph_mapper.add_vertices(vertices)
         self.bp = BasicPlacer(self.machine, self.graph)
-        self.subgraph = PartitionedGraph(subvertices=subvertices)
+        self.subgraph = MachineGraph(vertices=vertices)
         with self.assertRaises(PacmanPlaceException):
             placements = self.bp.place(self.subgraph, self.graph_mapper)
 
     @unittest.skip("demonstrating skipping")
     def test_fill_machine(self):
-        subvertices = list()
+        vertices = list()
         for i in range(99 * 17): #50 atoms per each processor on 20 chips
-            subvertices.append(PartitionedTestVertex(
+            vertices.append(TestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "SimplePartitionedVertex " + str(i)))
+                "SimpleMachineVertex " + str(i)))
 
-        self.graph = PartitionableGraph("Graph",subvertices)
+        self.graph = ApplicationGraph("Graph",vertices)
         self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_subvertices(subvertices)
+        self.graph_mapper.add_vertices(vertices)
         self.bp = BasicPlacer(self.machine, self.graph)
-        self.subgraph = PartitionedGraph(subvertices=subvertices)
+        self.subgraph = MachineGraph(vertices=vertices)
         placements = self.bp.place(self.subgraph, self.graph_mapper)
-    
+
 if __name__ == '__main__':
     unittest.main()

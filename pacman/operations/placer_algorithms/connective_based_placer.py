@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class ConnectiveBasedPlacer(RadialPlacer):
-    """ A radial algorithm that can place a partitioned_graph onto a\
+    """ A radial algorithm that can place a machine graph onto a\
         machine using a circle out behaviour from a Ethernet at a given point\
         and which will place things that are most connected closest to each\
         other
@@ -24,26 +24,26 @@ class ConnectiveBasedPlacer(RadialPlacer):
         """
         RadialPlacer.__init__(self)
 
-    def __call__(self, partitioned_graph, machine):
+    def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
-        self._check_constraints(partitioned_graph.vertices)
+        self._check_constraints(machine_graph.vertices)
 
         # Sort the vertices into those with and those without
         # placement constraints
         placements = Placements()
         constrained_vertices = list()
         unconstrained_vertices = set()
-        for subvertex in partitioned_graph.subvertices:
+        for vertex in machine_graph.vertices:
             placement_constraints = utility_calls.locate_constraints_of_type(
-                subvertex.constraints, AbstractPlacerConstraint)
+                vertex.constraints, AbstractPlacerConstraint)
             if len(placement_constraints) > 0:
-                constrained_vertices.append(subvertex)
+                constrained_vertices.append(vertex)
             else:
-                unconstrained_vertices.add(subvertex)
+                unconstrained_vertices.add(vertex)
 
         # Iterate over constrained vertices and generate placements
-        progress_bar = ProgressBar(len(partitioned_graph.subvertices),
+        progress_bar = ProgressBar(len(machine_graph.vertices),
                                    "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
@@ -61,7 +61,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
 
             # Initially, add the overall most connected vertex
             max_connected_vertex = self._find_max_connected_vertex(
-                unconstrained_vertices, partitioned_graph)
+                unconstrained_vertices, machine_graph)
             next_vertices.add(max_connected_vertex)
 
             while len(next_vertices) > 0:
@@ -69,7 +69,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 # Find the vertex most connected to the currently placed
                 # vertices
                 vertex = self._find_max_connected_vertex(next_vertices,
-                                                         partitioned_graph)
+                                                         machine_graph)
 
                 # Place the vertex
                 self._place_vertex(vertex, resource_tracker, machine,
@@ -79,30 +79,30 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 next_vertices.remove(vertex)
 
                 # Add all vertices connected to this one to the set
-                for in_edge in (partitioned_graph
-                                .incoming_subedges_from_subvertex(vertex)):
-                    if in_edge.pre_subvertex in unconstrained_vertices:
-                        next_vertices.add(in_edge.pre_subvertex)
-                for out_edge in (partitioned_graph
-                                 .outgoing_subedges_from_subvertex(vertex)):
-                    if out_edge.post_subvertex in unconstrained_vertices:
-                        next_vertices.add(out_edge.post_subvertex)
+                for in_edge in (machine_graph
+                                .get_edges_ending_at_vertex(vertex)):
+                    if in_edge.pre_vertex in unconstrained_vertices:
+                        next_vertices.add(in_edge.pre_vertex)
+                for out_edge in (machine_graph
+                                 .get_edges_starting_at_vertex(vertex)):
+                    if out_edge.post_vertex in unconstrained_vertices:
+                        next_vertices.add(out_edge.post_vertex)
 
         # finished, so stop progress bar and return placements
         progress_bar.end()
         return placements
 
-    def _find_max_connected_vertex(self, vertices, partitioned_graph):
+    def _find_max_connected_vertex(self, vertices, graph):
         max_connected_vertex = None
         max_weight = 0
         for vertex in vertices:
             in_weight = sum([
                 edge.weight
-                for edge in partitioned_graph.outgoing_subedges_from_subvertex(
+                for edge in graph.get_edges_starting_at_vertex(
                     vertex)])
             out_weight = sum([
                 edge.weight
-                for edge in partitioned_graph.incoming_subedges_from_subvertex(
+                for edge in graph.get_edges_ending_at_vertex(
                     vertex)])
             weight = in_weight + out_weight
 

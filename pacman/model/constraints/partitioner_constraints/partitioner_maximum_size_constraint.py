@@ -4,25 +4,22 @@ from pacman.model.constraints.partitioner_constraints\
 
 
 class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
-    """ A constraint which limits the number of atoms of a single subvertex\
-        during the partitioner process
+    """ A constraint which limits the number of atoms on each division of a\
+        vertex
     """
 
     def __init__(self, size):
         """
 
-        :param size: The maximum number of atoms to assign to each subvertex
+        :param size: The maximum number of atoms to split the vertex into
         :type size: int
-        :raise None: does not raise any known exceptions
         """
         self._size = size
 
     @property
     def size(self):
-        """ The maximum number of atoms to assign to each subvertex
+        """ The maximum number of atoms to split the vertex into
 
-        :return: the maximum number of atoms to assign to each subvertex
         :rtype: int
-        :raise None: does not raise any known exceptions
         """
         return self._size

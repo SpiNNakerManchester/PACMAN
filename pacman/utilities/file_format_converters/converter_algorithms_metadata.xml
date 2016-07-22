@@ -18,27 +18,30 @@
         </required_inputs>
         <outputs>
             <param_type>FilePlacements</param_type>
+            <param_type>MemoryVertexById</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="ConvertToFilePartitionedGraph">
-        <python_module>pacman.utilities.file_format_converters.convert_to_file_partitioned_graph</python_module>
-        <python_class>ConvertToFilePartitionedGraph</python_class>
+    <algorithm name="ConvertToFileMachineGraph">
+        <python_module>pacman.utilities.file_format_converters.convert_to_file_machine_graph</python_module>
+        <python_class>ConvertToFileMachineGraph</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>file_path</param_name>
-                <param_type>FilePartitionedGraphFilePath</param_type>
+                <param_type>FileMachineGraphFilePath</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>file_path</param_name>
         </required_inputs>
         <outputs>
-            <param_type>FilePartitionedGraph</param_type>
+            <param_type>FileMachineGraph</param_type>
+            <param_type>MemoryVertexById</param_type>
+            <param_type>MemoryPartitionById</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ConvertToFileCoreAllocation">
@@ -60,6 +63,7 @@
         </required_inputs>
         <outputs>
             <param_type>FileCoreAllocations</param_type>
+            <param_type>MemoryVertexById</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ConvertToFileMachine">
@@ -92,8 +96,8 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
              <parameter>
                 <param_name>file_path</param_name>
@@ -102,11 +106,12 @@
         </input_definitions>
         <required_inputs>
             <param_name>machine</param_name>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>file_path</param_name>
         </required_inputs>
         <outputs>
             <param_type>FileConstraints</param_type>
+            <param_type>MemoryVertexById</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ConvertToMemoryPlacements">
@@ -122,8 +127,8 @@
                 <param_type>FilePlacements</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>allocations</param_name>
@@ -133,13 +138,18 @@
                 <param_name>constraints</param_name>
                 <param_type>FileConstraints</param_type>
             </parameter>
+            <parameter>
+                <param_name>vertex_by_id</param_name>
+                <param_type>MemoryVertexById</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>extended_machine</param_name>
             <param_name>placements</param_name>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>allocations</param_name>
             <param_name>constraints</param_name>
+            <param_name>vertex_by_id</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -154,8 +164,8 @@
                 <param_type>FileRoutingPaths</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
@@ -165,12 +175,17 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>partition_by_id</param_name>
+                <param_type>MemoryPartitionById</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>file_routing_paths</param_name>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
+            <param_name>partition_by_id</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingPaths</param_type>

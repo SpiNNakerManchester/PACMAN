@@ -11,48 +11,43 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 logger = logging.getLogger(__name__)
 
 
-def generate_sub_edges(subgraph, graph_to_subgraph_mapper, graph):
-    """ Generate the sub edges for the subvertices in the graph
+def generate_machine_edges(machine_graph, graph_mapper, graph):
+    """ Generate the machine edges for the vertices in the graph
 
-    :param subgraph: the partitioned graph to work with
-    :type subgraph:\
-                :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-    :param graph_to_subgraph_mapper: the mapper between the \
-                partitionable graph and the partitioned graph
-    :type graph_to_subgraph_mapper:\
-                :py:class:`pacman.model.graph_mapper.GraphMapper`
-    :param graph: the partitionable graph to work with
+    :param machine_graph: the machine graph to add edges to
+    :type machine_graph:\
+        :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+    :param graph_mapper: the mapper graphs
+    :type graph_mapper:\
+        :py:class:`pacman.model.graph_mapper.GraphMapper`
+    :param graph: the application graph to work with
     :type graph:\
-                :py:class:`pacman.model.graph.partitionable_graph.PartitionableGraph`
+        :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
     """
 
     # start progress bar
-    progress_bar = ProgressBar(len(subgraph.subvertices),
+    progress_bar = ProgressBar(len(machine_graph.vertices),
                                "Partitioning graph edges")
 
     # Partition edges according to vertex partitioning
-    for src_sv in subgraph.subvertices:
+    for src_sv in machine_graph.vertices:
 
         # For each out edge of the parent vertex...
-        vertex = graph_to_subgraph_mapper.get_vertex_from_subvertex(src_sv)
+        vertex = graph_mapper.get_application_vertex(src_sv)
         outgoing_partitions = \
-            graph.outgoing_edges_partitions_from_vertex(vertex)
-        for outgoing_partition_identifer in outgoing_partitions:
-            partition = outgoing_partitions[outgoing_partition_identifer]
+            graph.get_outgoing_edge_partitions_starting_at_vertex(vertex)
+        for partition in outgoing_partitions:
             out_edges = partition.edges
-            partition_constraints = partition.constraints
             for edge in out_edges:
 
                 # and create and store a new subedge for each post-subvertex
                 post_vertex = edge.post_vertex
-                post_subverts = (graph_to_subgraph_mapper
-                                 .get_subvertices_from_vertex(post_vertex))
+                post_subverts = (graph_mapper
+                                 .get_machine_vertices(post_vertex))
                 for dst_sv in post_subverts:
-                    subedge = edge.create_subedge(src_sv, dst_sv)
-                    subgraph.add_subedge(subedge,
-                                         outgoing_partition_identifer,
-                                         partition_constraints)
-                    graph_to_subgraph_mapper.add_partitioned_edge(
+                    subedge = edge.create_machine_edge(src_sv, dst_sv)
+                    machine_graph.add_edge(subedge, partition.identifier)
+                    graph_mapper.add_edge_mapping(
                         subedge, edge)
         progress_bar.update()
     progress_bar.end()

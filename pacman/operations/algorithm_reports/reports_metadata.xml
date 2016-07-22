@@ -1,7 +1,7 @@
 <algorithms>
-    <algorithm name="PlacerReportWithPartitionableGraph">
+    <algorithm name="PlacerReportWithApplicationGraph">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
-        <python_function>placer_reports_with_partitionable_graph</python_function>
+        <python_function>placer_reports_with_application_graph</python_function>
         <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
@@ -13,7 +13,7 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
@@ -37,9 +37,9 @@
             <param_name>machine</param_name>
         </required_inputs>
     </algorithm>
-    <algorithm name="PlacerReportWithoutPartitionableGraph">
+    <algorithm name="PlacerReportWithoutApplicationGraph">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
-        <python_function>placer_reports_without_partitionable_graph</python_function>
+        <python_function>placer_reports_without_application_graph</python_function>
         <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
@@ -50,8 +50,8 @@
                 <param_type>IPAddress</param_type>
             </parameter>
             <parameter>
-                <param_name>sub_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
@@ -65,7 +65,7 @@
         <required_inputs>
             <param_name>report_folder</param_name>
             <param_name>hostname</param_name>
-            <param_name>sub_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
         </required_inputs>
@@ -79,8 +79,8 @@
                 <param_type>ReportFolder</param_type>
             </parameter>
              <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
@@ -105,7 +105,7 @@
         </input_definitions>
         <required_inputs>
             <param_name>report_folder</param_name>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>routing_tables</param_name>
             <param_name>routing_infos</param_name>
             <param_name>hostname</param_name>
@@ -122,8 +122,8 @@
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
@@ -132,7 +132,7 @@
         </input_definitions>
         <required_inputs>
             <param_name>report_folder</param_name>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>routing_infos</param_name>
         </required_inputs>
     </algorithm>
@@ -209,7 +209,7 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>

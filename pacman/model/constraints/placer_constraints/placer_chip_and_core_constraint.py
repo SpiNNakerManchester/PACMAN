@@ -3,8 +3,8 @@ from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
 
 
 class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
-    """ Creates a constraint object to place a vertex or a subvertex on a\
-        specific chip and, optionally, a specific core on that chip
+    """ A constraint to place a vertex on a specific chip and, optionally, a\
+        specific core on that chip
     """
 
     def __init__(self, x, y, p=None):

@@ -3,8 +3,8 @@ from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
 
 
 class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
-    """ Creates a constraint object to place the subvertices of a vertex on a\
-        specific chip, and optionally a specific core on that chip
+    """ A constraint that attempts to place a vertex as close to a chip\
+        as possible (including on it)
     """
 
     def __init__(self, x, y):

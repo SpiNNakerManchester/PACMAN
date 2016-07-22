@@ -19,53 +19,52 @@ MASK = 0xFFFFF800
 
 class BasicRoutingInfoAllocator(object):
     """ An basic algorithm that can produce routing keys and masks for\
-        edges in a partitioned_graph based on the x,y,p of the placement\
-        of the preceding partitioned vertex.
+        edges in a graph based on the x,y,p of the placement\
+        of the preceding vertex.
         Note that no constraints are supported, and that the number of keys\
         required by each edge must be 2048 or less, and that all edges coming\
         out of a vertex will be given the same key/mask assignment.
     """
 
-    def __call__(self, partitioned_graph, placements, n_keys_map):
+    def __call__(self, machine_graph, placements, n_keys_map):
         """
-        Allocates routing information to the partitioned edges in a\
-        partitioned graph
 
-        :param partitioned_graph: The partitioned graph to allocate the \
-                    outing info for
-        :type partitioned_graph:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-        :param placements: The placements of the subvertices
+        :param machine_graph:\
+            The machine graph to allocate the routing info for
+        :type machine_graph:\
+            :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+        :param placements: The placements of the vertices
         :type placements:\
-                    :py:class:`pacman.model.placements.placements.Placements`
-        :param n_keys_map: A map between the partitioned edges and the number\
-                    of keys required by the edges
+            :py:class:`pacman.model.placements.placements.Placements`
+        :param n_keys_map:\
+            A map between the edges and the number of keys required by the\
+            edges
         :type n_keys_map:\
-                    :py:class:`pacman.model.routing_info.abstract_partitioned_edge_n_keys_map.AbstractPartitionedEdgeNKeysMap`
+            :py:class:`pacman.model.routing_info.abstract_machine_partition_n_keys_map.AbstractMachinePartitionNKeysMap`
         :return: The routing information
         :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`,
-                :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
+            :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: If\
                    something goes wrong with the allocation
         """
 
         # check that this algorithm supports the constraints put onto the
-        # partitioned_edges
+        # partitions
         supported_constraints = [
             KeyAllocatorContiguousRangeContraint]
         utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=partitioned_graph.partitions,
+            constrained_vertices=machine_graph.outgoing_edge_partitions,
             supported_constraints=supported_constraints,
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each subedge and create keys from its placement
-        progress_bar = ProgressBar(len(partitioned_graph.subvertices),
+        progress_bar = ProgressBar(len(machine_graph.vertices),
                                    "Allocating routing keys")
         routing_infos = RoutingInfo()
-        for subvert in partitioned_graph.subvertices:
-            partitions = partitioned_graph.\
-                outgoing_edges_partitions_from_vertex(subvert)
-            for partition in partitions.values():
+        for subvert in machine_graph.vertices:
+            partitions = machine_graph.\
+                get_outgoing_edge_partitions_starting_at_vertex(subvert)
+            for partition in partitions:
                 n_keys = n_keys_map.n_keys_for_partition(partition)
                 if n_keys > MAX_KEYS_SUPPORTED:
                     raise PacmanRouteInfoAllocationException(
@@ -73,7 +72,7 @@ class BasicRoutingInfoAllocator(object):
                         " keys for any given subedge; cannot therefore"
                         " allocate keys to {}, which is requesting {} keys"
                         .format(MAX_KEYS_SUPPORTED, partition, n_keys))
-                placement = placements.get_placement_of_subvertex(subvert)
+                placement = placements.get_placement_of_vertex(subvert)
                 if placement is not None:
                     key = self._get_key_from_placement(placement)
                     keys_and_masks = list([BaseKeyAndMask(base_key=key,

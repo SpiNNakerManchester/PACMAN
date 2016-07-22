@@ -41,7 +41,7 @@ def deduce_types(subgraph):
     """
     seen_fields = dict()
     known_fields = list()
-    for partition in subgraph.partitions:
+    for partition in subgraph.outgoing_edge_partitions:
         for constraint in partition.constraints:
             if not isinstance(constraint,
                               KeyAllocatorContiguousRangeContraint):

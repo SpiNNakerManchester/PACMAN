@@ -34,10 +34,10 @@ class BasicRoutingTableGenerator(object):
             if len(partitions_in_table) != 0:
                 routing_table = MulticastRoutingTable(chip.x, chip.y)
                 for partition in partitions_in_table:
-                    keys_and_masks = routing_infos.\
-                        get_keys_and_masks_from_partition(partition)
+                    rinfo = routing_infos.get_routing_info_from_partition(
+                        partition)
                     entry = partitions_in_table[partition]
-                    for key_and_mask in keys_and_masks:
+                    for key_and_mask in rinfo.keys_and_masks:
                         multicast_routing_entry = MulticastRoutingEntry(
                             routing_entry_key=key_and_mask.key_combo,
                             defaultable=entry.defaultable,

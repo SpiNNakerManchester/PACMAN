@@ -4,7 +4,7 @@ tests for slice
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.graph_mapper.slice import Slice
+from pacman.model.graph.slice import Slice
 
 # general imports
 import unittest

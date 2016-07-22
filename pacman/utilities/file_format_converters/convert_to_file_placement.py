@@ -21,14 +21,16 @@ class ConvertToFilePlacement(object):
 
         # write basic stuff
         json_placement_dictory_rep = dict()
+        vertex_by_id = dict()
 
         progress_bar = ProgressBar(len(placements.placements) + 1,
                                    "converting to json placements")
 
         # process placements
         for placement in placements:
-            json_placement_dictory_rep[placement.subvertex.label] = \
-                [placement.x, placement.y]
+            vertex_id = id(placement.vertex)
+            vertex_by_id[vertex_id] = placement.vertex
+            json_placement_dictory_rep[vertex_id] = [placement.x, placement.y]
             progress_bar.update()
 
         # dump dict into json file
@@ -51,4 +53,4 @@ class ConvertToFilePlacement(object):
         progress_bar.end()
 
         # return the file format
-        return file_path
+        return file_path, vertex_by_id

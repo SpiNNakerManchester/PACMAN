@@ -8,12 +8,12 @@ class PartitionRoutingInfo(object):
 
     def __init__(self, keys_and_masks, partition):
         """
-        :param keys_and_masks: The keys allocated to the partitioned edge
+        :param keys_and_masks: The keys allocated to the machine partition
         :type keys_and_masks: iterable of\
                     :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.model.graph.outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
         """
         self._keys_and_masks = keys_and_masks
         self._partition = partition
@@ -42,6 +42,24 @@ class PartitionRoutingInfo(object):
     @property
     def keys_and_masks(self):
         return self._keys_and_masks
+
+    @property
+    def first_key_and_mask(self):
+        """ The first key and mask (or only one if there is only one)
+        """
+        return self._keys_and_masks[0]
+
+    @property
+    def first_key(self):
+        """ The first key (or only one if there is only one)
+        """
+        return self._keys_and_masks[0].key
+
+    @property
+    def first_mask(self):
+        """ The first mask (or only one if there is only one)
+        """
+        return self._keys_and_masks[0].mask
 
     @property
     def partition(self):

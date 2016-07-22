@@ -1,22 +1,22 @@
-from pacman.model.routing_info.abstract_partitioned_partition_n_keys_map \
-    import AbstractPartitionedPartitionNKeysMap
+from pacman.model.routing_info.abstract_machine_partition_n_keys_map \
+    import AbstractMachinePartitionNKeysMap
 
 
-class DictBasedPartitionedPartitionNKeysMap(
-        AbstractPartitionedPartitionNKeysMap):
+class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     """ A python dict-based implementation of the\
-        AbstractPartitionedPartitionNKeysMap
+        AbstractMachinePartitionNKeysMap
     """
 
     def __init__(self):
         self._n_keys_map = dict()
 
     def set_n_keys_for_partition(self, partition, n_keys):
-        """ Sets the number of keys required by a partitioned edge
+        """ Set the number of keys required by a machine outgoing edge\
+            partition
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.model.graph.outgoing_edge_partition.OutgoingEdgePartition`
+            :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
         :param n_keys: The number of keys required by the edge
         :type n_keys: int
         """
@@ -27,7 +27,7 @@ class DictBasedPartitionedPartitionNKeysMap(
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.model.graph.outgoing_edge_partition.OutgoingEdgePartition`
+            :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
         :return:
         """
         return self._n_keys_map[partition]

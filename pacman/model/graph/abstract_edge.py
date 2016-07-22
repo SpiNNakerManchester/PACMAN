@@ -2,9 +2,11 @@ from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractproperty
 
+from pacman.model.abstract_classes.abstract_has_label import AbstractHasLabel
+
 
 @add_metaclass(ABCMeta)
-class AbstractEdge(object):
+class AbstractEdge(AbstractHasLabel):
     """ A directed edge in a graph between two vertices
     """
 
@@ -20,4 +22,11 @@ class AbstractEdge(object):
         """ The vertex at the end of the edge
 
         :rtype: :py:class:`pacman.model.graph.abstract_vertex.AbstractVertex`
+        """
+
+    @abstractproperty
+    def traffic_type(self):
+        """ The traffic type of the edge
+
+        :rtype :py:class:`pacman.model.graph.edge_traffic_type.EdgeTrafficType`
         """

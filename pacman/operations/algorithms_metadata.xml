@@ -5,7 +5,7 @@
         <input_definitions>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -17,7 +17,7 @@
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPartitionedGraph</param_type>
+            <param_type>MemoryMachineGraph</param_type>
             <param_type>MemoryGraphMapper</param_type>
             <param_type>NChipsRequired</param_type>
         </outputs>
@@ -28,7 +28,7 @@
         <input_definitions>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -40,7 +40,7 @@
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPartitionedGraph</param_type>
+            <param_type>MemoryMachineGraph</param_type>
             <param_type>MemoryGraphMapper</param_type>
             <param_type>NChipsRequired</param_type>
         </outputs>
@@ -50,8 +50,8 @@
         <python_class>BasicPlacer</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -59,7 +59,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
@@ -71,8 +71,8 @@
         <python_class>RadialPlacer</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -80,7 +80,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
@@ -92,8 +92,8 @@
         <python_class>OneToOnePlacer</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -101,7 +101,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
@@ -113,8 +113,8 @@
         <python_class>ConnectiveBasedPlacer</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -122,7 +122,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
@@ -142,14 +142,14 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingTableByPartition</param_type>
@@ -160,12 +160,12 @@
         <python_class>BasicRoutingInfoAllocator</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedPartitionNKeysMap</param_type>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
@@ -173,7 +173,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
             <param_name>placements</param_name>
         </required_inputs>
@@ -186,12 +186,12 @@
         <python_class>DestinationBasedRoutingInfoAllocator</python_class>
         <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryMachineEdgeNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_paths</param_name>
@@ -203,7 +203,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>subgraph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
             <param_name>routing_paths</param_name>
             <param_name>placements</param_name>
@@ -218,12 +218,12 @@
         <python_class>MallocBasedRoutingInfoAllocator</python_class>
         <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedPartitionNKeysMap</param_type>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
@@ -231,7 +231,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>subgraph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
         </required_inputs>
         <optional_inputs>
@@ -246,12 +246,12 @@
         <python_class>CompressibleMallocBasedRoutingInfoAllocator</python_class>
         <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryMachineEdgeNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
@@ -259,7 +259,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>subgraph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
             <param_name>routing_tables</param_name>
         </required_inputs>
@@ -272,16 +272,16 @@
         <python_class>VertexBasedRoutingInfoAllocator</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryPartitionedPartitionNKeysMap</param_type>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
             </parameter>
             <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
@@ -289,9 +289,9 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
-            <param_name>partitionable_graph</param_name>
+            <param_name>application_graph</param_name>
             <param_name>graph_mapper</param_name>
         </required_inputs>
         <outputs>
@@ -391,19 +391,19 @@
                 <param_type>MemoryMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine</param_name>
             <one_of>
-                <param_name>partitionable_graph</param_name>
-                <param_name>partitioned_graph</param_name>
+                <param_name>application_graph</param_name>
+                <param_name>machine_graph</param_name>
             </one_of>
         </required_inputs>
         <outputs>
@@ -444,8 +444,8 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
@@ -464,7 +464,7 @@
         <required_inputs>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>routing_infos</param_name>
             <param_name>graph_mapper</param_name>
             <param_name>routing_tables</param_name>
@@ -475,8 +475,8 @@
         <python_class>RigPlaceAndRoute</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -484,7 +484,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
@@ -497,8 +497,8 @@
         <python_class>RigRoute</python_class>
         <input_definitions>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -510,7 +510,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>partitioned_graph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
             <param_name>placements</param_name>
         </required_inputs>

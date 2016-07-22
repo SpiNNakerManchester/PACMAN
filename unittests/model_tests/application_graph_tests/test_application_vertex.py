@@ -1,14 +1,10 @@
-
-"""
-test that tests the partitionable graph
-"""
-
 # pacman imports
 from pacman.model.constraints.partitioner_constraints\
     .partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
-from pacman.model.graph_mapper.slice import Slice
-from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
+from pacman.model.graph.slice import Slice
+from pacman.model.graph.machine.simple_machine_vertex\
+     import SimpleMachineVertex
 
 # unit tests imports
 from uinit_test_objects.test_vertex import TestVertex
@@ -17,9 +13,9 @@ from uinit_test_objects.test_vertex import TestVertex
 import unittest
 
 
-class TestPartitionableGraphModel(unittest.TestCase):
+class TestApplicationGraphModel(unittest.TestCase):
     """
-    tests which test the partitionable graph object
+    tests which test the application graph object
     """
     def test_create_new_vertex(self):
         """
@@ -93,48 +89,48 @@ class TestPartitionableGraphModel(unittest.TestCase):
 
     def test_create_subvertex_from_vertex_with_previous_constraints(self):
         """
-        test the create subvertex command given by the
-        AbstractPartitionableVertex actually works and generates a subvertex
+        test the create vertex command given by the
+        vertex actually works and generates a vertex
         with the same constraints mapped over
         :return:
         """
         constraint1 = PartitionerMaximumSizeConstraint(2)
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
-        subv_from_vert = vert.create_subvertex(
+        subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
         self.assertNotIn(constraint1, subv_from_vert.constraints)
 
     def test_new_create_subvertex_from_vertex_no_constraints(self):
         """
-        test the creating of a subvertex by the AbstractPartitionableVertex
-        create subvertex method will actually create a subvertex of the
-        partitioned vertex type.
+        test the creating of a vertex by the
+        create vertex method will actually create a vertex of the
+        vertex type.
         :return:
         """
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
-        subvertex = vert.create_subvertex(
+        vertex = vert.create_machine_vertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None))
-        self.assertIsInstance(subvertex, SimplePartitionedVertex)
+        self.assertIsInstance(vertex, SimpleMachineVertex)
 
     def test_new_create_subvertex_from_vertex_check_resources(self):
-        """ check that the creation of a subvertex means that the reosurces
-        calcualted by the partitionable vertex is the same as what the
-        parttiioned vertex says (given same sizes)
+        """ check that the creation of a vertex means that the reosurces
+        calcualted by the vertex is the same as what the
+        vertex says (given same sizes)
 
         :return:
         """
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         resources = vert.get_resources_used_by_atoms(Slice(0, 9), None)
-        subv_from_vert = vert.create_subvertex(Slice(0, 9), resources, "")
+        subv_from_vert = vert.create_machine_vertex(Slice(0, 9), resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
 
     @unittest.skip("demonstrating skipping")
     def test_create_new_subvertex_from_vertex_with_additional_constraints(
             self):
         """
-        test that a subvertex created from a parti9onable vertex with
+        test that a vertex created from a vertex with
         constraints can have more constraints added to it.
         :return:
         """
@@ -142,7 +138,7 @@ class TestPartitionableGraphModel(unittest.TestCase):
         constraint2 = PartitionerMaximumSizeConstraint(3)
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint([constraint1])
-        subv_from_vert = vert.create_subvertex(
+        subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9), None), "",
             [constraint2])

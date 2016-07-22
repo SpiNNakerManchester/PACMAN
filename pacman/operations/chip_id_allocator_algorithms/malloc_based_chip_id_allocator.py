@@ -1,12 +1,12 @@
 # pacman imports
-from pacman.model.graph.abstract_virtual_vertex \
-    import AbstractVirtualVertex
+from pacman.model.graph.application.simple_virtual_application_vertex \
+    import SimpleVirtualApplicationVertex
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
 from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
-from pacman.model.graph.virtual_partitioned_vertex \
-    import VirtualPartitionedVertex
+from pacman.model.graph.machine.simple_virtual_machine_vertex \
+    import SimpleVirtualMachineVertex
 from pacman import exceptions
 
 # general imports
@@ -27,25 +27,25 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         self._virtual_chips = dict()
 
     def __call__(
-            self, machine, partitionable_graph=None, partitioned_graph=None):
+            self, machine, application_graph=None, machine_graph=None):
         """
 
-        :param partitionable_graph:
-        :param partitioned_graph:
+        :param application_graph:
+        :param machine_graph:
         :param machine:
         :return:
         """
-        if partitionable_graph is not None:
+        if application_graph is not None:
 
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
-                (len(partitionable_graph.vertices) + len(list(machine.chips))),
+                (len(application_graph.vertices) + len(list(machine.chips))),
                 "Allocating virtual identifiers")
-        elif partitioned_graph is not None:
+        elif machine_graph is not None:
 
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
-                (len(partitioned_graph.subvertices) +
+                (len(machine_graph.vertices) +
                  len(list(machine.chips))),
                 "Allocating virtual identifiers")
         else:
@@ -58,11 +58,11 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             self._allocate_elements(expected_chip_id, 1)
             progress_bar.update()
 
-        if partitionable_graph is not None:
+        if application_graph is not None:
 
             # allocate ids for virtual chips
-            for vertex in partitionable_graph.vertices:
-                if isinstance(vertex, AbstractVirtualVertex):
+            for vertex in application_graph.vertices:
+                if isinstance(vertex, SimpleVirtualApplicationVertex):
                     link = vertex.spinnaker_link_id
                     virtual_x, virtual_y, real_x, real_y, real_link = \
                         self._assign_virtual_chip_info(machine, link)
@@ -70,11 +70,11 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                         virtual_x, virtual_y, real_x, real_y, real_link)
                 progress_bar.update()
             progress_bar.end()
-        elif partitioned_graph is not None:
+        elif machine_graph is not None:
 
             # allocate ids for virtual chips
-            for vertex in partitioned_graph.subvertices:
-                if isinstance(vertex, VirtualPartitionedVertex):
+            for vertex in machine_graph.vertices:
+                if isinstance(vertex, SimpleVirtualMachineVertex):
                     link = vertex.spinnaker_link_id
                     virtual_x, virtual_y, real_x, real_y, real_link = \
                         self._assign_virtual_chip_info(machine, link)

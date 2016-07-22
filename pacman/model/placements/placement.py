@@ -1,42 +1,40 @@
 
 class Placement(object):
-    """ Represents a placement of a subvertex on a specific processor on a\
-        specific chip in the machine
+    """ The placement of a vertex on to a machine chip and core
     """
 
-    def __init__(self, subvertex, x, y, p):
+    def __init__(self, vertex, x, y, p):
         """
 
-        :param subvertex: The subvertex that has been placed
-        :type subvertex: None or
-        :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
-        :param x: the x-coordinate of the chip on which the subvertex is placed
+        :param vertex: The vertex that has been placed
+        :type vertex:\
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
+        :param x: the x-coordinate of the chip on which the vertex is placed
         :type x: int
-        :param y: the y-coordinate of the chip on which the subvertex is placed
+        :param y: the y-coordinate of the chip on which the vertex is placed
         :type y: int
-        :param p: the id of the processor on which the subvertex is placed
-        :type p: int or None
-        :raise None: does not raise any known exceptions
+        :param p: the id of the processor on which the vertex is placed
+        :type p: int
         """
-        self._subvertex = subvertex
+        self._vertex = vertex
         self._x = x
         self._y = y
         self._p = p
 
     @property
-    def subvertex(self):
-        """ The subvertex that was placed
+    def vertex(self):
+        """ The vertex that was placed
 
-        :return: a subvertex
-        :rtype:
-        :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
+        :return: a vertex
+        :rtype:\
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
         :raise None: does not raise any known exceptions
         """
-        return self._subvertex
+        return self._vertex
 
     @property
     def x(self):
-        """ The x-coordinate of the chip where the subvertex is placed
+        """ The x-coordinate of the chip where the vertex is placed
 
         :return: The x-coordinate
         :rtype: int
@@ -45,7 +43,7 @@ class Placement(object):
 
     @property
     def y(self):
-        """ The y-coordinate of the chip where the subvertex is placed
+        """ The y-coordinate of the chip where the vertex is placed
 
         :return: The y-coordinate
         :rtype: int
@@ -54,7 +52,7 @@ class Placement(object):
 
     @property
     def p(self):
-        """ The id of the processor of the chip where the subvertex is placed
+        """ The id of the processor of the chip where the vertex is placed
 
         :return: The processor id
         :rtype: int
@@ -65,20 +63,14 @@ class Placement(object):
         if not isinstance(other, Placement):
             return False
         return (self._x == other.x and self._y == other.y and
-                self._p == other.p and self._subvertex == other.subvertex)
+                self._p == other.p and self._vertex == other.vertex)
 
     def __hash__(self):
-        if self._subvertex is None and self._p is None:
-            return hash((self._x, self._y))
-        elif self._subvertex is None and self._p is not None:
-            return hash((self._x, self._y, self._p))
-        elif self._subvertex is not None and self._p is None:
-            return hash((self._x, self._y, self._subvertex))
-        else:
-            return hash((self._x, self._y, self._p, self._subvertex))
+        return hash((self._x, self._y, self._p, self._vertex))
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return "Placement on core {}:{}:{}".format(self._x, self._y, self._p)
+        return "Placement(vertex={}, x={}, y={}, p={})".format(
+            self._vertex, self._x, self._y, self._p)

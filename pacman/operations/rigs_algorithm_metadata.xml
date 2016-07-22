@@ -11,7 +11,7 @@
         <input_definitions>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>FilePartitionedGraph</param_type>
+                <param_type>FileMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -50,7 +50,7 @@
         <input_definitions>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>FilePartitionedGraph</param_type>
+                <param_type>FileMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -89,7 +89,7 @@
         <input_definitions>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>FilePartitionedGraph</param_type>
+                <param_type>FileMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -130,7 +130,7 @@
         <input_definitions>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>FilePartitionedGraph</param_type>
+                <param_type>FileMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -185,7 +185,7 @@
         <input_definitions>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>FilePartitionedGraph</param_type>
+                <param_type>FileMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>

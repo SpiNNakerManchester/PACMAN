@@ -16,9 +16,9 @@ setup(
 
               'pacman.model.abstract_classes',
               'pacman.model.constraints',
-              'pacman.model.graph_mapper',
-              'pacman.model.partitionable_graph',
-              'pacman.model.partitioned_graph',
+              'pacman.model.graph',
+              'pacman.model.graph.application',
+              'pacman.model.graph.machine',
               'pacman.model.placements',
               'pacman.model.resources',
               'pacman.model.routing_info',
@@ -43,7 +43,6 @@ setup(
               'pacman.operations.routing_info_allocator_algorithms',
               'pacman.operations.routing_table_generators',
               'pacman.operations.tag_allocator_algorithms',
-
 
               'pacman.operations.router_compressors.mundys_router_compressor',
 

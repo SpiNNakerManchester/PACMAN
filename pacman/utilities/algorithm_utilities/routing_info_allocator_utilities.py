@@ -23,12 +23,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_edge_groups(partitioned_graph):
-    """ Utility method to get groups of partitioned edges using any\
+def get_edge_groups(machine_graph):
+    """ Utility method to get groups of edges using any\
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
-    :param partitioned_graph: the subgraph
+    :param machine_graph: the subgraph
     """
 
     # Keep a dictionary of the group which contains an edge
@@ -38,12 +38,11 @@ def get_edge_groups(partitioned_graph):
     flexi_field_groups = set()
     continuous_groups = set()
     none_continuous_groups = list()
-    for partitioned_vertex in partitioned_graph.subvertices:
+    for vertex in machine_graph.vertices:
         outgoing_edge_partitions = \
-            partitioned_graph.outgoing_edges_partitions_from_vertex(
-                partitioned_vertex)
-        for partition_id in outgoing_edge_partitions:
-            partition = outgoing_edge_partitions[partition_id]
+            machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+                vertex)
+        for partition in outgoing_edge_partitions:
 
             # assume all edges have the same constraints in them. use first one
             # to deduce which group to place it into
@@ -76,7 +75,7 @@ def check_types_of_edge_constraint(sub_graph):
     :param sub_graph: the subgraph to search through
     :return:
     """
-    for partition in sub_graph.partitions:
+    for partition in sub_graph.outgoing_edge_partitions:
         fixed_key = utility_calls.locate_constraints_of_type(
             partition.constraints, KeyAllocatorFixedKeyAndMaskConstraint)
 
@@ -164,14 +163,14 @@ def _check_masks_are_correct(partition):
 
 
 def get_fixed_mask(same_key_group):
-    """ Get a fixed mask from a group of partitioned edges if a\
+    """ Get a fixed mask from a group of edges if a\
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorFixedMaskConstraint`\
         constraint exists in any of the edges in the group.
 
-    :param same_key_group: Set of partitioned edges that are to be\
+    :param same_key_group: Set of edges that are to be\
                 assigned the same keys and masks
     :type same_key_group: iterable of\
-                :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
+                :py:class:`pacman.model.graph.machine.abstract_machine_edge.AbstractMachineEdge`
     :return: The fixed mask if found, or None
     :raise PacmanValueError: If two edges conflict in their requirements
     """
@@ -184,7 +183,7 @@ def get_fixed_mask(same_key_group):
         for fixed_mask_constraint in fixed_mask_constraints:
             if mask is not None and mask != fixed_mask_constraint.mask:
                 raise PacmanValueError(
-                    "Two Partitioned Edges {} and {} must have the same"
+                    "Two Edges {} and {} must have the same"
                     " key and mask, but have different fixed masks,"
                     " {} and {}".format(edge, edge_with_mask, mask,
                                         fixed_mask_constraint.mask))
@@ -192,7 +191,7 @@ def get_fixed_mask(same_key_group):
                     fixed_mask_constraint.fields is not None and
                     fields != fixed_mask_constraint.fields):
                 raise PacmanValueError(
-                    "Two Partitioned Edges {} and {} must have the same"
+                    "Two Edges {} and {} must have the same"
                     " key and mask, but have different field ranges"
                     .format(edge, edge_with_mask))
             mask = fixed_mask_constraint.mask

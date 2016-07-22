@@ -4,9 +4,8 @@ from pacman.model.constraints.partitioner_constraints\
 
 
 class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
-    """ A constraint which indicates that a vertex must be partitioned so that\
-        there are the same number of subvertices and the same number of atoms\
-        in each subvertex as those created for another vertex
+    """ A constraint which indicates that a vertex must be split in the\
+        same way as another vertex
     """
 
     def __init__(self, vertex):
@@ -14,7 +13,7 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
 
         :param vertex: The vertex to which the constraint refers
         :type vertex: \
-                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+            :py:class:`pacman.model.graph.application.abstract_application_vertex.AbstractApplicationVertex`
         :raise None: does not raise any known exceptions
         """
         self._vertex = vertex
@@ -25,7 +24,7 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
 
         :return: the vertex
         :rtype:\
-                    :py:class:`pacman.model.graph.abstract_partitionable_vertex.AbstractPartitionableVertex`
+                    :py:class:`pacman.model.graph.application.abstract_application_vertex.AbstractApplicationVertex`
         :raise None: does not raise any known exceptions
         """
         return self._vertex

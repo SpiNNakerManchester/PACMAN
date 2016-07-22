@@ -7,8 +7,8 @@ from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
 from pacman import exceptions
-from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
-    import MultiCastPartitionedEdge
+from pacman.model.graph.machine.simple_machine_edge \
+    import SimpleMachineEdge
 
 from spinn_machine.utilities.progress_bar import ProgressBar
 
@@ -20,30 +20,30 @@ logger = logging.getLogger(__name__)
 
 
 class BasicDijkstraRouting(object):
-    """ An routing algorithm that can find routes for subedges between\
-        subvertices in a partitioned_graph that have been placed on a
+    """ An routing algorithm that can find routes for edges between\
+        vertices in a machine graph that have been placed on a
         machine by the use of a Dijkstra shortest path algorithm
     """
 
     BW_PER_ROUTE_ENTRY = 0.01
     MAX_BW = 250
 
-    def __call__(self, placements, machine, partitioned_graph, k=1, l=0, m=0,
+    def __call__(self, placements, machine, machine_graph, k=1, l=0, m=0,
                  bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
-        """ Find routes between the subedges with the allocated information,
+        """ Find routes between the edges with the allocated information,
             placed in the given places
 
-        :param placements: The placements of the subedges
+        :param placements: The placements of the edges
         :type placements:\
-                    :py:class:`pacman.model.placements.placements.Placements`
+            :py:class:`pacman.model.placements.placements.Placements`
         :param machine: The machine through which the routes are to be found
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param partitioned_graph: the partitioned_graph object
-        :type partitioned_graph:\
-                    :py:class:`pacman.partitioned_graph.partitioned_graph.PartitionedGraph`
+        :param machine_graph: the machine_graph object
+        :type machine_graph:\
+            :py:class:`pacman.model.graph.machine_graph.MachineGraph`
         :return: The discovered routes
         :rtype:\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
+            :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
                    goes wrong with the routing
         """
@@ -61,30 +61,30 @@ class BasicDijkstraRouting(object):
         dijkstra_tables = self._initiate_dijkstra_tables(machine)
         self._update_all_weights(nodes_info, machine)
 
-        # each subvertex represents a core in the board
+        # each vertex represents a core in the board
         progress = ProgressBar(len(list(placements.placements)),
                                "Creating routing entries")
 
         for placement in placements.placements:
-            subvert = placement.subvertex
+            subvert = placement.vertex
             out_going_sub_edges = \
-                partitioned_graph.outgoing_subedges_from_subvertex(subvert)
+                machine_graph.get_edges_starting_at_vertex(subvert)
             out_going_sub_edges = filter(
-                lambda edge: isinstance(edge, MultiCastPartitionedEdge),
+                lambda edge: isinstance(edge, SimpleMachineEdge),
                 out_going_sub_edges)
 
             dest_chips = set()
-            subedges_to_route = list()
+            edges_to_route = list()
 
             for subedge in out_going_sub_edges:
-                destination_subvertex = subedge.post_subvertex
-                destination_placement = placements.get_placement_of_subvertex(
+                destination_subvertex = subedge.post_vertex
+                destination_placement = placements.get_placement_of_vertex(
                     destination_subvertex)
 
                 chip = machine.get_chip_at(destination_placement.x,
                                            destination_placement.y)
                 dest_chips.add((chip.x, chip.y))
-                subedges_to_route.append(subedge)
+                edges_to_route.append(subedge)
 
             if len(dest_chips) != 0:
                 self._update_all_weights(nodes_info, machine)
@@ -96,13 +96,13 @@ class BasicDijkstraRouting(object):
                     dijkstra_tables, nodes_info, dest_chips, placement.x,
                     placement.y)
 
-            for subedge in subedges_to_route:
-                dest = subedge.post_subvertex
-                dest_placement = placements.get_placement_of_subvertex(dest)
+            for subedge in edges_to_route:
+                dest = subedge.post_vertex
+                dest_placement = placements.get_placement_of_vertex(dest)
                 self._retrace_back_to_source(
                     dest_placement.x, dest_placement.y, dijkstra_tables,
                     dest_placement.p, subedge, nodes_info, placement.p,
-                    partitioned_graph)
+                    machine_graph)
             progress.update()
         progress.end()
         return self._routing_paths
@@ -312,7 +312,7 @@ class BasicDijkstraRouting(object):
                         x_source, y_source, weight)
 
             # This is the lowest cost across ALL
-            # deactivated nodes in the partitionable_graph.
+            # deactivated nodes in the graph.
             graph_lowest_cost = None
 
             # Find the next node to be activated
@@ -375,7 +375,7 @@ class BasicDijkstraRouting(object):
         if not neighbour_exists:
             raise exceptions.PacmanRoutingException(
                 "Tried to propagate to ({}, {}), which is not in the"
-                " partitionable_graph: remove non-existent neighbours"
+                " graph: remove non-existent neighbours"
                 .format(x_neighbour, y_neighbour))
 
         neighbour_activated =\
@@ -385,7 +385,7 @@ class BasicDijkstraRouting(object):
         neighbour_lowest_cost =\
             dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"]
 
-        # Only try to update if the neighbour is within the partitionable_graph
+        # Only try to update if the neighbour is within the graph
         #  and the cost if the node hasn't already been activated
         # and the lowest cost if the new cost is less, or if
         # there is no current cost
@@ -407,7 +407,7 @@ class BasicDijkstraRouting(object):
     def _retrace_back_to_source(
             self, x_destination, y_destination, dijkstra_tables,
             processor_dest, subedge, nodes_info, source_processor,
-            partitioned_graph):
+            graph):
         """
 
         :param x_destination:
@@ -422,8 +422,8 @@ class BasicDijkstraRouting(object):
         :type y_destination:
         :type dijkstra_tables:
         :type processor_dest:
-        :param partitioned_graph:
-        :type partitioned_graph:
+        :param graph:
+        :type graph:
         :return: the next coordinates to look into
         :rtype: int int
         :raise PacmanRoutingException: when the algorithm doesn't find a next\
@@ -442,12 +442,12 @@ class BasicDijkstraRouting(object):
         routing_entry_route_links = None
 
         # build the multicast entry
-        partitions = partitioned_graph.outgoing_edges_partitions_from_vertex(
-            subedge.pre_subvertex)
+        partitions = \
+            graph.get_outgoing_edge_partitions_starting_at_vertex(
+                subedge.pre_vertex)
 
         previous_routing_entry = None
-        for partition_key in partitions:
-            partition = partitions[partition_key]
+        for partition in partitions:
             if subedge in partition:
                 entry = MulticastRoutingTableByPartitionEntry(
                     out_going_links=routing_entry_route_links,
@@ -484,11 +484,11 @@ class BasicDijkstraRouting(object):
                                     neighbour_index, nodes_info,
                                     x_current, y_current,
                                     previous_routing_entry, subedge,
-                                    partitioned_graph)
+                                    graph)
                     else:
                         raise exceptions.PacmanRoutingException(
                             "Tried to trace back to node not in "
-                            "partitionable_graph: remove non-existent"
+                            "graph: remove non-existent"
                             " neighbours")
                 neighbour_index += 1
 
@@ -504,7 +504,7 @@ class BasicDijkstraRouting(object):
     def _create_routing_entry(
             self, x_neighbour, y_neighbour, dijkstra_tables, neighbour_index,
             nodes_info, x_current, y_current, previous_routing_entry, subedge,
-            partitioned_graph):
+            graph):
         """ Create a new routing entry
 
         :param x_neighbour:
@@ -515,7 +515,7 @@ class BasicDijkstraRouting(object):
         :param x_current:
         :param y_current:
         :param previous_routing_entry:
-        :param partitioned_graph:
+        :param graph:
         :param subedge:
         :type subedge:
         :type x_neighbour:
@@ -525,7 +525,7 @@ class BasicDijkstraRouting(object):
         :type nodes_info:
         :type x_current:
         :type y_current:
-        :type partitioned_graph:
+        :type graph:
         :type previous_routing_entry:
         :return x_current, y_current, previous_routing_entry, made_an_entry
         :rtype: int, int, spinn_machine.multicast_routing_entry, bool
@@ -554,11 +554,11 @@ class BasicDijkstraRouting(object):
                 0.00000000001):
 
             # build the multicast entry
-            partitions = partitioned_graph.\
-                outgoing_edges_partitions_from_vertex(subedge.pre_subvertex)
+            partitions = graph.\
+                get_outgoing_edge_partitions_starting_at_vertex(
+                    subedge.pre_vertex)
             entry = None
-            for partition_key in partitions:
-                partition = partitions[partition_key]
+            for partition in partitions:
                 if subedge in partition:
                     entry = MulticastRoutingTableByPartitionEntry(
                         out_going_links=dec_direction,

@@ -22,21 +22,21 @@ logger = logging.getLogger(__name__)
 
 
 class RadialPlacer(object):
-    """ A placement algorithm that can place a partitioned graph onto a\
+    """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    def __call__(self, partitioned_graph, machine):
+    def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
-        self._check_constraints(partitioned_graph.vertices)
+        self._check_constraints(machine_graph.vertices)
 
         placements = Placements()
         ordered_subverts = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
-                partitioned_graph.subvertices)
+                machine_graph.vertices)
 
-        # Iterate over subvertices and generate placements
+        # Iterate over vertices and generate placements
         progress_bar = ProgressBar(len(ordered_subverts),
                                    "Placing graph vertices")
         resource_tracker = ResourceTracker(

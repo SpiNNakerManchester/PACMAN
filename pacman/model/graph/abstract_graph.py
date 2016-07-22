@@ -3,9 +3,12 @@ from abc import ABCMeta
 from abc import abstractmethod
 from abc import abstractproperty
 
+from pacman.model.abstract_classes.abstract_has_constraints\
+    import AbstractHasConstraints
+
 
 @add_metaclass(ABCMeta)
-class AbstractGraph(object):
+class AbstractGraph(AbstractHasConstraints):
     """ A graph
     """
 
@@ -110,4 +113,13 @@ class AbstractGraph(object):
         :param outgoing_edge_partition_name: The name of the edge partition
         :type outgoing_edge_partition_name: str
         :rtype: :py:class:`pacman.model.graph.AbstractOutgoingEdgePartition`
+        """
+
+    @abstractmethod
+    def get_outgoing_edge_partitions_with_traffic_type(self, traffic_type):
+        """ Get the outgoing edge partitions with a given traffic type
+
+        :param traffic_type: The traffic type to look for
+        :type traffic_type:\
+            :py:class:`pacman.model.graph.edge_traffic_type.EdgeTrafficType`
         """

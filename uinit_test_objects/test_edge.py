@@ -1,24 +1,24 @@
-from pacman.model.partitionable_graph.abstract_partitionable_edge import \
-    AbstractPartitionableEdge
-from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
-    MultiCastPartitionedEdge
+from pacman.model.graph.application.simple_application_edge import \
+    SimpleApplicationEdge
+from pacman.model.graph.machine.simple_machine_edge import \
+    SimpleMachineEdge
 
 
-class TestPartitionableEdge(AbstractPartitionableEdge):
+class TestEdge(SimpleApplicationEdge):
     """
     test class for creating edges
     """
 
     def __init__(self, pre_vertex, post_vertex, label=None, constraints=None):
-        AbstractPartitionableEdge.__init__(
+        SimpleApplicationEdge.__init__(
             self, pre_vertex, post_vertex, constraints, label)
 
-    def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
+    def create_machine_edge(self, pre_vertex, post_vertex, constraints=None,
                        label=None):
-        """ method to create subedges
+        """ method to create edges
 
-        :param pre_subvertex:
-        :param post_subvertex:
+        :param pre_vertex:
+        :param post_vertex:
         :param constraints:
         :param label:
         :return:
@@ -29,12 +29,8 @@ class TestPartitionableEdge(AbstractPartitionableEdge):
         else:
             constraints = self._constraints
             print constraints
-        return MultiCastPartitionedEdge(pre_subvertex, post_subvertex,
+        return SimpleMachineEdge(pre_vertex, post_vertex,
                                         label, constraints)
-
-    def is_partitionable_edge(self):
-        """ helper for isinstance
-
         :return:
         """
         return True

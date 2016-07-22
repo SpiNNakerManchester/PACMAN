@@ -13,17 +13,17 @@ import jsonschema
 
 
 class ConvertToMemoryPlacements(object):
-    """ Takes the file-based placements, machine, partitioned graph and\
+    """ Takes the file-based placements, machine, machine graph and\
         constraints and builds a memory placements object
     """
 
-    def __call__(self, placements, allocations, partitioned_graph,
-                 extended_machine, constraints):
+    def __call__(self, placements, allocations, machine_graph,
+                 extended_machine, constraints, vertex_ids):
         """
 
         :param placements:
         :param allocations:
-        :param partitioned_graph:
+        :param machine_graph:
         :param extended_machine:
         :param constraints:
         :return:
@@ -45,9 +45,9 @@ class ConvertToMemoryPlacements(object):
 
         # process placements
         for vertex_id in file_placements:
-            subvertex = partitioned_graph.get_subvertex_by_id(vertex_id)
             if vertex_id not in core_allocations:
-                if subvertex is not None:
+                vertex = vertex_ids[vertex_id]
+                if vertex is not None:
 
                     # virtual chip or tag chip
                     constraints_for_vertex = self._locate_constraints(
@@ -75,23 +75,23 @@ class ConvertToMemoryPlacements(object):
 
                         # create placement
                         placements.add_placement(Placement(
-                            subvertex, destination_chip.x, destination_chip.y,
+                            vertex, destination_chip.x, destination_chip.y,
                             None))
                     else:
                         raise exceptions.PacmanConfigurationException(
                             "I don't recognise this pattern of constraints for"
                             " a vertex which does not have a placement")
             else:
-                if subvertex is None:
+                if vertex is None:
                     raise exceptions.PacmanConfigurationException(
-                        "Failed to locate the partitioned vertex in the "
-                        "partitioned graph with label {}".format(vertex_id))
+                        "Failed to locate the vertex in the "
+                        "graph with label {}".format(vertex_id))
                 else:
                     memory_placements.add_placement(
                         Placement(x=file_placements[vertex_id][0],
                                   y=file_placements[vertex_id][1],
                                   p=core_allocations[vertex_id][0],
-                                  subvertex=subvertex))
+                                  vertex=vertex))
 
         # return the file format
         return memory_placements

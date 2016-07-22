@@ -19,13 +19,13 @@ class OneToOnePlacer(RadialPlacer):
     def __init__(self):
         RadialPlacer.__init__(self)
 
-    def __call__(self, partitioned_graph, machine):
+    def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
-        self._check_constraints(partitioned_graph.vertices)
+        self._check_constraints(machine_graph.vertices)
 
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
-            partitioned_graph)
+            machine_graph)
 
         placements = Placements()
 
@@ -35,7 +35,7 @@ class OneToOnePlacer(RadialPlacer):
 
     def _do_allocation(self, ordered_subverts, placements, machine):
 
-        # Iterate over subvertices and generate placements
+        # Iterate over vertices and generate placements
         progress_bar = ProgressBar(
             len(ordered_subverts), "Placing graph vertices")
         resource_tracker = ResourceTracker(
@@ -53,9 +53,9 @@ class OneToOnePlacer(RadialPlacer):
 
             # if too many one to ones to fit on a chip, allocate individually
             if len(subvertex_list) > max_cores_on_chip:
-                for subvertex in subvertex_list:
+                for vertex in subvertex_list:
                     self._allocate_individual(
-                        subvertex, placements, progress_bar, resource_tracker)
+                        vertex, placements, progress_bar, resource_tracker)
             else:
 
                 # try to allocate in one block
@@ -82,29 +82,29 @@ class OneToOnePlacer(RadialPlacer):
 
                     # If something goes wrong, try to allocate each
                     # individually
-                    for subvertex in subvertex_list:
+                    for vertex in subvertex_list:
                         self._allocate_individual(
-                            subvertex, placements, progress_bar,
+                            vertex, placements, progress_bar,
                             resource_tracker)
         progress_bar.end()
 
     @staticmethod
     def _allocate_individual(
-            subvertex, placements, progress_bar, resource_tracker):
+            vertex, placements, progress_bar, resource_tracker):
 
         # Create and store a new placement anywhere on the board
         (x, y, p, _, _) = resource_tracker.\
             allocate_constrained_resources(
-                subvertex.resources_required, subvertex.constraints)
-        placement = Placement(subvertex, x, y, p)
+                vertex.resources_required, vertex.constraints)
+        placement = Placement(vertex, x, y, p)
         placements.add_placement(placement)
         progress_bar.update()
 
     def _sort_vertices_for_one_to_one_connection(
-            self, partitioned_graph):
+            self, machine_graph):
         """
 
-        :param partitioned_graph: the partitioned graph of this application
+        :param machine_graph: the graph to place
         :return: list of sorted vertices
         """
         sorted_vertices = list()
@@ -112,12 +112,12 @@ class OneToOnePlacer(RadialPlacer):
 
         # order subverts based on constraint priority
         ordered_subverts = placer_algorithm_utilities\
-            .sort_vertices_by_known_constraints(partitioned_graph.subvertices)
+            .sort_vertices_by_known_constraints(machine_graph.vertices)
 
         for vertex in ordered_subverts:
             if vertex not in found_list:
                 connected_vertices = self._find_one_to_one_vertices(
-                    vertex, partitioned_graph)
+                    vertex, machine_graph)
                 new_list = [
                     v for v in connected_vertices if v not in found_list]
                 sorted_vertices.append(new_list)
@@ -131,13 +131,13 @@ class OneToOnePlacer(RadialPlacer):
         return sorted_vertices
 
     @staticmethod
-    def _find_one_to_one_vertices(vertex, partitioned_graph):
+    def _find_one_to_one_vertices(vertex, graph):
         """ Find vertices which have one to one connections with the given\
             vertex, and where their constraints don't force them onto\
             different chips.
 
         :param vertex:  the vertex to use as a basis for one to one connections
-        :param partitioned_graph: \
+        :param graph: \
             the graph to look for other one to one vertices
         :return: set of one to one vertices
         """
@@ -146,8 +146,8 @@ class OneToOnePlacer(RadialPlacer):
         vertices_seen = {vertex}
 
         # look for one to ones leaving this vertex
-        outgoing = partitioned_graph.outgoing_subedges_from_subvertex(vertex)
-        vertices_to_try = [edge.post_subvertex for edge in outgoing]
+        outgoing = graph.get_edges_starting_at_vertex(vertex)
+        vertices_to_try = [edge.post_vertex for edge in outgoing]
         while len(vertices_to_try) != 0:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
@@ -159,7 +159,7 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 if y is not None and post_y is not None and y != post_y:
                     conflict = True
-                edges = partitioned_graph.incoming_subedges_from_subvertex(
+                edges = graph.get_edges_ending_at_vertex(
                     next_vertex)
                 if len(edges) == 1 and not conflict:
                     found_vertices.append(next_vertex)
@@ -168,18 +168,18 @@ class OneToOnePlacer(RadialPlacer):
                     if post_y is not None:
                         y = post_y
                     outgoing = \
-                        partitioned_graph.outgoing_subedges_from_subvertex(
+                        graph.get_edges_starting_at_vertex(
                             next_vertex)
                     vertices_to_try.extend([
-                        edge.post_subvertex for edge in outgoing
-                        if edge.post_subvertex not in vertices_seen])
+                        edge.post_vertex for edge in outgoing
+                        if edge.post_vertex not in vertices_seen])
 
         # look for one to ones entering this vertex
-        incoming = partitioned_graph.incoming_subedges_from_subvertex(
+        incoming = graph.get_edges_ending_at_vertex(
             vertex)
         vertices_to_try = [
-            edge.pre_subvertex for edge in incoming
-            if edge.pre_subvertex not in vertices_seen]
+            edge.pre_vertex for edge in incoming
+            if edge.pre_vertex not in vertices_seen]
         while len(vertices_to_try) != 0:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
@@ -191,7 +191,7 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 if y is not None and pre_y is not None and y != pre_y:
                     conflict = True
-                edges = partitioned_graph.outgoing_subedges_from_subvertex(
+                edges = graph.get_edges_starting_at_vertex(
                     next_vertex)
                 if len(edges) == 1 and not conflict:
                     found_vertices.append(next_vertex)
@@ -200,10 +200,10 @@ class OneToOnePlacer(RadialPlacer):
                     if pre_y is not None:
                         y = pre_y
                     incoming = \
-                        partitioned_graph.incoming_subedges_from_subvertex(
+                        graph.get_edges_ending_at_vertex(
                             next_vertex)
                     vertices_to_try.extend([
-                        edge.pre_subvertex for edge in incoming
-                        if edge.pre_subvertex not in vertices_seen])
+                        edge.pre_vertex for edge in incoming
+                        if edge.pre_vertex not in vertices_seen])
 
         return found_vertices

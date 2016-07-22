@@ -29,9 +29,9 @@ class BasicTagAllocator(object):
                                    "Allocating tags")
         placements_with_tags = list()
         for placement in placements.placements:
-            ResourceTracker.check_constraints([placement.subvertex])
+            ResourceTracker.check_constraints([placement.vertex])
             if len(utility_calls.locate_constraints_of_type(
-                    placement.subvertex.constraints,
+                    placement.vertex.constraints,
                     AbstractTagAllocatorConstraint)):
                 placements_with_tags.append(placement)
             progress_bar.update()
@@ -39,7 +39,7 @@ class BasicTagAllocator(object):
         # Go through and allocate the tags
         tags = Tags()
         for placement in placements_with_tags:
-            vertex = placement.subvertex
+            vertex = placement.vertex
 
             # Get the constraint details for the tags
             (board_address, ip_tags, reverse_ip_tags) =\

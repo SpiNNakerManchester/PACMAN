@@ -13,34 +13,24 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class DestinationBasedRoutingInfoAllocator(object):
-    """ An algorithm that can produce routing keys and masks for\
-        edges in a partitioned_graph based on the x,y,p of the placement\
-        of the receiving partitioned vertex.
-        Note that no constraints are supported, and that the number of keys\
-        required by each edge must be 2048 or less, and that all edges coming\
-        out of a vertex going to the same destination need to reside\
-        in the same partition.
-    """
 
     MAX_KEYS_SUPPORTED = 2048
     MASK = 0xFFFFF800
 
-    def __call__(self, subgraph, placements, n_keys_map, routing_paths):
+    def __call__(self, machine_graph, placements, n_keys_map, routing_paths):
         """
-        Allocates routing information to the partitioned edges in a\
-        partitioned graph
 
-        :param subgraph: The partitioned graph to allocate the routing info for
-        :type subgraph:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-        :param placements: The placements of the subvertices
+        :param machine_graph: The graph to allocate the routing info for
+        :type machine_graph:\
+            :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+        :param placements: The placements of the vertices
         :type placements:\
                     :py:class:`pacman.model.placements.placements.Placements`
-        :param n_keys_map: A map between the partitioned edges and the number\
+        :param n_keys_map: A map between the edges and the number\
                     of keys required by the edges
         :type n_keys_map:\
-                    :py:class:`pacman.model.routing_info.abstract_partitioned_edge_n_keys_map.AbstractPartitionedEdgeNKeysMap`
-        :param routing_paths: the paths each partitioned edge takes to get\
+                    :py:class:`pacman.model.routing_info.abstract_machine_partition_n_keys_map.AbstractMachinePartitionNKeysMap`
+        :param routing_paths: the paths each edge takes to get\
                 from source to destination.
         :type routing_paths:
             :py:class:`pacman.model.routing_paths.multicast_routing_paths.MulticastRoutingPaths
@@ -52,26 +42,29 @@ class DestinationBasedRoutingInfoAllocator(object):
         """
 
         # check that this algorithm supports the constraints put onto the
-        # partitioned_edges
+        # partitions
         supported_constraints = []
         utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=subgraph.subedges,
+            constrained_vertices=machine_graph.partitions,
             supported_constraints=supported_constraints,
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each subedge and create keys from its placement
-        progress_bar = ProgressBar(len(subgraph.subedges),
+        progress_bar = ProgressBar(len(machine_graph.edges),
                                    "Allocating routing keys")
         routing_infos = RoutingInfo()
         routing_tables = MulticastRoutingTables()
 
-        for subedge in subgraph.subedges:
-            destination = subedge.post_subvertex
-            placement = placements.get_placement_of_subvertex(destination)
+        for subedge in machine_graph.edges:
+            destination = subedge.post_vertex
+            placement = placements.get_placement_of_vertex(destination)
             key = self._get_key_from_placement(placement)
             keys_and_masks = list([BaseKeyAndMask(base_key=key,
                                                   mask=self.MASK)])
-            n_keys = n_keys_map.n_keys_for_partitioned_edge(subedge)
+            partition = machine_graph\
+                .get_outgoing_edge_partition_starting_at_vertex(
+                    subedge.pre_vertex)
+            n_keys = n_keys_map.n_keys_for_partition(partition)
             if n_keys > self.MAX_KEYS_SUPPORTED:
                 raise exceptions.PacmanConfigurationException(
                     "Only edges which require less than {} keys are supported"

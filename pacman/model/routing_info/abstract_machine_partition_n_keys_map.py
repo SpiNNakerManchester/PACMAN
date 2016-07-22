@@ -4,7 +4,7 @@ from six import add_metaclass
 
 
 @add_metaclass(ABCMeta)
-class AbstractPartitionedPartitionNKeysMap(object):
+class AbstractMachinePartitionNKeysMap(object):
     """ A map that provides the number of keys required by each partition
     """
 
@@ -14,7 +14,7 @@ class AbstractPartitionedPartitionNKeysMap(object):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.model.graph.outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
         :return: The number of keys required by the partition
         :rtype: int
         """

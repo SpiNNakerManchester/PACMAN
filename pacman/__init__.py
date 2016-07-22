@@ -1,111 +1,83 @@
 """ Provides various functions which together can be used to take a graph and\
     split it into pieces that can be loaded on to a machine, along with\
-    routes between the pieces.\
-    The main items provided are:
-
-        * :py:class:`pacman.operations.partitioner.Partitioner`
-        * :py:class:`pacman.operations.placer.Placer`
-        * \
-            :py:class:`pacman.operations.routing_info_allocator.RoutingInfoAllocator`
-        * :py:class:`pacman.operations.router.Router`
+    routes between the pieces.
 
     Functional Requirements
     =======================
 
-        * Creation of a graph of vertices to be partitioned, and edges\
-          between the vertices indicating a directional communication between\
-          the vertices.
+        * Creation of an Application Graph of Vertices indicating points of\
+          computation within the graph and Edges between the vertices\
+          indicating a directional communication between the vertices;\
+          and a similar Machine Graph.
 
-            * Vertices will have a number of *atoms* - an atom cannot be\
-              broken down in to anything smaller, and so each partitioned\
-              vertex (sub-vertex) must contain at least 1 atom.
+            * Vertices in the Application Graph will have a number of *atoms*\
+              - an atom cannot be broken down in to anything smaller.
 
-            * Vertices must be able to indicate what resources are required by\
-              any given subset of the atoms.
+            * Vertices in the Application Graph must be able to indicate what\
+              machine resources are required by any given subset of the atoms.
 
-            * A vertex can have a number of constraints which must be\
-              respected by any algorithm which uses the graph.  Initially,\
-              these will include:
+            * Vertices in the Machine Graph must be able to fit on a single\
+              chip of the machine in terms of resource usage.
 
-                  * The maximum number of atoms which any sub-vertex can\
-                    contain.
+            * A Vertex can have a number of constraints which must be\
+              respected by any algorithm which uses the graph.  Algorithms\
+              must check that they can support the given constraints and must\
+              fail if they cannot.  Provided constraints include support for:
 
-                  * The chip and/or processor on to which the vertex should\
-                    be placed.
+                  * The maximum number of atoms which any Machine Graph Vertex\
+                    can contain for a given Application Graph vertex
 
-                  * A set of vertices which should contain the same number of\
-                    atoms after partitioning.
+                  * The chip and/or processor on to which a Machine Graph\
+                    Vertex should be placed.
 
-                  * A set of vertices whose sub-vertices should be placed on\
-                    the same chip if they contain the same atom.
+                  * A set of Application Graph Vertices whose corresponding\
+                    Machine Graph vertices should contain the same number of\
+                    atoms.
 
-                  * A exact number of equal sized sub-vertices into which a\
-                    vertex should be partitioned.
-
-                  * The range of processors on a specific chip on to which the\
-                    sub-vertices of the vertex should be placed.
+                  * A set of Application Graph Vertices whose corresponding\
+                    Machine Graph vertices should be placed on the same chip\
+                    if they contain the same atom.
 
             * It should be possible to create new constraints as the need\
-              arises
-
-            * An edge should provide functionality to create sub-edges of the\
-              edge, to allow extensions of an edge and/or a sub-edge to\
-              contain additional information about the edge and/or sub-edge
+              arises.
 
             * Multiple edges can exist between the same two vertices.
 
-        * Creation of a subgraph of sub-vertices to be placed and/or routed,\
-          with sub-edges between the sub-vertices.
-
-            * It must be possible to build this subgraph directly without\
+            * It must be possible to build the Machine Graph directly without\
               requiring that it is created by one of the other modules.
 
-            * It is *not* required that there is a sub-edge between every pair\
-              of sub-vertices with the same vertex.
+            * It is *not* required that there is a Machine Graph Edge between\
+              every pair of Machine Graph Vertex from the same Application\
+              Graph Vertex.
 
-            * Where a subgraph is created from a graph, it should be possible\
-              to find the sub-vertices of a given vertex, and the sub-edges of\
-              a given edge.
-
-            * The subgraph does not have to reference a graph if it was not\
-              created from a graph, and similarly the sub-vertices do not have\
-              to reference a vertex, nor do the sub-edges have to reference an\
-              edge.
-
-            * A sub-vertex can have a number of constraints which must be\
-              respected by any algorithm which uses the subgraph.
-
-            * It should be possible to remove a sub-edge from a subgraph, to\
-              allow later pruning of a subgraph that has been created\
-              automatically from a graph.
-
-            * Multiple sub-edges can exist between any two sub-vertices.
+            * Where a Machine Graph is created from an Application Graph, it\
+              should be possible to find the corresponding Vertices and Edges\
+              from one graph to the other.
 
         * Creation of multicast routing info consisting of key/mask\
-          combinations assigned to sub-edges of a given subgraph.
+          combinations assigned to Edges of the Machine Graph.
 
             * It must be possible to build this information directly without\
               requiring that it is created by one of the other modules.
 
             * There should be exactly one key/mask combination for each\
-              sub-edge in the subgraph, which will represent all the keys\
-              which will be sent in all packets from the sub-vertex at the\
-              start of the sub-edge down that sub-edge.
+              Edge in the Machine Graph, which will represent all the keys\
+              which will be sent in all packets from the Vertex at the\
+              start of the Edge down that Edge.
 
-            * It is possible for a sub-vertex to send several different keys\
-              down several different sub-edges, but only one per sub-edge (but\
+            * It is possible for a Vertex to send several different keys\
+              down several different Edges, but only one per Edge (but\
               note that it is acceptable for different keys to be assigned to\
-              different sub-edges between the same two sub-vertices).
+              different Edges between the same two Vertices).
 
             * There should be no overlap between the key/mask combinations\
-              of sub-edges which come from different sub-vertices i.e. no\
-              two sub-edges which start at different sub-vertices should have\
+              of Edges which come from different Vertices i.e. no\
+              two Edges which start at different Vertices should have\
               the same key/mask combination.
 
-        * Partitioning of a graph with respect to a machine, such that the\
-          resources consumed by each sub-vertex does not exceed those\
-          provided by each processor on the machine.  This results in a\
-          subgraph.
+        * Partitioning of an Application graph with respect to a machine, such\
+          that the resources consumed by each Vertex does not exceed those\
+          provided by each chip on the machine.
 
             * It should be possible to select from a range of partitioning\
               algorithms or provide one, although a default should be provided\
@@ -117,36 +89,39 @@
               be ignored, although these can be used if it makes sense for\
               the given algorithm.
 
-            * It should be possible to create at least one grouping of the\
-              generated sub-vertices so that each group fits within the\
+            * It must be possible to create at least one grouping of the\
+              generated Vertices so that each group fits within the\
               resources provided by a single chip on the machine.
 
-            * It should not be assumed that a given grouping of sub-vertices\
+            * It should not be assumed that a given grouping of Vertices\
               will be the final grouping on the machine, although it is\
               acceptable to make hints through additional constraints about\
               what is likely to work.
 
-            * The machine itself should not be altered by the partitioning, so\
+            * The machine itself must not be altered by the partitioning, so\
               that it can be used in further processing.
 
-            * The graph itself should not be altered by the partitioning, so\
+            * The graph itself must not be altered by the partitioning, so\
               that it can be used in further processing.
 
-            * No two sub-vertices created from a single vertex should contain\
-              the same atom.
+            * No two Machine Graph Vertices created from a single Application\
+              Graph Vertex can contain the same atom.
 
-            * Any edges in the graph should be split with the vertices to\
-              create a number of sub-edges, such that where there was a vertex\
-              *v* connected to a vertex *w* by a single edge, there should be\
-              a sub-edge between every sub-vertex of vertex *v* and every\
-              sub-vertex of vertex *w*; for example, if there are 2\
-              sub-vertices of *v* and *w*, and one edge between them, then\
-              there will be 4 new sub-edges for this edge.
+            * Any Edges in the Application Graph must be split with the\
+              Vertices to create a number of Machine Graph edges, such that\
+              where there was a vertex *v* connected to a vertex *w* by a\
+              single edge in the Application Graph, there should be\
+              an Edge in the Machine Graph between every Vertex of\
+              Application Graph Vertex *v* and every Vertex of Application\
+              Graph Vertex *w*; for example, if there are 2\
+              Machine Graph Vertices for each of *v* and *w*, and one Edge\
+              between them in the Application Graph, then there will be 4 \
+              new Edges in the Machine Graph for this Edge.
 
-        * Placement of a subgraph on a given machine, such that the resources\
-          required by any combination of sub-vertices placed on any chip in\
-          the machine does not exceed the resources provided by that chip.\
-          This results in placements.
+        * Placement of a Machine Graph on a given machine, such that the\
+          resources required by any combination of Vertices placed on any\
+          chip in the machine does not exceed the resources provided by that\
+          chip.
 
             * It should be possible to choose from a range of placement\
               algorithms or provide one, although a default should be provided\
@@ -161,36 +136,35 @@
             * The machine itself should not be altered by placement so that\
               it can be used in further processing.
 
-            * The subgraph itself should not be altered by placement so that\
+            * The graph itself should not be altered by placement so that\
               it can be used in further processing.
 
             * The returned placements should only contain a single placement\
-              for each sub-vertex.
+              for each vertex.
 
-            * The placements should be such that the sub-vertices with\
-              sub-edges between them must be able to communicate with each\
+            * The placements should be such that the vertices with\
+              edges between them must be able to communicate with each\
               other.
 
-        * Allocation of multicast routing keys and masks to a subgraph such\
-          that each sub-vertex sends out packets with a different key/mask\
-          combination.  This results in multicast routing info.
+        * Allocation of multicast routing keys and masks to a Machine Graph\
+          such that each vertex sends out packets with a different key/mask\
+          combination.
 
             * This can use the placement information if required.  If an\
               algorithm requires placement information but none is provided\
               an exception is thrown.
 
-        * Routing of sub-edges between sub-vertices with a given allocation of\
-          routing keys and masks with respect to a given machine.  This\
-          results in multicast routing tables.
+        * Routing of edges between vertices with a given allocation of\
+          routing keys and masks with respect to a given machine.
 
             * It should be possible to choose from a range of routing\
               algorithms, or provide one, although a default should be\
               provided in the absence of such a choice
 
-            * For any sub-vertex, following the routes from the placement of\
-              the sub-vertex should result exactly in the set of placements of\
-              the destination sub-vertices described by all the sub-edges\
-              which start at that sub-vertex. No additional destination should\
+            * For any vertex, following the routes from the placement of\
+              the vertex should result exactly in the set of placements of\
+              the destination vertices described by all the edges\
+              which start at that vertex. No additional destination should\
               be reached, and no fewer than this set of destinations should be\
               reached.
 
@@ -213,22 +187,4 @@
           themselves. This will ensure that no misunderstanding can be made\
           about the speed of operation of a function.
 
-    Use Cases
-    =========
-
-        * All the algorithms are used to take a simulation specified as a\
-          :py:class:`~pacman.model.graph.graph.Graph` and ensure that each\
-          :py:class:`~pacman.model.graph.vertex.Vertex` can be divided so that
-          it can fit within the resources provided by a given machine, and\
-          create routing tables to ensure that data is sent along each\
-          specified :py:class:`~pacman.model.graph.edge.Edge` as requested,\
-          and that no stray traffic should be received.   This is used to\
-          generate data for a simulation which is then run on the machine.
-
-        * A subset of the algorithms are used to take a pre-defined\
-          :py:class:`~pacman.model.subgraph.subgraph.Subgraph` and pre-defined\
-          :py:class:`~pacman.model.routing_info.routing_info.RoutingInfo`, and\
-          generate :py:class:`~pacman.model.placements.placements.Placements`\
-          and\
-          :py:class:`~pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
 """

@@ -18,8 +18,8 @@ from pacman.model.constraints.tag_allocator_constraints\
     import TagAllocatorRequireReverseIptagConstraint
 from pacman.model.constraints.tag_allocator_constraints\
     .abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
-from pacman.model.resources.cpu_cycles_per_tick_resource \
-    import CPUCyclesPerTickResource
+from pacman.model.resources.cpu_cycles_resource \
+    import CPUCyclesResource
 
 from spinn_machine.utilities.ordered_set import OrderedSet
 
@@ -1164,7 +1164,7 @@ class ResourceTracker(object):
         return ResourceContainer(
             DTCMResource(max_dtcm_available),
             SDRAMResource(max_sdram_available),
-            CPUCyclesPerTickResource(max_cpu_available))
+            CPUCyclesResource(max_cpu_available))
 
     def unallocate_resources(self, chip_x, chip_y, processor_id, resources,
                              ip_tags, reverse_ip_tags):

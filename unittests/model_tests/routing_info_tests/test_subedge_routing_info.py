@@ -2,12 +2,12 @@
 test for subedge routing infos
 """
 # pacman imports
-from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
-    MultiCastPartitionedEdge
+from pacman.model.graph.machine.simple_machine_edge import \
+    SimpleMachineEdge
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
-from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
+from pacman.model.graph.machine.simple_machine_vertex import SimpleMachineVertex
 
 # general imports
 import unittest
@@ -20,9 +20,9 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
          right places
         :return:
         """
-        subv1 = SimplePartitionedVertex(None, "")
-        subv2 = SimplePartitionedVertex(None, "")
-        sube = MultiCastPartitionedEdge(subv1, subv2)
+        subv1 = SimpleMachineVertex(None, "")
+        subv2 = SimpleMachineVertex(None, "")
+        sube = SimpleMachineEdge(subv1, subv2)
         keys_and_masks = list()
         keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = PartitionRoutingInfo(keys_and_masks, sube)
@@ -36,9 +36,9 @@ class TestSubedgeRoutingInfos(unittest.TestCase):
         checks that creating a routing works on its own
         :return:
         """
-        subv1 = SimplePartitionedVertex(None, "")
-        subv2 = SimplePartitionedVertex(None, "")
-        sube = MultiCastPartitionedEdge(subv1, subv2)
+        subv1 = SimpleMachineVertex(None, "")
+        subv2 = SimpleMachineVertex(None, "")
+        sube = SimpleMachineEdge(subv1, subv2)
         keys_and_masks = list()
         keys_and_masks.append(BaseKeyAndMask(0x0012, 0x00ff))
         sri = PartitionRoutingInfo(keys_and_masks, sube)

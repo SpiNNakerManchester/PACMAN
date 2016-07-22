@@ -13,29 +13,28 @@ class Tags(object):
         # Mapping of (board address, tag) to ReverseIPTag
         self._reverse_ip_tags = dict()
 
-        # Mapping of partitioned vertex to list of IPTag
+        # Mapping of vertex to list of IPTag
         self._ip_tags_by_vertex = dict()
 
-        # Mapping of partitioned vertex to list of ReverseIPTag
+        # Mapping of vertex to list of ReverseIPTag
         self._reverse_ip_tags_by_vertex = dict()
 
         # Set of ports already assigned on a board
         self._ports_assigned = set()
 
-    def add_ip_tag(self, ip_tag, partitioned_vertex):
+    def add_ip_tag(self, ip_tag, vertex):
         """ Add an IP tag
 
         :param ip_tag: The tag to add
         :type ip_tag: :py:class:`spinn_machine.tags.iptag.IPTag`
-        :param partitioned_vertex: The partitioned vertex by which the tag\
-                    is to be used
-        :type partitioned_vertex:\
-                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
+        :param vertex: The machine vertex by which the tag is to be used
+        :type vertex:\
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
         :raises PacmanInvalidParameterException:
-                    * If the combination of (board-address, tag) has already\
-                      been assigned to an IP tag with different properties
-                    * If the combination of (board-address, tag) has already\
-                      been assigned to a reverse IP tag
+            * If the combination of (board-address, tag) has already been\
+              assigned to an IP tag with different properties
+            * If the combination of (board-address, tag) has already been\
+              assigned to a reverse IP tag
         """
 
         if (ip_tag.board_address, ip_tag.tag) in self._ip_tags:
@@ -55,25 +54,24 @@ class Tags(object):
                 " the given board")
 
         self._ip_tags[(ip_tag.board_address, ip_tag.tag)] = ip_tag
-        if partitioned_vertex not in self._ip_tags_by_vertex:
-            self._ip_tags_by_vertex[partitioned_vertex] = set()
-        self._ip_tags_by_vertex[partitioned_vertex].add(ip_tag)
+        if vertex not in self._ip_tags_by_vertex:
+            self._ip_tags_by_vertex[vertex] = set()
+        self._ip_tags_by_vertex[vertex].add(ip_tag)
 
-    def add_reverse_ip_tag(self, reverse_ip_tag, partitioned_vertex):
+    def add_reverse_ip_tag(self, reverse_ip_tag, vertex):
         """ Add a reverse iptag
 
         :param reverse_ip_tag: The tag to add
         :type reverse_ip_tag:\
-                    :py:class:`spinn_machine.tags.reverse_iptag.ReverseIPTag`
-        :param partitioned_vertex: The partitioned vertex by which the tag\
-                    is to be used
-        :type partitioned_vertex:\
-                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
+            :py:class:`spinn_machine.tags.reverse_iptag.ReverseIPTag`
+        :param vertex: The vertex by which the tag is to be used
+        :type vertex:\
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
         :raises PacmanInvalidParameterException:
-                    * If the combination of (board-address, tag) has already\
-                      been assigned to an IP tag or Reverse IP tag
-                    * If the port of the tag has already been assigned on\
-                      the given board-address
+            * If the combination of (board-address, tag) has already been\
+              assigned to an IP tag or Reverse IP tag
+            * If the port of the tag has already been assigned on the given\
+              board-address
         """
 
         if ((reverse_ip_tag.board_address, reverse_ip_tag.tag) in
@@ -92,9 +90,9 @@ class Tags(object):
 
         self._reverse_ip_tags[(reverse_ip_tag.board_address,
                                reverse_ip_tag.tag)] = reverse_ip_tag
-        if partitioned_vertex not in self._reverse_ip_tags_by_vertex:
-            self._reverse_ip_tags_by_vertex[partitioned_vertex] = set()
-        self._reverse_ip_tags_by_vertex[partitioned_vertex].add(
+        if vertex not in self._reverse_ip_tags_by_vertex:
+            self._reverse_ip_tags_by_vertex[vertex] = set()
+        self._reverse_ip_tags_by_vertex[vertex].add(
             reverse_ip_tag)
         self._ports_assigned.add(
             (reverse_ip_tag.board_address, reverse_ip_tag.port))
@@ -118,29 +116,29 @@ class Tags(object):
         """
         return self._reverse_ip_tags.itervalues()
 
-    def get_ip_tags_for_vertex(self, partitioned_vertex):
-        """ Get the IP Tags assigned to a given partitioned vertex
+    def get_ip_tags_for_vertex(self, vertex):
+        """ Get the IP Tags assigned to a given machine vertex
 
-        :param partitioned_vertex: The partitioned vertex to get the tags for
-        :type partitioned_vertex:\
-                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
+        :param vertex: The vertex to get the tags for
+        :type vertex:\
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
         :return: An iterable of IPTag or None if the vertex has no tags
         :rtype: iterable of :py:class:`spinn_machine.tags.iptag.IPTag`
         """
-        if partitioned_vertex not in self._ip_tags_by_vertex:
+        if vertex not in self._ip_tags_by_vertex:
             return None
-        return list(self._ip_tags_by_vertex[partitioned_vertex])
+        return list(self._ip_tags_by_vertex[vertex])
 
-    def get_reverse_ip_tags_for_vertex(self, partitioned_vertex):
-        """ Get the Reverse IP Tags assigned to a given partitioned vertex
+    def get_reverse_ip_tags_for_vertex(self, vertex):
+        """ Get the Reverse IP Tags assigned to a given machine vertex
 
-        :param partitioned_vertex: The partitioned vertex to get the tags for
-        :type partitioned_vertex:\
-                    :py:class:`pacman.model.graph.simple_partitioned_vertex.PartitionedVertex`
+        :param vertex: The vertex to get the tags for
+        :type vertex:\
+                    :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractVertex`
         :return: An iterable of ReverseIPTag or None if the vertex has no tags
         :rtype: iterable of \
                     :py:class:`spinn_machine.tags.reverse_iptag.ReverseIPTag`
         """
-        if partitioned_vertex not in self._reverse_ip_tags_by_vertex:
+        if vertex not in self._reverse_ip_tags_by_vertex:
             return None
-        return list(self._reverse_ip_tags_by_vertex[partitioned_vertex])
+        return list(self._reverse_ip_tags_by_vertex[vertex])
