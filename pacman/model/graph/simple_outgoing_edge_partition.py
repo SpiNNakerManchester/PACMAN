@@ -1,5 +1,9 @@
 from pacman.model.decorators.overrides import overrides
 from pacman.model.decorators.delegates_to import delegates_to
+from pacman.model.constraints.abstract_provides_outgoing_partition_constraints\
+    import AbstractProvidesOutgoingPartitionConstraints
+from pacman.model.constraints.abstract_provides_incoming_partition_constraints\
+    import AbstractProvidesIncomingPartitionConstraints
 from pacman.model.graph.abstract_outgoing_edge_partition \
     import AbstractOutgoingEdgePartition
 from pacman.model.abstract_classes.simple_constrained_object \
@@ -85,10 +89,26 @@ class SimpleOutgoingEdgePartition(AbstractOutgoingEdgePartition):
         # Check for an incompatible pre vertex
         if self._pre_vertex is None:
             self._pre_vertex = edge.pre_vertex
+
+            # Check new pre_vertex for additional constraints
+            if isinstance(
+                    edge.pre_vertex,
+                    AbstractProvidesOutgoingPartitionConstraints):
+                constraints = \
+                    edge.pre_vertex.get_outgoing_partition_constraints(self)
+                self.add_constraints(constraints)
         elif edge.pre_vertex != self._pre_vertex:
             raise exceptions.PacmanConfigurationException(
                 "A partition can only contain edges with the same"
                 "pre_vertex")
+
+        # Check if the post-vertex has any additional constraints
+        if isinstance(
+                edge.post_vertex,
+                AbstractProvidesIncomingPartitionConstraints):
+            constraints = \
+                edge.post_vertex.get_incoming_partition_constraints(self)
+            self.add_constraints(constraints)
 
         # Check for an incompatible traffic type
         if self._traffic_type is None:

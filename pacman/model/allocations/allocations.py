@@ -11,8 +11,11 @@ class Allocations(object):
         # A list of all allocations
         "_allocations",
 
-        # A dictionary vertex and resource type -> list of allocations
+        # A dictionary of vertex and resource type -> list of allocations
         "_allocations_by_vertex_and_type"
+
+        # A dictionary of resource type -> list of allocations
+        "_allocations_by_type"
     ]
 
     def __init__(self, allocations=None):
@@ -22,6 +25,7 @@ class Allocations(object):
         """
         self._allocations = list()
         self._allocations_by_vertex_and_type = defaultdict(list)
+        self._allocations_by_type = defaultdict(list)
         if allocations is not None:
             self.add_allocations(allocations)
 
@@ -39,6 +43,8 @@ class Allocations(object):
                 "{} and {}".format(
                     allocation.vertex, allocation.resource.resource_type))
         self._allocations_by_vertex_and_type[key].append(allocation)
+        self._allocations_by_type[allocation.resource.resource_type].append(
+            allocation)
         self._allocations.append(allocation)
 
     def add_allocations(self, allocations):
@@ -60,7 +66,7 @@ class Allocations(object):
         """
         return self._allocations
 
-    def get_allocations(self, vertex, resource_type):
+    def get_allocations_by_vertex(self, vertex, resource_type):
         """ Get the allocations of a resource to a vertex
 
         :param vertex: The vertex of the allocation to find
@@ -73,3 +79,14 @@ class Allocations(object):
             list of :py:class:`pacman.model.allocations.allocation.Allocation`
         """
         return self._allocations_by_vertex_and_type[vertex, resource_type]
+
+    def get_allocations_by_type(self, resource_type):
+        """ Get the allocations of a resource
+
+        :param resource_type: The resource type of the allocations to find
+        :type resource_type:\
+            :py:class:`pacman.model.resources.resource_type.ResourceType`
+        :rtype:\
+            list of :py:class:`pacman.model.allocations.allocation.Allocation`
+        """
+        return self._allocations_by_type[resource_type]

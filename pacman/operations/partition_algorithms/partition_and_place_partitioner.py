@@ -288,7 +288,7 @@ class PartitionAndPlacePartitioner(object):
             # get resources used by vertex
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(
-                vertex_slice, graph)
+                vertex_slice)
 
             # Work out the ratio of used to available resources
             ratio = self._find_max_ratio(used_resources, resources)
@@ -308,7 +308,7 @@ class PartitionAndPlacePartitioner(object):
                 if hi_atom >= lo_atom:
                     vertex_slice = Slice(lo_atom, hi_atom)
                     used_resources = vertex.get_resources_used_by_atoms(
-                        vertex_slice, graph)
+                        vertex_slice)
                     ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
@@ -404,8 +404,7 @@ class PartitionAndPlacePartitioner(object):
             # which resulted in a ratio < 1.0
             previous_used_resources = used_resources
             vertex_slice = Slice(lo_atom, hi_atom)
-            used_resources = vertex.get_resources_used_by_atoms(
-                vertex_slice, graph)
+            used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
             ratio = self._find_max_ratio(used_resources, resources)
 
         # If we have managed to fit everything exactly (unlikely but possible),

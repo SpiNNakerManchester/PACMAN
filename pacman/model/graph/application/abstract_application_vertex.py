@@ -27,14 +27,6 @@ class AbstractApplicationVertex(AbstractVertex):
         :raise None: this method does not raise any known exception
         """
 
-    @abstractproperty
-    def max_atoms_per_core(self):
-        """ Get the maximum number of atoms that can be run on a single core \
-            given the constraints set on this vertex
-
-        :rtype: int
-        """
-
     @abstractmethod
     def create_machine_vertex(
             self, vertex_slice, constraints=None):
