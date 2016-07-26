@@ -6,7 +6,7 @@ from pacman.model.constraints.abstract_constraint \
     import AbstractConstraint
 
 
-class SimpleConstrainedObject(AbstractHasConstraints):
+class ConstrainedObject(AbstractHasConstraints):
     """ An implementation of an object which holds constraints
     """
 

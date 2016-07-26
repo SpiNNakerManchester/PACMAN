@@ -1,5 +1,5 @@
-from pacman.model.abstract_classes.simple_constrained_object \
-    import SimpleConstrainedObject
+from pacman.model.abstract_classes.impl.constrained_object \
+    import ConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.machine.abstract_machine_vertex \
@@ -41,17 +41,17 @@ class MachineVertex(AbstractMachineVertex):
         self._label = label
 
         AbstractMachineVertex.__init__(self)
-        self._constraints = SimpleConstrainedObject(constraints)
+        self._constraints = ConstrainedObject(constraints)
 
-    @delegates_to("_constraints", SimpleConstrainedObject.add_constraint)
+    @delegates_to("_constraints", ConstrainedObject.add_constraint)
     def add_constraint(self, constraint):
         pass
 
-    @delegates_to("_constraints", SimpleConstrainedObject.add_constraints)
+    @delegates_to("_constraints", ConstrainedObject.add_constraints)
     def add_constraints(self, constraints):
         pass
 
-    @delegates_to("_constraints", SimpleConstrainedObject.constraints)
+    @delegates_to("_constraints", ConstrainedObject.constraints)
     def constraints(self):
         pass
 

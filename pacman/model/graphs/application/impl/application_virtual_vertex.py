@@ -1,8 +1,8 @@
 # pacman imports
 from pacman.model.graphs.machine.impl.machine_virtual_vertex \
     import MachineVirtualVertex
-from pacman.model.abstract_classes.simple_constrained_object \
-    import SimpleConstrainedObject
+from pacman.model.abstract_classes.impl.constrained_object \
+    import ConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.application.abstract_virtual_application_vertex \
@@ -35,17 +35,17 @@ class ApplicationVirtualVertex(AbstractVirtualApplicationVertex):
         self._spinnaker_link_id = spinnaker_link_id
         self._label = label
 
-        self._constraints = SimpleConstrainedObject(constraints)
+        self._constraints = ConstrainedObject(constraints)
 
-    @delegates_to("_constraints", SimpleConstrainedObject.add_constraint)
+    @delegates_to("_constraints", ConstrainedObject.add_constraint)
     def add_constraint(self, constraint):
         pass
 
-    @delegates_to("_constraints", SimpleConstrainedObject.add_constraints)
+    @delegates_to("_constraints", ConstrainedObject.add_constraints)
     def add_constraints(self, constraints):
         pass
 
-    @delegates_to("_constraints", SimpleConstrainedObject.constraints)
+    @delegates_to("_constraints", ConstrainedObject.constraints)
     def constraints(self):
         pass
 
