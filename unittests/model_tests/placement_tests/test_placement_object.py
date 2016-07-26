@@ -4,7 +4,7 @@ tests for placement
 # pacman imports
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.model.graph.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
 from pacman import exceptions
 
 # general imports

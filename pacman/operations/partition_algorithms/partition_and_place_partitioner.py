@@ -1,24 +1,25 @@
 import logging
 
+from pacman.model.graphs.slice import Slice
+
+from pacman import exceptions
 from pacman.model.constraints.partitioner_constraints.\
     abstract_partitioner_constraint import \
     AbstractPartitionerConstraint
 from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
-from pacman.model.graph.graph_mapper import \
-    GraphMapper
-from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
-from pacman.model.graph.machine.machine_graph import MachineGraph
-from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from pacman.model.graph.slice import Slice
-from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman import exceptions
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
+from pacman.model.graphs.common.graph_mapper import \
+    GraphMapper
+from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 

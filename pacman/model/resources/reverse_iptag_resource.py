@@ -1,4 +1,5 @@
 from pacman.model.resources.abstract_resource import AbstractResource
+from pacman.model.decorators.overrides import overrides
 
 
 class ReverseIPtagResource(AbstractResource):
@@ -49,5 +50,6 @@ class ReverseIPtagResource(AbstractResource):
         """
         return self._tag
 
+    @overrides(AbstractResource.get_value)
     def get_value(self):
         return [self._port, self._sdp_port, self._tag]

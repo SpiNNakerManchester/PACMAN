@@ -1,21 +1,23 @@
 # pacman model imports
+from pacman.model.graphs.application.simple_application_edge \
+    import SimpleApplicationEdge
 from pacman.model.resources.cpu_cycles_resource import \
     CPUCyclesResource
+
+from pacman.exceptions import PacmanRoutingException
+from pacman.model.graphs.application.application_graph \
+    import ApplicationGraph
+from pacman.model.graphs.machine.machine_graph import MachineGraph
+from pacman.model.graphs.machine.simple_machine_edge import SimpleMachineEdge
+from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.placements.placement import Placement
+from pacman.model.placements.placements import Placements
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.exceptions import PacmanRoutingException
-from pacman.model.graph.machine.simple_machine_edge import SimpleMachineEdge
-from pacman.model.graph.machine.simple_machine_vertex import SimpleMachineVertex
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
-from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
-from pacman.model.graph.application.simple_application_edge \
-    import SimpleApplicationEdge
-from pacman.model.graph.application.application_graph \
-    import ApplicationGraph
-from pacman.model.graph.machine.machine_graph import MachineGraph
+from pacman.model.routing_info.routing_info import RoutingInfo
+
 # pacman utility imports
 from pacman.utilities import constants
 # pacman operations imports
@@ -31,7 +33,7 @@ from spinn_machine.machine import Machine
 
 import unittest
 
-from pacman.model.graph.application.abstract_application_vertex import \
+from pacman.model.graphs.abstract_classes.abstract_application_vertex import \
     AbstractApplicationVertex
 
 

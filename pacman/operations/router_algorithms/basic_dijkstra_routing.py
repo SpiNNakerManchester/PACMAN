@@ -7,7 +7,7 @@ from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
 from pacman import exceptions
-from pacman.model.graph.machine.simple_machine_edge \
+from pacman.model.graphs.machine.simple_machine_edge \
     import SimpleMachineEdge
 
 from spinn_machine.utilities.progress_bar import ProgressBar
@@ -69,9 +69,10 @@ class BasicDijkstraRouting(object):
             vertex = placement.vertex
             out_going_edges = \
                 machine_graph.get_edges_starting_at_vertex(vertex)
-            out_going_edges = filter(
-                lambda edge: isinstance(edge, SimpleMachineEdge),
-                out_going_edges)
+            out_going_edges = \
+                filter(lambda application_edge:
+                       isinstance(application_edge, SimpleMachineEdge),
+                       out_going_edges)
 
             dest_chips = set()
             edges_to_route = list()

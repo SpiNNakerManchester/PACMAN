@@ -1,9 +1,9 @@
 
 # pacman imports
-from pacman.model.graph.machine.simple_machine_edge import \
+from pacman.model.graphs.machine.simple_machine_edge import \
     SimpleMachineEdge
-from pacman.model.graph.machine.simple_machine_vertex import SimpleMachineVertex
-from pacman.model.graph.machine.machine_graph import MachineGraph
+from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanAlreadyExistsException
 

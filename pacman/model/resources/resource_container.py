@@ -16,18 +16,21 @@ class ResourceContainer(object):
         :param dtcm: the amount of dtcm used
         :param sdram: the amount of sdram used
         :param cpu_cycles: the amount of cpu used
-        :param iptags: the iptag required
-        :param reverse_iptags:
-        :param sdram_tags:
+        :param iptags: the iptags required
+        :param reverse_iptags: the reverse iptags required
+        :param sdram_tags: the sdram tags required
         :type dtcm: None or \
                     :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
         :type sdram:None or \
                     :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
         :type cpu_cycles: None or \
                     :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
-        :type
-        :type
-        :type
+        :type iptags: None or list of \
+                    :py:class:`pacman.models.resources.iptag_resource.IPtagResource`
+        :type reverse_iptags: None or list of \
+                    :py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`
+        :type sdram_tags: None or \
+                    :py:class:`pacman.models.resources.sdram_tag_resource.SDRAMtagResource`
         :rtype: pacman.models.resources.resource_container.ResourceContainer
         :raise None: does not raise any known exception
 
@@ -47,7 +50,7 @@ class ResourceContainer(object):
         if self._cpu_cycles is None:
             self._cpu_cycles = CPUCyclesPerTickResource(0)
         if self._sdram_tags is None:
-            self._sdram_tags = SDRAMTagResource(0)
+            self._sdram_tags = SDRAMTagResource(0, None)
         if self._reverse_iptags is None:
             self._reverse_iptags = []
         if self._iptags is None:

@@ -1,5 +1,5 @@
 
-from pacman.model.graph.application.simple_virtual_application_vertex import \
+from pacman.model.graphs.application.simple_virtual_application_vertex import \
     SimpleVirtualApplicationVertex
 from pacman.model.constraints.tag_allocator_constraints.\
     abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint

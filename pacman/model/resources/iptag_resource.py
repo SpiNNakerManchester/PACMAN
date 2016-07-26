@@ -1,4 +1,5 @@
 from pacman.model.resources.abstract_resource import AbstractResource
+from pacman.model.decorators.overrides import overrides
 
 
 class IPtagResource(AbstractResource):
@@ -61,5 +62,6 @@ class IPtagResource(AbstractResource):
         """
         return self._tag
 
+    @overrides(AbstractResource.get_value)
     def get_value(self):
         return [self._ip_address, self._port, self._strip_sdp, self._tag]

@@ -1,12 +1,12 @@
 # pacman imports
 from pacman import exceptions
-from pacman.operations import algorithm_reports
+from pacman import operations
 from pacman.executor import injection_decorator
-from pacman.executor import algorithm_decorator
+from pacman.executor.algorithm_decorators import algorithm_decorator
 from pacman.executor.algorithm_metadata_xml_reader \
     import AlgorithmMetadataXmlReader
+from pacman.operations import algorithm_reports
 from pacman.utilities import file_format_converters
-from pacman import operations
 from pacman.utilities.utility_objs.timer import Timer
 
 # general imports

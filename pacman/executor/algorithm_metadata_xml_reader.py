@@ -1,13 +1,14 @@
-from pacman import exceptions
-from pacman.executor.single_input import SingleInput
-from pacman.executor.one_of_input import OneOfInput
-from pacman.executor.all_of_input import AllOfInput
-from pacman.executor.output import Output
-from pacman.executor.external_algorithm import ExternalAlgorithm
-from pacman.executor.python_function_algorithm import PythonFunctionAlgorithm
-from pacman.executor.python_class_algorithm import PythonClassAlgorithm
-
 from lxml import etree
+
+from pacman.executor.algorithm_decorators.one_of_input import OneOfInput
+from pacman.executor.algorithm_decorators.output import Output
+from pacman.executor.algorithm_classes.python_function_algorithm import PythonFunctionAlgorithm
+from pacman.executor.algorithm_decorators.single_input import SingleInput
+
+from pacman import exceptions
+from pacman.executor.algorithm_classes.external_algorithm import ExternalAlgorithm
+from pacman.executor.algorithm_classes.python_class_algorithm import PythonClassAlgorithm
+from pacman.executor.algorithm_decorators.all_of_input import AllOfInput
 
 
 class AlgorithmMetadataXmlReader(object):

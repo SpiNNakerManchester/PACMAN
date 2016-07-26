@@ -1,7 +1,7 @@
 # pacman imports
-from pacman.model.graph.application.simple_application_edge \
+from pacman.model.graphs.application.simple_application_edge \
     import SimpleApplicationEdge
-from pacman.model.graph.application.application_graph \
+from pacman.model.graphs.application.application_graph \
     import ApplicationGraph
 
 # uinit test object imports

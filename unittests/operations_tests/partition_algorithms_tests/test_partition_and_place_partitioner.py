@@ -11,10 +11,10 @@ from pacman.exceptions import PacmanPartitionException, \
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
-from pacman.model.graph.application.simple_application_edge import \
+from pacman.model.graphs.application.simple_application_edge import \
     SimpleApplicationEdge
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
-from pacman.model.graph.application.application_graph \
+from pacman.model.graphs.application.application_graph \
     import ApplicationGraph
 
 # spinnMachine imports

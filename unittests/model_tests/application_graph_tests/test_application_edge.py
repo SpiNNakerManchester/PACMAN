@@ -3,7 +3,7 @@
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_contiguous_range_constraint import \
     KeyAllocatorContiguousRangeContraint
-from pacman.model.graph.slice import Slice
+from pacman.model.graphs.common.slice import Slice
 
 # unit tests imports
 from uinit_test_objects.test_edge import TestEdge
@@ -12,7 +12,7 @@ from uinit_test_objects.test_vertex import TestVertex
 
 # general imports
 import unittest
-from pacman.model.graph.machine.simple_machine_edge import \
+from pacman.model.graphs.machine.simple_machine_edge import \
     SimpleMachineEdge
 
 

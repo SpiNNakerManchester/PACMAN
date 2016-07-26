@@ -1,17 +1,16 @@
-from pacman.model.graph.application.abstract_virtual_application_vertex \
-    import AbstractVirtualApplicationVertex
-from pacman.model.constraints.tag_allocator_constraints.\
-    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
-from pacman.utilities import utility_calls
-from pacman.utilities import file_format_schemas
-
-from spinn_machine.utilities.progress_bar import ProgressBar
-
+import json
+import os
 from collections import defaultdict
 
-import os
-import json
 import jsonschema
+from pacman.model.constraints.tag_allocator_constraints.\
+    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
+
+from pacman.model.graphs.abstract_classes.abstract_virtual_application_vertex \
+    import AbstractVirtualApplicationVertex
+from pacman.utilities import file_format_schemas
+from pacman.utilities import utility_calls
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 DEFAULT_NOUMBER_OF_CORES_USED_PER_VERTEX = 1
 

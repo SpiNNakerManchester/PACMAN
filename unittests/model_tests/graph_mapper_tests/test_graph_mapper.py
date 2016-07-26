@@ -7,12 +7,12 @@ from uinit_test_objects.test_edge import TestEdge
 from uinit_test_objects.test_vertex import TestVertex
 
 # pacman imports
-from pacman.model.graph.slice import Slice
-from pacman.model.graph.graph_mapper \
+from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common.graph_mapper \
     import GraphMapper
-from pacman.model.graph.application.simple_application_edge\
+from pacman.model.graphs.application.simple_application_edge\
     import SimpleMachineEdge
-from pacman.model.graph.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
 from pacman.exceptions import (PacmanNotFoundError)
 
 # general imports

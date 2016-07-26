@@ -22,7 +22,7 @@ from pacman.model.routing_table_by_partition\
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition_entry  \
     import MulticastRoutingTableByPartitionEntry
-from pacman.model.graph.machine.simple_virtual_machine_vertex \
+from pacman.model.graphs.machine.simple_virtual_machine_vertex \
     import SimpleVirtualMachineVertex
 
 

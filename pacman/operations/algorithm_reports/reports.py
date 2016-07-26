@@ -4,7 +4,7 @@ import logging
 
 from pacman import exceptions
 from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman.model.graph.machine.simple_virtual_machine_vertex \
+from pacman.model.graphs.machine.simple_virtual_machine_vertex \
     import SimpleVirtualMachineVertex
 
 logger = logging.getLogger(__name__)

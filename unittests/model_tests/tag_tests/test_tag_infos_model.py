@@ -3,7 +3,7 @@ TestTagsModel
 """
 
 # pacman imports
-from pacman.model.graph.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
 from pacman.model.tags.tags import Tags
 
 # spinnmachine imports

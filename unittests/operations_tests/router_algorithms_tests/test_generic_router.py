@@ -1,22 +1,23 @@
 import unittest
 
-from pacman.model.graph.machine.simple_machine_edge import \
-    SimpleMachineEdge
-from pacman.model.graph.machine.simple_machine_vertex import SimpleMachineVertex
-from pacman.operations.router_algorithms import BasicDijkstraRouting
-from pacman.model.graph.application.simple_application_edge \
+from pacman.model.graphs.application.simple_application_edge \
     import SimpleApplicationEdge
-from pacman.model.graph.application.application_graph \
+
+from pacman.model.graphs.abstract_classes.abstract_application_vertex import \
+    AbstractApplicationVertex
+from pacman.model.graphs.application.application_graph \
     import ApplicationGraph
-from pacman.model.graph.machine.machine_graph import MachineGraph
+from pacman.model.graphs.machine.machine_graph import MachineGraph
+from pacman.model.graphs.machine.simple_machine_edge import \
+    SimpleMachineEdge
+from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
-from spinn_machine.virtual_machine import VirtualMachine
+from pacman.model.routing_info.routing_info import RoutingInfo
+from pacman.operations.router_algorithms import BasicDijkstraRouting
 from pacman.utilities import constants
-from pacman.model.graph.application.abstract_application_vertex import \
-    AbstractApplicationVertex
+from spinn_machine.virtual_machine import VirtualMachine
 
 
 class Vertex(AbstractApplicationVertex):

@@ -1,6 +1,6 @@
-from pacman.model.graph.application.simple_application_edge import \
+from pacman.model.graphs.application.simple_application_edge import \
     SimpleApplicationEdge
-from pacman.model.graph.machine.simple_machine_edge import \
+from pacman.model.graphs.machine.simple_machine_edge import \
     SimpleMachineEdge
 
 

@@ -4,10 +4,11 @@ test vertex used in many unit tests
 """
 
 # pacman imports
-from pacman.model.graph.application.abstract_application_vertex import \
-    AbstractApplicationVertex
 from pacman.model.resources.cpu_cycles_resource import \
     CPUCyclesResource
+
+from pacman.model.graphs.abstract_classes.abstract_application_vertex import \
+    AbstractApplicationVertex
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
