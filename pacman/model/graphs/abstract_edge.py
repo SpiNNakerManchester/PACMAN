@@ -6,7 +6,7 @@ from pacman.model.abstract_classes.abstract_has_label import AbstractHasLabel
 
 
 @add_metaclass(ABCMeta)
-class AbstractBaseEdge(AbstractHasLabel):
+class AbstractEdge(AbstractHasLabel):
     """ A directed edge in a graph between two vertices
     """
 

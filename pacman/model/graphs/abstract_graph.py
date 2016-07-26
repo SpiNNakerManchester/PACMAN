@@ -8,7 +8,7 @@ from pacman.model.abstract_classes.abstract_has_constraints\
 
 
 @add_metaclass(ABCMeta)
-class AbstractBaseGraph(AbstractHasConstraints):
+class AbstractGraph(AbstractHasConstraints):
     """ A graph
     """
 

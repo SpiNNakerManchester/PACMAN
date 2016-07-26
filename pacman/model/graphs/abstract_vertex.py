@@ -8,7 +8,7 @@ from pacman.model.abstract_classes.abstract_has_label \
 
 
 @add_metaclass(ABCMeta)
-class AbstractBaseVertex(AbstractHasConstraints, AbstractHasLabel):
+class AbstractVertex(AbstractHasConstraints, AbstractHasLabel):
     """ A vertex in a graph
     """
 
