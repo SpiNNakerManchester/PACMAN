@@ -28,8 +28,7 @@ class AbstractApplicationVertex(AbstractVertex):
         """
 
     @abstractmethod
-    def create_machine_vertex(
-            self, vertex_slice, constraints=None):
+    def create_machine_vertex(self, vertex_slice, constraints=None):
         """ Create a machine vertex from this application vertex
 
         :param vertex_slice:\
