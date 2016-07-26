@@ -4,7 +4,7 @@ from abc import abstractproperty
 
 from six import add_metaclass
 
-from pacman.model.graphs.abstract_classes.abstract_vertex import AbstractVertex
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 
 @add_metaclass(ABCMeta)

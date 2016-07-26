@@ -4,7 +4,7 @@ from pacman.model.graphs.machine.abstract_machine_edge \
     import AbstractMachineEdge
 
 
-class SimpleMachineEdge(AbstractMachineEdge):
+class MachineEdge(AbstractMachineEdge):
     """ A simple implementation of a machine edge
     """
 
@@ -53,6 +53,7 @@ class SimpleMachineEdge(AbstractMachineEdge):
         self._traffic_type = traffic_type
         self._label = label
         self._traffic_weight = traffic_weight
+        AbstractMachineEdge.__init__(self)
 
     @property
     @overrides(AbstractMachineEdge.pre_vertex)

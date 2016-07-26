@@ -6,7 +6,7 @@ from pacman.model.graphs.machine.abstract_machine_vertex \
     import AbstractMachineVertex
 
 
-class SimpleMachineVertex(AbstractMachineVertex):
+class MachineVertex(AbstractMachineVertex):
     """ A simple implementation of a machine vertex
     """
 
@@ -40,6 +40,7 @@ class SimpleMachineVertex(AbstractMachineVertex):
         self._resources_required = resources_required
         self._label = label
 
+        AbstractMachineVertex.__init__(self)
         self._constraints = SimpleConstrainedObject(constraints)
 
     @delegates_to("_constraints", SimpleConstrainedObject.add_constraint)

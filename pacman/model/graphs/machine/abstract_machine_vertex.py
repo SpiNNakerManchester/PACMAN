@@ -1,6 +1,6 @@
 from abc import abstractproperty
 
-from pacman.model.graphs.abstract_classes.abstract_vertex import AbstractVertex
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 
 class AbstractMachineVertex(AbstractVertex):

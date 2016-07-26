@@ -1,7 +1,6 @@
 # pacman imports
-from pacman.model.graphs.machine.impl.simple_virtual_machine_vertex \
-    import SimpleVirtualMachineVertex
-
+from pacman.model.graphs.machine.impl.machine_virtual_vertex \
+    import MachineVirtualVertex
 from pacman.model.abstract_classes.simple_constrained_object \
     import SimpleConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
@@ -57,7 +56,7 @@ class ApplicationVirtualVertex(AbstractVirtualApplicationVertex):
 
     @overrides(AbstractVirtualApplicationVertex.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, constraints=None):
-        machine_vertex = SimpleVirtualMachineVertex(
+        machine_vertex = MachineVirtualVertex(
             self._spinnaker_link_id, constraints=constraints)
         return machine_vertex
 

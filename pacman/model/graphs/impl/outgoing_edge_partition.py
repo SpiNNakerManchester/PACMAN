@@ -37,12 +37,15 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         "_label",
 
         # The type of edges to accept
-        "_allowed_edge_types"
+        "_allowed_edge_types",
+
+        # The weight of traffic going down this partition
+        "_traffic_weight"
     ]
 
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
-            label=None):
+            label=None, traffic_weight=1):
         """
 
         :param identifier: The identifier of the partition
@@ -56,6 +59,7 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         self._pre_vertex = None
         self._traffic_type = None
         self._label = label
+        self._traffic_weight = traffic_weight
 
         self._constraints = SimpleConstrainedObject(constraints)
 
@@ -139,6 +143,11 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
     @overrides(AbstractOutgoingEdgePartition.traffic_type)
     def traffic_type(self):
         return self._traffic_type
+
+    @property
+    @overrides(AbstractOutgoingEdgePartition.traffic_weight)
+    def traffic_weight(self):
+        return self._traffic_weight
 
     def __repr__(self):
         return (

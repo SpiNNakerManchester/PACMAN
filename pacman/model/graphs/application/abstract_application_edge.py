@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from pacman.model.graphs.abstract_classes.abstract_edge import AbstractEdge
+from pacman.model.graphs.abstract_edge import AbstractEdge
 
 
 class AbstractApplicationEdge(AbstractEdge):

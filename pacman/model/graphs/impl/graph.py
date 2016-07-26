@@ -6,9 +6,9 @@ from pacman.model.abstract_classes.simple_constrained_object \
     import SimpleConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_classes.abstract_graph import AbstractGraph
-from pacman.model.graphs.simple_outgoing_edge_partition \
-    import SimpleOutgoingEdgePartition
+from pacman.model.graphs.abstract_graph import AbstractGraph
+from pacman.model.graphs.impl.outgoing_edge_partition \
+    import OutgoingEdgePartition
 
 
 class Graph(AbstractGraph):
@@ -110,7 +110,7 @@ class Graph(AbstractGraph):
         partition = None
         if ((edge.pre_vertex, outgoing_edge_partition_name) not in
                 self._outgoing_edge_partitions_by_name):
-            partition = SimpleOutgoingEdgePartition(
+            partition = OutgoingEdgePartition(
                 outgoing_edge_partition_name, self._allowed_edge_types)
             self._outgoing_edge_partitions_by_pre_vertex[
                 edge.pre_vertex].append(partition)
@@ -138,7 +138,7 @@ class Graph(AbstractGraph):
                 outgoing_edge_partition.identifier) in
                 self._outgoing_edge_partitions_by_name):
             raise PacmanAlreadyExistsException(
-                SimpleOutgoingEdgePartition.__class__,
+                OutgoingEdgePartition.__class__,
                 (outgoing_edge_partition.pre_vertex,
                     outgoing_edge_partition.identifier))
 

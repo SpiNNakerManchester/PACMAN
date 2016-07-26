@@ -1,6 +1,6 @@
 from abc import abstractproperty
 
-from pacman.model.graphs.abstract_classes.abstract_edge import AbstractEdge
+from pacman.model.graphs.abstract_edge import AbstractEdge
 
 
 class AbstractMachineEdge(AbstractEdge):

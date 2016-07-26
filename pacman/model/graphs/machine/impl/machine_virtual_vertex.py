@@ -2,11 +2,11 @@ from pacman.model.abstract_classes.simple_constrained_object \
     import SimpleConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.machine.abstract_virtual_machine_vertex \
-    import AbstractVirtualMachineVertex
+from pacman.model.graphs.machine.abstract_machine_virutal_vertex  \
+    import AbstractMachineVirtualVertex
 
 
-class MachineVirtualVertex(AbstractVirtualMachineVertex):
+class MachineVirtualVertex(AbstractMachineVirtualVertex):
     """ A simple implementation of a Virtual Machine vertex
     """
 
@@ -27,6 +27,7 @@ class MachineVirtualVertex(AbstractVirtualMachineVertex):
         self._label = label
 
         self._constraints = SimpleConstrainedObject(constraints)
+        AbstractMachineVirtualVertex.__init__(self)
 
     @delegates_to("_constraints", SimpleConstrainedObject.add_constraint)
     def add_constraint(self, constraint):
@@ -41,11 +42,11 @@ class MachineVirtualVertex(AbstractVirtualMachineVertex):
         pass
 
     @property
-    @overrides(AbstractVirtualMachineVertex.label)
+    @overrides(AbstractMachineVirtualVertex.label)
     def label(self):
         return self._label
 
     @property
-    @overrides(AbstractVirtualMachineVertex.spinnaker_link_id)
+    @overrides(AbstractMachineVirtualVertex.spinnaker_link_id)
     def spinnaker_link_id(self):
         return self._spinnaker_link_id
