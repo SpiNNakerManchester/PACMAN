@@ -100,6 +100,8 @@ class Graph(AbstractGraph):
 
     @overrides(AbstractGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
+
+        # verify that the edge is one suitable for this graph
         if not isinstance(edge, self._allowed_edge_types):
             raise exceptions.PacmanInvalidParameterException(
                 "edge", edge.__class__,
@@ -127,6 +129,8 @@ class Graph(AbstractGraph):
 
     @overrides(AbstractGraph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, outgoing_edge_partition):
+
+        # verify that this partition is suitable for this graph
         if not isinstance(
                 outgoing_edge_partition, self._allowed_partition_types):
             raise exceptions.PacmanInvalidParameterException(
@@ -134,6 +138,7 @@ class Graph(AbstractGraph):
                 "Partitions of this graph must be one of the following types:"
                 " {}".format(self._allowed_partition_types))
 
+        # check this partition doesnt already exist
         if ((outgoing_edge_partition.pre_vertex,
                 outgoing_edge_partition.identifier) in
                 self._outgoing_edge_partitions_by_name):

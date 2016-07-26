@@ -21,7 +21,7 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
         """ Add an edge to the partition
 
         :param edge: the edge to add
-        :type: :py:class:`pacman.model.graph.abstract_edge.AbstractEdge`
+        :type: :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
         :raises:\
             :py:class:`pacman.execptions.PacmanInvalidParameterException`\
             if the starting vertex of the edge does not match that of the\
@@ -41,14 +41,14 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
 
         :rtype:\
             iterable of\
-            :py:class:`pacman.model.graph.abstract_edge.AbstractEdge`
+            :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
         """
 
     @abstractproperty
     def pre_vertex(self):
         """ The vertex at which all edges in this partition start
 
-        :rtype: :py:class:`pacman.model.graph.AbstractVertex`
+        :rtype: :py:class:`pacman.model.graphs.abstract_vertex.AbstractVertex`
         """
 
     @abstractproperty
@@ -64,7 +64,7 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
         """ The traffic type of all the edges in this partition
 
         :rtype:\
-            :py:class:`pacman.model.graph.edge_traffic_type.EdgeTrafficType`
+            :py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
         """
 
     @abstractmethod
@@ -72,5 +72,5 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
         """ Determine if an edge is in the partition
 
         :param edge: The edge to check for the existence of
-        :type edge: :py:class:`pacman.model.graph.abstract_edge.AbstractEdge`
+        :type edge: :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
         """

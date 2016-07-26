@@ -16,7 +16,7 @@ class AbstractApplicationVertex(AbstractVertex):
     __slots__ = ()
 
     @abstractmethod
-    def get_resources_used_by_atoms(self, vertex_slice):
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
