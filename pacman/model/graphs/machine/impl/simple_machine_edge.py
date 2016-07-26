@@ -1,7 +1,7 @@
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_classes.abstract_machine_edge \
-    import AbstractMachineEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
+from pacman.model.graphs.machine.abstract_machine_edge \
+    import AbstractMachineEdge
 
 
 class SimpleMachineEdge(AbstractMachineEdge):

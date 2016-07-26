@@ -1,7 +1,8 @@
-from pacman.model.graphs.abstract_classes.abstract_machine_edge \
-    import AbstractMachineEdge
 from pacman.model.graphs.simple_outgoing_edge_partition\
     import SimpleOutgoingEdgePartition
+
+from pacman.model.graphs.machine.abstract_machine_edge \
+    import AbstractMachineEdge
 
 
 class MachineOutgoingEdgePartition(SimpleOutgoingEdgePartition):

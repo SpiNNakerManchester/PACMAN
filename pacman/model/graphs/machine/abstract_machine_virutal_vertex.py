@@ -1,12 +1,12 @@
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_classes.abstract_machine_vertex \
-    import AbstractMachineVertex
-from pacman.model.graphs.abstract_classes.abstract_virtual_vertex \
+from pacman.model.graphs.abstract_virtual_vertex \
     import AbstractVirtualVertex
+from pacman.model.graphs.machine.abstract_machine_vertex \
+    import AbstractMachineVertex
 from pacman.model.resources.resource_container import ResourceContainer
 
 
-class AbstractVirtualMachineVertex(
+class AbstractMachineVirtualVertex(
         AbstractVirtualVertex, AbstractMachineVertex):
     """ A machine vertex that is virtual
     """

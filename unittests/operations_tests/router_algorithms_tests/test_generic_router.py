@@ -1,16 +1,16 @@
 import unittest
 
-from pacman.model.graphs.application.simple_application_edge \
-    import SimpleApplicationEdge
-
-from pacman.model.graphs.abstract_classes.abstract_application_vertex import \
-    AbstractApplicationVertex
 from pacman.model.graphs.application.application_graph \
     import ApplicationGraph
+from pacman.model.graphs.application.simple_application_edge \
+    import SimpleApplicationEdge
 from pacman.model.graphs.machine.machine_graph import MachineGraph
-from pacman.model.graphs.machine.simple_machine_edge import \
-    SimpleMachineEdge
 from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
+
+from pacman.model.graphs.application.abstract_application_vertex import \
+    AbstractApplicationVertex
+from pacman.model.graphs.machine.impl.simple_machine_edge import \
+    SimpleMachineEdge
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo

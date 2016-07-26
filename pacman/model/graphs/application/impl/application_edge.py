@@ -1,8 +1,8 @@
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_classes.abstract_application_edge \
+from pacman.model.graphs.application.abstract_application_edge \
     import AbstractApplicationEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from pacman.model.graphs.machine.simple_machine_edge import SimpleMachineEdge
+from pacman.model.graphs.machine.impl.simple_machine_edge import SimpleMachineEdge
 
 
 class ApplicationEdge(AbstractApplicationEdge):

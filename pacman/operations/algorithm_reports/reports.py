@@ -1,11 +1,11 @@
+import logging
 import os
 import time
-import logging
 
 from pacman import exceptions
-from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman.model.graphs.machine.simple_virtual_machine_vertex \
+from pacman.model.graphs.machine.impl.simple_virtual_machine_vertex \
     import SimpleVirtualMachineVertex
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 

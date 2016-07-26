@@ -1,9 +1,9 @@
+from pacman.model.graphs.simple_graph import SimpleGraph
+
+from pacman.model.graphs.machine.abstract_machine_edge \
+    import AbstractMachineEdge
 from pacman.model.graphs.machine.abstract_machine_vertex \
     import AbstractMachineVertex
-
-from pacman.model.graphs.abstract_classes.abstract_machine_edge \
-    import AbstractMachineEdge
-from pacman.model.graphs.simple_graph import SimpleGraph
 
 
 class MachineGraph(SimpleGraph):

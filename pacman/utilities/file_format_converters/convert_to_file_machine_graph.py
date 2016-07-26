@@ -6,7 +6,7 @@ import jsonschema
 from pacman.model.constraints.tag_allocator_constraints.\
     abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 
-from pacman.model.graphs.abstract_classes.abstract_virtual_application_vertex \
+from pacman.model.graphs.application.abstract_virtual_application_vertex \
     import AbstractVirtualApplicationVertex
 from pacman.utilities import file_format_schemas
 from pacman.utilities import utility_calls

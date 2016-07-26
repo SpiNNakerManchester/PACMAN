@@ -1,15 +1,14 @@
 
 # pacman imports
-from pacman.model.routing_table_by_partition.\
-    multicast_routing_table_by_partition_entry \
-    import MulticastRoutingTableByPartitionEntry
+from pacman import exceptions
+from pacman.model.graphs.machine.impl.simple_machine_edge \
+    import SimpleMachineEdge
 from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
-from pacman import exceptions
-from pacman.model.graphs.machine.simple_machine_edge \
-    import SimpleMachineEdge
-
+from pacman.model.routing_table_by_partition.\
+    multicast_routing_table_by_partition_entry \
+    import MulticastRoutingTableByPartitionEntry
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 # general imports

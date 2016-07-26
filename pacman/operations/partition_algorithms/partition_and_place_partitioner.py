@@ -14,7 +14,7 @@ from pacman.model.constraints.partitioner_constraints.\
     import PartitionerSameSizeAsVertexConstraint
 from pacman.model.graphs.common.graph_mapper import \
     GraphMapper
-from pacman.model.graphs.machine.machine_graph import MachineGraph
+from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities

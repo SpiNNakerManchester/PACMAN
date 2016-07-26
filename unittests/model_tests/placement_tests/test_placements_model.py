@@ -3,9 +3,9 @@ tests for placements
 """
 
 # pacman imports
+from pacman.model.graphs.machine.impl.simple_machine_vertex import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
 
 # general imports
 import unittest

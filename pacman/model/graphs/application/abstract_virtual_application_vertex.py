@@ -1,8 +1,8 @@
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_classes.abstract_application_vertex \
-    import AbstractApplicationVertex
-from pacman.model.graphs.abstract_classes.abstract_virtual_vertex \
+from pacman.model.graphs.abstract_virtual_vertex \
     import AbstractVirtualVertex
+from pacman.model.graphs.application.abstract_application_vertex \
+    import AbstractApplicationVertex
 from pacman.model.resources.resource_container import ResourceContainer
 
 

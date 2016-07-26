@@ -1,13 +1,14 @@
 # pacman imports
 from pacman.model.graphs.application.simple_virtual_application_vertex \
     import SimpleVirtualApplicationVertex
+
+from pacman import exceptions
+from pacman.model.graphs.machine.impl.simple_virtual_machine_vertex \
+    import SimpleVirtualMachineVertex
+from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
 from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
-from pacman.model.graphs.machine.simple_virtual_machine_vertex \
-    import SimpleVirtualMachineVertex
-from pacman import exceptions
 
 # general imports
 import logging

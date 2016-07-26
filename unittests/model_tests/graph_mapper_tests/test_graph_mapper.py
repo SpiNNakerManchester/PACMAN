@@ -12,7 +12,7 @@ from pacman.model.graphs.common.graph_mapper \
     import GraphMapper
 from pacman.model.graphs.application.simple_application_edge\
     import SimpleMachineEdge
-from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.machine.impl.simple_machine_vertex import SimpleMachineVertex
 from pacman.exceptions import (PacmanNotFoundError)
 
 # general imports

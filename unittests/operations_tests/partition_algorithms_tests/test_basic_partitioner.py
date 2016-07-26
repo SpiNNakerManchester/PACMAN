@@ -3,16 +3,16 @@ test for partitioning
 """
 
 # pacman imports
-from pacman.exceptions import PacmanPartitionException, \
-    PacmanInvalidParameterException, PacmanValueError
-from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint import \
-    PartitionerMaximumSizeConstraint
 from pacman.model.graphs.application.simple_application_edge import \
     SimpleApplicationEdge
+
+from pacman.exceptions import PacmanInvalidParameterException, PacmanValueError
+from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint import \
+    PartitionerMaximumSizeConstraint
+from pacman.model.graphs.application.impl.application_graph \
+    import ApplicationGraph
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
-from pacman.model.graphs.application.application_graph \
-    import ApplicationGraph
 
 # spinnMachine imports
 from spinn_machine.machine import Machine

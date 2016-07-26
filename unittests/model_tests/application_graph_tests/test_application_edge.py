@@ -12,7 +12,7 @@ from uinit_test_objects.test_vertex import TestVertex
 
 # general imports
 import unittest
-from pacman.model.graphs.machine.simple_machine_edge import \
+from pacman.model.graphs.machine.impl.simple_machine_edge import \
     SimpleMachineEdge
 
 

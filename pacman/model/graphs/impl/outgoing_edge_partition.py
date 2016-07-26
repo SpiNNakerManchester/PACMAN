@@ -7,7 +7,7 @@ from pacman.model.constraints.abstract_provides_outgoing_partition_constraints\
     import AbstractProvidesOutgoingPartitionConstraints
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_classes.abstract_outgoing_edge_partition \
+from pacman.model.graphs.abstract_outgoing_edge_partition \
     import AbstractOutgoingEdgePartition
 
 

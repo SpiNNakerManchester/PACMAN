@@ -2,7 +2,7 @@ from pacman.model.abstract_classes.simple_constrained_object \
     import SimpleConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_classes.abstract_machine_vertex \
+from pacman.model.graphs.machine.abstract_machine_vertex \
     import AbstractMachineVertex
 
 

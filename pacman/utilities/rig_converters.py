@@ -1,30 +1,29 @@
-from rig.netlist import Net
+from collections import defaultdict
+
 from rig.machine import Machine, Links
-from rig.routing_table import Routes
-from rig.place_and_route.routing_tree import RoutingTree
+from rig.netlist import Net
 from rig.place_and_route.constraints import \
     LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint
-
-from collections import defaultdict
+from rig.place_and_route.routing_tree import RoutingTree
+from rig.routing_table import Routes
 from six import iteritems
 
-from pacman.utilities import constants
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_radial_placement_from_chip_constraint \
     import PlacerRadialPlacementFromChipConstraint
-from pacman.model.placements.placements import Placements
+from pacman.model.graphs.machine.impl.simple_virtual_machine_vertex \
+    import SimpleVirtualMachineVertex
 from pacman.model.placements.placement import Placement
+from pacman.model.placements.placements import Placements
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition \
     import MulticastRoutingTableByPartition
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition_entry  \
     import MulticastRoutingTableByPartitionEntry
-from pacman.model.graphs.machine.simple_virtual_machine_vertex \
-    import SimpleVirtualMachineVertex
-
+from pacman.utilities import constants
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
