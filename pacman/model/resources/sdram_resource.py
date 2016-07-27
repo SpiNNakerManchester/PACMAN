@@ -21,3 +21,12 @@ class SDRAMResource(AbstractResource):
         .AbstractResource.get_value`
         """
         return self._sdram
+
+
+    def add_to_usage_value(self, new_value):
+        """
+        supports adding new requirements after oriignally built.
+        :param new_value:  the extra usage requirement
+        :return:
+        """
+        self._sdram += new_value

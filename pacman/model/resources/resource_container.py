@@ -60,22 +60,40 @@ class ResourceContainer(object):
     def dtcm(self):
         return self._dtcm_usage
 
+    def add_to_dtcm_usage(self, extra_usage):
+        self._dtcm_usage.add_to_usage_value(extra_usage)
+
     @property
     def cpu_cycles(self):
         return self._cpu_cycles
+
+    def add_to_cpu_usage(self, extra_usage):
+        self._cpu_cycles.add_to_usage_value(extra_usage)
 
     @property
     def sdram(self):
         return self._sdram_usage
 
+    def add_to_sdram_usage(self, extra_usage):
+        self._sdram_usage.add_to_usage_value(extra_usage)
+
     @property
     def iptags(self):
         return self._iptags
+
+    def add_to_iptag_usage(self, extra_tag):
+        self._iptags.append(extra_tag)
 
     @property
     def reverse_iptags(self):
         return self._reverse_iptags
 
+    def add_to_reverse_iptags(self, extra_tag):
+        self._reverse_iptags.append(extra_tag)
+
     @property
     def sdram_tags(self):
         return self._sdram_tags
+
+    def add_to_sdram_tags(self, n_tags=None, tag_ids=None):
+        self._sdram_tags.add_tags(n_tags, tag_ids)

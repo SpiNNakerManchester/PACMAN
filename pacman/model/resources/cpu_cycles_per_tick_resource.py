@@ -21,3 +21,12 @@ class CPUCyclesPerTickResource(AbstractResource):
         .AbstractResource.get_value`
         """
         return self._cycles
+
+    def add_to_usage_value(self, new_value):
+        """
+        supports adding new requirements after oriignally built.
+        :param new_value:  the extra usage requirement
+        :return:
+        """
+        self._cycles += new_value
+

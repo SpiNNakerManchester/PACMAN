@@ -16,11 +16,10 @@ class AbstractApplicationVertex(AbstractVertex):
     __slots__ = ()
 
     @abstractmethod
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
+    def get_resources_used_by_atoms(self, vertex_slice):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
-        :param graph: A reference to the graph containing this vertex.
         :type vertex_slice: :py:class:`pacman.model.graph.slice.Slice`
         :return: a Resource container that contains a \
                     CPUCyclesPerTickResource, DTCMResource and SDRAMResource

@@ -2,7 +2,6 @@
 # pacman imports
 from pacman import exceptions
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
 from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition

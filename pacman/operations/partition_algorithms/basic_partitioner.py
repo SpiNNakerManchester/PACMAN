@@ -65,8 +65,7 @@ class BasicPartitioner(object):
 
             # Get the usage of the first atom, then assume that this
             # will be the usage of all the atoms
-            requirements = vertex.get_resources_used_by_atoms(
-                Slice(0, 1), graph)
+            requirements = vertex.get_resources_used_by_atoms(Slice(0, 1))
 
             # Locate the maximum resources available
             max_resources_available = \
@@ -112,8 +111,7 @@ class BasicPartitioner(object):
                         "Not enough resources available to create vertex")
 
                 vertex_slice = Slice(counted, counted + (alloc - 1))
-                resources = vertex.get_resources_used_by_atoms(
-                    vertex_slice, graph)
+                resources = vertex.get_resources_used_by_atoms(vertex_slice)
 
                 machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, resources,

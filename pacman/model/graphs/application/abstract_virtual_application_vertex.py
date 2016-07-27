@@ -14,5 +14,5 @@ class AbstractVirtualApplicationVertex(
     __slots__ = ()
 
     @overrides(AbstractApplicationVertex.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
+    def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer()
