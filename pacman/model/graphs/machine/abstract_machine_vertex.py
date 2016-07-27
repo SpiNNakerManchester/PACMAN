@@ -1,4 +1,5 @@
 from abc import abstractproperty
+from abc import abstractmethod
 
 from pacman.model.graphs.abstract_vertex import AbstractVertex
 
@@ -17,8 +18,8 @@ class AbstractMachineVertex(AbstractVertex):
             :py:class:`pacman.model.resources.resource_container.ResourceContainer`
         """
 
-    @abstractproperty
-    def set_resources_required(self):
+    @abstractmethod
+    def set_resources_required(self, resource_required):
         """ sets the reosurces required for a given vertex
 
         :return:  None

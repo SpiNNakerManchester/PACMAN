@@ -28,11 +28,13 @@ class AbstractApplicationVertex(AbstractVertex):
         """
 
     @abstractmethod
-    def create_machine_vertex(self, vertex_slice, constraints=None):
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, constraints=None):
         """ Create a machine vertex from this application vertex
 
         :param vertex_slice:\
             The slice of atoms that the machine vertex will cover
+        :param resources_required: the resources used by the machine vertex
         :param constraints: Constraints to be passed on to the machine vertex
         """
 
