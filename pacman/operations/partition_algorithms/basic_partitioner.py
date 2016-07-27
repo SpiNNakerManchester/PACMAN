@@ -1,6 +1,6 @@
 import logging
 
-from pacman.model.graphs.slice import Slice
+from pacman.model.graphs.common.slice import Slice
 
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints.\
@@ -8,8 +8,7 @@ from pacman.model.constraints.partitioner_constraints.\
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
-from pacman.model.graphs.common.graph_mapper import \
-    GraphMapper
+from pacman.model.graphs.common.graph_mapper import GraphMapper
 from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
@@ -72,7 +71,7 @@ class BasicPartitioner(object):
             # Locate the maximum resources available
             max_resources_available = \
                 resource_tracker.get_maximum_constrained_resources_available(
-                    vertex.constraints)
+                    vertex)
 
             # Find the ratio of each of the resources - if 0 is required,
             # assume the ratio is the max available
@@ -129,7 +128,7 @@ class BasicPartitioner(object):
 
                 # update allocated resources
                 resource_tracker.allocate_constrained_resources(
-                    resources, vertex.constraints)
+                    resources, vertex)
 
             # update and end progress bars as needed
             progress_bar.update()

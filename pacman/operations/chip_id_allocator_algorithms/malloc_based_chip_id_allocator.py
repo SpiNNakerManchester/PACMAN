@@ -1,10 +1,10 @@
 # pacman imports
-from pacman.model.graphs.application.simple_virtual_application_vertex \
-    import SimpleVirtualApplicationVertex
+from pacman.model.graphs.application.impl.application_virtual_vertex import  \
+    AbstractVirtualApplicationVertex
 
 from pacman import exceptions
-from pacman.model.graphs.machine.impl.simple_virtual_machine_vertex \
-    import SimpleVirtualMachineVertex
+from pacman.model.graphs.machine.impl.machine_virtual_vertex \
+    import MachineVirtualVertex
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
@@ -63,7 +63,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
             # allocate ids for virtual chips
             for vertex in application_graph.vertices:
-                if isinstance(vertex, SimpleVirtualApplicationVertex):
+                if isinstance(vertex, MachineVirtualVertex):
                     link = vertex.spinnaker_link_id
                     virtual_x, virtual_y, real_x, real_y, real_link = \
                         self._assign_virtual_chip_info(machine, link)
@@ -75,7 +75,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
             # allocate ids for virtual chips
             for vertex in machine_graph.vertices:
-                if isinstance(vertex, SimpleVirtualMachineVertex):
+                if isinstance(vertex, MachineVirtualVertex):
                     link = vertex.spinnaker_link_id
                     virtual_x, virtual_y, real_x, real_y, real_link = \
                         self._assign_virtual_chip_info(machine, link)

@@ -1,8 +1,8 @@
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.graphs.machine.impl.simple_machine_edge \
-    import SimpleMachineEdge
+from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
+from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
 from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition import \
     MulticastRoutingTableByPartition
@@ -69,9 +69,10 @@ class BasicDijkstraRouting(object):
             out_going_edges = \
                 machine_graph.get_edges_starting_at_vertex(vertex)
             out_going_edges = \
-                filter(lambda application_edge:
-                       isinstance(application_edge, SimpleMachineEdge),
-                       out_going_edges)
+                filter(
+                    lambda application_edge:
+                    application_edge.traffic_type == EdgeTrafficType.MULTICAST,
+                    out_going_edges)
 
             dest_chips = set()
             edges_to_route = list()

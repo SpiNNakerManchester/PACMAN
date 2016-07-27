@@ -194,10 +194,6 @@
                 <param_type>MemoryMachineEdgeNKeysMap</param_type>
             </parameter>
             <parameter>
-                <param_name>routing_paths</param_name>
-                <param_type>MemoryRoutingPaths</param_type>
-            </parameter>
-            <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
             </parameter>
@@ -205,7 +201,6 @@
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
-            <param_name>routing_paths</param_name>
             <param_name>placements</param_name>
         </required_inputs>
         <outputs>

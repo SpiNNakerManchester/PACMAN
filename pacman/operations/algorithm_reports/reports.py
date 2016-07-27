@@ -1,11 +1,15 @@
+# pacman imports
+from pacman import exceptions
+from pacman.model.graphs.machine.impl.machine_virtual_vertex \
+    import MachineVirtualVertex
+
+# spinn machine iports
+from spinn_machine.utilities.progress_bar import ProgressBar
+
+#general imports
 import logging
 import os
 import time
-
-from pacman import exceptions
-from pacman.model.graphs.machine.impl.simple_virtual_machine_vertex \
-    import SimpleVirtualMachineVertex
-from spinn_machine.utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 
@@ -744,7 +748,7 @@ def _search_route(
     # Create text for starting point
     source_vertex = source_placement.vertex
     text = ""
-    if isinstance(source_vertex, SimpleVirtualMachineVertex):
+    if isinstance(source_vertex, MachineVirtualVertex):
         text += "Virtual "
     text += "{}:{}:{} -> ".format(
         source_placement.x, source_placement.y, source_placement.p)

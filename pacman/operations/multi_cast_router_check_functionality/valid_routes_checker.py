@@ -8,6 +8,7 @@ from pacman import exceptions
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_contiguous_range_constraint import \
     KeyAllocatorContiguousRangeContraint
+from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 
@@ -53,7 +54,7 @@ def validate_routes(machine_graph, placements, routing_infos,
         n_atoms = graph_mapper.get_slice(placement.vertex).n_atoms
 
         for partition in partitions:
-            rinfo = routing_infos.get_routing_info_from_partition(
+            r_info = routing_infos.get_routing_info_from_partition(
                 partition)
 
             is_continuous = _check_if_partition_has_continuous_keys(partition)
@@ -66,7 +67,17 @@ def validate_routes(machine_graph, placements, routing_infos,
                     .format(partition))
 
             destination_placements = list()
-            for outgoing_edge in partition.edges:
+
+            # filter for just multicast edges, we dont check other types of
+            # edges here.
+            out_going_edges = \
+                filter(
+                    lambda machine_edge:
+                    machine_edge.traffic_type == EdgeTrafficType.MULTICAST,
+                    partition.edges)
+
+            # for every outgoing edge, locate its destination and store it.
+            for outgoing_edge in out_going_edges:
                 dest_placement = placements.get_placement_of_vertex(
                     outgoing_edge.post_vertex)
                 dest_tuple = PlacementTuple(x=dest_placement.x,
@@ -76,7 +87,7 @@ def validate_routes(machine_graph, placements, routing_infos,
                     destination_placements.append(dest_tuple)
 
             # search for these destinations
-            for key_and_mask in rinfo.keys_and_masks:
+            for key_and_mask in r_info.keys_and_masks:
                 _search_route(
                     placement, destination_placements, key_and_mask,
                     routing_tables, machine, n_atoms, is_continuous)
@@ -99,8 +110,7 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     :param source_placement: the placement from which the search started
     :param dest_placements: the placements to which this trace should visit\
             only once
-    :param key_and_mask: the key and mask associated with this set of\
-            edges
+    :param key_and_mask: the key and mask associated with this set of edges
     :param n_atoms: the number of atoms going through this path
     :param is_continuous: bool stating if the keys and atoms mapping is
     continuous

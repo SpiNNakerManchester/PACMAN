@@ -17,7 +17,7 @@ class DestinationBasedRoutingInfoAllocator(object):
     MAX_KEYS_SUPPORTED = 2048
     MASK = 0xFFFFF800
 
-    def __call__(self, machine_graph, placements, n_keys_map, routing_paths):
+    def __call__(self, machine_graph, placements, n_keys_map):
         """
 
         :param machine_graph: The graph to allocate the routing info for
@@ -30,10 +30,6 @@ class DestinationBasedRoutingInfoAllocator(object):
                     of keys required by the edges
         :type n_keys_map:\
                     :py:class:`pacman.model.routing_info.abstract_machine_partition_n_keys_map.AbstractMachinePartitionNKeysMap`
-        :param routing_paths: the paths each edge takes to get\
-                from source to destination.
-        :type routing_paths:
-            :py:class:`pacman.model.routing_paths.multicast_routing_paths.MulticastRoutingPaths
         :return: The routing information
         :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`,
                 :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable

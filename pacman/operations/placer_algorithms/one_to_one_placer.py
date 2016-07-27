@@ -58,16 +58,10 @@ class OneToOnePlacer(RadialPlacer):
                         vertex, placements, progress_bar, resource_tracker)
             else:
 
-                # try to allocate in one block
-                group_resources = [
-                    vertex.resources_required for vertex in vertex_list]
-                group_constraints = [
-                    vertex.constraints for vertex in vertex_list]
-
                 try:
                     allocations = \
                         resource_tracker.allocate_constrained_group_resources(
-                            group_resources, group_constraints)
+                            vertex_list)
 
                     # allocate cores to vertices
                     for vertex, (x, y, p, _, _) in zip(
@@ -94,8 +88,7 @@ class OneToOnePlacer(RadialPlacer):
 
         # Create and store a new placement anywhere on the board
         (x, y, p, _, _) = resource_tracker.\
-            allocate_constrained_resources(
-                vertex.resources_required, vertex.constraints)
+            allocate_constrained_resources(vertex.resources_required, vertex)
         placement = Placement(vertex, x, y, p)
         placements.add_placement(placement)
         progress_bar.update()

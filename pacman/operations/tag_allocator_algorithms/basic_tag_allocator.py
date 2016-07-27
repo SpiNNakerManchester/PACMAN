@@ -1,9 +1,6 @@
 
 # pacman imports
-from pacman.model.constraints.tag_allocator_constraints.\
-    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 from pacman.model.tags.tags import Tags
-from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from spinn_machine.utilities.progress_bar import ProgressBar
 
@@ -29,10 +26,10 @@ class BasicTagAllocator(object):
                                    "Allocating tags")
         placements_with_tags = list()
         for placement in placements.placements:
-            ResourceTracker.check_constraints([placement.vertex])
-            if len(utility_calls.locate_constraints_of_type(
-                    placement.vertex.constraints,
-                    AbstractTagAllocatorConstraint)):
+            if (len(placement.vertex.resources_required.iptags) > 0 or
+                    len(placement.vertex.resources_required.
+                        reverse_iptags) > 0):
+                ResourceTracker.check_constraints([placement.vertex])
                 placements_with_tags.append(placement)
             progress_bar.update()
 
@@ -42,8 +39,8 @@ class BasicTagAllocator(object):
             vertex = placement.vertex
 
             # Get the constraint details for the tags
-            (board_address, ip_tags, reverse_ip_tags) =\
-                ResourceTracker.get_ip_tag_info(vertex.constraints)
+            (board_address, ip_tags, reverse_ip_tags) = \
+                ResourceTracker.get_ip_tag_info(vertex)
 
             # Allocate the tags, first-come, first-served, using the
             # fixed placement of the vertex, and the required resources
