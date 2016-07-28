@@ -2,7 +2,8 @@ import sys
 
 from pacman.model.abstract_classes.impl.constrained_object \
     import ConstrainedObject
-from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint import \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides

@@ -26,6 +26,6 @@ class MachineGraph(Graph, AbstractHasLabel):
         AbstractHasLabel.__init__(self)
         self._label = label
 
-    @overrides(AbstractHasLabel.label())
+    @overrides(AbstractHasLabel.label)
     def label(self):
         return self._label

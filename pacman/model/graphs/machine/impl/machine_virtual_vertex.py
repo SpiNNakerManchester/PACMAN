@@ -1,4 +1,4 @@
-from pacman.model.abstract_classes.constrained_object \
+from pacman.model.abstract_classes.impl.constrained_object \
     import ConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides

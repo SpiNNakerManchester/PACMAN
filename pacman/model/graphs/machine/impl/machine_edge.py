@@ -76,7 +76,7 @@ class MachineEdge(AbstractMachineEdge):
         return self._label
 
     @property
-    @overrides(AbstractMachineEdge.traffic_type)
+    @overrides(AbstractMachineEdge.traffic_weight)
     def traffic_weight(self):
         return self._traffic_weight
 

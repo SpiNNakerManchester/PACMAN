@@ -66,8 +66,8 @@ class MachineVertex(AbstractMachineVertex):
         return self._resources_required
 
     @overrides(AbstractMachineVertex.set_resources_required)
-    def set_resources_required(self, resources_required):
-        self._resources_required = resources_required
+    def set_resources_required(self, resource_required):
+        self._resources_required = resource_required
 
     def __str__(self):
         return self._label

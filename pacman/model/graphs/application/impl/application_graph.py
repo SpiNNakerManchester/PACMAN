@@ -27,6 +27,6 @@ class ApplicationGraph(Graph, AbstractHasLabel):
 
         self._label = label
 
-    @overrides(AbstractHasLabel.label())
+    @overrides(AbstractHasLabel.label)
     def label(self):
         return self._label
