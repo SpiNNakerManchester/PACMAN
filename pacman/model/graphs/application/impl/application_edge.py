@@ -48,7 +48,7 @@ class ApplicationEdge(AbstractApplicationEdge):
         self._label = label
 
     @overrides(AbstractApplicationEdge.create_machine_edge)
-    def create_machine_edge(self, pre_vertex, post_vertex):
+    def create_machine_edge(self, pre_vertex, post_vertex, label):
         return MachineEdge(pre_vertex, post_vertex, self._traffic_type)
 
     @property

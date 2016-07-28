@@ -29,3 +29,8 @@ class MachineGraph(Graph, AbstractHasLabel):
     @overrides(AbstractHasLabel.label)
     def label(self):
         return self._label
+
+
+    @property
+    def model_name(self):
+        return "MachineGraph"

@@ -56,9 +56,10 @@ class ApplicationVirtualVertex(AbstractVirtualApplicationVertex):
 
     @overrides(AbstractVirtualApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, constraints=None):
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
         machine_vertex = MachineVirtualVertex(
-            self._spinnaker_link_id, constraints=constraints)
+            self._spinnaker_link_id, label, constraints=constraints)
         return machine_vertex
 
     @property
