@@ -461,9 +461,11 @@
             <param_name>machine</param_name>
             <param_name>machine_graph</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>routing_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <param_name>graph_mapper</param_name>
+        </optional_inputs>
     </algorithm>
     <algorithm name="RigPlaceAndRoute">
         <python_module>pacman.operations.rig_algorithms.rig_place_and_route</python_module>
