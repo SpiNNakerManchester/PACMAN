@@ -83,7 +83,7 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
     :param objects_to_inject:\
         The objects to be injected as a dict of type name -> object of type
     :type objects_to_inject: dict(str)->object
-    :param object_to_inject_into: \
+    :param objects_to_inject_into: \
         The objects whose classes support_injection, or None to use all\
         instances that have been created
     :type objects_to_inject_into: list
