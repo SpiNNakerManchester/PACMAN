@@ -161,7 +161,11 @@ class Graph(AbstractGraph):
     @property
     @overrides(AbstractGraph.edges)
     def edges(self):
-        return self._outgoing_edges.values()
+        data = list()
+        for edge_list in self._outgoing_edges.itervalues():
+            for edge in edge_list:
+                data.append(edge)
+        return data
 
     @property
     @overrides(AbstractGraph.outgoing_edge_partitions)
