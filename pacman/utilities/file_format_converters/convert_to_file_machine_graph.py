@@ -3,11 +3,9 @@ import os
 from collections import defaultdict
 
 import jsonschema
-from pacman.model.constraints.tag_allocator_constraints.\
-    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
 
-from pacman.model.graphs.application.abstract_virtual_application_vertex \
-    import AbstractVirtualApplicationVertex
+from pacman.model.graphs.machine.abstract_machine_virutal_vertex\
+    import AbstractMachineVirtualVertex
 from pacman.utilities import file_format_schemas
 from pacman.utilities import utility_calls
 from spinn_machine.utilities.progress_bar import ProgressBar
@@ -47,14 +45,14 @@ class ConvertToFileMachineGraph(object):
             vertex_by_id[vertex_id] = vertex
 
             # handle external devices
-            if isinstance(vertex, AbstractVirtualApplicationVertex):
+            if isinstance(vertex, AbstractMachineVirtualVertex):
                 vertex_resources = dict()
                 vertices_resources[vertex_id] = vertex_resources
                 vertex_resources["cores"] = 0
 
             # handle tagged vertices
-            elif len(utility_calls.locate_constraints_of_type(
-                    vertex.constraints, AbstractTagAllocatorConstraint)) != 0:
+            elif (len(vertex.resources_required.iptags) != 0 or
+                    len(vertex.resources_required.revese_iptags) != 0):
 
                 # handle the edge between the tag-able vertex and the fake
                 # vertex

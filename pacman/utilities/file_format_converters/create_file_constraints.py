@@ -1,19 +1,14 @@
 
-from pacman.model.graphs.application.simple_virtual_application_vertex import \
-    SimpleVirtualApplicationVertex
-from pacman.model.constraints.tag_allocator_constraints.\
-    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
+from pacman.model.graphs.application.impl.application_virtual_vertex \
+    import AbstractVirtualApplicationVertex
 from pacman.model.constraints.placer_constraints.\
     placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints.abstract_placer_constraint\
     import AbstractPlacerConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_iptag_constraint import \
-    TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_reverse_iptag_constraint import \
-    TagAllocatorRequireReverseIptagConstraint
 from pacman import exceptions
+from pacman.model.resources.iptag_resource import IPtagResource
+from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
+from pacman.model.resources.sdram_tag_resource import SDRAMTagResource
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
@@ -81,7 +76,10 @@ class CreateConstraintsToFile(object):
                     constraint, json_constraints_dictory_rep, vertex,
                     vertex_id)
                 progress_bar.update()
-            if isinstance(vertex, SimpleVirtualApplicationVertex):
+            self._handle_vertex_resources(
+                vertex.resources_required, json_constraints_dictory_rep,
+                vertex_id)
+            if isinstance(vertex, AbstractVirtualApplicationVertex):
                 self._handle_virtual_vertex(
                     vertex, vertex_id, json_constraints_dictory_rep, machine)
         return vertex_by_id
@@ -135,7 +133,7 @@ class CreateConstraintsToFile(object):
     @staticmethod
     def _handle_vertex_constraint(
             constraint, json_constraints_dictory_rep, vertex, vertex_id):
-        if not isinstance(vertex, SimpleVirtualApplicationVertex):
+        if not isinstance(vertex, AbstractVirtualApplicationVertex):
             if isinstance(constraint, AbstractPlacerConstraint):
                 if isinstance(constraint, PlacerChipAndCoreConstraint):
                     chip_loc_constraint = dict()
@@ -157,23 +155,29 @@ class CreateConstraintsToFile(object):
                     raise exceptions.PacmanConfigurationException(
                         "Converter does not recognise placer constraint {}"
                         .format(constraint))
-            if isinstance(constraint, AbstractTagAllocatorConstraint):
+
+    @staticmethod
+    def _handle_vertex_resources(
+            resources_required, json_constraints_dictory_rep, vertex_id):
+        tags = resources_required.tags
+        for tag in tags:
+            if isinstance(tag, IPtagResource):
                 tag_constraint = dict()
                 tag_constraint['type'] = "resource"
                 tag_constraint['vertex'] = vertex_id
-                if isinstance(constraint,
-                              TagAllocatorRequireIptagConstraint):
-                    tag_constraint['resource'] = "iptag"
-                    tag_constraint['range'] = [0, 1]
-                elif isinstance(constraint,
-                                TagAllocatorRequireReverseIptagConstraint):
-                    tag_constraint['resource'] = "reverse_iptag"
-                    tag_constraint['range'] = [0, 1]
-                else:
-                    raise exceptions.PacmanConfigurationException(
-                        "Converter does not recognise tag constraint {}"
-                        .format(constraint))
+                tag_constraint['resource'] = "iptag"
+                tag_constraint['range'] = [0, 1]
                 json_constraints_dictory_rep.append(tag_constraint)
+            if isinstance(tag, ReverseIPtagResource):
+                tag_constraint = dict()
+                tag_constraint['type'] = "resource"
+                tag_constraint['vertex'] = vertex_id
+                tag_constraint['resource'] = "reverse_iptag"
+                tag_constraint['range'] = [0, 1]
+                json_constraints_dictory_rep.append(tag_constraint)
+            if isinstance(tag, SDRAMTagResource):
+                raise exceptions.PacmanConfigurationException(
+                    "Converter does not know how to convert a SDRAM tag")
 
     @staticmethod
     def _add_extra_monitor_cores(json_constraints_dictory_rep, machine):
