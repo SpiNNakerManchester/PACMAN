@@ -21,8 +21,8 @@ class MachineGraph(Graph, AbstractHasLabel):
 
     def __init__(self, label):
         Graph.__init__(
-            self, [AbstractMachineVertex], [AbstractMachineEdge],
-            [AbstractOutgoingEdgePartition])
+            self, AbstractMachineVertex, AbstractMachineEdge,
+            AbstractOutgoingEdgePartition)
         AbstractHasLabel.__init__(self)
         self._label = label
 

@@ -378,8 +378,6 @@
     <algorithm name="MallocBasedChipIDAllocator">
         <python_module>pacman.operations.chip_id_allocator_algorithms.malloc_based_chip_id_allocator</python_module>
         <python_class>MallocBasedChipIdAllocator</python_class>
-        <optional_inputs>
-        </optional_inputs>
         <input_definitions>
             <parameter>
                 <param_name>machine</param_name>
