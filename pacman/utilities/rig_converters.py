@@ -13,8 +13,8 @@ from pacman.model.constraints.placer_constraints\
 from pacman.model.constraints.placer_constraints\
     .placer_radial_placement_from_chip_constraint \
     import PlacerRadialPlacementFromChipConstraint
-from pacman.model.graphs.machine.impl.simple_virtual_machine_vertex \
-    import SimpleVirtualMachineVertex
+from pacman.model.graphs.machine.impl.machine_virtual_vertex \
+    import MachineVirtualVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_table_by_partition\
@@ -110,7 +110,7 @@ def convert_to_rig_graph(machine_graph):
     for vertex in machine_graph.vertices:
 
         # handle external devices
-        if isinstance(vertex, SimpleVirtualMachineVertex):
+        if isinstance(vertex, MachineVirtualVertex):
             vertex_resources = dict()
             vertices_resources[vertex] = vertex_resources
             vertex_resources["cores"] = 0
@@ -161,7 +161,7 @@ def create_rig_graph_constraints(machine_graph, machine):
                 constraints.append(LocationConstraint(
                     vertex, (constraint.x, constraint.y)))
 
-        if isinstance(vertex, SimpleVirtualMachineVertex):
+        if isinstance(vertex, MachineVirtualVertex):
             constraints.append(LocationConstraint(
                 vertex, (vertex.real_chip_x, vertex.real_chip_y)))
             constraints.append(RouteEndpointConstraint(
@@ -185,14 +185,14 @@ def create_rig_machine_constraints(machine):
 def convert_to_rig_placements(placements):
     rig_placements = {
         p.vertex: (p.x, p.y)
-        if not isinstance(p.vertex, SimpleVirtualMachineVertex)
+        if not isinstance(p.vertex, MachineVirtualVertex)
         else (p.vertex.real_chip_x, p.vertex.real_chip_y)
         for p in placements.placements}
 
     core_allocations = {
         p.vertex: {"cores": slice(p.p, p.p + 1)}
         for p in placements.placements
-        if not isinstance(p.vertex, SimpleVirtualMachineVertex)}
+        if not isinstance(p.vertex, MachineVirtualVertex)}
 
     return rig_placements, core_allocations
 
@@ -201,7 +201,7 @@ def convert_from_rig_placements(
         rig_placements, rig_allocations, machine_graph):
     placements = Placements()
     for vertex in rig_placements:
-        if isinstance(vertex, SimpleVirtualMachineVertex):
+        if isinstance(vertex, MachineVirtualVertex):
             placements.add_placement(Placement(
                 vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
                 None))
