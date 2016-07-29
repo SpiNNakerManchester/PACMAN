@@ -313,16 +313,22 @@ def get_algorithms():
     return _algorithms
 
 
-def scan_packages(packages, recursive=True):
+def scan_packages(packages, xml_paths, recursive=True):
     """ Scan packages for algorithms
 
     :param packages:\
         The names of the packages to scan (using dotted notation),
         or the actual package modules
+    :param xml_paths: the list of paths for xml files
     :param recursive: True if sub-packages should be examined
     :return: A dict of algorithm name -> algorithm data
     """
     global _algorithms
+
+    xml_names = list()
+    for xml_path in xml_paths:
+        xml_names.append(os.path.splitext(os.path.basename(xml_path))[0])
+
     with _algorithm_lock:
         current_algorithms = _algorithms
         _algorithms = dict()
@@ -341,9 +347,10 @@ def scan_packages(packages, recursive=True):
 
                 # If recursive and this is a package, recurse
                 if is_pkg and recursive:
-                    scan_packages([package.__name__ + "." + name], recursive)
+                    scan_packages([package.__name__ + "." + name],
+                                  xml_paths, recursive)
 
-                else:
+                elif name not in xml_names and not recursive:
                     importlib.import_module("." + name, package.__name__)
 
         new_algorithms = _algorithms

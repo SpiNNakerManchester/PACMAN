@@ -163,21 +163,27 @@ class PACMANAlgorithmExecutor(object):
         # decode the algorithms specs
         xml_decoder = AlgorithmMetadataXmlReader(copy_of_xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
-        converter_decoder = AlgorithmMetadataXmlReader([
-            os.path.join(
-                os.path.dirname(file_format_converters.__file__),
-                "converter_algorithms_metadata.xml")
-        ])
+        converter_xml_path = \
+            os.path.join(os.path.dirname(file_format_converters.__file__),
+                         "converter_algorithms_metadata.xml")
+        converter_decoder = AlgorithmMetadataXmlReader([converter_xml_path])
         converters = converter_decoder.decode_algorithm_data_objects()
         algorithm_data_objects.update(converters)
 
         # Scan for annotated algorithms
         copy_of_packages.append(operations.__name__)
         copy_of_packages.append(algorithm_reports.__name__)
+
+        # get list of all xml's as this is used to exclude xml files from import
+        all_xml_paths = list()
+        all_xml_paths.extend(copy_of_xml_paths)
+        all_xml_paths.append(converter_xml_path)
+
         converters.update(algorithm_decorator.scan_packages(
-            [file_format_converters.__name__]))
+            [file_format_converters.__name__], all_xml_paths))
         algorithm_data_objects.update(
-            algorithm_decorator.scan_packages(copy_of_packages))
+            algorithm_decorator.scan_packages(
+                copy_of_packages, copy_of_xml_paths))
         algorithm_data_objects.update(converters)
 
         # Add converters to the optional algorithms
