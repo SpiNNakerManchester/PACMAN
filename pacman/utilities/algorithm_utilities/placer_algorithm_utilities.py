@@ -4,12 +4,6 @@ from pacman.model.constraints.placer_constraints\
     .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
 from pacman.utilities.vertex_sorter import VertexSorter
 from pacman.utilities.vertex_sorter import ConstraintOrder
-from pacman.model.constraints.tag_allocator_constraints\
-    .tag_allocator_require_iptag_constraint \
-    import TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints\
-    .tag_allocator_require_reverse_iptag_constraint \
-    import TagAllocatorRequireReverseIptagConstraint
 from pacman.model.constraints.placer_constraints.placer_board_constraint \
     import PlacerBoardConstraint
 from pacman.model.constraints.placer_constraints\
@@ -26,10 +20,6 @@ def sort_vertices_by_known_constraints(vertices):
         ConstraintOrder(PlacerChipAndCoreConstraint, 2),
         ConstraintOrder(PlacerSameChipAsConstraint, 3),
         ConstraintOrder(PlacerBoardConstraint, 4),
-        ConstraintOrder(TagAllocatorRequireIptagConstraint, 5, ["tag"]),
-        ConstraintOrder(TagAllocatorRequireReverseIptagConstraint, 5, ["tag"]),
-        ConstraintOrder(TagAllocatorRequireIptagConstraint, 6),
-        ConstraintOrder(TagAllocatorRequireReverseIptagConstraint, 6),
-        ConstraintOrder(PlacerRadialPlacementFromChipConstraint, 7)
+        ConstraintOrder(PlacerRadialPlacementFromChipConstraint, 5)
     ])
     return sorter.sort(vertices)
