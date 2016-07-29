@@ -58,7 +58,7 @@ class PartitionAndPlacePartitioner(object):
         vertices = graph.vertices
         machine_graph = MachineGraph(
             label="partitioned graph for {}".format(graph.label))
-        graph_mapper = GraphMapper(graph.label, machine_graph.label)
+        graph_mapper = GraphMapper()
 
         # sort out vertex's by placement constraints
         vertices = placer_algorithm_utilities\

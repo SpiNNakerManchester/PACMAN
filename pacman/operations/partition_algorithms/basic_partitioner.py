@@ -56,7 +56,8 @@ class BasicPartitioner(object):
         progress_bar = ProgressBar(len(graph.vertices),
                                    "Partitioning graph vertices")
         vertices = graph.vertices
-        machine_graph = MachineGraph()
+        machine_graph = MachineGraph(
+            "Machine graph for {}".format(graph.label))
         graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine)
 
