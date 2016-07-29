@@ -30,7 +30,6 @@ class MachineGraph(Graph, AbstractHasLabel):
     def label(self):
         return self._label
 
-
     @property
     def model_name(self):
         return "MachineGraph"
