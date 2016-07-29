@@ -58,7 +58,7 @@ class VertexSorter(object):
         # Sort each list of constraint by the number of optional properties,
         # largest first
         for constraints in self._constraints.itervalues():
-            constraints.sort(key=lambda _, opts: len(opts), reversed=True)
+            constraints.sort(key=lambda con: len(con), reverse=True)
 
     def sort(self, vertices):
         """ Sort the given set of vertices by the constraint ordering
@@ -81,11 +81,11 @@ class VertexSorter(object):
 
             # Sort and store the ranks for overall ordering
             ranks.sort()
-            vertices_with_rank.append(vertex, ranks)
+            vertices_with_rank.append((vertex, ranks))
 
         # Sort the vertices - because ranks is a list, things with the same
         # min rank will be sorted by the next highest rank and so on
-        vertices_with_rank.sort(key=lambda _, rank: rank)
+        vertices_with_rank.sort(key=lambda thing: thing[1])
         return [vertex for vertex, _ in vertices_with_rank]
 
     @staticmethod

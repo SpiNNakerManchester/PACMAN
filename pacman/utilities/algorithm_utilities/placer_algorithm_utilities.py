@@ -20,6 +20,5 @@ def sort_vertices_by_known_constraints(vertices):
         ConstraintOrder(PlacerChipAndCoreConstraint, 2),
         ConstraintOrder(PlacerSameChipAsConstraint, 3),
         ConstraintOrder(PlacerBoardConstraint, 4),
-        ConstraintOrder(PlacerRadialPlacementFromChipConstraint, 5)
-    ])
+        ConstraintOrder(PlacerRadialPlacementFromChipConstraint, 5)])
     return sorter.sort(vertices)
