@@ -136,7 +136,7 @@ def convert_to_rig_graph(machine_graph):
             weight = 0
             for edge in partition.edges:
                 sinks.append(edge.post_vertex)
-                weight += edge.weight
+                weight += edge.traffic_weight
             hyper_edge_dict['sinks'] = sinks
             hyper_edge_dict["weight"] = weight
             hyper_edge_dict["type"] = partition.traffic_type.name.lower()
