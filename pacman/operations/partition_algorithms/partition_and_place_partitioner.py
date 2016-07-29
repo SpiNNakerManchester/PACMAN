@@ -282,12 +282,12 @@ class PartitionAndPlacePartitioner(object):
             vertex = vertices[i]
 
             # get max resources available on machine
+            vertex_slice = Slice(lo_atom, hi_atom)
             resources = \
                 resource_tracker.get_maximum_constrained_resources_available(
-                    vertex)
+                    vertex, vertex_slice)
 
             # get resources used by vertex
-            vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
 
             # Work out the ratio of used to available resources
@@ -457,12 +457,12 @@ class PartitionAndPlacePartitioner(object):
         :raise None: this method does not raise any known exceptions
 
         """
-        if (resources.cpu.get_value() == 0 or
-                max_resources.cpu.get_value() == 0):
+        if (resources.cpu_cycles.get_value() == 0 or
+                max_resources.cpu_cycles.get_value() == 0):
             cpu_ratio = 0
         else:
-            cpu_ratio = (float(resources.cpu.get_value()) /
-                         float(max_resources.cpu.get_value()))
+            cpu_ratio = (float(resources.cpu_cycles.get_value()) /
+                         float(max_resources.cpu_cycles.get_value()))
         if (resources.dtcm.get_value() == 0 or
                 max_resources.dtcm.get_value() == 0):
             dtcm_ratio = 0

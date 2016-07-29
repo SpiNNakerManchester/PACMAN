@@ -1,4 +1,8 @@
 from pacman import exceptions
+from pacman.model.graphs.application.abstract_application_vertex import \
+    AbstractApplicationVertex
+from pacman.model.graphs.machine.abstract_machine_vertex import \
+    AbstractMachineVertex
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
@@ -149,7 +153,7 @@ class ResourceTracker(object):
             abstract_constraint_type=AbstractPlacerConstraint)
 
     @staticmethod
-    def get_ip_tag_info(vertex):
+    def get_ip_tag_info(vertex, vertex_slice):
         """ Get the ip tag resource information from the constraints
 
         :param vertex: The vertex to get the values from.
@@ -163,8 +167,16 @@ class ResourceTracker(object):
                     :py:class:`pacman.model.resources.reverse_iptag_resource.ReverseIPtabResource`)
         """
         board_address = None
-        ip_tags = vertex.resources.iptags
-        reverse_ip_tags = vertex.resources.reverse_iptags
+        if isinstance(vertex, AbstractApplicationVertex):
+            resources_required = \
+                vertex.get_resources_used_by_atoms(vertex_slice)
+        elif isinstance(vertex, AbstractMachineVertex):
+            resources_required = vertex.resources_required
+        else:
+            raise exceptions.PacmanConfigurationException(
+                "Dont know this vertex type.")
+        ip_tags = resources_required.iptags
+        reverse_ip_tags = resources_required.reverse_iptags
 
         for constraint in vertex.constraints:
             if isinstance(constraint, PlacerBoardConstraint):
@@ -1029,8 +1041,8 @@ class ResourceTracker(object):
             n_chips += 1
         return n_cores, n_chips, max_sdram
 
-    def get_maximum_constrained_resources_available(self, vertex,
-                                                    chips=None):
+    def get_maximum_constrained_resources_available(
+            self, vertex, vertex_slice, chips=None):
         """ Get the maximum resources available given the constraints
 
         :param vertex: the vertex to match
@@ -1041,7 +1053,7 @@ class ResourceTracker(object):
         """
         (x, y, p) = self.get_chip_and_core(vertex.constraints, chips)
         (board_address, ip_tags, reverse_ip_tags) = self.get_ip_tag_info(
-            vertex)
+            vertex, vertex_slice)
         chips = None
         if x is not None and y is not None:
             chips = [(x, y)]

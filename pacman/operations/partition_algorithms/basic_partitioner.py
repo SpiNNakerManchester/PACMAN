@@ -71,7 +71,7 @@ class BasicPartitioner(object):
             # Locate the maximum resources available
             max_resources_available = \
                 resource_tracker.get_maximum_constrained_resources_available(
-                    vertex)
+                    vertex, Slice(0, 1))
 
             # Find the ratio of each of the resources - if 0 is required,
             # assume the ratio is the max available
