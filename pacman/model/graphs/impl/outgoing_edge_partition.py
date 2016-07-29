@@ -164,3 +164,8 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         :return: boolean of true of false otherwise
         """
         return edge in self._edges
+
+    @property
+    @overrides(AbstractOutgoingEdgePartition.model_name)
+    def model_name(self):
+        return "OutgoingEdgePartition"
