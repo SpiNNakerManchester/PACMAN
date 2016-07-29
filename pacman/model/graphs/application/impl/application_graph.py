@@ -21,8 +21,8 @@ class ApplicationGraph(Graph, AbstractHasLabel):
 
     def __init__(self, label):
         Graph.__init__(
-            self, [AbstractApplicationVertex], [AbstractApplicationEdge],
-            [AbstractOutgoingEdgePartition])
+            self, AbstractApplicationVertex, AbstractApplicationEdge,
+            AbstractOutgoingEdgePartition)
         AbstractHasLabel.__init__(self)
 
         self._label = label
