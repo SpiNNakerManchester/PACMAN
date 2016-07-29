@@ -427,7 +427,7 @@ class PACMANAlgorithmExecutor(object):
             # Count the number of non-novel outputs
             n_boring_outputs = 0
             for output in algorithm.outputs:
-                if output in generated_outputs:
+                if output.output_type in generated_outputs:
                     n_boring_outputs += 1
 
             # If any, add to the list
