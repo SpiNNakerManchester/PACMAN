@@ -1,5 +1,6 @@
 from pacman.model.constraints.key_allocator_constraints.\
     abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from pacman.model.decorators.overrides import overrides
 
 
 class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
@@ -22,3 +23,7 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
 
     def __repr__(self):
         return "KeyAllocatorContiguousRangeConstraint()"
+
+    @overrides(AbstractKeyAllocatorConstraint.label)
+    def label(self):
+        return "Key allocator constraint to ensure that keys are not split"

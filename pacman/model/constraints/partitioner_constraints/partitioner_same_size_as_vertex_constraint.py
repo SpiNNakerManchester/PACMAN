@@ -1,6 +1,7 @@
 # pacman imports
 from pacman.model.constraints.partitioner_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
+from pacman.model.decorators.overrides import overrides
 
 
 class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
@@ -28,3 +29,8 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         :raise None: does not raise any known exceptions
         """
         return self._vertex
+
+    @overrides(AbstractPartitionerConstraint.label)
+    def label(self):
+        return "partitioner same size as other vertex constraint with " \
+               "vertex {}".format(self._vertex.label)

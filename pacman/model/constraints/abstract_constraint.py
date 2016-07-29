@@ -1,4 +1,4 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from six import add_metaclass
 
 
@@ -6,3 +6,7 @@ from six import add_metaclass
 class AbstractConstraint(object):
     """ A constraint of some sort which an algorithm might or might not support
     """
+
+    @abstractmethod
+    def label(self):
+        pass

@@ -1,5 +1,6 @@
 from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
+from pacman.model.decorators.overrides import overrides
 
 
 class PlacerBoardConstraint(AbstractPlacerConstraint):
@@ -23,3 +24,7 @@ class PlacerBoardConstraint(AbstractPlacerConstraint):
     def __repr__(self):
         return "PlacerBoardConstraint(board_address=\"{}\")".format(
             self._board_address)
+
+    @overrides(AbstractPlacerConstraint.label)
+    def label(self):
+        return "placer constraint for board {}".format(self._board_address)
