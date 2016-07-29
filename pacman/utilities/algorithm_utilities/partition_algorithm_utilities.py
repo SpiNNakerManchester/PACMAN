@@ -45,7 +45,8 @@ def generate_machine_edges(machine_graph, graph_mapper, graph):
                 post_vertices = graph_mapper.get_machine_vertices(post_vertex)
                 for dest_vertex in post_vertices:
                     machine_edge = edge.create_machine_edge(
-                        source_vertex, dest_vertex)
+                        source_vertex, dest_vertex,
+                        "machine_edge_for{}".format(edge.label))
                     machine_graph.add_edge(machine_edge, partition.identifier)
                     graph_mapper.add_edge_mapping(
                         machine_edge, edge)
