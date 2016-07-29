@@ -202,8 +202,9 @@ class PACMANAlgorithmExecutor(object):
             inputs, required_outputs, algorithm_data,
             optional_algorithms_datas)
 
+    @staticmethod
     def _get_algorithm_data(
-            self, algorithm_names, algorithm_data_objects):
+            algorithm_names, algorithm_data_objects):
         algorithms = list()
         for algorithm_name in algorithm_names:
             if algorithm_name in algorithm_data_objects:
