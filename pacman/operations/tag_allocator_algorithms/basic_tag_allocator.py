@@ -40,7 +40,7 @@ class BasicTagAllocator(object):
 
             # Get the constraint details for the tags
             (board_address, ip_tags, reverse_ip_tags) = \
-                ResourceTracker.get_ip_tag_info(vertex)
+                ResourceTracker.get_ip_tag_info(vertex, None)
 
             # Allocate the tags, first-come, first-served, using the
             # fixed placement of the vertex, and the required resources

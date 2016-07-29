@@ -834,7 +834,7 @@ class ResourceTracker(object):
         group_reverse_ip_tags = list()
         for vertex in vertex_list:
             this_board_address, this_ip_tags, this_reverse_ip_tags = \
-                self.get_ip_tag_info(vertex)
+                self.get_ip_tag_info(vertex, None)
             this_x, this_y, this_p = self.get_chip_and_core(
                 vertex.constraints, chips)
             if ((x is not None and this_x is not None and this_x != x) or
