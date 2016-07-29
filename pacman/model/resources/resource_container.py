@@ -92,6 +92,14 @@ class ResourceContainer(object):
         self._reverse_iptags.append(extra_tag)
 
     @property
+    def tags(self):
+        data = list()
+        data.extend(self.iptags)
+        data.extend(self.reverse_iptags)
+        data.extend(self.sdram_tags)
+        return data
+
+    @property
     def sdram_tags(self):
         return self._sdram_tags
 
