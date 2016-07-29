@@ -783,7 +783,7 @@ class ResourceTracker(object):
             return None
         return allocations
 
-    def allocate_constrained_resources(self, resources, vertex,
+    def allocate_constrained_resources(self, resources, vertex, vertex_slice,
                                        chips=None):
         """ Attempts to use the given resources of the machine, constrained\
             by the given placement constraints.
@@ -806,7 +806,7 @@ class ResourceTracker(object):
         """
         (x, y, p) = self.get_chip_and_core(vertex.constraints, chips)
         (board_address, ip_tags, reverse_ip_tags) = \
-            self.get_ip_tag_info(vertex)
+            self.get_ip_tag_info(vertex, vertex_slice)
         chips = None
         if x is not None and y is not None:
             chips = [(x, y)]

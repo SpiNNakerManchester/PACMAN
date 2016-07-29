@@ -65,7 +65,7 @@ class GraphMapper(object):
         machine_vertices = self._machine_vertices_by_application_vertex[
             application_vertex]
         self._index_by_machine_vertex[machine_vertex] = len(machine_vertices)
-        machine_vertices.append(machine_vertex)
+        machine_vertices.add(machine_vertex)
         self._slice_by_machine_vertex[machine_vertex] = vertex_slice
         self._slices_by_application_vertex[application_vertex].append(
             vertex_slice)

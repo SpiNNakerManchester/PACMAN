@@ -237,7 +237,7 @@ class PartitionAndPlacePartitioner(object):
             # Re-allocate the existing resources
             (x, y, p, ip_tags, reverse_ip_tags) = \
                 resource_tracker.allocate_constrained_resources(
-                    new_resources, placed_vertex)
+                    new_resources, placed_vertex, vertex_slice)
             new_used_placements.append(
                 (placed_vertex, x, y, p, new_resources, ip_tags,
                  reverse_ip_tags))
@@ -338,7 +338,7 @@ class PartitionAndPlacePartitioner(object):
             try:
                 (x, y, p, ip_tags, reverse_ip_tags) = \
                     resource_tracker.allocate_constrained_resources(
-                        used_resources, vertex)
+                        used_resources, vertex, vertex_slice)
                 used_placements.append(
                     (vertex, x, y, p, used_resources,
                      ip_tags, reverse_ip_tags))

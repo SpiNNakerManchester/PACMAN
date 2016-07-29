@@ -88,7 +88,8 @@ class OneToOnePlacer(RadialPlacer):
 
         # Create and store a new placement anywhere on the board
         (x, y, p, _, _) = resource_tracker.\
-            allocate_constrained_resources(vertex.resources_required, vertex)
+            allocate_constrained_resources(
+                vertex.resources_required, vertex, None)
         placement = Placement(vertex, x, y, p)
         placements.add_placement(placement)
         progress_bar.update()

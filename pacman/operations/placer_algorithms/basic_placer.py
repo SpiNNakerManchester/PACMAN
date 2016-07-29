@@ -45,7 +45,7 @@ class BasicPlacer(object):
 
             # Create and store a new placement anywhere on the board
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-                vertex.resources_required, vertex.constraints)
+                vertex.resources_required, vertex.constraints, None)
             placement = Placement(vertex, x, y, p)
             placements.add_placement(placement)
             progress_bar.update()
