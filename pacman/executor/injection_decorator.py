@@ -59,7 +59,10 @@ def requires_injection(types_required):
 
         @wraps(wrapped_method)
         def wrapper(obj, *args, **kwargs):
-            methods = _methods.get(obj.__class__, None)
+            methods = dict()
+            for cls in obj.__class__.__mro__:
+                cls_methods = _methods.get(cls, {})
+                methods.update(cls_methods)
             for object_type in types_required:
                 method = methods.get(object_type, None)
                 if method is None:
@@ -89,7 +92,10 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
     if objects_to_inject_into is None:
         injectees = _instances
     for obj in injectees:
-        methods = _methods.get(obj.__class__, None)
+        methods = dict()
+        for cls in obj.__class__.__mro__:
+            cls_methods = _methods.get(cls, {})
+            methods.update(cls_methods)
         if methods is not None:
             for object_type, object_to_inject in objects_to_inject.iteritems():
                 method = methods.get(object_type, None)
