@@ -52,7 +52,7 @@ class ConvertToFileMachineGraph(object):
 
             # handle tagged vertices
             elif (len(vertex.resources_required.iptags) != 0 or
-                    len(vertex.resources_required.revese_iptags) != 0):
+                    len(vertex.resources_required.reverse_iptags) != 0):
 
                 # handle the edge between the tag-able vertex and the fake
                 # vertex
@@ -104,7 +104,7 @@ class ConvertToFileMachineGraph(object):
 
                 for edge in partition.edges:
                     sinks_string.append(str(id(edge.post_vertex)))
-                    weight += edge.weight
+                    weight += edge.traffic_weight
                 hyper_edge_dict['sinks'] = sinks_string
                 hyper_edge_dict["weight"] = weight
                 hyper_edge_dict["type"] = partition.traffic_type.name.lower()
@@ -121,7 +121,7 @@ class ConvertToFileMachineGraph(object):
         )
         file_to_read = open(graph_schema_file_path, "r")
         graph_schema = json.load(file_to_read)
-        jsonschema.validate(json_graph_dictory_rep, graph_schema)
+        #jsonschema.validate(json_graph_dictory_rep, graph_schema)
 
         progress_bar.end()
 

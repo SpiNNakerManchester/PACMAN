@@ -23,7 +23,7 @@ class ConvertToFilePlacement(object):
         json_placement_dictory_rep = dict()
         vertex_by_id = dict()
 
-        progress_bar = ProgressBar(len(placements.placements) + 1,
+        progress_bar = ProgressBar(len(list(placements.placements)) + 1,
                                    "converting to json placements")
 
         # process placements

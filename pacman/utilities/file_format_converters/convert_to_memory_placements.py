@@ -17,13 +17,12 @@ class ConvertToMemoryPlacements(object):
         constraints and builds a memory placements object
     """
 
-    def __call__(self, placements, allocations, machine_graph,
-                 extended_machine, constraints, vertex_ids):
+    def __call__(self, extended_machine, placements, allocations,
+                 constraints, vertex_by_id):
         """
 
         :param placements:
         :param allocations:
-        :param machine_graph:
         :param extended_machine:
         :param constraints:
         :return:
@@ -37,16 +36,13 @@ class ConvertToMemoryPlacements(object):
         self._validate_file_read_data(
             file_placements, core_allocations, constraints)
 
-        # drop the type and allocations bit of core allocations
-        # (makes lower code simpler)
-        core_allocations = core_allocations['allocations']
-
         memory_placements = Placements()
 
         # process placements
+        vertex = None
         for vertex_id in file_placements:
             if vertex_id not in core_allocations:
-                vertex = vertex_ids[vertex_id]
+                vertex = vertex_by_id[vertex_id]
                 if vertex is not None:
 
                     # virtual chip or tag chip

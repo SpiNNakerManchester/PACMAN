@@ -176,8 +176,10 @@ class CreateConstraintsToFile(object):
                 tag_constraint['range'] = [0, 1]
                 json_constraints_dictory_rep.append(tag_constraint)
             if isinstance(tag, SDRAMTagResource):
-                raise exceptions.PacmanConfigurationException(
-                    "Converter does not know how to convert a SDRAM tag")
+                if ((tag.n_tags is not None and tag.n_tags >0) or
+                        (tag.tag_ids is not None and len(tag.tag_ids) > 0)):
+                    raise exceptions.PacmanConfigurationException(
+                        "Converter does not know how to convert a SDRAM tag")
 
     @staticmethod
     def _add_extra_monitor_cores(json_constraints_dictory_rep, machine):

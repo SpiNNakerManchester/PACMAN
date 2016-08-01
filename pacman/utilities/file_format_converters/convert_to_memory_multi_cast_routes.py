@@ -41,9 +41,7 @@ class ConvertToMemoryMultiCastRoutes(object):
         "SOUTH": (False, 5)
     }
 
-    def __call__(
-            self, file_routing_paths, machine_graph, placements,
-            partition_by_id):
+    def __call__(self, file_routing_paths, partition_by_id):
 
         # load the json files
         file_routing_paths = self._handle_json_files(file_routing_paths)
