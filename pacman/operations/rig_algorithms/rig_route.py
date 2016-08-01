@@ -8,7 +8,7 @@ class RigRoute(object):
     """
 
     def __call__(self, machine_graph, machine, placements):
-        progress_bar = ProgressBar(8, "Routing")
+        progress_bar = ProgressBar(7, "Routing")
 
         vertices_resources, nets, net_names = \
             rig_converters.convert_to_rig_graph(
@@ -38,9 +38,6 @@ class RigRoute(object):
             name: rig_routes[net] for net, name in net_names.iteritems()}
         progress_bar.update()
 
-        placements = rig_converters.convert_from_rig_placements(
-            rig_placements, rig_allocations, machine_graph)
-        progress_bar.update()
         routes = rig_converters.convert_from_rig_routes(
             rig_routes, machine_graph)
         progress_bar.update()
