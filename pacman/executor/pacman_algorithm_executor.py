@@ -168,7 +168,6 @@ class PACMANAlgorithmExecutor(object):
                          "converter_algorithms_metadata.xml")
         converter_decoder = AlgorithmMetadataXmlReader([converter_xml_path])
         converters = converter_decoder.decode_algorithm_data_objects()
-        algorithm_data_objects.update(converters)
 
         # Scan for annotated algorithms
         copy_of_packages.append(operations.__name__)
@@ -179,28 +178,22 @@ class PACMANAlgorithmExecutor(object):
         all_xml_paths.extend(copy_of_xml_paths)
         all_xml_paths.append(converter_xml_path)
 
-        #converters.update(algorithm_decorator.scan_packages(
-        #    [file_format_converters.__name__], all_xml_paths))
-        #algorithm_data_objects.update(
-        #    algorithm_decorator.scan_packages(
-        #        copy_of_packages, copy_of_xml_paths))
-        #algorithm_data_objects.update(converters)
-
-        # Add converters to the optional algorithms
-        copy_of_optional_algorithms.extend([
-            converter for converter in converters.iterkeys()
-        ])
+        converter_names = list()
+        for converter in converters.iterkeys():
+            converter_names.append(converter)
 
         # filter for just algorithms we want to use
         algorithm_data = self._get_algorithm_data(
             algorithms_names, algorithm_data_objects)
         optional_algorithms_datas = self._get_algorithm_data(
             copy_of_optional_algorithms, algorithm_data_objects)
+        converter_algorithms_datas = self._get_algorithm_data(
+            converter_names, converters)
 
         # sort_out_order_of_algorithms for execution
         self._sort_out_order_of_algorithms(
             inputs, required_outputs, algorithm_data,
-            optional_algorithms_datas)
+            optional_algorithms_datas, converter_algorithms_datas)
 
     @staticmethod
     def _get_algorithm_data(
@@ -216,7 +209,7 @@ class PACMANAlgorithmExecutor(object):
 
     def _sort_out_order_of_algorithms(
             self, inputs, required_outputs, algorithm_data,
-            optional_algorithm_data):
+            optional_algorithm_data, converter_algorithms_datas):
         """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
 
@@ -224,9 +217,8 @@ class PACMANAlgorithmExecutor(object):
         :type inputs: iterable of str
         :param required_outputs: the set of outputs that this workflow is\
                 meant to generate
-        :param optional_algorithms: the set of optional algorithms which\
-                include the converters for the file formats which can be\
-                inserted automatically if required
+        :param converter_algorithms_datas: the set of converter algorithms
+        :param optional_algorithm_data: the set of optional algorithms
         :return: None
         """
 
@@ -262,6 +254,16 @@ class PACMANAlgorithmExecutor(object):
                     self._remove_algorithm_and_update_outputs(
                         optionals_to_use, suitable_algorithm, input_types,
                         generated_outputs, outputs_to_find)
+                else:
+                    # if still no suitable algorithm, try converting some
+                    # stuff from memory to file or visa versa
+                    suitable_algorithm = self._locate_suitable_algorithm(
+                        converter_algorithms_datas, input_types,
+                        generated_outputs)
+                    if suitable_algorithm is not None:
+                        self._remove_algorithm_and_update_outputs(
+                            optionals_to_use, suitable_algorithm, input_types,
+                            generated_outputs, outputs_to_find)
 
             if suitable_algorithm is not None:
 
@@ -372,7 +374,8 @@ class PACMANAlgorithmExecutor(object):
                 outputs_to_find.remove(output.output_type)
 
     @staticmethod
-    def _locate_suitable_algorithm(algorithm_list, inputs, generated_outputs):
+    def _locate_suitable_algorithm(
+            algorithm_list, inputs, generated_outputs):
         """ Locates a suitable algorithm
 
         :param algorithm_list: the list of algorithms to choose from
