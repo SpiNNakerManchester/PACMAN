@@ -56,8 +56,8 @@ class PACMANAlgorithmExecutor(object):
     def __init__(
             self, algorithms, optional_algorithms, inputs, required_outputs,
             xml_paths=None, packages=None, do_timings=True,
-            print_timings=False, do_immediate_injection=False,
-            do_post_run_injection=False, inject_inputs=False):
+            print_timings=False, do_immediate_injection=True,
+            do_post_run_injection=False, inject_inputs=True):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -179,12 +179,12 @@ class PACMANAlgorithmExecutor(object):
         all_xml_paths.extend(copy_of_xml_paths)
         all_xml_paths.append(converter_xml_path)
 
-        converters.update(algorithm_decorator.scan_packages(
-            [file_format_converters.__name__], all_xml_paths))
-        algorithm_data_objects.update(
-            algorithm_decorator.scan_packages(
-                copy_of_packages, copy_of_xml_paths))
-        algorithm_data_objects.update(converters)
+        #converters.update(algorithm_decorator.scan_packages(
+        #    [file_format_converters.__name__], all_xml_paths))
+        #algorithm_data_objects.update(
+        #    algorithm_decorator.scan_packages(
+        #        copy_of_packages, copy_of_xml_paths))
+        #algorithm_data_objects.update(converters)
 
         # Add converters to the optional algorithms
         copy_of_optional_algorithms.extend([
@@ -432,7 +432,7 @@ class PACMANAlgorithmExecutor(object):
 
             # If any, add to the list
             if n_boring_outputs > 0:
-                boring_algorithms.append(algorithm)
+                boring_algorithms.append((algorithm, n_boring_outputs))
 
         # If all return something novel, return the first
         if len(boring_algorithms) == 0:
@@ -440,7 +440,7 @@ class PACMANAlgorithmExecutor(object):
 
         # Otherwise return the most non-novel
         boring_algorithms.sort(key=lambda (x, y): y, reverse=True)
-        return boring_algorithms[0]
+        return boring_algorithms[0][0]
 
     def execute_mapping(self):
         """ Executes the algorithms
@@ -472,7 +472,7 @@ class PACMANAlgorithmExecutor(object):
                     new_outputs.update(results)
 
             # Do injection with the outputs produced
-            if self._do_immediate_injection:
+            if self._do_immediate_injection and results is not None:
                 injection_decorator.do_injection(results)
 
         # Do injection with all the outputs

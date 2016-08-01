@@ -66,12 +66,13 @@ def requires_injection(types_required):
             for object_type in types_required:
                 method = methods.get(object_type, None)
                 if method is None:
-                    raise InjectionException("No injector for type {}".format(
-                        object_type))
+                    raise InjectionException(
+                        "No injector for type {} for obj {}"
+                        .format(object_type, obj))
                 if not method._called:
                     raise InjectionException(
-                        "Type {} has not been injected".format(
-                            object_type))
+                        "Type {} has not been injected for obj {}"
+                        .format(object_type, obj))
             return wrapped_method(obj, *args, **kwargs)
         return wrapper
     return wrap

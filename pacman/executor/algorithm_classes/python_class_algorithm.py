@@ -50,8 +50,11 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         method = instance
         if self._python_method is not None:
             method = getattr(instance, self._python_method)
-
-        return method(**inputs)
+        try:
+            return method(**inputs)
+        except Exception as e:
+            print "algorithm {} failed with exp exception {}".format(self, e)
+            raise e
 
     def __repr__(self):
         return (
