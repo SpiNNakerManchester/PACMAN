@@ -27,54 +27,29 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
-    def __call__(
-            self, machine, application_graph=None, machine_graph=None):
+    def __call__(self, machine, graph=None):
         """
 
-        :param application_graph:
-        :param machine_graph:
+        :param graph:
         :param machine:
         :return:
         """
-        if application_graph is not None:
+
+        if graph is not None:
 
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
-                (len(application_graph.vertices) + len(list(machine.chips))),
+                (len(graph.vertices) + len(list(machine.chips))),
                 "Allocating virtual identifiers")
-        elif machine_graph is not None:
 
-            # Go through the groups and allocate keys
-            progress_bar = ProgressBar(
-                (len(machine_graph.vertices) +
-                 len(list(machine.chips))),
-                "Allocating virtual identifiers")
-        else:
-            progress_bar = ProgressBar(
-                len(list(machine.chips)), "Allocating virtual identifiers")
-
-        # allocate standard ids for real chips
-        for chip in machine.chips:
-            expected_chip_id = (chip.x << 8) + chip.y
-            self._allocate_elements(expected_chip_id, 1)
-            progress_bar.update()
-
-        if application_graph is not None:
-
-            # allocate ids for virtual chips
-            for vertex in application_graph.vertices:
-                if isinstance(vertex, MachineVirtualVertex):
-                    link = vertex.spinnaker_link_id
-                    virtual_x, virtual_y, real_x, real_y, real_link = \
-                        self._assign_virtual_chip_info(machine, link)
-                    vertex.set_virtual_chip_coordinates(
-                        virtual_x, virtual_y, real_x, real_y, real_link)
+            # allocate standard ids for real chips
+            for chip in machine.chips:
+                expected_chip_id = (chip.x << 8) + chip.y
+                self._allocate_elements(expected_chip_id, 1)
                 progress_bar.update()
-            progress_bar.end()
-        elif machine_graph is not None:
 
             # allocate ids for virtual chips
-            for vertex in machine_graph.vertices:
+            for vertex in graph.vertices:
                 if isinstance(vertex, MachineVirtualVertex):
                     link = vertex.spinnaker_link_id
                     virtual_x, virtual_y, real_x, real_y, real_link = \
