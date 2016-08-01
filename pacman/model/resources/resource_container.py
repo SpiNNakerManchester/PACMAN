@@ -96,7 +96,7 @@ class ResourceContainer(object):
         data = list()
         data.extend(self.iptags)
         data.extend(self.reverse_iptags)
-        data.extend(self.sdram_tags)
+        data.append(self.sdram_tags)
         return data
 
     @property
