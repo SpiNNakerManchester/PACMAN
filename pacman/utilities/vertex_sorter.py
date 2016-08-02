@@ -75,9 +75,10 @@ class VertexSorter(object):
 
                 # If the constraint is one to sort by
                 if constraint.__class__ in self._constraints:
-                    rank, opts = self._constraints[constraint.__class__]
-                    if self._matches(constraint, opts):
-                        ranks.append(rank)
+                    current_ranks = self._constraints[constraint.__class__]
+                    for (rank, required_param) in current_ranks:
+                        if self._matches(constraint, required_param):
+                            ranks.append(rank)
 
             # Sort and store the ranks for overall ordering
             ranks.sort()
