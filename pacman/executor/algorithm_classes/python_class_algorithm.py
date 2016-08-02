@@ -1,8 +1,14 @@
 import importlib
+import traceback
+import logging
 
-from pacman.executor.algorithm_classes.abstract_python_algorithm import AbstractPythonAlgorithm
+import sys
+
+from pacman.executor.algorithm_classes.abstract_python_algorithm \
+    import AbstractPythonAlgorithm
 from pacman.model.decorators.overrides import overrides
 
+logger = logging.getLogger(__name__)
 
 class PythonClassAlgorithm(AbstractPythonAlgorithm):
     """ An algorithm that is a class
@@ -53,7 +59,11 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         try:
             return method(**inputs)
         except Exception as e:
-            print "algorithm {} failed with exp exception {}".format(self, e)
+            ex_type, ex_value, ex_traceback = sys.exc_info()
+            for line in traceback.format_tb(ex_traceback):
+                logger.error(line.strip())
+            logger.error(
+                "algorithm {} failed with exp exception {}".format(self, e))
             raise e
 
     def __repr__(self):
