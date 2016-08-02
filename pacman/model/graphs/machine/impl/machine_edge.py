@@ -80,6 +80,10 @@ class MachineEdge(AbstractMachineEdge):
     def traffic_weight(self):
         return self._traffic_weight
 
+    @overrides(AbstractMachineEdge.model_name)
+    def model_name(self):
+        return "MachineEdge"
+
     def __repr__(self):
         return (
             "SimpleMachineEdge(pre_vertex={}, post_vertex={}, traffic_type={},"
