@@ -105,3 +105,32 @@ class ResourceContainer(object):
 
     def add_to_sdram_tags(self, n_tags=None, tag_ids=None):
         self._sdram_tags.add_tags(n_tags, tag_ids)
+
+    def extend(self, other_resource_container):
+
+        # added cpu stuff
+        self._cpu_cycles.add_to_usage_value(
+            other_resource_container.cpu_cycles.get_value())
+
+        # added dtcm
+        self._dtcm_usage.add_to_usage_value(
+            other_resource_container.dtcm.get_value())
+
+        # add sdram usage
+        self._sdram_usage.add_to_usage_value(
+            other_resource_container.sdram.get_value())
+
+        # add iptags
+        self._iptags.extend(other_resource_container.iptags)
+
+        # add reverse iptags
+        self._reverse_iptags.extend(other_resource_container.reverse_iptags)
+
+        # add sdram tags
+        total = other_resource_container.sdram_tags.n_tags
+        tad_ids = other_resource_container.sdram_tags.tag_ids
+
+        if total is not None:
+            self._sdram_tags.add_to_n_tags(total)
+        if tad_ids is not None:
+            self._sdram_tags.add_to_tag_ids(tad_ids)

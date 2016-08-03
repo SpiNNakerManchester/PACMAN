@@ -17,10 +17,3 @@ class AbstractMachineVertex(AbstractVertex):
         :rtype:\
             :py:class:`pacman.model.resources.resource_container.ResourceContainer`
         """
-
-    @abstractmethod
-    def set_resources_required(self, resource_required):
-        """ sets the reosurces required for a given vertex
-
-        :return:  None
-        """
