@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 from collections import defaultdict
@@ -41,8 +42,8 @@ class ConvertToFileMachineGraph(object):
         partition_by_id = dict()
         for vertex in machine_graph.vertices:
 
-            vertex_id = str(id(vertex))
-            vertex_by_id[vertex_id] = vertex
+            vertex_id = id(vertex)
+            vertex_by_id[str(vertex_id)] = vertex
 
             # handle external devices
             if isinstance(vertex, AbstractMachineVirtualVertex):
@@ -56,10 +57,10 @@ class ConvertToFileMachineGraph(object):
 
                 # handle the edge between the tag-able vertex and the fake
                 # vertex
-                tag_id = vertex_id + "_tag"
+                tag_id = hashlib.md5(vertex_id + "_tag").hexdigest()
                 hyper_edge_dict = dict()
                 edges_resources[tag_id] = hyper_edge_dict
-                hyper_edge_dict["source"] = vertex_id
+                hyper_edge_dict["source"] = str(vertex_id)
                 hyper_edge_dict['sinks'] = tag_id
                 hyper_edge_dict["weight"] = 1.0
                 hyper_edge_dict["type"] = "FAKE_TAG_EDGE"
@@ -121,7 +122,7 @@ class ConvertToFileMachineGraph(object):
         )
         file_to_read = open(graph_schema_file_path, "r")
         graph_schema = json.load(file_to_read)
-        #jsonschema.validate(json_graph_dictory_rep, graph_schema)
+        jsonschema.validate(json_graph_dictory_rep, graph_schema)
 
         progress_bar.end()
 

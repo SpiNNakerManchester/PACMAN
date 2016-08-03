@@ -39,10 +39,12 @@ class ConvertToMemoryPlacements(object):
         memory_placements = Placements()
 
         # process placements
-        vertex = None
         for vertex_id in file_placements:
-            if vertex_id not in core_allocations:
-                vertex = vertex_by_id[vertex_id]
+            if str(vertex_id) in vertex_by_id:
+                vertex = vertex_by_id[str(vertex_id)]
+            else:
+                vertex = None
+            if unicode(vertex_id) not in core_allocations:
                 if vertex is not None:
 
                     # virtual chip or tag chip
@@ -81,7 +83,7 @@ class ConvertToMemoryPlacements(object):
                 if vertex is None:
                     raise exceptions.PacmanConfigurationException(
                         "Failed to locate the vertex in the "
-                        "graph with label {}".format(vertex_id))
+                        "graph with id {}".format(vertex_id))
                 else:
                     memory_placements.add_placement(
                         Placement(x=file_placements[vertex_id][0],

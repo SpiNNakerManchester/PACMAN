@@ -28,7 +28,7 @@ class ConvertToFilePlacement(object):
 
         # process placements
         for placement in placements:
-            vertex_id = id(placement.vertex)
+            vertex_id = str(id(placement.vertex))
             vertex_by_id[vertex_id] = placement.vertex
             json_placement_dictory_rep[vertex_id] = [placement.x, placement.y]
             progress_bar.update()

@@ -262,8 +262,8 @@ class PACMANAlgorithmExecutor(object):
                         generated_outputs)
                     if suitable_algorithm is not None:
                         self._remove_algorithm_and_update_outputs(
-                            optionals_to_use, suitable_algorithm, input_types,
-                            generated_outputs, outputs_to_find)
+                            converter_algorithms_datas, suitable_algorithm,
+                            input_types, generated_outputs, outputs_to_find)
 
             if suitable_algorithm is not None:
 
