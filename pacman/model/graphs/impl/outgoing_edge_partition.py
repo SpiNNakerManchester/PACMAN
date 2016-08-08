@@ -151,7 +151,7 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
 
     def __repr__(self):
         return (
-            "SimpleOutgoingEdgePartition("
+            "OutgoingEdgePartition("
             "identifier={}, edges={}, constraints={}, label={})".format(
                 self._identifier, self._edges, self.constraints, self.label)
         )
