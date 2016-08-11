@@ -1,4 +1,6 @@
 from pacman import exceptions
+from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint import \
+    PlacerRadialPlacementFromChipConstraint
 from pacman.model.graphs.application.abstract_application_vertex import \
     AbstractApplicationVertex
 from pacman.model.graphs.machine.abstract_machine_vertex import \
@@ -135,13 +137,12 @@ class ResourceTracker(object):
         :param additional_placement_constraints:\
             Additional placement constraints supported by the algorithm doing\
             this check
-        :param additional_tag_allocator_constraints:\
-            Additional tag allocator constraints supported by the
         """
 
         # These placement constraints are supported by the resource tracker
         placement_constraints = {
-            PlacerChipAndCoreConstraint, PlacerBoardConstraint
+            PlacerChipAndCoreConstraint, PlacerBoardConstraint,
+            PlacerRadialPlacementFromChipConstraint
         }
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
