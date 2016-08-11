@@ -24,11 +24,11 @@ class RigRoute(object):
 
         rig_constraints.extend(
             rig_converters.create_rig_graph_constraints(
-                machine_graph, rig_machine))
+                machine_graph, machine))
         progress_bar.update()
 
         rig_placements, rig_allocations = \
-            rig_converters.convert_to_rig_placements(placements)
+            rig_converters.convert_to_rig_placements(placements, machine)
         progress_bar.update()
 
         rig_routes = route(
