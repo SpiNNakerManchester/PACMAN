@@ -85,8 +85,7 @@ class MachineEdge(AbstractMachineEdge):
         return "MachineEdge"
 
     def __repr__(self):
-        return (
-            "SimpleMachineEdge(pre_vertex={}, post_vertex={}, traffic_type={},"
-            " label={}, traffic_weight={})".format(
+        return "SimpleMachineEdge(pre_vertex={}, post_vertex={}, " \
+               "traffic_type={}, label={}, traffic_weight={})".format(
                 self._pre_vertex, self._post_vertex, self._traffic_type,
-                self._label, self._traffic_weight))
+                self._label, self._traffic_weight)

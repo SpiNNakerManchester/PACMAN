@@ -143,9 +143,9 @@ class Graph(AbstractGraph):
                 outgoing_edge_partition.identifier) in
                 self._outgoing_edge_partitions_by_name):
             raise PacmanAlreadyExistsException(
-                OutgoingEdgePartition.__class__,
+                "{}".format(OutgoingEdgePartition.__class__,
                 (outgoing_edge_partition.pre_vertex,
-                    outgoing_edge_partition.identifier))
+                    outgoing_edge_partition.identifier)))
 
         self._outgoing_edge_partitions_by_pre_vertex[
             outgoing_edge_partition.pre_vertex].append(outgoing_edge_partition)

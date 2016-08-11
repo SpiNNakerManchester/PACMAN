@@ -54,6 +54,11 @@ class ApplicationVirtualVertex(AbstractVirtualApplicationVertex):
     def label(self):
         return self._label
 
+    @property
+    @overrides(AbstractVirtualApplicationVertex.n_atoms)
+    def n_atoms(self):
+        return self._n_atoms
+
     @overrides(AbstractVirtualApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
