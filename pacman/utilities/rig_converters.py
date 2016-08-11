@@ -30,12 +30,12 @@ LINK_LOOKUP = {l.name: l for l in Links}
 ROUTE_LOOKUP = {"core_{}".format(r.core_num) if r.is_core else r.name: r
                 for r in Routes}
 
-CHIP_HOMOGENIOUS_CORES = 18
-CHIP_HOMOGENIOUS_SDRAM = 119275520
-CHIP_HOMOGENIOUS_SRAM = 24320
-CHIP_HOMOGENIOUS_TAGS = 0
+CHIP_HOMOGENEOUS_CORES = 18
+CHIP_HOMOGENEOUS_SDRAM = 119275520
+CHIP_HOMOGENEOUS_SRAM = 24320
+CHIP_HOMOGENEOUS_TAGS = 0
 ROUTER_MAX_NUMBER_OF_LINKS = 6
-ROUTER_HOMOGENIOUS_ENTRIES = 1023
+ROUTER_HOMOGENEOUS_ENTRIES = 1023
 
 N_CORES_PER_VERTEX = 1
 
@@ -43,11 +43,11 @@ N_CORES_PER_VERTEX = 1
 def convert_to_rig_machine(machine):
 
     chip_resources = dict()
-    chip_resources['cores'] = CHIP_HOMOGENIOUS_CORES
-    chip_resources['sdram'] = CHIP_HOMOGENIOUS_SDRAM
-    chip_resources['sram'] = CHIP_HOMOGENIOUS_SRAM
-    chip_resources["router_entries"] = ROUTER_HOMOGENIOUS_ENTRIES
-    chip_resources['tags'] = CHIP_HOMOGENIOUS_TAGS
+    chip_resources['cores'] = CHIP_HOMOGENEOUS_CORES
+    chip_resources['sdram'] = CHIP_HOMOGENEOUS_SDRAM
+    chip_resources['sram'] = CHIP_HOMOGENEOUS_SRAM
+    chip_resources["router_entries"] = ROUTER_HOMOGENEOUS_ENTRIES
+    chip_resources['tags'] = CHIP_HOMOGENEOUS_TAGS
 
     # handle exceptions
     dead_chips = list()
@@ -75,7 +75,7 @@ def convert_to_rig_machine(machine):
                 resource_exceptions = dict()
                 n_processors = len([
                     processor for processor in chip.processors])
-                if n_processors < CHIP_HOMOGENIOUS_CORES:
+                if n_processors < CHIP_HOMOGENEOUS_CORES:
                     resource_exceptions["cores"] = n_processors
 
                 # Add tags if Ethernet chip
@@ -162,11 +162,15 @@ def create_rig_graph_constraints(machine_graph, machine):
                     vertex, (constraint.x, constraint.y)))
 
         if isinstance(vertex, MachineVirtualVertex):
+            spinnaker_link = \
+                machine.get_spinnaker_link_with_id(vertex.spinnaker_link_id)
             constraints.append(LocationConstraint(
-                vertex, (vertex.real_chip_x, vertex.real_chip_y)))
+                vertex, (spinnaker_link.connected_chip_x,
+                         spinnaker_link.connected_chip_y)))
             constraints.append(RouteEndpointConstraint(
                 vertex,
-                LINK_LOOKUP[constants.EDGES(vertex.real_link).name.lower()]))
+                LINK_LOOKUP[constants.EDGES(
+                    spinnaker_link.connected_link).name.lower()]))
     return constraints
 
 
@@ -182,12 +186,17 @@ def create_rig_machine_constraints(machine):
     return constraints
 
 
-def convert_to_rig_placements(placements):
-    rig_placements = {
-        p.vertex: (p.x, p.y)
-        if not isinstance(p.vertex, MachineVirtualVertex)
-        else (p.vertex.real_chip_x, p.vertex.real_chip_y)
-        for p in placements.placements}
+def convert_to_rig_placements(placements, machine):
+    rig_placements = dict()
+    for placement in placements:
+        if not isinstance(placement.vertex, MachineVirtualVertex):
+            rig_placements[placement.vertex] = (placement.x, placement.y)
+        else:
+            spinnaker_link = machine.get_spinnaker_link_with_id(
+                placement.vertex.spinnaker_link_id)
+            rig_placements[placement.vertex] = \
+                (spinnaker_link.connected_chip_x,
+                 spinnaker_link.connected_chip_y)
 
     core_allocations = {
         p.vertex: {"cores": slice(p.p, p.p + 1)}
