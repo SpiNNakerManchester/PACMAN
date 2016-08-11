@@ -70,4 +70,4 @@ class BasicTagAllocator(object):
                     tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
 
         progress_bar.end()
-        return tags.ip_tags, tags.reverse_ip_tags, tags
+        return list(tags.ip_tags), list(tags.reverse_ip_tags), tags
