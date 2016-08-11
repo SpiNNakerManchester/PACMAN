@@ -1,4 +1,6 @@
 import logging
+from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
+    AbstractHasGlobalMaxAtoms
 
 from pacman.model.graphs.common.slice import Slice
 
@@ -118,14 +120,15 @@ class PartitionAndPlacePartitioner(object):
                     atoms than its counterpart.
         """
 
-        partiton_together_vertices = \
+        partition_together_vertices = \
             self._locate_vertices_to_partition_now(vertex)
 
         # locate max atoms per core
         possible_max_atoms = list()
-        possible_max_atoms.append(vertex.get_max_atoms_per_core())
+        if isinstance(vertex, AbstractHasGlobalMaxAtoms):
+            possible_max_atoms.append(vertex.get_max_atoms_per_core())
 
-        for other_vertex in partiton_together_vertices:
+        for other_vertex in partition_together_vertices:
             max_atom_constraints = utility_calls.locate_constraints_of_type(
                 other_vertex.constraints,
                 PartitionerMaximumSizeConstraint)
@@ -135,7 +138,7 @@ class PartitionAndPlacePartitioner(object):
 
         # partition by atoms
         self._partition_by_atoms(
-            partiton_together_vertices, vertex.n_atoms, max_atoms_per_core,
+            partition_together_vertices, vertex.n_atoms, max_atoms_per_core,
             machine_graph, graph, graph_mapper, resource_tracker)
 
     def _partition_by_atoms(
