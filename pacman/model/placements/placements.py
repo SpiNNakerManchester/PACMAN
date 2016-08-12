@@ -8,6 +8,17 @@ class Placements(object):
     """ The placements of vertices on the chips of the machine
     """
 
+    __slots__ = [
+
+        # dict of [(x,y,p)] -> placement object. used for fast lookup of a
+        # vertex given a xyp coord.
+        "_placements",
+
+        # dict of [machine_vertex] -> placement object. used for fast lookup of
+        # the placement of a machine vertex.
+        "_machine_vertices",
+    ]
+
     def __init__(self, placements=None):
         """
 

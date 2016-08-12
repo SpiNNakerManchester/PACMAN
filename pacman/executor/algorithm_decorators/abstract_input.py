@@ -9,6 +9,8 @@ class AbstractInput(object):
     """ An abstract input to an algorithm
     """
 
+    __slots__ = []
+
     @abstractproperty
     def name(self):
         """ The name of the input

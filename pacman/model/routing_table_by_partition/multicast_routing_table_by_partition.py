@@ -3,6 +3,11 @@ class MulticastRoutingTableByPartition(object):
     """ A set of multicast routing path objects
     """
 
+    __slots__ = [
+        # dict mapping (x,y) -> dict mapping (partition) -> routing table entry
+        "_router_to_entries_map"
+    ]
+
     def __init__(self):
         self._router_to_entries_map = dict()
 

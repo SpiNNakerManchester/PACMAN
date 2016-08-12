@@ -8,6 +8,11 @@ class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
         or position
     """
 
+    __slots__ = [
+        # any fields that define regions in the mask with further limitations
+        "_fields"
+    ]
+
     def __init__(self, fields):
         self._fields = fields
 

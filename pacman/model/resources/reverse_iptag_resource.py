@@ -7,6 +7,18 @@ class ReverseIPtagResource(AbstractResource):
         on a chip of the machine
     """
 
+    __slots__ = [
+        # The target port of the tag
+        "_port",
+
+        # The SDP port number to be used when constructing SDP packets from
+        # the received UDP packets for this tag
+        "_sdp_port",
+
+        # A fixed tag id to assign, or None if any tag is OK
+        "_tag"
+    ]
+
     def __init__(self, port, sdp_port=1, tag=None):
         """
 

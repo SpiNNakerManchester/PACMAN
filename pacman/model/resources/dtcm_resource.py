@@ -6,6 +6,12 @@ class DTCMResource(AbstractResource):
     """ Represents the amount of local core memory available or used on a core\
         on a chip of the machine
     """
+
+    __slots__ = [
+
+        # The number of DTCM (in bytes) needed for a given object
+        "_dtcm"
+    ]
     
     def __init__(self, dtcm):
         """

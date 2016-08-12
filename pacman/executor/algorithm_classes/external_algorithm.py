@@ -7,9 +7,11 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class ExternalAlgorithm(AbstractAlgorithm):
+    """
+    the container for a algorithm which is external to the SpiNNaker software
+    """
 
     __slots__ = [
-
         # The command line to call
         "_command_line_arguments"
     ]

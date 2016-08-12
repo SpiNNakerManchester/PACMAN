@@ -15,6 +15,11 @@ class AlgorithmMetadataXmlReader(object):
     """ Converts an XML file into algorithm data
     """
 
+    __slots__ = [
+        # paths to extra metadata files
+        "_xml_paths"
+    ]
+
     def __init__(self, xml_paths):
         """
         :param xml_paths: paths to extra metadata files

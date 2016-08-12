@@ -8,6 +8,8 @@ class AbstractResource(object):
     """ Represents some finite resource
     """
 
+    __slots__ = []
+
     @abstractmethod
     def get_value(self):
         """ Get the amount of the resource used or available

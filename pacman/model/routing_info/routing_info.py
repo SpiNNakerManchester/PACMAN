@@ -7,6 +7,17 @@ class RoutingInfo(object):
         and masks
     """
 
+    __slots__ = [
+        # Partition information indexed by partition
+        "_partition_info_by_partition",
+
+        # Partition information indexed by edge pre vertex and partition id name
+        "_partition_info_by_pre_vertex",
+
+        # Partition information by edge
+        "_partition_info_by_edge"
+    ]
+
     def __init__(self, partition_info_items=None):
         """
 

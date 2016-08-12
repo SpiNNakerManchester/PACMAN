@@ -5,6 +5,23 @@ class Tags(object):
     """ Represents assigned IP Tag and Reverse IP Tags
     """
 
+    __slots__ = [
+        # Mapping of (board address, tag) to IPTag
+        "_ip_tags",
+
+        # Mapping of (board address, tag) to ReverseIPTag
+        "_reverse_ip_tags",
+
+        # Mapping of vertex to list of IPTag
+        "_ip_tags_by_vertex",
+
+        # Mapping of vertex to list of ReverseIPTag
+        "_reverse_ip_tags_by_vertex",
+
+        # Set of ports already assigned on a board
+        "_ports_assigned"
+    ]
+
     def __init__(self):
 
         # Mapping of (board address, tag) to IPTag

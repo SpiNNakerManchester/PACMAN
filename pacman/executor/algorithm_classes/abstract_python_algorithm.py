@@ -9,6 +9,11 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
     """ An algorithm written in Python
     """
 
+    __slots__ = [
+        # The module containing the python code to execute
+        "_python_module"
+    ]
+
     @overrides(AbstractAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,

@@ -5,6 +5,11 @@ from pacman.model.decorators.overrides import overrides
 class SDRAMResource(AbstractResource):
     """ Represents an amount of SDRAM used or available on a chip in the machine
     """
+
+    __slots__ = [
+        # The amount of SDRAM in bytes
+        "_sdram"
+    ]
     
     def __init__(self, sdram):
         """

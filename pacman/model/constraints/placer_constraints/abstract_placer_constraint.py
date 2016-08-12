@@ -9,3 +9,6 @@ from pacman.model.constraints.abstract_constraint \
 class AbstractPlacerConstraint(AbstractConstraint):
     """ A constraint on placement
     """
+
+    __slots__ = []
+

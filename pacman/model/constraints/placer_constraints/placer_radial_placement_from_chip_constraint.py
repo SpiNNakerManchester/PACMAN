@@ -8,6 +8,16 @@ class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
         as possible (including on it)
     """
 
+    __slots__ = [
+        # the chip x coord in the SpiNNaker machine to which the machine
+        # vertex is placed
+        "_x",
+
+        # the chip y coord in the SpiNNaker machine to which the machine
+        # vertex is placed
+        "_y"
+    ]
+
     def __init__(self, x, y):
         """
 

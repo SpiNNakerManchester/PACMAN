@@ -7,6 +7,11 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
     """ A key allocator that fixes the mask to be assigned to an edge
     """
 
+    __slots__ = [
+        # the mask to be used during key allocation
+        "_mask"
+    ]
+
     def __init__(self, mask):
         """
 

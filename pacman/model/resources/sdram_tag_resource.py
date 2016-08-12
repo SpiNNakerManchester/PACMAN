@@ -8,6 +8,15 @@ class SDRAMTagResource(AbstractResource):
         on a chip of the machine
     """
 
+    __slots__ = [
+
+        # the number of sdram tags that this vertex will need
+        "_n_tags",
+
+        # iterable of ints. The list of tag ids needed
+        "_tag_ids"
+    ]
+
     def __init__(self, n_tags, tag_ids):
         """
 

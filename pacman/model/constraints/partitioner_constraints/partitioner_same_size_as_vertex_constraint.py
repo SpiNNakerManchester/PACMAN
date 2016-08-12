@@ -9,6 +9,11 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         same way as another vertex
     """
 
+    __slots__ = [
+        # The application vertex to which the constraint refers
+        "_vertex"
+    ]
+
     def __init__(self, vertex):
         """
 

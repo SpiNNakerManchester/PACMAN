@@ -3,10 +3,10 @@ from pacman import exceptions
 from pacman.model.graphs.machine.impl.machine_virtual_vertex \
     import MachineVirtualVertex
 
-# spinn machine iports
+# spinn machine imports
 from spinn_machine.utilities.progress_bar import ProgressBar
 
-#general imports
+# general imports
 import logging
 import os
 import time

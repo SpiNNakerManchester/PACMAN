@@ -10,6 +10,7 @@ from pacman.model.decorators.overrides import overrides
 
 logger = logging.getLogger(__name__)
 
+
 class PythonClassAlgorithm(AbstractPythonAlgorithm):
     """ An algorithm that is a class
     """

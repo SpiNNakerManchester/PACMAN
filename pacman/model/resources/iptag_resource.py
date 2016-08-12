@@ -7,6 +7,22 @@ class IPtagResource(AbstractResource):
         on a chip of the machine
     """
 
+    __slots__ = [
+        # the string representation of the ip address of the SpiNNaker machine
+        # used by this iptag
+        "_ip_address",
+
+        # the port number used by the socket for this iptag
+        "_port",
+
+        # a boolean flag that indicates if the SDP headers are
+        #  stripped before transmission of data
+        "_strip_sdp",
+
+        #  A fixed tag id to assign, or None if any tag is OK
+        "_tag"
+    ]
+
     def __init__(self, ip_address, port, strip_sdp, tag=None):
         """
 

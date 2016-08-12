@@ -4,6 +4,9 @@ from pacman.model.graphs.abstract_edge import AbstractEdge
 
 
 class AbstractApplicationEdge(AbstractEdge):
+    """ a application edge between two application vertices
+
+    """
 
     __slots__ = ()
 

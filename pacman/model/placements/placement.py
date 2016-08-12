@@ -3,6 +3,24 @@ class Placement(object):
     """ The placement of a vertex on to a machine chip and core
     """
 
+    __slots__ = [
+
+        # the machine vertex that is placed on the core represented
+        "_vertex",
+
+        # the chip x coord in the SpiNNaker machine to which the machine
+        # vertex is placed
+        "_x",
+
+        # the chip y coord in the SpiNNaker machine to which the machine
+        # vertex is placed
+        "_y",
+
+        # The processor id on chip (x,y) that this vertex is placed on within
+        # the SpiNNaker machine
+        "_p",
+    ]
+
     def __init__(self, vertex, x, y, p):
         """
 

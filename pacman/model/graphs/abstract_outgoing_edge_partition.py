@@ -23,7 +23,7 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
         :param edge: the edge to add
         :type: :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
         :raises:\
-            :py:class:`pacman.execptions.PacmanInvalidParameterException`\
+            :py:class:`pacman.exceptions.PacmanInvalidParameterException`\
             if the starting vertex of the edge does not match that of the\
             edges already in the partition
         """

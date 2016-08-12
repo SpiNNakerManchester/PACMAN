@@ -7,6 +7,11 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
     """ Constraint that indicates fields in the mask of a key
     """
 
+    __slots__ = [
+        # any fields that define regions in the mask with further limitations
+        "_fields"
+    ]
+
     def __init__(self, fields=None):
         """
 

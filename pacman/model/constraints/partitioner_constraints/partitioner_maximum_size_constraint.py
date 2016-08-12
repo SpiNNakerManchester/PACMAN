@@ -9,6 +9,11 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
         vertex
     """
 
+    __slots__ = [
+        # The maximum number of atoms to split the application vertex into
+        "_size"
+    ]
+
     def __init__(self, size):
         """
 

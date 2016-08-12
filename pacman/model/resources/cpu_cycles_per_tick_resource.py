@@ -1,11 +1,18 @@
 from pacman.model.resources.abstract_resource import AbstractResource
 from pacman.model.decorators.overrides import overrides
 
+
 class CPUCyclesPerTickResource(AbstractResource):
     """ Represents the number of CPU clock cycles per tick used or available\
         on a core of a chip in the machine
     """
-    
+
+    __slots__ = [
+
+        # The number of cpu cycles needed for a given object
+        "_cycles"
+    ]
+
     def __init__(self, cycles):
         """
         

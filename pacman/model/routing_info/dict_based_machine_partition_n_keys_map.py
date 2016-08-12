@@ -7,6 +7,11 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
         AbstractMachinePartitionNKeysMap
     """
 
+    __slots__ = [
+        # A mapping of [partition] -> number of keys to use via this partition
+        "_n_keys_map"
+    ]
+
     def __init__(self):
         self._n_keys_map = dict()
 

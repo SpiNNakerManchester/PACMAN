@@ -7,6 +7,11 @@ class PlacerBoardConstraint(AbstractPlacerConstraint):
     """ A constraint on the board on which a placement is made
     """
 
+    __slots__ = [
+        #  The IP address of the Ethernet of the board to be used
+        "_board_address"
+    ]
+
     def __init__(self, board_address):
         """
 

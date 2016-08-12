@@ -8,6 +8,8 @@ class AbstractMachinePartitionNKeysMap(object):
     """ A map that provides the number of keys required by each partition
     """
 
+    __slots__ = []
+
     @abstractmethod
     def n_keys_for_partition(self, partition):
         """ The number of keys required by the given partition

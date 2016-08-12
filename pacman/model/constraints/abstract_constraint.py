@@ -7,6 +7,8 @@ class AbstractConstraint(object):
     """ A constraint of some sort which an algorithm might or might not support
     """
 
+    __slots__ = []
+
     @abstractmethod
     def label(self):
         pass

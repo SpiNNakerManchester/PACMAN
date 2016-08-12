@@ -9,3 +9,6 @@ from pacman.model.constraints.abstract_constraint \
 class AbstractRouterConstraint(AbstractConstraint):
     """ A constraint on routing
     """
+
+    __slots__ = []
+

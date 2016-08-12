@@ -9,3 +9,6 @@ from pacman.model.constraints.abstract_constraint \
 class AbstractKeyAllocatorConstraint(AbstractConstraint):
     """ A constraint on key allocation
     """
+
+    __slots__ = []
+

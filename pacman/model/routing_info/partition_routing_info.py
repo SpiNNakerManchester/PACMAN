@@ -6,6 +6,14 @@ class PartitionRoutingInfo(object):
         (keys and masks)
     """
 
+    __slots__ = [
+        # The keys allocated to the machine partition
+        "_keys_and_masks",
+
+        # The partition to set the number of keys for
+        "_partition"
+    ]
+
     def __init__(self, keys_and_masks, partition):
         """
         :param keys_and_masks: The keys allocated to the machine partition

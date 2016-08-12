@@ -6,6 +6,9 @@ from pacman.model.graphs.application.abstract_application_edge \
 
 
 class ApplicationOutgoingEdgePartition(OutgoingEdgePartition):
+    """ edge partition for the application graph.
+
+    """
 
     __slots__ = ()
 

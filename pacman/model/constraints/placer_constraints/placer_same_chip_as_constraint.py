@@ -8,6 +8,11 @@ class PlacerSameChipAsConstraint(AbstractPlacerConstraint):
         vertex
     """
 
+    __slots__ = [
+        #  The vertex to place on the same chip
+        "_vertex"
+    ]
+
     def __init__(self, vertex):
         """
 

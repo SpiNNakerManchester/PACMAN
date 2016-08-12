@@ -9,6 +9,8 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
         space.
     """
 
+    __slots__ = []
+
     def __eq__(self, other):
         if not isinstance(other, KeyAllocatorContiguousRangeContraint):
             return False

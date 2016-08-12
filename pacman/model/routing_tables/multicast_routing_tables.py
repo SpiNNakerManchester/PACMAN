@@ -5,6 +5,14 @@ class MulticastRoutingTables(object):
     """ Represents the multicast routing tables for a number of chips
     """
 
+    __slots__ = [
+        # set that holds routing tables
+        "_routing_tables",
+
+        # dict of (x,y) -> routing table
+        "_routing_tables_by_chip"
+    ]
+
     def __init__(self, routing_tables=None):
         """
         :param routing_tables: The routing tables to add

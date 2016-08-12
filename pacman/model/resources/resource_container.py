@@ -14,6 +14,36 @@ class ResourceContainer(object):
 
     """
 
+    __slots__ = [
+
+        # a DTCMResource object that reflects the amount of DTCM (in bytes)
+        # used by a machine vertex on the SpiNNaker machine
+        "_dtcm_usage",
+
+        # a SDRAMResource object that reflects the amount of SDRAM (in bytes)
+        # used by a machine vertex on the SpiNNaker machine
+        "_sdram_usage",
+
+        # a CPUCyclesPerTickResource object that reflects the number of
+        # cpu cycles the machine vertex is expected to use on a SpiNNaker
+        # machine
+        "_cpu_cycles",
+
+        # A iterable of IPtagResource objects that reflect the number of IPTags
+        # a machine vertex is going to use on a SpiNNaker machine, as well as
+        # the configuration data of said IPTags.
+        "_iptags",
+
+        # A iterable of ReverseIPtagResource objects that reflect the number of
+        #  ReverseIPtags a machine vertex is going to use on a SpiNNaker
+        # machine, as well as the configuration data of said reverse IPTags.
+        "_reverse_iptags",
+
+        # a SDRAMTagResource object that reflects the number of sdram tags
+        # a machine vertex is going to use on a SpiNNaker machine
+        "_sdram_tags"
+    ]
+
     def __init__(
             self, dtcm=None, sdram=None, cpu_cycles=None, iptags=None,
             reverse_iptags=None, sdram_tags=None):

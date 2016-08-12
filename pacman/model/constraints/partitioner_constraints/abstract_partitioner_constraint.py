@@ -9,3 +9,5 @@ from pacman.model.constraints.abstract_constraint \
 class AbstractPartitionerConstraint(AbstractConstraint):
     """ A constraint on the partitioning of a graph
     """
+
+    __slots__ = []

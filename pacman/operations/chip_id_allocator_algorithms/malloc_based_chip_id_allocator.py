@@ -21,6 +21,11 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         chip ids and attempts to allocate them as requested
     """
 
+    __slots__ = [
+        # dict of [spinnaker link data] = (x,y, link data)
+        "_virtual_chips"
+    ]
+
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
