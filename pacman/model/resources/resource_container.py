@@ -1,16 +1,23 @@
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.iptag_resource import IPtagResource
+from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
 from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.resources.sdram_tag_resource import SDRAMTagResource
+from pacman import exceptions
 
 
 class ResourceContainer(object):
+    """container object for the types of resources so that ordering is no
+        longer a risk
+
+    """
 
     def __init__(
             self, dtcm=None, sdram=None, cpu_cycles=None, iptags=None,
             reverse_iptags=None, sdram_tags=None):
-        """container object for the 3 types of resources so that ordering is no
+        """container object for the types of resources so that ordering is no
         longer a risk
 
         :param dtcm: the amount of dtcm used
@@ -82,14 +89,24 @@ class ResourceContainer(object):
         return self._iptags
 
     def add_to_iptag_usage(self, extra_tag):
-        self._iptags.append(extra_tag)
+        if isinstance(extra_tag, IPtagResource):
+            self._iptags.append(extra_tag)
+        else:
+            raise exceptions.PacmanConfigurationException(
+                "Trying to add {} which is not a IPtagResource"
+                .format(extra_tag))
 
     @property
     def reverse_iptags(self):
         return self._reverse_iptags
 
     def add_to_reverse_iptags(self, extra_tag):
-        self._reverse_iptags.append(extra_tag)
+        if isinstance(extra_tag, ReverseIPtagResource):
+            self._reverse_iptags.append(extra_tag)
+        else:
+            raise exceptions.PacmanConfigurationException(
+                "Trying to add {} which is not a ReverseIPtagResource"
+                .format(extra_tag))
 
     @property
     def tags(self):
