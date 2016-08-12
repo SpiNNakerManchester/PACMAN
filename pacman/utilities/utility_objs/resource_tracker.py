@@ -26,6 +26,59 @@ class ResourceTracker(object):
     """ Tracks the usage of resources of a machine
     """
 
+    __slots__ = [
+        # The amount of SDRAM used by each chip,
+        # indexed by the (x, y) tuple of coordinates of the chip
+        # Note that entries are only added when the SDRAM is first used
+        "_sdram_tracker",
+
+        # The set of processor ids available on each chip,
+        # indexed by the (x, y) tuple of coordinates of the chip
+        # Note that entries are only added when a core is first used
+        "_core_tracker",
+
+        # The machine object
+        "_machine",
+
+        # Set of tags available indexed by board address
+        # Note that entries are only added when a board is first used
+        "_tags_by_board",
+
+        # Set of boards with available ip tags
+        "_boards_with_ip_tags",
+
+        # Set of (board_address, tag) assigned to an ip tag indexed by
+        # (ip address, port, strip_sdp) - Note not reverse ip tags
+        "_ip_tags_address_and_port",
+
+        # The (ip address, port) assigned to an ip tag indexed by
+        # (board address, tag)
+        "_address_and_port_ip_tag",
+
+        # The (board address, port) combinations already assigned to a
+        # reverse ip tag - Note not ip tags
+        "_reverse_ip_tag_listen_port",
+
+        # The port assigned to a reverse ip tag, indexed by
+        # (board address, tag) - Note not ip tags
+        "_listen_port_reverse_ip_tag",
+
+        # A count of how many allocations are sharing the same ip tag -
+        # Note not reverse ip tags
+        "_n_ip_tag_allocations",
+
+        # Board address indexed by (x, y) tuple of coordinates of the chip
+        "_ethernet_area_codes",
+
+        # (x, y) tuple of coordinates of Ethernet connected chip indexed by
+        # board address
+        "_ethernet_chips",
+
+        # Set of (x, y) tuples of coordinates of chips which have available
+        # processors
+        "_chips_available"
+    ]
+
     def __init__(self, machine, chips=None):
         """
 

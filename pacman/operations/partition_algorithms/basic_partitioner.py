@@ -23,6 +23,8 @@ class BasicPartitioner(object):
         on the number of atoms in the vertices.
     """
 
+    __slots__ = []
+
     @staticmethod
     def _get_ratio(top, bottom):
         if bottom == 0:
@@ -127,7 +129,7 @@ class BasicPartitioner(object):
 
                 # update allocated resources
                 resource_tracker.allocate_constrained_resources(
-                    resources, vertex)
+                    resources, vertex, vertex_slice)
 
             # update and end progress bars as needed
             progress_bar.update()

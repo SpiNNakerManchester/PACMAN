@@ -14,6 +14,8 @@ class ConvertToMemoryMultiCastRoutes(object):
         the routes
     """
 
+    __slots__ = []
+
     route_translation = {
         "CORE_0": (True, 0),
         "CORE_1": (True, 1),

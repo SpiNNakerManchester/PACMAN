@@ -32,6 +32,8 @@ class PartitionAndPlacePartitioner(object):
 
     """
 
+    __slots__ = []
+
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine):
         """

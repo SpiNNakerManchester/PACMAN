@@ -17,6 +17,8 @@ class ConvertToMemoryPlacements(object):
         constraints and builds a memory placements object
     """
 
+    __slots__ = []
+
     def __call__(self, extended_machine, placements, allocations,
                  constraints, vertex_by_id):
         """

@@ -15,6 +15,8 @@ class BasicRoutingTableGenerator(object):
     """ An basic algorithm that can produce routing tables
     """
 
+    __slots__ = []
+
     def __call__(
             self, routing_infos, routing_table_by_partitions,
             machine):

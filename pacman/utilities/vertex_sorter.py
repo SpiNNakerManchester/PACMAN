@@ -5,6 +5,19 @@ class ConstraintOrder(object):
     """ A constraint order definition for sorting
     """
 
+    __slots__ = [
+        # The class of the constraint
+        "_constraint_class",
+
+        # The order of the constraint relative to other constraints to be
+        #  sorted
+        "_relative_order",
+
+        # Properties of the constraint instances that must not be None for
+        # the constraint to match this ordering
+        "_required_optional_properties"
+    ]
+
     def __init__(
             self, constraint_class, relative_order,
             required_optional_properties=None):
@@ -24,20 +37,37 @@ class ConstraintOrder(object):
 
     @property
     def constraint_class(self):
+        """
+        property method for the constraint class
+        :return:
+        """
         return self._constraint_class
 
     @property
     def relative_order(self):
+        """
+        property method for the relative order
+        :return:
+        """
         return self._relative_order
 
     @property
     def required_optional_properties(self):
+        """
+        property method for the required optional properties
+        :return:
+        """
         return self._required_optional_properties
 
 
 class VertexSorter(object):
     """ Sorts vertices based on constraints with given criteria
     """
+
+    __slots__ = [
+        # Group constraints based on the class
+        "_constraints"
+    ]
 
     def __init__(self, constraint_order):
         """

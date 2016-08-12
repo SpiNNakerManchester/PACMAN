@@ -11,6 +11,8 @@ class ConvertToFileCoreAllocations(object):
     """ Converts placements to core allocations
     """
 
+    __slots__ = []
+
     def __call__(self, placements, file_path):
         """
 

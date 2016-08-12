@@ -7,6 +7,26 @@ SUPPORTED_TAGS = Enum(
 
 
 class FlexiField(object):
+    """ field who's location is not fixed in key allocation
+
+    """
+
+    __slots__ = [
+        # identifier
+        "_flexi_field_name",
+
+        # what value to store in this field
+        "_value",
+
+        # the tag
+        "_tag",
+
+        # the number of keys to store within this field
+        "_instance_n_keys",
+
+        # how deep in recursive fields this field resides.
+        "_nested_level"
+    ]
 
     def __init__(
             self, flexi_field_name, value=None, instance_n_keys=None, tag=None,

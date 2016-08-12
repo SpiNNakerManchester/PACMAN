@@ -27,6 +27,8 @@ class MundyRouterCompressor(object):
     compressor from rig which has been tied into the main tool chain stack.
     """
 
+    __slots__ = []
+
     KeyMask = collections.namedtuple('KeyMask', 'key mask')
     RoutingEntry = collections.namedtuple('RoutingEntry',
                                           'key mask route defaultable')

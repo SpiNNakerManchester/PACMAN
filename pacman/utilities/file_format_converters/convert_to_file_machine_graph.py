@@ -8,35 +8,36 @@ import jsonschema
 from pacman.model.graphs.machine.abstract_machine_virutal_vertex\
     import AbstractMachineVirtualVertex
 from pacman.utilities import file_format_schemas
-from pacman.utilities import utility_calls
 from spinn_machine.utilities.progress_bar import ProgressBar
 
-DEFAULT_NOUMBER_OF_CORES_USED_PER_VERTEX = 1
+DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX = 1
 
 
 class ConvertToFileMachineGraph(object):
     """ Converts a memory based graph into a file based graph
     """
 
+    __slots__ = []
+
     def __call__(self, machine_graph, file_path):
         """
 
         :param machine_graph:
-        :param folder_path:
+        :param file_path:
         :return:
         """
         progress_bar = ProgressBar(
             len(machine_graph.vertices), "Converting to json graph")
 
         # write basic stuff
-        json_graph_dictory_rep = dict()
+        json_graph_directory_rep = dict()
 
         # write vertices data
         vertices_resources = dict()
-        json_graph_dictory_rep["vertices_resources"] = vertices_resources
+        json_graph_directory_rep["vertices_resources"] = vertices_resources
 
         edges_resources = defaultdict()
-        json_graph_dictory_rep["edges"] = edges_resources
+        json_graph_directory_rep["edges"] = edges_resources
 
         vertex_by_id = dict()
         partition_by_id = dict()
@@ -69,7 +70,7 @@ class ConvertToFileMachineGraph(object):
                 vertex_resources = dict()
                 vertices_resources[vertex_id] = vertex_resources
                 vertex_resources["cores"] = \
-                    DEFAULT_NOUMBER_OF_CORES_USED_PER_VERTEX
+                    DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX
                 vertex_resources["sdram"] = \
                     int(vertex.resources_required.sdram.get_value())
 
@@ -84,7 +85,7 @@ class ConvertToFileMachineGraph(object):
                 vertex_resources = dict()
                 vertices_resources[vertex_id] = vertex_resources
                 vertex_resources["cores"] = \
-                    DEFAULT_NOUMBER_OF_CORES_USED_PER_VERTEX
+                    DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX
                 vertex_resources["sdram"] = \
                     int(vertex.resources_required.sdram.get_value())
 
@@ -112,7 +113,7 @@ class ConvertToFileMachineGraph(object):
             progress_bar.update()
 
         file_to_write = open(file_path, "w")
-        json.dump(json_graph_dictory_rep, file_to_write)
+        json.dump(json_graph_directory_rep, file_to_write)
         file_to_write.close()
 
         # validate the schema
@@ -122,7 +123,7 @@ class ConvertToFileMachineGraph(object):
         )
         file_to_read = open(graph_schema_file_path, "r")
         graph_schema = json.load(file_to_read)
-        jsonschema.validate(json_graph_dictory_rep, graph_schema)
+        jsonschema.validate(json_graph_directory_rep, graph_schema)
 
         progress_bar.end()
 

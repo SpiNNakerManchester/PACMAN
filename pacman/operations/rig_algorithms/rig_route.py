@@ -7,6 +7,8 @@ class RigRoute(object):
     """ Performs routing using rig algorithm
     """
 
+    __slots__ = []
+
     def __call__(self, machine_graph, machine, placements):
         progress_bar = ProgressBar(7, "Routing")
 

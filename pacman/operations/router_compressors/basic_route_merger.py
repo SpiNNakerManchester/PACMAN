@@ -8,6 +8,12 @@ from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 
 class BasicRouteMerger(object):
+    """ functionality to merge routing tables entries via different masks and
+    a exploration process
+
+    """
+
+    __slots__ = []
 
     def __call__(self, router_tables):
         tables = MulticastRoutingTables()

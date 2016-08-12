@@ -9,6 +9,12 @@ import math
 
 
 class MallocBasedRouteMerger(object):
+    """ a routing table entry merging function, that merges based off a
+    malloc memory style.
+
+    """
+
+    __slots__ = []
 
     def __call__(self, router_tables):
         tables = MulticastRoutingTables()
@@ -106,7 +112,7 @@ class MallocBasedRouteMerger(object):
                     # print "    Last key:", hex(last_key_added)
                     merged_routes.add_mutlicast_routing_entry(
                         MulticastRoutingEntry(
-                            base_key, n_keys_mask,
+                            int(base_key), n_keys_mask,
                             processors, links, defaultable=False))
                     pos = next_pos
                     merge_done = True

@@ -26,6 +26,8 @@ class BasicRoutingInfoAllocator(object):
         out of a vertex will be given the same key/mask assignment.
     """
 
+    __slots__ = []
+
     def __call__(self, machine_graph, placements, n_keys_map):
         """
 

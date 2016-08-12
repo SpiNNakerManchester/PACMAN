@@ -42,6 +42,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         free keys and attempts to allocate them as requested
     """
 
+    __slots__ = []
+
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 

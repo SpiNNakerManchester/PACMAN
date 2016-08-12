@@ -23,6 +23,29 @@ class BasicDijkstraRouting(object):
         machine by the use of a Dijkstra shortest path algorithm
     """
 
+    __slots__ = [
+        # the routing path objects used to be returned to the work flow
+        "_routing_paths",
+
+        # parameter to control ...........
+        "_k",
+
+        # parameter to control ...........
+        "_l",
+
+        # parameter to control ...........
+        "_m",
+
+        # parameter to control ...........
+        "_bw_per_route_entry",
+
+        # parameter to control ...........
+        "_max_bw",
+
+        # the SpiNNMachine object used within the system.
+        "_machine"
+    ]
+
     BW_PER_ROUTE_ENTRY = 0.01
     MAX_BW = 250
 

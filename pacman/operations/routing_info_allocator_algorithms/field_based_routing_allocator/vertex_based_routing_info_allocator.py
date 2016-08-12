@@ -49,6 +49,27 @@ FIXED_FIELD_NAME = \
 
 
 class VertexBasedRoutingInfoAllocator(object):
+    """ allocator of routing keys based off the vertex requirements
+
+    """
+
+    __slots__ = [
+        # the field id used for a fixed key field.
+        "_fixed_key_application_field_value",
+
+        # the field id used for a fixed mask
+        "_fixed_mask_application_field_value",
+
+        # the id used for a flexi field
+        "_flexi_field_application_field_values",
+
+        # the id used for a fixed field
+        "_fixed_field_application_field_value",
+
+        # dictionary containing all fields that have been mapped during the
+        # process
+        "_field_mapper"
+    ]
 
     def __init__(self):
 

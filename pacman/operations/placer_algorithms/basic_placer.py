@@ -16,6 +16,8 @@ class BasicPlacer(object):
         a machine using the chips as they appear in the machine
     """
 
+    __slots__ = []
+
     def __call__(self, machine_graph, machine):
         """ Place a machine_graph so that each vertex is placed on a\
                     core

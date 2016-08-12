@@ -10,6 +10,8 @@ class RigPlaceAndRoute(object):
         to save conversion time
     """
 
+    __slots__ = []
+
     def __call__(self, machine_graph, machine):
         progress_bar = ProgressBar(9, "Placing and Routing")
 

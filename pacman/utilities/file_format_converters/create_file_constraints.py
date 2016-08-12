@@ -24,6 +24,8 @@ class CreateConstraintsToFile(object):
     """ Creates constraints file from the machine and machine graph
     """
 
+    __slots__ = []
+
     def __call__(self, machine_graph, machine, file_path):
         """
         :param machine_graph: the machine graph
@@ -35,17 +37,17 @@ class CreateConstraintsToFile(object):
             (len(machine_graph.vertices)) + 2,
             "creating json constraints")
 
-        json_constraints_dictory_rep = list()
-        self._add_monitor_core_reserve(json_constraints_dictory_rep)
+        json_constraints_directory_rep = list()
+        self._add_monitor_core_reserve(json_constraints_directory_rep)
         progress_bar.update()
-        self._add_extra_monitor_cores(json_constraints_dictory_rep, machine)
+        self._add_extra_monitor_cores(json_constraints_directory_rep, machine)
         progress_bar.update()
         vertex_by_id = self._search_graph_for_placement_constraints(
-            json_constraints_dictory_rep, machine_graph, machine,
+            json_constraints_directory_rep, machine_graph, machine,
             progress_bar)
 
         file_to_write = open(file_path, "w")
-        json.dump(json_constraints_dictory_rep, file_to_write)
+        json.dump(json_constraints_directory_rep, file_to_write)
         file_to_write.close()
 
         # validate the schema
@@ -57,7 +59,7 @@ class CreateConstraintsToFile(object):
         file_to_read = open(constraints_schema_file_path, "r")
         constraints_schema = json.load(file_to_read)
         jsonschema.validate(
-            json_constraints_dictory_rep, constraints_schema)
+            json_constraints_directory_rep, constraints_schema)
 
         # complete progress bar
         progress_bar.end()
@@ -65,7 +67,7 @@ class CreateConstraintsToFile(object):
         return file_path, vertex_by_id
 
     def _search_graph_for_placement_constraints(
-            self, json_constraints_dictory_rep, machine_graph, machine,
+            self, json_constraints_dictionary_rep, machine_graph, machine,
             progress_bar):
         vertex_by_id = dict()
         for vertex in machine_graph.vertices:
@@ -73,23 +75,23 @@ class CreateConstraintsToFile(object):
             vertex_by_id[vertex_id] = vertex
             for constraint in vertex.constraints:
                 self._handle_vertex_constraint(
-                    constraint, json_constraints_dictory_rep, vertex,
+                    constraint, json_constraints_dictionary_rep, vertex,
                     vertex_id)
                 progress_bar.update()
             self._handle_vertex_resources(
-                vertex.resources_required, json_constraints_dictory_rep,
+                vertex.resources_required, json_constraints_dictionary_rep,
                 vertex_id)
             if isinstance(vertex, AbstractVirtualApplicationVertex):
                 self._handle_virtual_vertex(
-                    vertex, vertex_id, json_constraints_dictory_rep, machine)
+                    vertex, vertex_id, json_constraints_dictionary_rep, machine)
         return vertex_by_id
 
     def _handle_virtual_vertex(
-            self, vertex, vertex_id, json_constraints_dictory_rep, machine):
+            self, vertex, vertex_id, json_constraints_dictionary_rep, machine):
         route_end_point_constraint = dict()
         virtual_chip_location_constraint = dict()
-        json_constraints_dictory_rep.append(route_end_point_constraint)
-        json_constraints_dictory_rep.append(virtual_chip_location_constraint)
+        json_constraints_dictionary_rep.append(route_end_point_constraint)
+        json_constraints_dictionary_rep.append(virtual_chip_location_constraint)
 
         (real_chip_id, direction_id) = \
             self._locate_connected_chip_data(vertex, machine)
@@ -132,7 +134,7 @@ class CreateConstraintsToFile(object):
 
     @staticmethod
     def _handle_vertex_constraint(
-            constraint, json_constraints_dictory_rep, vertex, vertex_id):
+            constraint, json_constraints_dictionary_rep, vertex, vertex_id):
         if not isinstance(vertex, AbstractVirtualApplicationVertex):
             if isinstance(constraint, AbstractPlacerConstraint):
                 if isinstance(constraint, PlacerChipAndCoreConstraint):
@@ -141,7 +143,7 @@ class CreateConstraintsToFile(object):
                     chip_loc_constraint['vertex'] = vertex_id
                     chip_loc_constraint['location'] = [
                         constraint.x, constraint.y]
-                    json_constraints_dictory_rep.append(chip_loc_constraint)
+                    json_constraints_dictionary_rep.append(chip_loc_constraint)
                     if constraint.p is not None:
                         chip_loc_constraint = dict()
                         chip_loc_constraint['type'] = "resource"
@@ -149,7 +151,7 @@ class CreateConstraintsToFile(object):
                         chip_loc_constraint['resource'] = "cores"
                         chip_loc_constraint['range'] = \
                             "[{}, {}]".format(constraint.p, constraint.p + 1)
-                        json_constraints_dictory_rep.append(
+                        json_constraints_dictionary_rep.append(
                             chip_loc_constraint)
                 else:
                     raise exceptions.PacmanConfigurationException(
@@ -158,7 +160,7 @@ class CreateConstraintsToFile(object):
 
     @staticmethod
     def _handle_vertex_resources(
-            resources_required, json_constraints_dictory_rep, vertex_id):
+            resources_required, json_constraints_dictionary_rep, vertex_id):
         tags = resources_required.tags
         for tag in tags:
             if isinstance(tag, IPtagResource):
@@ -167,14 +169,14 @@ class CreateConstraintsToFile(object):
                 tag_constraint['vertex'] = vertex_id
                 tag_constraint['resource'] = "iptag"
                 tag_constraint['range'] = [0, 1]
-                json_constraints_dictory_rep.append(tag_constraint)
+                json_constraints_dictionary_rep.append(tag_constraint)
             if isinstance(tag, ReverseIPtagResource):
                 tag_constraint = dict()
                 tag_constraint['type'] = "resource"
                 tag_constraint['vertex'] = vertex_id
                 tag_constraint['resource'] = "reverse_iptag"
                 tag_constraint['range'] = [0, 1]
-                json_constraints_dictory_rep.append(tag_constraint)
+                json_constraints_dictionary_rep.append(tag_constraint)
             if isinstance(tag, SDRAMTagResource):
                 if ((tag.n_tags is not None and tag.n_tags >0) or
                         (tag.tag_ids is not None and len(tag.tag_ids) > 0)):
@@ -182,7 +184,7 @@ class CreateConstraintsToFile(object):
                         "Converter does not know how to convert a SDRAM tag")
 
     @staticmethod
-    def _add_extra_monitor_cores(json_constraints_dictory_rep, machine):
+    def _add_extra_monitor_cores(json_constraints_dictionary_rep, machine):
         for chip in machine.chips:
             for processor in chip.processors:
                 if processor.processor_id != 0 and processor.is_monitor:
@@ -192,13 +194,13 @@ class CreateConstraintsToFile(object):
                     reserve_monitor['reservation'] = \
                         [processor.processor_id, processor.processor_id + 1]
                     reserve_monitor['location'] = [chip.x, chip.y]
-                    json_constraints_dictory_rep.append(reserve_monitor)
+                    json_constraints_dictionary_rep.append(reserve_monitor)
 
     @staticmethod
-    def _add_monitor_core_reserve(json_constraints_dictory_rep):
+    def _add_monitor_core_reserve(json_constraints_dictionary_rep):
         reserve_monitor = dict()
         reserve_monitor['type'] = "reserve_resource"
         reserve_monitor['resource'] = "cores"
         reserve_monitor['reservation'] = [0, 1]
         reserve_monitor['location'] = None
-        json_constraints_dictory_rep.append(reserve_monitor)
+        json_constraints_dictionary_rep.append(reserve_monitor)

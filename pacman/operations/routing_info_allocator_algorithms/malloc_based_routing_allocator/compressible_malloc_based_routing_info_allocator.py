@@ -45,6 +45,8 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         looks at routing tables in an attempt to make things more compressible
     """
 
+    __slots__ = []
+
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 

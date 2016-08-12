@@ -6,6 +6,23 @@ class Field(object):
     """ Field object used in a field constraint for key allocation
     """
 
+    __slots__ = [
+        # the lo bit in the routing table entry for this field
+        "_lo",
+
+        # the hi bit in the routing table entry for this field
+        "_hi",
+
+        # the value to store in this field
+        "_value",
+
+        # field tag
+        "_tag",
+
+        # field name
+        "_name"
+    ]
+
     def __init__(self, lo, hi, value, tag=SUPPORTED_TAGS.ROUTING, name=None):
         self._lo = lo
         self._hi = hi

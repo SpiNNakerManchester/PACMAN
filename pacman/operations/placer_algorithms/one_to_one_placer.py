@@ -16,6 +16,8 @@ class OneToOnePlacer(RadialPlacer):
         destination on the same chip
     """
 
+    __slots__ = []
+
     def __init__(self):
         RadialPlacer.__init__(self)
 

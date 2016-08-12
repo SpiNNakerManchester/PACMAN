@@ -26,6 +26,8 @@ class RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
+    __slots__ = []
+
     def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
