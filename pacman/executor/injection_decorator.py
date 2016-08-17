@@ -3,6 +3,7 @@ from functools import wraps
 
 _instances = list()
 _methods = defaultdict(dict)
+_injectables = None
 
 
 class InjectionException(Exception):
@@ -67,15 +68,61 @@ def requires_injection(types_required):
                 method = methods.get(object_type, None)
                 if method is None:
                     raise InjectionException(
-                        "No injector for type {} for obj {}"
+                        "No injector for type {} for object {}"
                         .format(object_type, obj))
                 if not method._called:
                     raise InjectionException(
-                        "Type {} has not been injected for obj {}"
+                        "Type {} has not been injected for object {}"
                         .format(object_type, obj))
             return wrapped_method(obj, *args, **kwargs)
         return wrapper
     return wrap
+
+
+def inject_items(types):
+    """ Indicates values that need to be injected into the method
+
+    :param types: A dict of method argument name to type name to be injected
+    """
+    def wrap(wrapped_method):
+
+        @wraps(wrapped_method)
+        def wrapper(obj, *args, **kwargs):
+            if _injectables is None:
+                raise InjectionException(
+                    "No injectable objects have been provided")
+            new_args = dict(kwargs)
+            for arg, arg_type in types.iteritems():
+                value = _injectables.get(arg_type, None)
+                if value is None:
+                    raise InjectionException(
+                        "Cannot fine object of type {} to inject".format(
+                            arg_type))
+                if arg in new_args:
+                    raise InjectionException(
+                        "Argument {} was already provided".format(arg))
+                new_args[arg] = value
+            return wrapped_method(obj, *args, **new_args)
+        return wrapper
+    return wrap
+
+
+def provide_injectables(injectables):
+    """ Set the objects from which values should be injected into methods
+
+    :param injectables: A dict of type to value
+    """
+    global _injectables
+    if _injectables is not None:
+        raise InjectionException("Injectables have already been defined")
+    _injectables = injectables
+
+
+def clear_injectables():
+    """ Clear the current set of injectables
+    """
+    global _injectables
+    _injectables = None
 
 
 def do_injection(objects_to_inject, objects_to_inject_into=None):

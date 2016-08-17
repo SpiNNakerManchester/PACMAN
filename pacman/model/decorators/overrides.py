@@ -14,10 +14,15 @@ class overrides(object):
         "_super_class_method",
 
         # True if the doc string is to be extended, False to set if not set
-        "_extend_doc"
+        "_extend_doc",
+
+        # Any additional arguments required by the subclass method
+        "_additional_arguments"
     ]
 
-    def __init__(self, super_class_method, extend_doc=True):
+    def __init__(
+            self, super_class_method, extend_doc=True,
+            additional_arguments=None):
         """
 
         :param super_class_method: The method to override in the superclass
@@ -25,9 +30,15 @@ class overrides(object):
             True the method doc string should be appended to the super-method\
             doc string, False if the documentation should be set to the\
             super-method doc string only if there isn't a doc string already
+        :param additional_arguments:\
+            Additional arguments taken by the subclass method over the\
+            superclass method e.g. that are to be injected
         """
         self._super_class_method = super_class_method
         self._extend_doc = extend_doc
+        self._additional_arguments = additional_arguments
+        if additional_arguments is None:
+            additional_arguments = {}
         if isinstance(super_class_method, property):
             self._super_class_method = super_class_method.fget
 
@@ -52,22 +63,32 @@ class overrides(object):
         if method.__name__ != "__init__":
             method_args = inspect.getargspec(method)
             super_args = inspect.getargspec(self._super_class_method)
-            if len(method_args.args) != len(super_args.args):
+            all_args = [
+                arg for arg in method_args.args
+                if arg not in self._additional_arguments
+            ]
+            default_args = None
+            if method_args.defaults is not None:
+                default_args = [
+                    arg for arg in method_args.defaults
+                    if arg not in self._additional_arguments
+                ]
+            if len(all_args) != len(super_args.args):
                 raise AttributeError(
                     "Method has {} arguments but super class method has {}"
                     " arguments".format(
                         len(method_args.args), len(super_args.args)))
-            for arg, super_arg in zip(method_args.args, super_args.args):
+            for arg, super_arg in zip(all_args, super_args.args):
                 if arg != super_arg:
                     raise AttributeError(
                         "Missing argument {}".format(super_arg))
-            if ((method_args.defaults is None and
+            if ((default_args is None and
                 super_args.defaults is not None) or
-                (method_args.defaults is not None and
+                (default_args is not None and
                     super_args.defaults is None) or
-                    (method_args.defaults is not None and
+                    (default_args is not None and
                         super_args.defaults is not None and
-                        len(method_args.defaults) !=
+                        len(default_args) !=
                         len(super_args.defaults))):
                 raise AttributeError(
                     "Default arguments don't match super class method")
