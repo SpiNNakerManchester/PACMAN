@@ -399,9 +399,13 @@ class PACMANAlgorithmExecutor(object):
         :return: a suitable algorithm which uses the inputs
         """
 
-        # Find all algorithms which *can* run now and rank them using the
-        # number of unavailable optional inputs
-        algorithms_available = list()
+        # TODO: This can be made "cleverer" by looking at which algorithms have
+        # unsatisfied optional inputs.  The next algorithm to run can then
+        # be the next that outputs the most unsatisfied optional inputs for
+        # other algorithms from those with the least unsatisfied optional
+        # inputs
+
+        # Find the next algorithm which can run now
         for algorithm in algorithm_list:
 
             # check all inputs
@@ -412,58 +416,10 @@ class PACMANAlgorithmExecutor(object):
                     break
 
             if all_inputs_match:
-
-                # check for optional inputs
-                n_optional_inputs_unavailable = 0
-                for optional_input in algorithm.optional_inputs:
-                    if not optional_input.input_matches(inputs):
-                        n_optional_inputs_unavailable += 1
-
-                algorithms_available.append(
-                    (algorithm, n_optional_inputs_unavailable))
+                return algorithm
 
         # If no algorithms are available, return None
-        if len(algorithms_available) == 0:
-            return None
-
-        # Find the algorithm with the least unavailable optional inputs
-        algorithms_available.sort(key=lambda (_, n_opts): n_opts)
-        algorithm, n_optional_inputs_unavailable = algorithms_available[0]
-
-        # Find any other algorithms with the same ranking; if None return this
-        other_algorithms = filter(
-            lambda (x, y): y == n_optional_inputs_unavailable,
-            algorithms_available)
-        if len(other_algorithms) == 1:
-            return algorithm
-
-        # If there are other algorithms, rank by the number of non-novel
-        # outputs
-        boring_algorithms = list()
-        for algorithm, _ in other_algorithms:
-
-            # Count the number of non-novel outputs
-            n_boring_outputs = 0
-            for output in algorithm.outputs:
-                if output.output_type in generated_outputs:
-                    n_boring_outputs += 1
-
-            # If the algorithm has no outputs, it is infinitely boring!
-            if len(algorithm.outputs) == 0:
-                n_boring_outputs = sys.maxint
-
-            # If any, add to the list
-            if n_boring_outputs > 0:
-                boring_algorithms.append((algorithm, n_boring_outputs))
-
-        # If all return something novel, return the first
-        if len(boring_algorithms) == 0:
-            return algorithm
-
-        # Otherwise return the most non-novel
-        boring_algorithms.sort(
-            key=lambda (_, n_boring): n_boring, reverse=True)
-        return boring_algorithms[0][0]
+        return None
 
     def execute_mapping(self):
         """ Executes the algorithms

@@ -1,5 +1,6 @@
 from pacman import exceptions
-from pacman.model.constraints.placer_constraints.placer_radial_placement_from_chip_constraint import \
+from pacman.model.constraints.placer_constraints\
+    .placer_radial_placement_from_chip_constraint import \
     PlacerRadialPlacementFromChipConstraint
 from pacman.model.graphs.application.abstract_application_vertex import \
     AbstractApplicationVertex
@@ -228,7 +229,7 @@ class ResourceTracker(object):
             resources_required = vertex.resources_required
         else:
             raise exceptions.PacmanConfigurationException(
-                "Dont know this vertex type.")
+                "Don't know this vertex type.")
         ip_tags = resources_required.iptags
         reverse_ip_tags = resources_required.reverse_iptags
 
