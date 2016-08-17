@@ -12,6 +12,7 @@ from pacman.utilities.utility_objs.timer import Timer
 # general imports
 import logging
 import os
+import sys
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -426,7 +427,7 @@ class PACMANAlgorithmExecutor(object):
             return None
 
         # Find the algorithm with the least unavailable optional inputs
-        algorithms_available.sort(key=lambda (x, y): y)
+        algorithms_available.sort(key=lambda (_, n_opts): n_opts)
         algorithm, n_optional_inputs_unavailable = algorithms_available[0]
 
         # Find any other algorithms with the same ranking; if None return this
@@ -447,6 +448,10 @@ class PACMANAlgorithmExecutor(object):
                 if output.output_type in generated_outputs:
                     n_boring_outputs += 1
 
+            # If the algorithm has no outputs, it is infinitely boring!
+            if len(algorithm.outputs) == 0:
+                n_boring_outputs = sys.maxint
+
             # If any, add to the list
             if n_boring_outputs > 0:
                 boring_algorithms.append((algorithm, n_boring_outputs))
@@ -456,7 +461,8 @@ class PACMANAlgorithmExecutor(object):
             return algorithm
 
         # Otherwise return the most non-novel
-        boring_algorithms.sort(key=lambda (x, y): y, reverse=True)
+        boring_algorithms.sort(
+            key=lambda (_, n_boring): n_boring, reverse=True)
         return boring_algorithms[0][0]
 
     def execute_mapping(self):
