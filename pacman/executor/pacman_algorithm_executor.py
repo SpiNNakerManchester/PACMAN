@@ -50,14 +50,18 @@ class PACMANAlgorithmExecutor(object):
         "_do_post_run_injection",
 
         # True if the inputs are to be injected
-        "_inject_inputs"
+        "_inject_inputs",
+
+        # True if direct injection is to be done
+        "_do_direct_injection"
     ]
 
     def __init__(
             self, algorithms, optional_algorithms, inputs, required_outputs,
             xml_paths=None, packages=None, do_timings=True,
             print_timings=False, do_immediate_injection=True,
-            do_post_run_injection=False, inject_inputs=True):
+            do_post_run_injection=False, inject_inputs=True,
+            do_direct_injection=True):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -88,6 +92,10 @@ class PACMANAlgorithmExecutor(object):
             variables define when the injection of inputs is done; if\
             immediate injection is True, injection of inputs is done at the\
             start of the run, otherwise it is done at the end.
+        :param do_direct_injection:\
+            True if direct injection into methods should be supported.  This\
+            will allow any of the inputs or generated outputs to be injected\
+            into a method
         """
 
         # algorithm timing information
@@ -110,6 +118,7 @@ class PACMANAlgorithmExecutor(object):
         self._do_immediate_injection = do_immediate_injection
         self._do_post_run_injection = do_post_run_injection
         self._inject_inputs = inject_inputs
+        self._do_direct_injection = do_direct_injection
 
         self._set_up_pacman_algorithm_listings(
             algorithms, optional_algorithms, xml_paths,
@@ -170,10 +179,15 @@ class PACMANAlgorithmExecutor(object):
         converters = converter_decoder.decode_algorithm_data_objects()
 
         # Scan for annotated algorithms
-        copy_of_packages.append(operations.__name__)
-        copy_of_packages.append(algorithm_reports.__name__)
+        copy_of_packages.append(operations)
+        copy_of_packages.append(algorithm_reports)
+        converters.update(algorithm_decorator.scan_packages(
+            [file_format_converters]))
+        algorithm_data_objects.update(
+            algorithm_decorator.scan_packages(copy_of_packages))
 
-        # get list of all xml's as this is used to exclude xml files from import
+        # get list of all xml's as this is used to exclude xml files from
+        # import
         all_xml_paths = list()
         all_xml_paths.extend(copy_of_xml_paths)
         all_xml_paths.append(converter_xml_path)

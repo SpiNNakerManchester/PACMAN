@@ -6,11 +6,13 @@ from threading import RLock
 
 from pacman.executor.algorithm_decorators.one_of_input import OneOfInput
 from pacman.executor.algorithm_decorators.output import Output
-from pacman.executor.algorithm_classes.python_function_algorithm import PythonFunctionAlgorithm
+from pacman.executor.algorithm_classes.python_function_algorithm \
+    import PythonFunctionAlgorithm
 from pacman.executor.algorithm_decorators.single_input import SingleInput
 
 from pacman import exceptions
-from pacman.executor.algorithm_classes.python_class_algorithm import PythonClassAlgorithm
+from pacman.executor.algorithm_classes.python_class_algorithm \
+    import PythonClassAlgorithm
 from pacman.executor.algorithm_decorators.all_of_input import AllOfInput
 from spinn_machine.utilities.ordered_set import OrderedSet
 
@@ -313,21 +315,16 @@ def get_algorithms():
     return _algorithms
 
 
-def scan_packages(packages, xml_paths, recursive=True):
+def scan_packages(packages, recursive=True):
     """ Scan packages for algorithms
 
     :param packages:\
         The names of the packages to scan (using dotted notation),
         or the actual package modules
-    :param xml_paths: the list of paths for xml files
     :param recursive: True if sub-packages should be examined
     :return: A dict of algorithm name -> algorithm data
     """
     global _algorithms
-
-    xml_names = list()
-    for xml_path in xml_paths:
-        xml_names.append(os.path.splitext(os.path.basename(xml_path))[0])
 
     with _algorithm_lock:
         current_algorithms = _algorithms
@@ -338,7 +335,7 @@ def scan_packages(packages, xml_paths, recursive=True):
 
             # Import the package
             package = package_name
-            if not inspect.ismodule(package_name):
+            if isinstance(package_name, str):
                 package = importlib.import_module(package_name, "")
             pkg_path = os.path.dirname(package.__file__)
 
@@ -347,10 +344,9 @@ def scan_packages(packages, xml_paths, recursive=True):
 
                 # If recursive and this is a package, recurse
                 if is_pkg and recursive:
-                    scan_packages([package.__name__ + "." + name],
-                                  xml_paths, recursive)
+                    scan_packages([package.__name__ + "." + name], recursive)
 
-                elif name not in xml_names and not recursive:
+                else:
                     importlib.import_module("." + name, package.__name__)
 
         new_algorithms = _algorithms

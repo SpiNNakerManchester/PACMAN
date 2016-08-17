@@ -38,7 +38,7 @@ class overrides(object):
         self._extend_doc = extend_doc
         self._additional_arguments = additional_arguments
         if additional_arguments is None:
-            additional_arguments = {}
+            self._additional_arguments = {}
         if isinstance(super_class_method, property):
             self._super_class_method = super_class_method.fget
 
