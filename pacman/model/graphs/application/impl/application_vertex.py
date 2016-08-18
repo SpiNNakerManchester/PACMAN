@@ -51,7 +51,6 @@ class ApplicationVertex(AbstractApplicationVertex):
         self._constraints.add_constraint(
             PartitionerMaximumSizeConstraint(max_atoms_per_core))
 
-
     @delegates_to("_constraints", ConstrainedObject.add_constraint)
     def add_constraint(self, constraint):
         pass
