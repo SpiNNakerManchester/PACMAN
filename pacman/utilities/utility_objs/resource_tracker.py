@@ -1077,7 +1077,7 @@ class ResourceTracker(object):
             "    Request for CPU: {}, DTCM: {}, SDRAM: {}\n"
             "    Resources available which meet constraints:"
             "        {} Cores on {} chips, largest SDRAM space: {}".format(
-                resources.cpu.get_value(), resources.dtcm.get_value(),
+                resources.cpu_cycles.get_value(), resources.dtcm.get_value(),
                 resources.sdram.get_value(), n_cores, n_chips, max_sdram))
 
     def _available_resources(self, usable_chips):
