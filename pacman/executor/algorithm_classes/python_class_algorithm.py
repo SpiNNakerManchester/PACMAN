@@ -1,8 +1,5 @@
 import importlib
-import traceback
 import logging
-
-import sys
 
 from pacman.executor.algorithm_classes.abstract_python_algorithm \
     import AbstractPythonAlgorithm
@@ -57,15 +54,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         method = instance
         if self._python_method is not None:
             method = getattr(instance, self._python_method)
-        try:
-            return method(**inputs)
-        except Exception as e:
-            ex_type, ex_value, ex_traceback = sys.exc_info()
-            for line in traceback.format_tb(ex_traceback):
-                logger.error(line.strip())
-            logger.error(
-                "algorithm {} failed with exp exception {}".format(self, e))
-            raise e
+        return method(**inputs)
 
     def __repr__(self):
         return (
