@@ -1,5 +1,6 @@
 from collections import defaultdict
 from functools import wraps
+import inspect
 
 _instances = list()
 _methods = defaultdict(dict)
@@ -88,6 +89,16 @@ def inject_items(types):
 
         @wraps(wrapped_method)
         def wrapper(obj, *args, **kwargs):
+
+            method_args = inspect.getargspec(wrapped_method)
+            for type_arg in types:
+                if type_arg not in method_args.args:
+                    raise InjectionException(
+                        "Argument {} does not exist for method {} of"
+                        " {}".format(
+                            type_arg, wrapped_method.__name__,
+                            obj.__class__))
+
             if _injectables is None:
                 raise InjectionException(
                     "No injectable objects have been provided")
@@ -96,7 +107,7 @@ def inject_items(types):
                 value = _injectables.get(arg_type, None)
                 if value is None:
                     raise InjectionException(
-                        "Cannot fine object of type {} to inject".format(
+                        "Cannot find object of type {} to inject".format(
                             arg_type))
                 if arg in new_args:
                     raise InjectionException(

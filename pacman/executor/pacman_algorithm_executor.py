@@ -12,7 +12,6 @@ from pacman.utilities.utility_objs.timer import Timer
 # general imports
 import logging
 import os
-import sys
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -425,9 +424,12 @@ class PACMANAlgorithmExecutor(object):
         """ Executes the algorithms
         :return: None
         """
+        self._internal_type_mapping.update(self._inputs)
+        if self._do_direct_injection:
+            injection_decorator.provide_injectables(
+                self._internal_type_mapping)
         if self._inject_inputs and self._do_immediate_injection:
             injection_decorator.do_injection(self._inputs)
-        self._internal_type_mapping.update(self._inputs)
         new_outputs = dict()
 
         for algorithm in self._algorithms:
@@ -460,6 +462,9 @@ class PACMANAlgorithmExecutor(object):
                 injection_decorator.do_injection(self._internal_type_mapping)
             else:
                 injection_decorator.do_injection(new_outputs)
+
+        if self._do_direct_injection:
+            injection_decorator.clear_injectables()
 
     def get_item(self, item_type):
         """ Get an item from the outputs of the execution
