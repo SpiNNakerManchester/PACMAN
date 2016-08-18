@@ -194,9 +194,12 @@ class PartitionAndPlacePartitioner(object):
                 vertex_slice = Slice(lo_atom, hi_atom)
                 machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, used_resources,
-                    "{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
-                    partition_algorithm_utilities.get_remaining_constraints(
-                        vertex))
+                    label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
+                    constraints=(
+                        partition_algorithm_utilities
+                        .get_remaining_constraints(vertex)
+                    )
+                )
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
