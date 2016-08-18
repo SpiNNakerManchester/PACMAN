@@ -65,11 +65,6 @@ class MachineVertex(AbstractMachineVertex):
     def resources_required(self):
         return self._resources_required
 
-    @property
-    @overrides(AbstractMachineVertex.model_name)
-    def model_name(self):
-        return "Machine vertex"
-
     def __str__(self):
         return self._label
 

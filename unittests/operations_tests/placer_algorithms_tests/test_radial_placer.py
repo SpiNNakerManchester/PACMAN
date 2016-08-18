@@ -46,9 +46,6 @@ class Vertex(AbstractApplicationVertex):
                                              max_atoms_per_core=256)
         self._model_based_max_atoms_per_core = 256
 
-    def model_name(self):
-        return "test vertex"
-
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 10 * (hi_atom - lo_atom)
 

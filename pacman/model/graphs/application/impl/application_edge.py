@@ -70,8 +70,3 @@ class ApplicationEdge(AbstractApplicationEdge):
     @overrides(AbstractApplicationEdge.label)
     def label(self):
         return self._label
-
-    @property
-    @overrides(AbstractApplicationEdge.model_name)
-    def model_name(self):
-        return "Application edge"

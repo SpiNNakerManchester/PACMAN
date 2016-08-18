@@ -171,7 +171,7 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
                                "Generating partitioner report")
     for v in vertices:
         vertex_name = v.label
-        vertex_model = v.model_name
+        vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
         f_place_by_vertex.write(
             "**** Vertex: '{}'\n".format(vertex_name))
@@ -239,7 +239,7 @@ def placement_report_with_application_graph_by_vertex(
                                "Generating placement report")
     for v in vertices:
         vertex_name = v.label
-        vertex_model = v.model_name
+        vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
         f_place_by_vertex.write(
             "**** Vertex: '{}'\n".format(vertex_name))
@@ -316,7 +316,7 @@ def placement_report_without_application_graph_by_vertex(
     progress_bar = ProgressBar(len(vertices), "Generating placement report")
     for v in vertices:
         vertex_name = v.label
-        vertex_model = v.model_name
+        vertex_model = v.__class__.__name__
         f_place_by_vertex.write(
             "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
@@ -390,7 +390,7 @@ def placement_report_with_application_graph_by_core(
                     chip.x, chip.y, processor.processor_id)
                 app_vertex = graph_mapper.get_application_vertex(vertex)
                 vertex_label = app_vertex.label
-                vertex_model = app_vertex.model_name
+                vertex_model = app_vertex.__class__.__name__
                 vertex_atoms = app_vertex.n_atoms
                 lo_atom = graph_mapper.get_slice(vertex).lo_atom
                 hi_atom = graph_mapper.get_slice(vertex).hi_atom
@@ -457,7 +457,7 @@ def placement_report_without_application_graph_by_core(
                     chip.x, chip.y, processor.processor_id)
 
                 vertex_label = vertex.label
-                vertex_model = vertex.model_name
+                vertex_model = vertex.__class__.__name__
 
                 p_str = ("  Processor {}: Vertex: '{}' \n"
                          .format(pro_id, vertex_label))

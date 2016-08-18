@@ -42,13 +42,6 @@ class TestVertex(AbstractApplicationVertex):
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice,
                                                             None)))
 
-    def model_name(self):
-        """
-        the model name of this test vertex
-        :return:
-        """
-        return "test model"
-
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
 

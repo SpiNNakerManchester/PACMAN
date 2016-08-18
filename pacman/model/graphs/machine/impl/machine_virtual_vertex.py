@@ -50,8 +50,3 @@ class MachineVirtualVertex(AbstractMachineVirtualVertex):
     @overrides(AbstractMachineVirtualVertex.spinnaker_link_id)
     def spinnaker_link_id(self):
         return self._spinnaker_link_id
-
-    @property
-    @overrides(AbstractMachineVirtualVertex.model_name)
-    def model_name(self):
-        return "Machine virtual vertex"
