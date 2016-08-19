@@ -11,4 +11,3 @@ class AbstractPlacerConstraint(AbstractConstraint):
     """
 
     __slots__ = []
-

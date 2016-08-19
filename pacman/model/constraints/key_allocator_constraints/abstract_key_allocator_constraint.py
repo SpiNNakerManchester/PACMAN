@@ -11,4 +11,3 @@ class AbstractKeyAllocatorConstraint(AbstractConstraint):
     """
 
     __slots__ = []
-

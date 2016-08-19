@@ -1,7 +1,4 @@
 # pacman imports
-from pacman.model.graphs.application.impl.application_virtual_vertex import  \
-    AbstractVirtualApplicationVertex
-
 from pacman import exceptions
 from pacman.model.graphs.machine.impl.machine_virtual_vertex \
     import MachineVirtualVertex

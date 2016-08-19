@@ -60,7 +60,7 @@ class VertexBasedRoutingInfoAllocator(object):
         # the field id used for a fixed mask
         "_fixed_mask_application_field_value",
 
-        # the id used for a flexi field
+        # the id used for a flexible field
         "_flexi_field_application_field_values",
 
         # the id used for a fixed field

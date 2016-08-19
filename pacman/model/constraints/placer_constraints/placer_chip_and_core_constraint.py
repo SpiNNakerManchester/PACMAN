@@ -1,6 +1,5 @@
 from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
-from pacman.model.decorators.overrides import overrides
 
 
 class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
@@ -80,8 +79,3 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
     def __repr__(self):
         return "PlacerChipAndCoreConstraint(x={}, y={}, p={})".format(
             self._x, self._y, self._p)
-
-    @overrides(AbstractPlacerConstraint.label)
-    def label(self):
-        return "placer chip and core constraint at coords {},{},{}"\
-            .format(self.x, self.y, self.p)

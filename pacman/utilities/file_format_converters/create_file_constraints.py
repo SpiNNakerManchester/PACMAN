@@ -6,9 +6,6 @@ from pacman.model.constraints.placer_constraints.\
 from pacman.model.constraints.placer_constraints.abstract_placer_constraint\
     import AbstractPlacerConstraint
 from pacman import exceptions
-from pacman.model.resources.iptag_resource import IPtagResource
-from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
-from pacman.model.resources.sdram_tag_resource import SDRAMTagResource
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
@@ -83,7 +80,8 @@ class CreateConstraintsToFile(object):
                 vertex_id)
             if isinstance(vertex, AbstractVirtualApplicationVertex):
                 self._handle_virtual_vertex(
-                    vertex, vertex_id, json_constraints_dictionary_rep, machine)
+                    vertex, vertex_id, json_constraints_dictionary_rep,
+                    machine)
         return vertex_by_id
 
     def _handle_virtual_vertex(
@@ -91,7 +89,8 @@ class CreateConstraintsToFile(object):
         route_end_point_constraint = dict()
         virtual_chip_location_constraint = dict()
         json_constraints_dictionary_rep.append(route_end_point_constraint)
-        json_constraints_dictionary_rep.append(virtual_chip_location_constraint)
+        json_constraints_dictionary_rep.append(
+            virtual_chip_location_constraint)
 
         (real_chip_id, direction_id) = \
             self._locate_connected_chip_data(vertex, machine)
@@ -161,27 +160,20 @@ class CreateConstraintsToFile(object):
     @staticmethod
     def _handle_vertex_resources(
             resources_required, json_constraints_dictionary_rep, vertex_id):
-        tags = resources_required.tags
-        for tag in tags:
-            if isinstance(tag, IPtagResource):
-                tag_constraint = dict()
-                tag_constraint['type'] = "resource"
-                tag_constraint['vertex'] = vertex_id
-                tag_constraint['resource'] = "iptag"
-                tag_constraint['range'] = [0, 1]
-                json_constraints_dictionary_rep.append(tag_constraint)
-            if isinstance(tag, ReverseIPtagResource):
-                tag_constraint = dict()
-                tag_constraint['type'] = "resource"
-                tag_constraint['vertex'] = vertex_id
-                tag_constraint['resource'] = "reverse_iptag"
-                tag_constraint['range'] = [0, 1]
-                json_constraints_dictionary_rep.append(tag_constraint)
-            if isinstance(tag, SDRAMTagResource):
-                if ((tag.n_tags is not None and tag.n_tags >0) or
-                        (tag.tag_ids is not None and len(tag.tag_ids) > 0)):
-                    raise exceptions.PacmanConfigurationException(
-                        "Converter does not know how to convert a SDRAM tag")
+        for _ in resources_required.iptags:
+            tag_constraint = dict()
+            tag_constraint['type'] = "resource"
+            tag_constraint['vertex'] = vertex_id
+            tag_constraint['resource'] = "iptag"
+            tag_constraint['range'] = [0, 1]
+            json_constraints_dictionary_rep.append(tag_constraint)
+        for _ in resources_required.reverse_iptags:
+            tag_constraint = dict()
+            tag_constraint['type'] = "resource"
+            tag_constraint['vertex'] = vertex_id
+            tag_constraint['resource'] = "reverse_iptag"
+            tag_constraint['range'] = [0, 1]
+            json_constraints_dictionary_rep.append(tag_constraint)
 
     @staticmethod
     def _add_extra_monitor_cores(json_constraints_dictionary_rep, machine):

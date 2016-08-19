@@ -1,6 +1,5 @@
 from pacman.model.constraints.key_allocator_constraints.\
     abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.decorators.overrides import overrides
 
 
 class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
@@ -51,7 +50,5 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
     def __hash__(self):
         return hash(self._mask)
 
-    @overrides(AbstractKeyAllocatorConstraint.label)
-    def label(self):
-        return "key allocator constraint where subedges coming from the " \
-               "vertex requires a specific mask"
+    def __repr__(self):
+        return "KeyAllocatorFixedMaskConstraint(mask={})".format(self._mask)

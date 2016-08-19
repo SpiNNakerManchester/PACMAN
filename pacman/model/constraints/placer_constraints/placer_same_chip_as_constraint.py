@@ -1,6 +1,5 @@
 from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
-from pacman.model.decorators.overrides import overrides
 
 
 class PlacerSameChipAsConstraint(AbstractPlacerConstraint):
@@ -26,6 +25,5 @@ class PlacerSameChipAsConstraint(AbstractPlacerConstraint):
         """
         return self._vertex
 
-    @overrides(AbstractPlacerConstraint.label)
-    def label(self):
-        return "place the vertex next to this one : {}".format(self._vertex)
+    def __repr__(self):
+        return "PlacerSameChipAsConstraint(vertex={})".format(self._vertex)

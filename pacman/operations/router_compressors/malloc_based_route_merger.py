@@ -105,11 +105,7 @@ class MallocBasedRouteMerger(object):
                         (next_pos + 1 >= len(entries) or
                          entries[pos].routing_entry_key + n_keys <
                          entries[next_pos + 1].routing_entry_key)):
-                    # print "Merged into", hex(base_key), hex(n_keys_mask)
-                    # for i in range(pos, next_pos + 1):
-                    #     print "    ", hex(entries[i].routing_entry_key)
                     last_key_added = base_key + n_keys
-                    # print "    Last key:", hex(last_key_added)
                     merged_routes.add_mutlicast_routing_entry(
                         MulticastRoutingEntry(
                             int(base_key), n_keys_mask,
@@ -122,8 +118,6 @@ class MallocBasedRouteMerger(object):
                 last_key_added = (
                     entries[pos].routing_entry_key +
                     (~entries[pos].mask & 0xFFFFFFFFL))
-                # print "Not Merged", hex(entries[pos].routing_entry_key),\
-                # hex(entries[pos].mask)
             pos += 1
 
         return merged_routes

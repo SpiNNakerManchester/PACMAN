@@ -1,6 +1,5 @@
 from pacman.model.constraints.key_allocator_constraints.\
     abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.decorators.overrides import overrides
 
 
 class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
@@ -35,8 +34,6 @@ class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
     def __hash__(self):
         return hash(frozenset(self._fields))
 
-    @overrides(AbstractKeyAllocatorConstraint.label)
-    def label(self):
-        return "Key allocator constraint where subedges coming from the " \
-               "partitioned_graph requires a set of fields which are " \
-               "flexible in nature"
+    def __repr__(self):
+        return "KeyAllocatorFlexiFieldConstraint(fields={})".format(
+            self._fields)

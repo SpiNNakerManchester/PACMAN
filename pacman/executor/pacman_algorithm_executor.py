@@ -432,39 +432,42 @@ class PACMANAlgorithmExecutor(object):
             injection_decorator.do_injection(self._inputs)
         new_outputs = dict()
 
-        for algorithm in self._algorithms:
+        try:
+            for algorithm in self._algorithms:
 
-            # set up timer
-            timer = None
-            if self._do_timing:
-                timer = Timer()
-                timer.start_timing()
+                # set up timer
+                timer = None
+                if self._do_timing:
+                    timer = Timer()
+                    timer.start_timing()
 
-            # Execute the algorithm
-            results = algorithm.call(self._internal_type_mapping)
+                # Execute the algorithm
+                results = algorithm.call(self._internal_type_mapping)
 
-            # handle_prov_data
-            if self._do_timing:
-                self._update_timings(timer, algorithm)
+                # handle_prov_data
+                if self._do_timing:
+                    self._update_timings(timer, algorithm)
 
-            if results is not None:
-                self._internal_type_mapping.update(results)
-                if self._do_immediate_injection and not self._inject_inputs:
-                    new_outputs.update(results)
+                if results is not None:
+                    self._internal_type_mapping.update(results)
+                    if (self._do_immediate_injection and
+                            not self._inject_inputs):
+                        new_outputs.update(results)
 
-            # Do injection with the outputs produced
-            if self._do_immediate_injection and results is not None:
-                injection_decorator.do_injection(results)
+                # Do injection with the outputs produced
+                if self._do_immediate_injection and results is not None:
+                    injection_decorator.do_injection(results)
 
-        # Do injection with all the outputs
-        if self._do_post_run_injection:
-            if self._inject_inputs:
-                injection_decorator.do_injection(self._internal_type_mapping)
-            else:
-                injection_decorator.do_injection(new_outputs)
-
-        if self._do_direct_injection:
-            injection_decorator.clear_injectables()
+            # Do injection with all the outputs
+            if self._do_post_run_injection:
+                if self._inject_inputs:
+                    injection_decorator.do_injection(
+                        self._internal_type_mapping)
+                else:
+                    injection_decorator.do_injection(new_outputs)
+        finally:
+            if self._do_direct_injection:
+                injection_decorator.clear_injectables()
 
     def get_item(self, item_type):
         """ Get an item from the outputs of the execution

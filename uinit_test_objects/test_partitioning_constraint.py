@@ -7,7 +7,7 @@ from pacman.model.constraints.partitioner_constraints\
 
 class NewPartitionerConstraint(AbstractPartitionerConstraint):
     """
-    a partitioning constraint that shouldnt be recongised by any algorithum
+    a partitioning constraint that shouldn't be recognised by any algorithm
     """
 
     def __init__(self, label):

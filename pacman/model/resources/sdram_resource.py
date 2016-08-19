@@ -10,10 +10,10 @@ class SDRAMResource(AbstractResource):
         # The amount of SDRAM in bytes
         "_sdram"
     ]
-    
+
     def __init__(self, sdram):
         """
-        
+
         :param sdram: The amount of SDRAM in bytes
         :type sdram: int
         :raise None: No known exceptions are raised
@@ -26,12 +26,3 @@ class SDRAMResource(AbstractResource):
         .AbstractResource.get_value`
         """
         return self._sdram
-
-
-    def add_to_usage_value(self, new_value):
-        """
-        supports adding new requirements after oriignally built.
-        :param new_value:  the extra usage requirement
-        :return:
-        """
-        self._sdram += new_value

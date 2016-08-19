@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from six import add_metaclass
 
 
@@ -8,7 +8,3 @@ class AbstractConstraint(object):
     """
 
     __slots__ = []
-
-    @abstractmethod
-    def label(self):
-        pass

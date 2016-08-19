@@ -7,10 +7,10 @@ class Field(object):
     """
 
     __slots__ = [
-        # the lo bit in the routing table entry for this field
+        # the low bit in the routing table entry for this field
         "_lo",
 
-        # the hi bit in the routing table entry for this field
+        # the high bit in the routing table entry for this field
         "_hi",
 
         # the value to store in this field

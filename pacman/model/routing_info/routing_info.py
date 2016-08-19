@@ -11,7 +11,8 @@ class RoutingInfo(object):
         # Partition information indexed by partition
         "_partition_info_by_partition",
 
-        # Partition information indexed by edge pre vertex and partition id name
+        # Partition information indexed by edge pre vertex and partition id
+        # name
         "_partition_info_by_pre_vertex",
 
         # Partition information by edge

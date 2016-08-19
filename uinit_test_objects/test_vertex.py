@@ -4,14 +4,14 @@ test vertex used in many unit tests
 """
 
 # pacman imports
-from pacman.model.resources.cpu_cycles_resource import \
-    CPUCyclesResource
 
 from pacman.model.graphs.application.abstract_application_vertex import \
     AbstractApplicationVertex
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.resources.cpu_cycles_per_tick_resource \
+    import CPUCyclesPerTickResource
 
 
 class TestVertex(AbstractApplicationVertex):
@@ -37,7 +37,7 @@ class TestVertex(AbstractApplicationVertex):
         return ResourceContainer(
             sdram=SDRAMResource(
                 self.get_sdram_usage_for_atoms(vertex_slice, None)),
-            cpu=CPUCyclesResource(
+            cpu=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice, None)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice,
                                                             None)))

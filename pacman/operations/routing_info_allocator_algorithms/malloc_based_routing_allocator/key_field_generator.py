@@ -11,31 +11,31 @@ class KeyFieldGenerator(object):
     """
 
     __slots__ = [
-        # ??????????
+        # The fixed mask over which to generate keys
         "_fixed_mask",
 
-        # ??????????
+        # True if there is another key to be read
         "_is_next_key",
 
-        # ??????????
+        # The list of free spaces to constrain to
         "_free_space_list",
 
-        # ??????????
+        # The position in the free space list
         "_free_space_pos",
 
-        # ??????????
+        # True if the next key has been read, False if not
         "_next_key_read",
 
-        # ??????????
+        # The number of keys possible given the mask
         "_n_mask_keys",
 
-        # ??????????
+        # The fields of the mask to constrain to
         "_fields",
 
-        # ??????????
+        # The indices of the ones in the fields
         "_field_ones",
 
-        # ??????????
+        # The next valid value of the field
         "_field_value"
     ]
 

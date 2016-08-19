@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
 from pacman import exceptions
-from pacman.executor.algorithm_classes.abstract_algorithm import AbstractAlgorithm
+from pacman.executor.algorithm_classes.abstract_algorithm \
+    import AbstractAlgorithm
 from pacman.model.decorators.overrides import overrides
 
 

@@ -11,4 +11,3 @@ class AbstractRouterConstraint(AbstractConstraint):
     """
 
     __slots__ = []
-

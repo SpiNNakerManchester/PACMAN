@@ -1,7 +1,6 @@
 # pacman import
 from pacman.model.constraints.partitioner_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
-from pacman.model.decorators.overrides import overrides
 
 
 class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
@@ -30,8 +29,5 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
         """
         return self._size
 
-    @overrides(AbstractPartitionerConstraint.label)
-    def label(self):
-        return "partitioner max atom per core constraint with size {}"\
-            .format(self._size)
-
+    def __repr__(self):
+        return "PartitionerMaximumSizeConstraint(size={})".format(self._size)

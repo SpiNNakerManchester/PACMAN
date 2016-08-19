@@ -11,7 +11,7 @@ class Placements(object):
     __slots__ = [
 
         # dict of [(x,y,p)] -> placement object. used for fast lookup of a
-        # vertex given a xyp coord.
+        # vertex given a set of coordinates
         "_placements",
 
         # dict of [machine_vertex] -> placement object. used for fast lookup of

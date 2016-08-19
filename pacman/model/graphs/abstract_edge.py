@@ -30,5 +30,6 @@ class AbstractEdge(AbstractHasLabel):
     def traffic_type(self):
         """ The traffic type of the edge
 
-        :rtype :py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
+        :rtype:\
+            py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
         """

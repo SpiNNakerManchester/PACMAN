@@ -1,6 +1,5 @@
 from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
-from pacman.model.decorators.overrides import overrides
 
 
 class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
@@ -38,7 +37,6 @@ class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     def y(self):
         return self._y
 
-    @overrides(AbstractPlacerConstraint.label)
-    def label(self):
-        return "placer radial placement from chip and core constraint at " \
-               "coords {},{}".format(self.x, self.y)
+    def __repr__(self):
+        return "PlacerRadialPlacementFromChipConstraint(x={}, y={})".format(
+            self._x, self._y)

@@ -1,5 +1,4 @@
 from abc import abstractproperty
-from abc import abstractmethod
 
 from pacman.model.graphs.abstract_vertex import AbstractVertex
 

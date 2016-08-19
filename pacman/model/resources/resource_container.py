@@ -1,11 +1,7 @@
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.iptag_resource import IPtagResource
-from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.resources.sdram_tag_resource import SDRAMTagResource
-from pacman import exceptions
 
 
 class ResourceContainer(object):
@@ -37,25 +33,19 @@ class ResourceContainer(object):
         # A iterable of ReverseIPtagResource objects that reflect the number of
         #  ReverseIPtags a machine vertex is going to use on a SpiNNaker
         # machine, as well as the configuration data of said reverse IPTags.
-        "_reverse_iptags",
-
-        # a SDRAMTagResource object that reflects the number of sdram tags
-        # a machine vertex is going to use on a SpiNNaker machine
-        "_sdram_tags"
+        "_reverse_iptags"
     ]
 
     def __init__(
             self, dtcm=None, sdram=None, cpu_cycles=None, iptags=None,
-            reverse_iptags=None, sdram_tags=None):
-        """container object for the types of resources so that ordering is no
-        longer a risk
+            reverse_iptags=None):
+        """ Container object for the types of resources
 
         :param dtcm: the amount of dtcm used
         :param sdram: the amount of sdram used
         :param cpu_cycles: the amount of cpu used
         :param iptags: the iptags required
         :param reverse_iptags: the reverse iptags required
-        :param sdram_tags: the sdram tags required
         :type dtcm: None or \
                     :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
         :type sdram:None or \
@@ -66,8 +56,6 @@ class ResourceContainer(object):
                     :py:class:`pacman.models.resources.iptag_resource.IPtagResource`
         :type reverse_iptags: None or list of \
                     :py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`
-        :type sdram_tags: None or \
-                    :py:class:`pacman.models.resources.sdram_tag_resource.SDRAMtagResource`
         :rtype: pacman.models.resources.resource_container.ResourceContainer
         :raise None: does not raise any known exception
 
@@ -77,7 +65,6 @@ class ResourceContainer(object):
         self._cpu_cycles = cpu_cycles
         self._iptags = iptags
         self._reverse_iptags = reverse_iptags
-        self._sdram_tags = sdram_tags
 
         # check for none resources
         if self._dtcm_usage is None:
@@ -86,8 +73,6 @@ class ResourceContainer(object):
             self._sdram_usage = SDRAMResource(0)
         if self._cpu_cycles is None:
             self._cpu_cycles = CPUCyclesPerTickResource(0)
-        if self._sdram_tags is None:
-            self._sdram_tags = SDRAMTagResource(0, None)
         if self._reverse_iptags is None:
             self._reverse_iptags = []
         if self._iptags is None:
@@ -97,87 +82,42 @@ class ResourceContainer(object):
     def dtcm(self):
         return self._dtcm_usage
 
-    def add_to_dtcm_usage(self, extra_usage):
-        self._dtcm_usage.add_to_usage_value(extra_usage)
-
     @property
     def cpu_cycles(self):
         return self._cpu_cycles
-
-    def add_to_cpu_usage(self, extra_usage):
-        self._cpu_cycles.add_to_usage_value(extra_usage)
 
     @property
     def sdram(self):
         return self._sdram_usage
 
-    def add_to_sdram_usage(self, extra_usage):
-        self._sdram_usage.add_to_usage_value(extra_usage)
-
     @property
     def iptags(self):
         return self._iptags
-
-    def add_to_iptag_usage(self, extra_tag):
-        if isinstance(extra_tag, IPtagResource):
-            self._iptags.append(extra_tag)
-        else:
-            raise exceptions.PacmanConfigurationException(
-                "Trying to add {} which is not a IPtagResource"
-                .format(extra_tag))
 
     @property
     def reverse_iptags(self):
         return self._reverse_iptags
 
-    def add_to_reverse_iptags(self, extra_tag):
-        if isinstance(extra_tag, ReverseIPtagResource):
-            self._reverse_iptags.append(extra_tag)
-        else:
-            raise exceptions.PacmanConfigurationException(
-                "Trying to add {} which is not a ReverseIPtagResource"
-                .format(extra_tag))
-
-    @property
-    def tags(self):
-        data = list()
-        data.extend(self.iptags)
-        data.extend(self.reverse_iptags)
-        data.append(self.sdram_tags)
-        return data
-
     @property
     def sdram_tags(self):
         return self._sdram_tags
 
-    def add_to_sdram_tags(self, n_tags=None, tag_ids=None):
-        self._sdram_tags.add_tags(n_tags, tag_ids)
-
-    def extend(self, other_resource_container):
+    def extend(self, other):
 
         # added cpu stuff
-        self._cpu_cycles.add_to_usage_value(
-            other_resource_container.cpu_cycles.get_value())
+        self._cpu_cycles = CPUCyclesPerTickResource(
+            self._cpu_cycles.get_value() + other.cpu_cycles.get_value())
 
         # added dtcm
-        self._dtcm_usage.add_to_usage_value(
-            other_resource_container.dtcm.get_value())
+        self._dtcm_usage = DTCMResource(
+            self._dtcm_usage.get_value() + other.dtcm.get_value())
 
         # add sdram usage
-        self._sdram_usage.add_to_usage_value(
-            other_resource_container.sdram.get_value())
+        self._sdram_usage = SDRAMResource(
+            self._sdram_usage.get_value() + other.sdram.get_value())
 
         # add iptags
-        self._iptags.extend(other_resource_container.iptags)
+        self._iptags.extend(other.iptags)
 
         # add reverse iptags
-        self._reverse_iptags.extend(other_resource_container.reverse_iptags)
-
-        # add sdram tags
-        total = other_resource_container.sdram_tags.n_tags
-        tad_ids = other_resource_container.sdram_tags.tag_ids
-
-        if total is not None:
-            self._sdram_tags.add_to_n_tags(total)
-        if tad_ids is not None:
-            self._sdram_tags.add_to_tag_ids(tad_ids)
+        self._reverse_iptags.extend(other.reverse_iptags)

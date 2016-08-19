@@ -1,6 +1,5 @@
 from pacman.model.constraints.key_allocator_constraints.\
     abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.decorators.overrides import overrides
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman import exceptions
 
@@ -96,8 +95,3 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         return (
             frozenset(self._keys_and_masks),
             self._key_list_function).__hash__()
-
-    @overrides(AbstractKeyAllocatorConstraint.label)
-    def label(self):
-        return "key allocator constraint to fix the keys and masks to" \
-               " {}".format(self._keys_and_masks)
