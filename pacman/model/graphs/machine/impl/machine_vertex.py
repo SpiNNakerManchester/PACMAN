@@ -71,4 +71,4 @@ class MachineVertex(AbstractMachineVertex):
     def __repr__(self):
         return (
             "MachineVertex(resources_required={}, label={}, constraints={}"
-            .format(self._resources_required, self.constraints, self._label))
+            .format(self._resources_required, self._label, self.constraints))

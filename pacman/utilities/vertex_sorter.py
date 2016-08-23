@@ -1,4 +1,5 @@
 from collections import defaultdict
+import sys
 
 
 class ConstraintOrder(object):
@@ -100,7 +101,7 @@ class VertexSorter(object):
         for vertex in vertices:
 
             # Get all the ranks of the constraints
-            ranks = []
+            ranks = [sys.maxint]
             for constraint in vertex.constraints:
 
                 # If the constraint is one to sort by
