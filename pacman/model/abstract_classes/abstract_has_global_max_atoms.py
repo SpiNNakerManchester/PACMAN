@@ -5,17 +5,12 @@ from abc import abstractmethod
 
 @add_metaclass(ABCMeta)
 class AbstractHasGlobalMaxAtoms(object):
-    """ A interface to support models which have a global max atoms per core
-    per application vertex
-
+    """ Indicates an application vertex which has a global max atoms per core
     """
 
     __slots__ = []
 
     @abstractmethod
     def get_max_atoms_per_core(self):
+        """ The global maximum atoms per core
         """
-        returns the global max atoms per core.
-        :return:
-        """
-        pass
