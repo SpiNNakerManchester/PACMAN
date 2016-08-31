@@ -385,7 +385,7 @@ class ResourceTracker(object):
             return ((chip.sdram.size - self._sdram_tracker[key]) >=
                     resources.sdram.get_value())
         else:
-            return chip.sdram >= resources.sdram.get_value()
+            return chip.sdram.size >= resources.sdram.get_value()
 
     def _sdram_available(self, chip, key):
         """ Return the amount of SDRAM available on a chip
