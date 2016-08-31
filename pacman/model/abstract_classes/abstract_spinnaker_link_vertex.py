@@ -2,7 +2,6 @@
 # pacman imports
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman import exceptions
 from pacman.model.partitioned_graph.\
     virtual_spinnaker_link_partitioned_vertex import \
     VirtualSpinnakerLinkPartitionedVertex
@@ -17,8 +16,9 @@ class AbstractSpiNNakerLinkVertex(AbstractVirtualVertex):
     """ A class that allows models to define that they are virtual
     """
 
-    def __init__(self, n_atoms, label, max_atoms_per_core, board_address,
-                 spinnaker_link_id=None, constraints=None):
+    def __init__(
+            self, n_atoms, label, max_atoms_per_core, spinnaker_link_id,
+            board_address=None, constraints=None):
 
         AbstractVirtualVertex.__init__(
             self, n_atoms, label, max_atoms_per_core, board_address,
@@ -26,10 +26,6 @@ class AbstractSpiNNakerLinkVertex(AbstractVirtualVertex):
 
         self._spinnaker_link_id = spinnaker_link_id
 
-        if self._spinnaker_link_id is None:
-            raise exceptions.PacmanConfigurationException(
-                "The spinnaker link vertex needs to connec to a spinnaker "
-                "link.")
     @property
     def spinnaker_link_id(self):
         """ property for returning the spinnaker link being used

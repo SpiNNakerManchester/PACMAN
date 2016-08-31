@@ -1,6 +1,5 @@
 from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman import exceptions
 
 # general imports
 from abc import ABCMeta
@@ -22,17 +21,6 @@ class AbstractFPGAVertex(AbstractVirtualVertex):
 
         self._fpga_link_id = fpga_link_id
         self._fpga_id = fpga_id
-
-        if self._fpga_id is None or self._fpga_link_id is None:
-            raise exceptions.PacmanConfigurationException(
-                "The sata vertex needs to connec to a fpga via a link and "
-                "fpga id. Please refer to spin4-5.pdf found here for more "
-                "details. https://drive.google.com/drive/folders/"
-                "0B9312BuJXntlb2w0OGx1OVU5cmc")
-
-    @property
-    def model_name(self):
-        return "SATAVertex:{}".format(self.label)
 
     def is_virtual_vertex(self):
         return True

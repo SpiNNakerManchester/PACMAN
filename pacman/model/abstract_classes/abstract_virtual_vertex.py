@@ -15,7 +15,7 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
     """ A class that allows models to define that they are virtual
     """
 
-    def __init__(self, n_atoms, label, max_atoms_per_core, board_address,
+    def __init__(self, n_atoms, label, max_atoms_per_core, board_address=None,
                  constraints=None):
 
         AbstractPartitionableVertex.__init__(
@@ -59,8 +59,8 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
             self._board_address = new_value
         else:
             raise exceptions.PacmanConfigurationException(
-                "The board address of the virutal vertex has already been "
-                "configured. Overiding at this point is deemed an error.")
+                "The board address of the virtual vertex has already been "
+                "configured. Overriding at this point is deemed an error.")
 
     def set_virtual_chip_coordinates(
             self, virtual_chip_x, virtual_chip_y, real_chip_x, real_chip_y,

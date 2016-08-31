@@ -98,7 +98,8 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             # allocate ids for virtual chips
             for vertex in partitioned_graph.subvertices:
 
-                if (isinstance(vertex, VirtualSpinnakerLinkPartitionedVertex) or
+                if (isinstance(
+                        vertex, VirtualSpinnakerLinkPartitionedVertex) or
                         isinstance(vertex, VirtualSataLinkPartitionedVertex)):
                     board_address = vertex.board_address
                     if board_address is None:
@@ -133,9 +134,8 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                 machine.boot_x, machine.boot_y).ip_address
         else:
             raise exceptions.PacmanConfigurationException(
-                "You are using a multi-board machine and have no declaired "
-                "a board address for your external devices. This is deemed "
-                "an error.")
+                "Using a multi-board machine but not specified "
+                "a board address for an external device")
 
     def _assign_sata_virtual_chip_info(
             self, machine, fpga_link, fpga_id, board_address):
@@ -152,9 +152,9 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                     chip_id_x, chip_id_y, link_data.connected_chip_x,
                     link_data.connected_chip_y, link_data.connected_link
                 )
-            except KeyError as e:
+            except KeyError:
                 raise exceptions.PacmanElementAllocationException(
-                    "The machine in use does not have a sata link located at "
+                    "The machine in use does not have an FPGA link located at "
                     " {}:{}:{}.  Please ensure that you are using a valid "
                     "setup board.".format(fpga_id, fpga_link, board_address))
         chip_id_x, chip_id_y, link_data = \
