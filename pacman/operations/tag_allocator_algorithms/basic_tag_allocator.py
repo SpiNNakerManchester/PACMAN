@@ -1,15 +1,6 @@
 
 # pacman imports
-from pacman.model.constraints.abstract_constraints.\
-    abstract_tag_allocator_constraint import AbstractTagAllocatorConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_iptag_constraint import \
-    TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_reverse_iptag_constraint import \
-    TagAllocatorRequireReverseIptagConstraint
 from pacman.model.tags.tags import Tags
-from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from spinn_machine.utilities.progress_bar import ProgressBar
 
@@ -24,6 +15,8 @@ class BasicTagAllocator(object):
 
     """
 
+    __slots__ = []
+
     def __call__(self, machine, placements):
         """ see AbstractTagAllocatorAlgorithm.allocate_tags
         """
@@ -35,27 +28,21 @@ class BasicTagAllocator(object):
                                    "Allocating tags")
         placements_with_tags = list()
         for placement in placements.placements:
-            utility_calls.check_algorithm_can_support_constraints(
-                constrained_vertices=[placement.subvertex],
-                supported_constraints=[
-                    TagAllocatorRequireIptagConstraint,
-                    TagAllocatorRequireReverseIptagConstraint
-                ],
-                abstract_constraint_type=AbstractTagAllocatorConstraint)
-            if len(utility_calls.locate_constraints_of_type(
-                    placement.subvertex.constraints,
-                    AbstractTagAllocatorConstraint)):
+            if (len(placement.vertex.resources_required.iptags) > 0 or
+                    len(placement.vertex.resources_required.
+                        reverse_iptags) > 0):
+                ResourceTracker.check_constraints([placement.vertex])
                 placements_with_tags.append(placement)
             progress_bar.update()
 
         # Go through and allocate the tags
         tags = Tags()
         for placement in placements_with_tags:
-            vertex = placement.subvertex
+            vertex = placement.vertex
 
             # Get the constraint details for the tags
-            (board_address, ip_tags, reverse_ip_tags) =\
-                utility_calls.get_ip_tag_info(vertex.constraints)
+            (board_address, ip_tags, reverse_ip_tags) = \
+                ResourceTracker.get_ip_tag_info(vertex, None)
 
             # Allocate the tags, first-come, first-served, using the
             # fixed placement of the vertex, and the required resources
@@ -85,4 +72,4 @@ class BasicTagAllocator(object):
                     tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
 
         progress_bar.end()
-        return {'tags': tags}
+        return list(tags.ip_tags), list(tags.reverse_ip_tags), tags

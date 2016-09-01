@@ -1,14 +1,11 @@
-
 # pacman imports
-from pacman.model.abstract_classes.abstract_virtual_vertex \
-    import AbstractVirtualVertex
+from pacman import exceptions
+from pacman.model.graphs.machine.impl.machine_virtual_vertex \
+    import MachineVirtualVertex
+from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
 from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
-from pacman.model.abstract_classes.virtual_partitioned_vertex \
-    import VirtualPartitionedVertex
-from pacman import exceptions
 
 # general imports
 import logging
@@ -21,61 +18,41 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         chip ids and attempts to allocate them as requested
     """
 
+    __slots__ = [
+        # dict of [spinnaker link data] = (x,y, link data)
+        "_virtual_chips"
+    ]
+
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
-    def __call__(
-            self, machine, partitionable_graph=None, partitioned_graph=None):
+    def __call__(self, machine, graph=None):
         """
 
-        :param partitionable_graph:
-        :param partitioned_graph:
+        :param graph:
         :param machine:
         :return:
         """
-        if partitionable_graph is not None:
+
+        if graph is not None:
 
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
-                (len(partitionable_graph.vertices) + len(list(machine.chips))),
+                (len(graph.vertices) + len(list(machine.chips))),
                 "Allocating virtual identifiers")
-        elif partitioned_graph is not None:
 
-            # Go through the groups and allocate keys
-            progress_bar = ProgressBar(
-                (len(partitioned_graph.subvertices) +
-                 len(list(machine.chips))),
-                "Allocating virtual identifiers")
-        else:
-            progress_bar = ProgressBar(
-                len(list(machine.chips)), "Allocating virtual identifiers")
-
-        # allocate standard ids for real chips
-        for chip in machine.chips:
-            expected_chip_id = (chip.x << 8) + chip.y
-            self._allocate_elements(expected_chip_id, 1)
-            progress_bar.update()
-
-        if partitionable_graph is not None:
-
-            # allocate ids for virtual chips
-            for vertex in partitionable_graph.vertices:
-                if isinstance(vertex, AbstractVirtualVertex):
-                    link = vertex.spinnaker_link_id
-                    virtual_x, virtual_y, real_x, real_y, real_link = \
-                        self._assign_virtual_chip_info(machine, link)
-                    vertex.set_virtual_chip_coordinates(
-                        virtual_x, virtual_y, real_x, real_y, real_link)
+            # allocate standard ids for real chips
+            for chip in machine.chips:
+                expected_chip_id = (chip.x << 8) + chip.y
+                self._allocate_elements(expected_chip_id, 1)
                 progress_bar.update()
-            progress_bar.end()
-        elif partitioned_graph is not None:
 
             # allocate ids for virtual chips
-            for vertex in partitioned_graph.subvertices:
-                if isinstance(vertex, VirtualPartitionedVertex):
+            for vertex in graph.vertices:
+                if isinstance(vertex, MachineVirtualVertex):
                     link = vertex.spinnaker_link_id
                     virtual_x, virtual_y, real_x, real_y, real_link = \
                         self._assign_virtual_chip_info(machine, link)
@@ -84,7 +61,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                 progress_bar.update()
             progress_bar.end()
 
-        return {"machine": machine}
+        return machine
 
     def _assign_virtual_chip_info(self, machine, link):
         if link not in self._virtual_chips:

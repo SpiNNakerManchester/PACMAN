@@ -3,9 +3,9 @@ tests for placements
 """
 
 # pacman imports
+from pacman.model.graphs.machine.impl.simple_machine_vertex import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
 # general imports
 import unittest
@@ -21,7 +21,7 @@ class TestPlacements(unittest.TestCase):
         test creating a placements object
         :return:
         """
-        subv = PartitionedVertex(None, "")
+        subv = SimpleMachineVertex(None, "")
         pl = Placement(subv, 0, 0, 1)
         Placements([pl])
 
@@ -32,16 +32,16 @@ class TestPlacements(unittest.TestCase):
         """
         pls = Placements()
         self.assertEqual(pls._placements, dict())
-        self.assertEqual(pls._subvertices, dict())
+        self.assertEqual(pls._machine_vertices, dict())
 
-    def test_get_placement_of_subvertex(self):
+    def test_get_placement_of_vertex(self):
         """
         checks the placements get placement method
         :return:
         """
         subv = list()
         for i in range(5):
-            subv.append(PartitionedVertex(None, ""))
+            subv.append(SimpleMachineVertex(None, ""))
 
         pl = list()
         for i in range(4):
@@ -49,17 +49,17 @@ class TestPlacements(unittest.TestCase):
 
         pls = Placements(pl)
         for i in range(4):
-            self.assertEqual(pls.get_placement_of_subvertex(subv[i]), pl[i])
+            self.assertEqual(pls.get_placement_of_vertex(subv[i]), pl[i])
 
-    def test_get_subvertex_on_processor(self):
+    def test_get_vertex_on_processor(self):
         """
         checks that from a placements object, you can get to the correct
-        subvertex using the get_subvertex_on_processor() method
+        vertex using the get_vertex_on_processor() method
         :return:
         """
         subv = list()
         for i in range(5):
-            subv.append(PartitionedVertex(None, ""))
+            subv.append(SimpleMachineVertex(None, ""))
 
         pl = list()
         for i in range(4):
@@ -67,9 +67,9 @@ class TestPlacements(unittest.TestCase):
 
         pls = Placements(pl)
         for i in range(4):
-            self.assertEqual(pls.get_subvertex_on_processor(0, 0, i), subv[i])
+            self.assertEqual(pls.get_vertex_on_processor(0, 0, i), subv[i])
 
-        self.assertEqual(pls.get_placement_of_subvertex(subv[0]), pl[0])
+        self.assertEqual(pls.get_placement_of_vertex(subv[0]), pl[0])
 
     def test_get_placements(self):
         """
@@ -78,7 +78,7 @@ class TestPlacements(unittest.TestCase):
         """
         subv = list()
         for i in range(5):
-            subv.append(PartitionedVertex(None, ""))
+            subv.append(SimpleMachineVertex(None, ""))
 
         pl = list()
         for i in range(4):

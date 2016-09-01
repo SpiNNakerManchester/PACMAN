@@ -7,6 +7,20 @@ class MulticastRoutingTableByPartitionEntry(object):
     """ An entry in a path of a multicast route
     """
 
+    __slots__ = [
+        # the edges this path entry goes down
+        "_out_going_links",
+
+        # the processors this path entry goes to
+        "_out_going_processors",
+
+        # the direction this entry came from in link
+        "_incoming_link",
+
+        # the direction this entry came from
+        "_incoming_processor"
+    ]
+
     def __init__(self, out_going_links, outgoing_processors,
                  incoming_processor=None, incoming_link=None):
         """

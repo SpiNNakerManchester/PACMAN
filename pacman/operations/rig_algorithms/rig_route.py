@@ -7,12 +7,14 @@ class RigRoute(object):
     """ Performs routing using rig algorithm
     """
 
-    def __call__(self, partitioned_graph, machine, placements):
-        progress_bar = ProgressBar(8, "Routing")
+    __slots__ = []
+
+    def __call__(self, machine_graph, machine, placements):
+        progress_bar = ProgressBar(7, "Routing")
 
         vertices_resources, nets, net_names = \
-            rig_converters.convert_to_rig_partitioned_graph(
-                partitioned_graph)
+            rig_converters.convert_to_rig_graph(
+                machine_graph)
         progress_bar.update()
 
         rig_machine = rig_converters.convert_to_rig_machine(machine)
@@ -23,12 +25,12 @@ class RigRoute(object):
         progress_bar.update()
 
         rig_constraints.extend(
-            rig_converters.create_rig_partitioned_graph_constraints(
-                partitioned_graph, rig_machine))
+            rig_converters.create_rig_graph_constraints(
+                machine_graph, machine))
         progress_bar.update()
 
         rig_placements, rig_allocations = \
-            rig_converters.convert_to_rig_placements(placements)
+            rig_converters.convert_to_rig_placements(placements, machine)
         progress_bar.update()
 
         rig_routes = route(
@@ -38,12 +40,9 @@ class RigRoute(object):
             name: rig_routes[net] for net, name in net_names.iteritems()}
         progress_bar.update()
 
-        placements = rig_converters.convert_from_rig_placements(
-            rig_placements, rig_allocations, partitioned_graph)
-        progress_bar.update()
         routes = rig_converters.convert_from_rig_routes(
-            rig_routes, partitioned_graph)
+            rig_routes, machine_graph)
         progress_bar.update()
         progress_bar.end()
 
-        return {"routing_paths": routes}
+        return routes

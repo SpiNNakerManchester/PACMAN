@@ -33,15 +33,15 @@ ROUTING_MASK_BIT = 1
 START_OF_ROUTING_KEY_POSITION = 0
 
 
-def deduce_types(subgraph):
+def deduce_types(graph):
     """
     deducing the number of applications required for this key space
-    :param subgraph:
+    :param graph:
     :return:
     """
     seen_fields = dict()
     known_fields = list()
-    for partition in subgraph.partitions:
+    for partition in graph.outgoing_edge_partitions:
         for constraint in partition.constraints:
             if not isinstance(constraint,
                               KeyAllocatorContiguousRangeContraint):

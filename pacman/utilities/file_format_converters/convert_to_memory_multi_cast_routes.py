@@ -14,6 +14,8 @@ class ConvertToMemoryMultiCastRoutes(object):
         the routes
     """
 
+    __slots__ = []
+
     route_translation = {
         "CORE_0": (True, 0),
         "CORE_1": (True, 1),
@@ -41,8 +43,7 @@ class ConvertToMemoryMultiCastRoutes(object):
         "SOUTH": (False, 5)
     }
 
-    def __call__(
-            self, file_routing_paths, partitioned_graph, placements):
+    def __call__(self, file_routing_paths, partition_by_id):
 
         # load the json files
         file_routing_paths = self._handle_json_files(file_routing_paths)
@@ -52,7 +53,7 @@ class ConvertToMemoryMultiCastRoutes(object):
         # iterate though the path for each edge and create entries
         routing_tables = MulticastRoutingTableByPartition()
         for partition_id in file_routing_paths:
-            partition = partitioned_graph.get_partition_by_id(partition_id)
+            partition = partition_by_id[partition_id]
 
             # if the vertex is none, its a vertex with the special skills of
             # needing no cores. therefore ignore
@@ -64,7 +65,7 @@ class ConvertToMemoryMultiCastRoutes(object):
             progress_bar.update()
         progress_bar.end()
 
-        return {'routing_paths': routing_tables}
+        return routing_tables
 
     @staticmethod
     def _convert_next_route(

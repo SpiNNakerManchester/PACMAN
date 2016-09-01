@@ -11,6 +11,8 @@ class ConvertToFileCoreAllocations(object):
     """ Converts placements to core allocations
     """
 
+    __slots__ = []
+
     def __call__(self, placements, file_path):
         """
 
@@ -27,9 +29,13 @@ class ConvertToFileCoreAllocations(object):
 
         json_core_allocations_dict['type'] = "cores"
 
+        vertex_by_id = dict()
+
         # process placements
         for placement in placements:
-            json_core_allocations_dict[placement.subvertex.label] = \
+            vertex_id = str(id(placement.vertex))
+            vertex_by_id[vertex_id] = placement.vertex
+            json_core_allocations_dict[vertex_id] = \
                 [placement.p, placement.p + 1]
             progress_bar.update()
 
@@ -52,4 +58,4 @@ class ConvertToFileCoreAllocations(object):
         progress_bar.end()
 
         # return the file format
-        return {"FileCoreAllocations": file_path}
+        return file_path, vertex_by_id

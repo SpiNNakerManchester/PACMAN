@@ -6,6 +6,38 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 
 
 class KeyFieldGenerator(object):
+    """ functionality to handle fields in a routing key.
+
+    """
+
+    __slots__ = [
+        # The fixed mask over which to generate keys
+        "_fixed_mask",
+
+        # True if there is another key to be read
+        "_is_next_key",
+
+        # The list of free spaces to constrain to
+        "_free_space_list",
+
+        # The position in the free space list
+        "_free_space_pos",
+
+        # True if the next key has been read, False if not
+        "_next_key_read",
+
+        # The number of keys possible given the mask
+        "_n_mask_keys",
+
+        # The fields of the mask to constrain to
+        "_fields",
+
+        # The indices of the ones in the fields
+        "_field_ones",
+
+        # The next valid value of the field
+        "_field_value"
+    ]
 
     def __init__(self, fixed_mask, fields, free_space_list):
 
@@ -14,6 +46,8 @@ class KeyFieldGenerator(object):
         self._free_space_list = free_space_list
         self._free_space_pos = 0
         self._next_key_read = False
+        self._field_ones = dict()
+        self._field_value = dict()
 
         expanded_mask = utility_calls.expand_to_bit_array(fixed_mask)
         zeros = numpy.where(expanded_mask == 0)[0]
@@ -61,8 +95,6 @@ class KeyFieldGenerator(object):
         # Generate a set of indices of ones for each field, and then store
         # the current value of each field given the minimum key (even if the
         # value might be out of range for the key - see later for fix for this)
-        self._field_ones = dict()
-        self._field_value = dict()
         for field in self._fields:
             expanded_mask = utility_calls.expand_to_bit_array(field.value)
             field_ones = numpy.where(expanded_mask == 1)[0]
