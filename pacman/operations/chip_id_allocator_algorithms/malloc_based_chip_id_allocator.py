@@ -60,9 +60,23 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                         link_data = machine.get_fpga_link_with_id(
                             vertex.fpga_id, vertex.fpga_link_id,
                             vertex.board_address)
+                        if link_data is None:
+                            raise exceptions.PacmanConfigurationException(
+                                "No FPGA Link {} on FPGA {} found on board "
+                                "{}.  This would be true if another chip was "
+                                "found connected at this point".format(
+                                    vertex.fpga_link_id, vertex.fpga_id,
+                                    vertex.board_address))
                     elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
                         link_data = machine.get_spinnaker_link_with_id(
                             vertex.spinnaker_link_id, vertex.board_address)
+                        if link_data is None:
+                            raise exceptions.PacmanConfigurationException(
+                                "No SpiNNaker Link {} found on board "
+                                "{}.  This would be true if another chip was "
+                                "found connected at this point".format(
+                                    vertex.spinnaker_link_id,
+                                    vertex.board_address))
                     else:
                         raise exceptions.PacmanConfigurationException(
                             "Unknown virtual vertex type {}".format(
