@@ -8,6 +8,12 @@ from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 
 class BasicRouteMerger(object):
+    """ functionality to merge routing tables entries via different masks and
+    a exploration process
+
+    """
+
+    __slots__ = []
 
     def __call__(self, router_tables):
         tables = MulticastRoutingTables()
@@ -44,7 +50,7 @@ class BasicRouteMerger(object):
                         n_entries))
             progress.update()
         progress.end()
-        return {'routing_tables': tables}
+        return tables
 
     def _get_merge_masks(self, mask, previous_masks):
         if mask in previous_masks:

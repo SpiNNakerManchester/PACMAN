@@ -14,6 +14,11 @@ class ElementAllocatorAlgorithm(object):
         a pool of a given size
     """
 
+    __slots__ = [
+        # the space object for memory allocation
+        "_free_space_tracker"
+    ]
+
     def __init__(self, size_begin, size_end):
         self._free_space_tracker = list()
         self._free_space_tracker.append(ElementFreeSpace(size_begin, size_end))

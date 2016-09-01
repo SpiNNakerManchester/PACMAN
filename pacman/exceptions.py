@@ -202,13 +202,13 @@ class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
     pass
 
 
-class PacmanSubvertexAlreadyPlacedError(ValueError):
-    """Indicates multiple placements are being made for a subvertex."""
+class PacmanAlreadyPlacedError(ValueError):
+    """Indicates multiple placements are being made for a vertex."""
     pass
 
 
-class PacmanSubvertexNotPlacedError(KeyError):
-    """Indicates no placements are made for a subvertex."""
+class PacmanNotPlacedError(KeyError):
+    """Indicates no placements are made for a vertex."""
     pass
 
 

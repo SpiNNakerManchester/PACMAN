@@ -3,19 +3,20 @@ test for partitioning
 """
 
 # pacman imports
-from pacman.model.constraints.partitioner_constraints\
-    .partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
+from pacman.model.graphs.application.simple_application_edge import \
+    SimpleApplicationEdge
+
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException, PacmanValueError
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
-    MultiCastPartitionableEdge
+from pacman.model.constraints.partitioner_constraints\
+    .partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
+from pacman.model.graphs.application.impl.application_graph \
+    import ApplicationGraph
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
-from pacman.model.partitionable_graph.partitionable_graph \
-    import PartitionableGraph
 
 # spinnMachine imports
 from spinn_machine.machine import Machine
@@ -45,15 +46,15 @@ class TestBasicPartitioner(unittest.TestCase):
         self.vert1 = TestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = MultiCastPartitionableEdge(self.vert1, self.vert2,
+        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2,
                                                 None, "First edge")
-        self.edge2 = MultiCastPartitionableEdge(self.vert2, self.vert1,
+        self.edge2 = SimpleApplicationEdge(self.vert2, self.vert1,
                                                 None, "Second edge")
-        self.edge3 = MultiCastPartitionableEdge(self.vert1, self.vert3,
+        self.edge3 = SimpleApplicationEdge(self.vert1, self.vert3,
                                                 None, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
-        self.graph = PartitionableGraph("Graph", self.verts, self.edges)
+        self.graph = ApplicationGraph("Graph", self.verts, self.edges)
 
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -100,15 +101,14 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        subgraph, mapper = self.bp.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 3)
+        graph, mapper = self.bp.partition(self.graph, self.machine)
+        self.assertEqual(len(graph.vertices), 3)
         vert_sizes = []
         for vert in self.verts:
             vert_sizes.append(vert.n_atoms)
-        self.assertEqual(len(subgraph.subedges), 3)
-        for subvert in subgraph.subvertices:
-            self.assertIn(mapper.get_subvertex_slice(subvert).n_atoms,
-                          vert_sizes)
+        self.assertEqual(len(graph.edges), 3)
+        for vertex in graph.vertices:
+            self.assertIn(mapper.get_slice(vertex).n_atoms, vert_sizes)
 
     def test_partition_with_no_additional_constraints_extra_edge(self):
         """
@@ -116,11 +116,11 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        self.graph.add_edge(MultiCastPartitionableEdge(self.vert3, self.vert1,
-                                                       None, "Extra edge"))
-        subgraph, mapper = self.bp.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 3)
-        self.assertEqual(len(subgraph.subedges), 4)
+        self.graph.add_edge(
+            SimpleApplicationEdge(self.vert3, self.vert1), "TEST")
+        graph, mapper = self.bp.partition(self.graph, self.machine)
+        self.assertEqual(len(graph.vertices), 3)
+        self.assertEqual(len(graph.edges), 4)
 
     def test_partition_on_large_vertex_than_has_to_be_split(self):
         """
@@ -129,11 +129,11 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = TestVertex(300, "Large vertex")
-        self.graph = PartitionableGraph(
+        self.graph = ApplicationGraph(
             "Graph with large vertex", [large_vertex], [])
-        subgraph, mapper = self.bp.partition(self.graph, self.machine)
+        graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.assertGreater(len(subgraph.subvertices), 1)
+        self.assertGreater(len(graph.vertices), 1)
 
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
         """
@@ -143,24 +143,24 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         large_vertex = TestVertex(500, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.graph = PartitionableGraph(
+        self.graph = ApplicationGraph(
             "Graph with large vertex", [large_vertex], [])
-        subgraph, mapper = self.bp.partition(self.graph, self.machine)
+        graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.assertGreater(len(subgraph.subvertices), 1)
+        self.assertGreater(len(graph.vertices), 1)
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
         """
-        test that fixed partitioning causes correct number of subvertices
+        test that fixed partitioning causes correct number of vertices
         :return:
         """
         self.setup()
         large_vertex = TestVertex(1000, "Large vertex")
         large_vertex.add_constraint(PartitionerMaximumSizeConstraint(10))
-        self.graph = PartitionableGraph(
+        self.graph = ApplicationGraph(
             "Graph with large vertex", [large_vertex], [])
-        subgraph, mapper = self.bp.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 100)
+        graph, mapper = self.bp.partition(self.graph, self.machine)
+        self.assertEqual(len(graph.vertices), 100)
 
     def test_partition_with_barely_sufficient_space(self):
         """
@@ -197,11 +197,11 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips)
         singular_vertex = TestVertex(450, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.graph = PartitionableGraph(
+        self.graph = ApplicationGraph(
             "Graph with large vertex", [singular_vertex], [])
-        subgraph, mapper = self.bp.partition(self.graph, self.machine)
+        graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.assertEqual(len(subgraph.subvertices), 450)
+        self.assertEqual(len(graph.vertices), 450)
 
     def test_partition_with_insufficient_space(self):
         """
@@ -239,7 +239,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips)
         large_vertex = TestVertex(3000, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
-        self.graph = PartitionableGraph(
+        self.graph = ApplicationGraph(
             "Graph with large vertex", [large_vertex], [])
         self.assertRaises(PacmanValueError, self.bp.partition,
                           self.graph, self.machine)
@@ -326,7 +326,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = TestVertex(13, "Constrained")
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
-        graph = PartitionableGraph("Graph", [constrained_vertex], None)
+        graph = ApplicationGraph("Graph", [constrained_vertex], None)
         partitioner = PartitionAndPlacePartitioner()
         self.assertRaises(PacmanInvalidParameterException,
                           partitioner.partition, graph, self.machine)
@@ -337,9 +337,9 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        self.graph = PartitionableGraph()
-        subgraph, mapper = self.bp.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 0)
+        self.graph = ApplicationGraph()
+        graph, mapper = self.bp.partition(self.graph, self.machine)
+        self.assertEqual(len(graph.vertices), 0)
 
     def test_operation_with_same_size_as_vertex_constraint(self):
         """
@@ -353,9 +353,9 @@ class TestBasicPartitioner(unittest.TestCase):
             PartitionerSameSizeAsVertexConstraint(self.vert2))
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
-        subgraph, graph_to_sub_graph_mapper = \
+        graph, graph_mapper = \
             partitioner.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 5)
+        self.assertEqual(len(graph.vertices), 5)
 
     def test_operation_with_same_size_as_vertex_constraint_large_vertices(self):
         """
@@ -368,12 +368,12 @@ class TestBasicPartitioner(unittest.TestCase):
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             PartitionerSameSizeAsVertexConstraint(new_large_vertex))
-        self.graph = PartitionableGraph(
+        self.graph = ApplicationGraph(
             "New graph", [new_large_vertex, constrained_vertex])
         partitioner = PartitionAndPlacePartitioner()
-        subgraph, graph_to_sub_graph_mapper = \
+        graph, graph_mapper = \
             partitioner.partition(self.graph, self.machine)
-        self.assertEqual(len(subgraph.subvertices), 6)
+        self.assertEqual(len(graph.vertices), 6)
 
     def test_operation_same_size_as_vertex_constraint_different_order(self):
         """
@@ -387,13 +387,13 @@ class TestBasicPartitioner(unittest.TestCase):
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             PartitionerSameSizeAsVertexConstraint(new_large_vertex))
-        self.graph = PartitionableGraph("New graph",
+        self.graph = ApplicationGraph("New graph",
                                         [constrained_vertex, new_large_vertex])
         partitioner = PartitionAndPlacePartitioner()
-        subgraph, graph_to_sub_graph_mapper = \
+        graph, graph_mapper = \
             partitioner.partition(self.graph, self.machine)
-        # split in 256 each, so 4 partitioned vertices
-        self.assertEqual(len(subgraph.subvertices), 4)
+        # split in 256 each, so 4 machine vertices
+        self.assertEqual(len(graph.vertices), 4)
 
     def test_operation_with_same_size_as_vertex_constraint_exception(self):
         """

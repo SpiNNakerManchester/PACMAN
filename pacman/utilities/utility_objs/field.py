@@ -6,6 +6,23 @@ class Field(object):
     """ Field object used in a field constraint for key allocation
     """
 
+    __slots__ = [
+        # the low bit in the routing table entry for this field
+        "_lo",
+
+        # the high bit in the routing table entry for this field
+        "_hi",
+
+        # the value to store in this field
+        "_value",
+
+        # field tag
+        "_tag",
+
+        # field name
+        "_name"
+    ]
+
     def __init__(self, lo, hi, value, tag=SUPPORTED_TAGS.ROUTING, name=None):
         self._lo = lo
         self._hi = hi
@@ -49,8 +66,8 @@ class Field(object):
         self._tag = new_value
 
     def __repr__(self):
-        return "Field with ranges {}:{} and value {} and tag {} and name {}"\
-            .format(self.lo, self.hi, self.value, self._value, self._name)
+        return "Field(lo={}, hi={}, value={}, tag={}, name={})".format(
+            self.lo, self.hi, self.value, self._value, self._name)
 
     def __str__(self):
         return self.__repr__()

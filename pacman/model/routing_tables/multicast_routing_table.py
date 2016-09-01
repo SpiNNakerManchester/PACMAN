@@ -6,6 +6,21 @@ class MulticastRoutingTable(object):
     """ Represents a routing table for a chip
     """
 
+    __slots__ = [
+        # The x-coordinate of the chip for which this is the routing table
+        "_x",
+
+        # The y-coordinate of the chip for which this is the routing tables
+        "_y",
+
+        # An iterable of routing entries to add to the table
+        "_multicast_routing_entries",
+
+        # dict of multicast routing entries.
+        # (key, mask) -> multicast_routing_entry
+        "_multicast_routing_entries_by_routing_entry_key"
+    ]
+
     def __init__(self, x, y, multicast_routing_entries=None):
         """
 

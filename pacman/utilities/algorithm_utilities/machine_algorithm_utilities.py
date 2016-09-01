@@ -6,36 +6,14 @@ from spinn_machine.router import Router
 import sys
 
 
-def create_virtual_chip(
-        machine, spinnaker_link_id, fpga_link_id, fpga_id, virtual_chip_x,
-        virtual_chip_y, board_address):
-    """ Create a virtual chip as a real chip in the machine
-
-    :param spinnaker_link_id:
-    :param virtual_chip_x:
-    :param virtual_chip_y:
-    :param board_address:
-    :param fpga_id:
-    :param fpga_link_id:
-    :param machine: the machine which will be adjusted
-    :return: The spinnaker link data
-    """
-
-    if spinnaker_link_id is not None:
-
-        # Get the spinnaker link from the machine
-        link_data = machine.get_spinnaker_link_with_id(
-            spinnaker_link_id, board_address)
-    else:
-        link_data = machine.get_sata_link_with_id(
-            board_address, fpga_link_id, fpga_id)
+def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
 
     # If the chip already exists, return the data
     if machine.is_chip_at(virtual_chip_x, virtual_chip_y):
         if not machine.get_chip_at(virtual_chip_x, virtual_chip_y).virtual:
             raise Exception(
                 "Attempting to add virtual chip in place of a real chip")
-        return link_data
+        return
 
     # Create link to the virtual chip from the real chip
     virtual_link_id = (link_data.connected_link + 3) % 6
@@ -81,5 +59,3 @@ def create_virtual_chip(
         sdram=SDRAM(size=0),
         x=virtual_chip_x, y=virtual_chip_y,
         virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None))
-
-    return link_data

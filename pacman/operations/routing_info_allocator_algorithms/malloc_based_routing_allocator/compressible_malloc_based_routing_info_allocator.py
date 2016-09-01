@@ -1,5 +1,5 @@
 # pacman imports
-from pacman.model.constraints.abstract_constraints\
+from pacman.model.constraints.key_allocator_constraints\
     .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_field_constraint import \
@@ -45,14 +45,16 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         looks at routing tables in an attempt to make things more compressible
     """
 
+    __slots__ = []
+
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
-    def __call__(self, subgraph, n_keys_map, routing_tables):
+    def __call__(self, machine_graph, n_keys_map, routing_tables):
 
         # check that this algorithm supports the constraints
         utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=subgraph.partitions,
+            constrained_vertices=machine_graph.outgoing_edge_partitions,
             supported_constraints=[
                 KeyAllocatorFixedMaskConstraint,
                 KeyAllocatorFixedKeyAndMaskConstraint,
@@ -62,14 +64,14 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # verify that no edge has more than 1 of a constraint ,and that
         # constraints are compatible
         routing_info_allocator_utilities.\
-            check_types_of_edge_constraint(subgraph)
+            check_types_of_edge_constraint(machine_graph)
 
         routing_infos = RoutingInfo()
 
-        # Get the partitioned edges grouped by those that require the same key
+        # Get the edges grouped by those that require the same key
         (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
          flexi_field_groups, continuous_groups, none_continuous_groups) = \
-            routing_info_allocator_utilities.get_edge_groups(subgraph)
+            routing_info_allocator_utilities.get_edge_groups(machine_graph)
 
         # Even non-continuous keys will be continuous
         for group in none_continuous_groups:
@@ -77,7 +79,8 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(
-            len(subgraph.partitions), "Allocating routing keys")
+            len(machine_graph.outgoing_edge_partitions),
+            "Allocating routing keys")
 
         # allocate the groups that have fixed keys
         for group in fixed_key_groups:  # fixed keys groups
@@ -217,7 +220,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 progress_bar.update()
 
         progress_bar.end()
-        return {'routing_infos': routing_infos}
+        return routing_infos
 
     @staticmethod
     def _update_routing_objects(

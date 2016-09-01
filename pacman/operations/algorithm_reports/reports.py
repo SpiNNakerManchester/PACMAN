@@ -3,10 +3,10 @@ import os
 import time
 
 from pacman import exceptions
-from pacman.model.partitioned_graph.virtual_spinnaker_link_partitioned_vertex \
-    import VirtualSpinnakerLinkPartitionedVertex
-from pacman.model.partitioned_graph.virtual_sata_partitioned_vertex \
-    import VirtualSataLinkPartitionedVertex
+from pacman.model.graphs.abstract_spinnaker_link_vertex \
+    import AbstractSpiNNakerLinkVertex
+from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
+
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
@@ -42,41 +42,41 @@ def tag_allocator_report(report_folder, tag_infos):
     progress_bar.end()
 
 
-def placer_reports_with_partitionable_graph(
+def placer_reports_with_application_graph(
         report_folder, hostname, graph, graph_mapper, placements, machine):
-    """ Reports that can be produced from placement given a partitionable\
+    """ Reports that can be produced from placement given a application\
         graph's existence
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
-    :param graph: the partitionable graph to which placements were built
-    :param graph_mapper: the mapping between partitionable and partitioned \
+    :param graph: the application graph to which placements were built
+    :param graph_mapper: the mapping between application and machine \
                 graphs
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
     :return None
     """
-    placement_report_with_partitionable_graph_by_vertex(
+    placement_report_with_application_graph_by_vertex(
         report_folder, hostname, graph, graph_mapper, placements)
-    placement_report_with_partitionable_graph_by_core(
+    placement_report_with_application_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper)
     sdram_usage_report_per_chip(
         report_folder, hostname, placements, machine)
 
 
-def placer_reports_without_partitionable_graph(
-        report_folder, hostname, sub_graph, placements, machine):
+def placer_reports_without_application_graph(
+        report_folder, hostname, machine_graph, placements, machine):
     """
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
-    :param sub_graph: the partitioned graph to which the reports are to\
+    :param machine_graph: the machine graph to which the reports are to\
              operate on
     :return None
     """
-    placement_report_without_partitionable_graph_by_vertex(
-        report_folder, hostname, placements, sub_graph)
-    placement_report_without_partitionable_graph_by_core(
+    placement_report_without_application_graph_by_vertex(
+        report_folder, hostname, placements, machine_graph)
+    placement_report_without_application_graph_by_core(
         report_folder, hostname, placements, machine)
     sdram_usage_report_per_chip(
         report_folder, hostname, placements, machine)
@@ -84,14 +84,14 @@ def placer_reports_without_partitionable_graph(
 
 def router_report_from_paths(
         report_folder, routing_tables, routing_infos, hostname,
-        partitioned_graph, placements, machine):
+        machine_graph, placements, machine):
     """ Generates a text file of routing paths
 
     :param routing_tables:
     :param report_folder:
     :param hostname:
     :param routing_infos:
-    :param partitioned_graph:
+    :param machine_graph:
     :param placements:
     :param machine:
     :return:
@@ -111,41 +111,43 @@ def router_report_from_paths(
     f_routing.write(" for target machine '{}'".format(hostname))
     f_routing.write("\n\n")
 
-    progress_bar = ProgressBar(len(partitioned_graph.subedges),
+    progress_bar = ProgressBar(len(machine_graph.edges),
                                "Generating Routing path report")
-    for edge in partitioned_graph.subedges:
-        source_placement = placements.get_placement_of_subvertex(
-            edge.pre_subvertex)
-        destination_placement = placements.get_placement_of_subvertex(
-            edge.post_subvertex)
-        partition = partitioned_graph.get_partition_of_subedge(edge)
-        key_and_mask = routing_infos.get_keys_and_masks_from_partition(
-            partition)[0]
-        path, number_of_entries = _search_route(
-            source_placement, destination_placement, key_and_mask,
-            routing_tables, machine)
-        text = "**** SubEdge '{}', from vertex: '{}' to vertex: '{}'".format(
-            edge.label, edge.pre_subvertex.label, edge.post_subvertex.label)
-        text += " Takes path \n {}".format(path)
-        f_routing.write(text)
-        f_routing.write("\n")
-        text = "Route length: {}\n".format(number_of_entries)
-        f_routing.write(text)
+    for partition in machine_graph.outgoing_edge_partitions:
+        source_placement = placements.get_placement_of_vertex(
+            partition.pre_vertex)
+        key_and_mask = routing_infos.get_routing_info_from_partition(
+            partition).first_key_and_mask
+        for edge in partition.edges:
+            destination_placement = placements.get_placement_of_vertex(
+                edge.post_vertex)
+            path, number_of_entries = _search_route(
+                source_placement, destination_placement, key_and_mask,
+                routing_tables, machine)
+            text = ("**** Edge '{}', from vertex: '{}'"
+                    " to vertex: '{}'".format(
+                        edge.label, edge.pre_vertex.label,
+                        edge.post_vertex.label))
+            text += " Takes path \n {}".format(path)
+            f_routing.write(text)
+            f_routing.write("\n")
+            text = "Route length: {}\n".format(number_of_entries)
+            f_routing.write(text)
 
-        # End one entry:
-        f_routing.write("\n")
-        progress_bar.update()
+            # End one entry:
+            f_routing.write("\n")
+            progress_bar.update()
     f_routing.flush()
     f_routing.close()
     progress_bar.end()
 
 
 def partitioner_report(report_folder, hostname, graph, graph_mapper):
-    """ Generate report on the placement of sub-vertices onto cores.
+    """ Generate report on the placement of vertices onto cores.
     """
 
-    # Cycle through all vertices, and for each cycle through its sub-vertices.
-    # For each sub-vertex, describe its core mapping.
+    # Cycle through all vertices, and for each cycle through its vertices.
+    # For each vertex, describe its core mapping.
     file_name = os.path.join(report_folder, "partitioned_by_vertex.rpt")
     f_place_by_vertex = None
     try:
@@ -167,23 +169,23 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
                                "Generating partitioner report")
     for v in vertices:
         vertex_name = v.label
-        vertex_model = v.model_name
+        vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
         f_place_by_vertex.write(
             "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop size: {}\n".format(num_atoms))
-        f_place_by_vertex.write("Sub-vertices: \n")
+        f_place_by_vertex.write("Machine Vertices: \n")
 
-        partitioned_vertices = \
-            sorted(graph_mapper.get_subvertices_from_vertex(v),
+        machine_vertices = \
+            sorted(graph_mapper.get_machine_vertices(v),
                    key=lambda x: x.label)
-        partitioned_vertices = \
-            sorted(partitioned_vertices,
-                   key=lambda x: graph_mapper.get_subvertex_slice(x).lo_atom)
-        for sv in partitioned_vertices:
-            lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
-            hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
+        machine_vertices = \
+            sorted(machine_vertices,
+                   key=lambda x: graph_mapper.get_slice(x).lo_atom)
+        for sv in machine_vertices:
+            lo_atom = graph_mapper.get_slice(sv).lo_atom
+            hi_atom = graph_mapper.get_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
             my_string = "  Slice {}:{} ({} atoms) \n"\
                         .format(lo_atom, hi_atom, num_atoms)
@@ -197,20 +199,19 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
     progress_bar.end()
 
 
-def placement_report_with_partitionable_graph_by_vertex(
+def placement_report_with_application_graph_by_vertex(
         report_folder, hostname, graph, graph_mapper, placements):
-    """ Generate report on the placement of sub-vertices onto cores by vertex.
+    """ Generate report on the placement of vertices onto cores by vertex.
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
-    :param graph: the partitionable graph to which placements were built
-    :param graph_mapper: the mapping between partitionable and partitioned\
-            graphs
+    :param graph: the graph to which placements were built
+    :param graph_mapper: the mapping between graphs
     :param placements: the placements objects built by the placer.
     """
 
-    # Cycle through all vertices, and for each cycle through its sub-vertices.
-    # For each sub-vertex, describe its core mapping.
+    # Cycle through all vertices, and for each cycle through its vertices.
+    # For each vertex, describe its core mapping.
     file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
     f_place_by_vertex = None
     try:
@@ -229,33 +230,33 @@ def placement_report_with_partitionable_graph_by_vertex(
 
     used_processors_by_chip = dict()
     used_sdram_by_chip = dict()
-    subvertex_by_processor = dict()
+    vertex_by_processor = dict()
 
     vertices = sorted(graph.vertices, key=lambda x: x.label)
     progress_bar = ProgressBar(len(vertices),
                                "Generating placement report")
     for v in vertices:
         vertex_name = v.label
-        vertex_model = v.model_name
+        vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
         f_place_by_vertex.write(
             "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
         f_place_by_vertex.write("Pop size: {}\n".format(num_atoms))
-        f_place_by_vertex.write("Sub-vertices: \n")
+        f_place_by_vertex.write("Machine Vertices: \n")
 
-        partitioned_vertices = \
-            sorted(graph_mapper.get_subvertices_from_vertex(v),
+        machine_vertices = \
+            sorted(graph_mapper.get_machine_vertices(v),
                    key=lambda vert: vert.label)
-        partitioned_vertices = \
-            sorted(partitioned_vertices,
+        machine_vertices = \
+            sorted(machine_vertices,
                    key=lambda vert:
-                   graph_mapper.get_subvertex_slice(vert).lo_atom)
-        for sv in partitioned_vertices:
-            lo_atom = graph_mapper.get_subvertex_slice(sv).lo_atom
-            hi_atom = graph_mapper.get_subvertex_slice(sv).hi_atom
+                   graph_mapper.get_slice(vert).lo_atom)
+        for sv in machine_vertices:
+            lo_atom = graph_mapper.get_slice(sv).lo_atom
+            hi_atom = graph_mapper.get_slice(sv).hi_atom
             num_atoms = hi_atom - lo_atom + 1
-            cur_placement = placements.get_placement_of_subvertex(sv)
+            cur_placement = placements.get_placement_of_vertex(sv)
             x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
             key = "{},{}".format(x, y)
             if key in used_processors_by_chip:
@@ -263,7 +264,7 @@ def placement_report_with_partitionable_graph_by_vertex(
             else:
                 used_pros = list()
                 used_sdram_by_chip.update({key: 0})
-            subvertex_by_processor["{},{},{}".format(x, y, p)] = sv
+            vertex_by_processor["{},{},{}".format(x, y, p)] = sv
             new_pro = [p, cur_placement]
             used_pros.append(new_pro)
             used_processors_by_chip.update({key: used_pros})
@@ -278,17 +279,17 @@ def placement_report_with_partitionable_graph_by_vertex(
     progress_bar.end()
 
 
-def placement_report_without_partitionable_graph_by_vertex(
-        report_folder, hostname, placements, partitioned_graph):
-    """ Generate report on the placement of sub-vertices onto cores by vertex.
+def placement_report_without_application_graph_by_vertex(
+        report_folder, hostname, placements, machine_graph):
+    """ Generate report on the placement of vertices onto cores by vertex.
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
-    :param partitioned_graph: the partitioned graph generated by the end user
+    :param machine_graph: the machine graph generated by the end user
     """
 
-    # Cycle through all vertices, and for each cycle through its sub-vertices.
-    # For each sub-vertex, describe its core mapping.
+    # Cycle through all vertices, and for each cycle through its vertices.
+    # For each vertex, describe its core mapping.
     file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
     f_place_by_vertex = None
     try:
@@ -298,7 +299,7 @@ def placement_report_without_partitionable_graph_by_vertex(
                      " writing.".format(file_name))
 
     f_place_by_vertex.write(
-        "        Placement Information by AbstractConstrainedVertex\n")
+        "        Placement Information by Vertex\n")
     f_place_by_vertex.write("        ===============================\n\n")
     time_date_string = time.strftime("%c")
     f_place_by_vertex.write("Generated: {}".format(time_date_string))
@@ -307,19 +308,18 @@ def placement_report_without_partitionable_graph_by_vertex(
 
     used_processors_by_chip = dict()
     used_sdram_by_chip = dict()
-    subvertex_by_processor = dict()
+    vertex_by_processor = dict()
 
-    vertices = sorted(partitioned_graph.subvertices, key=lambda sub: sub.label)
-    progress_bar = ProgressBar(len(vertices),
-                               "Generating placement report")
+    vertices = sorted(machine_graph.vertices, key=lambda vertex: vertex.label)
+    progress_bar = ProgressBar(len(vertices), "Generating placement report")
     for v in vertices:
         vertex_name = v.label
-        vertex_model = v.model_name
+        vertex_model = v.__class__.__name__
         f_place_by_vertex.write(
-            "**** AbstractConstrainedVertex: '{}'\n".format(vertex_name))
+            "**** Vertex: '{}'\n".format(vertex_name))
         f_place_by_vertex.write("Model: {}\n".format(vertex_model))
 
-        cur_placement = placements.get_placement_of_subvertex(v)
+        cur_placement = placements.get_placement_of_vertex(v)
         x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
         key = "{},{}".format(x, y)
         if key in used_processors_by_chip:
@@ -327,7 +327,7 @@ def placement_report_without_partitionable_graph_by_vertex(
         else:
             used_pros = list()
             used_sdram_by_chip.update({key: 0})
-        subvertex_by_processor["{},{},{}".format(x, y, p)] = v
+        vertex_by_processor["{},{},{}".format(x, y, p)] = v
         new_pro = [p, cur_placement]
         used_pros.append(new_pro)
         used_processors_by_chip.update({key: used_pros})
@@ -341,13 +341,13 @@ def placement_report_without_partitionable_graph_by_vertex(
     progress_bar.end()
 
 
-def placement_report_with_partitionable_graph_by_core(
+def placement_report_with_application_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper):
-    """ Generate report on the placement of sub-vertices onto cores by core.
+    """ Generate report on the placement of vertices onto cores by core.
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
-    :param graph_mapper: the mapping between partitionable and partitioned\
+    :param graph_mapper: the mapping between application and machine\
             graphs
     :param machine: the spinnaker machine object
     :param placements: the placements objects built by the placer.
@@ -375,8 +375,8 @@ def placement_report_with_partitionable_graph_by_core(
     for chip in machine.chips:
         written_header = False
         for processor in chip.processors:
-            if placements.is_subvertex_on_processor(chip.x, chip.y,
-                                                    processor.processor_id):
+            if placements.is_processor_occupied(
+                    chip.x, chip.y, processor.processor_id):
                 if not written_header:
                     f_place_by_core.write("**** Chip: ({}, {})\n"
                                           .format(chip.x, chip.y))
@@ -384,17 +384,14 @@ def placement_report_with_partitionable_graph_by_core(
                                           .format(len(list(chip.processors))))
                     written_header = True
                 pro_id = processor.processor_id
-                subvertex = \
-                    placements.get_subvertex_on_processor(
-                        chip.x, chip.y, processor.processor_id)
-                vertex = \
-                    graph_mapper\
-                    .get_vertex_from_subvertex(subvertex)
-                vertex_label = vertex.label
-                vertex_model = vertex.model_name
-                vertex_atoms = vertex.n_atoms
-                lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
-                hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
+                vertex = placements.get_vertex_on_processor(
+                    chip.x, chip.y, processor.processor_id)
+                app_vertex = graph_mapper.get_application_vertex(vertex)
+                vertex_label = app_vertex.label
+                vertex_model = app_vertex.__class__.__name__
+                vertex_atoms = app_vertex.n_atoms
+                lo_atom = graph_mapper.get_slice(vertex).lo_atom
+                hi_atom = graph_mapper.get_slice(vertex).hi_atom
                 num_atoms = hi_atom - lo_atom + 1
                 p_str = "  Processor {}: Vertex: '{}', pop size: {}\n".format(
                     pro_id, vertex_label, vertex_atoms)
@@ -412,9 +409,9 @@ def placement_report_with_partitionable_graph_by_core(
     progress_bar.end()
 
 
-def placement_report_without_partitionable_graph_by_core(
+def placement_report_without_application_graph_by_core(
         report_folder, hostname, placements, machine):
-    """ Generate report on the placement of sub-vertices onto cores by core.
+    """ Generate report on the placement of vertices onto cores by core.
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
@@ -445,8 +442,8 @@ def placement_report_without_partitionable_graph_by_core(
     for chip in machine.chips:
         written_header = False
         for processor in chip.processors:
-            if placements.is_subvertex_on_processor(chip.x, chip.y,
-                                                    processor.processor_id):
+            if placements.is_processor_occupied(
+                    chip.x, chip.y, processor.processor_id):
                 if not written_header:
                     f_place_by_core.write("**** Chip: ({}, {})\n"
                                           .format(chip.x, chip.y))
@@ -454,14 +451,13 @@ def placement_report_without_partitionable_graph_by_core(
                                           .format(len(list(chip.processors))))
                     written_header = True
                 pro_id = processor.processor_id
-                subvertex = \
-                    placements.get_subvertex_on_processor(
-                        chip.x, chip.y, processor.processor_id)
+                vertex = placements.get_vertex_on_processor(
+                    chip.x, chip.y, processor.processor_id)
 
-                vertex_label = subvertex.label
-                vertex_model = subvertex.model_name
+                vertex_label = vertex.label
+                vertex_model = vertex.__class__.__name__
 
-                p_str = ("  Processor {}: AbstractConstrainedVertex: '{}' \n"
+                p_str = ("  Processor {}: Vertex: '{}' \n"
                          .format(pro_id, vertex_label))
                 f_place_by_core.write(p_str)
                 f_place_by_core.write(p_str)
@@ -501,15 +497,14 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
     f_mem_used_by_core.write("\n\n")
     used_sdram_by_chip = dict()
 
-    placements = sorted(placements.placements, key=lambda x: x.subvertex.label)
+    placements = sorted(placements.placements, key=lambda x: x.vertex.label)
 
     progress_bar = ProgressBar(len(placements) + len(list(machine.chips)),
                                "Generating SDRAM usage report")
-    for cur_placement in placements:
-        subvert = cur_placement.subvertex
-        requirements = subvert.resources_required
+    for placement in placements:
+        requirements = placement.vertex.resources_required
 
-        x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
+        x, y, p = placement.x, placement.y, placement.p
         f_mem_used_by_core.write(
             "SDRAM requirements for core ({},{},{}) is {} KB\n".format(
                 x, y, p, int(requirements.sdram.get_value() / 1024.0)))
@@ -541,12 +536,12 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
     progress_bar.end()
 
 
-def routing_info_report(report_folder, partitioned_graph, routing_infos):
+def routing_info_report(report_folder, machine_graph, routing_infos):
     """ Generates a report which says which keys is being allocated to each\
-        subvertex
+        vertex
 
     :param report_folder: the report folder to store this value
-    :param partitioned_graph:
+    :param machine_graph:
     :param routing_infos:
     """
     file_name = os.path.join(report_folder,
@@ -557,18 +552,16 @@ def routing_info_report(report_folder, partitioned_graph, routing_infos):
     except IOError:
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
-    progress_bar = ProgressBar(len(partitioned_graph.subvertices),
+    progress_bar = ProgressBar(len(machine_graph.vertices),
                                "Generating Routing info report")
-    for subvert in partitioned_graph.subvertices:
-        output.write("Subvert: {} \n".format(subvert))
-        partitions = \
-            partitioned_graph.outgoing_edges_partitions_from_vertex(subvert)
-        for partition in partitions.values():
-            keys_and_masks = \
-                routing_infos.get_keys_and_masks_from_partition(partition)
-            for subedge in partition.edges:
-                output.write("subedge:{}, keys_and_masks:{} \n".format(
-                    subedge, keys_and_masks))
+
+    for partition in machine_graph.outgoing_edge_partitions:
+        output.write("Vertex: {} \n".format(partition.pre_vertex))
+        rinfo = routing_infos.get_routing_info_from_partition(
+            partition)
+        for edge in partition.edges:
+            output.write("edge:{}, keys_and_masks:{} \n".format(
+                edge, rinfo.keys_and_masks))
         output.write("\n\n")
         progress_bar.update()
     progress_bar.end()
@@ -620,15 +613,15 @@ def router_report_from_compressed_router_tables(report_folder, routing_tables):
 
 
 def _generate_routing_table(routing_table, top_level_folder):
-    file_sub_name = "routing_table_{}_{}.rpt".format(
+    file_name = "routing_table_{}_{}.rpt".format(
         routing_table.x, routing_table.y)
-    file_name = os.path.join(top_level_folder, file_sub_name)
+    file_path = os.path.join(top_level_folder, file_name)
     output = None
     try:
-        output = open(file_name, "w")
+        output = open(file_path, "w")
     except IOError:
         logger.error("Generate_placement_reports: Can't open file"
-                     " {} for writing.".format(file_name))
+                     " {} for writing.".format(file_path))
 
     output.write("Router contains {} entries\n".format(
         routing_table.number_of_entries))
@@ -751,12 +744,12 @@ def _search_route(
         machine):
 
     # Create text for starting point
-    source_vertex = source_placement.subvertex
+    source_vertex = source_placement.vertex
     text = ""
-    if isinstance(source_vertex, VirtualSpinnakerLinkPartitionedVertex):
+    if isinstance(source_vertex, AbstractSpiNNakerLinkVertex):
         text += "Virtual SpiNNaker Link"
-    if isinstance(source_vertex, VirtualSataLinkPartitionedVertex):
-        text += "Virtual SATA Link"
+    if isinstance(source_vertex, AbstractFPGAVertex):
+        text += "Virtual FPGA Link"
     text += "{}:{}:{} -> ".format(
         source_placement.x, source_placement.y, source_placement.p)
 
@@ -833,7 +826,7 @@ def _add_direction(link):
 
 
 def _locate_routing_entry(current_router, key):
-    """ locate the entry from the router based off the subedge
+    """ locate the entry from the router based off the edge
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement

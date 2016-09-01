@@ -1,13 +1,13 @@
 """
 test constraint
 """
-from pacman.model.constraints.abstract_constraints\
+from pacman.model.constraints.partitioner_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
 class NewPartitionerConstraint(AbstractPartitionerConstraint):
     """
-    a partitioning constraint that shouldnt be recongised by any algorithum
+    a partitioning constraint that shouldn't be recognised by any algorithm
     """
 
     def __init__(self, label):
