@@ -336,7 +336,10 @@ def scan_packages(packages, recursive=True):
             # Import the package
             package = package_name
             if isinstance(package_name, str):
-                package = importlib.import_module(package_name, "")
+                try:
+                    package = importlib.import_module(package_name, "")
+                except Exception as e:
+                        continue
             pkg_path = os.path.dirname(package.__file__)
 
             # Go through the modules and import them
@@ -345,9 +348,11 @@ def scan_packages(packages, recursive=True):
                 # If recursive and this is a package, recurse
                 if is_pkg and recursive:
                     scan_packages([package.__name__ + "." + name], recursive)
-
                 else:
-                    importlib.import_module("." + name, package.__name__)
+                    try:
+                        importlib.import_module("." + name, package.__name__)
+                    except Exception as e:
+                        continue
 
         new_algorithms = _algorithms
         _algorithms = current_algorithms
