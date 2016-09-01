@@ -20,6 +20,7 @@ class ApplicationSpiNNakerLinkVertex(
     """
 
     __slots__ = (
+        "_n_atoms",
         "_spinnaker_link_id",
         "_board_address",
         "_virtual_chip_x",
@@ -27,11 +28,12 @@ class ApplicationSpiNNakerLinkVertex(
     )
 
     def __init__(
-            self, spinnaker_link_id, board_address=None, label=None,
+            self, n_atoms, spinnaker_link_id, board_address=None, label=None,
             constraints=None, max_atoms_per_core=sys.maxint):
         ApplicationVertex.__init__(
             self, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
+        self._n_atoms = n_atoms
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
         self._virtual_chip_x = None
@@ -61,6 +63,11 @@ class ApplicationSpiNNakerLinkVertex(
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y
+
+    @property
+    @overrides(ApplicationVertex.n_atoms)
+    def n_atoms(self):
+        return self._n_atoms
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):

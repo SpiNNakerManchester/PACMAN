@@ -22,16 +22,18 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
         "_fpga_link_id",
         "_board_address",
         "_virtual_chip_x",
-        "_virtual_chip_y"
+        "_virtual_chip_y",
+        "_n_atoms"
     )
 
     def __init__(
-            self, fpga_id, fpga_link_id, board_address=None, label=None,
-            constraints=None, max_atoms_per_core=sys.maxint):
+            self, n_atoms, fpga_id, fpga_link_id, board_address=None,
+            label=None, constraints=None, max_atoms_per_core=sys.maxint):
         ApplicationVertex.__init__(
             self, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
 
+        self._n_atoms = n_atoms
         self._fpga_id = fpga_id
         self._fpga_link_id = fpga_link_id
         self._board_address = board_address
@@ -67,6 +69,11 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y
+
+    @property
+    @overrides(ApplicationVertex.n_atoms)
+    def n_atoms(self):
+        return self._n_atoms
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
