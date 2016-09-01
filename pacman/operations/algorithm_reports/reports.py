@@ -1,15 +1,13 @@
-# pacman imports
-from pacman import exceptions
-from pacman.model.graphs.machine.impl.machine_virtual_vertex \
-    import MachineVirtualVertex
-
-# spinn machine imports
-from spinn_machine.utilities.progress_bar import ProgressBar
-
-# general imports
 import logging
 import os
 import time
+
+from pacman import exceptions
+from pacman.model.graphs.abstract_spinnaker_link_vertex \
+    import AbstractSpiNNakerLinkVertex
+from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 
@@ -748,8 +746,10 @@ def _search_route(
     # Create text for starting point
     source_vertex = source_placement.vertex
     text = ""
-    if isinstance(source_vertex, MachineVirtualVertex):
-        text += "Virtual "
+    if isinstance(source_vertex, AbstractSpiNNakerLinkVertex):
+        text += "Virtual SpiNNaker Link"
+    if isinstance(source_vertex, AbstractFPGAVertex):
+        text += "Virtual FPGA Link"
     text += "{}:{}:{} -> ".format(
         source_placement.x, source_placement.y, source_placement.p)
 

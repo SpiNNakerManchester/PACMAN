@@ -13,8 +13,10 @@ from pacman.model.constraints.placer_constraints\
 from pacman.model.constraints.placer_constraints\
     .placer_radial_placement_from_chip_constraint \
     import PlacerRadialPlacementFromChipConstraint
-from pacman.model.graphs.machine.impl.machine_virtual_vertex \
-    import MachineVirtualVertex
+from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs.abstract_spinnaker_link_vertex \
+    import AbstractSpiNNakerLinkVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_table_by_partition\
@@ -110,7 +112,7 @@ def convert_to_rig_graph(machine_graph):
     for vertex in machine_graph.vertices:
 
         # handle external devices
-        if isinstance(vertex, MachineVirtualVertex):
+        if isinstance(vertex, AbstractVirtualVertex):
             vertex_resources = dict()
             vertices_resources[vertex] = vertex_resources
             vertex_resources["cores"] = 0
@@ -161,16 +163,21 @@ def create_rig_graph_constraints(machine_graph, machine):
                 constraints.append(LocationConstraint(
                     vertex, (constraint.x, constraint.y)))
 
-        if isinstance(vertex, MachineVirtualVertex):
-            spinnaker_link = \
-                machine.get_spinnaker_link_with_id(vertex.spinnaker_link_id)
+        if isinstance(vertex, AbstractVirtualVertex):
+            link_data = None
+            if isinstance(vertex, AbstractFPGAVertex):
+                link_data = machine.get_fpga_link_with_id(
+                    vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+            elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+                link_data = machine.get_spinnaker_link_with_id(
+                    vertex.spinnaker_link_id, vertex.board_address)
             constraints.append(LocationConstraint(
-                vertex, (spinnaker_link.connected_chip_x,
-                         spinnaker_link.connected_chip_y)))
+                vertex,
+                (link_data.connected_chip_x, link_data.connected_chip_y)))
             constraints.append(RouteEndpointConstraint(
                 vertex,
                 LINK_LOOKUP[constants.EDGES(
-                    spinnaker_link.connected_link).name.lower()]))
+                    link_data.connected_link).name.lower()]))
     return constraints
 
 
@@ -189,19 +196,25 @@ def create_rig_machine_constraints(machine):
 def convert_to_rig_placements(placements, machine):
     rig_placements = dict()
     for placement in placements:
-        if not isinstance(placement.vertex, MachineVirtualVertex):
+        if not isinstance(placement.vertex, AbstractVirtualVertex):
             rig_placements[placement.vertex] = (placement.x, placement.y)
         else:
-            spinnaker_link = machine.get_spinnaker_link_with_id(
-                placement.vertex.spinnaker_link_id)
-            rig_placements[placement.vertex] = \
-                (spinnaker_link.connected_chip_x,
-                 spinnaker_link.connected_chip_y)
+            link_data = None
+            vertex = placement.vertex
+            if isinstance(vertex, AbstractFPGAVertex):
+                link_data = machine.get_fpga_link_with_id(
+                    vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+            elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+                link_data = machine.get_spinnaker_link_with_id(
+                    vertex.spinnaker_link_id, vertex.board_address)
+            rig_placements[placement.vertex] = (
+                link_data.connected_chip_x, link_data.connected_chip_y
+            )
 
     core_allocations = {
         p.vertex: {"cores": slice(p.p, p.p + 1)}
         for p in placements.placements
-        if not isinstance(p.vertex, MachineVirtualVertex)}
+        if not isinstance(p.vertex, AbstractVirtualVertex)}
 
     return rig_placements, core_allocations
 
@@ -210,7 +223,7 @@ def convert_from_rig_placements(
         rig_placements, rig_allocations, machine_graph):
     placements = Placements()
     for vertex in rig_placements:
-        if isinstance(vertex, MachineVirtualVertex):
+        if isinstance(vertex, AbstractVirtualVertex):
             placements.add_placement(Placement(
                 vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
                 None))

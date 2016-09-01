@@ -1,6 +1,4 @@
-
-from pacman.model.graphs.application.impl.application_virtual_vertex \
-    import AbstractVirtualApplicationVertex
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.model.constraints.placer_constraints.\
     placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints.abstract_placer_constraint\
@@ -78,7 +76,7 @@ class CreateConstraintsToFile(object):
             self._handle_vertex_resources(
                 vertex.resources_required, json_constraints_dictionary_rep,
                 vertex_id)
-            if isinstance(vertex, AbstractVirtualApplicationVertex):
+            if isinstance(vertex, AbstractVirtualVertex):
                 self._handle_virtual_vertex(
                     vertex, vertex_id, json_constraints_dictionary_rep,
                     machine)
@@ -134,7 +132,7 @@ class CreateConstraintsToFile(object):
     @staticmethod
     def _handle_vertex_constraint(
             constraint, json_constraints_dictionary_rep, vertex, vertex_id):
-        if not isinstance(vertex, AbstractVirtualApplicationVertex):
+        if not isinstance(vertex, AbstractVirtualVertex):
             if isinstance(constraint, AbstractPlacerConstraint):
                 if isinstance(constraint, PlacerChipAndCoreConstraint):
                     chip_loc_constraint = dict()

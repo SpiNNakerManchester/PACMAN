@@ -5,9 +5,9 @@ from collections import defaultdict
 
 import jsonschema
 
-from pacman.model.graphs.machine.abstract_machine_virutal_vertex\
-    import AbstractMachineVirtualVertex
 from pacman.utilities import file_format_schemas
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX = 1
@@ -47,7 +47,7 @@ class ConvertToFileMachineGraph(object):
             vertex_by_id[str(vertex_id)] = vertex
 
             # handle external devices
-            if isinstance(vertex, AbstractMachineVirtualVertex):
+            if isinstance(vertex, AbstractVirtualVertex):
                 vertex_resources = dict()
                 vertices_resources[vertex_id] = vertex_resources
                 vertex_resources["cores"] = 0

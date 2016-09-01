@@ -1,7 +1,9 @@
 # pacman imports
 from pacman import exceptions
-from pacman.model.graphs.machine.impl.machine_virtual_vertex \
-    import MachineVirtualVertex
+from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
+from pacman.model.graphs.abstract_spinnaker_link_vertex\
+    import AbstractSpiNNakerLinkVertex
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
@@ -52,40 +54,52 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
             # allocate ids for virtual chips
             for vertex in graph.vertices:
-                if isinstance(vertex, MachineVirtualVertex):
-                    link = vertex.spinnaker_link_id
-                    virtual_x, virtual_y, real_x, real_y, real_link = \
-                        self._assign_virtual_chip_info(machine, link)
-                    vertex.set_virtual_chip_coordinates(
-                        virtual_x, virtual_y, real_x, real_y, real_link)
+                if isinstance(vertex, AbstractVirtualVertex):
+                    link_data = None
+                    if isinstance(vertex, AbstractFPGAVertex):
+                        link_data = machine.get_fpga_link_with_id(
+                            vertex.fpga_id, vertex.fpga_link_id,
+                            vertex.board_address)
+                        if link_data is None:
+                            raise exceptions.PacmanConfigurationException(
+                                "No FPGA Link {} on FPGA {} found on board "
+                                "{}.  This would be true if another chip was "
+                                "found connected at this point".format(
+                                    vertex.fpga_link_id, vertex.fpga_id,
+                                    vertex.board_address))
+                    elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+                        link_data = machine.get_spinnaker_link_with_id(
+                            vertex.spinnaker_link_id, vertex.board_address)
+                        if link_data is None:
+                            raise exceptions.PacmanConfigurationException(
+                                "No SpiNNaker Link {} found on board "
+                                "{}.  This would be true if another chip was "
+                                "found connected at this point".format(
+                                    vertex.spinnaker_link_id,
+                                    vertex.board_address))
+                    else:
+                        raise exceptions.PacmanConfigurationException(
+                            "Unknown virtual vertex type {}".format(
+                                vertex.__class__))
+                    virtual_x, virtual_y = self._assign_virtual_chip_info(
+                        machine, link_data)
+                    vertex.set_virtual_chip_coordinates(virtual_x, virtual_y)
                 progress_bar.update()
             progress_bar.end()
 
         return machine
 
-    def _assign_virtual_chip_info(self, machine, link):
-        if link not in self._virtual_chips:
-            try:
-                chip_id_x, chip_id_y = self._allocate_id()
-                link_data = machine_algorithm_utilities.create_virtual_chip(
-                    machine, link, chip_id_x, chip_id_y)
-                self._virtual_chips[link] = (chip_id_x, chip_id_y, link_data)
+    def _assign_virtual_chip_info(self, machine, link_data):
+        if link_data not in self._virtual_chips:
+            chip_id_x, chip_id_y = self._allocate_id()
+            machine_algorithm_utilities.create_virtual_chip(
+                machine, link_data, chip_id_x, chip_id_y)
+            self._virtual_chips[link_data] = (chip_id_x, chip_id_y)
 
-                return (
-                    chip_id_x, chip_id_y, link_data.connected_chip_x,
-                    link_data.connected_chip_y, link_data.connected_link
-                )
-            except KeyError:
-                raise exceptions.PacmanElementAllocationException(
-                    "The machine in use does not have a spinnaker link"
-                    " {}.  Please ensure that you are using a single physical"
-                    " board.".format(link))
+            return chip_id_x, chip_id_y
 
-        chip_id_x, chip_id_y, link_data = self._virtual_chips[link]
-        return (
-            chip_id_x, chip_id_y, link_data.connected_chip_x,
-            link_data.connected_chip_y, link_data.connected_link
-        )
+        chip_id_x, chip_id_y = self._virtual_chips[link_data]
+        return chip_id_x, chip_id_y
 
     def _allocate_id(self):
         """ Allocate a chip id from the free space
