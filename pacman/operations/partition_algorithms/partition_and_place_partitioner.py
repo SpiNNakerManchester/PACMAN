@@ -86,8 +86,7 @@ class PartitionAndPlacePartitioner(object):
             if machine_vertices is None:
                 self._partition_vertex(
                     vertex, machine_graph, graph_mapper, resource_tracker,
-                    graph)
-            progress_bar.update(vertex.n_atoms)
+                    graph, progress_bar)
         progress_bar.end()
 
         partition_algorithm_utilities.generate_machine_edges(
@@ -97,7 +96,7 @@ class PartitionAndPlacePartitioner(object):
 
     def _partition_vertex(
             self, vertex, machine_graph, graph_mapper, resource_tracker,
-            graph):
+            graph, progress_bar):
         """ Partition a single vertex
 
         :param vertex: the vertex to partition
@@ -141,11 +140,11 @@ class PartitionAndPlacePartitioner(object):
         # partition by atoms
         self._partition_by_atoms(
             partition_together_vertices, vertex.n_atoms, max_atoms_per_core,
-            machine_graph, graph, graph_mapper, resource_tracker)
+            machine_graph, graph, graph_mapper, resource_tracker, progress_bar)
 
     def _partition_by_atoms(
             self, vertices, n_atoms, max_atoms_per_core, machine_graph, graph,
-            graph_mapper, resource_tracker):
+            graph_mapper, resource_tracker, progress_bar):
         """ Try to partition vertices on how many atoms it can fit on\
             each vertex
 
@@ -205,6 +204,8 @@ class PartitionAndPlacePartitioner(object):
                 machine_graph.add_vertex(machine_vertex)
                 graph_mapper.add_vertex_mapping(
                     machine_vertex, vertex_slice, vertex)
+
+            progress_bar.update(((hi_atom - lo_atom) + 1) * len(vertices))
 
     @staticmethod
     def _reallocate_resources(
