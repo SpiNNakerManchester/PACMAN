@@ -1,4 +1,4 @@
-from enum.enum import Enum
+from enum import Enum
 
 
 class EdgeTrafficType(Enum):
