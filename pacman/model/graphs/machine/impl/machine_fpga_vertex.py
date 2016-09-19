@@ -24,16 +24,19 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
             self, fpga_id, fpga_link_id, board_address=None, label=None,
             constraints=None):
         MachineVertex.__init__(
-            self, ResourceContainer(
-                dtcm=DTCMResource(0), sdram=SDRAMResource(0),
-                cpu_cycles=CPUCyclesPerTickResource(0)),
-            label=label, constraints=constraints)
+            self, label=label, constraints=constraints)
 
         self._fpga_id = fpga_id
         self._fpga_link_id = fpga_link_id
         self._board_address = board_address
         self._virtual_chip_x = None
         self._virtual_chip_y = None
+
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        return ResourceContainer(
+                dtcm=DTCMResource(0), sdram=SDRAMResource(0),
+                cpu_cycles=CPUCyclesPerTickResource(0))
 
     @property
     @overrides(AbstractFPGAVertex.fpga_id)
