@@ -28,6 +28,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
                 dtcm=DTCMResource(0), sdram=SDRAMResource(0),
                 cpu_cycles=CPUCyclesPerTickResource(0)),
             label=label, constraints=constraints)
+        AbstractSpiNNakerLinkVertex.__init__(self)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
         self._virtual_chip_x = None
