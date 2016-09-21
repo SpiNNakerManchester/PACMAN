@@ -31,15 +31,16 @@ class OneToOnePlacer(RadialPlacer):
 
         placements = Placements()
 
-        self._do_allocation(sorted_vertices, placements, machine)
+        progress_bar = ProgressBar(
+            len(machine_graph.vertices), "Placing graph vertices")
+
+        self._do_allocation(sorted_vertices, placements, machine, progress_bar)
 
         return placements
 
-    def _do_allocation(self, vertices, placements, machine):
+    def _do_allocation(self, vertices, placements, machine, progress_bar):
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(
-            len(vertices), "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
 
@@ -74,7 +75,6 @@ class OneToOnePlacer(RadialPlacer):
                 except exceptions.PacmanValueError or \
                         exceptions.PacmanException or \
                         exceptions.PacmanInvalidParameterException:
-                    traceback.print_exc()
 
                     # If something goes wrong, try to allocate each
                     # individually
