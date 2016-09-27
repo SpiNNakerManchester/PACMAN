@@ -104,12 +104,12 @@ def inject_items(types):
                     "No injectable objects have been provided")
             new_args = dict(kwargs)
             for arg, arg_type in types.iteritems():
-                value = _injectables.get(arg_type, None)
-                if value is None:
+                if arg_type not in _injectables:
                     raise InjectionException(
                         "Cannot find object of type {} to inject into"
                         " method {} of {}".format(
                             arg_type, wrapped_method.__name__, obj.__class__))
+                value = _injectables.get(arg_type, None)
                 if arg in new_args:
                     raise InjectionException(
                         "Argument {} was already provided to"
