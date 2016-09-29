@@ -79,7 +79,7 @@ class RadialPlacer(object):
 
         # Create and store a new placement
         (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-            vertex.resources_required, vertex, None, chips)
+            vertex.resources_required, vertex.constraints, chips)
         placement = Placement(vertex, x, y, p)
         placements.add_placement(placement)
 
