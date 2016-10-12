@@ -142,10 +142,11 @@ class OneToOnePlacer(RadialPlacer):
                     vertex, machine_graph)
                 new_list = {
                     v for v in connected_vertices if v not in found_list}
+
                 same_chip_vertices = {
                     v for vert in new_list
-                    for group in same_chip_vertex_groups.get(vert)
-                    for v in group if v not in new_list}
+                    for v in same_chip_vertex_groups[vert]
+                    if v not in new_list}
                 new_list.update(same_chip_vertices)
 
                 sorted_vertices.append(new_list)

@@ -67,7 +67,7 @@ def get_same_chip_vertex_groups(vertices):
 
                     # The other vertex has been seen elsewhere, so add this
                     # vertex to the existing group
-                    group = same_chip_vertices[same_chip_vertices]
+                    group = same_chip_vertices[same_as_vertex]
                     group.append(vertex)
                     same_chip_vertices[vertex] = group
 
@@ -81,5 +81,7 @@ def get_same_chip_vertex_groups(vertices):
                         group_1.extend(group_2)
                         for vert in group_2:
                             same_chip_vertices[vert] = group_1
+        else:
+            same_chip_vertices[vertex] = [vertex]
 
-        return same_chip_vertices
+    return same_chip_vertices
