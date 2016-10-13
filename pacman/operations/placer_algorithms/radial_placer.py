@@ -3,6 +3,9 @@
 from pacman.model.constraints.placer_constraints.\
     placer_radial_placement_from_chip_constraint \
     import PlacerRadialPlacementFromChipConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_same_chip_as_constraint\
+    import PlacerSameChipAsConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
@@ -55,7 +58,9 @@ class RadialPlacer(object):
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
-        placement_constraints = {PlacerRadialPlacementFromChipConstraint}
+        placement_constraints = {
+            PlacerRadialPlacementFromChipConstraint, PlacerSameChipAsConstraint
+        }
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
         ResourceTracker.check_constraints(

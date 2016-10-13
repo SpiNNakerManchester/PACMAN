@@ -51,16 +51,26 @@ def get_same_chip_vertex_groups(vertices):
                         vertex not in same_chip_vertices):
 
                     # Neither vertex has been seen, so add both to a new group
-                    group = [vertex, same_as_vertex]
+                    group = {vertex, same_as_vertex}
                     same_chip_vertices[vertex] = group
                     same_chip_vertices[same_as_vertex] = group
+                elif (same_as_vertex in same_chip_vertices and
+                        vertex in same_chip_vertices):
+
+                    # Both vertices have been seen elsewhere, so merge
+                    # their groups
+                    group_1 = same_chip_vertices[vertex]
+                    group_2 = same_chip_vertices[same_as_vertex]
+                    group_1.update(group_2)
+                    for vert in group_1:
+                        same_chip_vertices[vert] = group_1
 
                 elif vertex in same_chip_vertices:
 
                     # The current vertex has been seen elsewhere, so add the
                     # new vertex to the existing group
                     group = same_chip_vertices[vertex]
-                    group.append(same_as_vertex)
+                    group.add(same_as_vertex)
                     same_chip_vertices[same_as_vertex] = group
 
                 elif same_as_vertex in same_chip_vertices:
@@ -68,20 +78,11 @@ def get_same_chip_vertex_groups(vertices):
                     # The other vertex has been seen elsewhere, so add this
                     # vertex to the existing group
                     group = same_chip_vertices[same_as_vertex]
-                    group.append(vertex)
+                    group.add(vertex)
                     same_chip_vertices[vertex] = group
 
-                else:
 
-                    # Both vertices have been seen elsewhere, so merge
-                    # their groups
-                    group_1 = same_chip_vertices[vertex]
-                    group_2 = same_chip_vertices[same_as_vertex]
-                    if group_1 != group_2:
-                        group_1.extend(group_2)
-                        for vert in group_2:
-                            same_chip_vertices[vert] = group_1
         else:
-            same_chip_vertices[vertex] = [vertex]
+            same_chip_vertices[vertex] = {vertex}
 
     return same_chip_vertices
