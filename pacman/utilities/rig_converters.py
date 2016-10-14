@@ -15,6 +15,8 @@ from pacman.model.constraints.placer_constraints\
     import PlacerRadialPlacementFromChipConstraint
 from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from rig.place_and_route.constraints import SameChipConstraint
+from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.graphs.abstract_spinnaker_link_vertex \
     import AbstractSpiNNakerLinkVertex
 from pacman.model.placements.placement import Placement
@@ -156,13 +158,6 @@ def create_rig_graph_constraints(machine_graph, machine):
 
     constraints = []
     for vertex in machine_graph.vertices:
-        for constraint in vertex.constraints:
-            if isinstance(constraint, (
-                    PlacerChipAndCoreConstraint,
-                    PlacerRadialPlacementFromChipConstraint)):
-                constraints.append(LocationConstraint(
-                    vertex, (constraint.x, constraint.y)))
-
         if isinstance(vertex, AbstractVirtualVertex):
             link_data = None
             if isinstance(vertex, AbstractFPGAVertex):
@@ -178,6 +173,20 @@ def create_rig_graph_constraints(machine_graph, machine):
                 vertex,
                 LINK_LOOKUP[constants.EDGES(
                     link_data.connected_link).name.lower()]))
+        else:
+            for constraint in vertex.constraints:
+                if isinstance(constraint, (
+                        PlacerChipAndCoreConstraint,
+                        PlacerRadialPlacementFromChipConstraint)):
+                    constraints.append(LocationConstraint(
+                        vertex, (constraint.x, constraint.y)))
+
+    vertices_on_same_chip = \
+        placer_algorithm_utilities.get_same_chip_vertex_groups(
+            machine_graph.vertices)
+    for group in vertices_on_same_chip.values():
+        if len(group) > 1:
+            constraints.append(SameChipConstraint(group))
     return constraints
 
 

@@ -81,7 +81,6 @@ def get_same_chip_vertex_groups(vertices):
                     group.add(vertex)
                     same_chip_vertices[vertex] = group
 
-
         else:
             same_chip_vertices[vertex] = {vertex}
 

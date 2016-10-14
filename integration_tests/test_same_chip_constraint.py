@@ -4,6 +4,7 @@ from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints\
     .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+from pacman.operations.rig_algorithms.rig_place import RigPlace
 from pacman.operations.placer_algorithms.one_to_one_placer \
     import OneToOnePlacer
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
@@ -61,3 +62,6 @@ class TestSameChipConstraint(unittest.TestCase):
 
     def test_radial(self):
         self._do_test(RadialPlacer())
+
+    def test_rig(self):
+        self._do_test(RigPlace())
