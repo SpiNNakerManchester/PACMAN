@@ -35,49 +35,52 @@ def get_same_chip_vertex_groups(vertices):
 
     for vertex in vertices:
 
-        # Find all vertices that this vertex should be on the same chip as
-        same_as_vertices = list()
+        # Find all vertices that have a same chip constraint associated with
+        #  this vertex
+        same_chip_as_vertices = list()
         for constraint in vertex.constraints:
             if isinstance(constraint, PlacerSameChipAsConstraint):
-                same_as_vertices.append(constraint.vertex)
+                same_chip_as_vertices.append(constraint.vertex)
 
-        if len(same_as_vertices) > 0:
+        if len(same_chip_as_vertices) > 0:
 
-            # Go through vertices that this vertex should be on the same
-            # chip as
-            for same_as_vertex in same_as_vertices:
-
-                if (same_as_vertex not in same_chip_vertices and
+            # Go through all the verts that want to be on the same chip as
+            # the top level vert
+            for same_as_chip_vertex in same_chip_as_vertices:
+                
+                # Neither vertex has been seen
+                if (same_as_chip_vertex not in same_chip_vertices and
                         vertex not in same_chip_vertices):
-
-                    # Neither vertex has been seen, so add both to a new group
-                    group = {vertex, same_as_vertex}
+                
+                    # add both to a new group
+                    group = {vertex, same_as_chip_vertex}
                     same_chip_vertices[vertex] = group
-                    same_chip_vertices[same_as_vertex] = group
-                elif (same_as_vertex in same_chip_vertices and
+                    same_chip_vertices[same_as_chip_vertex] = group
+                    
+                # Both vertices have been seen elsewhere
+                elif (same_as_chip_vertex in same_chip_vertices and
                         vertex in same_chip_vertices):
 
-                    # Both vertices have been seen elsewhere, so merge
-                    # their groups
+                    # merge their groups
                     group_1 = same_chip_vertices[vertex]
-                    group_2 = same_chip_vertices[same_as_vertex]
+                    group_2 = same_chip_vertices[same_as_chip_vertex]
                     group_1.update(group_2)
                     for vert in group_1:
                         same_chip_vertices[vert] = group_1
 
+                # The current vertex has been seen elsewhere
                 elif vertex in same_chip_vertices:
 
-                    # The current vertex has been seen elsewhere, so add the
-                    # new vertex to the existing group
+                    # add the new vertex to the existing group
                     group = same_chip_vertices[vertex]
-                    group.add(same_as_vertex)
-                    same_chip_vertices[same_as_vertex] = group
+                    group.add(same_as_chip_vertex)
+                    same_chip_vertices[same_as_chip_vertex] = group
 
-                elif same_as_vertex in same_chip_vertices:
+                # The other vertex has been seen elsewhere
+                elif same_as_chip_vertex in same_chip_vertices:
 
-                    # The other vertex has been seen elsewhere, so add this
-                    # vertex to the existing group
-                    group = same_chip_vertices[same_as_vertex]
+                    #  so add this vertex to the existing group
+                    group = same_chip_vertices[same_as_chip_vertex]
                     group.add(vertex)
                     same_chip_vertices[vertex] = group
 
