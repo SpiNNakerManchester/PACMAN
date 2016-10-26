@@ -138,15 +138,30 @@ class OneToOnePlacer(RadialPlacer):
 
         for vertex in vertices:
             if vertex not in found_list:
+
+                # verts that are one to one connected with vertex and are not
+                # forced off chip
                 connected_vertices = self._find_one_to_one_vertices(
                     vertex, machine_graph)
-                new_list = {
-                    v for v in connected_vertices if v not in found_list}
 
-                same_chip_vertices = {
-                    v for vert in new_list
-                    for v in same_chip_vertex_groups[vert]
-                    if v not in new_list}
+                # create list for each vertex thats connected havent already
+                #  been seen before
+                new_list = set()
+                for found_vertex in connected_vertices:
+                    if found_vertex not in found_list:
+                        new_list.add(found_vertex)
+
+                # looks for verts that have same chip constraints but not found
+                # by the one to one connection search.
+                same_chip_vertices = list()
+                for found_vertex in new_list:
+                    for same_chip_constrained_vertex in \
+                            same_chip_vertex_groups[found_vertex]:
+                        if same_chip_constrained_vertex not in new_list:
+                            same_chip_vertices.append(
+                                same_chip_constrained_vertex)
+
+                # add these newly found verts to the list
                 new_list.update(same_chip_vertices)
 
                 sorted_vertices.append(new_list)
