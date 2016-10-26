@@ -677,7 +677,7 @@ class ResourceTracker(object):
         else:
             self._sdram_tracker[key] += resources.sdram.get_value()
 
-    def _allocate_core(self, chip, key, processor_id, resources):
+    def _allocate_core(self, chip, key, processor_id):
         """ Allocates a core on the given chip
 
         :param chip: The chip to allocate the resources of
@@ -992,8 +992,7 @@ class ResourceTracker(object):
                     for resources, proc_id, ip_tags, reverse_ip_tags in zip(
                             group_resources, processor_ids, group_ip_tags,
                             group_reverse_ip_tags):
-                        processor_id = self._allocate_core(
-                            chip, key, proc_id, resources)
+                        processor_id = self._allocate_core(chip, key, proc_id)
                         self._allocate_sdram(chip, key, resources)
                         ip_tags_allocated = self._allocate_ip_tags(
                             board_address, ip_tags)
@@ -1056,8 +1055,7 @@ class ResourceTracker(object):
                                                 ip_tags) and
                     self._are_reverse_ip_tags_available(chip, board_address,
                                                         reverse_ip_tags)):
-                processor_id = self._allocate_core(
-                    chip, key, processor_id, resources)
+                processor_id = self._allocate_core(chip, key, processor_id)
                 self._allocate_sdram(chip, key, resources)
                 ip_tags_allocated = self._allocate_ip_tags(
                     board_address, ip_tags)
