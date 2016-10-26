@@ -39,15 +39,15 @@ class BasicTagAllocator(object):
         tags = Tags()
         for placement in placements_with_tags:
             vertex = placement.vertex
+            resources = vertex.resources_required
 
             # Get the constraint details for the tags
             (board_address, ip_tags, reverse_ip_tags) = \
-                ResourceTracker.get_ip_tag_info(vertex, None)
+                ResourceTracker.get_ip_tag_info(resources, vertex.constraints)
 
             # Allocate the tags, first-come, first-served, using the
             # fixed placement of the vertex, and the required resources
             chips = [(placement.x, placement.y)]
-            resources = vertex.resources_required
             (_, _, _, returned_ip_tags, returned_reverse_ip_tags) = \
                 resource_tracker.allocate_resources(
                     resources, chips, placement.p, board_address, ip_tags,

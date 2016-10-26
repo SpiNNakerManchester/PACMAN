@@ -7,8 +7,9 @@ from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 from spinn_machine.utilities.progress_bar import ProgressBar
-import traceback
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.model.constraints.placer_constraints\
+    .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -24,24 +25,32 @@ class OneToOnePlacer(RadialPlacer):
     def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
-        self._check_constraints(machine_graph.vertices)
+        self._check_constraints(
+            machine_graph.vertices,
+            additional_placement_constraints={PlacerSameChipAsConstraint})
 
+        # Get which vertices must be placed on the same chip as another vertex
+        same_chip_vertex_groups = placer_algorithm_utilities\
+            .get_same_chip_vertex_groups(machine_graph.vertices)
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
-            machine_graph)
+            machine_graph, same_chip_vertex_groups)
 
-        placements = Placements()
-
-        self._do_allocation(sorted_vertices, placements, machine)
+        placements = self._do_allocation(
+            sorted_vertices, machine, same_chip_vertex_groups)
 
         return placements
 
-    def _do_allocation(self, vertices, placements, machine):
+    def _do_allocation(
+            self, vertices, machine, same_chip_vertex_groups):
+
+        placements = Placements()
 
         # Iterate over vertices and generate placements
         progress_bar = ProgressBar(
             len(vertices), "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
+        all_vertices_placed = set()
 
         # iterate over vertices
         for vertex_list in vertices:
@@ -50,20 +59,23 @@ class OneToOnePlacer(RadialPlacer):
             # (for one to one placement)
             max_cores_on_chip = \
                 resource_tracker.most_avilable_cores_on_a_chip()
-            if max_cores_on_chip % 2 != 0:
-                max_cores_on_chip -= 1
 
             # if too many one to ones to fit on a chip, allocate individually
             if len(vertex_list) > max_cores_on_chip:
                 for vertex in vertex_list:
                     self._allocate_individual(
-                        vertex, placements, progress_bar, resource_tracker)
+                        vertex, placements, resource_tracker,
+                        same_chip_vertex_groups, all_vertices_placed)
+                    progress_bar.update()
             else:
 
                 try:
+                    resource_and_constraint_list = [
+                        (vertex.resources_required, vertex.constraints)
+                        for vertex in vertex_list]
                     allocations = \
                         resource_tracker.allocate_constrained_group_resources(
-                            vertex_list)
+                            resource_and_constraint_list)
 
                     # allocate cores to vertices
                     for vertex, (x, y, p, _, _) in zip(
@@ -74,30 +86,44 @@ class OneToOnePlacer(RadialPlacer):
                 except exceptions.PacmanValueError or \
                         exceptions.PacmanException or \
                         exceptions.PacmanInvalidParameterException:
-                    traceback.print_exc()
 
                     # If something goes wrong, try to allocate each
                     # individually
                     for vertex in vertex_list:
                         self._allocate_individual(
-                            vertex, placements, progress_bar,
-                            resource_tracker)
+                            vertex, placements, resource_tracker,
+                            same_chip_vertex_groups, all_vertices_placed)
+                        progress_bar.update()
         progress_bar.end()
+        return placements
 
     @staticmethod
     def _allocate_individual(
-            vertex, placements, progress_bar, resource_tracker):
+            vertex, placements, resource_tracker, same_chip_vertex_groups,
+            all_vertices_placed):
+        if vertex not in all_vertices_placed:
+            vertices = same_chip_vertex_groups[vertex]
 
-        # Create and store a new placement anywhere on the board
-        (x, y, p, _, _) = resource_tracker.\
-            allocate_constrained_resources(
-                vertex.resources_required, vertex, None)
-        placement = Placement(vertex, x, y, p)
-        placements.add_placement(placement)
-        progress_bar.update()
+            if len(vertices) > 1:
+                resources = \
+                    resource_tracker.allocate_constrained_group_resources([
+                        (vert.resources_required, vert.constraints)
+                        for vert in vertices
+                    ])
+                for (x, y, p, _, _), vert in zip(resources, vertices):
+                    placement = Placement(vert, x, y, p)
+                    placements.add_placement(placement)
+                    all_vertices_placed.add(vert)
+            else:
+                (x, y, p, _, _) = resource_tracker.\
+                    allocate_constrained_resources(
+                        vertex.resources_required, vertex.constraints)
+                placement = Placement(vertex, x, y, p)
+                placements.add_placement(placement)
+                all_vertices_placed.add(vertex)
 
     def _sort_vertices_for_one_to_one_connection(
-            self, machine_graph):
+            self, machine_graph, same_chip_vertex_groups):
         """
 
         :param machine_graph: the graph to place
@@ -112,12 +138,34 @@ class OneToOnePlacer(RadialPlacer):
 
         for vertex in vertices:
             if vertex not in found_list:
+
+                # verts that are one to one connected with vertex and are not
+                # forced off chip
                 connected_vertices = self._find_one_to_one_vertices(
                     vertex, machine_graph)
-                new_list = [
-                    v for v in connected_vertices if v not in found_list]
+
+                # create list for each vertex thats connected havent already
+                #  been seen before
+                new_list = set()
+                for found_vertex in connected_vertices:
+                    if found_vertex not in found_list:
+                        new_list.add(found_vertex)
+
+                # looks for verts that have same chip constraints but not found
+                # by the one to one connection search.
+                same_chip_vertices = list()
+                for found_vertex in new_list:
+                    for same_chip_constrained_vertex in \
+                            same_chip_vertex_groups[found_vertex]:
+                        if same_chip_constrained_vertex not in new_list:
+                            same_chip_vertices.append(
+                                same_chip_constrained_vertex)
+
+                # add these newly found verts to the list
+                new_list.update(same_chip_vertices)
+
                 sorted_vertices.append(new_list)
-                found_list.update(set(new_list))
+                found_list.update(new_list)
 
         # locate vertices which have no output or input, and add them for
         # placement

@@ -66,9 +66,11 @@ class MachineVertex(AbstractMachineVertex):
         return self._resources_required
 
     def __str__(self):
+        if self._label is None:
+            return self.__repr__()
         return self._label
 
     def __repr__(self):
-        return (
-            "MachineVertex(resources_required={}, label={}, constraints={}"
-            .format(self._resources_required, self._label, self.constraints))
+        return\
+            "MachineVertex(resources_required={}, label={}, constraints={}"\
+            .format(self._resources_required, self._label, self.constraints)
