@@ -1065,31 +1065,52 @@ class ResourceTracker(object):
                         reverse_ip_tags_allocated)
 
         # If no chip is available, raise an exception
-        n_cores, n_chips, max_sdram = self._available_resources(usable_chips)
+        n_cores, n_chips, max_sdram, n_tags = \
+            self._available_resources(usable_chips)
+        all_chips = self._get_usable_chips(None, None, None, None)
+        all_n_cores, all_n_chips, all_max_sdram, all_n_tags = \
+            self._available_resources(all_chips)
         raise exceptions.PacmanValueError(
             "No resources available to allocate the given resources"
             " within the given constraints:\n"
-            "    Request for CPU: {}, DTCM: {}, SDRAM: {}\n"
-            "    Resources available which meet constraints:"
-            "        {} Cores on {} chips, largest SDRAM space: {}".format(
+            "    Request for CPU: {}, DTCM: {}, SDRAM: {}, IP TAGS: {}, {}\n"
+            "    Resources available which meet constraints:\n"
+            "      {} Cores and {} tags on {} chips, largest SDRAM space: {}\n"
+            "    All resources available:\n"
+            "      {} Cores and {} tags on {} chips, largest SDRAM space: {}\n"
+            .format(
                 resources.cpu_cycles.get_value(), resources.dtcm.get_value(),
-                resources.sdram.get_value(), n_cores, n_chips, max_sdram))
+                resources.sdram.get_value(), resources.iptags,
+                resources.reverse_iptags, n_cores, n_chips, max_sdram, n_tags,
+                all_n_cores, all_n_chips, all_max_sdram, all_n_tags))
 
     def _available_resources(self, usable_chips):
         n_cores = 0
         max_sdram = 0
         n_chips = 0
+        n_tags = 0
+        boards_seen = set()
         for x, y in usable_chips:
             chip = self._machine.get_chip_at(x, y)
             if (x, y) in self._core_tracker:
                 n_cores += len(self._core_tracker[x, y])
             else:
                 n_cores += len(list(chip.processors))
+            ethernet_chip = self._machine.get_chip_at(
+                chip.nearest_ethernet_x, chip.nearest_ethernet_y)
+            if ethernet_chip is not None:
+                if ethernet_chip.ip_address not in boards_seen:
+                    if ethernet_chip.ip_address not in self._tags_by_board:
+                        n_tags += len(ethernet_chip.tag_ids)
+                    else:
+                        n_tags += len(self._tags_by_board[
+                            ethernet_chip.ip_address])
+                    boards_seen.add(ethernet_chip.ip_address)
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:
                 max_sdram = sdram_available
             n_chips += 1
-        return n_cores, n_chips, max_sdram
+        return n_cores, n_chips, max_sdram, n_tags
 
     def get_maximum_constrained_resources_available(
             self, resources, constraints, chips=None):
