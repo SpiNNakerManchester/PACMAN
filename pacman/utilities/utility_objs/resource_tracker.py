@@ -536,7 +536,7 @@ class ResourceTracker(object):
                 tag in self._tags_by_board[board_address])
 
     def _is_ip_tag_available(self, board_address, tag, ip_address, port,
-                             strip_sdp):
+                             strip_sdp, transmission_id):
         """ Check if an iptag is available given the constraints
         :param board_address: the board address to locate the chip on
         :type board_address: str or None
@@ -548,18 +548,21 @@ class ResourceTracker(object):
         :type port: int
         :param strip_sdp: if the iptag has to be able to strip the SDP header
         :type strip_sdp: bool
+        :param transmission_id: the label for what type of data is being
+        used within this ip_tag
+        :type transmission_id: str
         :return: True if a matching iptag is available, False otherwise
         :rtype: bool
         """
         # If something is already sending to the same ip address and port but
         # is performing the opposite operation for strip SDP, then no tag can
         # be allocated
-        reverse_strip_key = (ip_address, port, not strip_sdp)
+        reverse_strip_key = (ip_address, transmission_id, not strip_sdp)
         if reverse_strip_key in self._ip_tags_address_and_port:
             return False
 
         # If the same key is being used for another ip tag, re-use it
-        key = (ip_address, port, strip_sdp)
+        key = (ip_address, transmission_id, strip_sdp)
         (b_address, _) = self._get_matching_ip_tag(board_address, tag, key)
         if b_address is not None:
             return True
@@ -593,9 +596,9 @@ class ResourceTracker(object):
 
         # Check if each of the tags is available
         for ip_tag in ip_tags:
-            if not self._is_ip_tag_available(board_address, ip_tag.tag,
-                                             ip_tag.ip_address, ip_tag.port,
-                                             ip_tag.strip_sdp):
+            if not self._is_ip_tag_available(
+                    board_address, ip_tag.tag, ip_tag.ip_address, ip_tag.port,
+                    ip_tag.strip_sdp, ip_tag.traffic_identifier):
                 return False
         return True
 
@@ -754,7 +757,8 @@ class ResourceTracker(object):
             return None
         allocations = list()
         for ip_tag in ip_tags:
-            key = (ip_tag.ip_address, ip_tag.port, ip_tag.strip_sdp)
+            key = (ip_tag.ip_address, ip_tag.traffic_identifier,
+                   ip_tag.strip_sdp)
             (b_address, a_tag) = self._get_matching_ip_tag(board_address,
                                                            ip_tag.tag, key)
 

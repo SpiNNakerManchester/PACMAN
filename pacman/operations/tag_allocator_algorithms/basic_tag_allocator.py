@@ -2,11 +2,13 @@
 # pacman imports
 from pacman.model.tags.tags import Tags
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from spinn_machine.utilities.progress_bar import ProgressBar
+from pacman import exceptions
 
 # spinn_machine imports
 from spinn_machine.tags.iptag import IPTag
 from spinn_machine.tags.reverse_iptag import ReverseIPTag
+from spinn_machine.utilities.progress_bar import ProgressBar
+
 
 
 class BasicTagAllocator(object):
@@ -17,7 +19,7 @@ class BasicTagAllocator(object):
 
     __slots__ = []
 
-    def __call__(self, machine, placements):
+    def __call__(self, machine, placements, traffic_id_to_port_num_map):
         """ see AbstractTagAllocatorAlgorithm.allocate_tags
         """
 
@@ -57,9 +59,22 @@ class BasicTagAllocator(object):
             if returned_ip_tags is not None:
                 for (tag_constraint, (board_address, tag)) in zip(
                         ip_tags, returned_ip_tags):
+                    port = tag_constraint.port
+                    if port is None:
+                        if (tag_constraint.traffic_identifier in
+                                traffic_id_to_port_num_map):
+                            port = traffic_id_to_port_num_map[
+                                tag_constraint.traffic_identifier]
+                        else:
+                            raise exceptions.PacmanConfigurationException(
+                                "The port of a ip_tag must not be none, or "
+                                "must have been allocated dynamically."
+                            )
                     ip_tag = IPTag(
-                        board_address, tag, tag_constraint.ip_address,
-                        tag_constraint.port, tag_constraint.strip_sdp)
+                        board_address=board_address, tag=tag,
+                        ip_address=tag_constraint.ip_address,
+                        port=port, strip_sdp=tag_constraint.strip_sdp,
+                        traffic_identifier=tag_constraint.traffic_identifier)
                     tags.add_ip_tag(ip_tag, vertex)
 
             # Put the allocated reverse ip tag information into the tag object

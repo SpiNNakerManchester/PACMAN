@@ -411,10 +411,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>traffic_id_to_port_num_map</param_name>
+                <param_type>TrafficIdentifierToPortNumMap</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
+            <param_name>traffic_id_to_port_num_map</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryIpTags</param_type>
