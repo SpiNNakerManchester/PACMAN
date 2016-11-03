@@ -246,7 +246,7 @@ class PartitionAndPlacePartitioner(object):
             # Re-allocate the existing resources
             (x, y, p, ip_tags, reverse_ip_tags) = \
                 resource_tracker.allocate_constrained_resources(
-                    new_resources, placed_vertex, vertex_slice)
+                    new_resources, placed_vertex.constraints)
             new_used_placements.append(
                 (placed_vertex, x, y, p, new_resources, ip_tags,
                  reverse_ip_tags))
@@ -290,14 +290,14 @@ class PartitionAndPlacePartitioner(object):
         for i in range(len(vertices)):
             vertex = vertices[i]
 
-            # get max resources available on machine
+            # get resources used by vertex
             vertex_slice = Slice(lo_atom, hi_atom)
+            used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
+
+            # get max resources available on machine
             resources = \
                 resource_tracker.get_maximum_constrained_resources_available(
-                    vertex, vertex_slice)
-
-            # get resources used by vertex
-            used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
+                    used_resources, vertex.constraints)
 
             # Work out the ratio of used to available resources
             ratio = self._find_max_ratio(used_resources, resources)
@@ -347,7 +347,7 @@ class PartitionAndPlacePartitioner(object):
             try:
                 (x, y, p, ip_tags, reverse_ip_tags) = \
                     resource_tracker.allocate_constrained_resources(
-                        used_resources, vertex, vertex_slice)
+                        used_resources, vertex.constraints)
                 used_placements.append(
                     (vertex, x, y, p, used_resources,
                      ip_tags, reverse_ip_tags))

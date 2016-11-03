@@ -65,3 +65,10 @@ class ReverseIPtagResource(AbstractResource):
     @overrides(AbstractResource.get_value)
     def get_value(self):
         return [self._port, self._sdp_port, self._tag]
+
+    def __repr__(self):
+        return (
+            "ReverseIPTagResource(port={}, sdp_port={}, tag={})"
+            .format(self._port, self._sdp_port, self._tag)
+        )
+
