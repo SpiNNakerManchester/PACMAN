@@ -35,8 +35,8 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return ResourceContainer(
-                dtcm=DTCMResource(0), sdram=SDRAMResource(0),
-                cpu_cycles=CPUCyclesPerTickResource(0))
+            dtcm=DTCMResource(0), sdram=SDRAMResource(0),
+            cpu_cycles=CPUCyclesPerTickResource(0))
 
     @property
     @overrides(AbstractFPGAVertex.fpga_id)
