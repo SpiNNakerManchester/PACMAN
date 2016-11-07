@@ -81,3 +81,9 @@ class IPtagResource(AbstractResource):
     @overrides(AbstractResource.get_value)
     def get_value(self):
         return [self._ip_address, self._port, self._strip_sdp, self._tag]
+
+    def __repr__(self):
+        return (
+            "IPTagResource(ip_address={}, port={}, strip_sdp={}, tag={})"
+            .format(self._ip_address, self._port, self._strip_sdp, self._tag)
+        )
