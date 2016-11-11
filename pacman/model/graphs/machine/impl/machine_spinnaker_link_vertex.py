@@ -23,16 +23,19 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
     def __init__(
             self, spinnaker_link_id, board_address=None, label=None,
             constraints=None):
-        MachineVertex.__init__(
-            self, ResourceContainer(
-                dtcm=DTCMResource(0), sdram=SDRAMResource(0),
-                cpu_cycles=CPUCyclesPerTickResource(0)),
-            label=label, constraints=constraints)
+        MachineVertex.__init__(self, label=label, constraints=constraints)
         AbstractSpiNNakerLinkVertex.__init__(self)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
         self._virtual_chip_x = None
         self._virtual_chip_y = None
+
+    @property
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        return ResourceContainer(
+            dtcm=DTCMResource(0), sdram=SDRAMResource(0),
+            cpu_cycles=CPUCyclesPerTickResource(0))
 
     @property
     @overrides(AbstractSpiNNakerLinkVertex.spinnaker_link_id)

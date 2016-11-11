@@ -1005,17 +1005,17 @@ class ResourceTracker(object):
                     return results
 
         # If no chip is available, raise an exception
-        n_cores, n_chips, max_sdram, n_tags = \
-            self._available_resources(usable_chips)
+        n_cores, n_chips, max_sdram, n_tags = self._available_resources(
+            usable_chips)
         raise exceptions.PacmanValueError(
             "No resources available to allocate the given group resources"
             " within the given constraints:\n"
             "    Request for {} cores on a single chip with SDRAM: {}\n"
             "    Resources available which meet constraints:"
-            "        {} Cores on {} chips, largest SDRAM space: {} and "
-            "n tags : {}".format(
-                len(group_resources), total_sdram, n_cores, n_chips,
-                max_sdram, n_tags))
+            "        {} Cores and {} tags on {} chips,"
+            " largest SDRAM space: {}".format(
+                len(group_resources), total_sdram, n_cores, n_tags, n_chips,
+                max_sdram))
 
     def allocate_resources(self, resources, chips=None,
                            processor_id=None, board_address=None,
