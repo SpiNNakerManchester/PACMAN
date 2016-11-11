@@ -17,9 +17,6 @@ class ApplicationVertex(AbstractApplicationVertex):
 
     __slots__ = [
 
-        # The resources required
-        "_resources_required",
-
         # The label
         "_label",
 
@@ -73,5 +70,5 @@ class ApplicationVertex(AbstractApplicationVertex):
 
     def __repr__(self):
         return (
-            "ApplicationVertex(resources_required={}, label={}, constraints={}"
-            .format(self._resources_required, self.constraints, self._label))
+            "ApplicationVertex(label={}, constraints={}"
+            .format(self.constraints, self._label))
