@@ -29,6 +29,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
         self._virtual_chip_x = None
         self._virtual_chip_y = None
 
+    @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return ResourceContainer(
