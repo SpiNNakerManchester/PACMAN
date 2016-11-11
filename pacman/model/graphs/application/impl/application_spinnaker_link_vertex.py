@@ -1,6 +1,5 @@
 from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
+    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.graphs.application.impl.application_vertex\
     import ApplicationVertex
 from pacman.model.decorators.overrides import overrides
@@ -36,7 +35,6 @@ class ApplicationSpiNNakerLinkVertex(
         ApplicationVertex.__init__(
             self, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
-        AbstractSpiNNakerLinkVertex.__init__(self)
         self._n_atoms = n_atoms
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address

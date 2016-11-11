@@ -1,5 +1,5 @@
-from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.graphs.application.impl.application_vertex\
     import ApplicationVertex
 from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex

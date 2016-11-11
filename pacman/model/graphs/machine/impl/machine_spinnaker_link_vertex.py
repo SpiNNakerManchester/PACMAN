@@ -24,7 +24,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
             self, spinnaker_link_id, board_address=None, label=None,
             constraints=None):
         MachineVertex.__init__(self, label=label, constraints=constraints)
-        AbstractSpiNNakerLinkVertex.__init__(self)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
         self._virtual_chip_x = None
