@@ -1,3 +1,5 @@
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.graphs.application.impl.application_vertex\
     import ApplicationVertex
 from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
@@ -69,6 +71,8 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y
+        self.add_constraint(PlacerChipAndCoreConstraint(
+            self._virtual_chip_x, self._virtual_chip_y))
 
     @property
     @overrides(ApplicationVertex.n_atoms)

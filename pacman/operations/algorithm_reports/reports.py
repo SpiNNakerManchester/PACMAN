@@ -32,10 +32,10 @@ def tag_allocator_report(report_folder, tag_infos):
         logger.error("Generate_tag_report: Can't open file {} for "
                      "writing.".format(file_name))
     for ip_tag in tag_infos.ip_tags:
-        f_routing.write("{}".format(ip_tag))
+        f_routing.write("{}\n".format(ip_tag))
         progress_bar.update()
     for reverse_ip_tag in tag_infos.reverse_ip_tags:
-        f_routing.write("{}".format(reverse_ip_tag))
+        f_routing.write("{}\n".format(reverse_ip_tag))
         progress_bar.update()
     f_routing.flush()
     f_routing.close()
@@ -552,7 +552,7 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
     except IOError:
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
-    progress_bar = ProgressBar(len(machine_graph.vertices),
+    progress_bar = ProgressBar(len(machine_graph.outgoing_edge_partitions),
                                "Generating Routing info report")
 
     for partition in machine_graph.outgoing_edge_partitions:
