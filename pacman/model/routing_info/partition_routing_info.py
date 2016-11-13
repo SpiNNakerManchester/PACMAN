@@ -1,4 +1,5 @@
 import numpy
+from pacman import exceptions
 
 
 class PartitionRoutingInfo(object):
@@ -35,10 +36,17 @@ class PartitionRoutingInfo(object):
         :rtype: array-like of int
         """
 
+        max_n_keys = 0
+        for key_and_mask in self._keys_and_masks:
+            max_n_keys += key_and_mask.n_keys
+
         if n_keys is None:
-            n_keys = 0
-            for key_and_mask in self._keys_and_masks:
-                n_keys += key_and_mask.n_keys
+            n_keys = max_n_keys
+        else:
+            if max_n_keys < n_keys:
+                raise exceptions.PacmanConfigurationException(
+                    "You asked for {} keys, but the routing info can only "
+                    "provide {} keys.".format(n_keys, max_n_keys))
 
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0

@@ -109,7 +109,7 @@ def inject_items(types):
                         "Cannot find object of type {} to inject into"
                         " method {} of {}".format(
                             arg_type, wrapped_method.__name__, obj.__class__))
-                value = _injectables.get(arg_type, None)
+                value = _injectables.get(arg_type)
                 if arg in new_args:
                     raise InjectionException(
                         "Argument {} was already provided to"

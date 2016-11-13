@@ -3,6 +3,9 @@
 from pacman.model.constraints.placer_constraints.\
     placer_radial_placement_from_chip_constraint \
     import PlacerRadialPlacementFromChipConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_same_chip_as_constraint\
+    import PlacerSameChipAsConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
@@ -26,8 +29,6 @@ class RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    __slots__ = []
-
     def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
@@ -42,25 +43,38 @@ class RadialPlacer(object):
         progress_bar = ProgressBar(len(vertices), "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
+        vertices_on_same_chip = placer_algorithm_utilities\
+            .get_same_chip_vertex_groups(machine_graph.vertices)
+        all_vertices_placed = set()
         for vertex in vertices:
-            self._place_vertex(vertex, resource_tracker, machine, placements)
+            if vertex not in all_vertices_placed:
+                vertices_placed = self._place_vertex(
+                    vertex, resource_tracker, machine, placements,
+                    vertices_on_same_chip)
+                all_vertices_placed.update(vertices_placed)
             progress_bar.update()
         progress_bar.end()
         return placements
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
-        placement_constraints = {PlacerRadialPlacementFromChipConstraint}
+        placement_constraints = {
+            PlacerRadialPlacementFromChipConstraint, PlacerSameChipAsConstraint
+        }
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
 
-    def _place_vertex(self, vertex, resource_tracker, machine, placements):
+    def _place_vertex(
+            self, vertex, resource_tracker, machine, placements,
+            vertices_on_same_chip):
+
+        vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
         radial_constraints = utility_calls.locate_constraints_of_type(
-            [vertex], PlacerRadialPlacementFromChipConstraint)
+            vertices, PlacerRadialPlacementFromChipConstraint)
         start_x = None
         start_y = None
         for constraint in radial_constraints:
@@ -74,14 +88,25 @@ class RadialPlacer(object):
                 raise PacmanPlaceException("Non-matching constraints")
         chips = None
         if start_x is not None and start_y is not None:
-            chips = self._generate_radial_chips(machine, resource_tracker,
-                                                start_x, start_y)
+            chips = self._generate_radial_chips(
+                machine, resource_tracker, start_x, start_y)
 
-        # Create and store a new placement
-        (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-            vertex.resources_required, vertex, None, chips)
-        placement = Placement(vertex, x, y, p)
-        placements.add_placement(placement)
+        if len(vertices) > 1:
+            assigned_values = \
+                resource_tracker.allocate_constrained_group_resources([
+                    (vert.resources_required, vert.constraints)
+                    for vert in vertices
+                ])
+            for (x, y, p, _, _), vert in zip(assigned_values, vertices):
+                placement = Placement(vert, x, y, p)
+                placements.add_placement(placement)
+        else:
+            (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
+                vertex.resources_required, vertex.constraints, chips)
+            placement = Placement(vertex, x, y, p)
+            placements.add_placement(placement)
+
+        return vertices
 
     @staticmethod
     def _generate_radial_chips(

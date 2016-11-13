@@ -73,7 +73,7 @@ class BasicPartitioner(object):
             # Locate the maximum resources available
             max_resources_available = \
                 resource_tracker.get_maximum_constrained_resources_available(
-                    vertex, Slice(0, 1))
+                    requirements, vertex.constraints)
 
             # Find the ratio of each of the resources - if 0 is required,
             # assume the ratio is the max available
@@ -129,7 +129,7 @@ class BasicPartitioner(object):
 
                 # update allocated resources
                 resource_tracker.allocate_constrained_resources(
-                    resources, vertex, vertex_slice)
+                    resources, vertex.constraints)
 
             # update and end progress bars as needed
             progress_bar.update()

@@ -12,9 +12,6 @@ class MachineVertex(AbstractMachineVertex):
 
     __slots__ = [
 
-        # The resources required
-        "_resources_required",
-
         # The label
         "_label",
 
@@ -22,12 +19,8 @@ class MachineVertex(AbstractMachineVertex):
         "_constraints"
     ]
 
-    def __init__(self, resources_required, label=None, constraints=None):
+    def __init__(self, label=None, constraints=None):
         """
-        :param resources_required:\
-            The maximum resources needed for the vertex
-        :type resources_required:\
-            :py:class:`pacman.models.resources.resource_container.ResourceContainer`
         :param label: The optional name of the vertex
         :type label: str
         :param constraints: The optional initial constraints of the vertex
@@ -37,7 +30,6 @@ class MachineVertex(AbstractMachineVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
         """
-        self._resources_required = resources_required
         self._label = label
 
         AbstractMachineVertex.__init__(self)
@@ -60,15 +52,13 @@ class MachineVertex(AbstractMachineVertex):
     def label(self):
         return self._label
 
-    @property
-    @overrides(AbstractMachineVertex.resources_required)
-    def resources_required(self):
-        return self._resources_required
-
     def __str__(self):
+        if self._label is None:
+            return self.__repr__()
         return self._label
 
     def __repr__(self):
         return (
-            "MachineVertex(resources_required={}, label={}, constraints={}"
-            .format(self._resources_required, self._label, self.constraints))
+            "MachineVertex(label={}, constraints={}"
+            .format(self._label, self.constraints)
+        )
