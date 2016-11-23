@@ -16,10 +16,14 @@ class ReverseIPtagResource(AbstractResource):
         "_sdp_port",
 
         # A fixed tag id to assign, or None if any tag is OK
-        "_tag"
+        "_tag",
+
+        # The type of traffic that will go through this tag
+        "_traffic_identifier"
     ]
 
-    def __init__(self, port, sdp_port=1, tag=None):
+    def __init__(
+            self, port, sdp_port=1, tag=None, traffic_identifier="DEFAULT"):
         """
 
         :param port: The target port of the tag
@@ -32,6 +36,9 @@ class ReverseIPtagResource(AbstractResource):
         :type sdp_port: int
         :param tag: A fixed tag id to assign, or None if any tag is OK
         :type tag: int
+        :param traffic_identifier: Identifies the traffic that is going to\
+            flow over this tag; can be used to select the tag from a list\
+            once assigned
         """
         self._port = port
         self._sdp_port = sdp_port
@@ -71,4 +78,3 @@ class ReverseIPtagResource(AbstractResource):
             "ReverseIPTagResource(port={}, sdp_port={}, tag={})"
             .format(self._port, self._sdp_port, self._tag)
         )
-

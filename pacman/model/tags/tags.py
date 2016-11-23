@@ -146,18 +146,6 @@ class Tags(object):
             return None
         return list(self._ip_tags_by_vertex[vertex])
 
-    def get_iptag_with_transmission_id_for_vertex(
-            self, vertex, transmission_id):
-        # check vertex has tags
-        if vertex not in self._ip_tags_by_vertex:
-            return None
-
-        # locate tag with correct id
-        for tag in self._ip_tags_by_vertex[vertex]:
-            if tag.traffic_identifier == transmission_id:
-                return tag
-        return None
-
     def get_reverse_ip_tags_for_vertex(self, vertex):
         """ Get the Reverse IP Tags assigned to a given machine vertex
 
