@@ -105,6 +105,22 @@ class AbstractGraph(AbstractHasConstraints):
         """
 
     @abstractmethod
+    def get_edges_ending_at_vertex_with_partition_name(
+            self, vertex, partition_name):
+        """ Get all the edges that end at the given vertex, and reside in the
+         correct partition id
+
+        :param vertex:  The vertex at which the edges to get end
+        :type vertex:\
+            :py:class:`pacman.model.graphs.abstract_vertex.AbstractVertex`
+        :param partition_name: the label for the partition
+        :type partition_name: str
+        :return: \
+            iterable of\
+            :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
+        """
+
+    @abstractmethod
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the edge partitions that start at the given vertex
 

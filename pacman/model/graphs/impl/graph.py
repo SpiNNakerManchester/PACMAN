@@ -40,6 +40,9 @@ class Graph(AbstractGraph):
         # The incoming edges by post-vertex
         "_incoming_edges",
 
+        # map between incoming edges and their associated partitions
+        "_incoming_edges_by_partition_name",
+
         # The outgoing edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
 
@@ -71,6 +74,7 @@ class Graph(AbstractGraph):
         self._outgoing_edge_partitions_by_name = dict()
         self._outgoing_edges = defaultdict(list)
         self._incoming_edges = defaultdict(list)
+        self._incoming_edges_by_partition_name = defaultdict(list)
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(list)
         self._outgoing_edge_partitions_by_traffic_type = defaultdict(list)
 
@@ -125,6 +129,8 @@ class Graph(AbstractGraph):
 
         # Add the edge to the indices
         self._outgoing_edges[edge.pre_vertex].append(edge)
+        self._incoming_edges_by_partition_name[
+            (edge.post_vertex, outgoing_edge_partition_name)].append(edge)
         self._incoming_edges[edge.post_vertex].append(edge)
 
     @overrides(AbstractGraph.add_outgoing_edge_partition)
@@ -178,7 +184,19 @@ class Graph(AbstractGraph):
 
     @overrides(AbstractGraph.get_edges_ending_at_vertex)
     def get_edges_ending_at_vertex(self, vertex):
-        return self._incoming_edges[vertex]
+        if vertex in self._incoming_edges:
+            return self._incoming_edges[vertex]
+        else:
+            return []
+
+    @overrides(AbstractGraph.get_edges_ending_at_vertex_with_partition_name)
+    def get_edges_ending_at_vertex_with_partition_name(
+            self, vertex, partition_name):
+        if (vertex, partition_name) in self._incoming_edges_by_partition_name:
+            return self._incoming_edges_by_partition_name[
+                (vertex, partition_name)]
+        else:
+            return []
 
     @overrides(AbstractGraph.get_outgoing_edge_partitions_starting_at_vertex)
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
