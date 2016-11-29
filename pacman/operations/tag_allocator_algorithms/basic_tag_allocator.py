@@ -7,6 +7,10 @@ from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from spinn_machine.tags.iptag import IPTag
 from spinn_machine.tags.reverse_iptag import ReverseIPTag
 from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_machine.utilities.ordered_set import OrderedSet
+
+# A range of ports from which to allocate ports to Reverse IP Tags
+_BOARD_PORTS = range(17896, 18000)
 
 
 class BasicTagAllocator(object):
@@ -22,6 +26,11 @@ class BasicTagAllocator(object):
         """
 
         resource_tracker = ResourceTracker(machine)
+
+        # Keep track of ports allocated to reverse ip tags
+        # and tags that still need a port to be allocated
+        ports_to_allocate = dict()
+        tags_to_allocate_ports = list()
 
         # Check that the algorithm can handle the constraints
         progress_bar = ProgressBar(placements.n_placements,
@@ -69,10 +78,32 @@ class BasicTagAllocator(object):
             if returned_reverse_ip_tags is not None:
                 for (tag_constraint, (board_address, tag)) in zip(
                         reverse_ip_tags, returned_reverse_ip_tags):
-                    reverse_ip_tag = ReverseIPTag(
-                        board_address, tag, tag_constraint.port, placement.x,
-                        placement.y, placement.p, tag_constraint.sdp_port)
-                    tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+                    if board_address not in ports_to_allocate:
+                        ports_to_allocate[board_address] = OrderedSet(
+                            _BOARD_PORTS)
+                    if tag_constraint.port is not None:
+                        reverse_ip_tag = ReverseIPTag(
+                            board_address, tag, tag_constraint.port,
+                            placement.x, placement.y, placement.p,
+                            tag_constraint.sdp_port)
+                        tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+                        ports_to_allocate[board_address].remove(
+                            tag_constraint.port)
+                    else:
+                        tags_to_allocate_ports.append(
+                            (tag_constraint, board_address, tag))
 
         progress_bar.end()
+
+        # Finally allocate the ports to the reverse ip tags
+        for (tag_constraint, board_address, tag) in tags_to_allocate_ports:
+            if board_address not in ports_to_allocate:
+                ports_to_allocate[board_address] = OrderedSet(_BOARD_PORTS)
+            port = ports_to_allocate[board_address].pop(last=False)
+            reverse_ip_tag = ReverseIPTag(
+                board_address, tag, port,
+                placement.x, placement.y, placement.p,
+                tag_constraint.sdp_port)
+            tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+
         return list(tags.ip_tags), list(tags.reverse_ip_tags), tags
