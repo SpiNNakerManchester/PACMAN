@@ -1,4 +1,7 @@
 from pacman.exceptions import PacmanInvalidParameterException
+from pacman.utilities import utility_calls
+
+from collections import defaultdict
 
 
 class Tags(object):
@@ -31,10 +34,10 @@ class Tags(object):
         self._reverse_ip_tags = dict()
 
         # Mapping of vertex to list of IPTag
-        self._ip_tags_by_vertex = dict()
+        self._ip_tags_by_vertex = defaultdict(set)
 
         # Mapping of vertex to list of ReverseIPTag
-        self._reverse_ip_tags_by_vertex = dict()
+        self._reverse_ip_tags_by_vertex = defaultdict(set)
 
         # Set of ports already assigned on a board
         self._ports_assigned = set()
@@ -53,11 +56,12 @@ class Tags(object):
             * If the combination of (board-address, tag) has already been\
               assigned to a reverse IP tag
         """
-
+        existing_tag = None
         if (ip_tag.board_address, ip_tag.tag) in self._ip_tags:
             existing_tag = self._ip_tags[(ip_tag.board_address, ip_tag.tag)]
             if (existing_tag.ip_address != ip_tag.ip_address or
-                    existing_tag.port != ip_tag.port or
+                    not utility_calls.is_equal_or_None(
+                        existing_tag.port, ip_tag.port) or
                     existing_tag.strip_sdp != ip_tag.strip_sdp):
                 raise PacmanInvalidParameterException(
                     "ip_tag", str(ip_tag),
@@ -70,10 +74,15 @@ class Tags(object):
                 "The tag has already been assigned to a reverse IP tag on"
                 " the given board")
 
-        self._ip_tags[(ip_tag.board_address, ip_tag.tag)] = ip_tag
-        if vertex not in self._ip_tags_by_vertex:
-            self._ip_tags_by_vertex[vertex] = set()
-        self._ip_tags_by_vertex[vertex].add(ip_tag)
+        if existing_tag is None:
+            self._ip_tags[(ip_tag.board_address, ip_tag.tag)] = ip_tag
+            self._ip_tags_by_vertex[vertex].add(ip_tag)
+        else:
+            self._ip_tags_by_vertex[vertex].add(existing_tag)
+
+            # Update the port number if necessary
+            if existing_tag.port is None and ip_tag.port is not None:
+                existing_tag.port = ip_tag.port
 
     def add_reverse_ip_tag(self, reverse_ip_tag, vertex):
         """ Add a reverse iptag
@@ -99,20 +108,20 @@ class Tags(object):
                 "reverse_ip_tag", reverse_ip_tag,
                 "The tag has already been assigned on the given board")
 
-        if (reverse_ip_tag.board_address,
-                reverse_ip_tag.port) in self._reverse_ip_tags:
-            raise PacmanInvalidParameterException(
-                "reverse_ip_tag", reverse_ip_tag,
-                "The port has already been assigned on the given board")
+        if reverse_ip_tag.port is not None:
+            if (reverse_ip_tag.board_address,
+                    reverse_ip_tag.port) in self._ports_assigned:
+                raise PacmanInvalidParameterException(
+                    "reverse_ip_tag", reverse_ip_tag,
+                    "The port has already been assigned on the given board")
 
-        self._reverse_ip_tags[(reverse_ip_tag.board_address,
-                               reverse_ip_tag.tag)] = reverse_ip_tag
-        if vertex not in self._reverse_ip_tags_by_vertex:
-            self._reverse_ip_tags_by_vertex[vertex] = set()
-        self._reverse_ip_tags_by_vertex[vertex].add(
-            reverse_ip_tag)
-        self._ports_assigned.add(
-            (reverse_ip_tag.board_address, reverse_ip_tag.port))
+        self._reverse_ip_tags[
+            (reverse_ip_tag.board_address,
+             reverse_ip_tag.tag)] = reverse_ip_tag
+        self._reverse_ip_tags_by_vertex[vertex].add(reverse_ip_tag)
+        if reverse_ip_tag.port is not None:
+            self._ports_assigned.add(
+                (reverse_ip_tag.board_address, reverse_ip_tag.port))
 
     @property
     def ip_tags(self):
