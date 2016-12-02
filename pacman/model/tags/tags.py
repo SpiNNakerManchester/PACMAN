@@ -34,10 +34,10 @@ class Tags(object):
         self._reverse_ip_tags = dict()
 
         # Mapping of vertex to list of IPTag
-        self._ip_tags_by_vertex = defaultdict(set)
+        self._ip_tags_by_vertex = defaultdict(list)
 
         # Mapping of vertex to list of ReverseIPTag
-        self._reverse_ip_tags_by_vertex = defaultdict(set)
+        self._reverse_ip_tags_by_vertex = defaultdict(list)
 
         # Set of ports already assigned on a board
         self._ports_assigned = set()
@@ -149,22 +149,18 @@ class Tags(object):
         :type vertex:\
             :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
         :return: An iterable of IPTag or None if the vertex has no tags
-        :rtype: iterable of :py:class:`spinn_machine.tags.iptag.IPTag`
+        :rtype: iterable of :py:class:`spinn_machine.tags.iptag.IPTag` or None
         """
-        if vertex not in self._ip_tags_by_vertex:
-            return None
-        return list(self._ip_tags_by_vertex[vertex])
+        return self._ip_tags_by_vertex.get(vertex, None)
 
     def get_reverse_ip_tags_for_vertex(self, vertex):
         """ Get the Reverse IP Tags assigned to a given machine vertex
 
         :param vertex: The vertex to get the tags for
         :type vertex:\
-                    :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractVertex`
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractVertex`
         :return: An iterable of ReverseIPTag or None if the vertex has no tags
         :rtype: iterable of \
-                    :py:class:`spinn_machine.tags.reverse_iptag.ReverseIPTag`
+            :py:class:`spinn_machine.tags.reverse_iptag.ReverseIPTag` or None
         """
-        if vertex not in self._reverse_ip_tags_by_vertex:
-            return None
-        return list(self._reverse_ip_tags_by_vertex[vertex])
+        return self._reverse_ip_tags_by_vertex.get(vertex, None)
