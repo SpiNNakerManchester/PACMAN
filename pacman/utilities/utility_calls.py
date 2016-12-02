@@ -115,3 +115,10 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
     expanded_value = numpy.zeros(32, dtype="uint8")
     expanded_value[-len(bit_positions):] = bit_array[bit_positions]
     return compress_from_bit_array(expanded_value)
+
+
+def is_equal_or_None(a, b):
+        """ If a and b are both not None, return True iff they are equal,\
+            otherwise return True
+        """
+        return True if a is None or b is None or a == b else False
