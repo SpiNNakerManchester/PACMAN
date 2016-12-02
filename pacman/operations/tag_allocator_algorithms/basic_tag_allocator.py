@@ -87,16 +87,19 @@ class BasicTagAllocator(object):
                             placement.x, placement.y, placement.p,
                             tag_constraint.sdp_port)
                         tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
-                        ports_to_allocate[board_address].remove(
+
+                        ports_to_allocate[board_address].discard(
                             tag_constraint.port)
                     else:
                         tags_to_allocate_ports.append(
-                            (tag_constraint, board_address, tag))
+                            (tag_constraint, board_address, tag, vertex,
+                             placement))
 
         progress_bar.end()
 
         # Finally allocate the ports to the reverse ip tags
-        for (tag_constraint, board_address, tag) in tags_to_allocate_ports:
+        for (tag_constraint, board_address, tag, vertex, placement) in\
+                tags_to_allocate_ports:
             if board_address not in ports_to_allocate:
                 ports_to_allocate[board_address] = OrderedSet(_BOARD_PORTS)
             port = ports_to_allocate[board_address].pop(last=False)

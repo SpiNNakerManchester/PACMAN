@@ -76,9 +76,9 @@ class Tags(object):
 
         if existing_tag is None:
             self._ip_tags[(ip_tag.board_address, ip_tag.tag)] = ip_tag
-            self._ip_tags_by_vertex[vertex].add(ip_tag)
+            self._ip_tags_by_vertex[vertex].append(ip_tag)
         else:
-            self._ip_tags_by_vertex[vertex].add(existing_tag)
+            self._ip_tags_by_vertex[vertex].append(existing_tag)
 
             # Update the port number if necessary
             if existing_tag.port is None and ip_tag.port is not None:
@@ -118,7 +118,7 @@ class Tags(object):
         self._reverse_ip_tags[
             (reverse_ip_tag.board_address,
              reverse_ip_tag.tag)] = reverse_ip_tag
-        self._reverse_ip_tags_by_vertex[vertex].add(reverse_ip_tag)
+        self._reverse_ip_tags_by_vertex[vertex].append(reverse_ip_tag)
         if reverse_ip_tag.port is not None:
             self._ports_assigned.add(
                 (reverse_ip_tag.board_address, reverse_ip_tag.port))

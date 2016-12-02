@@ -117,7 +117,7 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
     return compress_from_bit_array(expanded_value)
 
 
-def is_equal_or_None(self, a, b):
+def is_equal_or_None(a, b):
         """ If a and b are both not None, return True iff they are equal,\
             otherwise return True
         """
