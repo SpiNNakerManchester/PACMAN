@@ -253,7 +253,7 @@ class PACMANAlgorithmExecutor(object):
 
             # Find a usable algorithm
             suitable_algorithm = self._locate_suitable_algorithm(
-                algorithms_to_find, input_types, generated_outputs)
+                algorithms_to_find, input_types, None)
             if suitable_algorithm is not None:
                 self._remove_algorithm_and_update_outputs(
                     algorithms_to_find, suitable_algorithm, input_types,
@@ -414,8 +414,22 @@ class PACMANAlgorithmExecutor(object):
                     all_inputs_match = False
                     break
 
+            # verify that a new output is being generated.
             if all_inputs_match:
-                return algorithm
+                unique_output = False
+
+                # this check needs to be for none, and not a empty, list, to
+                # allow searches though lists of purely optional algorithms.
+                if (len(algorithm.outputs) > 0 and
+                        generated_outputs is not None):
+                    for output in algorithm.outputs:
+                        if (output.output_type not in generated_outputs and
+                                output.output_type not in inputs):
+                            unique_output = True
+                    if unique_output:
+                        return algorithm
+                else:
+                    return algorithm
 
         # If no algorithms are available, return None
         return None
