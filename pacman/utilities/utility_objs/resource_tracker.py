@@ -520,14 +520,15 @@ class ResourceTracker(object):
             return None, None, None
         existing_tags = self._ip_tags_address_traffic[
             (ip_address, traffic_identifier)]
-        for (b_address, a_tag) in existing_tags:
-            (a_strip_sdp, a_port) = self._ip_tags_strip_sdp_and_port[
-                (b_address, a_tag)]
-            if (utility_calls.is_equal_or_None(b_address, board_address) and
-                    utility_calls.is_equal_or_None(a_tag, tag) and
-                    a_strip_sdp == strip_sdp and
-                    utility_calls.is_equal_or_None(a_port, port)):
-                return b_address, a_tag, a_port
+        for (other_board_address, other_tag) in existing_tags:
+            (other_stripe_sdp, other_port) = self._ip_tags_strip_sdp_and_port[
+                (other_board_address, other_tag)]
+            if (utility_calls.is_equal_or_None(
+                        other_board_address, board_address) and
+                    utility_calls.is_equal_or_None(other_tag, tag) and
+                    other_stripe_sdp == strip_sdp and
+                    utility_calls.is_equal_or_None(other_port, port)):
+                return other_board_address, other_tag, other_port
         return None, None, None
 
     def _is_tag_available(self, board_address, tag):

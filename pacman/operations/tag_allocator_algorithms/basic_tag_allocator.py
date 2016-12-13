@@ -9,7 +9,7 @@ from spinn_machine.tags.reverse_iptag import ReverseIPTag
 from spinn_machine.utilities.progress_bar import ProgressBar
 from spinn_machine.utilities.ordered_set import OrderedSet
 
-# A range of ports from which to allocate ports to Reverse IP Tags
+# An arbitrary range of ports from which to allocate ports to Reverse IP Tags
 _BOARD_PORTS = range(17896, 18000)
 
 
