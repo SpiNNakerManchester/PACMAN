@@ -524,7 +524,7 @@ class ResourceTracker(object):
             (other_stripe_sdp, other_port) = self._ip_tags_strip_sdp_and_port[
                 (other_board_address, other_tag)]
             if (utility_calls.is_equal_or_None(
-                        other_board_address, board_address) and
+                    other_board_address, board_address) and
                     utility_calls.is_equal_or_None(other_tag, tag) and
                     other_stripe_sdp == strip_sdp and
                     utility_calls.is_equal_or_None(other_port, port)):
