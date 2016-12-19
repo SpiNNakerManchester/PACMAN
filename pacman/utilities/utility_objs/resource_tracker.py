@@ -825,9 +825,12 @@ class ResourceTracker(object):
 
             if b_address is not None:
 
+                # Get the chip with the Ethernet
+                (e_chip_x, e_chip_y) = self._ethernet_chips[b_address]
+
                 # If there is already an allocation that matches the current
                 # tag, return this as the allocated tag
-                allocations.append((b_address, a_tag))
+                allocations.append((b_address, a_tag, e_chip_x, e_chip_y))
 
                 # Add to the number of things allocated to the tag
                 self._n_ip_tag_allocations[(b_address, a_tag)] += 1
@@ -1105,7 +1108,7 @@ class ResourceTracker(object):
                     :py:class:`pacman.model.resources.reverse_iptag_resource.ReverseIPtagResource`
         :return: The x and y coordinates of the used chip, the processor_id,\
                  and the ip tag and reverse ip tag allocation tuples
-        :rtype: (int, int, int, list((int, int)), list((int, int)))
+        :rtype: (int, int, int, list((int, int, int, int)), list((int, int)))
         """
         usable_chips = self._get_usable_chips(chips, board_address,
                                               ip_tags, reverse_ip_tags)
