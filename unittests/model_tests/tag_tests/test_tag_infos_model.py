@@ -32,7 +32,7 @@ class TestTagsModel(unittest.TestCase):
         :return:
         """
         tag_info = Tags()
-        iptag = IPTag("", 1, "122.2.2.2", 1, False)
+        iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
         parttiioned_vertex = SimpleMachineVertex(None, "")
         tag_info.add_ip_tag(iptag, parttiioned_vertex)
 
@@ -52,7 +52,7 @@ class TestTagsModel(unittest.TestCase):
         :return:
         """
         tag_info = Tags()
-        iptag = IPTag("", 1, "122.2.2.2", 1, False)
+        iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
         parttiioned_vertex = SimpleMachineVertex(None, "")
         tag_info.add_ip_tag(iptag, parttiioned_vertex)
 
@@ -65,7 +65,7 @@ class TestTagsModel(unittest.TestCase):
         :return:
         """
         tag_info = Tags()
-        iptag = IPTag("", 1, "122.2.2.2", 1, False)
+        iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
         parttiioned_vertex = SimpleMachineVertex(None, "")
         parttiioned_vertex_2 = SimpleMachineVertex(None, "")
         tag_info.add_ip_tag(iptag, parttiioned_vertex)
