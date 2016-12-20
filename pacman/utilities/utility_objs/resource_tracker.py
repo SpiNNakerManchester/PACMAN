@@ -1149,35 +1149,30 @@ class ResourceTracker(object):
             .format(
                 resources.cpu_cycles.get_value(), resources.dtcm.get_value(),
                 resources.sdram.get_value(), resources.iptags,
-                resources.reverse_iptags, n_cores, n_chips, max_sdram, n_tags,
-                all_n_cores, all_n_chips, all_max_sdram, all_n_tags))
+                resources.reverse_iptags, n_cores, n_tags, n_chips, max_sdram,
+                all_n_cores, all_n_tags, all_n_chips, all_max_sdram))
 
     def _available_resources(self, usable_chips):
         n_cores = 0
         max_sdram = 0
         n_chips = 0
         n_tags = 0
-        boards_seen = set()
         for x, y in usable_chips:
             chip = self._machine.get_chip_at(x, y)
             if (x, y) in self._core_tracker:
                 n_cores += len(self._core_tracker[x, y])
             else:
                 n_cores += len(list(chip.processors))
-            ethernet_chip = self._machine.get_chip_at(
-                chip.nearest_ethernet_x, chip.nearest_ethernet_y)
-            if ethernet_chip is not None:
-                if ethernet_chip.ip_address not in boards_seen:
-                    if ethernet_chip.ip_address not in self._tags_by_board:
-                        n_tags += len(ethernet_chip.tag_ids)
-                    else:
-                        n_tags += len(self._tags_by_board[
-                            ethernet_chip.ip_address])
-                    boards_seen.add(ethernet_chip.ip_address)
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:
                 max_sdram = sdram_available
             n_chips += 1
+        for board_address in self._boards_with_ip_tags:
+            if board_address in self._tags_by_board:
+                n_tags += len(self._tags_by_board)
+            else:
+                eth_x, eth_y = self._ethernet_chips[board_address]
+                n_tags += len(self._machine.get_chip_at(eth_x, eth_y).tag_ids)
         return n_cores, n_chips, max_sdram, n_tags
 
     def get_maximum_constrained_resources_available(
