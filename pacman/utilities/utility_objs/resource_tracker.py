@@ -885,7 +885,7 @@ class ResourceTracker(object):
         allocations = list()
         for reverse_ip_tag in reverse_ip_tags:
 
-            (_, tag) = self._allocate_tag(
+            (board_address, tag) = self._allocate_tag(
                 chip, board_address, reverse_ip_tag.tag)
             allocations.append((board_address, tag))
             if reverse_ip_tag.port is not None:
