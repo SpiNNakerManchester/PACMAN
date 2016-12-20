@@ -64,14 +64,14 @@ class TestTagsBoardAddresses(unittest.TestCase):
             SimpleMachineVertex(
                 ResourceContainer(iptags=[IPtagResource(
                     "127.0.0.1", port=tag, strip_sdp=True)]),
-                label="Eth Vertex {}".format(proc))
+                label="Ethernet Vertex {}".format(proc))
             for tag in eth_chip.tag_ids
         ]
         eth2_vertices = [
             SimpleMachineVertex(
                 ResourceContainer(iptags=[IPtagResource(
                     "127.0.0.1", port=10000 + tag, strip_sdp=True)]),
-                label="Eth 2 Vertex {}".format(proc))
+                label="Ethernet 2 Vertex {}".format(proc))
             for tag in range(n_extra_vertices)
         ]
         placements = Placements([
