@@ -8,39 +8,52 @@ class IPtagResource(AbstractResource):
     """
 
     __slots__ = [
-        # the string representation of the ip address of the SpiNNaker machine
-        # used by this iptag
+
+        # The host ip address that will receive the data from this tag
         "_ip_address",
 
-        # the port number used by the socket for this iptag
+        # the port number that data from this tag will be sent to, or None
+        # if the port is to be assigned elsewhere
         "_port",
 
         # a boolean flag that indicates if the SDP headers are
-        #  stripped before transmission of data
+        # stripped before transmission of data
         "_strip_sdp",
 
         #  A fixed tag id to assign, or None if any tag is OK
-        "_tag"
+        "_tag",
+
+        # the identifier that states what type of data is being transmitted
+        # through this iptag
+        "_traffic_identifier"
+
     ]
 
-    def __init__(self, ip_address, port, strip_sdp, tag=None):
+    def __init__(
+            self, ip_address, port, strip_sdp, tag=None,
+            traffic_identifier="DEFAULT"):
         """
 
-        :param ip_address: The IP address that the tag will cause data to be\
-                    sent to
+        :param ip_address: The ip address of the host that will receive data\
+                    from this tag
         :type ip_address: str
-        :param port: The target port of the tag
-        :type port: int
+        :param port: The port that will
+        :type port: int or None
         :param strip_sdp: Whether the tag requires that SDP headers are\
                     stripped before transmission of data
         :type strip_sdp: bool
         :param tag: A fixed tag id to assign, or None if any tag is OK
         :type tag: int
+        :param traffic_identifier: The traffic to be sent using this tag; \
+                    traffic with the same traffic_identifier can be sent using\
+                    the same tag
+        :type traffic_identifier: str
         """
         self._ip_address = ip_address
         self._port = port
         self._strip_sdp = strip_sdp
         self._tag = tag
+        self._traffic_identifier = traffic_identifier
 
     @property
     def ip_address(self):
@@ -59,6 +72,14 @@ class IPtagResource(AbstractResource):
         :rtype: int
         """
         return self._port
+
+    @property
+    def traffic_identifier(self):
+        """ the traffic identifier for this iptag
+
+        :return:
+        """
+        return self._traffic_identifier
 
     @property
     def strip_sdp(self):
@@ -80,10 +101,15 @@ class IPtagResource(AbstractResource):
 
     @overrides(AbstractResource.get_value)
     def get_value(self):
-        return [self._ip_address, self._port, self._strip_sdp, self._tag]
+        return [
+            self._ip_address, self._port, self._strip_sdp, self._tag,
+            self._traffic_identifier
+        ]
 
     def __repr__(self):
         return (
-            "IPTagResource(ip_address={}, port={}, strip_sdp={}, tag={})"
-            .format(self._ip_address, self._port, self._strip_sdp, self._tag)
+            "IPTagResource(ip_address={}, port={}, strip_sdp={}, tag={}, "
+            "traffic_identifier={})"
+            .format(self._ip_address, self._port, self._strip_sdp, self._tag,
+                    self._traffic_identifier)
         )
