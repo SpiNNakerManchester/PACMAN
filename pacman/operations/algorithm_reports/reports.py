@@ -585,7 +585,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
 
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
-            _generate_routing_table(routing_table, top_level_folder)
+            generate_routing_table(routing_table, top_level_folder)
         progress_bar.update()
     progress_bar.end()
 
@@ -607,12 +607,12 @@ def router_report_from_compressed_router_tables(report_folder, routing_tables):
 
     for routing_table in routing_tables.routing_tables:
         if routing_table.number_of_entries > 0:
-            _generate_routing_table(routing_table, top_level_folder)
+            generate_routing_table(routing_table, top_level_folder)
         progress_bar.update()
     progress_bar.end()
 
 
-def _generate_routing_table(routing_table, top_level_folder):
+def generate_routing_table(routing_table, top_level_folder):
     file_name = "routing_table_{}_{}.rpt".format(
         routing_table.x, routing_table.y)
     file_path = os.path.join(top_level_folder, file_name)
