@@ -110,7 +110,7 @@ class Tags(object):
 
         if reverse_ip_tag.port is not None:
             if (reverse_ip_tag.board_address,
-                    reverse_ip_tag.port) in self._ports_assigned:
+                reverse_ip_tag.port) in self._ports_assigned:
                 raise PacmanInvalidParameterException(
                     "reverse_ip_tag", reverse_ip_tag,
                     "The port has already been assigned on the given board")

@@ -526,7 +526,7 @@ class ResourceTracker(object):
             if (utility_calls.is_equal_or_None(
                     other_board_address, board_address) and
                     utility_calls.is_equal_or_None(other_tag, tag) and
-                    other_stripe_sdp == strip_sdp and
+                        other_stripe_sdp == strip_sdp and
                     utility_calls.is_equal_or_None(other_port, port)):
                 return other_board_address, other_tag, other_port
         return None, None, None
@@ -640,7 +640,8 @@ class ResourceTracker(object):
             # If the board address is not None, and the port is already
             # assigned, the tag is not available
             if (port is not None and
-                    (board_address, port) in self._reverse_ip_tag_listen_port):
+                        (board_address,
+                         port) in self._reverse_ip_tag_listen_port):
                 return False
 
             # If the port is available, return true if the tag is available
@@ -652,7 +653,8 @@ class ResourceTracker(object):
         port_available = False
         for b_address in self._boards_with_ip_tags:
             if ((port is None or
-                 (b_address, port) not in self._reverse_ip_tag_listen_port) and
+                         (b_address,
+                          port) not in self._reverse_ip_tag_listen_port) and
                     self._is_tag_available(b_address, tag)):
                 port_available = True
                 break
@@ -813,7 +815,7 @@ class ResourceTracker(object):
                 # If the port is None and the requested port is not None,
                 # update the port number
                 if a_port is None and ip_tag.port is not None:
-                    self._ip_tags_strip_sdp_and_port[(b_address, a_tag)] =\
+                    self._ip_tags_strip_sdp_and_port[(b_address, a_tag)] = \
                         (ip_tag.strip_sdp, a_port)
             else:
 
