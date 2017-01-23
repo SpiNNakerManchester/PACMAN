@@ -1,7 +1,7 @@
 """
 TestTagsModel
 """
-
+from __future__ import absolute_import
 # pacman imports
 from pacman.model.graphs.machine.impl.simple_machine_vertex \
     import SimpleMachineVertex
