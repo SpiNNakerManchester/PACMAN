@@ -34,8 +34,8 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
-        parttiioned_vertex = SimpleMachineVertex(None, "")
-        tag_info.add_ip_tag(iptag, parttiioned_vertex)
+        machine_vertex = SimpleMachineVertex(None, "")
+        tag_info.add_ip_tag(iptag, machine_vertex)
 
     def test_adding_a_reverse_iptag(self):
         """
@@ -44,8 +44,8 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
-        parttiioned_vertex = SimpleMachineVertex(None, "")
-        tag_info.add_reverse_ip_tag(reverse_iptag, parttiioned_vertex)
+        machine_vertex = SimpleMachineVertex(None, "")
+        tag_info.add_reverse_ip_tag(reverse_iptag, machine_vertex)
 
     def test_add_iptag_then_locate_tag(self):
         """
@@ -54,10 +54,10 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
-        parttiioned_vertex = SimpleMachineVertex(None, "")
-        tag_info.add_ip_tag(iptag, parttiioned_vertex)
+        machine_vertex = SimpleMachineVertex(None, "")
+        tag_info.add_ip_tag(iptag, machine_vertex)
 
-        gotton_tag = tag_info.get_ip_tags_for_vertex(parttiioned_vertex)
+        gotton_tag = tag_info.get_ip_tags_for_vertex(machine_vertex)
         self.assertEqual(gotton_tag[0], iptag)
 
     def test_add_iptag_then_fail_to_locate(self):
@@ -67,11 +67,11 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
-        parttiioned_vertex = SimpleMachineVertex(None, "")
-        parttiioned_vertex_2 = SimpleMachineVertex(None, "")
-        tag_info.add_ip_tag(iptag, parttiioned_vertex)
+        machine_vertex = SimpleMachineVertex(None, "")
+        machine_vertex_2 = SimpleMachineVertex(None, "")
+        tag_info.add_ip_tag(iptag, machine_vertex)
 
-        gotton_tag = tag_info.get_ip_tags_for_vertex(parttiioned_vertex_2)
+        gotton_tag = tag_info.get_ip_tags_for_vertex(machine_vertex_2)
         self.assertEqual(gotton_tag, None)
 
     def test_add_reverse_iptag_then_locate_tag(self):
@@ -82,10 +82,10 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
-        parttiioned_vertex = SimpleMachineVertex(None, "")
-        tag_info.add_reverse_ip_tag(reverse_iptag, parttiioned_vertex)
+        machine_vertex = SimpleMachineVertex(None, "")
+        tag_info.add_reverse_ip_tag(reverse_iptag, machine_vertex)
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(
-            parttiioned_vertex)
+            machine_vertex)
         self.assertEqual(gotton_tag[0], reverse_iptag)
 
     def test_add_reverse_iptag_then_not_locate_tag(self):
@@ -96,11 +96,11 @@ class TestTagsModel(unittest.TestCase):
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
-        parttiioned_vertex = SimpleMachineVertex(None, "")
-        parttiioned_vertex2 = SimpleMachineVertex(None, "")
-        tag_info.add_reverse_ip_tag(reverse_iptag, parttiioned_vertex2)
+        machine_vertex = SimpleMachineVertex(None, "")
+        machine_vertex2 = SimpleMachineVertex(None, "")
+        tag_info.add_reverse_ip_tag(reverse_iptag, machine_vertex2)
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(
-            parttiioned_vertex)
+            machine_vertex)
         self.assertEqual(gotton_tag, None)
 
 if __name__ == '__main__':
