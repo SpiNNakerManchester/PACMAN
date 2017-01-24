@@ -77,9 +77,9 @@ class ResourceTracker(object):
         # board address
         "_ethernet_chips",
 
-        # Set of (x, y) tuples of coordinates of chips which have available
+        # Set of (x, y) tuples of coordinates of chips which have no available
         # processors
-        "_chips_available"
+        "_chips_used"
     ]
 
     def __init__(self, machine, chips=None):
@@ -147,10 +147,13 @@ class ResourceTracker(object):
         # (x, y) tuple of coordinates of Ethernet connected chip indexed by
         # board address
         self._ethernet_chips = dict()
+        for chip in self._machine.ethernet_connected_chips:
+            self._ethernet_chips[chip.ip_address] = (chip.x, chip.y)
+            self._boards_with_ip_tags.add(chip.ip_address)
 
-        # Set of (x, y) tuples of coordinates of chips which have available
+        # Set of (x, y) tuples of coordinates of chips which have no available
         # processors
-        self._chips_available = OrderedSet()
+        self._chips_used = OrderedSet()
         if chips is None:
             for chip in machine.chips:
                 n_processors = len(
@@ -182,10 +185,6 @@ class ResourceTracker(object):
                         if ethernet_area_code not in self._ethernet_area_codes:
                             self._ethernet_area_codes[
                                 ethernet_area_code] = OrderedSet()
-                            self._boards_with_ip_tags.add(ethernet_area_code)
-                            self._ethernet_chips[ethernet_area_code] = (
-                                chip.nearest_ethernet_x,
-                                chip.nearest_ethernet_y)
                         self._ethernet_area_codes[ethernet_area_code].add(key)
 
     @staticmethod
@@ -276,20 +275,13 @@ class ResourceTracker(object):
                     "The constraint cannot be met with the given chips")
         return x, y, p
 
-    def _get_usable_ip_tag_chips(self):
-        """ Get the coordinates of any chips that have available ip tags
+    def _chip_available(self, x, y):
+        return (self._machine.is_chip_at(x, y) and
+                ((x, y) not in self._core_tracker or
+                 len(self._core_tracker[x, y]) > 0))
 
-        :return: Generator of tuples of (x, y) coordinates of chips
-        :rtype: generator of (int, int)
-        """
-        for board_address in self._boards_with_ip_tags:
-            for key in self._ethernet_area_codes[board_address]:
-                if (key not in self._core_tracker or
-                        len(self._core_tracker[key]) > 0):
-                    yield key
-
-    def _get_usable_chips(self, chips, board_address,
-                          ip_tags, reverse_ip_tags):
+    def _get_usable_chips(
+            self, chips, board_address, ip_tags, reverse_ip_tags):
         """ Get all chips that are available on a board given the constraints
 
         :param chips: iterable of tuples of (x, y) coordinates of chips to \
@@ -312,46 +304,42 @@ class ResourceTracker(object):
                     * When a non-existent chip is specified
                     * When all the chips in the specified board have been used
         """
+        eth_chip = None
+        if board_address is not None:
+            if board_address not in self._ethernet_chips:
+                raise exceptions.PacmanInvalidParameterException(
+                    "board_address", str(board_address),
+                    "Unrecognised board address")
+            eth_x, eth_y = self._ethernet_chips[board_address]
+            eth_chip = self._machine.get_chip_at(eth_x, eth_y)
+
         if chips is not None:
-            chips_to_use = list()
             area_code = None
-            if board_address is not None:
-                if board_address not in self._ethernet_area_codes:
-                    raise exceptions.PacmanInvalidParameterException(
-                        "board_address", str(board_address),
-                        "Unrecognised board address")
-                area_code = self._ethernet_area_codes[board_address]
+            if eth_chip is not None:
+                area_code = set(self._machine.get_chips_on_board(eth_chip))
+            chip_found = False
             for (chip_x, chip_y) in chips:
-                if ((chip_x is None and chip_y is not None) or
-                        (chip_x is not None and chip_y is None)):
-                    raise exceptions.PacmanInvalidParameterException(
-                        "chip_x and chip_y", "{} and {}".format(
-                            chip_x, chip_y),
-                        "Either both or neither must be None")
-                elif self._machine.get_chip_at(chip_x, chip_y) is None:
-                    raise exceptions.PacmanInvalidParameterException(
-                        "chip_x and chip_y", "{} and {}".format(
-                            chip_x, chip_y),
-                        "No such chip was found in the machine")
-                elif ((chip_x, chip_y) in self._chips_available and
-                        (area_code is None or (chip_x, chip_y) in area_code)):
-                    chips_to_use.append((chip_x, chip_y))
-            if len(chips_to_use) == 0:
+                if ((area_code is None or (chip_x, chip_y) in area_code) and
+                        self._chip_available(chip_x, chip_y)):
+                    chip_found = True
+                    yield (chip_x, chip_y)
+            if not chip_found:
                 raise exceptions.PacmanInvalidParameterException(
                     "chips and board_address",
                     "{} and {}".format(chips, board_address),
                     "No valid chips found on the specified board")
-            return chips_to_use
         elif board_address is not None:
-            return self._ethernet_area_codes[board_address]
-        elif ((ip_tags is not None and len(ip_tags) > 0) or
-                (reverse_ip_tags is not None and len(reverse_ip_tags) > 0)):
-            return self._get_usable_ip_tag_chips()
-        return self._chips_available
+            for (x, y) in self._machine.get_chips_on_board(eth_chip):
+                if self._chip_available(x, y):
+                    yield (x, y)
+        else:
+            for chip in self._machine.chips:
+                if self._chip_available(x, y):
+                    yield chip.x, chip.y
 
     def most_avilable_cores_on_a_chip(self):
-        """
-        returns the number of cores on the chip which has the most cores.
+        """ Get the number of cores on the chip which has the most cores
+
         :return: int
         """
         size = 0
