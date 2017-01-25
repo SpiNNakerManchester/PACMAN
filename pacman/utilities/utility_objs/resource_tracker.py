@@ -77,9 +77,9 @@ class ResourceTracker(object):
         # board address
         "_ethernet_chips",
 
-        # Set of (x, y) tuples of coordinates of chips which have no available
+        # Set of (x, y) tuples of coordinates of chips which have available
         # processors
-        "_chips_used"
+        "_chips_available"
     ]
 
     def __init__(self, machine, chips=None):
@@ -141,9 +141,6 @@ class ResourceTracker(object):
         # Note not reverse ip tags
         self._n_ip_tag_allocations = dict()
 
-        # Board address indexed by (x, y) tuple of coordinates of the chip
-        self._ethernet_area_codes = dict()
-
         # (x, y) tuple of coordinates of Ethernet connected chip indexed by
         # board address
         self._ethernet_chips = dict()
@@ -151,41 +148,14 @@ class ResourceTracker(object):
             self._ethernet_chips[chip.ip_address] = (chip.x, chip.y)
             self._boards_with_ip_tags.add(chip.ip_address)
 
-        # Set of (x, y) tuples of coordinates of chips which have no available
+        # Set of (x, y) tuples of coordinates of chips which have available
         # processors
-        self._chips_used = OrderedSet()
+        self._chips_available = OrderedSet()
         if chips is None:
-            for chip in machine.chips:
-                n_processors = len(
-                    [p for p in chip.processors if not p.is_monitor])
-                if n_processors > 0:
-                    key = (chip.x, chip.y)
-                    self._chips_available.add(key)
+            for x, y in machine.chip_coordinates:
+                self._chips_available.add((x, y))
         else:
-            for x, y in chips:
-                chip = machine.get_chip_at(x, y)
-                n_processors = len(
-                    [p for p in chip.processors if not p.is_monitor])
-                if n_processors > 0:
-                    self._chips_available.add((x, y))
-
-        # Initialise the Ethernet area codes
-        for (chip_x, chip_y) in self._chips_available:
-            chip = self._machine.get_chip_at(chip_x, chip_y)
-            key = (chip_x, chip_y)
-            if key in self._chips_available:
-
-                # add area codes for Ethernets
-                if (chip.nearest_ethernet_x is not None and
-                        chip.nearest_ethernet_y is not None):
-                    ethernet_connected_chip = machine.get_chip_at(
-                        chip.nearest_ethernet_x, chip.nearest_ethernet_y)
-                    if ethernet_connected_chip is not None:
-                        ethernet_area_code = ethernet_connected_chip.ip_address
-                        if ethernet_area_code not in self._ethernet_area_codes:
-                            self._ethernet_area_codes[
-                                ethernet_area_code] = OrderedSet()
-                        self._ethernet_area_codes[ethernet_area_code].add(key)
+            self._chips_available.update(chips)
 
     @staticmethod
     def check_constraints(
@@ -276,9 +246,12 @@ class ResourceTracker(object):
         return x, y, p
 
     def _chip_available(self, x, y):
-        return (self._machine.is_chip_at(x, y) and
-                ((x, y) not in self._core_tracker or
-                 len(self._core_tracker[x, y]) > 0))
+        return (
+            self._machine.is_chip_at(x, y) and
+            (((x, y) not in self._core_tracker and
+              self._machine.get_chip_at(x, y).n_user_processors > 0) or
+             len(self._core_tracker[x, y]) > 0)
+        )
 
     def _get_usable_chips(
             self, chips, board_address, ip_tags, reverse_ip_tags):
@@ -333,31 +306,15 @@ class ResourceTracker(object):
                 if self._chip_available(x, y):
                     yield (x, y)
         else:
-            for chip in self._machine.chips:
+            for (x, y) in self._chips_available:
                 if self._chip_available(x, y):
-                    yield chip.x, chip.y
+                    yield (x, y)
 
-    def most_avilable_cores_on_a_chip(self):
-        """ Get the number of cores on the chip which has the most cores
-
-        :return: int
+    @property
+    def chips_available(self):
+        """ The chips currently available
         """
-        size = 0
-        for chip in self._chips_available:
-            if chip not in self._core_tracker:
-                processors = self._machine.get_chip_at(
-                    chip[0], chip[1]).processors
-                chip_size = 0
-                for processor in processors:
-                    if not processor.is_monitor:
-                        chip_size += 1
-                if chip_size > size:
-                    size = chip_size
-            else:
-                cores = self._core_tracker[chip]
-                if len(cores) > size:
-                    size = len(cores)
-        return size
+        return self._chips_available
 
     def _is_sdram_available(self, chip, key, resources):
         """ Check if the SDRAM available on a given chip is enough for the\
@@ -544,6 +501,7 @@ class ResourceTracker(object):
         # If we got here, we didn't find an existing tag on the same board
         # so check if the tag *could* be assigned to the current board
         if self._is_tag_available_on_ethernet_chip(eth_chip, tag_id):
+
             # If the tag is available, allow it to be used
             return None, None, None
 
@@ -575,12 +533,12 @@ class ResourceTracker(object):
 
     def _is_tag_available_on_ethernet_chip(self, ethernet_chip, tag_id):
         if ethernet_chip is not None:
+
             # Having found the board address, it can only be used if a
             # tag is available
             if (ethernet_chip.ip_address in self._boards_with_ip_tags and
                     (tag_id is None or
-                             tag_id in self._tags_by_board[
-                             ethernet_chip.ip_address])):
+                     tag_id in self._tags_by_board[ethernet_chip.ip_address])):
                 return True
         return False
 
@@ -753,14 +711,14 @@ class ResourceTracker(object):
             eth_chip = self._machine.get_chip_at(
                 chip.nearest_ethernet_x, chip.nearest_ethernet_y)
 
-            # verify if the ethernet chip has the available tag id
+            # verify if the Ethernet chip has the available tag id
             if self._is_tag_available_on_ethernet_chip(eth_chip, tag_id):
                 board_address = eth_chip.ip_address
 
         if board_address is None and tag_id is not None:
             for b_address in self._boards_with_ip_tags:
                 if (b_address not in self._tags_by_board or
-                            tag_id in self._tags_by_board[b_address]):
+                        tag_id in self._tags_by_board[b_address]):
                     board_address = b_address
                     break
         elif board_address is None and tag_id is None:
@@ -836,7 +794,7 @@ class ResourceTracker(object):
                     (ip_tag.ip_address, ip_tag.traffic_identifier)
 
                 # Remember how many allocations are sharing this tag
-                # in case an de-allocation is requested
+                # in case an deallocation is requested
                 self._n_ip_tag_allocations[tag_key] = 1
 
                 # Get the chip with the Ethernet

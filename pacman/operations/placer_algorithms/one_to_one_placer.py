@@ -55,13 +55,8 @@ class OneToOnePlacer(RadialPlacer):
         # iterate over vertices
         for vertex_list in vertices:
 
-            # ensure largest cores per chip is divisible by 2
-            # (for one to one placement)
-            max_cores_on_chip = \
-                resource_tracker.most_avilable_cores_on_a_chip()
-
             # if too many one to ones to fit on a chip, allocate individually
-            if len(vertex_list) > max_cores_on_chip:
+            if len(vertex_list) > machine.maximum_user_cores_on_chip:
                 for vertex in vertex_list:
                     self._allocate_individual(
                         vertex, placements, resource_tracker,
@@ -139,20 +134,20 @@ class OneToOnePlacer(RadialPlacer):
         for vertex in vertices:
             if vertex not in found_list:
 
-                # verts that are one to one connected with vertex and are not
-                # forced off chip
+                # vertices that are one to one connected with vertex and are
+                # not forced off chip
                 connected_vertices = self._find_one_to_one_vertices(
                     vertex, machine_graph)
 
-                # create list for each vertex thats connected havent already
+                # create list for each vertex thats connected haven't already
                 #  been seen before
                 new_list = set()
                 for found_vertex in connected_vertices:
                     if found_vertex not in found_list:
                         new_list.add(found_vertex)
 
-                # looks for verts that have same chip constraints but not found
-                # by the one to one connection search.
+                # looks for vertices that have same chip constraints but not
+                # found by the one to one connection search.
                 same_chip_vertices = list()
                 for found_vertex in new_list:
                     for same_chip_constrained_vertex in \
@@ -161,7 +156,7 @@ class OneToOnePlacer(RadialPlacer):
                             same_chip_vertices.append(
                                 same_chip_constrained_vertex)
 
-                # add these newly found verts to the list
+                # add these newly found vertices to the list
                 new_list.update(same_chip_vertices)
 
                 sorted_vertices.append(new_list)
