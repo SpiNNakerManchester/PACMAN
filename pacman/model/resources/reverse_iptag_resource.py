@@ -8,7 +8,8 @@ class ReverseIPtagResource(AbstractResource):
     """
 
     __slots__ = [
-        # The target port of the tag
+        # The target port of the tag or None if this is to be assigned
+        # elsewhere
         "_port",
 
         # The SDP port number to be used when constructing SDP packets from
@@ -19,11 +20,12 @@ class ReverseIPtagResource(AbstractResource):
         "_tag"
     ]
 
-    def __init__(self, port, sdp_port=1, tag=None):
+    def __init__(
+            self, port=None, sdp_port=1, tag=None):
         """
 
-        :param port: The target port of the tag
-        :type port: int
+        :param port: The target port of the tag or None to assign elsewhere
+        :type port: int or None
         :param port: The UDP port to listen to on the board for this tag
         :type port: int
         :param sdp_port:\
@@ -31,7 +33,7 @@ class ReverseIPtagResource(AbstractResource):
             the received UDP packets for this tag
         :type sdp_port: int
         :param tag: A fixed tag id to assign, or None if any tag is OK
-        :type tag: int
+        :type tag: int or None
         """
         self._port = port
         self._sdp_port = sdp_port
@@ -71,4 +73,3 @@ class ReverseIPtagResource(AbstractResource):
             "ReverseIPTagResource(port={}, sdp_port={}, tag={})"
             .format(self._port, self._sdp_port, self._tag)
         )
-
