@@ -155,7 +155,8 @@ class ResourceTracker(object):
             for x, y in machine.chip_coordinates:
                 self._chips_available.add((x, y))
         else:
-            self._chips_available.update(chips)
+            for x, y in chips:
+                self._chips_available.add((x, y))
 
     @staticmethod
     def check_constraints(
