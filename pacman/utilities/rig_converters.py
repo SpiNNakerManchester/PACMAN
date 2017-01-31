@@ -81,9 +81,9 @@ def convert_to_rig_machine(machine):
                                     link.destination_x, link.destination_y):
                                 is_dead = True
                             else:
-                                chip = machine.get_chip_at(
+                                dest_chip = machine.get_chip_at(
                                     link.destination_x, link.destination_y)
-                                if chip.virtual:
+                                if dest_chip.virtual:
                                     is_dead = True
                         if is_dead:
                             dead_links.append(
