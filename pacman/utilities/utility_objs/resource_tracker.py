@@ -1304,7 +1304,7 @@ class ResourceTracker(object):
 
         :param chip_x: the x coord of the chip
         :type chip_x: int
-        :param chip_y:the y coord of the chip
+        :param chip_y: the y coord of the chip
         :type chip_y: int
         :return: True if the chip is available, False otherwise
         :rtype: bool
