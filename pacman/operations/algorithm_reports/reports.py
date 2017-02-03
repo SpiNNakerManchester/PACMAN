@@ -46,6 +46,7 @@ def placer_reports_with_application_graph(
         report_folder, hostname, graph, graph_mapper, placements, machine):
     """ Reports that can be produced from placement given a application\
         graph's existence
+
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param graph: the application graph to which placements were built
@@ -66,6 +67,7 @@ def placer_reports_with_application_graph(
 def placer_reports_without_application_graph(
         report_folder, hostname, machine_graph, placements, machine):
     """
+
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
@@ -282,6 +284,7 @@ def placement_report_with_application_graph_by_vertex(
 def placement_report_without_application_graph_by_vertex(
         report_folder, hostname, placements, machine_graph):
     """ Generate report on the placement of vertices onto cores by vertex.
+
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.

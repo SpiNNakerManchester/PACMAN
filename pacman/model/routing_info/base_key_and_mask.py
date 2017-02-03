@@ -16,6 +16,7 @@ class BaseKeyAndMask(object):
 
     def __init__(self, base_key, mask):
         """
+
         :param base_key: The routing key
         :type base_key: int
         :param mask: The routing mask

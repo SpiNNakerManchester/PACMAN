@@ -16,6 +16,7 @@ class NewPartitionerConstraint(AbstractPartitionerConstraint):
     def is_constraint(self):
         """
         helper method for is_instance
+
         :return:
         """
         return True

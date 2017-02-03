@@ -31,6 +31,7 @@ class AbstractVirtualVertex(AbstractVertex):
     def virtual_chip_x(self):
         """ The x-coordinate of the virtual chip where this vertex is to be\
             placed
+
             :return int
         """
 
@@ -38,5 +39,6 @@ class AbstractVirtualVertex(AbstractVertex):
     def virtual_chip_y(self):
         """ The y-coordinate of the virtual chip where this vertex is to be\
             placed
+
             :return int
         """

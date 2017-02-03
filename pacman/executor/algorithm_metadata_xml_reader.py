@@ -25,6 +25,7 @@ class AlgorithmMetadataXmlReader(object):
 
     def __init__(self, xml_paths):
         """
+
         :param xml_paths: paths to extra metadata files
         :return:
         """

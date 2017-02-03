@@ -36,6 +36,7 @@ START_OF_ROUTING_KEY_POSITION = 0
 def deduce_types(graph):
     """
     deducing the number of applications required for this key space
+
     :param graph:
     :return:
     """

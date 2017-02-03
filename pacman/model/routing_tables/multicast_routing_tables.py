@@ -15,6 +15,7 @@ class MulticastRoutingTables(object):
 
     def __init__(self, routing_tables=None):
         """
+
         :param routing_tables: The routing tables to add
         :type routing_tables: iterable of\
                     :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`

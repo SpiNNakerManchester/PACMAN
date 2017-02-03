@@ -72,6 +72,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     @property
     def out_going_processors(self):
         """ The destination processors of the entry
+
         :return:
         """
         return self._out_going_processors
@@ -79,6 +80,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     @property
     def out_going_links(self):
         """ The destination links of the entry
+
         :return:
         """
         return self._out_going_links
@@ -86,6 +88,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     @property
     def incoming_link(self):
         """ The source link for this path entry
+
         :return:
         """
         return self._incoming_link
@@ -139,6 +142,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     def merge_entry(self, other):
         """ Merges the another entry with this one and returns a new\
             MulticastRoutingTableByPartitionEntry
+
         :param other: the MulticastRoutingTableByPartitionEntry to merge into\
                     this one
         :return: a merged MulticastRoutingTableByPartitionEntry

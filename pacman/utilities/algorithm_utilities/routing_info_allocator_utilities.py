@@ -28,6 +28,7 @@ def get_edge_groups(machine_graph):
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
+
     :param machine_graph: the machine graph
     """
 

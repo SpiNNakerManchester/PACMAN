@@ -90,6 +90,7 @@ class RoutingInfo(object):
 
     def get_routing_info_from_partition(self, partition):
         """
+
         :param partition: The partition to set the number of keys for
         :type partition:\
                     :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
