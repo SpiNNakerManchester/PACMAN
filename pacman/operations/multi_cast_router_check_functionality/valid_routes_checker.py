@@ -401,7 +401,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement
-    :return None:
+    :return: None
     :raise PacmanRoutingException: when there is no entry located on this\
             router.
     """

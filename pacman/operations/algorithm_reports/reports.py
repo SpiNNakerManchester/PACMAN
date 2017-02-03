@@ -53,7 +53,7 @@ def placer_reports_with_application_graph(
                 graphs
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
-    :return None
+    :return: None
     """
     placement_report_with_application_graph_by_vertex(
         report_folder, hostname, graph, graph_mapper, placements)
@@ -72,7 +72,7 @@ def placer_reports_without_application_graph(
     :param machine: the python machine object
     :param machine_graph: the machine graph to which the reports are to\
              operate on
-    :return None
+    :return: None
     """
     placement_report_without_application_graph_by_vertex(
         report_folder, hostname, placements, machine_graph)
@@ -478,7 +478,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
-    :return None
+    :return: None
     """
 
     file_name = os.path.join(report_folder, "chip_sdram_usage_by_core.rpt")
@@ -830,7 +830,7 @@ def _locate_routing_entry(current_router, key):
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement
-    :return None:
+    :return: None
     :raise PacmanRoutingException: when there is no entry located on this\
             router.
     """

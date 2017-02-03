@@ -203,7 +203,7 @@ class BasicDijkstraRouting(object):
                     structure of the machine
         :type nodes_info: dict
         :type machine 'py:class':spinn_machine.machine.Machine
-        :return None
+        :return: None
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -221,7 +221,7 @@ class BasicDijkstraRouting(object):
         :type key: str
         :type nodes_info: dict
         :type machine 'py:class':spinn_machine.machine.Machine
-        :return None
+        :return: None
         :rtype: None
         :raise None: this method does not raise any known exception
         """
