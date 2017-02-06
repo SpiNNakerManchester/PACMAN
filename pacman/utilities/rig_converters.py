@@ -67,43 +67,41 @@ def convert_to_rig_machine(machine):
             else:
                 chip = machine.get_chip_at(x_coord, y_coord)
 
-                if not chip.virtual:
-
-                    # write dead links
-                    for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
-                        router = chip.router
-                        is_dead = False
-                        if not router.is_link(link_id):
+                # write dead links
+                for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
+                    router = chip.router
+                    is_dead = False
+                    if not router.is_link(link_id):
+                        is_dead = True
+                    else:
+                        link = router.get_link(link_id)
+                        if not machine.is_chip_at(
+                                link.destination_x, link.destination_y):
                             is_dead = True
                         else:
-                            link = router.get_link(link_id)
-                            if not machine.is_chip_at(
-                                    link.destination_x, link.destination_y):
+                            dest_chip = machine.get_chip_at(
+                                link.destination_x, link.destination_y)
+                            if dest_chip.virtual:
                                 is_dead = True
-                            else:
-                                dest_chip = machine.get_chip_at(
-                                    link.destination_x, link.destination_y)
-                                if dest_chip.virtual:
-                                    is_dead = True
-                        if is_dead:
-                            dead_links.append(
-                                [x_coord, y_coord, "{}".format(
-                                 constants.EDGES(link_id).name.lower())])
+                    if is_dead:
+                        dead_links.append(
+                            [x_coord, y_coord, "{}".format(
+                             constants.EDGES(link_id).name.lower())])
 
-                    # Fix the number of processors when there are less
-                    resource_exceptions = dict()
-                    n_processors = len([
-                        processor for processor in chip.processors])
-                    if n_processors < CHIP_HOMOGENEOUS_CORES:
-                        resource_exceptions["cores"] = n_processors
+                # Fix the number of processors when there are less
+                resource_exceptions = dict()
+                n_processors = len([
+                    processor for processor in chip.processors])
+                if n_processors < CHIP_HOMOGENEOUS_CORES:
+                    resource_exceptions["cores"] = n_processors
 
-                    # Add tags if Ethernet chip
-                    if chip.ip_address is not None:
-                        resource_exceptions["tags"] = len(chip.tag_ids)
+                # Add tags if Ethernet chip
+                if chip.ip_address is not None:
+                    resource_exceptions["tags"] = len(chip.tag_ids)
 
-                    if len(resource_exceptions) > 0:
-                        chip_resource_exceptions.append(
-                            (x_coord, y_coord, resource_exceptions))
+                if len(resource_exceptions) > 0:
+                    chip_resource_exceptions.append(
+                        (x_coord, y_coord, resource_exceptions))
 
     return Machine(
         width=machine.max_chip_x + 1,
