@@ -12,8 +12,8 @@ from uinit_test_objects.test_vertex import TestVertex
 
 # general imports
 import unittest
-from pacman.model.graphs.machine.impl.simple_machine_edge import \
-    SimpleMachineEdge
+from pacman.model.graphs.machine.impl.machine_edge import \
+    MachineEdge
 
 
 class TestApplicationEdgeModel(unittest.TestCase):
@@ -132,7 +132,7 @@ class TestApplicationEdgeModel(unittest.TestCase):
         edge1 = TestEdge(vert1, vert2, "edge 1")
 
         edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2)
-        self.assertIsInstance(edge, SimpleMachineEdge)
+        self.assertIsInstance(edge, MachineEdge)
 
     def test_create_new_machine_edge_from_edge(self):
         """
@@ -148,5 +148,5 @@ class TestApplicationEdgeModel(unittest.TestCase):
             Slice(0, 4), vert2.get_resources_used_by_atoms(Slice(0, 4), None))
         edge1 = TestEdge(vert1, vert2, "First edge")
         edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2,
-                                        None, "First edge")
+                                         None, "First edge")
         self.assertEqual(edge.label, "First edge")

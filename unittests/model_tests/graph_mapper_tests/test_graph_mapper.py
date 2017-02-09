@@ -10,10 +10,11 @@ from uinit_test_objects.test_vertex import TestVertex
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.graph_mapper \
     import GraphMapper
-from pacman.model.graphs.application.simple_application_edge\
-    import SimpleMachineEdge
-from pacman.model.graphs.machine.impl.simple_machine_vertex import SimpleMachineVertex
-from pacman.exceptions import (PacmanNotFoundError)
+from pacman.model.graphs.machine.impl.machine_edge import \
+    MachineEdge
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
+from pacman.exceptions import PacmanNotFoundError
 
 # general imports
 import unittest
@@ -40,11 +41,9 @@ class TestGraphMapper(unittest.TestCase):
         edges = list()
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
-        edges.append(SimpleMachineEdge(vertices[0],
-                                                 vertices[1]))
-        edges.append(SimpleMachineEdge(vertices[1],
-                                                 vertices[1]))
-        sube = SimpleMachineEdge(vertices[1], vertices[0])
+        edges.append(MachineEdge(vertices[0], vertices[1]))
+        edges.append(MachineEdge(vertices[1], vertices[1]))
+        sube = MachineEdge(vertices[1], vertices[0])
         edges.append(sube)
         graph = GraphMapper()
         edge = TestEdge(TestVertex(10, "pre"), TestVertex(5, "post"))
@@ -68,10 +67,8 @@ class TestGraphMapper(unittest.TestCase):
         vertex2 = SimpleMachineVertex(None, "")
 
         edges = list()
-        edges.append(SimpleMachineEdge(vertices[0],
-                                                 vertices[1]))
-        edges.append(SimpleMachineEdge(vertices[1],
-                                                 vertices[1]))
+        edges.append(MachineEdge(vertices[0], vertices[1]))
+        edges.append(MachineEdge(vertices[1], vertices[1]))
 
         graph_mapper = GraphMapper()
         vert = TestVertex(4, "Some testing vertex")
@@ -127,12 +124,10 @@ class TestGraphMapper(unittest.TestCase):
         vertices.append(SimpleMachineVertex(None, ""))
 
         edges = list()
-        edges.append(SimpleMachineEdge(vertices[0],
-                                                 vertices[1]))
-        edges.append(SimpleMachineEdge(vertices[1],
-                                                 vertices[1]))
+        edges.append(MachineEdge(vertices[0], vertices[1]))
+        edges.append(MachineEdge(vertices[1], vertices[1]))
 
-        sube = SimpleMachineEdge(vertices[1], vertices[0])
+        sube = MachineEdge(vertices[1], vertices[0])
         edges.append(sube)
 
         # Create the graph mapper

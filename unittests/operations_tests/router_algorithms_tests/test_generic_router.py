@@ -1,16 +1,17 @@
 import unittest
 
-from pacman.model.graphs.application.application_graph \
+from pacman.model.graphs.application.impl.application_graph \
     import ApplicationGraph
-from pacman.model.graphs.application.simple_application_edge \
-    import SimpleApplicationEdge
-from pacman.model.graphs.machine.machine_graph import MachineGraph
-from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.application.impl.application_edge \
+    import ApplicationEdge
+from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
 
 from pacman.model.graphs.application.abstract_application_vertex import \
     AbstractApplicationVertex
-from pacman.model.graphs.machine.impl.simple_machine_edge import \
-    SimpleMachineEdge
+from pacman.model.graphs.machine.impl.machine_edge import \
+    MachineEdge
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
@@ -43,7 +44,7 @@ class TestRouter(unittest.TestCase):
         #sort out graph
         self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
-        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2, "First edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
         self.verts = [self.vert1, self.vert2]
         self.edges = [self.edge1]
         self.graph = ApplicationGraph("Graph", self.verts, self.edges)
@@ -53,7 +54,7 @@ class TestRouter(unittest.TestCase):
             0, 10, self.vert1.get_resources_used_by_atoms(0, 10, []))
         self.vertex2 = SimpleMachineVertex(
             0, 5, self.vert2.get_resources_used_by_atoms(0, 10, []))
-        self.edge = SimpleMachineEdge(self.vertex1, self.vertex2)
+        self.edge = MachineEdge(self.vertex1, self.vertex2)
         self.graph.add_vertex(self.vertex1)
         self.graph.add_vertex(self.vertex2)
         self.graph.add_edge(self.edge, "TEST")
@@ -114,7 +115,7 @@ class TestRouter(unittest.TestCase):
         self.routing_info = RoutingInfo()
         self.edge_routing_info1 = \
             PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               edge=self.edge)
+                                 edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         #create machine
         self.machine = VirtualMachine(10, 10, False)

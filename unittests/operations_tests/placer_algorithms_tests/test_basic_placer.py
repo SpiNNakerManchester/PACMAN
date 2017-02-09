@@ -3,9 +3,9 @@ test basic placer
 """
 
 # pacman imports
-from pacman.model.graphs.application.simple_application_edge import \
-    SimpleApplicationEdge
-from pacman.model.graphs.machine.simple_machine_vertex \
+from pacman.model.graphs.application.impl.application_edge import \
+    ApplicationEdge
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
     import SimpleMachineVertex
 
 from pacman.exceptions import PacmanPlaceException
@@ -42,12 +42,9 @@ class TestBasicPlacer(unittest.TestCase):
         self.vert1 = TestVertex(100, "New AbstractConstrainedTestVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedTestVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedTestVertex 3")
-        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2,
-                                                "First edge")
-        self.edge2 = SimpleApplicationEdge(self.vert2, self.vert1,
-                                                "Second edge")
-        self.edge3 = SimpleApplicationEdge(self.vert1, self.vert3,
-                                                "Third edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
+        self.edge2 = ApplicationEdge(self.vert2, self.vert1, "Second edge")
+        self.edge3 = ApplicationEdge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph", self.verts, self.edges)
@@ -100,8 +97,7 @@ class TestBasicPlacer(unittest.TestCase):
         self.vertices.append(self.vertex3)
         self.vertices.append(self.vertex4)
         self.edges = list()
-        self.graph = MachineGraph(self.vertices,
-                                         self.edges)
+        self.graph = MachineGraph(self.vertices, self.edges)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(self.vertices)
 

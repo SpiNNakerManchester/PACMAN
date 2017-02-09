@@ -1,10 +1,11 @@
 import unittest
 
-from pacman.model.graphs.application.simple_application_edge\
-    import SimpleApplicationEdge
-from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
-from pacman.model.resources.cpu_cycles_resource import \
-    CPUCyclesResource
+from pacman.model.graphs.application.impl.application_edge\
+    import ApplicationEdge
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
 
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
@@ -33,7 +34,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     sdram_requirement = vertex.get_sdram_usage_for_atoms(
         lo_atom, hi_atom, vertex_in_edges)
     # noinspection PyTypeChecker
-    resources = ResourceContainer(cpu=CPUCyclesResource(cpu_cycles),
+    resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                   dtcm=DTCMResource(dtcm_requirement),
                                   sdram=SDRAMResource(sdram_requirement))
     return resources
@@ -73,9 +74,9 @@ class TestRadialPlacer(unittest.TestCase):
         self.vert1 = Vertex(100, "New AbstractConstrainedVertex 1")
         self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = Vertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2, "First edge")
-        self.edge2 = SimpleApplicationEdge(self.vert2, self.vert1, "Second edge")
-        self.edge3 = SimpleApplicationEdge(self.vert1, self.vert3, "Third edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
+        self.edge2 = ApplicationEdge(self.vert2, self.vert1, "Second edge")
+        self.edge3 = ApplicationEdge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph", self.verts, self.edges)

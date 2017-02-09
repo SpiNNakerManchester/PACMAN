@@ -1,6 +1,6 @@
 # pacman imports
-from pacman.model.graphs.application.simple_application_edge \
-    import SimpleApplicationEdge
+from pacman.model.graphs.application.impl.application_edge \
+    import ApplicationEdge
 
 from pacman.model.graphs.application.impl.application_graph \
     import ApplicationGraph
@@ -27,9 +27,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
         vert3 = TestVertex(3, "New AbstractConstrainedVertex 3", 256)
-        edge1 = SimpleApplicationEdge(vert1, vert2, None, "First edge")
-        edge2 = SimpleApplicationEdge(vert2, vert1, None, "First edge")
-        edge3 = SimpleApplicationEdge(vert1, vert3, None, "First edge")
+        edge1 = ApplicationEdge(vert1, vert2, None, "First edge")
+        edge2 = ApplicationEdge(vert2, vert1, None, "First edge")
+        edge3 = ApplicationEdge(vert1, vert3, None, "First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
         graph = ApplicationGraph("Graph", verts, edges)

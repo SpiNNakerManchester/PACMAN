@@ -3,8 +3,8 @@ test for partitioning
 """
 
 # pacman imports
-from pacman.model.graphs.application.simple_application_edge import \
-    SimpleApplicationEdge
+from pacman.model.graphs.application.impl.application_edge import \
+    ApplicationEdge
 
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException, PacmanValueError
@@ -46,12 +46,9 @@ class TestBasicPartitioner(unittest.TestCase):
         self.vert1 = TestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2,
-                                                None, "First edge")
-        self.edge2 = SimpleApplicationEdge(self.vert2, self.vert1,
-                                                None, "Second edge")
-        self.edge3 = SimpleApplicationEdge(self.vert1, self.vert3,
-                                                None, "Third edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None, "First edge")
+        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None, "Second edge")
+        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph", self.verts, self.edges)
@@ -117,7 +114,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         self.graph.add_edge(
-            SimpleApplicationEdge(self.vert3, self.vert1), "TEST")
+            ApplicationEdge(self.vert3, self.vert1), "TEST")
         graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(len(graph.vertices), 3)
         self.assertEqual(len(graph.edges), 4)

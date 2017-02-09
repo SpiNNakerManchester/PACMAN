@@ -1,12 +1,13 @@
 
 # pacman imports
-from pacman.model.graphs.machine.machine_graph import MachineGraph
-from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
 
 from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.graphs.machine.impl.simple_machine_edge import \
-    SimpleMachineEdge
+from pacman.model.graphs.machine.impl.machine_edge import \
+    MachineEdge
 
 # general imports
 import unittest
@@ -42,10 +43,9 @@ class TestMachineGraphModel(unittest.TestCase):
         for i in range(10):
             vertices.append(SimpleMachineVertex(None, ""))
         for i in range(5):
-            edges.append(SimpleMachineEdge(vertices[0],
-                                                     vertices[(i + 1)]))
+            edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
         for i in range(5, 10):
-            edges.append(SimpleMachineEdge(
+            edges.append(MachineEdge(
                 vertices[5], vertices[(i + 1) % 10]))
         graph = MachineGraph(vertices=vertices, edges=edges)
         outgoing = graph.get_edges_starting_at_vertex(vertices[0])
@@ -87,10 +87,8 @@ class TestMachineGraphModel(unittest.TestCase):
         vertices.append(subv)
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(subv)
-        edges.append(SimpleMachineEdge(vertices[0],
-                                                 vertices[1]))
-        edges.append(SimpleMachineEdge(vertices[1],
-                                                 vertices[0]))
+        edges.append(MachineEdge(vertices[0], vertices[1]))
+        edges.append(MachineEdge(vertices[1], vertices[0]))
         with self.assertRaises(PacmanAlreadyExistsException):
             MachineGraph(vertices=vertices, edges=edges)
 
@@ -104,7 +102,7 @@ class TestMachineGraphModel(unittest.TestCase):
             edges = list()
             vertices.append(SimpleMachineVertex(None, ""))
             vertices.append(SimpleMachineVertex(None, ""))
-            edge = SimpleMachineEdge(vertices[0], vertices[1])
+            edge = MachineEdge(vertices[0], vertices[1])
             edges.append(edge)
             edges.append(edge)
             MachineGraph(vertices=vertices, edges=edges)
@@ -119,9 +117,8 @@ class TestMachineGraphModel(unittest.TestCase):
         edges = list()
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
-        edges.append(SimpleMachineEdge(vertices[0],
-                                                 vertices[1]))
-        edges.append(SimpleMachineEdge(
+        edges.append(MachineEdge(vertices[0], vertices[1]))
+        edges.append(MachineEdge(
             SimpleMachineVertex(None, ""), vertices[0]))
         with self.assertRaises(PacmanInvalidParameterException):
             MachineGraph(vertices=vertices, edges=edges)
@@ -136,9 +133,8 @@ class TestMachineGraphModel(unittest.TestCase):
         edges = list()
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
-        edges.append(SimpleMachineEdge(vertices[0],
-                                                 vertices[1]))
-        edges.append(SimpleMachineEdge(
+        edges.append(MachineEdge(vertices[0], vertices[1]))
+        edges.append(MachineEdge(
             vertices[0], SimpleMachineVertex(None, "")))
         with self.assertRaises(PacmanInvalidParameterException):
             MachineGraph(vertices=vertices, edges=edges)
