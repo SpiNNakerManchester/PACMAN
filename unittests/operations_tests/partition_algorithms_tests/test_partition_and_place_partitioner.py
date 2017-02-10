@@ -81,7 +81,7 @@ class TestBasicPartitioner(unittest.TestCase):
             for y in range(5):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
-        self.machine = Machine(chips)
+        self.machine = Machine(chips, 0, 0)
         self.bp = PartitionAndPlacePartitioner()
 
     def test_new_basic_partitioner(self):
@@ -193,7 +193,7 @@ class TestBasicPartitioner(unittest.TestCase):
             for y in range(5):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
-        self.machine = Machine(chips)
+        self.machine = Machine(chips, 0, 0)
         singular_vertex = TestVertex(450, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
@@ -235,7 +235,7 @@ class TestBasicPartitioner(unittest.TestCase):
             for y in range(5):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
-        self.machine = Machine(chips)
+        self.machine = Machine(chips, 0, 0)
         large_vertex = TestVertex(3000, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
@@ -276,7 +276,7 @@ class TestBasicPartitioner(unittest.TestCase):
             for y in range(5):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
-        self.machine = Machine(chips)
+        self.machine = Machine(chips, 0, 0)
         self.bp.partition(self.graph, self.machine)
 
     def test_partition_with_more_sdram_than_default(self):
@@ -312,7 +312,7 @@ class TestBasicPartitioner(unittest.TestCase):
             for y in range(5):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
-        self.machine = Machine(chips)
+        self.machine = Machine(chips, 0, 0)
         self.bp.partition(self.graph, self.machine)
 
     def test_partition_with_unsupported_constraints(self):
