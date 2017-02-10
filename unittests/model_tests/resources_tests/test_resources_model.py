@@ -66,7 +66,7 @@ class TestResourceModels(unittest.TestCase):
         container = ResourceContainer(dtcm, sdram, cpu)
         self.assertEqual(container.sdram.get_value(), 128 * (2**20))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**20) + 1)
-        self.assertEqual(container.cpu.get_value(), 128 * (2**20) + 2)
+        self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**20) + 2)
 
         sdram = SDRAMResource(128 * (2**19))
         dtcm = DTCMResource(128 * (2**19) + 1)
@@ -75,7 +75,7 @@ class TestResourceModels(unittest.TestCase):
         container = ResourceContainer(dtcm, sdram, cpu)
         self.assertEqual(container.sdram.get_value(), 128 * (2**19))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**19) + 1)
-        self.assertEqual(container.cpu.get_value(), 128 * (2**19) + 2)
+        self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**19) + 2)
 
         sdram = SDRAMResource(128 * (2**21))
         dtcm = DTCMResource(128 * (2**21) + 1)
@@ -84,7 +84,7 @@ class TestResourceModels(unittest.TestCase):
         container = ResourceContainer(dtcm, sdram, cpu)
         self.assertEqual(container.sdram.get_value(), 128 * (2**21))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**21) + 1)
-        self.assertEqual(container.cpu.get_value(), 128 * (2**21) + 2)
+        self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**21) + 2)
 
 
 if __name__ == '__main__':
