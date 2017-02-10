@@ -29,12 +29,11 @@ class TestVertex(ApplicationVertex):
         self._model_based_max_atoms_per_core = max_atoms_per_core
         self._n_atoms = n_atoms
 
-    def get_resources_used_by_atoms(self, vertex_slice, vertex_in_edges):
+    def get_resources_used_by_atoms(self, vertex_slice):
         """
         standard method call to get the sdram, cpu and dtcm usage of a
         collection of atoms
         :param vertex_slice: the collection of atoms
-        :param vertex_in_edges: the edges coming into this vertex
         :return:
         """
         return ResourceContainer(
