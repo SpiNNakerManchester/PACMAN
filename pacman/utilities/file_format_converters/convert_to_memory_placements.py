@@ -27,7 +27,6 @@ class ConvertToMemoryPlacements(object):
         :param allocations:
         :param extended_machine:
         :param constraints:
-        :return:
         """
 
         # load the json files
@@ -103,7 +102,6 @@ class ConvertToMemoryPlacements(object):
         :param placements:
         :param allocations:
         :param constraints:
-        :return:
         """
 
         placments_file = open(placements, "r")
@@ -120,8 +118,9 @@ class ConvertToMemoryPlacements(object):
     def _valid_constraints_for_external_device(constraints_for_vertex):
         """ Search for the constraint pattern which represents an external\
             device
+
         :param constraints_for_vertex: constraints for a vertex
-        :return: bool
+        :rtype: bool
         """
         found_route_end_point = None
         found_placement_constraint = None

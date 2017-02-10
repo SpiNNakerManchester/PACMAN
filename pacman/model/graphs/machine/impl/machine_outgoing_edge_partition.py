@@ -23,7 +23,7 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
         :param constraints: Any initial constraints
         :param label: An optional label of the partition
         :param traffic_weight: the weight of this partition in relation
-        to other partitions
+            to other partitions
         """
         OutgoingEdgePartition.__init__(
             self, identifier, AbstractMachineEdge, constraints, label)

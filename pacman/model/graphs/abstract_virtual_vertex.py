@@ -32,7 +32,7 @@ class AbstractVirtualVertex(AbstractVertex):
         """ The x-coordinate of the virtual chip where this vertex is to be\
             placed
 
-            :return int
+            :rtype: int
         """
 
     @abstractproperty
@@ -40,5 +40,5 @@ class AbstractVirtualVertex(AbstractVertex):
         """ The y-coordinate of the virtual chip where this vertex is to be\
             placed
 
-            :return int
+            :rtype: int
         """

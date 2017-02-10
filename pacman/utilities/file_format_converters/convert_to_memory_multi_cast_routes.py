@@ -107,7 +107,6 @@ class ConvertToMemoryMultiCastRoutes(object):
         """
 
         :param file_routing_paths:
-        :return:
         """
         file_routing_paths_file = open(file_routing_paths, "r")
         file_routing_paths = json.load(file_routing_paths_file)

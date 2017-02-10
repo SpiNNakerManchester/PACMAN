@@ -74,7 +74,7 @@ def check_types_of_edge_constraint(machine_graph):
         are compatible.
 
     :param machine_graph: the graph to search through
-    :return:
+    :rtype: None:
     """
     for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = utility_calls.locate_constraints_of_type(
@@ -139,7 +139,7 @@ def _check_masks_are_correct(partition):
 
     :param partition: the outgoing_edge_partition to search for these\
                 constraints
-    :return:
+    :rtype: None:
     """
     fixed_mask = utility_calls.locate_constraints_of_type(
         partition.constraints, KeyAllocatorFixedMaskConstraint)[0]

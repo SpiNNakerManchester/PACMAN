@@ -46,7 +46,6 @@ class BaseKeyAndMask(object):
     @property
     def key_combo(self):
         """ The key combined with the mask
-        :return:
         """
         return self._base_key & self._mask
 

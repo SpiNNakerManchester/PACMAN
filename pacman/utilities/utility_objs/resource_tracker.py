@@ -352,6 +352,7 @@ class ResourceTracker(object):
     def most_avilable_cores_on_a_chip(self):
         """
         returns the number of cores on the chip which has the most cores.
+
         :return: int
         """
         size = 0
@@ -710,6 +711,7 @@ class ResourceTracker(object):
 
     def _allocate_sdram(self, key, resources):
         """ Allocates the SDRAM on the given chip
+
         :param key: The (x, y) coordinates of the chip
         :type key: tuple of (int, int)
         :param resources: the resources containing the SDRAM required
@@ -1265,7 +1267,7 @@ class ResourceTracker(object):
         :type ip_tags: iterable of (str, int) or None
         :param reverse_ip_tags: the details of the reverse ip tags allocated
         :type reverse_ip_tags: iterable of (str, int) or None
-        :return: None
+        :rtype: None
         """
 
         self._chips_available.add((chip_x, chip_y))

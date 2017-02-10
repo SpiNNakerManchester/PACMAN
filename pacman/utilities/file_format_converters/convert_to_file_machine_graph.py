@@ -20,12 +20,6 @@ class ConvertToFileMachineGraph(object):
     __slots__ = []
 
     def __call__(self, machine_graph, file_path):
-        """
-
-        :param machine_graph:
-        :param file_path:
-        :return:
-        """
         progress_bar = ProgressBar(
             len(machine_graph.vertices), "Converting to json graph")
 

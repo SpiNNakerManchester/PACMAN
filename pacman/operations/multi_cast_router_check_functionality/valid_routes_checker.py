@@ -33,7 +33,7 @@ def validate_routes(machine_graph, placements, routing_infos,
                 machine graph
     :param machine: the python machine object
     :type machine: spinnMachine.machine.Machine object
-    :return: None
+    :rtype: None
     :raises PacmanRoutingException: when either no routing table entry is\
                 found by the search on a given router, or a cycle is\
                 detected
@@ -124,13 +124,13 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     :param key_and_mask: the key and mask associated with this set of edges
     :param n_atoms: the number of atoms going through this path
     :param is_continuous: bool stating if the keys and atoms mapping is
-    continuous
+        continuous
     :type source_placement: instance of\
             pacman.model.placements.placement.Placement
     :type dest_placements: iterable of PlacementTuple
     :type key_and_mask: instance of\
             pacman.model.routing_info.key_and_mask.BaseKeyAndMask
-    :return: None
+    :rtype: None
     :raise PacmanRoutingException: when the trace completes and there are\
                 still destinations not visited
     """
@@ -225,7 +225,7 @@ def _start_trace_via_routing_tables(
                 continuous
     :param failed_to_cover_all_keys_routers: list of failed routers for all\
                 keys
-    :return: None
+    :rtype: None
     :raises None: this method does not raise any known exception
     """
     current_router_table = routing_tables.get_routing_table_for_chip(
@@ -298,7 +298,7 @@ def _recursive_trace_to_destinations(
     :type visited_routers: iterable of\
             pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
     :type reached_placements: iterable of placement_tuple
-    :return: None
+    :rtype: None
     :raise None: this method does not raise any known exceptions
     """
 
@@ -363,7 +363,7 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
     :type chip_y: int
     :type visited_routers: iterable of\
                 pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
-    :return: None
+    :rtype: None
     :raise PacmanRoutingException: when a router has been visited twice.
     """
     visited_routers_router = (chip_x, chip_y)
@@ -384,7 +384,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
     :param processor_ids: the processor ids which the last router entry\
                 said the trace should visit
     :param current_router: the current router being used in the trace
-    :return: None
+    :rtype: None
     :raise None: this method does not raise any known exceptions
     """
 
@@ -401,7 +401,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement
-    :return: None
+    :rtype: None
     :raise PacmanRoutingException: when there is no entry located on this\
             router.
     """

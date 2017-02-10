@@ -27,7 +27,6 @@ class ConvertToFileMachine(object):
 
         :param machine:
         :param file_path:
-        :return:
         """
         progress_bar = ProgressBar(
             ((machine.max_chip_x + 1) * (machine.max_chip_y + 1)) + 2,
@@ -103,15 +102,6 @@ class ConvertToFileMachine(object):
     def _check_for_exceptions(
             self, json_dictionary_rep, x_coord, y_coord, machine,
             chip_resource_exceptions):
-        """
-
-        :param json_dictionary_rep:
-        :param x_coord:
-        :param y_coord:
-        :param machine:
-        :return:
-        """
-
         no_processors = CHIP_HOMOGENEOUS_CORES
         chip = machine.get_chip_at(x_coord, y_coord)
 

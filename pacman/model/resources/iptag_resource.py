@@ -77,7 +77,6 @@ class IPtagResource(AbstractResource):
     def traffic_identifier(self):
         """ the traffic identifier for this iptag
 
-        :return:
         """
         return self._traffic_identifier
 
