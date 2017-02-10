@@ -23,8 +23,9 @@ class TestVertex(ApplicationVertex):
     """
     _model_based_max_atoms_per_core = None
 
-    def __init__(self, n_atoms, max_atoms_per_core=256):
-        ApplicationVertex.__init__(self, label=label, max_atoms_per_core=max_atoms_per_core)
+    def __init__(self, n_atoms, label=None, max_atoms_per_core=256):
+        ApplicationVertex.__init__(self, label=label,
+                                   max_atoms_per_core=max_atoms_per_core)
         self._model_based_max_atoms_per_core = max_atoms_per_core
         self._n_atoms = n_atoms
 
@@ -41,8 +42,8 @@ class TestVertex(ApplicationVertex):
                 self.get_sdram_usage_for_atoms(vertex_slice, None)),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice, None)),
-            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice,
-                                                            None)))
+            dtcm=DTCMResource(
+                self.get_dtcm_usage_for_atoms(vertex_slice, None)))
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
