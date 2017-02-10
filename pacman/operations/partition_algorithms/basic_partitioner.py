@@ -84,8 +84,8 @@ class BasicPartitioner(object):
                 max_resources_available.dtcm.get_value(),
                 requirements.dtcm.get_value())
             atoms_per_cpu = self._get_ratio(
-                max_resources_available.cpu.get_value(),
-                requirements.cpu.get_value())
+                max_resources_available.cpu_cycles.get_value(),
+                requirements.cpu_cycles.get_value())
 
             max_atom_values = [atoms_per_sdram, atoms_per_dtcm, atoms_per_cpu]
 
