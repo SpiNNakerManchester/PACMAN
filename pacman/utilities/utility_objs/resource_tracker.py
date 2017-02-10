@@ -93,7 +93,7 @@ class ResourceTracker(object):
                     the set of chips used, or to re-order the chips.  Note\
                     also that on deallocation, the order is no longer\
                     guaranteed.
-        :type chips: iterable of (x, y) tuples of coordinates of chips
+        :type chips: iterable of (int, int) tuples of coordinates of chips
         """
 
         # The amount of SDRAM used by each chip,
