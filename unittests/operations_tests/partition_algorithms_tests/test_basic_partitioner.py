@@ -80,16 +80,6 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips, 0, 0)
         self.bp = BasicPartitioner()
 
-    def test_new_basic_partitioner(self):
-        """
-        test that the basic partitioner only can handle
-        PartitionerMaximumSizeConstraints
-        :return:
-        """
-        self.setup()
-        self.assertEqual(self.bp._supported_constraints[0],
-                         PartitionerMaximumSizeConstraint)
-
     def test_partition_with_no_additional_constraints(self):
         """
         test a partitionign with a graph with no extra constraints
@@ -112,7 +102,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         self.graph.add_edge(
-            SimpleApplicationEdge(self.vert3, self.vert1), "TEST")
+            ApplicationEdge(self.vert3, self.vert1, None, "extra"), "TEST")
         graph, mapper = self.bp(self.graph, self.machine)
         self.assertEqual(len(graph.vertices), 3)
         self.assertEqual(len(graph.edges), 4)
