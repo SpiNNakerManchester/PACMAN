@@ -30,7 +30,7 @@ class TestMachineGraphModel(unittest.TestCase):
         test that the creation of a empty machine graph works
         :return:
         """
-        MachineGraph()
+        MachineGraph("foo")
 
     def test_new_graph(self):
         """

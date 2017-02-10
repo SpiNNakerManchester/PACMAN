@@ -47,7 +47,9 @@ class TestBasicPartitioner(unittest.TestCase):
         self.edge3 = ApplicationEdge(self.vert1, self.vert3, None, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
-        self.graph = ApplicationGraph("Graph", self.verts, self.edges)
+        self.graph = ApplicationGraph("Graph")
+        self.graph.add_vertices(self.verts)
+        self.graph.add_edges(self.edges, "foo")
 
         flops = 1000
         (e, ne, n, w, sw, s) = range(6)
@@ -122,8 +124,8 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = TestVertex(300, "Large vertex")
-        self.graph = ApplicationGraph(
-            "Graph with large vertex", [large_vertex], [])
+        self.graph = ApplicationGraph("Graph with large vertex")
+        self.graph.add_vertex(large_vertex)
         graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(graph.vertices), 1)
@@ -136,8 +138,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         large_vertex = TestVertex(500, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.graph = ApplicationGraph(
-            "Graph with large vertex", [large_vertex], [])
+        self.graph = ApplicationGraph("Graph with large vertex")
+        self.graph.add_vertex(large_vertex)
         graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(graph.vertices), 1)
@@ -150,8 +152,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         large_vertex = TestVertex(1000, "Large vertex")
         large_vertex.add_constraint(PartitionerMaximumSizeConstraint(10))
-        self.graph = ApplicationGraph(
-            "Graph with large vertex", [large_vertex], [])
+        self.graph = ApplicationGraph("Graph with large vertex")
+        self.graph.add_vertex(large_vertex)
         graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(len(graph.vertices), 100)
 
@@ -190,8 +192,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips)
         singular_vertex = TestVertex(450, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.graph = ApplicationGraph(
-            "Graph with large vertex", [singular_vertex], [])
+        self.graph = ApplicationGraph("Graph with large vertex")
+        self.graph.add_vertex(singular_vertex)
         graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.assertEqual(len(graph.vertices), 450)
@@ -232,8 +234,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = Machine(chips)
         large_vertex = TestVertex(3000, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
-        self.graph = ApplicationGraph(
-            "Graph with large vertex", [large_vertex], [])
+        self.graph = ApplicationGraph("Graph with large vertex")
+        self.graph.add_vertex(large_vertex)
         self.assertRaises(PacmanValueError, self.bp.partition,
                           self.graph, self.machine)
 
@@ -319,7 +321,8 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = TestVertex(13, "Constrained")
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
-        graph = ApplicationGraph("Graph", [constrained_vertex], None)
+        graph = ApplicationGraph("Graph")
+        self.graph.add_vertex(constrained_vertex)
         partitioner = BasicPartitioner()
         self.assertRaises(PacmanInvalidParameterException,
                           partitioner.partition, graph, self.machine)
@@ -330,7 +333,7 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        self.graph = ApplicationGraph()
+        self.graph = ApplicationGraph("foo")
         graph, mapper = self.bp.partition(self.graph, self.machine)
         self.assertEqual(len(graph.vertices), 0)
 

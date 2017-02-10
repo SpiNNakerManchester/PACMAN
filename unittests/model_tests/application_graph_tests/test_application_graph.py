@@ -21,7 +21,7 @@ class TestApplicationGraphModel(unittest.TestCase):
 
         :return:
         """
-        ApplicationGraph()
+        ApplicationGraph("foo")
 
     def test_create_new_graph(self):
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
@@ -32,10 +32,11 @@ class TestApplicationGraphModel(unittest.TestCase):
         edge3 = ApplicationEdge(vert1, vert3, None, "First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
-        graph = ApplicationGraph("Graph", verts, edges)
-        for i in range(3):
-            self.assertEqual(graph.vertices[i], verts[i])
-            self.assertEqual(graph.edges[i], edges[i])
+        graph = ApplicationGraph("Graph")
+        graph.add_vertices(verts)
+        graph.add_edges(edges, "foo")  # Any old partition label
+        assert frozenset(verts) == frozenset(graph.vertices)
+        assert frozenset(edges) == frozenset(graph.edges)
 
         oev = graph.get_edges_starting_at_vertex(vert1)
         if edge2 in oev:

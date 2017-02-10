@@ -36,7 +36,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         pieces = vert.label.split(" ")
         self.assertIn(pieces[0], "Population n")
 
-
     def test_create_new_vertex_with_constraint_list(self):
         """
         test initisation of a vertex with a max size constraint
@@ -47,7 +46,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert.add_constraint(constraint)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
-        self.assertEqual(vert.constraints[1], constraint)
+        assert constraint in vert.constraints
 
     def test_create_new_vertex_add_constraint(self):
         """
