@@ -36,7 +36,7 @@ class ApplicationVertex(AbstractApplicationVertex):
         :param max_atoms_per_core: the max number of atoms that can be
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
-        :raise pacman.exceptions.PacmanInvalidParameterException:
+        :raise pacman.exceptions.PacmanInvalidParameterException:\
                     * If one of the constraints is not valid
         """
         self._label = label
