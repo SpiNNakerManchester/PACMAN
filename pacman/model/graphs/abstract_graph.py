@@ -25,6 +25,18 @@ class AbstractGraph(AbstractHasConstraints):
             If the vertex is not of a valid type
         """
 
+    def add_vertices(self, vertices):
+        """ Add a collection of vertices to the graph.
+
+        :param vertices: The vertices to add
+        :type vertices: an iterable of \
+            :py:class:`pacman.model.graphs.abstract_vertex.AbstractVertex`
+        :raises PacmanInvalidParameterException:\
+            If any vertex is not of a valid type
+        """
+        for v in vertices:
+            self.add_vertex(v)
+
     @abstractmethod
     def add_edge(self, edge, outgoing_edge_partition_name):
         """ Add an edge to the graph
@@ -40,6 +52,24 @@ class AbstractGraph(AbstractHasConstraints):
             added to this partition that start at a different vertex to this\
             one
         """
+
+    def add_edges(self, edges, outgoing_edge_partition_name):
+        """ Add a collection of edges to the graph
+
+        :param edges: The edges to add
+        :type edges: an iterable of \
+            :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
+        :param outgoing_edge_partition_name: \
+            The name of the edge partition to add the edges to; each edge\
+            partition is the partition of edges that start at the same vertex
+        :type outgoing_edge_partition_name: str
+        :raises PacmanInvalidParameterException:\
+            If any edge is not of a valid type or if edges have already been\
+            added to this partition that start at a different vertex to this\
+            one
+        """
+        for e in edges:
+            self.add_edge(e, outgoing_edge_partition_name)
 
     @abstractmethod
     def add_outgoing_edge_partition(self, outgoing_edge_partition):

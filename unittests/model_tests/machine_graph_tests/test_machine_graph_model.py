@@ -47,7 +47,9 @@ class TestMachineGraphModel(unittest.TestCase):
         for i in range(5, 10):
             edges.append(MachineEdge(
                 vertices[5], vertices[(i + 1) % 10]))
-        graph = MachineGraph(vertices=vertices, edges=edges)
+        graph = MachineGraph("foo")
+        graph.add_vertices(vertices)
+        graph.add_edges(edges, "bar")
         outgoing = graph.get_edges_starting_at_vertex(vertices[0])
         for i in range(5):
             if edges[i] not in outgoing:
@@ -90,7 +92,9 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(MachineEdge(vertices[0], vertices[1]))
         edges.append(MachineEdge(vertices[1], vertices[0]))
         with self.assertRaises(PacmanAlreadyExistsException):
-            MachineGraph(vertices=vertices, edges=edges)
+            graph = MachineGraph("foo")
+            graph.add_vertices(vertices)
+            graph.add_edges(edges, "bar")
 
     def test_add_duplicate_edge(self):
         """
@@ -105,7 +109,9 @@ class TestMachineGraphModel(unittest.TestCase):
             edge = MachineEdge(vertices[0], vertices[1])
             edges.append(edge)
             edges.append(edge)
-            MachineGraph(vertices=vertices, edges=edges)
+            graph = MachineGraph("foo")
+            graph.add_vertices(vertices)
+            graph.add_edges(edges, "bar")
 
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
@@ -121,7 +127,9 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(MachineEdge(
             SimpleMachineVertex(None, ""), vertices[0]))
         with self.assertRaises(PacmanInvalidParameterException):
-            MachineGraph(vertices=vertices, edges=edges)
+            graph = MachineGraph("foo")
+            graph.add_vertices(vertices)
+            graph.add_edges(edges, "bar")
 
     def test_add_edge_with_no_existing_post_vertex_in_graph(self):
         """
@@ -137,7 +145,9 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(MachineEdge(
             vertices[0], SimpleMachineVertex(None, "")))
         with self.assertRaises(PacmanInvalidParameterException):
-            MachineGraph(vertices=vertices, edges=edges)
+            graph = MachineGraph("foo")
+            graph.add_vertices(vertices)
+            graph.add_edges(edges, "bar")
 
 
 if __name__ == '__main__':
