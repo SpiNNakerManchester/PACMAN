@@ -345,3 +345,5 @@ if os.environ.get('READTHEDOCS', None) == 'True':
                 and f != "index.rst" and f != "modules.rst"):
             os.remove(f)
     apidoc.main([None, '-o', "../../spinn_machine", "."])
+    for f in os.listdir("."):
+        print(f)
