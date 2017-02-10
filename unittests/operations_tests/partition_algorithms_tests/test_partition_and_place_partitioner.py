@@ -368,8 +368,8 @@ class TestBasicPartitioner(unittest.TestCase):
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             PartitionerSameSizeAsVertexConstraint(new_large_vertex))
-        self.graph = ApplicationGraph(
-            "New graph", [new_large_vertex, constrained_vertex])
+        self.graph = ApplicationGraph("New graph")
+        self.graph.add_vertices([new_large_vertex, constrained_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, graph_mapper = \
             partitioner.partition(self.graph, self.machine)
@@ -387,8 +387,8 @@ class TestBasicPartitioner(unittest.TestCase):
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             PartitionerSameSizeAsVertexConstraint(new_large_vertex))
-        self.graph = ApplicationGraph("New graph",
-                                        [constrained_vertex, new_large_vertex])
+        self.graph = ApplicationGraph("New graph")
+        self.graph.add_vertices([constrained_vertex, new_large_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, graph_mapper = \
             partitioner.partition(self.graph, self.machine)
