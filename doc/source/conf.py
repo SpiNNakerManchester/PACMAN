@@ -340,10 +340,12 @@ autoclass_content = 'both'
 if os.environ.get('READTHEDOCS', None) == 'True':
     from sphinx import apidoc
 
+    for f in os.listdir("../../spinn_machine"):
+        print(f)
     for f in os.listdir("."):
         if (os.path.isfile(f) and f.endswith(".rst")
                 and f != "index.rst" and f != "modules.rst"):
             os.remove(f)
-    apidoc.main([None, '-o', "../../spinn_machine", "."])
+    apidoc.main([None, '-o', ".", "../../spinn_machine"])
     for f in os.listdir("."):
         print(f)
