@@ -54,11 +54,11 @@ class TestApplicationEdgeModel(unittest.TestCase):
         vert1 = TestVertex(10, "New AbstractConstrainedVertex", 256)
         v_from_vert1 = vert1.create_machine_vertex(
             Slice(0, 9),
-            vert1.get_resources_used_by_atoms(Slice(0, 9), None))
+            vert1.get_resources_used_by_atoms(Slice(0, 9)))
         vert2 = TestVertex(10, "New AbstractConstrainedVertex", 256)
         v_from_vert2 = vert2.create_machine_vertex(
             Slice(0, 9),
-            vert2.get_resources_used_by_atoms(Slice(0, 9), None))
+            vert2.get_resources_used_by_atoms(Slice(0, 9)))
         edge1 = TestEdge(vert1, vert2, "edge 1")
 
         edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2)
@@ -72,10 +72,10 @@ class TestApplicationEdgeModel(unittest.TestCase):
         """
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
         v_from_vert1 = vert1.create_machine_vertex(
-            Slice(0, 9), vert1.get_resources_used_by_atoms(Slice(0, 9), None))
+            Slice(0, 9), vert1.get_resources_used_by_atoms(Slice(0, 9)))
         vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
         v_from_vert2 = vert2.create_machine_vertex(
-            Slice(0, 4), vert2.get_resources_used_by_atoms(Slice(0, 4), None))
+            Slice(0, 4), vert2.get_resources_used_by_atoms(Slice(0, 4)))
         edge1 = TestEdge(vert1, vert2, "First edge")
         edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2,
                                          None, "First edge")

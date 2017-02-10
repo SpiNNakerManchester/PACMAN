@@ -97,7 +97,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
-            vert.get_resources_used_by_atoms(Slice(0, 9), None))
+            vert.get_resources_used_by_atoms(Slice(0, 9)))
         self.assertNotIn(constraint1, subv_from_vert.constraints)
 
     def test_new_create_vertex_from_vertex_no_constraints(self):
@@ -110,7 +110,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         vertex = vert.create_machine_vertex(
             Slice(0, 9),
-            vert.get_resources_used_by_atoms(Slice(0, 9), None))
+            vert.get_resources_used_by_atoms(Slice(0, 9)))
         self.assertIsInstance(vertex, SimpleMachineVertex)
 
     def test_new_create_vertex_from_vertex_check_resources(self):
@@ -121,7 +121,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         :return:
         """
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
-        resources = vert.get_resources_used_by_atoms(Slice(0, 9), None)
+        resources = vert.get_resources_used_by_atoms(Slice(0, 9))
         subv_from_vert = vert.create_machine_vertex(Slice(0, 9), resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
 
@@ -139,7 +139,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert.add_constraint([constraint1])
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
-            vert.get_resources_used_by_atoms(Slice(0, 9), None), "",
+            vert.get_resources_used_by_atoms(Slice(0, 9)), "",
             [constraint2])
         subv_from_vert.add_constraint(constraint1)
         self.assertEqual(len(subv_from_vert.constraints), 2)

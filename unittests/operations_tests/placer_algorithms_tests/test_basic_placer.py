@@ -83,7 +83,7 @@ class TestBasicPlacer(unittest.TestCase):
         ########################################################################
         self.vertices = list()
         self.vertex1 = SimpleMachineVertex(
-            0, 1, self.vert1.get_resources_used_by_atoms(0, 1, []),
+            0, 1, self.vert1.get_resources_used_by_atoms(Slice(0, 1)),
             "First vertex")
         self.vertex2 = SimpleMachineVertex(
             1, 5, get_resources_used_by_atoms(1, 5, []), "Second vertex")
