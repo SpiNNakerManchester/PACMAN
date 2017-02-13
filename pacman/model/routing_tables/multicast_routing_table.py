@@ -154,16 +154,10 @@ class MulticastRoutingTable(object):
     def __eq__(self, other):
         if not isinstance(other, MulticastRoutingTable):
             return False
-        else:
-            if self._x != other.x and self._y != other.y:
-                return False
-            else:
-                for this_entry, other_entry in zip(
-                        list(self._multicast_routing_entries),
-                        list(other.multicast_routing_entries)):
-                    if this_entry != other_entry:
-                        return False
-                return True
+        if self._x != other.x and self._y != other.y:
+            return False
+        return self._multicast_routing_entries == \
+            other.multicast_routing_entries
 
     def __ne__(self, other):
         return not self.__eq__(other)
