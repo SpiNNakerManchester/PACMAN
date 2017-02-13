@@ -317,14 +317,6 @@ class PartitionAndPlacePartitioner(object):
                     ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
-            if lo_atom < 1:
-                raise exceptions.PacmanPartitionException(
-                    "No vertex '{}' would fit on the board at all:\n"
-                    "    Request for SDRAM: {}\n"
-                    "    Largest SDRAM space: {}".format(
-                        vertex,
-                        used_resources.sdram.get_value(),
-                        resources.sdram.get_value()))
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
                     "No more of vertex '{}' would fit on the board:\n"

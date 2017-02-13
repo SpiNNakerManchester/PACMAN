@@ -148,7 +148,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that partitioning will work when close to filling the machine
         """
         self.setup()
-        flops = 1000
+        flops = 200000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()
@@ -230,7 +230,7 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        flops = 1000
+        flops = 200000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()
@@ -266,7 +266,7 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        flops = 1000
+        flops = 200000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()
@@ -305,7 +305,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
         graph = ApplicationGraph("Graph")
-        self.graph.add_vertex(constrained_vertex)
+        graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         with self.assertRaises(PacmanInvalidParameterException):
             partitioner(graph, self.machine)

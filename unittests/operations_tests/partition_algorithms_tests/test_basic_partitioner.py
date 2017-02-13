@@ -6,7 +6,8 @@ test for partitioning
 from pacman.model.graphs.application.impl.application_edge import \
     ApplicationEdge
 
-from pacman.exceptions import PacmanInvalidParameterException, PacmanValueError
+from pacman.exceptions import PacmanInvalidParameterException,\
+    PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.graphs.application.impl.application_graph \
@@ -153,7 +154,7 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        flops = 1000
+        flops = 20000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()
@@ -226,7 +227,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        with self.assertRaises(PacmanValueError):
+        with self.assertRaises(PacmanPartitionException):
             self.bp(self.graph, self.machine)
 
     def test_partition_with_less_sdram_than_default(self):
@@ -236,7 +237,7 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        flops = 1000
+        flops = 20000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()
@@ -272,7 +273,7 @@ class TestBasicPartitioner(unittest.TestCase):
         :return:
         """
         self.setup()
-        flops = 1000
+        flops = 20000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()
@@ -312,7 +313,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
         graph = ApplicationGraph("Graph")
-        self.graph.add_vertex(constrained_vertex)
+        graph.add_vertex(constrained_vertex)
         partitioner = BasicPartitioner()
         with self.assertRaises(PacmanInvalidParameterException):
             partitioner(graph, self.machine)
