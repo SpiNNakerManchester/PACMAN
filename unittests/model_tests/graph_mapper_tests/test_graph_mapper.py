@@ -14,7 +14,6 @@ from pacman.model.graphs.machine.impl.machine_edge import \
     MachineEdge
 from pacman.model.graphs.machine.impl.simple_machine_vertex \
     import SimpleMachineVertex
-from pacman.exceptions import PacmanNotFoundError
 
 # general imports
 import unittest
@@ -142,8 +141,7 @@ class TestGraphMapper(unittest.TestCase):
         self.assertEqual(
             graph.get_application_edge(edges[0]),
             edge)
-        with self.assertRaises(PacmanNotFoundError):
-            graph.get_application_edge(edges[1])
+        self.assertIsNone(graph.get_application_edge(edges[1]))
 
 
 if __name__ == '__main__':
