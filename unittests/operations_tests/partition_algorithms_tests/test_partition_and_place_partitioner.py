@@ -53,7 +53,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertices(self.verts)
         self.graph.add_edges(self.edges, "foo")
 
-        flops = 1000
+        flops = 200000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()

@@ -51,7 +51,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertices(self.verts)
         self.graph.add_edges(self.edges, "foo")
 
-        flops = 1000
+        flops = 200000000
         (e, _, n, w, _, s) = range(6)
 
         processors = list()
@@ -116,8 +116,8 @@ class TestBasicPartitioner(unittest.TestCase):
         large_vertex = TestVertex(300, "Large vertex")
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        graph, _, _ = self.bp(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        graph, _, _ = self.bp(self.graph, self.machine)
         self.assertGreater(len(graph.vertices), 1)
 
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
