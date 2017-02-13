@@ -96,12 +96,10 @@ class Graph(AbstractGraph):
                 "vertex", vertex.__class__,
                 "Vertices of this graph must be one of the following types:"
                 " {}".format(self._allowed_vertex_types))
-
-        self._vertices.append(vertex)
+        self._vertices.add(vertex)
 
     @overrides(AbstractGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
-
         # verify that the edge is one suitable for this graph
         if not isinstance(edge, self._allowed_edge_types):
             raise exceptions.PacmanInvalidParameterException(
@@ -116,7 +114,7 @@ class Graph(AbstractGraph):
             partition = OutgoingEdgePartition(
                 outgoing_edge_partition_name, self._allowed_edge_types)
             self._outgoing_edge_partitions_by_pre_vertex[
-                edge.pre_vertex].append(partition)
+                edge.pre_vertex].add(partition)
             self._outgoing_edge_partitions_by_name[
                 edge.pre_vertex, outgoing_edge_partition_name] = partition
         else:
@@ -125,8 +123,8 @@ class Graph(AbstractGraph):
         partition.add_edge(edge)
 
         # Add the edge to the indices
-        self._outgoing_edges[edge.pre_vertex].append(edge)
-        self._incoming_edges[edge.post_vertex].append(edge)
+        self._outgoing_edges[edge.pre_vertex].add(edge)
+        self._incoming_edges[edge.post_vertex].add(edge)
 
     @overrides(AbstractGraph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, outgoing_edge_partition):
@@ -149,7 +147,7 @@ class Graph(AbstractGraph):
                  outgoing_edge_partition.identifier))
 
         self._outgoing_edge_partitions_by_pre_vertex[
-            outgoing_edge_partition.pre_vertex].append(outgoing_edge_partition)
+            outgoing_edge_partition.pre_vertex].add(outgoing_edge_partition)
         self._outgoing_edge_partitions_by_name[
             outgoing_edge_partition.pre_vertex,
             outgoing_edge_partition.identifier] = outgoing_edge_partition

@@ -9,8 +9,14 @@ from pacman.model.graphs.abstract_outgoing_edge_partition \
 
 
 class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
-    """ A collection of edges which start at a single vertex which have the\
+    """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key
+
+    :param identifier: The identifier of the partition
+    :param allowed_edge_types: The types of edges allowed
+    :param constraints: Any initial constraints
+    :param label: An optional label of the partition
+    :param traffic_weight: The weight of traffic going down this partition
     """
 
     __slots__ = [
@@ -43,13 +49,6 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
-        """
-
-        :param identifier: The identifier of the partition
-        :param allowed_edge_types: The types of edges allowed
-        :param constraints: Any initial constraints
-        :param label: An optional label of the partition
-        """
         self._identifier = identifier
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
@@ -104,7 +103,7 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
                 "A partition can only contain edges with the same"
                 " traffic_type")
 
-        self._edges.append(edge)
+        self._edges.add(edge)
 
     @property
     @overrides(AbstractOutgoingEdgePartition.identifier)
@@ -135,8 +134,7 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         return (
             "OutgoingEdgePartition("
             "identifier={}, edges={}, constraints={}, label={})".format(
-                self._identifier, self._edges, self.constraints, self.label)
-        )
+                self._identifier, self._edges, self.constraints, self.label))
 
     @overrides(AbstractOutgoingEdgePartition.__contains__)
     def __contains__(self, edge):
