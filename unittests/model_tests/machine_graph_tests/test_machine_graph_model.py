@@ -4,7 +4,6 @@ from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from pacman.model.graphs.machine.impl.simple_machine_vertex \
     import SimpleMachineVertex
 
-from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.machine.impl.machine_edge import \
     MachineEdge
@@ -87,10 +86,9 @@ class TestMachineGraphModel(unittest.TestCase):
         vertices.append(subv)
         edges.append(MachineEdge(vertices[0], vertices[1]))
         edges.append(MachineEdge(vertices[1], vertices[0]))
-        with self.assertRaises(PacmanAlreadyExistsException):
-            graph = MachineGraph("foo")
-            graph.add_vertices(vertices)
-            graph.add_edges(edges, "bar")
+        graph = MachineGraph("foo")
+        graph.add_vertices(vertices)
+        graph.add_edges(edges, "bar")
 
     def test_add_duplicate_edge(self):
         """
