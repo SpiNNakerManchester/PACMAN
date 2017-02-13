@@ -33,21 +33,21 @@ class MyTestCase(unittest.TestCase):
 
         original_tables = MulticastRoutingTables()
         original_table = MulticastRoutingTable(x=0, y=0)
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0000, 0b1111, [1, 2], [], False))
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0001, 0b1111, [0], [], False))
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0101, 0b1111, [4], [], False))
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b1000, 0b1111, [1, 2], [], False))
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b1001, 0b1111, [0], [], False))
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b1110, 0b1111, [4], [], False))
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b1100, 0b1111, [1, 2], [], False))
-        original_table.add_mutlicast_routing_entry(
+        original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0000, 0b1011, [4, 5], [], False))
         original_tables.add_routing_table(original_table)
 
@@ -56,15 +56,15 @@ class MyTestCase(unittest.TestCase):
         compressed_table = compressed_tables.get_routing_table_for_chip(0, 0)
 
         result_table_expected = MulticastRoutingTable(x=0, y=0)
-        result_table_expected.add_mutlicast_routing_entry(
+        result_table_expected.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0000, 0b1111, [1, 2], [], False))
-        result_table_expected.add_mutlicast_routing_entry(
+        result_table_expected.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0000, 0b1011, [4, 5], [], False))
-        result_table_expected.add_mutlicast_routing_entry(
+        result_table_expected.add_multicast_routing_entry(
             MulticastRoutingEntry(0b1000, 0b1011, [1, 2], [], False))
-        result_table_expected.add_mutlicast_routing_entry(
+        result_table_expected.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0001, 0b0111, [0], [], False))
-        result_table_expected.add_mutlicast_routing_entry(
+        result_table_expected.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0100, 0b0100, [4], [], False))
 
         # Minimise as far as possible

@@ -46,7 +46,7 @@ class BasicRoutingTableGenerator(object):
                             mask=key_and_mask.mask,
                             link_ids=entry.out_going_links,
                             processor_ids=entry.out_going_processors)
-                        routing_table.add_mutlicast_routing_entry(
+                        routing_table.add_multicast_routing_entry(
                             multicast_routing_entry)
                 routing_tables.add_routing_table(routing_table)
             progress_bar.update()

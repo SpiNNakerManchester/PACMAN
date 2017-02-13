@@ -49,9 +49,9 @@ class MulticastRoutingTable(object):
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
-                self.add_mutlicast_routing_entry(multicast_routing_entry)
+                self.add_multicast_routing_entry(multicast_routing_entry)
 
-    def add_mutlicast_routing_entry(self, multicast_routing_entry):
+    def add_multicast_routing_entry(self, multicast_routing_entry):
         """ Adds a routing entry to this table
 
         :param multicast_routing_entry: The route to add
