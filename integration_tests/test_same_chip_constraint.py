@@ -20,17 +20,14 @@ class TestSameChipConstraint(unittest.TestCase):
         graph = MachineGraph("Test")
 
         vertices = [
-            SimpleMachineVertex(
-                resources_required=ResourceContainer(), label="v{}".format(i))
+            SimpleMachineVertex(ResourceContainer(), label="v{}".format(i))
             for i in range(100)
         ]
         for vertex in vertices:
             graph.add_vertex(vertex)
 
         same_vertices = [
-            SimpleMachineVertex(
-                resources_required=ResourceContainer(),
-                label="same{}".format(i))
+            SimpleMachineVertex(ResourceContainer(), label="same{}".format(i))
             for i in range(10)
         ]
         for vertex in same_vertices:
