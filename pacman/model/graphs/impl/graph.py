@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from pacman import exceptions
 from pacman.exceptions import PacmanAlreadyExistsException
+from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.abstract_classes.impl.constrained_object \
     import ConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
@@ -67,12 +68,12 @@ class Graph(AbstractGraph):
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
 
-        self._vertices = list()
+        self._vertices = OrderedSet()
         self._outgoing_edge_partitions_by_name = dict()
-        self._outgoing_edges = defaultdict(list)
-        self._incoming_edges = defaultdict(list)
-        self._outgoing_edge_partitions_by_pre_vertex = defaultdict(list)
-        self._outgoing_edge_partitions_by_traffic_type = defaultdict(list)
+        self._outgoing_edges = defaultdict(OrderedSet)
+        self._incoming_edges = defaultdict(OrderedSet)
+        self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
+        self._outgoing_edge_partitions_by_traffic_type = defaultdict(OrderedSet)
 
         self._constraints = ConstrainedObject()
 

@@ -101,17 +101,16 @@ class TestMachineGraphModel(unittest.TestCase):
         test that adding the same machine edge will cause an error
         :return:
         """
-        with self.assertRaises(PacmanAlreadyExistsException):
-            vertices = list()
-            edges = list()
-            vertices.append(SimpleMachineVertex(None, ""))
-            vertices.append(SimpleMachineVertex(None, ""))
-            edge = MachineEdge(vertices[0], vertices[1])
-            edges.append(edge)
-            edges.append(edge)
-            graph = MachineGraph("foo")
-            graph.add_vertices(vertices)
-            graph.add_edges(edges, "bar")
+        vertices = list()
+        edges = list()
+        vertices.append(SimpleMachineVertex(None, ""))
+        vertices.append(SimpleMachineVertex(None, ""))
+        edge = MachineEdge(vertices[0], vertices[1])
+        edges.append(edge)
+        edges.append(edge)
+        graph = MachineGraph("foo")
+        graph.add_vertices(vertices)
+        graph.add_edges(edges, "bar")
 
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """

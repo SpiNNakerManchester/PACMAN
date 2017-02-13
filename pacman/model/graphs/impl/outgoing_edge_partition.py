@@ -1,4 +1,5 @@
 from pacman import exceptions
+from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.abstract_classes.impl.constrained_object \
     import ConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
@@ -50,7 +51,7 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         :param label: An optional label of the partition
         """
         self._identifier = identifier
-        self._edges = list()
+        self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
         self._pre_vertex = None
         self._traffic_type = None
