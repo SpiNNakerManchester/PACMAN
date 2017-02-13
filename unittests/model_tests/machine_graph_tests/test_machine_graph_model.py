@@ -21,22 +21,19 @@ class TestMachineGraphModel(unittest.TestCase):
     def test_new_vertex(self):
         """
         test the creation of a machine vertex
-        :return:
         """
         SimpleMachineVertex(None, "")
 
     def test_new_empty_graph(self):
         """
         test that the creation of a empty machine graph works
-        :return:
         """
         MachineGraph("foo")
 
     def test_new_graph(self):
         """
         tests that after building a machine graph, all partitined vertices
-        and partitioend edges are in existance
-        :return:
+        and partitioned edges are in existence
         """
         vertices = list()
         edges = list()
@@ -81,7 +78,6 @@ class TestMachineGraphModel(unittest.TestCase):
         """
         testing that adding the same machine vertex twice will cause an
         error
-        :return:
         """
         vertices = list()
         edges = list()
@@ -99,7 +95,6 @@ class TestMachineGraphModel(unittest.TestCase):
     def test_add_duplicate_edge(self):
         """
         test that adding the same machine edge will cause an error
-        :return:
         """
         vertices = list()
         edges = list()
@@ -115,8 +110,7 @@ class TestMachineGraphModel(unittest.TestCase):
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
         test that adding a edge where the pre vertex has not been added
-        to the machine graph coauses ane rror
-        :return:
+        to the machine graph causes an error
         """
         vertices = list()
         edges = list()
@@ -133,8 +127,7 @@ class TestMachineGraphModel(unittest.TestCase):
     def test_add_edge_with_no_existing_post_vertex_in_graph(self):
         """
         test that adding a edge where the post vertex has not been added
-        to the machine graph coauses ane rror
-        :return:
+        to the machine graph causes an error
         """
         vertices = list()
         edges = list()
