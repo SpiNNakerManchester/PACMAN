@@ -52,9 +52,7 @@ class MyTestCase(unittest.TestCase):
         original_tables.add_routing_table(original_table)
 
         mundy_compressor = MundyRouterCompressor()
-        result = mundy_compressor(original_tables)
-
-        compressed_tables = result.routing_tables
+        compressed_tables = mundy_compressor(original_tables)
         compressed_table = compressed_tables.get_routing_table_for_chip(0, 0)
 
         result_table_expected = MulticastRoutingTable(x=0, y=0)
