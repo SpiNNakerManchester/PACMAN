@@ -49,8 +49,7 @@ class TestGraphMapper(unittest.TestCase):
         edge = TestEdge(TestVertex(10, "pre"), TestVertex(5, "post"))
         graph.add_edge_mapping(sube, edge)
         graph.add_edge_mapping(edges[0], edge)
-        edges_from_edge = \
-            graph.get_machine_edges(edge)
+        edges_from_edge = graph.get_machine_edges(edge)
         self.assertIn(sube, edges_from_edge)
         self.assertIn(edges[0], edges_from_edge)
         self.assertNotIn(edges[1], edges_from_edge)
@@ -137,19 +136,15 @@ class TestGraphMapper(unittest.TestCase):
         graph.add_edge_mapping(sube, edge)
         graph.add_edge_mapping(edges[0], edge)
 
-        edge_from_machine_edge = \
-            graph.get_application_edge(sube)
+        edge_from_machine_edge = graph.get_application_edge(sube)
 
         self.assertEqual(edge_from_machine_edge, edge)
         self.assertEqual(
             graph.get_application_edge(edges[0]),
-            edge
-        )
-        self.assertRaises(
-            PacmanNotFoundError,
-            graph.get_application_edge,
-            edges[1]
-        )
+            edge)
+        with self.assertRaises(PacmanNotFoundError):
+            graph.get_application_edge(edges[1])
+
 
 if __name__ == '__main__':
     unittest.main()

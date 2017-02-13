@@ -1,8 +1,5 @@
 
 # pacman imports
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_contiguous_range_constraint import \
-    KeyAllocatorContiguousRangeContraint
 from pacman.model.graphs.common.slice import Slice
 
 # unit tests imports
@@ -61,7 +58,7 @@ class TestApplicationEdgeModel(unittest.TestCase):
             vert2.get_resources_used_by_atoms(Slice(0, 9)))
         edge1 = TestEdge(vert1, vert2, "edge 1")
 
-        edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2)
+        edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2, "edge")
         self.assertIsInstance(edge, MachineEdge)
 
     def test_create_new_machine_edge_from_edge(self):
@@ -78,5 +75,5 @@ class TestApplicationEdgeModel(unittest.TestCase):
             Slice(0, 4), vert2.get_resources_used_by_atoms(Slice(0, 4)))
         edge1 = TestEdge(vert1, vert2, "First edge")
         edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2,
-                                         None, "First edge")
+                                         "First edge")
         self.assertEqual(edge.label, "First edge")

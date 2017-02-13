@@ -78,7 +78,6 @@ class PartitionAndPlacePartitioner(object):
 
         # Partition one vertex at a time
         for vertex in vertices:
-
             # check that the vertex hasn't already been partitioned
             machine_vertices = graph_mapper.get_machine_vertices(vertex)
 
@@ -194,11 +193,8 @@ class PartitionAndPlacePartitioner(object):
                 machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, used_resources,
                     label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
-                    constraints=(
-                        partition_algorithm_utilities
-                        .get_remaining_constraints(vertex)
-                    )
-                )
+                    constraints=partition_algorithm_utilities
+                        .get_remaining_constraints(vertex))
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
@@ -321,6 +317,14 @@ class PartitionAndPlacePartitioner(object):
                     ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
+            if lo_atom < 1:
+                raise exceptions.PacmanPartitionException(
+                    "No vertex {} would fit on the board at all:\n"
+                    "    Request for SDRAM: {}\n"
+                    "    Largest SDRAM space: {}".format(
+                        vertex,
+                        used_resources.sdram.get_value(),
+                        resources.sdram.get_value()))
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
                     "No more of vertex {} would fit on the board:\n"
@@ -348,11 +352,9 @@ class PartitionAndPlacePartitioner(object):
                 (x, y, p, ip_tags, reverse_ip_tags) = \
                     resource_tracker.allocate_constrained_resources(
                         used_resources, vertex.constraints)
-                used_placements.append(
-                    (vertex, x, y, p, used_resources,
+                used_placements.append((vertex, x, y, p, used_resources,
                      ip_tags, reverse_ip_tags))
             except exceptions.PacmanValueError as e:
-
                 raise exceptions.PacmanValueError(
                     "Unable to allocate requested resources to"
                     " vertex {}:\n{}".format(vertex, e))
@@ -511,6 +513,5 @@ class PartitionAndPlacePartitioner(object):
                 raise exceptions.PacmanPartitionException(
                     "A vertex and its partition-dependent vertices must "
                     "have the same number of atoms")
-            else:
-                partition_together_vertices.append(constraint.vertex)
+            partition_together_vertices.append(constraint.vertex)
         return partition_together_vertices
