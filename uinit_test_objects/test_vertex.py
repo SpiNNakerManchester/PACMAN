@@ -12,6 +12,7 @@ from pacman.model.graphs.application.abstract_application_vertex import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.graphs.machine.impl.simple_machine_vertex import SimpleMachineVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource \
     import CPUCyclesPerTickResource
 from pacman.model.decorators.overrides import overrides
@@ -74,7 +75,7 @@ class TestVertex(ApplicationVertex):
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        raise Exception("unimplemented")
+        return SimpleMachineVertex(resources_required, label, constraints)
 
     @property
     @overrides(AbstractApplicationVertex.n_atoms)
