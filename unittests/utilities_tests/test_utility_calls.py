@@ -1,5 +1,5 @@
 import unittest
-import pacman.utilities.utility_calls
+# import pacman.utilities.utility_calls
 
 
 class TestUtilityCalls(unittest.TestCase):

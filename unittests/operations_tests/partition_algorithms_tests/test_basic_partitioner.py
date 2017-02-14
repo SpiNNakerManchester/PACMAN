@@ -8,8 +8,8 @@ from pacman.model.graphs.application.impl.application_edge import \
 
 from pacman.exceptions import PacmanInvalidParameterException,\
     PacmanPartitionException
-from pacman.model.constraints.partitioner_constraints.partitioner_maximum_size_constraint import \
-    PartitionerMaximumSizeConstraint
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
 from pacman.model.graphs.application.impl.application_graph \
     import ApplicationGraph
 from pacman.operations.partition_algorithms.basic_partitioner \
@@ -32,20 +32,24 @@ from uinit_test_objects.test_vertex import TestVertex
 
 class TestBasicPartitioner(unittest.TestCase):
     """
-    test for basic parittioning algorithum
+    test for basic partitioning algorithm
     """
+
+    TheTestAddress = "192.162.240.253"
 
     def setup(self):
         """
-        setup for all absic partitioner tests
-        :return:
+        setup for all basic partitioner tests
         """
         self.vert1 = TestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None, "First edge")
-        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None, "Second edge")
-        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None, "Third edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None,
+                                     "First edge")
+        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None,
+                                     "Second edge")
+        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None,
+                                     "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph")
@@ -72,7 +76,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(1, 0, 3, 0, 1, w, w))
         r = Router(links, False, 100, 1024)
 
-        ip = "192.162.240.253"
+        ip = TestBasicPartitioner.TheTestAddress
         chips = list()
         for x in range(5):
             for y in range(5):
@@ -83,8 +87,7 @@ class TestBasicPartitioner(unittest.TestCase):
 
     def test_partition_with_no_additional_constraints(self):
         """
-        test a partitionign with a graph with no extra constraints
-        :return:
+        test a partitioning with a graph with no extra constraints
         """
         self.setup()
         graph, mapper, _ = self.bp(self.graph, self.machine)
@@ -99,7 +102,6 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_no_additional_constraints_extra_edge(self):
         """
         test that the basic form with an extra edge works
-        :return:
         """
         self.setup()
         self.graph.add_edge(
@@ -110,8 +112,7 @@ class TestBasicPartitioner(unittest.TestCase):
 
     def test_partition_on_large_vertex_than_has_to_be_split(self):
         """
-        test that partitioning 1 lage vertex can make it into 2 small ones
-        :return:
+        test that partitioning 1 large vertex can make it into 2 small ones
         """
         self.setup()
         large_vertex = TestVertex(300, "Large vertex")
@@ -123,8 +124,8 @@ class TestBasicPartitioner(unittest.TestCase):
 
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
         """
-        test that partitioning 1 lage vertex can make it into multiple small ones
-        :return:
+        test that partitioning 1 large vertex can make it into multiple small
+        ones
         """
         self.setup()
         large_vertex = TestVertex(500, "Large vertex")
@@ -138,7 +139,6 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
         """
         test that fixed partitioning causes correct number of vertices
-        :return:
         """
         self.setup()
         large_vertex = TestVertex(1000, "Large vertex")
@@ -151,7 +151,6 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_barely_sufficient_space(self):
         """
         test that partitioning will work when close to filling the machine
-        :return:
         """
         self.setup()
         flops = 20000000
@@ -174,7 +173,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(1, 0, 3, 0, 1, w, w))
         r = Router(links, False, 100, 1024)
 
-        ip = "192.162.240.253"
+        ip = TestBasicPartitioner.TheTestAddress
         chips = list()
         for x in range(5):
             for y in range(5):
@@ -191,9 +190,8 @@ class TestBasicPartitioner(unittest.TestCase):
 
     def test_partition_with_insufficient_space(self):
         """
-        test that if theres not enough space, the test the partitioner will
-         raise an error
-        :return:
+        test that if there's not enough space, the test the partitioner will
+        raise an error
         """
         self.setup()
         flops = 1000
@@ -216,7 +214,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(1, 0, 3, 0, 1, w, w))
         r = Router(links, False, 100, 1024)
 
-        ip = "192.162.240.253"
+        ip = TestBasicPartitioner.TheTestAddress
         chips = list()
         for x in range(5):
             for y in range(5):
@@ -233,8 +231,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_less_sdram_than_default(self):
         """
         test that the partitioner works when its machine is slightly malformed
-        in that it has less sdram avilable
-        :return:
+        in that it has less sdram available
         """
         self.setup()
         flops = 20000000
@@ -257,7 +254,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(1, 0, 3, 0, 1, w, w))
         r = Router(links, False, 100, 1024)
 
-        ip = "192.162.240.253"
+        ip = TestBasicPartitioner.TheTestAddress
         chips = list()
         for x in range(5):
             for y in range(5):
@@ -293,7 +290,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(1, 0, 3, 0, 1, w, w))
         r = Router(links, False, 100, 1024)
 
-        ip = "192.162.240.253"
+        ip = TestBasicPartitioner.TheTestAddress
         chips = list()
         for x in range(5):
             for y in range(5):

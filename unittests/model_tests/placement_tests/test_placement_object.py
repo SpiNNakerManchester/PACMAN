@@ -3,7 +3,8 @@ tests for placement
 """
 # pacman imports
 from pacman import exceptions
-from pacman.model.graphs.machine.impl.simple_machine_vertex import SimpleMachineVertex
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 
@@ -37,8 +38,8 @@ class TestPlacement(unittest.TestCase):
         pl = list()
         for i in range(4):
             pl.append(Placement(subv, 0, 0, i))
-        self.assertRaises(exceptions.PacmanAlreadyPlacedError,
-                          Placements, pl)
+        with self.assertRaises(exceptions.PacmanAlreadyPlacedError):
+            Placements(pl)
 
 
 if __name__ == '__main__':

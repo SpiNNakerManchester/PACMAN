@@ -16,11 +16,12 @@ from pacman.model.placements.placements import Placements
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
+from pacman.model.routing_info.partition_routing_info \
+    import PartitionRoutingInfo
 from pacman.model.routing_info.routing_info import RoutingInfo
 
 # pacman utility imports
-from pacman.utilities import constants
+from pacman.utilities.constants import DEFAULT_MASK
 # pacman operations imports
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
@@ -94,12 +95,12 @@ class MyTestCase(unittest.TestCase):
         # sort out routing infos
         self.routing_info = RoutingInfo()
         self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               edge=self.edge)
+            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
+                                 edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -126,7 +127,7 @@ class MyTestCase(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def set_up_4_node_board(self):
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -194,7 +195,7 @@ class MyTestCase(unittest.TestCase):
     def test_bad_machine_setup(self):
         # create machine
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -237,8 +238,8 @@ class MyTestCase(unittest.TestCase):
         # sort out routing infos
         self.routing_info = RoutingInfo()
         self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               edge=self.edge)
+            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
+                                 edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
 
         self.set_up_4_node_board()
@@ -262,14 +263,14 @@ class MyTestCase(unittest.TestCase):
         self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
         self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
         vertices = list()
-        for i in range(4 * 17): #51 atoms per each processor on 20 chips
+        for i in range(4 * 17):  # 51 atoms per each processor on 20 chips
             vertices.append(SimpleMachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "vertex " + str(i)))
         edges = list()
         for i in range(len(vertices)):
-            edges.append(SimpleMachineEdge(
-                vertices[i], vertices[(i + 1)%len(vertices)]))
+            edges.append(MachineEdge(
+                vertices[i], vertices[(i + 1) % len(vertices)]))
         graph = MachineGraph(vertices, edges)
         p = 1
         x = 0
@@ -288,11 +289,10 @@ class MyTestCase(unittest.TestCase):
         edge_routing_info = list()
         for i in range(len(edges)):
             edge_routing_info.append(PartitionRoutingInfo(
-                edges[i], i<<11, constants.DEFAULT_MASK))
+                edges[i], i << 11, DEFAULT_MASK))
 
         for edge_info in edge_routing_info:
             routing_info.add_partition_info(edge_info)
-
 
         self.set_up_4_node_board()
 

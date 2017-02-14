@@ -51,9 +51,8 @@ class Graph(AbstractGraph):
         "_constraints"
     )
 
-    def __init__(
-            self, allowed_vertex_types, allowed_edge_types,
-            allowed_partition_types):
+    def __init__(self, allowed_vertex_types, allowed_edge_types,
+                 allowed_partition_types):
         """
 
         :param allowed_vertex_types:\
@@ -73,7 +72,8 @@ class Graph(AbstractGraph):
         self._outgoing_edges = defaultdict(OrderedSet)
         self._incoming_edges = defaultdict(OrderedSet)
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
-        self._outgoing_edge_partitions_by_traffic_type = defaultdict(OrderedSet)
+        self._outgoing_edge_partitions_by_traffic_type = \
+            defaultdict(OrderedSet)
 
         self._constraints = ConstrainedObject()
 

@@ -44,9 +44,12 @@ class TestBasicPartitioner(unittest.TestCase):
         self.vert1 = TestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None, "First edge")
-        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None, "Second edge")
-        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None, "Third edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None,
+                                     "First edge")
+        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None,
+                                     "Second edge")
+        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None,
+                                     "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph")
@@ -332,7 +335,8 @@ class TestBasicPartitioner(unittest.TestCase):
         graph, _, _ = partitioner(self.graph, self.machine)
         self.assertEqual(len(graph.vertices), 5)
 
-    def test_operation_with_same_size_as_vertex_constraint_large_vertices(self):
+    def test_operation_with_same_size_as_vertex_constraint_large_vertices(
+            self):
         """
         test that the partition and place partitioner can handle same size as
         constraints on a vertex which has to be split over many cores

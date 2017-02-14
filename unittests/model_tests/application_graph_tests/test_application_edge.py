@@ -1,4 +1,3 @@
-
 # pacman imports
 from pacman.model.graphs.common.slice import Slice
 

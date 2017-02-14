@@ -9,6 +9,7 @@ virtualenv:
 
 before_script:
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install --upgrade git+git://github.com/project-rig/rig.git@master
   - pip install -r requirements-test.txt
   - python ./setup.py install
 script:

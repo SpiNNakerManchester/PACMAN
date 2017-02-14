@@ -3,7 +3,6 @@ from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
     import MallocBasedRoutingInfoAllocator
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-import traceback
 
 
 class MyTestCase(unittest.TestCase):
@@ -89,6 +88,7 @@ class MyTestCase(unittest.TestCase):
                          0x1800, error)
         self.assertEqual(allocator._free_space_tracker[2].size,
                          0x100000000L - 0x1800, error)
+
 
 if __name__ == '__main__':
     unittest.main()

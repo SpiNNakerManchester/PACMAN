@@ -194,7 +194,7 @@ class PartitionAndPlacePartitioner(object):
                     vertex_slice, used_resources,
                     label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
                     constraints=partition_algorithm_utilities
-                        .get_remaining_constraints(vertex))
+                    .get_remaining_constraints(vertex))
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
@@ -345,7 +345,7 @@ class PartitionAndPlacePartitioner(object):
                     resource_tracker.allocate_constrained_resources(
                         used_resources, vertex.constraints)
                 used_placements.append((vertex, x, y, p, used_resources,
-                     ip_tags, reverse_ip_tags))
+                                        ip_tags, reverse_ip_tags))
             except exceptions.PacmanValueError as e:
                 raise exceptions.PacmanValueError(
                     "Unable to allocate requested resources to"
