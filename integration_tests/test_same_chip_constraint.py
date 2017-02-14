@@ -30,6 +30,7 @@ class TestSameChipConstraint(unittest.TestCase):
             SimpleMachineVertex(ResourceContainer(), label="same{}".format(i))
             for i in range(10)
         ]
+        random.seed(12345)
         for vertex in same_vertices:
             graph.add_vertex(vertex)
             for i in range(0, random.randint(1, 5)):
@@ -61,8 +62,5 @@ class TestSameChipConstraint(unittest.TestCase):
     def test_radial(self):
         self._do_test(RadialPlacer())
 
-    @unittest.skip("broken; fails randomly")
     def test_rig(self):
-        # TODO: Import the code from rig so we can fix it and make this test
-        # pass reliably.
         self._do_test(RigPlace())
