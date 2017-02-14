@@ -4,7 +4,7 @@ which is part of the SpiNNaker_ Project.
 This code depends on SpiNNMachine_.
 
 .. _SpiNNaker: http://apt.cs.manchester.ac.uk/projects/SpiNNaker/
-.. _PACMAN: tps://github.com/SpiNNakerManchester/PACMAN
+.. _PACMAN: https://github.com/SpiNNakerManchester/PACMAN
 .. _SpiNNMachine: http://spinnmachine.readthedocs.io
 
 
