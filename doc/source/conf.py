@@ -274,7 +274,7 @@ texinfo_documents = [
 epub_title = u'PACMAN'
 epub_author = u''
 epub_publisher = u''
-epub_copyright = u'2014'
+epub_copyright = u'2014-2017'
 
 # The basename for the epub file. It defaults to the project name.
 # epub_basename = u'data_allocation'
