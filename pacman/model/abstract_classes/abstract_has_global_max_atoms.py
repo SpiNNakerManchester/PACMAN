@@ -11,6 +11,7 @@ class AbstractHasGlobalMaxAtoms(object):
     __slots__ = []
 
     @abstractmethod
-    def get_max_atoms_per_core(self):
+    @staticmethod
+    def get_max_atoms_per_core():
         """ The global maximum atoms per core
         """

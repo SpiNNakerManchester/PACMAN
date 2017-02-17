@@ -17,12 +17,15 @@ class overrides(object):
         "_extend_doc",
 
         # Any additional arguments required by the subclass method
-        "_additional_arguments"
+        "_additional_arguments",
+
+        # any addional comments for the doc string
+        "_additional_comments"
     ]
 
     def __init__(
             self, super_class_method, extend_doc=True,
-            additional_arguments=None):
+            additional_arguments=None, additional_comments=""):
         """
 
         :param super_class_method: The method to override in the superclass
@@ -33,10 +36,13 @@ class overrides(object):
         :param additional_arguments:\
             Additional arguments taken by the subclass method over the\
             superclass method e.g. that are to be injected
+        :param additional_comments:\
+            additional comments to put on the end of the doc string
         """
         self._super_class_method = super_class_method
         self._extend_doc = extend_doc
         self._additional_arguments = additional_arguments
+        self._additional_comments = additional_comments
         if additional_arguments is None:
             self._additional_arguments = {}
         if isinstance(super_class_method, property):
@@ -100,6 +106,6 @@ class overrides(object):
                 self._super_class_method.__doc__ is not None):
             method.__doc__ = (
                 self._super_class_method.__doc__ +
-                method.__doc__
+                method.__doc__ + self._additional_comments
             )
         return method
