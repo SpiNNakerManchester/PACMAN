@@ -1,12 +1,12 @@
 These pages document the python code for the PACMAN_ module
 which is part of the SpiNNaker_ Project.
 
-This code depends on SpiNNMachine_.
+This code depends on SpiNNMachine_ (Combined_documentation_).
 
 .. _SpiNNaker: http://apt.cs.manchester.ac.uk/projects/SpiNNaker/
 .. _PACMAN: https://github.com/SpiNNakerManchester/PACMAN
 .. _SpiNNMachine: http://spinnmachine.readthedocs.io
-
+.. _Combined_documentation: http://spinnakermanchester.readthedocs.io
 
 PACMAN
 ======

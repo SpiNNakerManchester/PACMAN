@@ -54,4 +54,6 @@ enabled, run:
 
 Documentation
 =============
-[Python code documentation](http://pacman.readthedocs.io)
+[PACMAN python documentation](http://pacman.readthedocs.io)
+
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)
