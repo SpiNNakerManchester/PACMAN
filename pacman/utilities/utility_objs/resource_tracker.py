@@ -586,15 +586,15 @@ class ResourceTracker(object):
                 tag in self._tags_by_board[board_address])
 
     def _is_tag_available_on_ethernet_chip(self, ethernet_chip, tag_id):
-        if ethernet_chip is not None:
-            # Having found the board address, it can only be used if a
-            # tag is available
-            if (ethernet_chip.ip_address in self._boards_with_ip_tags and
-                    (tag_id is None or
-                     ethernet_chip.ip_address not in self._tags_by_board or
-                     tag_id in self._tags_by_board[ethernet_chip.ip_address])):
-                return True
-        return False
+        if ethernet_chip is None:
+            return False
+        addr = ethernet_chip.ip_address
+
+        # Having found the board address, it can only be used if a
+        # tag is available
+        return (addr in self._boards_with_ip_tags and
+                (tag_id is None or addr not in self._tags_by_board or
+                 tag_id in self._tags_by_board[ethernet_chip.ip_address]))
 
     def _is_ip_tag_available(
             self, board_address, tag, ip_address, port, strip_sdp,
