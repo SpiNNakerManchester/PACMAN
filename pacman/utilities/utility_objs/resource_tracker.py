@@ -591,8 +591,8 @@ class ResourceTracker(object):
             # tag is available
             if (ethernet_chip.ip_address in self._boards_with_ip_tags and
                     (tag_id is None or
-                             tag_id in self._tags_by_board[
-                             ethernet_chip.ip_address])):
+                     ethernet_chip.ip_address not in self._tags_by_board or
+                     tag_id in self._tags_by_board[ethernet_chip.ip_address])):
                 return True
         return False
 
@@ -765,14 +765,14 @@ class ResourceTracker(object):
             eth_chip = self._machine.get_chip_at(
                 chip.nearest_ethernet_x, chip.nearest_ethernet_y)
 
-            # verify if the ethernet chip has the available tag id
+            # verify if the Ethernet chip has the available tag id
             if self._is_tag_available_on_ethernet_chip(eth_chip, tag_id):
                 board_address = eth_chip.ip_address
 
         if board_address is None and tag_id is not None:
             for b_address in self._boards_with_ip_tags:
                 if (b_address not in self._tags_by_board or
-                            tag_id in self._tags_by_board[b_address]):
+                        tag_id in self._tags_by_board[b_address]):
                     board_address = b_address
                     break
         elif board_address is None and tag_id is None:
@@ -848,7 +848,7 @@ class ResourceTracker(object):
                     (ip_tag.ip_address, ip_tag.traffic_identifier)
 
                 # Remember how many allocations are sharing this tag
-                # in case an de-allocation is requested
+                # in case an deallocation is requested
                 self._n_ip_tag_allocations[tag_key] = 1
 
                 # Get the chip with the Ethernet
