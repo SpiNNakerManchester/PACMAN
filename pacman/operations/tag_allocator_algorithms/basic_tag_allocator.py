@@ -64,10 +64,12 @@ class BasicTagAllocator(object):
 
             # Put the allocated ip tag information into the tag object
             if returned_ip_tags is not None:
-                for (tag_constraint, (board_address, tag)) in zip(
-                        ip_tags, returned_ip_tags):
+                for (tag_constraint,
+                        (board_address, tag, dest_x, dest_y)) in zip(
+                            ip_tags, returned_ip_tags):
                     ip_tag = IPTag(
-                        board_address=board_address, tag=tag,
+                        board_address=board_address, destination_x=dest_x,
+                        destination_y=dest_y, tag=tag,
                         ip_address=tag_constraint.ip_address,
                         port=tag_constraint.port,
                         strip_sdp=tag_constraint.strip_sdp,
