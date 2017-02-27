@@ -100,7 +100,7 @@ class BasicTagAllocator(object):
         progress_bar.end()
 
         # Finally allocate the ports to the reverse ip tags
-        for (tag_constraint, board_address, tag, vertex, placement) in \
+        for (tag_constraint, board_address, tag, vertex, placement) in\
                 tags_to_allocate_ports:
             if board_address not in ports_to_allocate:
                 ports_to_allocate[board_address] = OrderedSet(_BOARD_PORTS)
