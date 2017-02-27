@@ -241,50 +241,43 @@ class PACMANAlgorithmExecutor(object):
         allocated_algorithms = list()
         generated_outputs = set()
         generated_outputs.union(input_types)
-        allocated_a_algorithm = True
         algorithms_to_find = list(algorithm_data)
         optionals_to_use = list(optional_algorithm_data)
         outputs_to_find = self._remove_outputs_which_are_inputs(
             required_outputs, inputs)
 
-        while ((len(algorithms_to_find) > 0 or len(outputs_to_find) > 0) and
-                allocated_a_algorithm):
-            allocated_a_algorithm = False
+        while ((len(algorithms_to_find) > 0 or len(outputs_to_find) > 0)):
 
             # Find a usable algorithm
-            suitable_algorithm = self._locate_suitable_algorithm(
-                algorithms_to_find, input_types, None)
-            if suitable_algorithm is not None:
-                self._remove_algorithm_and_update_outputs(
-                    algorithms_to_find, suitable_algorithm, input_types,
-                    generated_outputs, outputs_to_find)
-
-            else:
+            suitable_algorithm, algorithm_list = \
+                self._locate_suitable_algorithm(
+                    algorithms_to_find, input_types, None)
+            if suitable_algorithm is None:
 
                 # If no algorithm, find a usable optional algorithm
-                suitable_algorithm = self._locate_suitable_algorithm(
-                    optionals_to_use, input_types, generated_outputs)
-                if suitable_algorithm is not None:
-                    self._remove_algorithm_and_update_outputs(
-                        optionals_to_use, suitable_algorithm, input_types,
-                        generated_outputs, outputs_to_find)
-                else:
-                    # if still no suitable algorithm, try converting some
-                    # stuff from memory to file or visa versa
-                    suitable_algorithm = self._locate_suitable_algorithm(
+                suitable_algorithm, algorithm_list = \
+                    self._locate_suitable_algorithm(
+                        optionals_to_use, input_types, generated_outputs)
+
+            if suitable_algorithm is None:
+
+                # if still no suitable algorithm, try using a converter
+                # algorithm
+                suitable_algorithm, algorithm_list = \
+                    self._locate_suitable_algorithm(
                         converter_algorithms_datas, input_types,
                         generated_outputs)
-                    if suitable_algorithm is not None:
-                        self._remove_algorithm_and_update_outputs(
-                            converter_algorithms_datas, suitable_algorithm,
-                            input_types, generated_outputs, outputs_to_find)
 
             if suitable_algorithm is not None:
+
+                # Remove the value
+                self._remove_algorithm_and_update_outputs(
+                    algorithm_list, suitable_algorithm, input_types,
+                    generated_outputs, outputs_to_find)
 
                 # add the suitable algorithms to the list and take the outputs
                 # as new inputs
                 allocated_algorithms.append(suitable_algorithm)
-                allocated_a_algorithm = True
             else:
 
                 # Failed to find an algorithm to run!
@@ -416,23 +409,22 @@ class PACMANAlgorithmExecutor(object):
 
             # verify that a new output is being generated.
             if all_inputs_match:
-                unique_output = False
 
-                # this check needs to be for none, and not a empty, list, to
-                # allow searches though lists of purely optional algorithms.
+                # If the list of generated outputs is given, only use the
+                # algorithm if it generates something new, assuming the
+                # algorithm generates any outputs at all
+                # (otherwise just use it)
                 if (len(algorithm.outputs) > 0 and
                         generated_outputs is not None):
                     for output in algorithm.outputs:
                         if (output.output_type not in generated_outputs and
                                 output.output_type not in inputs):
-                            unique_output = True
-                    if unique_output:
-                        return algorithm
+                            return algorithm, algorithm_list
                 else:
-                    return algorithm
+                    return algorithm, algorithm_list
 
         # If no algorithms are available, return None
-        return None
+        return None, algorithm_list
 
     def execute_mapping(self):
         """ Executes the algorithms
