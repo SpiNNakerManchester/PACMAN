@@ -61,7 +61,7 @@ class PACMANAlgorithmExecutor(object):
             xml_paths=None, packages=None, do_timings=True,
             print_timings=False, do_immediate_injection=True,
             do_post_run_injection=False, inject_inputs=True,
-            do_direct_injection=True):
+            do_direct_injection=True, use_unscanned_annotated_algorithms=True):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -96,6 +96,9 @@ class PACMANAlgorithmExecutor(object):
             True if direct injection into methods should be supported.  This\
             will allow any of the inputs or generated outputs to be injected\
             into a method
+        :param use_unscanned_annotated_algorithms:\
+            True if algorithms that have been detected outside of the packages\
+            argument specified above should be used
         """
 
         # algorithm timing information
@@ -122,11 +125,12 @@ class PACMANAlgorithmExecutor(object):
 
         self._set_up_pacman_algorithm_listings(
             algorithms, optional_algorithms, xml_paths,
-            packages, inputs, required_outputs)
+            packages, inputs, required_outputs,
+            use_unscanned_annotated_algorithms)
 
     def _set_up_pacman_algorithm_listings(
             self, algorithms, optional_algorithms, xml_paths, packages, inputs,
-            required_outputs):
+            required_outputs, use_unscanned_algorithms):
         """ Translates the algorithm string and uses the config XML to create\
             algorithm objects
 
@@ -185,6 +189,9 @@ class PACMANAlgorithmExecutor(object):
             [file_format_converters]))
         algorithm_data_objects.update(
             algorithm_decorator.scan_packages(copy_of_packages))
+        if use_unscanned_algorithms:
+            algorithm_data_objects.update(
+                algorithm_decorator.get_algorithms())
 
         # get list of all xml's as this is used to exclude xml files from
         # import
