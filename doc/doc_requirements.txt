@@ -1,4 +1,3 @@
 six
 enum34
--e git+https://github.com/SpiNNakerManchester/sphinx_python_api_utils.git@master#egg=sphinx_python_api_utils
 -e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
