@@ -95,7 +95,7 @@ class TestBasicPartitioner(unittest.TestCase):
         vert_sizes = []
         for vert in self.verts:
             vert_sizes.append(vert.n_atoms)
-        self.assertEqual(len(graph.edges), 3)
+        self.assertEqual(len(list(graph.edges)), 3)
         for vertex in graph.vertices:
             self.assertIn(mapper.get_slice(vertex).n_atoms, vert_sizes)
 
@@ -107,8 +107,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, None, "extra"), "TEST")
         graph, _, _ = self.bp(self.graph, self.machine)
-        self.assertEqual(len(graph.vertices), 3)
-        self.assertEqual(len(graph.edges), 4)
+        self.assertEqual(len(list(graph.vertices)), 3)
+        self.assertEqual(len(list(graph.edges)), 4)
 
     def test_partition_on_large_vertex_than_has_to_be_split(self):
         """

@@ -116,6 +116,11 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         return self._edges
 
     @property
+    @overrides(AbstractOutgoingEdgePartition.n_edges)
+    def n_edges(self):
+        return len(self._edges)
+
+    @property
     @overrides(AbstractOutgoingEdgePartition.pre_vertex)
     def pre_vertex(self):
         return self._pre_vertex

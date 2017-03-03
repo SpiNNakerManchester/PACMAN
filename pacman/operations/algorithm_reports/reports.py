@@ -111,8 +111,9 @@ def router_report_from_paths(
     f_routing.write(" for target machine '{}'".format(hostname))
     f_routing.write("\n\n")
 
-    progress_bar = ProgressBar(len(machine_graph.edges),
-                               "Generating Routing path report")
+    progress_bar = ProgressBar(
+        machine_graph.n_outgoing_edge_partitions,
+        "Generating Routing path report")
     for partition in machine_graph.outgoing_edge_partitions:
         source_placement = placements.get_placement_of_vertex(
             partition.pre_vertex)
@@ -136,7 +137,7 @@ def router_report_from_paths(
 
             # End one entry:
             f_routing.write("\n")
-            progress_bar.update()
+        progress_bar.update()
     f_routing.flush()
     f_routing.close()
     progress_bar.end()

@@ -93,6 +93,13 @@ class AbstractGraph(AbstractHasConstraints):
         """
 
     @abstractproperty
+    def n_vertices(self):
+        """ The number of vertices in the graph
+
+        :rtype: int
+        """
+
+    @abstractproperty
     def edges(self):
         """ The edges in the graph
 
@@ -108,6 +115,13 @@ class AbstractGraph(AbstractHasConstraints):
         :rtype:\
             iterable of\
             :py:class:`pacman.model.graphs.abstract_outgoing_edge_partition.AbstractOutgoingEdgePartition`
+        """
+
+    @abstractproperty
+    def n_outgoing_edge_partitions(self):
+        """ The number of outgoing edge partitions in the graph
+
+        :rtype: int
         """
 
     @abstractmethod

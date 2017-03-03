@@ -1188,7 +1188,7 @@ class VertexBasedRoutingInfoAllocator(object):
         fields = list()
 
         verts = list(graph.vertices)
-        vertex = partition.edges[0].pre_vertex
+        vertex = partition.pre_vertex
         app_vertex = graph_mapper.get_application_vertex(vertex)
         vertices = list(graph_mapper.get_machine_vertices(app_vertex))
 

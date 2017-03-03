@@ -165,18 +165,28 @@ class Graph(AbstractGraph):
         return self._vertices
 
     @property
+    @overrides(AbstractGraph.n_vertices)
+    def n_vertices(self):
+        return len(self._vertices)
+
+    @property
     @overrides(AbstractGraph.edges)
     def edges(self):
-        data = list()
-        for edge_list in self._outgoing_edges.itervalues():
-            for edge in edge_list:
-                data.append(edge)
-        return data
+        return [
+            edge
+            for partition in self._outgoing_edge_partitions_by_name.values()
+            for edge in partition.edges
+        ]
 
     @property
     @overrides(AbstractGraph.outgoing_edge_partitions)
     def outgoing_edge_partitions(self):
         return self._outgoing_edge_partitions_by_name.values()
+
+    @property
+    @overrides(AbstractGraph.n_outgoing_edge_partitions)
+    def n_outgoing_edge_partitions(self):
+        return len(self._outgoing_edge_partitions_by_name)
 
     @overrides(AbstractGraph.get_edges_starting_at_vertex)
     def get_edges_starting_at_vertex(self, vertex):
