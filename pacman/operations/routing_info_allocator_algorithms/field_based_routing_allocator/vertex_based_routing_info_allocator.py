@@ -94,7 +94,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :return: routing information objects
         """
         progress_bar = ProgressBar(
-            len(machine_graph.outgoing_edge_partitions) * 3,
+            machine_graph.n_outgoing_edge_partitions * 3,
             "Allocating routing keys")
 
         # ensure groups are stable and correct
@@ -108,7 +108,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # locate however many types of constraints there are
         seen_fields = field_utilities.deduce_types(machine_graph)
-        progress_bar.update(len(machine_graph.outgoing_edge_partitions))
+        progress_bar.update(machine_graph.n_outgoing_edge_partitions)
 
         if len(seen_fields) > 1:
             self._adds_application_field_to_the_fields(seen_fields)

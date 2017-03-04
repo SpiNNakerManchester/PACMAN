@@ -551,8 +551,9 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
     except IOError:
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
-    progress_bar = ProgressBar(len(machine_graph.outgoing_edge_partitions),
-                               "Generating Routing info report")
+    progress_bar = ProgressBar(
+        machine_graph.n_outgoing_edge_partitions,
+        "Generating Routing info report")
 
     for partition in machine_graph.outgoing_edge_partitions:
         output.write("Vertex: {} \n".format(partition.pre_vertex))

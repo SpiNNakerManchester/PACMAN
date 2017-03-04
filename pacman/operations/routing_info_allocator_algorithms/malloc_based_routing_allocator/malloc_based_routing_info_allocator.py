@@ -76,7 +76,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(
-            len(machine_graph.outgoing_edge_partitions),
+            machine_graph.n_outgoing_edge_partitions,
             "Allocating routing keys")
 
         # allocate the groups that have fixed keys
