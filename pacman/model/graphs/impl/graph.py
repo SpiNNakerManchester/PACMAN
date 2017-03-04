@@ -110,7 +110,7 @@ class Graph(AbstractGraph):
         if edge.pre_vertex not in self._vertices:
             raise exceptions.PacmanInvalidParameterException(
                 "edge", edge.pre_vertex, "pre-vertex must be known in graph")
-        if edge.post_vertex not in self.vertices:
+        if edge.post_vertex not in self._vertices:
             raise exceptions.PacmanInvalidParameterException(
                 "edge", edge.post_vertex, "post-vertex must be known in graph")
 

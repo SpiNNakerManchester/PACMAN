@@ -59,14 +59,13 @@ class PartitionAndPlacePartitioner(object):
                                    PartitionerSameSizeAsVertexConstraint])
 
         # Load the vertices and create the machine_graph to fill
-        vertices = graph.vertices
         machine_graph = MachineGraph(
             label="partitioned graph for {}".format(graph.label))
         graph_mapper = GraphMapper()
 
         # sort out vertex's by placement constraints
         vertices = placer_algorithm_utilities\
-            .sort_vertices_by_known_constraints(vertices)
+            .sort_vertices_by_known_constraints(graph.vertices)
 
         # Set up the progress
         n_atoms = 0
@@ -78,6 +77,7 @@ class PartitionAndPlacePartitioner(object):
 
         # Partition one vertex at a time
         for vertex in vertices:
+
             # check that the vertex hasn't already been partitioned
             machine_vertices = graph_mapper.get_machine_vertices(vertex)
 

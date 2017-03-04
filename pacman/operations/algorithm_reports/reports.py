@@ -165,10 +165,9 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
     f_place_by_vertex.write(" for target machine '{}'".format(hostname))
     f_place_by_vertex.write("\n\n")
 
-    vertices = sorted(graph.vertices, key=lambda x: x.label)
-    progress_bar = ProgressBar(len(vertices),
-                               "Generating partitioner report")
-    for v in vertices:
+    progress_bar = ProgressBar(
+        graph.n_vertices, "Generating partitioner report")
+    for v in graph.vertices:
         vertex_name = v.label
         vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
@@ -233,10 +232,9 @@ def placement_report_with_application_graph_by_vertex(
     used_sdram_by_chip = dict()
     vertex_by_processor = dict()
 
-    vertices = sorted(graph.vertices, key=lambda x: x.label)
-    progress_bar = ProgressBar(len(vertices),
-                               "Generating placement report")
-    for v in vertices:
+    progress_bar = ProgressBar(
+        graph.n_vertices, "Generating placement report")
+    for v in graph.vertices:
         vertex_name = v.label
         vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
@@ -311,9 +309,9 @@ def placement_report_without_application_graph_by_vertex(
     used_sdram_by_chip = dict()
     vertex_by_processor = dict()
 
-    vertices = sorted(machine_graph.vertices, key=lambda vertex: vertex.label)
-    progress_bar = ProgressBar(len(vertices), "Generating placement report")
-    for v in vertices:
+    progress_bar = ProgressBar(
+        machine_graph.n_vertices, "Generating placement report")
+    for v in machine_graph.vertices:
         vertex_name = v.label
         vertex_model = v.__class__.__name__
         f_place_by_vertex.write(

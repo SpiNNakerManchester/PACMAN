@@ -90,7 +90,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         graph, mapper, _ = self.bp(self.graph, self.machine)
-        self.assertEqual(len(graph.vertices), 3)
+        self.assertEqual(len(list(graph.vertices)), 3)
         vert_sizes = []
         for vert in self.verts:
             vert_sizes.append(vert.n_atoms)
@@ -118,7 +118,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.assertGreater(len(graph.vertices), 1)
+        self.assertGreater(len(list(graph.vertices)), 1)
 
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
         """
@@ -132,7 +132,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        self.assertGreater(len(graph.vertices), 1)
+        self.assertGreater(len(list(graph.vertices)), 1)
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
         """
@@ -144,7 +144,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine)
-        self.assertEqual(len(graph.vertices), 100)
+        self.assertEqual(len(list(graph.vertices)), 100)
 
     def test_partition_with_barely_sufficient_space(self):
         """
@@ -184,7 +184,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(singular_vertex)
         graph, _, _ = self.bp(self.graph, self.machine)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.assertEqual(len(graph.vertices), 450)
+        self.assertEqual(len(list(graph.vertices)), 450)
 
     def test_partition_with_insufficient_space(self):
         """
@@ -319,7 +319,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         self.graph = ApplicationGraph("foo")
         graph, _, _ = self.bp(self.graph, self.machine)
-        self.assertEqual(len(graph.vertices), 0)
+        self.assertEqual(len(list(graph.vertices)), 0)
 
     def test_operation_with_same_size_as_vertex_constraint(self):
         """
@@ -333,7 +333,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine)
-        self.assertEqual(len(graph.vertices), 5)
+        self.assertEqual(len(list(graph.vertices)), 5)
 
     def test_operation_with_same_size_as_vertex_constraint_large_vertices(
             self):
@@ -350,7 +350,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertices([new_large_vertex, constrained_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine)
-        self.assertEqual(len(graph.vertices), 6)
+        self.assertEqual(len(list(graph.vertices)), 6)
 
     def test_operation_same_size_as_vertex_constraint_different_order(self):
         """
@@ -368,7 +368,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine)
         # split in 256 each, so 4 machine vertices
-        self.assertEqual(len(graph.vertices), 4)
+        self.assertEqual(len(list(graph.vertices)), 4)
 
     def test_operation_with_same_size_as_vertex_constraint_exception(self):
         """

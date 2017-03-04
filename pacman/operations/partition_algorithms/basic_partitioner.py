@@ -55,16 +55,15 @@ class BasicPartitioner(object):
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
-        progress_bar = ProgressBar(len(graph.vertices),
-                                   "Partitioning graph vertices")
-        vertices = graph.vertices
+        progress_bar = ProgressBar(
+            graph.n_vertices, "Partitioning graph vertices")
         machine_graph = MachineGraph(
             "Machine graph for {}".format(graph.label))
         graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine)
 
         # Partition one vertex at a time
-        for vertex in vertices:
+        for vertex in graph.vertices:
 
             # Get the usage of the first atom, then assume that this
             # will be the usage of all the atoms
