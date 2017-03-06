@@ -46,7 +46,7 @@ class TestMachineGraphModel(unittest.TestCase):
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
         graph.add_edges(edges, "bar")
-        outgoing = graph.get_edges_starting_at_vertex(vertices[0])
+        outgoing = set(graph.get_edges_starting_at_vertex(vertices[0]))
         for i in range(5):
             if edges[i] not in outgoing:
                 raise AssertionError(
@@ -56,7 +56,7 @@ class TestMachineGraphModel(unittest.TestCase):
                 raise AssertionError(
                     "edges[" + str(i) + "] is in outgoing and shouldn't be")
 
-        incoming = graph.get_edges_ending_at_vertex(vertices[0])
+        incoming = set(graph.get_edges_ending_at_vertex(vertices[0]))
 
         if edges[9] not in incoming:
             raise AssertionError(
