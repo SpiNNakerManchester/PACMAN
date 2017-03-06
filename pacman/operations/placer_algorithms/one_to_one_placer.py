@@ -5,11 +5,12 @@ from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-
-from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.constraints.placer_constraints\
     .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+from pacman.utilities import utility_calls
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -203,9 +204,9 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 if y is not None and post_y is not None and y != post_y:
                     conflict = True
-                edges = graph.get_edges_ending_at_vertex(
-                    next_vertex)
-                if len(edges) == 1 and not conflict:
+                edges = graph.get_edges_ending_at_vertex(next_vertex)
+
+                if utility_calls.is_single(edges) and not conflict:
                     found_vertices.append(next_vertex)
                     if post_x is not None:
                         x = post_x
@@ -235,15 +236,9 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 if y is not None and pre_y is not None and y != pre_y:
                     conflict = True
-                edges = graph.get_edges_starting_at_vertex(
-                    next_vertex)
-                is_single = True
-                for i, _ in enumerate(edges):
-                    if i > 0:
-                        is_single = False
-                        break
+                edges = graph.get_edges_starting_at_vertex(next_vertex)
 
-                if is_single and not conflict:
+                if utility_calls.is_single(edges) and not conflict:
                     found_vertices.append(next_vertex)
                     if pre_x is not None:
                         x = pre_x
