@@ -1149,7 +1149,7 @@ class ResourceTracker(object):
 
         :param usable_chips: Coordinates of usable chips
         :type usable_chips: iterable of pair(int,int)
-        :return: #cores, #chips, amount of SDRAM, #tags
+        :return: returns #cores, #chips, amount of SDRAM, #tags
         :rtype: 4-tuple of int
         """
         n_cores = 0
