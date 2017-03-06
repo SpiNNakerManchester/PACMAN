@@ -113,8 +113,9 @@ def router_report_from_paths(
     f_routing.write(" for target machine '{}'".format(hostname))
     f_routing.write("\n\n")
 
-    progress_bar = ProgressBar(len(machine_graph.edges),
-                               "Generating Routing path report")
+    progress_bar = ProgressBar(
+        machine_graph.n_outgoing_edge_partitions,
+        "Generating Routing path report")
     for partition in machine_graph.outgoing_edge_partitions:
         source_placement = placements.get_placement_of_vertex(
             partition.pre_vertex)
@@ -138,7 +139,7 @@ def router_report_from_paths(
 
             # End one entry:
             f_routing.write("\n")
-            progress_bar.update()
+        progress_bar.update()
     f_routing.flush()
     f_routing.close()
     progress_bar.end()
@@ -166,10 +167,9 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
     f_place_by_vertex.write(" for target machine '{}'".format(hostname))
     f_place_by_vertex.write("\n\n")
 
-    vertices = sorted(graph.vertices, key=lambda x: x.label)
-    progress_bar = ProgressBar(len(vertices),
-                               "Generating partitioner report")
-    for v in vertices:
+    progress_bar = ProgressBar(
+        graph.n_vertices, "Generating partitioner report")
+    for v in graph.vertices:
         vertex_name = v.label
         vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
@@ -234,10 +234,9 @@ def placement_report_with_application_graph_by_vertex(
     used_sdram_by_chip = dict()
     vertex_by_processor = dict()
 
-    vertices = sorted(graph.vertices, key=lambda x: x.label)
-    progress_bar = ProgressBar(len(vertices),
-                               "Generating placement report")
-    for v in vertices:
+    progress_bar = ProgressBar(
+        graph.n_vertices, "Generating placement report")
+    for v in graph.vertices:
         vertex_name = v.label
         vertex_model = v.__class__.__name__
         num_atoms = v.n_atoms
@@ -313,9 +312,9 @@ def placement_report_without_application_graph_by_vertex(
     used_sdram_by_chip = dict()
     vertex_by_processor = dict()
 
-    vertices = sorted(machine_graph.vertices, key=lambda vertex: vertex.label)
-    progress_bar = ProgressBar(len(vertices), "Generating placement report")
-    for v in vertices:
+    progress_bar = ProgressBar(
+        machine_graph.n_vertices, "Generating placement report")
+    for v in machine_graph.vertices:
         vertex_name = v.label
         vertex_model = v.__class__.__name__
         f_place_by_vertex.write(
@@ -555,8 +554,9 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
     except IOError:
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.".format(file_name))
-    progress_bar = ProgressBar(len(machine_graph.outgoing_edge_partitions),
-                               "Generating Routing info report")
+    progress_bar = ProgressBar(
+        machine_graph.n_outgoing_edge_partitions,
+        "Generating Routing info report")
 
     for partition in machine_graph.outgoing_edge_partitions:
         output.write("Vertex: {} \n".format(partition.pre_vertex))

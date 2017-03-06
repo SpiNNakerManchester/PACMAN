@@ -60,8 +60,8 @@ class BasicRoutingInfoAllocator(object):
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each edge and create keys from its placement
-        progress_bar = ProgressBar(len(machine_graph.vertices),
-                                   "Allocating routing keys")
+        progress_bar = ProgressBar(
+            machine_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
         for vertex in machine_graph.vertices:
             partitions = machine_graph.\

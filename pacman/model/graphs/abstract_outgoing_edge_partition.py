@@ -45,6 +45,13 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
         """
 
     @abstractproperty
+    def n_edges(self):
+        """ The number of edges in the partition
+
+        :rtype: int
+        """
+
+    @abstractproperty
     def pre_vertex(self):
         """ The vertex at which all edges in this partition start
 

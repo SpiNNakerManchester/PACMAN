@@ -1,6 +1,7 @@
 from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from spinn_machine.virtual_machine import VirtualMachine
-from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints\
     .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
@@ -19,19 +20,17 @@ class TestSameChipConstraint(unittest.TestCase):
         graph = MachineGraph("Test")
 
         vertices = [
-            MachineVertex(
-                resources_required=ResourceContainer(), label="v{}".format(i))
+            SimpleMachineVertex(ResourceContainer(), label="v{}".format(i))
             for i in range(100)
         ]
         for vertex in vertices:
             graph.add_vertex(vertex)
 
         same_vertices = [
-            MachineVertex(
-                resources_required=ResourceContainer(),
-                label="same{}".format(i))
+            SimpleMachineVertex(ResourceContainer(), label="same{}".format(i))
             for i in range(10)
         ]
+        random.seed(12345)
         for vertex in same_vertices:
             graph.add_vertex(vertex)
             for i in range(0, random.randint(1, 5)):

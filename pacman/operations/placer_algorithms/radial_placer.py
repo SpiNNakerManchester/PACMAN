@@ -40,7 +40,8 @@ class RadialPlacer(object):
                 machine_graph.vertices)
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(len(vertices), "Placing graph vertices")
+        progress_bar = ProgressBar(
+            machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         vertices_on_same_chip = placer_algorithm_utilities\

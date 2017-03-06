@@ -28,8 +28,7 @@ class CreateConstraintsToFile(object):
         """
 
         progress_bar = ProgressBar(
-            (len(machine_graph.vertices)) + 2,
-            "creating json constraints")
+            machine_graph.n_vertices + 2, "creating json constraints")
 
         json_constraints_directory_rep = list()
         self._add_monitor_core_reserve(json_constraints_directory_rep)

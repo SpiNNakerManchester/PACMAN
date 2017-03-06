@@ -393,6 +393,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
         reached_placements.add(PlacementTuple(dest_x, dest_y,
                                               processor_id))
 
+
 range_masks = {0xFFFFFFFFL - ((2 ** i) - 1) for i in range(33)}
 
 
