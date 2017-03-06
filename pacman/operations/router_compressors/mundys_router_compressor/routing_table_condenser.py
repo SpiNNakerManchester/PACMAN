@@ -122,7 +122,7 @@ class MundyRouterCompressor(object):
                     len(mundy_compressed_router_table_entries)))
         for entry in mundy_compressed_router_table_entries:
 
-            table.add_mutlicast_routing_entry(
+            table.add_multicast_routing_entry(
                 MulticastRoutingEntry(
                     entry.key, entry.mask,  # Key and mask
                     ((int(c) - 6) for c in entry.route if c.is_core),  # Cores

@@ -49,9 +49,9 @@ class MulticastRoutingTable(object):
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
-                self.add_mutlicast_routing_entry(multicast_routing_entry)
+                self.add_multicast_routing_entry(multicast_routing_entry)
 
-    def add_mutlicast_routing_entry(self, multicast_routing_entry):
+    def add_multicast_routing_entry(self, multicast_routing_entry):
         """ Adds a routing entry to this table
 
         :param multicast_routing_entry: The route to add
@@ -154,16 +154,10 @@ class MulticastRoutingTable(object):
     def __eq__(self, other):
         if not isinstance(other, MulticastRoutingTable):
             return False
-        else:
-            if self._x != other.x and self._y != other.y:
-                return False
-            else:
-                for this_entry, other_entry in zip(
-                        list(self._multicast_routing_entries),
-                        list(other.multicast_routing_entries)):
-                    if this_entry != other_entry:
-                        return False
-                return True
+        if self._x != other.x and self._y != other.y:
+            return False
+        return self._multicast_routing_entries == \
+            other.multicast_routing_entries
 
     def __ne__(self, other):
         return not self.__eq__(other)
