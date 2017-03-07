@@ -27,10 +27,9 @@ class BasicRoutingTableGenerator(object):
         :param machine:
         :return:
         """
-        progress_bar = ProgressBar(
-            len(list(machine.chips)), "Generating routing tables")
+        progress = ProgressBar(machine.chips, "Generating routing tables")
         routing_tables = MulticastRoutingTables()
-        for chip in machine.chips:
+        for chip in progress.over(machine.chips):
             partitions_in_table = routing_table_by_partitions.\
                 get_entries_for_router(chip.x, chip.y)
             if len(partitions_in_table) != 0:
@@ -49,7 +48,5 @@ class BasicRoutingTableGenerator(object):
                         routing_table.add_multicast_routing_entry(
                             multicast_routing_entry)
                 routing_tables.add_routing_table(routing_table)
-            progress_bar.update()
-        progress_bar.end()
 
         return routing_tables

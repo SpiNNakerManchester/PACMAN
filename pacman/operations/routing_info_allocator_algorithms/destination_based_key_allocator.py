@@ -51,13 +51,12 @@ class DestinationBasedRoutingInfoAllocator(object):
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each edge and create keys from its placement
-        progress_bar = ProgressBar(
-            machine_graph.n_outgoing_edge_partitions,
-            "Allocating routing keys")
+        progress = ProgressBar(machine_graph.n_outgoing_edge_partitions,
+                               "Allocating routing keys")
         routing_infos = RoutingInfo()
         routing_tables = MulticastRoutingTables()
 
-        for partition in machine_graph.outgoing_edge_partitions:
+        for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 destination = edge.post_vertex
                 placement = placements.get_placement_of_vertex(destination)
@@ -75,9 +74,6 @@ class DestinationBasedRoutingInfoAllocator(object):
 
                 partition_info = PartitionRoutingInfo(keys_and_masks, edge)
                 routing_infos.add_partition_info(partition_info)
-
-            progress_bar.update()
-        progress_bar.end()
 
         return routing_infos, routing_tables
 

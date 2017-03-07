@@ -1,3 +1,4 @@
+from spinn_utilities.timer import Timer
 # pacman imports
 from pacman import exceptions
 from pacman import operations
@@ -7,7 +8,6 @@ from pacman.executor.algorithm_metadata_xml_reader \
     import AlgorithmMetadataXmlReader
 from pacman.operations import algorithm_reports
 from pacman.utilities import file_format_converters
-from pacman.utilities.utility_objs.timer import Timer
 
 # general imports
 import logging

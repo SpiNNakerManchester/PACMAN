@@ -33,16 +33,15 @@ class BasicTagAllocator(object):
         tags_to_allocate_ports = list()
 
         # Check that the algorithm can handle the constraints
-        progress_bar = ProgressBar(placements.n_placements,
+        progress = ProgressBar(placements.n_placements,
                                    "Allocating tags")
         placements_with_tags = list()
         for placement in placements.placements:
-            if (len(placement.vertex.resources_required.iptags) > 0 or
-                    len(placement.vertex.resources_required.
-                        reverse_iptags) > 0):
+            if (placement.vertex.resources_required.iptags or
+                    placement.vertex.resources_required.reverse_iptags):
                 ResourceTracker.check_constraints([placement.vertex])
                 placements_with_tags.append(placement)
-            progress_bar.update()
+            progress.update()
 
         # Go through and allocate the tags
         tags = Tags()
@@ -97,7 +96,7 @@ class BasicTagAllocator(object):
                             (tag_constraint, board_address, tag, vertex,
                              placement))
 
-        progress_bar.end()
+        progress.end()
 
         # Finally allocate the ports to the reverse ip tags
         for (tag_constraint, board_address, tag, vertex, placement) in\

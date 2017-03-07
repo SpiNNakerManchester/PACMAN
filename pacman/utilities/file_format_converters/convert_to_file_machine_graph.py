@@ -26,7 +26,7 @@ class ConvertToFileMachineGraph(object):
         :param file_path:
         :return:
         """
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_vertices, "Converting to json graph")
 
         # write basic stuff
@@ -45,7 +45,7 @@ class ConvertToFileMachineGraph(object):
             self._convert_vertex(vertex, vertex_by_id, vertices_resources,
                                  edges_resources, machine_graph,
                                  partition_by_id)
-            progress_bar.update()
+            progress.update()
 
         with open(file_path, "w") as file_to_write:
             json.dump(json_graph_directory_rep, file_to_write)
@@ -58,7 +58,7 @@ class ConvertToFileMachineGraph(object):
             graph_schema = json.load(file_to_read)
             jsonschema.validate(json_graph_directory_rep, graph_schema)
 
-        progress_bar.end()
+        progress.end()
 
         return file_path, vertex_by_id, partition_by_id
 

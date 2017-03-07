@@ -19,8 +19,7 @@ class BasicPlacer(object):
     __slots__ = []
 
     def __call__(self, machine_graph, machine):
-        """ Place a machine_graph so that each vertex is placed on a\
-                    core
+        """ Place a machine_graph so that each vertex is placed on a core
 
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
@@ -40,16 +39,12 @@ class BasicPlacer(object):
                 machine_graph.vertices)
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(len(vertices),
-                                   "Placing graph vertices")
+        progress = ProgressBar(vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(machine)
-        for vertex in vertices:
-
+        for vertex in progress.over(vertices):
             # Create and store a new placement anywhere on the board
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 vertex.resources_required, vertex.constraints, None)
             placement = Placement(vertex, x, y, p)
             placements.add_placement(placement)
-            progress_bar.update()
-        progress_bar.end()
         return placements

@@ -60,10 +60,10 @@ class BasicRoutingInfoAllocator(object):
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each edge and create keys from its placement
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
-        for vertex in machine_graph.vertices:
+        for vertex in progress.over(machine_graph.vertices):
             partitions = machine_graph.\
                 get_outgoing_edge_partitions_starting_at_vertex(vertex)
             for partition in partitions:
@@ -75,19 +75,14 @@ class BasicRoutingInfoAllocator(object):
                         " allocate keys to {}, which is requesting {} keys"
                         .format(MAX_KEYS_SUPPORTED, partition, n_keys))
                 placement = placements.get_placement_of_vertex(vertex)
-                if placement is not None:
-                    key = self._get_key_from_placement(placement)
-                    keys_and_masks = list([BaseKeyAndMask(base_key=key,
-                                                          mask=MASK)])
-                    routing_info = PartitionRoutingInfo(
-                        keys_and_masks, partition)
-                    routing_infos.add_partition_info(routing_info)
-                else:
+                if placement is None:
                     raise PacmanRouteInfoAllocationException(
                         "The vertex '{}' has no placement".format(vertex))
-
-            progress_bar.update()
-        progress_bar.end()
+                key = self._get_key_from_placement(placement)
+                keys_and_masks = list([BaseKeyAndMask(
+                    base_key=key, mask=MASK)])
+                routing_infos.add_partition_info(PartitionRoutingInfo(
+                    keys_and_masks, partition))
 
         return routing_infos
 

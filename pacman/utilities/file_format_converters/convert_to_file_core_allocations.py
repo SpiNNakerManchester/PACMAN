@@ -21,8 +21,8 @@ class ConvertToFileCoreAllocations(object):
         :return:
         """
 
-        progress_bar = ProgressBar(
-            len(placements), "Converting to json core allocations")
+        progress = ProgressBar(placements + 1,
+                               "Converting to json core allocations")
 
         # write basic stuff
         json_core_allocations_dict = dict()
@@ -33,11 +33,12 @@ class ConvertToFileCoreAllocations(object):
         for placement in placements:
             self._convert_placement(placement, vertex_by_id,
                                     json_core_allocations_dict)
-            progress_bar.update()
+            progress.update()
 
         # dump dict into json file
         with open(file_path, "w") as file_to_write:
             json.dump(json_core_allocations_dict, file_to_write)
+        progress.update()
 
         # validate the schema
         core_allocations_schema_file_path = os.path.join(
@@ -49,7 +50,7 @@ class ConvertToFileCoreAllocations(object):
                 json_core_allocations_dict, core_allocations_schema)
 
         # complete progress bar
-        progress_bar.end()
+        progress.end()
 
         # return the file format
         return file_path, vertex_by_id

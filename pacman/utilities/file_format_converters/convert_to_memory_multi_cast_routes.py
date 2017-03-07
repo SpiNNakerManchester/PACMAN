@@ -46,12 +46,12 @@ class ConvertToMemoryMultiCastRoutes(object):
     def __call__(self, file_routing_paths, partition_by_id):
         # load the json files
         file_routing_paths = self._handle_json_files(file_routing_paths)
-        progress_bar = ProgressBar(
-            len(file_routing_paths), "Converting to PACMAN routes")
+        progress = ProgressBar(file_routing_paths,
+                               "Converting to PACMAN routes")
 
         # iterate though the path for each edge and create entries
         routing_tables = MulticastRoutingTableByPartition()
-        for partition_id in file_routing_paths:
+        for partition_id in progress.over(file_routing_paths):
             partition = partition_by_id[partition_id]
 
             # if the vertex is none, its a vertex with the special skills of
@@ -60,9 +60,6 @@ class ConvertToMemoryMultiCastRoutes(object):
                 partition_route = file_routing_paths[partition_id]
                 self._convert_next_route(
                     routing_tables, partition, 0, None, partition_route)
-
-            progress_bar.update()
-        progress_bar.end()
 
         return routing_tables
 

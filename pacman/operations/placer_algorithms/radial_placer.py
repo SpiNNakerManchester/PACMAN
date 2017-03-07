@@ -30,7 +30,6 @@ class RadialPlacer(object):
     """
 
     def __call__(self, machine_graph, machine):
-
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 
@@ -40,21 +39,19 @@ class RadialPlacer(object):
                 machine_graph.vertices)
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         vertices_on_same_chip = placer_algorithm_utilities\
             .get_same_chip_vertex_groups(machine_graph.vertices)
         all_vertices_placed = set()
-        for vertex in vertices:
+        for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine, placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
-            progress_bar.update()
-        progress_bar.end()
         return placements
 
     def _check_constraints(

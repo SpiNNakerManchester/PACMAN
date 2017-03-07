@@ -28,16 +28,16 @@ class CreateConstraintsToFile(object):
         :return:
         """
 
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_vertices + 2, "creating json constraints")
 
         json_obj = list()
         self._add_monitor_core_reserve(json_obj)
-        progress_bar.update()
+        progress.update()
         self._add_extra_monitor_cores(json_obj, machine)
-        progress_bar.update()
+        progress.update()
         vertex_by_id = self._search_graph_for_placement_constraints(
-            json_obj, machine_graph, machine, progress_bar)
+            json_obj, machine_graph, machine, progress)
 
         with open(file_path, "w") as file_to_write:
             json.dump(json_obj, file_to_write)
@@ -51,12 +51,12 @@ class CreateConstraintsToFile(object):
             jsonschema.validate(json_obj, json.load(file_to_read))
 
         # complete progress bar
-        progress_bar.end()
+        progress.end()
 
         return file_path, vertex_by_id
 
     def _search_graph_for_placement_constraints(
-            self, json_obj, machine_graph, machine, progress_bar):
+            self, json_obj, machine_graph, machine, progress):
         vertex_by_id = dict()
         for vertex in machine_graph.vertices:
             vertex_id = str(id(vertex))
@@ -64,7 +64,7 @@ class CreateConstraintsToFile(object):
             for constraint in vertex.constraints:
                 self._handle_vertex_constraint(
                     constraint, json_obj, vertex, vertex_id)
-                progress_bar.update()
+                progress.update()
             self._handle_vertex_resources(
                 vertex.resources_required, json_obj, vertex_id)
             if isinstance(vertex, AbstractVirtualVertex):

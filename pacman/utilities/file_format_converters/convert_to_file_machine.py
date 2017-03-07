@@ -29,7 +29,7 @@ class ConvertToFileMachine(object):
         :param file_path:
         :return:
         """
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             (machine.max_chip_x + 1) * (machine.max_chip_y + 1) + 2,
             "Converting to json machine")
 
@@ -56,14 +56,14 @@ class ConvertToFileMachine(object):
                 self._add_possibly_dead_chip(json_obj, machine,
                                              x_coord, y_coord,
                                              chip_resource_exceptions)
-                progress_bar.update()
+                progress.update()
 
         # convert dict into list
         chip_resource_exceptions_list = []
         for (chip_x, chip_y) in chip_resource_exceptions:
             chip_resource_exceptions_list.append(
                 [chip_x, chip_y, chip_resource_exceptions[(chip_x, chip_y)]])
-        progress_bar.update()
+        progress.update()
 
         # store exceptions into json form
         json_obj['chip_resource_exceptions'] = chip_resource_exceptions_list
@@ -79,8 +79,8 @@ class ConvertToFileMachine(object):
             jsonschema.validate(json_obj, json.load(file_to_read))
 
         # update and complete progress bar
-        progress_bar.update()
-        progress_bar.end()
+        progress.update()
+        progress.end()
 
         return file_path
 
