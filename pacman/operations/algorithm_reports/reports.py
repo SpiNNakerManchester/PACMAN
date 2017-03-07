@@ -7,7 +7,7 @@ from pacman.model.graphs.abstract_spinnaker_link_vertex \
     import AbstractSpiNNakerLinkVertex
 from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 

@@ -42,16 +42,15 @@ class AlgorithmMetadataXmlReader(object):
         for xml_path in self._xml_paths:
             xml_root = etree.parse(xml_path)
             files_read_so_far.append(xml_path)
-            elements = xml_root.findall(".//algorithm")
-            for element in elements:
-                if element.get('name') in algorithm_data_objects:
+            for element in xml_root.findall(".//algorithm"):
+                name = element.get('name')
+                if name in algorithm_data_objects:
                     raise exceptions.PacmanConfigurationException(
                         "There are two algorithms with the same name {}"
                         " in these xml files {}. Please rectify and try again."
-                        .format(element.get("name"), files_read_so_far))
-                else:
-                    algorithm_data_objects[element.get('name')] = \
-                        self._generate_algorithm_data(xml_path, element)
+                        .format(name, files_read_so_far))
+                algorithm_data_objects[name] = \
+                    self._generate_algorithm_data(xml_path, element)
         return algorithm_data_objects
 
     @staticmethod
@@ -69,12 +68,10 @@ class AlgorithmMetadataXmlReader(object):
         :return: a AbstractAlgorithm
         """
         self._check_allowed_elements(
-            path, element,
-            {
+            path, element, {
                 "input_definitions", "required_inputs", "optional_inputs",
                 "outputs", "command_line_args", "python_module",
-                "python_class", "python_method", "python_function"
-            })
+                "python_class", "python_method", "python_function"})
 
         algorithm_id = element.get('name')
         if algorithm_id is None:
@@ -181,10 +178,9 @@ class AlgorithmMetadataXmlReader(object):
                 translated_args.append(arg.text.strip())
 
         # return none if empty
-        if len(translated_args) == 0:
-            return None
-        else:
+        if translated_args:
             return translated_args
+        return None
 
     @staticmethod
     def _translate_input_definitions(path, defs_element):
@@ -202,8 +198,7 @@ class AlgorithmMetadataXmlReader(object):
                 param_name = parameter.find("param_name").text.strip()
                 param_types = [
                     param_type.text.strip()
-                    for param_type in parameter.findall("param_type")
-                ]
+                    for param_type in parameter.findall("param_type")]
                 definitions[param_name] = SingleInput(param_name, param_types)
         return definitions
 

@@ -26,8 +26,8 @@ from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 from pacman import exceptions
 
-from spinn_machine.utilities.progress_bar import ProgressBar
-from spinn_machine.utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 
 # general imports
 import math

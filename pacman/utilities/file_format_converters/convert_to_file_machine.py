@@ -1,6 +1,6 @@
 from pacman.utilities import constants
 from pacman.utilities import file_format_schemas
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 from collections import defaultdict
 
@@ -30,43 +30,32 @@ class ConvertToFileMachine(object):
         :return:
         """
         progress_bar = ProgressBar(
-            ((machine.max_chip_x + 1) * (machine.max_chip_y + 1)) + 2,
+            (machine.max_chip_x + 1) * (machine.max_chip_y + 1) + 2,
             "Converting to json machine")
 
         # write basic stuff
-        json_directory_rep = dict()
-        json_directory_rep['width'] = machine.max_chip_x + 1
-        json_directory_rep['height'] = machine.max_chip_y + 1
-        json_directory_rep['chip_resources'] = dict()
-        json_directory_rep['chip_resources']['cores'] = CHIP_HOMOGENEOUS_CORES
-        json_directory_rep['chip_resources']['sdram'] = CHIP_HOMOGENEOUS_SDRAM
-        json_directory_rep['chip_resources']['sram'] = CHIP_HOMOGENEOUS_SRAM
-        json_directory_rep['chip_resources']["router_entries"] = \
+        json_obj = dict()
+        json_obj['width'] = machine.max_chip_x + 1
+        json_obj['height'] = machine.max_chip_y + 1
+        json_obj['chip_resources'] = dict()
+        json_obj['chip_resources']['cores'] = CHIP_HOMOGENEOUS_CORES
+        json_obj['chip_resources']['sdram'] = CHIP_HOMOGENEOUS_SDRAM
+        json_obj['chip_resources']['sram'] = CHIP_HOMOGENEOUS_SRAM
+        json_obj['chip_resources']["router_entries"] = \
             ROUTER_HOMOGENEOUS_ENTRIES
-        json_directory_rep['chip_resources']['tags'] = CHIP_HOMOGENEOUS_TAGS
+        json_obj['chip_resources']['tags'] = CHIP_HOMOGENEOUS_TAGS
 
         # handle exceptions
-        json_directory_rep['dead_chips'] = list()
-        json_directory_rep['dead_links'] = list()
+        json_obj['dead_chips'] = list()
+        json_obj['dead_links'] = list()
         chip_resource_exceptions = defaultdict()
 
         # write dead chips
         for x_coord in range(0, machine.max_chip_x + 1):
             for y_coord in range(0, machine.max_chip_y + 1):
-                if (not machine.is_chip_at(x_coord, y_coord) or
-                        machine.get_chip_at(x_coord, y_coord).virtual):
-                    json_directory_rep['dead_chips'].append([x_coord, y_coord])
-                else:
-                    # write dead links
-                    for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
-                        router = machine.get_chip_at(x_coord, y_coord).router
-                        if not router.is_link(link_id):
-                            json_directory_rep['dead_links'].append(
-                                [x_coord, y_coord, "{}".format(
-                                 constants.EDGES(link_id).name.lower())])
-                    self._check_for_exceptions(
-                        json_directory_rep, x_coord, y_coord, machine,
-                        chip_resource_exceptions)
+                self._add_possibly_dead_chip(json_obj, machine,
+                                             x_coord, y_coord,
+                                             chip_resource_exceptions)
                 progress_bar.update()
 
         # convert dict into list
@@ -77,22 +66,17 @@ class ConvertToFileMachine(object):
         progress_bar.update()
 
         # store exceptions into json form
-        json_directory_rep['chip_resource_exceptions'] = \
-            chip_resource_exceptions_list
+        json_obj['chip_resource_exceptions'] = chip_resource_exceptions_list
 
         # dump to json file
-        file_to_write = open(file_path, "w")
-        json.dump(json_directory_rep, file_to_write)
-        file_to_write.close()
+        with open(file_path, "w") as file_to_write:
+            json.dump(json_obj, file_to_write)
 
         # validate the schema
         machine_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "machine.json"
-        )
-        file_to_read = open(machine_schema_file_path, "r")
-        machine_schema = json.load(file_to_read)
-        jsonschema.validate(
-            json_directory_rep, machine_schema)
+            os.path.dirname(file_format_schemas.__file__), "machine.json")
+        with open(machine_schema_file_path, "r") as file_to_read:
+            jsonschema.validate(json_obj, json.load(file_to_read))
 
         # update and complete progress bar
         progress_bar.update()
@@ -100,37 +84,27 @@ class ConvertToFileMachine(object):
 
         return file_path
 
-    def _check_for_exceptions(
-            self, json_dictionary_rep, x_coord, y_coord, machine,
-            chip_resource_exceptions):
-        """
+    def _add_possibly_dead_chip(self, json_obj, machine, x, y, exceptions):
+        if not machine.is_chip_at(x, y) or machine.get_chip_at(x, y).virtual:
+            json_obj['dead_chips'].append([x, y])
+            return
 
-        :param json_dictionary_rep:
-        :param x_coord:
-        :param y_coord:
-        :param machine:
-        :return:
-        """
+        # write dead links
+        for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
+            router = machine.get_chip_at(x, y).router
+            if not router.is_link(link_id):
+                json_obj['dead_links'].append(
+                    [x, y, "{}".format(constants.EDGES(link_id).name.lower())])
 
-        no_processors = CHIP_HOMOGENEOUS_CORES
-        chip = machine.get_chip_at(x_coord, y_coord)
-
-        if not chip.is_processor_with_id(no_processors - 1):
-
+        chip = machine.get_chip_at(x, y)
+        if not chip.is_processor_with_id(CHIP_HOMOGENEOUS_CORES - 1):
             # locate the highest core id
-            has_processor = False
-            while not has_processor and no_processors > 0:
-                no_processors -= 1
-                has_processor = machine.get_chip_at(x_coord, y_coord).\
-                    is_processor_with_id(no_processors - 1)
-
+            no_processors = self._locate_core_id(machine, x, y)
             # locate number of monitor cores
             no_monitors = self._locate_no_monitors(chip)
-
             chip_exceptions = dict()
             chip_exceptions["cores"] = no_processors - no_monitors
-
-            chip_resource_exceptions[(x_coord, y_coord)] = chip_exceptions
+            exceptions[(x, y)] = chip_exceptions
 
         else:
             no_monitors = self._locate_no_monitors(chip)
@@ -140,14 +114,23 @@ class ConvertToFileMachine(object):
                 chip_exceptions = dict()
                 chip_exceptions["cores"] = \
                     CHIP_HOMOGENEOUS_CORES - 1 - no_monitors
-                chip_resource_exceptions[(x_coord, y_coord)] = chip_exceptions
+                exceptions[(x, y)] = chip_exceptions
 
         # search for Ethernet connected chips
         for chip in machine.ethernet_connected_chips:
-            if (chip.x, chip.y) not in chip_resource_exceptions:
-                chip_resource_exceptions[(chip.x, chip.y)] = dict()
-            chip_resource_exceptions[(chip.x, chip.y)]['tags'] = \
-                len(chip.tag_ids)
+            if (chip.x, chip.y) not in exceptions:
+                exceptions[(chip.x, chip.y)] = dict()
+            exceptions[(chip.x, chip.y)]['tags'] = len(chip.tag_ids)
+
+    @staticmethod
+    def _locate_core_id(machine, x, y):
+        no_processors = CHIP_HOMOGENEOUS_CORES
+        has_processor = False
+        while not has_processor and no_processors > 0:
+            no_processors -= 1
+            has_processor = machine.get_chip_at(x, y).\
+                is_processor_with_id(no_processors - 1)
+        return no_processors
 
     @staticmethod
     def _locate_no_monitors(chip):
@@ -155,7 +138,7 @@ class ConvertToFileMachine(object):
 
         # search for monitors in the list of processors
         for processor in range(0, CHIP_HOMOGENEOUS_CORES - 1):
-            if chip.is_processor_with_id(processor):
-                if chip.get_processor_with_id(processor).is_monitor:
-                    no_monitors += 1
+            if chip.is_processor_with_id(processor) and \
+                    chip.get_processor_with_id(processor).is_monitor:
+                no_monitors += 1
         return no_monitors

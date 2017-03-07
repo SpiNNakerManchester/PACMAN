@@ -1,6 +1,6 @@
 from pacman.utilities import file_format_schemas
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 import os
 import json
@@ -22,7 +22,7 @@ class ConvertToFilePlacement(object):
         """
 
         # write basic stuff
-        json_placement_directory_rep = dict()
+        json_obj = dict()
         vertex_by_id = dict()
 
         progress_bar = ProgressBar(len(list(placements.placements)) + 1,
@@ -32,25 +32,19 @@ class ConvertToFilePlacement(object):
         for placement in placements:
             vertex_id = str(id(placement.vertex))
             vertex_by_id[vertex_id] = placement.vertex
-            json_placement_directory_rep[vertex_id] = [
-                placement.x, placement.y]
+            json_obj[vertex_id] = [placement.x, placement.y]
             progress_bar.update()
 
         # dump dict into json file
-        file_to_write = open(file_path, "w")
-        json.dump(json_placement_directory_rep, file_to_write)
-        file_to_write.close()
+        with open(file_path, "w") as file_to_write:
+            json.dump(json_obj, file_to_write)
 
         # validate the schema
         placements_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "placements.json"
-        )
+            os.path.dirname(file_format_schemas.__file__), "placements.json")
 
-        file_to_read = open(placements_schema_file_path, "r")
-        placements_schema = json.load(file_to_read)
-
-        jsonschema.validate(
-            json_placement_directory_rep, placements_schema)
+        with open(placements_schema_file_path, "r") as file_to_read:
+            jsonschema.validate(json_obj, json.load(file_to_read))
 
         progress_bar.update()
         progress_bar.end()

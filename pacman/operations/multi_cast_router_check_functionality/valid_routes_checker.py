@@ -9,7 +9,7 @@ from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_contiguous_range_constraint import \
     KeyAllocatorContiguousRangeContraint
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 
 logger = logging.getLogger(__name__)

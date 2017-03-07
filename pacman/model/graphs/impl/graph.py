@@ -1,8 +1,9 @@
 from collections import defaultdict
 
+from spinn_utilities.ordered_set import OrderedSet
+
 from pacman import exceptions
 from pacman.exceptions import PacmanAlreadyExistsException
-from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.abstract_classes.impl.constrained_object \
     import ConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to

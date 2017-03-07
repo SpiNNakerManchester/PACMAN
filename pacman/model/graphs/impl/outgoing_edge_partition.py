@@ -1,5 +1,5 @@
+from spinn_utilities.ordered_set import OrderedSet
 from pacman import exceptions
-from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.abstract_classes.impl.constrained_object \
     import ConstrainedObject
 from pacman.model.decorators.delegates_to import delegates_to
@@ -20,7 +20,6 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
     """
 
     __slots__ = [
-
         # The partition identifier
         "_identifier",
 
@@ -78,7 +77,6 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
 
     @overrides(AbstractOutgoingEdgePartition.add_edge)
     def add_edge(self, edge):
-
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
             raise exceptions.PacmanInvalidParameterException(

@@ -8,6 +8,7 @@ virtualenv:
   system_site_packages: true
 
 before_script:
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
   - pip install --upgrade git+git://github.com/project-rig/rig.git@master
   - pip install -r requirements-test.txt

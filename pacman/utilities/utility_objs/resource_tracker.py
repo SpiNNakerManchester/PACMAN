@@ -16,7 +16,7 @@ from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 
-from spinn_machine.utilities.ordered_set import OrderedSet
+from spinn_utilities.ordered_set import OrderedSet
 
 from collections import defaultdict
 

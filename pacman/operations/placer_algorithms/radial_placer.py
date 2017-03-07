@@ -13,8 +13,8 @@ from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
-from spinn_machine.utilities.progress_bar import ProgressBar
-from spinn_machine.utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 
 # general imports
 from collections import deque

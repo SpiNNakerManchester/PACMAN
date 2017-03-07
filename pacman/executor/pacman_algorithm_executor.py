@@ -11,7 +11,6 @@ from pacman.utilities.utility_objs.timer import Timer
 
 # general imports
 import logging
-import os
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -163,22 +162,15 @@ class PACMANAlgorithmExecutor(object):
 
         # set up XML reader for standard PACMAN algorithms XML file reader
         # (used in decode_algorithm_data_objects function)
-        copy_of_xml_paths.append(os.path.join(
-            os.path.dirname(operations.__file__),
-            "algorithms_metadata.xml"))
-        copy_of_xml_paths.append(os.path.join(
-            os.path.dirname(operations.__file__),
-            "rigs_algorithm_metadata.xml"))
-        copy_of_xml_paths.append(os.path.join(
-            os.path.dirname(algorithm_reports.__file__),
-            "reports_metadata.xml"))
+        copy_of_xml_paths.append(operations.algorithms_metdata_file)
+        copy_of_xml_paths.append(operations.rigs_algorithm_metadata_file)
+        copy_of_xml_paths.append(algorithm_reports.reports_metadata_file)
 
         # decode the algorithms specs
         xml_decoder = AlgorithmMetadataXmlReader(copy_of_xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
         converter_xml_path = \
-            os.path.join(os.path.dirname(file_format_converters.__file__),
-                         "converter_algorithms_metadata.xml")
+            file_format_converters.converter_algorithms_metadata_file
         converter_decoder = AlgorithmMetadataXmlReader([converter_xml_path])
         converters = converter_decoder.decode_algorithm_data_objects()
 
@@ -190,8 +182,7 @@ class PACMANAlgorithmExecutor(object):
         algorithm_data_objects.update(
             algorithm_decorator.scan_packages(copy_of_packages))
         if use_unscanned_algorithms:
-            algorithm_data_objects.update(
-                algorithm_decorator.get_algorithms())
+            algorithm_data_objects.update(algorithm_decorator.get_algorithms())
 
         # get list of all xml's as this is used to exclude xml files from
         # import
@@ -212,7 +203,7 @@ class PACMANAlgorithmExecutor(object):
             converter_names, converters)
 
         # sort_out_order_of_algorithms for execution
-        self._sort_out_order_of_algorithms(
+        self._determine_algorithm_order(
             inputs, required_outputs, algorithm_data,
             optional_algorithms_datas, converter_algorithms_datas)
 
@@ -221,14 +212,13 @@ class PACMANAlgorithmExecutor(object):
             algorithm_names, algorithm_data_objects):
         algorithms = list()
         for algorithm_name in algorithm_names:
-            if algorithm_name in algorithm_data_objects:
-                algorithms.append(algorithm_data_objects[algorithm_name])
-            else:
+            if algorithm_name not in algorithm_data_objects:
                 raise exceptions.PacmanConfigurationException(
                     "Cannot find algorithm {}".format(algorithm_name))
+            algorithms.append(algorithm_data_objects[algorithm_name])
         return algorithms
 
-    def _sort_out_order_of_algorithms(
+    def _determine_algorithm_order(
             self, inputs, required_outputs, algorithm_data,
             optional_algorithm_data, converter_algorithms_datas):
         """ Takes the algorithms and determines which order they need to be\
@@ -253,30 +243,26 @@ class PACMANAlgorithmExecutor(object):
         outputs_to_find = self._remove_outputs_which_are_inputs(
             required_outputs, inputs)
 
-        while ((len(algorithms_to_find) > 0 or len(outputs_to_find) > 0)):
-
+        while algorithms_to_find or outputs_to_find:
             # Find a usable algorithm
             suitable_algorithm, algorithm_list = \
                 self._locate_suitable_algorithm(
                     algorithms_to_find, input_types, None)
-            if suitable_algorithm is None:
 
-                # If no algorithm, find a usable optional algorithm
+            # If no algorithm, find a usable optional algorithm
+            if suitable_algorithm is None:
                 suitable_algorithm, algorithm_list = \
                     self._locate_suitable_algorithm(
                         optionals_to_use, input_types, generated_outputs)
 
+            # if still no suitable algorithm, try using a converter algorithm
             if suitable_algorithm is None:
-
-                # if still no suitable algorithm, try using a converter
-                # algorithm
                 suitable_algorithm, algorithm_list = \
                     self._locate_suitable_algorithm(
                         converter_algorithms_datas, input_types,
                         generated_outputs)
 
             if suitable_algorithm is not None:
-
                 # Remove the value
                 self._remove_algorithm_and_update_outputs(
                     algorithm_list, suitable_algorithm, input_types,
@@ -351,19 +337,15 @@ class PACMANAlgorithmExecutor(object):
         return copy_required_outputs
 
     def _deduce_inputs_required_to_run(self, algorithm, inputs):
-        left_over_inputs = "            {}: ".format(algorithm.algorithm_id)
-        first = True
+        left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
+        separator = ""
         for an_input in algorithm.required_inputs:
             unfound_types = [
                 param_type for param_type in an_input.param_types
-                if param_type not in inputs
-            ]
-            if len(unfound_types) > 0:
-                if first:
-                    left_over_inputs += "['{}'".format(unfound_types)
-                    first = False
-                else:
-                    left_over_inputs += ", '{}'".format(unfound_types)
+                if param_type not in inputs]
+            if unfound_types:
+                left_over_inputs += "{}'{}'".format(separator, unfound_types)
+                separator = ", "
         left_over_inputs += "]\n"
         return left_over_inputs
 
@@ -421,8 +403,7 @@ class PACMANAlgorithmExecutor(object):
                 # algorithm if it generates something new, assuming the
                 # algorithm generates any outputs at all
                 # (otherwise just use it)
-                if (len(algorithm.outputs) > 0 and
-                        generated_outputs is not None):
+                if algorithm.outputs and generated_outputs is not None:
                     for output in algorithm.outputs:
                         if (output.output_type not in generated_outputs and
                                 output.output_type not in inputs):
@@ -491,8 +472,7 @@ class PACMANAlgorithmExecutor(object):
         """
         if item_type not in self._internal_type_mapping:
             return None
-        else:
-            return self._internal_type_mapping[item_type]
+        return self._internal_type_mapping[item_type]
 
     def get_items(self):
         """ Get all the outputs from a execution

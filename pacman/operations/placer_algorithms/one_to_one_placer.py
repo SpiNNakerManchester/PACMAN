@@ -10,7 +10,7 @@ from pacman.model.constraints.placer_constraints\
     .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
 from pacman.utilities import utility_calls
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class OneToOnePlacer(RadialPlacer):

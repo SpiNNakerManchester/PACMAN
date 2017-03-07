@@ -8,7 +8,7 @@ from pacman.model.routing_table_by_partition.\
 from pacman.model.routing_table_by_partition.\
     multicast_routing_table_by_partition_entry \
     import MulticastRoutingTableByPartitionEntry
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 # general imports
 import logging

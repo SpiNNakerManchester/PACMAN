@@ -1,6 +1,6 @@
 import json
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition_entry import \
     MulticastRoutingTableByPartitionEntry
@@ -44,7 +44,6 @@ class ConvertToMemoryMultiCastRoutes(object):
     }
 
     def __call__(self, file_routing_paths, partition_by_id):
-
         # load the json files
         file_routing_paths = self._handle_json_files(file_routing_paths)
         progress_bar = ProgressBar(
@@ -71,7 +70,6 @@ class ConvertToMemoryMultiCastRoutes(object):
     def _convert_next_route(
             routing_tables, partition, incoming_processor, incoming_link,
             partition_route):
-
         x, y = partition_route["chip"]
 
         next_hops = list()

@@ -2,13 +2,9 @@
 A collection of methods which support partitioning algorithms.
 """
 
-import logging
-
 from pacman.model.constraints.partitioner_constraints\
     .abstract_partitioner_constraint import AbstractPartitionerConstraint
-from spinn_machine.utilities.progress_bar import ProgressBar
-
-logger = logging.getLogger(__name__)
+from spinn_utilities.progress_bar import ProgressBar
 
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):

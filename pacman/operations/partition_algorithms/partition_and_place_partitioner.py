@@ -21,7 +21,7 @@ from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 

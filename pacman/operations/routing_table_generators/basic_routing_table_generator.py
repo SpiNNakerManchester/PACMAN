@@ -5,7 +5,7 @@ from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
 
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800

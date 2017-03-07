@@ -1,3 +1,4 @@
+from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
 from pacman.model.routing_tables.multicast_routing_table import \
@@ -8,7 +9,6 @@ from pacman import exceptions
 
 # spinnMachine imports
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-from spinn_machine.utilities.progress_bar import ProgressBar
 
 # rig imports
 from rig import routing_table as rig_routing_table

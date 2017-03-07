@@ -47,51 +47,47 @@ class ConvertToMemoryPlacements(object):
             else:
                 vertex = None
             if unicode(vertex_id) not in core_allocations:
-                if vertex is not None:
+                if vertex is None:
+                    raise exceptions.PacmanConfigurationException(
+                        "I don't recognise this pattern of constraints for"
+                        " a vertex which does not have a placement")
 
-                    # virtual chip or tag chip
-                    constraints_for_vertex = self._locate_constraints(
+                # virtual chip or tag chip
+                constraints_for_vertex = self._locate_constraints(
                         vertex_id, constraints)
-                    external_device_constraints = \
+                external_device_constraints = \
                         self._valid_constraints_for_external_device(
                             constraints_for_vertex)
-                    if len(external_device_constraints) != 0:
+                if len(external_device_constraints) != 0:
+                    # get data for virtual chip
+                    route_constraint = \
+                        external_device_constraints['end_point']
+                    route_direction = constants.EDGES(
+                        route_constraint['direction'].upper())
+                    placement_constraint = \
+                        external_device_constraints['placement']
+                    coords = placement_constraint['location']
 
-                        # get data for virtual chip
-                        route_constraint = \
-                            external_device_constraints['end_point']
-                        route_direction = constants.EDGES(
-                            route_constraint['direction'].upper())
-                        placement_constraint = \
-                            external_device_constraints['placement']
-                        coords = placement_constraint['location']
+                    # locate virtual chip
+                    link = extended_machine.get_chip_at(
+                        coords[0], coords[1]).router.get_link(
+                        route_direction.value)
+                    destination_chip = extended_machine.get_chip_at(
+                        link.destination_x, link.destination_y)
 
-                        # locate virtual chip
-                        link = extended_machine.get_chip_at(
-                            coords[0], coords[1]).router.get_link(
-                            route_direction.value)
-                        destination_chip = extended_machine.get_chip_at(
-                            link.destination_x, link.destination_y)
-
-                        # create placement
-                        placements.add_placement(Placement(
-                            vertex, destination_chip.x, destination_chip.y,
-                            None))
-                    else:
-                        raise exceptions.PacmanConfigurationException(
-                            "I don't recognise this pattern of constraints for"
-                            " a vertex which does not have a placement")
+                    # create placement
+                    placements.add_placement(Placement(
+                        vertex, destination_chip.x, destination_chip.y, None))
             else:
                 if vertex is None:
                     raise exceptions.PacmanConfigurationException(
                         "Failed to locate the vertex in the "
                         "graph with id {}".format(vertex_id))
-                else:
-                    memory_placements.add_placement(
-                        Placement(x=file_placements[vertex_id][0],
-                                  y=file_placements[vertex_id][1],
-                                  p=core_allocations[vertex_id][0],
-                                  vertex=vertex))
+                memory_placements.add_placement(Placement(
+                    x=file_placements[vertex_id][0],
+                    y=file_placements[vertex_id][1],
+                    p=core_allocations[vertex_id][0],
+                    vertex=vertex))
 
         # return the file format
         return memory_placements
@@ -144,32 +140,26 @@ class ConvertToMemoryPlacements(object):
         # verify that the files meet the schema.
         # locate schemas
         file_placements_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "placements.json"
-        )
+            os.path.dirname(file_format_schemas.__file__), "placements.json")
         file_allocations_schema_file_path = os.path.join(
             os.path.dirname(file_format_schemas.__file__),
-            "core_allocations.json"
-        )
+            "core_allocations.json")
         file_constraints_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "constraints.json"
-        )
+            os.path.dirname(file_format_schemas.__file__), "constraints.json")
 
         # open readers for schemas and read in schema
-        file_to_read = open(file_placements_schema_file_path, "r")
-        placements_schema = json.load(file_to_read)
+        with open(file_placements_schema_file_path, "r") as file_to_read:
+            placements_schema = json.load(file_to_read)
 
-        file_to_read = open(file_allocations_schema_file_path, "r")
-        core_allocations_schema = json.load(file_to_read)
+        with open(file_allocations_schema_file_path, "r") as file_to_read:
+            core_allocations_schema = json.load(file_to_read)
 
-        file_to_read = open(file_constraints_schema_file_path, "r")
-        constraints_schema = json.load(file_to_read)
+        with open(file_constraints_schema_file_path, "r") as file_to_read:
+            constraints_schema = json.load(file_to_read)
 
-        jsonschema.validate(
-            file_placements, placements_schema)
-        jsonschema.validate(
-            file_allocations, core_allocations_schema)
-        jsonschema.validate(
-            constraints, constraints_schema)
+        jsonschema.validate(file_placements, placements_schema)
+        jsonschema.validate(file_allocations, core_allocations_schema)
+        jsonschema.validate(constraints, constraints_schema)
 
     @staticmethod
     def _locate_constraints(vertex_label, constraints):

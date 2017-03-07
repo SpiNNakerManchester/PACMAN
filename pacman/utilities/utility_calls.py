@@ -26,6 +26,29 @@ def locate_constraints_of_type(constraints, constraint_type):
     return passed_constraints
 
 
+def locate_first_constraint_of_type(constraints, constraint_type):
+    """ Locates the first constraint of a given type out of a list
+
+    :param constraints: The constraints to select from
+    :type constraints: iterable of\
+                :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
+    :param constraint_type: The type of constraints to return
+    :type constraint_type:\
+                :py:class:`pacman.model.constraint.abstract_partitioner_constraint.AbstractPartitionConstraint`
+    :return: The first constraint of constraint_type that was\
+                found in the constraints given
+    :rtype: :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
+    :raises pacman.exceptions.PacmanInvalidParameterException: if no such
+    constraint is present
+    """
+    for constraint in constraints:
+        if isinstance(constraint, constraint_type):
+            return constraint
+    raise PacmanInvalidParameterException(
+        "constraints", constraint.__class__,
+        "Constraints of this class are not present")
+
+
 def check_algorithm_can_support_constraints(
         constrained_vertices, supported_constraints, abstract_constraint_type):
     """ Helper method to find out if an algorithm can support all the\

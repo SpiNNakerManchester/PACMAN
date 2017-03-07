@@ -6,7 +6,7 @@ from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
 from pacman.model.placements.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 logger = logging.getLogger(__name__)

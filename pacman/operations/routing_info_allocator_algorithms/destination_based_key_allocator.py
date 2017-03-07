@@ -9,7 +9,7 @@ from pacman.model.routing_tables.multicast_routing_tables import \
 from pacman.utilities import utility_calls
 from pacman import exceptions
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class DestinationBasedRoutingInfoAllocator(object):
