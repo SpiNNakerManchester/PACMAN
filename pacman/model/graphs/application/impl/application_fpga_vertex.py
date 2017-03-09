@@ -7,6 +7,9 @@ from pacman.model.decorators.overrides import overrides
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs.application.abstract_application_vertex \
+    import AbstractApplicationVertex
 from pacman.model.graphs.machine.impl.machine_fpga_vertex \
     import MachineFPGAVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource \
@@ -53,21 +56,21 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
         return self._fpga_link_id
 
     @property
-    @overrides(AbstractFPGAVertex.board_address)
+    @overrides(AbstractVirtualVertex.board_address)
     def board_address(self):
         return self._board_address
 
     @property
-    @overrides(AbstractFPGAVertex.virtual_chip_x)
+    @overrides(AbstractVirtualVertex.virtual_chip_x)
     def virtual_chip_x(self):
         return self._virtual_chip_x
 
     @property
-    @overrides(AbstractFPGAVertex.virtual_chip_y)
+    @overrides(AbstractVirtualVertex.virtual_chip_y)
     def virtual_chip_y(self):
         return self._virtual_chip_y
 
-    @overrides(AbstractFPGAVertex.set_virtual_chip_coordinates)
+    @overrides(AbstractVirtualVertex.set_virtual_chip_coordinates)
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y
@@ -75,18 +78,18 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
             self._virtual_chip_x, self._virtual_chip_y))
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(AbstractApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
-    @overrides(ApplicationVertex.get_resources_used_by_atoms)
+    @overrides(AbstractApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer(
             dtcm=DTCMResource(0), sdram=SDRAMResource(0),
             cpu_cycles=CPUCyclesPerTickResource(0)
         )
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(AbstractApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):

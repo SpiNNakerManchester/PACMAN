@@ -1,4 +1,5 @@
 from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.abstract_edge import AbstractEdge
 from pacman.model.graphs.application.abstract_application_edge \
     import AbstractApplicationEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
@@ -48,16 +49,16 @@ class ApplicationEdge(AbstractApplicationEdge):
                            label=label)
 
     @property
-    @overrides(AbstractApplicationEdge.pre_vertex)
+    @overrides(AbstractEdge.pre_vertex)
     def pre_vertex(self):
         return self._pre_vertex
 
     @property
-    @overrides(AbstractApplicationEdge.post_vertex)
+    @overrides(AbstractEdge.post_vertex)
     def post_vertex(self):
         return self._post_vertex
 
     @property
-    @overrides(AbstractApplicationEdge.traffic_type)
+    @overrides(AbstractEdge.traffic_type)
     def traffic_type(self):
         return self._traffic_type

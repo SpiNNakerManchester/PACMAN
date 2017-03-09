@@ -4,6 +4,9 @@ from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs.machine.abstract_machine_vertex \
+    import AbstractMachineVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource \
     import CPUCyclesPerTickResource
 
@@ -33,7 +36,7 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
         self._virtual_chip_y = None
 
     @property
-    @overrides(MachineVertex.resources_required)
+    @overrides(AbstractMachineVertex.resources_required)
     def resources_required(self):
         return ResourceContainer(
             dtcm=DTCMResource(0), sdram=SDRAMResource(0),
@@ -50,21 +53,21 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
         return self._fpga_link_id
 
     @property
-    @overrides(AbstractFPGAVertex.board_address)
+    @overrides(AbstractVirtualVertex.board_address)
     def board_address(self):
         return self._board_address
 
     @property
-    @overrides(AbstractFPGAVertex.virtual_chip_x)
+    @overrides(AbstractVirtualVertex.virtual_chip_x)
     def virtual_chip_x(self):
         return self._virtual_chip_x
 
     @property
-    @overrides(AbstractFPGAVertex.virtual_chip_y)
+    @overrides(AbstractVirtualVertex.virtual_chip_y)
     def virtual_chip_y(self):
         return self._virtual_chip_y
 
-    @overrides(AbstractFPGAVertex.set_virtual_chip_coordinates)
+    @overrides(AbstractVirtualVertex.set_virtual_chip_coordinates)
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y
