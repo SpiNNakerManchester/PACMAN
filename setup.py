@@ -17,7 +17,6 @@ setup(
 
               'pacman.model',
               'pacman.model.abstract_classes',
-              'pacman.model.abstract_classes.impl',
               'pacman.model.constraints',
               'pacman.model.constraints.key_allocator_constraints',
               'pacman.model.constraints.partitioner_constraints',
