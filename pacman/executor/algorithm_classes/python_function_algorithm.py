@@ -11,9 +11,6 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
 
     __slots__ = [
 
-        # Python Module containing the algorithm function
-        "_python_module",
-
         # Python Function to call
         "_python_function"
     ]
