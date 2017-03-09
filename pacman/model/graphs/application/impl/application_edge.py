@@ -2,8 +2,7 @@ from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.application.abstract_application_edge \
     import AbstractApplicationEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from pacman.model.graphs.machine.impl.machine_edge import \
-    MachineEdge
+from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
 
 
 class ApplicationEdge(AbstractApplicationEdge):
@@ -11,7 +10,6 @@ class ApplicationEdge(AbstractApplicationEdge):
     """
 
     __slots__ = [
-
         # The edge at the start of the vertex
         "_pre_vertex",
 
@@ -19,10 +17,7 @@ class ApplicationEdge(AbstractApplicationEdge):
         "_post_vertex",
 
         # The type of traffic on the edge
-        "_traffic_type",
-
-        # The label of the edge
-        "_label"
+        "_traffic_type"
     ]
 
     def __init__(
@@ -42,10 +37,10 @@ class ApplicationEdge(AbstractApplicationEdge):
         :param label: The name of the edge
         :type label: str
         """
+        AbstractApplicationEdge.__init__(self, label)
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
-        self._label = label
 
     @overrides(AbstractApplicationEdge.create_machine_edge)
     def create_machine_edge(self, pre_vertex, post_vertex, label):
@@ -66,8 +61,3 @@ class ApplicationEdge(AbstractApplicationEdge):
     @overrides(AbstractApplicationEdge.traffic_type)
     def traffic_type(self):
         return self._traffic_type
-
-    @property
-    @overrides(AbstractApplicationEdge.label)
-    def label(self):
-        return self._label

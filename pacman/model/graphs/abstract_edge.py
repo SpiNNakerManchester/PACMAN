@@ -1,16 +1,26 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractproperty
-
-from pacman.model.abstract_classes.abstract_has_label import AbstractHasLabel
+from abc import ABCMeta, abstractproperty
 
 
 @add_metaclass(ABCMeta)
-class AbstractEdge(AbstractHasLabel):
+class AbstractEdge(object):
     """ A directed edge in a graph between two vertices
     """
 
-    __slots__ = ()
+    __slots__ = ("_label")
+
+    def __init__(self, label):
+        self._label = label
+
+    @property
+    def label(self):
+        """ The label of the edge
+
+        :return: The label
+        :rtype: str
+        :raise None: Raises no known exceptions
+        """
+        return self._label
 
     @abstractproperty
     def pre_vertex(self):

@@ -9,6 +9,9 @@ class AbstractMachineVertex(AbstractVertex):
 
     __slots__ = ()
 
+    def __init__(self, label, constraints):
+        AbstractVertex.__init__(self, label, constraints)
+
     @abstractproperty
     def resources_required(self):
         """ The resources required by the vertex

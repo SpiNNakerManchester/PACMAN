@@ -1,20 +1,29 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
-from abc import abstractproperty
-
-from pacman.model.abstract_classes.abstract_has_constraints \
-    import AbstractHasConstraints
-from pacman.model.abstract_classes.abstract_has_label import AbstractHasLabel
+from abc import ABCMeta, abstractmethod, abstractproperty
+from pacman.model.graphs.common.constrained_object import ConstrainedObject
 
 
 @add_metaclass(ABCMeta)
-class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
+class AbstractOutgoingEdgePartition(ConstrainedObject):
     """ A group of edges that start at the same vertex and share the same\
         semantics; used to group edges that can use the same multicast key
     """
 
-    __slots__ = ()
+    __slots__ = ("_label")
+
+    def __init__(self, label, constraints):
+        ConstrainedObject.__init__(self, constraints)
+        self._label = label
+
+    @property
+    def label(self):
+        """ The label of the item
+
+        :return: The label
+        :rtype: str
+        :raise None: Raises no known exceptions
+        """
+        return self._label
 
     @abstractmethod
     def add_edge(self, edge):

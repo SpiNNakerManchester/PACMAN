@@ -9,6 +9,9 @@ class AbstractMachineEdge(AbstractEdge):
 
     __slots__ = ()
 
+    def __init__(self, label):
+        AbstractEdge.__init__(self, label)
+
     @abstractproperty
     def traffic_weight(self):
         """ The amount of traffic expected to go down this edge relative to\

@@ -10,6 +10,9 @@ class AbstractApplicationEdge(AbstractEdge):
 
     __slots__ = ()
 
+    def __init__(self, label):
+        AbstractEdge.__init__(self, label)
+
     @abstractmethod
     def create_machine_edge(self, pre_vertex, post_vertex, label):
         """ Create a machine edge between two machine vertices

@@ -9,7 +9,6 @@ class MachineEdge(AbstractMachineEdge):
     """
 
     __slots__ = [
-
         # The vertex at the start of the edge
         "_pre_vertex",
 
@@ -18,9 +17,6 @@ class MachineEdge(AbstractMachineEdge):
 
         # The type of traffic for this edge
         "_traffic_type",
-
-        # The label of the edge
-        "_label",
 
         # The traffic weight of the edge
         "_traffic_weight"
@@ -48,12 +44,11 @@ class MachineEdge(AbstractMachineEdge):
             relative to other edges (default is 1)
         :type traffic_weight: int
         """
+        AbstractMachineEdge.__init__(self, label)
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
-        self._label = label
         self._traffic_weight = traffic_weight
-        AbstractMachineEdge.__init__(self)
 
     @property
     @overrides(AbstractMachineEdge.pre_vertex)
@@ -71,11 +66,6 @@ class MachineEdge(AbstractMachineEdge):
         return self._traffic_type
 
     @property
-    @overrides(AbstractMachineEdge.label)
-    def label(self):
-        return self._label
-
-    @property
     @overrides(AbstractMachineEdge.traffic_weight)
     def traffic_weight(self):
         return self._traffic_weight
@@ -85,4 +75,4 @@ class MachineEdge(AbstractMachineEdge):
             "SimpleMachineEdge(pre_vertex={}, post_vertex={}, "
             "traffic_type={}, label={}, traffic_weight={})".format(
                 self._pre_vertex, self._post_vertex, self._traffic_type,
-                self._label, self._traffic_weight))
+                self.label, self._traffic_weight))

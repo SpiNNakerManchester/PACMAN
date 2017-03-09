@@ -1,8 +1,5 @@
 from pacman import exceptions
 from spinn_machine.utilities.ordered_set import OrderedSet
-from pacman.model.abstract_classes.impl.constrained_object \
-    import ConstrainedObject
-from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.abstract_outgoing_edge_partition \
     import AbstractOutgoingEdgePartition
@@ -20,28 +17,16 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
     """
 
     __slots__ = [
-
         # The partition identifier
         "_identifier",
-
         # The edges in the partition
         "_edges",
-
         # The vertex at the start of all the edges
         "_pre_vertex",
-
         # The traffic type of all the edges
         "_traffic_type",
-
-        # The constraints delegate
-        "_constraints",
-
-        # The label
-        "_label",
-
         # The type of edges to accept
         "_allowed_edge_types",
-
         # The weight of traffic going down this partition
         "_traffic_weight"
     ]
@@ -49,36 +34,16 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
+        AbstractOutgoingEdgePartition.__init__(self, label, constraints)
         self._identifier = identifier
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
         self._pre_vertex = None
         self._traffic_type = None
-        self._label = label
         self._traffic_weight = traffic_weight
-
-        self._constraints = ConstrainedObject(constraints)
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraint)
-    def add_constraint(self, constraint):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraints)
-    def add_constraints(self, constraints):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.constraints)
-    def constraints(self):
-        pass
-
-    @property
-    @overrides(AbstractOutgoingEdgePartition.label)
-    def label(self):
-        return self._label
 
     @overrides(AbstractOutgoingEdgePartition.add_edge)
     def add_edge(self, edge):
-
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
             raise exceptions.PacmanInvalidParameterException(

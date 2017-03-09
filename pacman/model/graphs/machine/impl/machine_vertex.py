@@ -1,7 +1,3 @@
-from pacman.model.abstract_classes.impl.constrained_object \
-    import ConstrainedObject
-from pacman.model.decorators.delegates_to import delegates_to
-from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.machine.abstract_machine_vertex \
     import AbstractMachineVertex
 
@@ -10,14 +6,7 @@ class MachineVertex(AbstractMachineVertex):
     """ A simple implementation of a machine vertex
     """
 
-    __slots__ = [
-
-        # The label
-        "_label",
-
-        # The constraints delegate
-        "_constraints"
-    ]
+    __slots__ = []
 
     def __init__(self, label=None, constraints=None):
         """
@@ -30,35 +19,12 @@ class MachineVertex(AbstractMachineVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
         """
-        self._label = label
-
-        AbstractMachineVertex.__init__(self)
-        self._constraints = ConstrainedObject(constraints)
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraint)
-    def add_constraint(self, constraint):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraints)
-    def add_constraints(self, constraints):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.constraints)
-    def constraints(self):
-        pass
-
-    @property
-    @overrides(AbstractMachineVertex.label)
-    def label(self):
-        return self._label
+        AbstractMachineVertex.__init__(self, label, constraints)
 
     def __str__(self):
-        if self._label is None:
-            return self.__repr__()
-        return self._label
+        l = self.label
+        return self.__repr__() if l is None else l
 
     def __repr__(self):
-        return (
-            "MachineVertex(label={}, constraints={}"
-            .format(self._label, self.constraints)
-        )
+        return "MachineVertex(label={}, constraints={}".format(
+            self.label, self.constraints)
