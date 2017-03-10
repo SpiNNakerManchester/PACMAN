@@ -6,11 +6,10 @@ from pacman.model.decorators.overrides import overrides
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs \
+    import AbstractVirtualVertex, AbstractSpiNNakerLinkVertex
 from pacman.model.graphs.machine.machine_spinnaker_link_vertex \
     import MachineSpiNNakerLinkVertex
-from pacman.model.graphs.abstract_spinnaker_link_vertex \
-    import AbstractSpiNNakerLinkVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource \
     import CPUCyclesPerTickResource
 

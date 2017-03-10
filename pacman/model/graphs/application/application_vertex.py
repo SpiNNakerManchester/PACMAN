@@ -5,7 +5,7 @@ import sys
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
-from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.graphs import AbstractVertex
 
 
 @add_metaclass(ABCMeta)

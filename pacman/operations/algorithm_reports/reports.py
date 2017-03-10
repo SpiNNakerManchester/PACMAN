@@ -3,9 +3,7 @@ import os
 import time
 
 from pacman import exceptions
-from pacman.model.graphs.abstract_spinnaker_link_vertex \
-    import AbstractSpiNNakerLinkVertex
-from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
+from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 
 from spinn_machine.utilities.progress_bar import ProgressBar
 

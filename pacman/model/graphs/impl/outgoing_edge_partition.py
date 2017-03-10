@@ -1,8 +1,7 @@
 from pacman import exceptions
 from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_outgoing_edge_partition \
-    import AbstractOutgoingEdgePartition
+from pacman.model.graphs import AbstractOutgoingEdgePartition
 
 
 class OutgoingEdgePartition(AbstractOutgoingEdgePartition):

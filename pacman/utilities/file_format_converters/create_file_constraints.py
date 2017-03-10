@@ -1,4 +1,4 @@
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs import AbstractVirtualVertex
 from pacman.model.constraints.placer_constraints\
     import PlacerChipAndCoreConstraint, AbstractPlacerConstraint
 from pacman import exceptions

@@ -4,7 +4,7 @@ from pacman import exceptions
 from pacman.exceptions import PacmanAlreadyExistsException
 from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_graph import AbstractGraph
+from pacman.model.graphs import AbstractGraph
 from pacman.model.graphs.impl.outgoing_edge_partition \
     import OutgoingEdgePartition
 
