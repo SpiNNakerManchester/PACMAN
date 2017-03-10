@@ -14,9 +14,6 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
 
     __slots__ = [
 
-        # Python Module containing the algorithm function
-        "_python_module",
-
         # Python Class to create
         "_python_class",
 

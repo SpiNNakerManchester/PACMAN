@@ -1,6 +1,5 @@
 from pacman.model.graphs.impl.outgoing_edge_partition\
     import OutgoingEdgePartition
-from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.machine.abstract_machine_edge \
     import AbstractMachineEdge
 
@@ -26,10 +25,5 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
             to other partitions
         """
         OutgoingEdgePartition.__init__(
-            self, identifier, AbstractMachineEdge, constraints, label)
-        self._traffic_weight = traffic_weight
-
-    @property
-    @overrides(OutgoingEdgePartition.traffic_weight)
-    def traffic_weight(self):
-        return self._traffic_type
+            self, identifier, AbstractMachineEdge, constraints, label,
+            traffic_weight=traffic_weight)
