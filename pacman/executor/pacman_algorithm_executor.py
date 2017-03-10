@@ -199,17 +199,13 @@ class PACMANAlgorithmExecutor(object):
         all_xml_paths.extend(copy_of_xml_paths)
         all_xml_paths.append(converter_xml_path)
 
-        converter_names = list()
-        for converter in converters.iterkeys():
-            converter_names.append(converter)
-
         # filter for just algorithms we want to use
         algorithm_data = self._get_algorithm_data(
             algorithms_names, algorithm_data_objects)
         optional_algorithms_datas = self._get_algorithm_data(
             copy_of_optional_algorithms, algorithm_data_objects)
         converter_algorithms_datas = self._get_algorithm_data(
-            converter_names, converters)
+            converters.keys(), converters)
 
         # sort_out_order_of_algorithms for execution
         self._sort_out_order_of_algorithms(

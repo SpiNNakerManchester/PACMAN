@@ -1,4 +1,5 @@
 import inspect
+import logging
 import os
 import pkgutil
 import sys
@@ -22,6 +23,7 @@ _algorithms = dict()
 # A lock of the algorithms
 _algorithm_lock = RLock()
 
+logger = logging.getLogger(__name__)
 
 class AllOf(object):
     """ Indicates that all of the items specified are required
@@ -340,7 +342,8 @@ def scan_packages(packages, recursive=True):
                     __import__(package_name)
                     package = sys.modules[package_name]
                 except Exception as ex:
-                    print ex
+                    msg = "Failed to import " + package_name + " : " + str(ex)
+                    logger.warning(msg)
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -348,13 +351,16 @@ def scan_packages(packages, recursive=True):
             for _, name, is_pkg in pkgutil.iter_modules([pkg_path]):
 
                 # If recursive and this is a package, recurse
+                module = package.__name__ + "." + name
                 if is_pkg and recursive:
-                    scan_packages([package.__name__ + "." + name], recursive)
+                    scan_packages([module], recursive)
                 else:
                     try:
-                        __import__(package.__name__ + "." + name)
-                    except Exception:
-                        print "oops"
+                        __import__(module)
+                    except Exception as ex:
+                        msg = "Failed to import " + module + " : " + str(ex)
+                        logger.warning(msg)
+                        continue
 
         new_algorithms = _algorithms
         _algorithms = current_algorithms
