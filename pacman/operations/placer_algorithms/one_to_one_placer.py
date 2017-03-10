@@ -1,13 +1,12 @@
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.placements.placements import Placements
-from pacman.model.placements.placement import Placement
+from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.constraints.placer_constraints\
-    .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+    import PlacerSameChipAsConstraint
 from pacman.utilities import utility_calls
 
 from spinn_machine.utilities.progress_bar import ProgressBar

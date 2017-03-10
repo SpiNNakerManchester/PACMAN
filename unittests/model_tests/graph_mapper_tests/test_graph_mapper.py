@@ -8,12 +8,8 @@ from uinit_test_objects.test_vertex import TestVertex
 
 # pacman imports
 from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.common.graph_mapper \
-    import GraphMapper
-from pacman.model.graphs.machine.impl.machine_edge import \
-    MachineEdge
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
+from pacman.model.graphs.common.graph_mapper import GraphMapper
+from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
 
 # general imports
 import unittest

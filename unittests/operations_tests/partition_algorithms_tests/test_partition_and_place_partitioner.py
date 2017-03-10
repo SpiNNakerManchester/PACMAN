@@ -3,19 +3,14 @@ test for partitioning
 """
 
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge import \
-    ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException, PacmanValueError
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_maximum_size_constraint import \
-    PartitionerMaximumSizeConstraint
 from pacman.model.constraints.partitioner_constraints\
-    .partitioner_same_size_as_vertex_constraint \
+    import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.partitioner_constraints\
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 
 # spinnMachine imports

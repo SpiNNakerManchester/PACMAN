@@ -1,14 +1,9 @@
 
 # pacman imports
-from pacman.model.constraints.placer_constraints.\
-    placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_same_chip_as_constraint\
-    import PlacerSameChipAsConstraint
+from pacman.model.constraints.placer_constraints \
+    import PlacerRadialPlacementFromChipConstraint, PlacerSameChipAsConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.model.placements.placements import Placements
-from pacman.model.placements.placement import Placement
+from pacman.model.placements import Placement, Placements
 from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from pacman.exceptions import PacmanPlaceException

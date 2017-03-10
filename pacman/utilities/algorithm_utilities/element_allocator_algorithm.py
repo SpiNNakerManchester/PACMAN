@@ -1,5 +1,5 @@
 # pacman imports
-from pacman.model.resources.element_free_space import ElementFreeSpace
+from pacman.model.resources import ElementFreeSpace
 from pacman import exceptions
 
 # general imports

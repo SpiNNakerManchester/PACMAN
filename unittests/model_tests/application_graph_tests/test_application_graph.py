@@ -1,9 +1,5 @@
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge \
-    import ApplicationEdge
-
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 # uinit test object imports
 from uinit_test_objects.test_vertex import TestVertex
 

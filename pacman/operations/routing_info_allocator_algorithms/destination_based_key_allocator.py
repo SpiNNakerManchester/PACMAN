@@ -1,11 +1,8 @@
 from pacman.model.constraints.key_allocator_constraints\
-    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.partition_routing_info \
-    import PartitionRoutingInfo
-from pacman.model.routing_tables.multicast_routing_tables import \
-    MulticastRoutingTables
+    import AbstractKeyAllocatorConstraint
+from pacman.model.routing_info \
+    import BaseKeyAndMask, RoutingInfo, PartitionRoutingInfo
+from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.utilities import utility_calls
 from pacman import exceptions
 

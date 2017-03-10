@@ -3,10 +3,8 @@ from pacman.model.decorators.overrides import overrides
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
-from pacman.model.graphs.machine.abstract_machine_vertex \
-    import AbstractMachineVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource \
     import CPUCyclesPerTickResource
 
@@ -36,7 +34,7 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
         self._virtual_chip_y = None
 
     @property
-    @overrides(AbstractMachineVertex.resources_required)
+    @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return ResourceContainer(
             dtcm=DTCMResource(0), sdram=SDRAMResource(0),

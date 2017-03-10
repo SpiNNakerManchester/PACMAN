@@ -1,8 +1,10 @@
-from pacman.model.graphs.machine.abstract_machine_vertex \
-    import AbstractMachineVertex
+from abc import abstractproperty, ABCMeta
+from six import add_metaclass
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 
-class MachineVertex(AbstractMachineVertex):
+@add_metaclass(ABCMeta)
+class MachineVertex(AbstractVertex):
     """ A simple implementation of a machine vertex
     """
 
@@ -19,7 +21,7 @@ class MachineVertex(AbstractMachineVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
         """
-        AbstractMachineVertex.__init__(self, label, constraints)
+        AbstractVertex.__init__(self, label, constraints)
 
     def __str__(self):
         l = self.label
@@ -28,3 +30,11 @@ class MachineVertex(AbstractMachineVertex):
     def __repr__(self):
         return "MachineVertex(label={}, constraints={}".format(
             self.label, self.constraints)
+
+    @abstractproperty
+    def resources_required(self):
+        """ The resources required by the vertex
+
+        :rtype:\
+            :py:class:`pacman.model.resources.resource_container.ResourceContainer`
+        """

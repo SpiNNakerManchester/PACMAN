@@ -1,11 +1,9 @@
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.model.graphs.abstract_edge import AbstractEdge
-from pacman.model.graphs.machine.abstract_machine_edge \
-    import AbstractMachineEdge
 
 
-class MachineEdge(AbstractMachineEdge):
+class MachineEdge(AbstractEdge):
     """ A simple implementation of a machine edge
     """
 
@@ -31,10 +29,10 @@ class MachineEdge(AbstractMachineEdge):
 
         :param pre_vertex: the vertex at the start of the edge
         :type pre_vertex:\
-            :py:class:`pacman.model.graphs.machine.abstract_machine_vertex.AbstractMachineVertex`
+            :py:class:`pacman.model.graphs.machine.abstract_machine_vertex.impl.MachineVertex`
         :param post_vertex: the vertex at the end of the edge
         :type post_vertex:\
-            :py:class:`pacman.model.graphs.machine.abstract_machine_vertex.AbstractMachineVertex`
+            :py:class:`pacman.model.graphs.machine.abstract_machine_vertex.impl.MachineVertex`
         :param traffic_type: The type of traffic that this edge will carry
         :type traffic_type:\
             :py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
@@ -45,7 +43,7 @@ class MachineEdge(AbstractMachineEdge):
             relative to other edges (default is 1)
         :type traffic_weight: int
         """
-        AbstractMachineEdge.__init__(self, label)
+        AbstractEdge.__init__(self, label)
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
@@ -67,13 +65,15 @@ class MachineEdge(AbstractMachineEdge):
         return self._traffic_type
 
     @property
-    @overrides(AbstractMachineEdge.traffic_weight)
     def traffic_weight(self):
+        """ The amount of traffic expected to go down this edge relative to
+            other edges
+        """
         return self._traffic_weight
 
     def __repr__(self):
         return (
-            "SimpleMachineEdge(pre_vertex={}, post_vertex={}, "
+            "MachineEdge(pre_vertex={}, post_vertex={}, "
             "traffic_type={}, label={}, traffic_weight={})".format(
                 self._pre_vertex, self._post_vertex, self._traffic_type,
                 self.label, self._traffic_weight))

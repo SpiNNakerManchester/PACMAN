@@ -2,12 +2,8 @@
 # pacman imports
 from pacman import exceptions
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from pacman.model.routing_table_by_partition.\
-    multicast_routing_table_by_partition import \
-    MulticastRoutingTableByPartition
-from pacman.model.routing_table_by_partition.\
-    multicast_routing_table_by_partition_entry \
-    import MulticastRoutingTableByPartitionEntry
+from pacman.model.routing_table_by_partition import \
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 # general imports

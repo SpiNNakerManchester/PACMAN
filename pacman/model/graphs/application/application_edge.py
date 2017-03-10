@@ -1,12 +1,10 @@
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.abstract_edge import AbstractEdge
-from pacman.model.graphs.application.abstract_application_edge \
-    import AbstractApplicationEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
+from pacman.model.graphs.machine.machine_edge import MachineEdge
 
 
-class ApplicationEdge(AbstractApplicationEdge):
+class ApplicationEdge(AbstractEdge):
     """ A simple implementation of an application edge
     """
 
@@ -18,35 +16,53 @@ class ApplicationEdge(AbstractApplicationEdge):
         "_post_vertex",
 
         # The type of traffic on the edge
-        "_traffic_type"
+        "_traffic_type",
+
+        # Machine edge type
+        "_machine_edge_type"
     ]
 
     def __init__(
             self, pre_vertex, post_vertex,
-            traffic_type=EdgeTrafficType.MULTICAST, label=None):
+            traffic_type=EdgeTrafficType.MULTICAST, label=None,
+            machine_edge_type=MachineEdge):
         """
 
         :param pre_vertex: the application vertex at the start of the edge
         :type pre_vertex: \
-            :py:class:`pacman.model.graph.application.abstract_application_vertex.AbstractApplicationVertex`
+            :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
         :param post_vertex: the application vertex at the end of the edge
         :type post_vertex: \
-            :py:class:`pacman.model.graph.application.abstract_application_vertex.AbstractApplicationVertex`
+            :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
         :param traffic_type: The type of the traffic on the edge
         :type traffic_type:\
             :py:class:`pacman.model.graph.edge_traffic_type.EdgeTrafficType`
         :param label: The name of the edge
         :type label: str
         """
-        AbstractApplicationEdge.__init__(self, label)
+        AbstractEdge.__init__(self, label)
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
+        self._machine_edge_type = machine_edge_type
 
-    @overrides(AbstractApplicationEdge.create_machine_edge)
     def create_machine_edge(self, pre_vertex, post_vertex, label):
-        return MachineEdge(pre_vertex, post_vertex, self._traffic_type,
-                           label=label)
+        """ Create a machine edge between two machine vertices
+
+        :param pre_vertex: The machine vertex at the start of the edge
+        :type pre_vertex:\
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+        :param post_vertex: The machine vertex at the end of the edge
+        :type post_vertex:\
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+        :param label: label of the edge
+        :type label: str
+        :return: The created machine edge
+        :rtype:\
+            :py:class:`pacman.model.graph.machine.impl.machine_edge.MachineEdge`
+        """
+        return self._machine_edge_type(
+            pre_vertex, post_vertex, self._traffic_type, label=label)
 
     @property
     @overrides(AbstractEdge.pre_vertex)

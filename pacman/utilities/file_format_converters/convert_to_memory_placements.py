@@ -1,7 +1,6 @@
 
 # pacman imports
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
+from pacman.model.placements import Placement, Placements
 from pacman import exceptions
 from pacman.utilities import file_format_schemas
 from pacman.utilities import constants

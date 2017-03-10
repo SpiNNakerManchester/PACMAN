@@ -1,17 +1,12 @@
 
 # pacman imports
-from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.partition_routing_info \
-    import PartitionRoutingInfo
+from pacman.model.routing_info \
+    import RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask
 from pacman.utilities import utility_calls
 from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.key_allocator_constraints\
-    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint\
-    import KeyAllocatorContiguousRangeContraint
+    import AbstractKeyAllocatorConstraint, KeyAllocatorContiguousRangeContraint
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800

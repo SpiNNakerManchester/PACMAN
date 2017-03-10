@@ -1,20 +1,12 @@
 from pacman import exceptions
 from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint import \
-    PlacerRadialPlacementFromChipConstraint
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.utilities import utility_calls
+    import PlacerRadialPlacementFromChipConstraint, PlacerBoardConstraint
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+    import PlacerChipAndCoreConstraint, AbstractPlacerConstraint
+from pacman.model.resources import ResourceContainer, DTCMResource, \
+    SDRAMResource, CPUCyclesPerTickResource
+from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.constraints.placer_constraints.placer_board_constraint \
-    import PlacerBoardConstraint
-from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
 
 from spinn_machine.utilities.ordered_set import OrderedSet
 

@@ -1,9 +1,7 @@
-from pacman.model.routing_tables.multicast_routing_tables import \
-    MulticastRoutingTables
+from pacman.model.routing_tables \
+    import MulticastRoutingTable, MulticastRoutingTables
 from pacman.operations.router_compressors.mundys_router_compressor.\
     routing_table_condenser import MundyRouterCompressor
-from pacman.model.routing_tables.multicast_routing_table \
-    import MulticastRoutingTable
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 import unittest
 
