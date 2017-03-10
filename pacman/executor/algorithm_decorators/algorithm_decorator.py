@@ -1,7 +1,7 @@
-import importlib
 import inspect
 import os
 import pkgutil
+import sys
 from threading import RLock
 
 from pacman.executor.algorithm_decorators.one_of_input import OneOfInput
@@ -337,8 +337,10 @@ def scan_packages(packages, recursive=True):
             package = package_name
             if isinstance(package_name, str):
                 try:
-                    package = importlib.import_module(package_name, "")
-                except Exception:
+                    __import__(package_name)
+                    package = sys.modules[package_name]
+                except Exception as ex:
+                    print ex
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -350,9 +352,9 @@ def scan_packages(packages, recursive=True):
                     scan_packages([package.__name__ + "." + name], recursive)
                 else:
                     try:
-                        importlib.import_module("." + name, package.__name__)
+                        __import__(package.__name__ + "." + name)
                     except Exception:
-                        continue
+                        print "oops"
 
         new_algorithms = _algorithms
         _algorithms = current_algorithms
