@@ -55,16 +55,15 @@ class BasicPartitioner(object):
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
-        progress_bar = ProgressBar(len(graph.vertices),
-                                   "Partitioning graph vertices")
-        vertices = graph.vertices
+        progress_bar = ProgressBar(
+            graph.n_vertices, "Partitioning graph vertices")
         machine_graph = MachineGraph(
             "Machine graph for {}".format(graph.label))
         graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine)
 
         # Partition one vertex at a time
-        for vertex in vertices:
+        for vertex in graph.vertices:
 
             # Get the usage of the first atom, then assume that this
             # will be the usage of all the atoms
@@ -84,8 +83,8 @@ class BasicPartitioner(object):
                 max_resources_available.dtcm.get_value(),
                 requirements.dtcm.get_value())
             atoms_per_cpu = self._get_ratio(
-                max_resources_available.cpu.get_value(),
-                requirements.cpu.get_value())
+                max_resources_available.cpu_cycles.get_value(),
+                requirements.cpu_cycles.get_value())
 
             max_atom_values = [atoms_per_sdram, atoms_per_dtcm, atoms_per_cpu]
 

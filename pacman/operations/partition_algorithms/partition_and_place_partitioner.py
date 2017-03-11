@@ -59,14 +59,13 @@ class PartitionAndPlacePartitioner(object):
                                    PartitionerSameSizeAsVertexConstraint])
 
         # Load the vertices and create the machine_graph to fill
-        vertices = graph.vertices
         machine_graph = MachineGraph(
             label="partitioned graph for {}".format(graph.label))
         graph_mapper = GraphMapper()
 
         # sort out vertex's by placement constraints
         vertices = placer_algorithm_utilities\
-            .sort_vertices_by_known_constraints(vertices)
+            .sort_vertices_by_known_constraints(graph.vertices)
 
         # Set up the progress
         n_atoms = 0
@@ -194,11 +193,8 @@ class PartitionAndPlacePartitioner(object):
                 machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, used_resources,
                     label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
-                    constraints=(
-                        partition_algorithm_utilities
-                        .get_remaining_constraints(vertex)
-                    )
-                )
+                    constraints=partition_algorithm_utilities
+                    .get_remaining_constraints(vertex))
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
@@ -323,7 +319,7 @@ class PartitionAndPlacePartitioner(object):
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
                 raise exceptions.PacmanPartitionException(
-                    "No more of vertex {} would fit on the board:\n"
+                    "No more of vertex '{}' would fit on the board:\n"
                     "    Allocated so far: {} atoms\n"
                     "    Request for SDRAM: {}\n"
                     "    Largest SDRAM space: {}".format(
@@ -348,14 +344,12 @@ class PartitionAndPlacePartitioner(object):
                 (x, y, p, ip_tags, reverse_ip_tags) = \
                     resource_tracker.allocate_constrained_resources(
                         used_resources, vertex.constraints)
-                used_placements.append(
-                    (vertex, x, y, p, used_resources,
-                     ip_tags, reverse_ip_tags))
+                used_placements.append((vertex, x, y, p, used_resources,
+                                        ip_tags, reverse_ip_tags))
             except exceptions.PacmanValueError as e:
-
                 raise exceptions.PacmanValueError(
                     "Unable to allocate requested resources to"
-                    " vertex {}:\n{}".format(vertex, e))
+                    " vertex '{}':\n{}".format(vertex, e))
 
         # reduce data to what the parent requires
         final_placements = list()
@@ -452,6 +446,17 @@ class PartitionAndPlacePartitioner(object):
         return max_atoms_per_core
 
     @staticmethod
+    def _ratio(a, b):
+        """Get the ratio between two resource descriptors, with special
+        handling for when either descriptor is zero.
+        """
+        aval = a.get_value()
+        bval = b.get_value()
+        if aval == 0 or bval == 0:
+            return 0
+        return float(aval) / float(bval)
+
+    @staticmethod
     def _find_max_ratio(resources, max_resources):
         """ Find the max ratio between the resources
 
@@ -466,24 +471,12 @@ class PartitionAndPlacePartitioner(object):
         :raise None: this method does not raise any known exceptions
 
         """
-        if (resources.cpu_cycles.get_value() == 0 or
-                max_resources.cpu_cycles.get_value() == 0):
-            cpu_ratio = 0
-        else:
-            cpu_ratio = (float(resources.cpu_cycles.get_value()) /
-                         float(max_resources.cpu_cycles.get_value()))
-        if (resources.dtcm.get_value() == 0 or
-                max_resources.dtcm.get_value() == 0):
-            dtcm_ratio = 0
-        else:
-            dtcm_ratio = (float(resources.dtcm.get_value()) /
-                          float(max_resources.dtcm.get_value()))
-        if (resources.sdram.get_value() == 0 or
-                max_resources.sdram.get_value() == 0):
-            sdram_ratio = 0
-        else:
-            sdram_ratio = (float(resources.sdram.get_value()) /
-                           float(max_resources.sdram.get_value()))
+        cpu_ratio = PartitionAndPlacePartitioner._ratio(
+            resources.cpu_cycles, max_resources.cpu_cycles)
+        dtcm_ratio = PartitionAndPlacePartitioner._ratio(
+            resources.dtcm, max_resources.dtcm)
+        sdram_ratio = PartitionAndPlacePartitioner._ratio(
+            resources.sdram, max_resources.sdram)
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
 
     @staticmethod
@@ -511,6 +504,5 @@ class PartitionAndPlacePartitioner(object):
                 raise exceptions.PacmanPartitionException(
                     "A vertex and its partition-dependent vertices must "
                     "have the same number of atoms")
-            else:
-                partition_together_vertices.append(constraint.vertex)
+            partition_together_vertices.append(constraint.vertex)
         return partition_together_vertices

@@ -529,23 +529,23 @@ class ResourceTracker(object):
             return board_address in self._boards_with_ip_tags
         elif board_address is None and tag is None:
             return len(self._boards_with_ip_tags) > 0
-        return (board_address not in self._tags_by_board or
-                tag in self._tags_by_board[board_address])
+        return board_address not in self._tags_by_board \
+            or tag in self._tags_by_board[board_address]
 
     def _is_tag_available_on_ethernet_chip(self, ethernet_chip, tag_id):
-        if ethernet_chip is not None:
+        if ethernet_chip is None:
+            return False
 
-            # Having found the board address, it can only be used if a
-            # tag is available
-            if (ethernet_chip.ip_address in self._boards_with_ip_tags and
-                    (tag_id is None or
-                     tag_id in self._tags_by_board[ethernet_chip.ip_address])):
-                return True
-        return False
+        # Having found the board address, it can only be used if a
+        # tag is available
+        addr = ethernet_chip.ip_address
+        return (
+            addr in self._boards_with_ip_tags and
+            (tag_id is None or tag_id in self._tags_by_board[addr])
+        )
 
-    def _is_ip_tag_available(
-            self, board_address, tag, ip_address, port, strip_sdp,
-            traffic_identifier):
+    def _is_ip_tag_available(self, board_address, tag, ip_address, port,
+                             strip_sdp, traffic_identifier):
         """ Check if an iptag is available given the constraints
 
         :param board_address: the board address to locate the chip on
@@ -1093,6 +1093,13 @@ class ResourceTracker(object):
                 all_n_cores, all_n_tags, all_n_chips, all_max_sdram))
 
     def _available_resources(self, usable_chips):
+        """Describe how much of the various resource types are available.
+
+        :param usable_chips: Coordinates of usable chips
+        :type usable_chips: iterable of pair(int,int)
+        :return: #cores, #chips, amount of SDRAM, #tags
+        :rtype: 4-tuple of int
+        """
         n_cores = 0
         max_sdram = 0
         n_chips = 0
@@ -1115,8 +1122,8 @@ class ResourceTracker(object):
                 n_tags += len(self._machine.get_chip_at(eth_x, eth_y).tag_ids)
         return n_cores, n_chips, max_sdram, n_tags
 
-    def get_maximum_constrained_resources_available(
-            self, resources, constraints, chips=None):
+    def get_maximum_constrained_resources_available(self, resources,
+                                                    constraints, chips=None):
         """ Get the maximum resources available given the constraints
 
         :param resources: The resources of the item to check

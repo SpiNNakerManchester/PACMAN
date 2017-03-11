@@ -45,8 +45,8 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 unconstrained_vertices.add(vertex)
 
         # Iterate over constrained vertices and generate placements
-        progress_bar = ProgressBar(len(machine_graph.vertices),
-                                   "Placing graph vertices")
+        progress_bar = ProgressBar(
+            machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         constrained_vertices = \
