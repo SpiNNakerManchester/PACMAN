@@ -27,7 +27,7 @@ class ConvertToFileMachineGraph(object):
         :return:
         """
         progress_bar = ProgressBar(
-            len(machine_graph.vertices), "Converting to json graph")
+            machine_graph.n_vertices, "Converting to json graph")
 
         # write basic stuff
         json_graph_directory_rep = dict()

@@ -118,7 +118,24 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
 
 
 def is_equal_or_None(a, b):
-        """ If a and b are both not None, return True iff they are equal,\
-            otherwise return True
-        """
-        return True if a is None or b is None or a == b else False
+    """ If a and b are both not None, return True iff they are equal,\
+        otherwise return True
+    """
+    return True if a is None or b is None or a == b else False
+
+
+def is_single(iterable):
+    """ Test if there is exactly one item in the iterable
+    """
+    iterator = iter(iterable)
+
+    # Test if there is a first item, if not return False
+    if next(iterator, None) is None:
+        return False
+
+    # Test if there is a second item, if not return True
+    if next(iterator, None) is None:
+        return True
+
+    # Otherwise return False
+    return False
