@@ -103,5 +103,6 @@ class TestTagsModel(unittest.TestCase):
             machine_vertex)
         self.assertEqual(gotton_tag, None)
 
+
 if __name__ == '__main__':
     unittest.main()

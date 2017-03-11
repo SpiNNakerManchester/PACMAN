@@ -1,25 +1,27 @@
 # pacman model imports
-from pacman.model.graphs.application.simple_application_edge \
-    import SimpleApplicationEdge
-from pacman.model.graphs.machine.machine_graph import MachineGraph
-from pacman.model.graphs.machine.simple_machine_vertex import SimpleMachineVertex
-from pacman.model.resources.cpu_cycles_resource import \
-    CPUCyclesResource
+from pacman.model.graphs.application.impl.application_edge \
+    import ApplicationEdge
+from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
 
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.application.impl.application_graph \
     import ApplicationGraph
-from pacman.model.graphs.machine.impl.simple_machine_edge import SimpleMachineEdge
+from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
+from pacman.model.routing_info.partition_routing_info \
+    import PartitionRoutingInfo
 from pacman.model.routing_info.routing_info import RoutingInfo
 
 # pacman utility imports
-from pacman.utilities import constants
+from pacman.utilities.constants import DEFAULT_MASK
 # pacman operations imports
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
@@ -44,7 +46,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     sdram_requirement = \
         vertex.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
     # noinspection PyTypeChecker
-    resources = ResourceContainer(cpu=CPUCyclesResource(cpu_cycles),
+    resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                   dtcm=DTCMResource(dtcm_requirement),
                                   sdram=SDRAMResource(sdram_requirement))
     return resources
@@ -53,7 +55,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
 class Vertex(AbstractApplicationVertex):
     def __init__(self, n_atoms, label):
         AbstractApplicationVertex.__init__(self, label=label, n_atoms=n_atoms,
-                                             max_atoms_per_core=256)
+                                           max_atoms_per_core=256)
 
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 10 * (hi_atom - lo_atom)
@@ -70,7 +72,7 @@ class MyTestCase(unittest.TestCase):
         # sort out graph
         self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
-        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2, "First edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
         self.verts = [self.vert1, self.vert2]
         self.edges = [self.edge1]
         self.graph = ApplicationGraph("Graph", self.verts, self.edges)
@@ -80,7 +82,7 @@ class MyTestCase(unittest.TestCase):
             0, 10, get_resources_used_by_atoms(0, 10, []))
         self.vertex2 = SimpleMachineVertex(
             0, 5, get_resources_used_by_atoms(0, 10, []))
-        self.edge = SimpleMachineEdge(self.vertex1, self.vertex2)
+        self.edge = MachineEdge(self.vertex1, self.vertex2)
         self.graph.add_vertex(self.vertex1)
         self.graph.add_vertex(self.vertex2)
         self.graph.add_edge(self.edge, "TEST")
@@ -93,12 +95,12 @@ class MyTestCase(unittest.TestCase):
         # sort out routing infos
         self.routing_info = RoutingInfo()
         self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               edge=self.edge)
+            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
+                                 edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -125,7 +127,7 @@ class MyTestCase(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def set_up_4_node_board(self):
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -193,7 +195,7 @@ class MyTestCase(unittest.TestCase):
     def test_bad_machine_setup(self):
         # create machine
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -236,8 +238,8 @@ class MyTestCase(unittest.TestCase):
         # sort out routing infos
         self.routing_info = RoutingInfo()
         self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               edge=self.edge)
+            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
+                                 edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
 
         self.set_up_4_node_board()
@@ -261,14 +263,14 @@ class MyTestCase(unittest.TestCase):
         self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
         self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
         vertices = list()
-        for i in range(4 * 17): #51 atoms per each processor on 20 chips
+        for i in range(4 * 17):  # 51 atoms per each processor on 20 chips
             vertices.append(SimpleMachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "vertex " + str(i)))
         edges = list()
         for i in range(len(vertices)):
-            edges.append(SimpleMachineEdge(
-                vertices[i], vertices[(i + 1)%len(vertices)]))
+            edges.append(MachineEdge(
+                vertices[i], vertices[(i + 1) % len(vertices)]))
         graph = MachineGraph(vertices, edges)
         p = 1
         x = 0
@@ -287,11 +289,10 @@ class MyTestCase(unittest.TestCase):
         edge_routing_info = list()
         for i in range(len(edges)):
             edge_routing_info.append(PartitionRoutingInfo(
-                edges[i], i<<11, constants.DEFAULT_MASK))
+                edges[i], i << 11, DEFAULT_MASK))
 
         for edge_info in edge_routing_info:
             routing_info.add_partition_info(edge_info)
-
 
         self.set_up_4_node_board()
 

@@ -92,8 +92,8 @@ def check_types_of_edge_constraint(machine_graph):
                 len(fixed_mask) > 1 or len(flexi_field) > 1):
             raise exceptions.PacmanConfigurationException(
                 "There are more than one of the same constraint type on "
-                "the partition {} for edges {}. Please fix and try again."
-                .format(partition.identifer, partition.edges))
+                "the partition {} starting at {}. Please fix and try again."
+                .format(partition.identifer, partition.pre_vertex))
 
         fixed_key = len(fixed_key) == 1
         fixed_mask = len(fixed_mask) == 1
@@ -104,18 +104,18 @@ def check_types_of_edge_constraint(machine_graph):
         # merged before now
         if fixed_key and fixed_mask:
             raise exceptions.PacmanConfigurationException(
-                "The partition {} with edges {} has a fixed key and fixed "
+                "The partition {} starting at {} has a fixed key and fixed "
                 "mask constraint. These can be merged together, but is "
                 "deemed an error here"
-                .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.pre_vertex))
 
         # check for a fixed key and fixed field, as these are incompatible
         if fixed_key and fixed_field:
             raise exceptions.PacmanConfigurationException(
-                "The partition {} for edges {} has a fixed key and fixed "
+                "The partition {} starting at {} has a fixed key and fixed "
                 "field constraint. These may be merge-able together, but "
                 "is deemed an error here"
-                .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.pre_vertex))
 
         # check that a fixed mask and fixed field have compatible masks
         if fixed_mask and fixed_field:
@@ -125,10 +125,10 @@ def check_types_of_edge_constraint(machine_graph):
         # error
         if flexi_field and (fixed_mask or fixed_key or fixed_field):
             raise exceptions.PacmanConfigurationException(
-                "The partition {} for edges {} has a flexible field and "
+                "The partition {} starting at {} has a flexible field and "
                 "another fixed constraint. These maybe be merge-able, but "
                 "is deemed an error here"
-                .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.pre_vertex))
 
 
 def _check_masks_are_correct(partition):
