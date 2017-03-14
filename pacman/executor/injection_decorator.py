@@ -86,19 +86,20 @@ def inject_items(types):
     :param types: A dict of method argument name to type name to be injected
     """
     def wrap(wrapped_method):
+        exn_arg = None
+        method_args = inspect.getargspec(wrapped_method)
+        for type_arg in types:
+            if type_arg not in method_args.args:
+                # Can't raise exception until run time
+                exn_arg = type_arg
+                break
 
         @wraps(wrapped_method)
         def wrapper(obj, *args, **kwargs):
-
-            method_args = inspect.getargspec(wrapped_method)
-            for type_arg in types:
-                if type_arg not in method_args.args:
-                    raise InjectionException(
-                        "Argument {} does not exist for method {} of"
-                        " {}".format(
-                            type_arg, wrapped_method.__name__,
-                            obj.__class__))
-
+            if exn_arg is not None:
+                raise InjectionException(
+                    "Argument {} does not exist for method {} of {}".format(
+                        exn_arg, wrapped_method.__name__, obj.__class__))
             if _injectables is None:
                 raise InjectionException(
                     "No injectable objects have been provided")
@@ -109,13 +110,12 @@ def inject_items(types):
                         "Cannot find object of type {} to inject into"
                         " method {} of {}".format(
                             arg_type, wrapped_method.__name__, obj.__class__))
-                value = _injectables.get(arg_type)
                 if arg in new_args:
                     raise InjectionException(
                         "Argument {} was already provided to"
                         " method {} of {}".format(
                             arg, wrapped_method.__name, obj.__class__))
-                new_args[arg] = value
+                new_args[arg] = _injectables.get(arg_type)
             return wrapped_method(obj, *args, **new_args)
         return wrapper
     return wrap
