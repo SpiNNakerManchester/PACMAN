@@ -48,7 +48,7 @@ class ResourceContainer(object):
         :param reverse_iptags: the reverse iptags required
         :type dtcm: None or \
                     :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
-        :type sdram:None or \
+        :type sdram: None or \
                     :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
         :type cpu_cycles: None or \
                     :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`

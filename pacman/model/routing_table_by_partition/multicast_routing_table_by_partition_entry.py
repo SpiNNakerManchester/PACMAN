@@ -33,7 +33,6 @@ class MulticastRoutingTableByPartitionEntry(object):
         :type incoming_processor: int between 0 and 17
         :param incoming_link: the direction this entry came from in link
         :type incoming_link: int between 0 and 5
-        :return:
         """
         if isinstance(out_going_links, int):
             self._out_going_links = set()
@@ -72,21 +71,21 @@ class MulticastRoutingTableByPartitionEntry(object):
     @property
     def out_going_processors(self):
         """ The destination processors of the entry
-        :return:
+
         """
         return self._out_going_processors
 
     @property
     def out_going_links(self):
         """ The destination links of the entry
-        :return:
+
         """
         return self._out_going_links
 
     @property
     def incoming_link(self):
         """ The source link for this path entry
-        :return:
+
         """
         return self._incoming_link
 
@@ -139,6 +138,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     def merge_entry(self, other):
         """ Merges the another entry with this one and returns a new\
             MulticastRoutingTableByPartitionEntry
+
         :param other: the MulticastRoutingTableByPartitionEntry to merge into\
                     this one
         :return: a merged MulticastRoutingTableByPartitionEntry

@@ -113,7 +113,6 @@ class PartitionAndPlacePartitioner(object):
         :param graph: the graph object
         :type graph:\
             :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanPartitionException: if the extra vertex\
                     for partitioning identically has a different number of\

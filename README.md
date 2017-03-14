@@ -51,3 +51,9 @@ To install as a development version in a `virtualenv`, with the `virutalenv`
 enabled, run:
 
     python setup.py develop
+
+Documentation
+=============
+[PACMAN python documentation](http://pacman.readthedocs.io)
+
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)
