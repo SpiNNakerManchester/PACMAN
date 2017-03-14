@@ -344,7 +344,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :param seen_fields:
         :param application_field:
         :param required_bits:
-        :return: bool true if it was able to adjust to the field,
+        :return: bool true if it was able to adjust to the field,\
             false otherwise
         """
         fixed_mask_masks = \

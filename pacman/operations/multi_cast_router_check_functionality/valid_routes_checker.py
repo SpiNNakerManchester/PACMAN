@@ -123,8 +123,8 @@ def _search_route(source_placement, dest_placements, key_and_mask,
             only once
     :param key_and_mask: the key and mask associated with this set of edges
     :param n_atoms: the number of atoms going through this path
-    :param is_continuous: bool stating if the keys and atoms mapping is
-        continuous
+    :param is_continuous: bool stating if the keys and atoms mapping is\
+            continuous
     :type source_placement: instance of\
             pacman.model.placements.placement.Placement
     :type dest_placements: iterable of PlacementTuple

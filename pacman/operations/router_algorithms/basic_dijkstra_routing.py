@@ -368,22 +368,6 @@ class BasicDijkstraRouting(object):
             x_source, y_source, weight):
         """ Update the lowest cost for each neighbour of a node
 
-        :param dijkstra_tables:
-        :param x_current:
-        :param y_current:
-        :param x_source:
-        :param y_source:
-        :param x_neighbour:
-        :param y_neighbour:
-        :param weight:
-        :type dijkstra_tables:
-        :type x_current:
-        :type y_current:
-        :type x_source:
-        :type y_source:
-        :type x_neighbour:
-        :type y_neighbour:
-        :type weight:
         :rtype: None
         :raise PacmanRoutingException: when the algorithm goes to a node that\
                     doesn't exist in the machine or the node's cost was set\
@@ -525,26 +509,6 @@ class BasicDijkstraRouting(object):
             graph):
         """ Create a new routing entry
 
-        :param x_neighbour:
-        :param y_neighbour:
-        :param dijkstra_tables:
-        :param neighbour_index:
-        :param nodes_info:
-        :param x_current:
-        :param y_current:
-        :param previous_routing_entry:
-        :param graph:
-        :param edge:
-        :type edge:
-        :type x_neighbour:
-        :type y_neighbour:
-        :type dijkstra_tables:
-        :type neighbour_index:
-        :type nodes_info:
-        :type x_current:
-        :type y_current:
-        :type graph:
-        :type previous_routing_entry:
         :return: x_current, y_current, previous_routing_entry, made_an_entry
         :rtype: int, int, spinn_machine.multicast_routing_entry, bool
         :raise PacmanRoutingException: when the bandwidth of a router is\

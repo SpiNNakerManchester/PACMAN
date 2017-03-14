@@ -33,7 +33,7 @@ class ApplicationVertex(AbstractApplicationVertex):
         :type constraints: \
             iterable of\
             :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        :param max_atoms_per_core: the max number of atoms that can be
+        :param max_atoms_per_core: the max number of atoms that can be\
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
         :raise pacman.exceptions.PacmanInvalidParameterException:\
