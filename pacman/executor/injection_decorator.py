@@ -139,6 +139,44 @@ def clear_injectables():
     _injectables = None
 
 
+class _DictFacade(dict):
+    def __init__(self, *dicts):
+        self.dicts = dicts
+
+    def __getitem__(self, key):
+        for d in self.dicts:
+            try:
+                return d.__getitem__(key)
+            except KeyError:
+                pass
+        raise KeyError(key)
+
+    def __contains__(self, item):
+        for d in self.dicts:
+            if item in d:
+                return True
+        return False
+
+
+class injection_context(object):
+    def __init__(self, injection_dictionary):
+        self.old = None
+        self.mine = injection_dictionary
+
+    def __enter__(self):
+        global _injectables
+        dicts = [self.mine]
+        if _injectables is not None:
+            dicts.append(_injectables)
+        self.old = _injectables
+        _injectables = _DictFacade(*dicts)
+
+    def __exit__(self, a, b, c):
+        global _injectables
+        _injectables = self.old
+        return False
+
+
 def do_injection(objects_to_inject, objects_to_inject_into=None):
     """ Perform the actual injection of objects
 
@@ -150,6 +188,8 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
         instances that have been created
     :type objects_to_inject_into: list
     """
+    if objects_to_inject is None:
+        return
     injectees = objects_to_inject_into
     if objects_to_inject_into is None:
         injectees = _instances
