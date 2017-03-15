@@ -14,13 +14,6 @@ class ConvertToFileCoreAllocations(object):
     __slots__ = []
 
     def __call__(self, placements, file_path):
-        """
-
-        :param placements:
-        :param file_path:
-        :return:
-        """
-
         progress_bar = ProgressBar(
             len(placements), "Converting to json core allocations")
 

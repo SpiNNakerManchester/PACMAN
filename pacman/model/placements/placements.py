@@ -148,7 +148,6 @@ class Placements(object):
     def __iter__(self):
         """ An iterator for the placements object within
 
-        :return:
         """
         return iter(self.placements)
 

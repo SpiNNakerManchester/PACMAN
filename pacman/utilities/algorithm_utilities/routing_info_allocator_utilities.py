@@ -21,6 +21,7 @@ def get_edge_groups(machine_graph):
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
+
     :param machine_graph: the machine graph
     """
 
@@ -66,7 +67,7 @@ def check_types_of_edge_constraint(machine_graph):
         are compatible.
 
     :param machine_graph: the graph to search through
-    :return:
+    :rtype: None:
     """
     for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = utility_calls.locate_constraints_of_type(
@@ -131,7 +132,7 @@ def _check_masks_are_correct(partition):
 
     :param partition: the outgoing_edge_partition to search for these\
                 constraints
-    :return:
+    :rtype: None:
     """
     fixed_mask = utility_calls.locate_constraints_of_type(
         partition.constraints, KeyAllocatorFixedMaskConstraint)[0]

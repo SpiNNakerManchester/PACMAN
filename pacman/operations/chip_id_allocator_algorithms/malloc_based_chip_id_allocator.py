@@ -30,13 +30,6 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         self._virtual_chips = dict()
 
     def __call__(self, machine, graph=None):
-        """
-
-        :param graph:
-        :param machine:
-        :return:
-        """
-
         if graph is not None:
 
             # Go through the groups and allocate keys

@@ -171,14 +171,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     @staticmethod
     def _update_routing_objects(
             keys_and_masks, routing_infos, group):
-        """
-
-        :param keys_and_masks:
-        :param routing_infos:
-        :param group:
-        :return:
-        """
-
         # Allocate the routing information
         partition_info = PartitionRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)

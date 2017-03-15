@@ -85,7 +85,7 @@ class ResourceTracker(object):
                     the set of chips used, or to re-order the chips.  Note\
                     also that on deallocation, the order is no longer\
                     guaranteed.
-        :type chips: iterable of (x, y) tuples of coordinates of chips
+        :type chips: iterable of (int, int) tuples of coordinates of chips
         """
 
         # The amount of SDRAM used by each chip,
@@ -344,6 +344,7 @@ class ResourceTracker(object):
     def most_avilable_cores_on_a_chip(self):
         """
         returns the number of cores on the chip which has the most cores.
+
         :return: int
         """
         size = 0
@@ -699,6 +700,7 @@ class ResourceTracker(object):
 
     def _allocate_sdram(self, key, resources):
         """ Allocates the SDRAM on the given chip
+
         :param key: The (x, y) coordinates of the chip
         :type key: tuple of (int, int)
         :param resources: the resources containing the SDRAM required
@@ -1139,7 +1141,7 @@ class ResourceTracker(object):
 
         :param usable_chips: Coordinates of usable chips
         :type usable_chips: iterable of pair(int,int)
-        :return: #cores, #chips, amount of SDRAM, #tags
+        :return: returns #cores, #chips, amount of SDRAM, #tags
         :rtype: 4-tuple of int
         """
         n_cores = 0
@@ -1261,7 +1263,7 @@ class ResourceTracker(object):
         :type ip_tags: iterable of (str, int) or None
         :param reverse_ip_tags: the details of the reverse ip tags allocated
         :type reverse_ip_tags: iterable of (str, int) or None
-        :return: None
+        :rtype: None
         """
 
         self._chips_available.add((chip_x, chip_y))
@@ -1300,7 +1302,7 @@ class ResourceTracker(object):
 
         :param chip_x: the x coord of the chip
         :type chip_x: int
-        :param chip_y:the y coord of the chip
+        :param chip_y: the y coord of the chip
         :type chip_y: int
         :return: True if the chip is available, False otherwise
         :rtype: bool

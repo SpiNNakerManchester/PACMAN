@@ -23,7 +23,6 @@ class BasicRoutingTableGenerator(object):
         :param routing_infos:
         :param routing_table_by_partitions:
         :param machine:
-        :return:
         """
         progress_bar = ProgressBar(
             len(list(machine.chips)), "Generating routing tables")
