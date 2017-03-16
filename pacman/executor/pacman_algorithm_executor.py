@@ -240,7 +240,7 @@ class PACMANAlgorithmExecutor(object):
                 meant to generate
         :param converter_algorithms_datas: the set of converter algorithms
         :param optional_algorithm_data: the set of optional algorithms
-        :return: None
+        :rtype: None
         """
 
         input_types = set(inputs.iterkeys())
@@ -378,7 +378,7 @@ class PACMANAlgorithmExecutor(object):
         :param inputs: the inputs list to update output from algorithm
         :param generated_outputs: the outputs list to update output from\
                     algorithm
-        :return: none
+        :rtype: None
         """
         algorithm_list.remove(algorithm)
         for output in algorithm.outputs:
@@ -432,7 +432,8 @@ class PACMANAlgorithmExecutor(object):
 
     def execute_mapping(self):
         """ Executes the algorithms
-        :return: None
+
+        :rtype: None
         """
         self._internal_type_mapping.update(self._inputs)
         if self._do_direct_injection:

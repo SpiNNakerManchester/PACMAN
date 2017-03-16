@@ -25,8 +25,9 @@ class AlgorithmMetadataXmlReader(object):
 
     def __init__(self, xml_paths):
         """
+
         :param xml_paths: paths to extra metadata files
-        :return:
+        :rtype: None
         """
         self._xml_paths = xml_paths
 
@@ -170,7 +171,6 @@ class AlgorithmMetadataXmlReader(object):
         """ Convert an XML arg element into a list of args
 
         :param args_element:
-        :return:
         """
         translated_args = list()
         if args_element is not None:

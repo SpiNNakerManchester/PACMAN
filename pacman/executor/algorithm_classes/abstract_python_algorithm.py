@@ -20,6 +20,7 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             python_module):
         """
+
         :param python_module: The module containing the python code to execute
         """
         AbstractAlgorithm.__init__(

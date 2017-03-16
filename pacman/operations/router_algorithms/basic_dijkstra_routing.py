@@ -177,7 +177,7 @@ class BasicDijkstraRouting(object):
 
         :param machine: the machine object
         :type machine: the spinn_machine.machine.Machine object
-        :return the  Dijkstra's table dictionary
+        :return: the  Dijkstra's table dictionary
         :rtype: dict
         :raise None: this method does not raise any known exception
         """
@@ -199,11 +199,10 @@ class BasicDijkstraRouting(object):
         """ Change the weights of the neighbouring nodes
 
         :param nodes_info: the node info dictionary
+        :type nodes_info: dict
         :param machine: the machine python object that represents the\
                     structure of the machine
-        :type nodes_info: dict
-        :type machine 'py:class':spinn_machine.machine.Machine
-        :return None
+        :type machine: 'py:class':spinn_machine.machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -220,8 +219,7 @@ class BasicDijkstraRouting(object):
         :param key: the identifier to the object in nodes_info
         :type key: str
         :type nodes_info: dict
-        :type machine 'py:class':spinn_machine.machine.Machine
-        :return None
+        :type machine: 'py:class':spinn_machine.machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -245,7 +243,7 @@ class BasicDijkstraRouting(object):
         :type router: spinn_machine.router.Router
         :type bws: int
         :type no_routing_table_entries: int
-        :return weight of this router
+        :return: weight of this router
         :rtype: int
         :raise None: does not raise any known exception
         """
@@ -271,7 +269,6 @@ class BasicDijkstraRouting(object):
 
         :param dijkstra_tables: the dictionary object for the Dijkstra-tables
         :type dijkstra_tables: dict
-        :return: None
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -296,7 +293,6 @@ class BasicDijkstraRouting(object):
          :type dest_chips:
          :type x_source: int
          :type y_source: int
-         :return: None
          :rtype: None
          :raise PacmanRoutingException: when the destination node could not be\
                     reached from this source node.
@@ -372,24 +368,7 @@ class BasicDijkstraRouting(object):
             x_source, y_source, weight):
         """ Update the lowest cost for each neighbour of a node
 
-        :param dijkstra_tables:
-        :param x_current:
-        :param y_current:
-        :param x_source:
-        :param y_source:
-        :param x_neighbour:
-        :param y_neighbour:
-        :param weight:
-        :type dijkstra_tables:
-        :type x_current:
-        :type y_current:
-        :type x_source:
-        :type y_source:
-        :type x_neighbour:
-        :type y_neighbour:
-        :type weight:
-        :return:
-        :rtype:
+        :rtype: None
         :raise PacmanRoutingException: when the algorithm goes to a node that\
                     doesn't exist in the machine or the node's cost was set\
                     too low.
@@ -530,27 +509,7 @@ class BasicDijkstraRouting(object):
             graph):
         """ Create a new routing entry
 
-        :param x_neighbour:
-        :param y_neighbour:
-        :param dijkstra_tables:
-        :param neighbour_index
-        :param nodes_info:
-        :param x_current:
-        :param y_current:
-        :param previous_routing_entry:
-        :param graph:
-        :param edge:
-        :type edge:
-        :type x_neighbour:
-        :type y_neighbour:
-        :type dijkstra_tables:
-        :type neighbour_index
-        :type nodes_info:
-        :type x_current:
-        :type y_current:
-        :type graph:
-        :type previous_routing_entry:
-        :return x_current, y_current, previous_routing_entry, made_an_entry
+        :return: x_current, y_current, previous_routing_entry, made_an_entry
         :rtype: int, int, spinn_machine.multicast_routing_entry, bool
         :raise PacmanRoutingException: when the bandwidth of a router is\
                 beyond expected parameters
