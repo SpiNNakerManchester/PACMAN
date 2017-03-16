@@ -1,9 +1,8 @@
-from abc import ABCMeta
 from six import add_metaclass
-from abc import abstractmethod
 
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractHasGlobalMaxAtoms(object):
     """ Indicates an application vertex which has a global max atoms per core
     """

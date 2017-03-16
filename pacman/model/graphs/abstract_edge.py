@@ -1,8 +1,8 @@
 from six import add_metaclass
-from abc import ABCMeta, abstractproperty
 
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractEdge(object):
     """ A directed edge in a graph between two vertices
     """

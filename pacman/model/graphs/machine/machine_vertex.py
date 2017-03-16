@@ -1,9 +1,9 @@
-from abc import abstractproperty, ABCMeta
 from six import add_metaclass
+
 from pacman.model.graphs import AbstractVertex
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
-
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class MachineVertex(AbstractVertex):
     """ A simple implementation of a machine vertex
     """

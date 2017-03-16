@@ -1,10 +1,9 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
 from pacman.exceptions import PacmanConfigurationException
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractAlgorithm(object):
     """ Represents the metadata for an algorithm
     """

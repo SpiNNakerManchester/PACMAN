@@ -1,15 +1,15 @@
 from pacman.exceptions import PacmanInvalidParameterException
-from abc import ABCMeta
 from six import add_metaclass
 from pacman.model.constraints.abstract_constraint \
     import AbstractConstraint
+from spinn_utilities.abstract_base import AbstractBase
 
 
 def _get_class_name(cls):
     return "{}.{}".format(cls.__module__, cls.__name__)
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class ConstrainedObject(object):
     """ An implementation of an object which holds constraints
     """

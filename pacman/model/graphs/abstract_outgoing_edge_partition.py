@@ -1,9 +1,9 @@
 from six import add_metaclass
-from abc import ABCMeta, abstractmethod, abstractproperty
+
 from pacman.model.graphs.common.constrained_object import ConstrainedObject
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod, abstractproperty
 
-
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractOutgoingEdgePartition(ConstrainedObject):
     """ A group of edges that start at the same vertex and share the same\
         semantics; used to group edges that can use the same multicast key

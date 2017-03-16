@@ -1,9 +1,8 @@
-from abc import ABCMeta
-from abc import abstractmethod
 from six import add_metaclass
 
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractMachinePartitionNKeysMap(object):
     """ A map that provides the number of keys required by each partition
     """

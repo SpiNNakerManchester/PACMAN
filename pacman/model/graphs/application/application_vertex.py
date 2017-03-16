@@ -1,4 +1,3 @@
-from abc import abstractmethod, abstractproperty, ABCMeta
 from six import add_metaclass
 import sys
 
@@ -6,9 +5,10 @@ from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.graphs import AbstractVertex
+from spinn_utilities.abstract_base import abstractmethod, abstractproperty, AbstractBase
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class ApplicationVertex(AbstractVertex):
     """ A vertex that can be broken down into a number of smaller vertices
         based on the resources that the vertex requires
