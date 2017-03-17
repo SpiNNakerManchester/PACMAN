@@ -1,14 +1,16 @@
 from six import add_metaclass
 
 from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.common.constrained_object import ConstrainedObject
+
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 @add_metaclass(AbstractBase)
-class MachineVertex(AbstractVertex):
+class MachineVertex(AbstractVertex, ConstrainedObject):
     """ A simple implementation of a machine vertex
     """
 
-    __slots__ = []
+    __slots__ = ("_label")
 
     def __init__(self, label=None, constraints=None):
         """
@@ -21,7 +23,10 @@ class MachineVertex(AbstractVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
         """
-        AbstractVertex.__init__(self, label, constraints)
+        ConstrainedObject.__init__(self, constraints)
+        self._label = label
+
+
 
     def __str__(self):
         l = self.label
