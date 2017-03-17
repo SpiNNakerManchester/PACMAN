@@ -12,7 +12,6 @@ from pacman.utilities.utility_objs.timer import Timer
 # general imports
 import logging
 import os
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +108,7 @@ class PACMANAlgorithmExecutor(object):
         self._inputs = inputs
 
         # define mapping between types and internal values
-        self._internal_type_mapping = defaultdict()
+        self._internal_type_mapping = dict()
 
         # store timing request
         self._do_timing = do_timings
@@ -483,9 +482,7 @@ class PACMANAlgorithmExecutor(object):
                     returned
         :return: the returned item
         """
-        if item_type not in self._internal_type_mapping:
-            return None
-        return self._internal_type_mapping[item_type]
+        return self._internal_type_mapping.get(item_type)
 
     def get_items(self):
         """ Get all the outputs from a execution
