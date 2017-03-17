@@ -5,16 +5,18 @@ from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.common.constrained_object import ConstrainedObject
+
 from spinn_utilities.abstract_base import abstractmethod, abstractproperty, AbstractBase
 
 
 @add_metaclass(AbstractBase)
-class ApplicationVertex(AbstractVertex):
+class ApplicationVertex(AbstractVertex, ConstrainedObject):
     """ A vertex that can be broken down into a number of smaller vertices
         based on the resources that the vertex requires
     """
 
-    __slots__ = []
+    __slots__ = ("_label")
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxint):
@@ -32,7 +34,9 @@ class ApplicationVertex(AbstractVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:\
                     * If one of the constraints is not valid
         """
-        AbstractVertex.__init__(self, label, constraints)
+
+        ConstrainedObject.__init__(self, constraints)
+        self._label = label
 
         # add a constraint for max partitioning
         self.add_constraint(
