@@ -1,7 +1,7 @@
 # pacman imports
 from pacman import exceptions
 from pacman import operations
-from pacman.executor import injection_decorator
+from pacman.executor.injection_decorator import injection_context, do_injection
 from pacman.executor.algorithm_decorators import algorithm_decorator
 from pacman.executor.algorithm_metadata_xml_reader \
     import AlgorithmMetadataXmlReader
@@ -12,7 +12,6 @@ from pacman.utilities.utility_objs.timer import Timer
 # general imports
 import logging
 import os
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +108,7 @@ class PACMANAlgorithmExecutor(object):
         self._inputs = inputs
 
         # define mapping between types and internal values
-        self._internal_type_mapping = defaultdict()
+        self._internal_type_mapping = dict()
 
         # store timing request
         self._do_timing = do_timings
@@ -406,7 +405,6 @@ class PACMANAlgorithmExecutor(object):
 
         # Find the next algorithm which can run now
         for algorithm in algorithm_list:
-
             # check all inputs
             all_inputs_match = True
             for input_parameter in algorithm.required_inputs:
@@ -416,13 +414,11 @@ class PACMANAlgorithmExecutor(object):
 
             # verify that a new output is being generated.
             if all_inputs_match:
-
                 # If the list of generated outputs is given, only use the
                 # algorithm if it generates something new, assuming the
                 # algorithm generates any outputs at all
                 # (otherwise just use it)
-                if (len(algorithm.outputs) > 0 and
-                        generated_outputs is not None):
+                if algorithm.outputs and generated_outputs is not None:
                     for output in algorithm.outputs:
                         if (output.output_type not in generated_outputs and
                                 output.output_type not in inputs):
@@ -440,48 +436,44 @@ class PACMANAlgorithmExecutor(object):
         """
         self._internal_type_mapping.update(self._inputs)
         if self._do_direct_injection:
-            injection_decorator.provide_injectables(
-                self._internal_type_mapping)
+            with injection_context(self._internal_type_mapping):
+                self._execute_mapping()
+        else:
+            self._execute_mapping()
+
+    def _execute_mapping(self):
         if self._inject_inputs and self._do_immediate_injection:
-            injection_decorator.do_injection(self._inputs)
+            do_injection(self._inputs)
         new_outputs = dict()
+        for algorithm in self._algorithms:
+            # set up timer
+            timer = None
+            if self._do_timing:
+                timer = Timer()
+                timer.start_timing()
 
-        try:
-            for algorithm in self._algorithms:
+            # Execute the algorithm
+            results = algorithm.call(self._internal_type_mapping)
 
-                # set up timer
-                timer = None
-                if self._do_timing:
-                    timer = Timer()
-                    timer.start_timing()
+            # handle_prov_data
+            if self._do_timing:
+                self._update_timings(timer, algorithm)
 
-                # Execute the algorithm
-                results = algorithm.call(self._internal_type_mapping)
+            if results is not None:
+                self._internal_type_mapping.update(results)
+                if self._do_immediate_injection and not self._inject_inputs:
+                    new_outputs.update(results)
 
-                # handle_prov_data
-                if self._do_timing:
-                    self._update_timings(timer, algorithm)
+            # Do injection with the outputs produced
+            if self._do_immediate_injection:
+                do_injection(results)
 
-                if results is not None:
-                    self._internal_type_mapping.update(results)
-                    if (self._do_immediate_injection and
-                            not self._inject_inputs):
-                        new_outputs.update(results)
-
-                # Do injection with the outputs produced
-                if self._do_immediate_injection and results is not None:
-                    injection_decorator.do_injection(results)
-
-            # Do injection with all the outputs
-            if self._do_post_run_injection:
-                if self._inject_inputs:
-                    injection_decorator.do_injection(
-                        self._internal_type_mapping)
-                else:
-                    injection_decorator.do_injection(new_outputs)
-        finally:
-            if self._do_direct_injection:
-                injection_decorator.clear_injectables()
+        # Do injection with all the outputs
+        if self._do_post_run_injection:
+            if self._inject_inputs:
+                do_injection(self._internal_type_mapping)
+            else:
+                do_injection(new_outputs)
 
     def get_item(self, item_type):
         """ Get an item from the outputs of the execution
@@ -490,10 +482,7 @@ class PACMANAlgorithmExecutor(object):
                     returned
         :return: the returned item
         """
-        if item_type not in self._internal_type_mapping:
-            return None
-        else:
-            return self._internal_type_mapping[item_type]
+        return self._internal_type_mapping.get(item_type)
 
     def get_items(self):
         """ Get all the outputs from a execution
