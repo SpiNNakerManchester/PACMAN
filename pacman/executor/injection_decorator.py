@@ -115,7 +115,7 @@ def inject_items(types):
                         "Argument {} was already provided to"
                         " method {} of {}".format(
                             arg, wrapped_method.__name, obj.__class__))
-                new_args[arg] = _injectables.get(arg_type)
+                new_args[arg] = _injectables[arg_type]
             return wrapped_method(obj, *args, **new_args)
         return wrapper
     return wrap
@@ -140,11 +140,11 @@ def clear_injectables():
 
 
 class _DictFacade(dict):
-    def __init__(self, *dicts):
-        self.dicts = dicts
+    def __init__(self, dicts):
+        self._dicts = dicts
 
     def __getitem__(self, key):
-        for d in self.dicts:
+        for d in self._dicts:
             try:
                 return d.__getitem__(key)
             except KeyError:
@@ -152,7 +152,7 @@ class _DictFacade(dict):
         raise KeyError(key)
 
     def __contains__(self, item):
-        for d in self.dicts:
+        for d in self._dicts:
             if item in d:
                 return True
         return False
@@ -160,20 +160,20 @@ class _DictFacade(dict):
 
 class injection_context(object):
     def __init__(self, injection_dictionary):
-        self.old = None
-        self.mine = injection_dictionary
+        self._old = None
+        self._mine = injection_dictionary
 
     def __enter__(self):
         global _injectables
-        dicts = [self.mine]
+        dicts = [self._mine]
         if _injectables is not None:
             dicts.append(_injectables)
-        self.old = _injectables
-        _injectables = _DictFacade(*dicts)
+        self._old = _injectables
+        _injectables = _DictFacade(dicts)
 
     def __exit__(self, a, b, c):
         global _injectables
-        _injectables = self.old
+        _injectables = self._old
         return False
 
 
