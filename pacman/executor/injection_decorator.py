@@ -140,8 +140,22 @@ def clear_injectables():
 
 
 class _DictFacade(dict):
+    """ Provides a dict of dict overlay so that container-ship is True if any\
+        one of the dict objects contains the items and the item is returned\
+        from the first dict
+    """
     def __init__(self, dicts):
+        """
+
+        :param dicts: An iterable of dict objects to be used
+        """
         self._dicts = dicts
+
+    def get(self, key, default=None):
+        for d in self._dicts:
+            if key in d:
+                return d[key]
+        return default
 
     def __getitem__(self, key):
         for d in self._dicts:
@@ -159,7 +173,15 @@ class _DictFacade(dict):
 
 
 class injection_context(object):
+    """ Provides a context for injection to use with "with"
+    """
+
     def __init__(self, injection_dictionary):
+        """
+
+        :param injection_dictionary:\
+            The dictionary of items to inject whilst in the context
+        """
         self._old = None
         self._mine = injection_dictionary
 
