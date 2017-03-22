@@ -3,7 +3,8 @@ import math
 
 from pacman.model.resources import ElementFreeSpace
 from pacman import exceptions
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import AbstractBase
+
 
 @add_metaclass(AbstractBase)
 class ElementAllocatorAlgorithm(object):

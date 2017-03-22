@@ -5,6 +5,7 @@ from pacman.model.graphs.common.constrained_object import ConstrainedObject
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
+
 @add_metaclass(AbstractBase)
 class MachineVertex(AbstractVertex, ConstrainedObject):
     """ A simple implementation of a machine vertex
@@ -25,8 +26,6 @@ class MachineVertex(AbstractVertex, ConstrainedObject):
         """
         ConstrainedObject.__init__(self, constraints)
         self._label = label
-
-
 
     def __str__(self):
         l = self.label

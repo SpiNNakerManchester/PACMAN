@@ -7,7 +7,8 @@ from pacman.model.constraints.partitioner_constraints.\
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common.constrained_object import ConstrainedObject
 
-from spinn_utilities.abstract_base import abstractmethod, abstractproperty, AbstractBase
+from spinn_utilities.abstract_base import \
+    abstractmethod, abstractproperty, AbstractBase
 
 
 @add_metaclass(AbstractBase)

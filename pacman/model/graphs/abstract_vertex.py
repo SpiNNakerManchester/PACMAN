@@ -1,6 +1,7 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase
+
 
 @add_metaclass(AbstractBase)
 class AbstractVertex(object):

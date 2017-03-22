@@ -2,6 +2,7 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
+
 @add_metaclass(AbstractBase)
 class AbstractEdge(object):
     """ A directed edge in a graph between two vertices
