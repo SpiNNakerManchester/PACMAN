@@ -49,6 +49,27 @@ FIXED_FIELD_NAME = \
 
 
 class VertexBasedRoutingInfoAllocator(object):
+    """ allocator of routing keys based off the vertex requirements
+
+    """
+
+    __slots__ = [
+        # the field id used for a fixed key field.
+        "_fixed_key_application_field_value",
+
+        # the field id used for a fixed mask
+        "_fixed_mask_application_field_value",
+
+        # the id used for a flexible field
+        "_flexi_field_application_field_values",
+
+        # the id used for a fixed field
+        "_fixed_field_application_field_value",
+
+        # dictionary containing all fields that have been mapped during the
+        # process
+        "_field_mapper"
+    ]
 
     def __init__(self):
 
@@ -62,23 +83,23 @@ class VertexBasedRoutingInfoAllocator(object):
         # TODO: FIX THIS BIT OF HORRIBLE CODE USAGE
         self._field_mapper = dict()
 
-    def __call__(self, partitionable_graph, graph_mapper, partitioned_graph,
+    def __call__(self, application_graph, graph_mapper, machine_graph,
                  n_keys_map):
         """
 
-        :param partitionable_graph: The partitionable graph object
-        :param graph_mapper: the mapping between the partitionable and\
-                    partitioned graph
-        :param partitioned_graph: the partitioned graph
+        :param application_graph: The application graph
+        :param graph_mapper: the mapping between graphs
+        :param machine_graph: the machine graph
         :param n_keys_map: the mapping between edges and n keys
         :return: routing information objects
         """
-        progress_bar = ProgressBar(len(partitioned_graph.partitions) * 3,
-                                   "Allocating routing keys")
+        progress_bar = ProgressBar(
+            machine_graph.n_outgoing_edge_partitions * 3,
+            "Allocating routing keys")
 
         # ensure groups are stable and correct
         self._determine_groups(
-            partitioned_graph, graph_mapper, partitionable_graph, n_keys_map,
+            machine_graph, graph_mapper, application_graph, n_keys_map,
             progress_bar)
 
         # define the key space
@@ -86,8 +107,8 @@ class VertexBasedRoutingInfoAllocator(object):
         field_positions = set()
 
         # locate however many types of constraints there are
-        seen_fields = field_utilities.deduce_types(partitioned_graph)
-        progress_bar.update(len(partitioned_graph.partitions))
+        seen_fields = field_utilities.deduce_types(machine_graph)
+        progress_bar.update(machine_graph.n_outgoing_edge_partitions)
 
         if len(seen_fields) > 1:
             self._adds_application_field_to_the_fields(seen_fields)
@@ -108,7 +129,7 @@ class VertexBasedRoutingInfoAllocator(object):
         seen_mask_instances = 0
 
         # extract keys and masks for each edge from the bitfield
-        for partition in partitioned_graph.partitions:
+        for partition in machine_graph.outgoing_edge_partitions:
             # get keys and masks
             keys_and_masks, seen_mask_instances = \
                 self._extract_keys_and_masks_from_bit_field(
@@ -123,8 +144,7 @@ class VertexBasedRoutingInfoAllocator(object):
             progress_bar.update()
         progress_bar.end()
 
-        return {'routing_infos': routing_info,
-                'fields': field_positions}
+        return routing_info, field_positions
 
     def _assign_flexi_field_positions(
             self, bit_field_space, seen_fields, field_positions):
@@ -134,7 +154,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :param seen_fields: the fields been seen
         :param field_positions: the set of fields that have been allocated\
                     over the entire key space
-        :return: None
+        :rtype: None
         """
 
         # locate the application field if it exists
@@ -190,7 +210,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
         :param seen_fields: the types of fields needed to get this simulation\
                     operating correctly
-        :return: None
         """
 
         application_field = None
@@ -208,12 +227,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _fixed_key_application_field_allocation(
             self, seen_fields, required_bits):
-        """
-
-        :param seen_fields:
-        :param required_bits:
-        :return:
-        """
         fixed_keys = seen_fields[FIXED_KEY_NAME]
         if len(fixed_keys) == 1:
             found = False
@@ -331,8 +344,8 @@ class VertexBasedRoutingInfoAllocator(object):
         :param seen_fields:
         :param application_field:
         :param required_bits:
-        :return: bool true if it was able to adjust to the field,
-        false otherwise
+        :return: bool true if it was able to adjust to the field,\
+            false otherwise
         """
         fixed_mask_masks = \
             seen_fields[FIXED_MASK_NAME]
@@ -909,7 +922,7 @@ class VertexBasedRoutingInfoAllocator(object):
                 if application_field is not None:
 
                     # create a new bit field where everything is linked off a
-                    # sub internal app field
+                    # internal app field
                     internal_value = application_field_spare_values[0]
                     application_field_spare_values.remove(internal_value)
                     internal_bit_field_space = \
@@ -988,7 +1001,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :param bit_field_space: the bit field space
         :param field: the field that needs placing into the bitfield space
         :param fields: ???????
-        :return: None
+        :rtype: None
         """
 
         # field must be a flexible field, work accordingly
@@ -1019,21 +1032,12 @@ class VertexBasedRoutingInfoAllocator(object):
                     self._create_internal_field_space(
                         bit_field_space, value, field_instance)
 
-    def _determine_groups(self, subgraph, graph_mapper, partitionable_graph,
+    def _determine_groups(self, machine_graph, graph_mapper, graph,
                           n_keys_map, progress_bar):
-        """
-
-        :param subgraph:
-        :param graph_mapper:
-        :param partitionable_graph:
-        :param n_keys_map:
-        :return:
-        """
-
         routing_info_allocator_utilities.check_types_of_edge_constraint(
-            subgraph)
+            machine_graph)
 
-        for partition in subgraph.partitions:
+        for partition in machine_graph.outgoing_edge_partitions:
             fixed_key_constraints = \
                 utility_calls.locate_constraints_of_type(
                     partition.constraints,
@@ -1051,7 +1055,7 @@ class VertexBasedRoutingInfoAllocator(object):
                     len(fixed_mask_constraints) == 0 and
                     len(fixed_field_constraints) == 0):
                 self.add_field_constraints(
-                    partition, graph_mapper, partitionable_graph, n_keys_map)
+                    partition, graph_mapper, graph, n_keys_map)
             progress_bar.update()
 
     @staticmethod
@@ -1101,12 +1105,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     @staticmethod
     def _deduce_key_value_for_field(key, fixed_key_field):
-        """
-
-        :param key:
-        :param fixed_key_field:
-        :return:
-        """
         new_key = key >> fixed_key_field.lo
         mask = int(math.pow(2, ((fixed_key_field.hi -
                                  fixed_key_field.lo) + 1))) - 1
@@ -1154,66 +1152,49 @@ class VertexBasedRoutingInfoAllocator(object):
 
     @staticmethod
     def add_field_constraints(
-            partition, graph_mapper, partitionable_graph, n_keys_map):
-        """ Search though the subgraph adding field constraints for the key\
+            partition, graph_mapper, graph, n_keys_map):
+        """ Search though the graph adding field constraints for the key\
                     allocator
 
-        :param partition:
-        :param graph_mapper:
-        :param partitionable_graph:
-        :param n_keys_map:
-        :return:
         """
 
         fields = list()
 
-        verts = list(partitionable_graph.vertices)
-        subvert = partition.edges[0].pre_subvertex
-        vertex = graph_mapper.get_vertex_from_subvertex(subvert)
-        subverts = list(graph_mapper.get_subvertices_from_vertex(vertex))
+        verts = list(graph.vertices)
+        vertex = partition.pre_vertex
+        app_vertex = graph_mapper.get_application_vertex(vertex)
+        vertices = list(graph_mapper.get_machine_vertices(app_vertex))
 
         # pop based flexible field
         fields.append(FlexiField(
-            flexi_field_name="Population", value=verts.index(vertex),
+            flexi_field_name="Population", value=verts.index(app_vertex),
             tag=SUPPORTED_TAGS.ROUTING.name, nested_level=0))
 
-        # sub pop flexible field
+        # part-population flexible field
         fields.append(FlexiField(
-            flexi_field_name="SubPopulation{}".format(verts.index(vertex)),
-            tag=SUPPORTED_TAGS.ROUTING.name, value=subverts.index(subvert),
+            flexi_field_name="PartPopulation{}".format(
+                verts.index(app_vertex)),
+            tag=SUPPORTED_TAGS.ROUTING.name, value=vertices.index(vertex),
             nested_level=1))
 
         fields.append(FlexiField(
-            flexi_field_name="POP({}:{})Keys"
-            .format(verts.index(vertex), subverts.index(subvert)),
+            flexi_field_name="POP({}:{})Keys".format(
+                verts.index(app_vertex), vertices.index(vertex)),
             tag=SUPPORTED_TAGS.APPLICATION.name,
             instance_n_keys=n_keys_map.n_keys_for_partition(partition),
             nested_level=2))
 
-        # add constraint to the subedge
+        # add constraint to the edge
         partition.add_constraint(KeyAllocatorFlexiFieldConstraint(fields))
 
     @staticmethod
     def _create_internal_field_space(higher_space, field_value, field):
-        """
-
-        :param higher_space:
-        :param field_value:
-        :param field:
-        :return:
-        """
         inputs = dict()
         inputs[field.name] = field_value
         return higher_space(**inputs)
 
     @staticmethod
     def _locate_field_value_by_name(field_list, field_name):
-        """
-
-        :param field_list:
-        :param field_name:
-        :return:
-        """
         for field in field_list:
             if field.name == field_name:
                 return field.value

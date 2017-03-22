@@ -1,23 +1,27 @@
 # pacman model imports
+from pacman.model.graphs.application.impl.application_edge \
+    import ApplicationEdge
+from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.machine.impl.simple_machine_vertex \
+    import SimpleMachineVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
+
+from pacman.exceptions import PacmanRoutingException
+from pacman.model.graphs.application.impl.application_graph \
+    import ApplicationGraph
+from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
+from pacman.model.placements.placement import Placement
+from pacman.model.placements.placements import Placements
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.exceptions import PacmanRoutingException
-from pacman.model.partitioned_graph.abstract_partitioned_edge import AbstractPartitionedEdge
-from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
+from pacman.model.routing_info.partition_routing_info \
+    import PartitionRoutingInfo
 from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.partition_routing_info import PartitionRoutingInfo
-from pacman.model.partitionable_graph.abstract_partitionable_edge \
-    import AbstractPartitionableEdge
-from pacman.model.partitionable_graph.partitionable_graph \
-    import PartitionableGraph
-from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
+
 # pacman utility imports
-from pacman.utilities import constants
+from pacman.utilities.constants import DEFAULT_MASK
 # pacman operations imports
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
@@ -31,8 +35,8 @@ from spinn_machine.machine import Machine
 
 import unittest
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
-    AbstractPartitionableVertex
+from pacman.model.graphs.application.abstract_application_vertex import \
+    AbstractApplicationVertex
 
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
@@ -48,13 +52,10 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     return resources
 
 
-class Vertex(AbstractPartitionableVertex):
+class Vertex(AbstractApplicationVertex):
     def __init__(self, n_atoms, label):
-        AbstractPartitionableVertex.__init__(self, label=label, n_atoms=n_atoms,
-                                             max_atoms_per_core=256)
-
-    def model_name(self):
-        return "test vertex"
+        AbstractApplicationVertex.__init__(self, label=label, n_atoms=n_atoms,
+                                           max_atoms_per_core=256)
 
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 10 * (hi_atom - lo_atom)
@@ -71,35 +72,35 @@ class MyTestCase(unittest.TestCase):
         # sort out graph
         self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
-        self.edge1 = AbstractPartitionableEdge(self.vert1, self.vert2, "First edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
         self.verts = [self.vert1, self.vert2]
         self.edges = [self.edge1]
-        self.graph = PartitionableGraph("Graph", self.verts, self.edges)
-        # sort out subgraph
-        self.subgraph = PartitionedGraph()
-        self.subvert1 = PartitionedVertex(
+        self.graph = ApplicationGraph("Graph", self.verts, self.edges)
+        # sort out graph
+        self.graph = MachineGraph()
+        self.vertex1 = SimpleMachineVertex(
             0, 10, get_resources_used_by_atoms(0, 10, []))
-        self.subvert2 = PartitionedVertex(
+        self.vertex2 = SimpleMachineVertex(
             0, 5, get_resources_used_by_atoms(0, 10, []))
-        self.subedge = AbstractPartitionedEdge(self.subvert1, self.subvert2)
-        self.subgraph.add_subvertex(self.subvert1)
-        self.subgraph.add_subvertex(self.subvert2)
-        self.subgraph.add_subedge(self.subedge)
+        self.edge = MachineEdge(self.vertex1, self.vertex2)
+        self.graph.add_vertex(self.vertex1)
+        self.graph.add_vertex(self.vertex2)
+        self.graph.add_edge(self.edge, "TEST")
         # sort out placements
         self.placements = Placements()
-        self.placement1 = Placement(x=0, y=0, p=2, subvertex=self.subvert1)
-        self.placement2 = Placement(x=1, y=1, p=2, subvertex=self.subvert2)
+        self.placement1 = Placement(x=0, y=0, p=2, vertex=self.vertex1)
+        self.placement2 = Placement(x=1, y=1, p=2, vertex=self.vertex2)
         self.placements.add_placement(self.placement1)
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.subedge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               subedge=self.subedge)
-        self.routing_info.add_partition_info(self.subedge_routing_info1)
+        self.edge_routing_info1 = \
+            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
+                                 edge=self.edge)
+        self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -126,7 +127,7 @@ class MyTestCase(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def set_up_4_node_board(self):
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -165,7 +166,7 @@ class MyTestCase(unittest.TestCase):
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=self.placements,
-            partitioned_graph=self.subgraph,
+            machine_graph=self.graph,
             routing_info_allocation=self.routing_info)
         for entry in routing_tables.routing_tables:
             print entry.x, entry.y
@@ -180,7 +181,7 @@ class MyTestCase(unittest.TestCase):
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=self.placements,
-            partitioned_graph=self.subgraph,
+            machine_graph=self.graph,
             routing_info_allocation=self.routing_info)
 
         for entry in routing_tables.routing_tables:
@@ -194,7 +195,7 @@ class MyTestCase(unittest.TestCase):
     def test_bad_machine_setup(self):
         # create machine
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -224,29 +225,29 @@ class MyTestCase(unittest.TestCase):
         with self.assertRaises(PacmanRoutingException):
             dijkstra_router.route(
                 machine=self.machine, placements=self.placements,
-                partitioned_graph=self.subgraph,
+                machine_graph=self.graph,
                 routing_info_allocation=self.routing_info)
 
     @unittest.skip("demonstrating skipping")
     def test_routing_on_chip_custom_4_node_machine(self):
         self.placements = Placements()
-        self.placement1 = Placement(x=1, y=0, p=2, subvertex=self.subvert1)
-        self.placement2 = Placement(x=1, y=0, p=3, subvertex=self.subvert2)
+        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
+        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
         self.placements.add_placement(self.placement1)
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.subedge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                               subedge=self.subedge)
-        self.routing_info.add_partition_info(self.subedge_routing_info1)
+        self.edge_routing_info1 = \
+            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
+                                 edge=self.edge)
+        self.routing_info.add_partition_info(self.edge_routing_info1)
 
         self.set_up_4_node_board()
 
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=self.placements,
-            partitioned_graph=self.subgraph,
+            machine_graph=self.graph,
             routing_info_allocation=self.routing_info)
 
         for entry in routing_tables.routing_tables:
@@ -259,23 +260,23 @@ class MyTestCase(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_full_machine_routing(self):
         placements = Placements()
-        self.placement1 = Placement(x=1, y=0, p=2, subvertex=self.subvert1)
-        self.placement2 = Placement(x=1, y=0, p=3, subvertex=self.subvert2)
-        subvertices = list()
-        for i in range(4 * 17): #51 atoms per each processor on 20 chips
-            subvertices.append(PartitionedVertex(
+        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
+        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
+        vertices = list()
+        for i in range(4 * 17):  # 51 atoms per each processor on 20 chips
+            vertices.append(SimpleMachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
-                "Subvertex " + str(i)))
-        subedges = list()
-        for i in range(len(subvertices)):
-            subedges.append(AbstractPartitionedEdge(
-                subvertices[i], subvertices[(i + 1)%len(subvertices)]))
-        subgraph = PartitionedGraph("Subgraph", subvertices, subedges)
+                "vertex " + str(i)))
+        edges = list()
+        for i in range(len(vertices)):
+            edges.append(MachineEdge(
+                vertices[i], vertices[(i + 1) % len(vertices)]))
+        graph = MachineGraph(vertices, edges)
         p = 1
         x = 0
         y = 0
-        for subvert in subvertices:
-            placements.add_placement(Placement(subvert, x, y, p))
+        for vertex in vertices:
+            placements.add_placement(Placement(vertex, x, y, p))
             p = (p + 1) % 18
             if p == 0:
                 p += 1
@@ -285,21 +286,20 @@ class MyTestCase(unittest.TestCase):
                     x += 1
 
         routing_info = RoutingInfo()
-        subedge_routing_info = list()
-        for i in range(len(subedges)):
-            subedge_routing_info.append(PartitionRoutingInfo(
-                subedges[i], i<<11, constants.DEFAULT_MASK))
+        edge_routing_info = list()
+        for i in range(len(edges)):
+            edge_routing_info.append(PartitionRoutingInfo(
+                edges[i], i << 11, DEFAULT_MASK))
 
-        for subedge_info in subedge_routing_info:
-            routing_info.add_partition_info(subedge_info)
-
+        for edge_info in edge_routing_info:
+            routing_info.add_partition_info(edge_info)
 
         self.set_up_4_node_board()
 
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
             machine=self.machine, placements=placements,
-            partitioned_graph=subgraph,
+            machine_graph=graph,
             routing_info_allocation=routing_info)
 
         for entry in routing_tables.routing_tables:

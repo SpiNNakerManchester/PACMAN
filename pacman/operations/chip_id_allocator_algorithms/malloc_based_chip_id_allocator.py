@@ -1,14 +1,13 @@
-
 # pacman imports
-from pacman.model.abstract_classes.abstract_virtual_vertex \
-    import AbstractVirtualVertex
+from pacman import exceptions
+from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
+from pacman.model.graphs.abstract_spinnaker_link_vertex\
+    import AbstractSpiNNakerLinkVertex
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm
 from spinn_machine.utilities.progress_bar import ProgressBar
-from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
-from pacman.model.abstract_classes.virtual_partitioned_vertex \
-    import VirtualPartitionedVertex
-from pacman import exceptions
 
 # general imports
 import logging
@@ -21,94 +20,79 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         chip ids and attempts to allocate them as requested
     """
 
+    __slots__ = [
+        # dict of [spinnaker link data] = (x,y, link data)
+        "_virtual_chips"
+    ]
+
     def __init__(self):
         ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
 
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
-    def __call__(
-            self, machine, partitionable_graph=None, partitioned_graph=None):
-        """
-
-        :param partitionable_graph:
-        :param partitioned_graph:
-        :param machine:
-        :return:
-        """
-        if partitionable_graph is not None:
+    def __call__(self, machine, graph=None):
+        if graph is not None:
 
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
-                (len(partitionable_graph.vertices) + len(list(machine.chips))),
+                graph.n_vertices + machine.n_chips,
                 "Allocating virtual identifiers")
-        elif partitioned_graph is not None:
 
-            # Go through the groups and allocate keys
-            progress_bar = ProgressBar(
-                (len(partitioned_graph.subvertices) +
-                 len(list(machine.chips))),
-                "Allocating virtual identifiers")
-        else:
-            progress_bar = ProgressBar(
-                len(list(machine.chips)), "Allocating virtual identifiers")
-
-        # allocate standard ids for real chips
-        for chip in machine.chips:
-            expected_chip_id = (chip.x << 8) + chip.y
-            self._allocate_elements(expected_chip_id, 1)
-            progress_bar.update()
-
-        if partitionable_graph is not None:
+            # allocate standard ids for real chips
+            for chip in machine.chips:
+                expected_chip_id = (chip.x << 8) + chip.y
+                self._allocate_elements(expected_chip_id, 1)
+                progress_bar.update()
 
             # allocate ids for virtual chips
-            for vertex in partitionable_graph.vertices:
+            for vertex in graph.vertices:
                 if isinstance(vertex, AbstractVirtualVertex):
-                    link = vertex.spinnaker_link_id
-                    virtual_x, virtual_y, real_x, real_y, real_link = \
-                        self._assign_virtual_chip_info(machine, link)
-                    vertex.set_virtual_chip_coordinates(
-                        virtual_x, virtual_y, real_x, real_y, real_link)
+                    link_data = None
+                    if isinstance(vertex, AbstractFPGAVertex):
+                        link_data = machine.get_fpga_link_with_id(
+                            vertex.fpga_id, vertex.fpga_link_id,
+                            vertex.board_address)
+                        if link_data is None:
+                            raise exceptions.PacmanConfigurationException(
+                                "No FPGA Link {} on FPGA {} found on board "
+                                "{}.  This would be true if another chip was "
+                                "found connected at this point".format(
+                                    vertex.fpga_link_id, vertex.fpga_id,
+                                    vertex.board_address))
+                    elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+                        link_data = machine.get_spinnaker_link_with_id(
+                            vertex.spinnaker_link_id, vertex.board_address)
+                        if link_data is None:
+                            raise exceptions.PacmanConfigurationException(
+                                "No SpiNNaker Link {} found on board "
+                                "{}.  This would be true if another chip was "
+                                "found connected at this point".format(
+                                    vertex.spinnaker_link_id,
+                                    vertex.board_address))
+                    else:
+                        raise exceptions.PacmanConfigurationException(
+                            "Unknown virtual vertex type {}".format(
+                                vertex.__class__))
+                    virtual_x, virtual_y = self._assign_virtual_chip_info(
+                        machine, link_data)
+                    vertex.set_virtual_chip_coordinates(virtual_x, virtual_y)
                 progress_bar.update()
             progress_bar.end()
-        elif partitioned_graph is not None:
 
-            # allocate ids for virtual chips
-            for vertex in partitioned_graph.subvertices:
-                if isinstance(vertex, VirtualPartitionedVertex):
-                    link = vertex.spinnaker_link_id
-                    virtual_x, virtual_y, real_x, real_y, real_link = \
-                        self._assign_virtual_chip_info(machine, link)
-                    vertex.set_virtual_chip_coordinates(
-                        virtual_x, virtual_y, real_x, real_y, real_link)
-                progress_bar.update()
-            progress_bar.end()
+        return machine
 
-        return {"machine": machine}
+    def _assign_virtual_chip_info(self, machine, link_data):
+        if link_data not in self._virtual_chips:
+            chip_id_x, chip_id_y = self._allocate_id()
+            machine_algorithm_utilities.create_virtual_chip(
+                machine, link_data, chip_id_x, chip_id_y)
+            self._virtual_chips[link_data] = (chip_id_x, chip_id_y)
 
-    def _assign_virtual_chip_info(self, machine, link):
-        if link not in self._virtual_chips:
-            try:
-                chip_id_x, chip_id_y = self._allocate_id()
-                link_data = machine_algorithm_utilities.create_virtual_chip(
-                    machine, link, chip_id_x, chip_id_y)
-                self._virtual_chips[link] = (chip_id_x, chip_id_y, link_data)
+            return chip_id_x, chip_id_y
 
-                return (
-                    chip_id_x, chip_id_y, link_data.connected_chip_x,
-                    link_data.connected_chip_y, link_data.connected_link
-                )
-            except KeyError:
-                raise exceptions.PacmanElementAllocationException(
-                    "The machine in use does not have a spinnaker link"
-                    " {}.  Please ensure that you are using a single physical"
-                    " board.".format(link))
-
-        chip_id_x, chip_id_y, link_data = self._virtual_chips[link]
-        return (
-            chip_id_x, chip_id_y, link_data.connected_chip_x,
-            link_data.connected_chip_y, link_data.connected_link
-        )
+        chip_id_x, chip_id_y = self._virtual_chips[link_data]
+        return chip_id_x, chip_id_y
 
     def _allocate_id(self):
         """ Allocate a chip id from the free space

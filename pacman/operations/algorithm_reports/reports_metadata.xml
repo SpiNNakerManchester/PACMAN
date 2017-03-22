@@ -1,8 +1,8 @@
 <algorithms>
-    <algorithm name="PlacerReportWithPartitionableGraph">
+    <algorithm name="PlacerReportWithApplicationGraph">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
-        <python_function>placer_reports_with_partitionable_graph</python_function>
-        <required_inputs>
+        <python_function>placer_reports_with_application_graph</python_function>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
@@ -13,7 +13,7 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
@@ -27,12 +27,20 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>hostname</param_name>
+            <param_name>graph</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>placements</param_name>
+            <param_name>machine</param_name>
         </required_inputs>
     </algorithm>
-    <algorithm name="PlacerReportWithoutPartitionableGraph">
+    <algorithm name="PlacerReportWithoutApplicationGraph">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
-        <python_function>placer_reports_without_partitionable_graph</python_function>
-        <required_inputs>
+        <python_function>placer_reports_without_application_graph</python_function>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
@@ -42,8 +50,8 @@
                 <param_type>IPAddress</param_type>
             </parameter>
             <parameter>
-                <param_name>sub_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
@@ -53,19 +61,26 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>hostname</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>placements</param_name>
+            <param_name>machine</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="RouterReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>router_report_from_paths</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
              <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
@@ -87,30 +102,44 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>routing_tables</param_name>
+            <param_name>routing_infos</param_name>
+            <param_name>hostname</param_name>
+            <param_name>placements</param_name>
+            <param_name>machine</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="routingInfoReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>routing_info_report</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>routing_infos</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="unCompressedRoutingTableReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>router_report_from_router_tables</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
@@ -119,12 +148,16 @@
                 <param_name>routing_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>routing_tables</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="compressedRoutingTableReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>router_report_from_compressed_router_tables</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
@@ -133,12 +166,16 @@
                 <param_name>routing_tables</param_name>
                 <param_type>MemoryCompressedRoutingTables</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>routing_tables</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="comparisonOfRoutingTablesReport">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>generate_comparison_router_report</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
@@ -151,12 +188,17 @@
                 <param_name>routing_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>compressed_routing_tables</param_name>
+            <param_name>routing_tables</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="PartitionerReport">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>partitioner_report</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
@@ -167,18 +209,24 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>hostname</param_name>
+            <param_name>graph</param_name>
+            <param_name>graph_mapper</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="TagReport">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>tag_allocator_report</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>report_folder</param_name>
                 <param_type>ReportFolder</param_type>
@@ -187,6 +235,10 @@
                 <param_name>tag_infos</param_name>
                 <param_type>MemoryTags</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>tag_infos</param_name>
         </required_inputs>
     </algorithm>
 </algorithms>

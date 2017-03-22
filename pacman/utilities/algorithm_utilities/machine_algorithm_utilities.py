@@ -6,44 +6,34 @@ from spinn_machine.router import Router
 import sys
 
 
-def create_virtual_chip(
-        machine, spinnaker_link_id, virtual_chip_x, virtual_chip_y):
-    """ Create a virtual chip as a real chip in the machine
-
-    :param virtual_vertex: virtual vertex to convert into a real chip
-    :param machine: the machine which will be adjusted
-    :return: The spinnaker link data
-    """
-
-    # Get the spinnaker link from the machine
-    spinnaker_link_data = machine.get_spinnaker_link_with_id(spinnaker_link_id)
+def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
 
     # If the chip already exists, return the data
     if machine.is_chip_at(virtual_chip_x, virtual_chip_y):
         if not machine.get_chip_at(virtual_chip_x, virtual_chip_y).virtual:
             raise Exception(
                 "Attempting to add virtual chip in place of a real chip")
-        return spinnaker_link_data
+        return
 
     # Create link to the virtual chip from the real chip
-    virtual_link_id = (spinnaker_link_data.connected_link + 3) % 6
+    virtual_link_id = (link_data.connected_link + 3) % 6
     to_virtual_chip_link = Link(
         destination_x=virtual_chip_x,
         destination_y=virtual_chip_y,
-        source_x=spinnaker_link_data.connected_chip_x,
-        source_y=spinnaker_link_data.connected_chip_y,
+        source_x=link_data.connected_chip_x,
+        source_y=link_data.connected_chip_y,
         multicast_default_from=virtual_link_id,
         multicast_default_to=virtual_link_id,
-        source_link_id=spinnaker_link_data.connected_link)
+        source_link_id=link_data.connected_link)
 
     # Create link to the real chip from the virtual chip
     from_virtual_chip_link = Link(
-        destination_x=spinnaker_link_data.connected_chip_x,
-        destination_y=spinnaker_link_data.connected_chip_y,
+        destination_x=link_data.connected_chip_x,
+        destination_y=link_data.connected_chip_y,
         source_x=virtual_chip_x,
         source_y=virtual_chip_y,
-        multicast_default_from=spinnaker_link_data.connected_link,
-        multicast_default_to=spinnaker_link_data.connected_link,
+        multicast_default_from=link_data.connected_link,
+        multicast_default_to=link_data.connected_link,
         source_link_id=virtual_link_id)
 
     # create the router
@@ -56,19 +46,16 @@ def create_virtual_chip(
     # create the processors
     processors = list()
     for virtual_core_id in range(0, 128):
-        processors.append(Processor(
-            virtual_core_id, Processor.CPU_AVAILABLE, virtual_core_id == 0))
+        processors.append(Processor(virtual_core_id))
 
     # connect the real chip with the virtual one
     connected_chip = machine.get_chip_at(
-        spinnaker_link_data.connected_chip_x,
-        spinnaker_link_data.connected_chip_y)
+        link_data.connected_chip_x,
+        link_data.connected_chip_y)
     connected_chip.router.add_link(to_virtual_chip_link)
 
     machine.add_chip(Chip(
         processors=processors, router=router_object,
-        sdram=SDRAM(total_size=0, user_base_address=0, system_base_address=0),
+        sdram=SDRAM(size=0),
         x=virtual_chip_x, y=virtual_chip_y,
         virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None))
-
-    return spinnaker_link_data

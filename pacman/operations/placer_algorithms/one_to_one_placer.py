@@ -1,26 +1,14 @@
 
 # pacman imports
-from pacman.model.constraints.abstract_constraints.\
-    abstract_placer_constraint import \
-    AbstractPlacerConstraint
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints.\
-    placer_radial_placement_from_chip_constraint import \
-    PlacerRadialPlacementFromChipConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_iptag_constraint import \
-    TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints.\
-    tag_allocator_require_reverse_iptag_constraint import \
-    TagAllocatorRequireReverseIptagConstraint
+from pacman import exceptions
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.operations.placer_algorithms import RadialPlacer
-from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from pacman import exceptions
+from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.model.constraints.placer_constraints\
+    .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+from pacman.utilities import utility_calls
 
 from spinn_machine.utilities.progress_bar import ProgressBar
 
@@ -30,224 +18,237 @@ class OneToOnePlacer(RadialPlacer):
         destination on the same chip
     """
 
-    MAX_CORES_PER_CHIP_TO_CONSIDER = 16
+    __slots__ = []
 
     def __init__(self):
         RadialPlacer.__init__(self)
 
-    def __call__(self, partitioned_graph, machine):
-
-        sorted_vertices = self._sort_vertices_for_one_to_one_connection(
-            partitioned_graph)
+    def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=partitioned_graph.subvertices,
-            supported_constraints=[
-                PlacerRadialPlacementFromChipConstraint,
-                TagAllocatorRequireIptagConstraint,
-                TagAllocatorRequireReverseIptagConstraint,
-                PlacerChipAndCoreConstraint],
-            abstract_constraint_type=AbstractPlacerConstraint)
+        self._check_constraints(
+            machine_graph.vertices,
+            additional_placement_constraints={PlacerSameChipAsConstraint})
+
+        # Get which vertices must be placed on the same chip as another vertex
+        same_chip_vertex_groups = placer_algorithm_utilities\
+            .get_same_chip_vertex_groups(machine_graph.vertices)
+        sorted_vertices = self._sort_vertices_for_one_to_one_connection(
+            machine_graph, same_chip_vertex_groups)
+
+        placements = self._do_allocation(
+            sorted_vertices, machine, same_chip_vertex_groups)
+
+        return placements
+
+    def _do_allocation(
+            self, vertices, machine, same_chip_vertex_groups):
 
         placements = Placements()
 
-        self._do_allocation(sorted_vertices, placements, machine)
-
-        return {'placements': placements}
-
-    def _do_allocation(self, ordered_subverts, placements, machine):
-
-        # Iterate over subvertices and generate placements
-        progress_bar = ProgressBar(len(ordered_subverts),
-                                   "Placing graph vertices")
+        # Iterate over vertices and generate placements
+        progress_bar = ProgressBar(
+            len(vertices), "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
+        all_vertices_placed = set()
 
-        # iterate over subverts
-        for subvertex_list in ordered_subverts:
+        # iterate over vertices
+        for vertex_list in vertices:
+
+            # ensure largest cores per chip is divisible by 2
+            # (for one to one placement)
+            max_cores_on_chip = \
+                resource_tracker.most_avilable_cores_on_a_chip()
 
             # if too many one to ones to fit on a chip, allocate individually
-            if len(subvertex_list) > self.MAX_CORES_PER_CHIP_TO_CONSIDER:
-                for subvertex in subvertex_list:
+            if len(vertex_list) > max_cores_on_chip:
+                for vertex in vertex_list:
                     self._allocate_individual(
-                        subvertex, placements, progress_bar, resource_tracker)
-            else:  # can allocate in one block
+                        vertex, placements, resource_tracker,
+                        same_chip_vertex_groups, all_vertices_placed)
+                    progress_bar.update()
+            else:
 
-                # merge constraints
-                placement_constraint, ip_tag_constraints, \
-                    reverse_ip_tag_constraints = \
-                    self._merge_constraints(subvertex_list)
-                # locate most cores on a chip
-                max_size_on_a_chip = resource_tracker.\
-                    max_available_cores_on_chips_that_satisfy(
-                        placement_constraint, ip_tag_constraints,
-                        reverse_ip_tag_constraints)
+                try:
+                    resource_and_constraint_list = [
+                        (vertex.resources_required, vertex.constraints)
+                        for vertex in vertex_list]
+                    allocations = \
+                        resource_tracker.allocate_constrained_group_resources(
+                            resource_and_constraint_list)
 
-                # if size fits block allocate, otherwise allocate individually
-                if max_size_on_a_chip < len(subvertex_list):
-
-                    # collect resource requirement
-                    resources = list()
-                    for subvert in subvertex_list:
-                        resources.append(subvert.resources_required)
-
-                    # get cores
-                    cores = resource_tracker.allocate_group(
-                        resources, placement_constraint, ip_tag_constraints,
-                        reverse_ip_tag_constraints)
-
-                    # allocate cores to subverts
-                    for subvert, (x, y, p, _, _) in zip(subvertex_list, cores):
-                        placement = Placement(subvert, x, y, p)
+                    # allocate cores to vertices
+                    for vertex, (x, y, p, _, _) in zip(
+                            vertex_list, allocations):
+                        placement = Placement(vertex, x, y, p)
                         placements.add_placement(placement)
                         progress_bar.update()
-                else:
-                    for subvertex in subvertex_list:
-                        self._allocate_individual(
-                            subvertex, placements, progress_bar,
-                            resource_tracker)
-        progress_bar.end()
+                except exceptions.PacmanValueError or \
+                        exceptions.PacmanException or \
+                        exceptions.PacmanInvalidParameterException:
 
-    @staticmethod
-    def _merge_constraints(subvertex_list):
-        merged_placement = None
-        ip_tag = list()
-        reverse_ip_tags = list()
-        for subvertex in subvertex_list:
-            place_constraints = utility_calls.locate_constraints_of_type(
-                subvertex.constraints, PlacerChipAndCoreConstraint)
-            ip_tag_constraints = utility_calls.locate_constraints_of_type(
-                subvertex.constraints, TagAllocatorRequireIptagConstraint)
-            ip_tag.extend(ip_tag_constraints)
-            reverse_ip_tag = utility_calls.locate_constraints_of_type(
-                subvertex.constraints,
-                TagAllocatorRequireReverseIptagConstraint)
-            reverse_ip_tags.extend(reverse_ip_tag)
-            if len(place_constraints) != 0:
-                for place_constraint in place_constraints:
-                    if merged_placement is None:
-                        merged_placement = place_constraint
-                    else:
-                        x_level = merged_placement.x == \
-                            place_constraint.x
-                        y_level = merged_placement.y == \
-                            place_constraint.y
-                        p_level = merged_placement.p != \
-                            place_constraint.p
-                        if not x_level or not y_level or not p_level:
-                            raise exceptions.PacmanConfigurationException(
-                                "can't handle conflicting constraints")
-        return merged_placement, ip_tag, reverse_ip_tags
+                    # If something goes wrong, try to allocate each
+                    # individually
+                    for vertex in vertex_list:
+                        self._allocate_individual(
+                            vertex, placements, resource_tracker,
+                            same_chip_vertex_groups, all_vertices_placed)
+                        progress_bar.update()
+        progress_bar.end()
+        return placements
 
     @staticmethod
     def _allocate_individual(
-            subvertex, placements, progress_bar, resource_tracker):
-        # Create and store a new placement anywhere on the board
-        (x, y, p, _, _) = resource_tracker.\
-            allocate_constrained_resources(
-                subvertex.resources_required, subvertex.constraints)
-        placement = Placement(subvertex, x, y, p)
-        placements.add_placement(placement)
-        progress_bar.update()
+            vertex, placements, resource_tracker, same_chip_vertex_groups,
+            all_vertices_placed):
+        if vertex not in all_vertices_placed:
+            vertices = same_chip_vertex_groups[vertex]
+
+            if len(vertices) > 1:
+                resources = \
+                    resource_tracker.allocate_constrained_group_resources([
+                        (vert.resources_required, vert.constraints)
+                        for vert in vertices
+                    ])
+                for (x, y, p, _, _), vert in zip(resources, vertices):
+                    placement = Placement(vert, x, y, p)
+                    placements.add_placement(placement)
+                    all_vertices_placed.add(vert)
+            else:
+                (x, y, p, _, _) = resource_tracker.\
+                    allocate_constrained_resources(
+                        vertex.resources_required, vertex.constraints)
+                placement = Placement(vertex, x, y, p)
+                placements.add_placement(placement)
+                all_vertices_placed.add(vertex)
 
     def _sort_vertices_for_one_to_one_connection(
-            self, partitioned_graph):
+            self, machine_graph, same_chip_vertex_groups):
         """
 
-        :param partitioned_graph: the partitioned graph of this application
+        :param machine_graph: the graph to place
         :return: list of sorted vertices
         """
         sorted_vertices = list()
-        found_list = list()
+        found_list = set()
 
-        # order subverts based on constraint priority
-        ordered_subverts = utility_calls.sort_objects_by_constraint_authority(
-            partitioned_graph.subvertices)
+        # order vertices based on constraint priority
+        vertices = placer_algorithm_utilities\
+            .sort_vertices_by_known_constraints(machine_graph.vertices)
 
-        for vertex in ordered_subverts:
-            incoming_edges = \
-                partitioned_graph.incoming_subedges_from_subvertex(vertex)
+        for vertex in vertices:
+            if vertex not in found_list:
 
-            # do search if not already added and has incoming edges
-            if vertex not in found_list and len(incoming_edges) != 0:
-                chip_constraint = utility_calls.locate_constraints_of_type(
-                    vertex.constraints, PlacerChipAndCoreConstraint)
+                # vertices that are one to one connected with vertex and are
+                # not forced off chip
+                connected_vertices = self._find_one_to_one_vertices(
+                    vertex, machine_graph)
 
-                # if has constraint, add first then add incoming
-                if len(chip_constraint) != 0:
-                    one_to_one_incoming_edges = list()
-                    one_to_one_incoming_edges.append(vertex)
-                    sorted_vertices.append(one_to_one_incoming_edges)
-                    found_list.append(vertex)
-                    self.check_incoming_verts(
-                        one_to_one_incoming_edges, vertex, partitioned_graph,
-                        found_list)
-                else:  # if no constraint add incoming then first
-                    one_to_one_incoming_edges = list()
-                    sorted_vertices.append(one_to_one_incoming_edges)
-                    self.check_incoming_verts(
-                        one_to_one_incoming_edges, vertex, partitioned_graph,
-                        found_list)
-                    one_to_one_incoming_edges.append(vertex)
-                    found_list.append(vertex)
+                # create list for each vertex thats connected haven't already
+                #  been seen before
+                new_list = set()
+                for found_vertex in connected_vertices:
+                    if found_vertex not in found_list:
+                        new_list.add(found_vertex)
+
+                # looks for vertices that have same chip constraints but not
+                # found by the one to one connection search.
+                same_chip_vertices = list()
+                for found_vertex in new_list:
+                    for same_chip_constrained_vertex in \
+                            same_chip_vertex_groups[found_vertex]:
+                        if same_chip_constrained_vertex not in new_list:
+                            same_chip_vertices.append(
+                                same_chip_constrained_vertex)
+
+                # add these newly found vertices to the list
+                new_list.update(same_chip_vertices)
+
+                sorted_vertices.append(new_list)
+                found_list.update(new_list)
 
         # locate vertices which have no output or input, and add them for
         # placement
-        for vertex in ordered_subverts:
+        for vertex in vertices:
             if vertex not in found_list:
-                listed_vertex = list()
-                listed_vertex.append(vertex)
-                sorted_vertices.append(listed_vertex)
+                sorted_vertices.append([vertex])
         return sorted_vertices
 
     @staticmethod
-    def check_incoming_verts(one_to_one_verts, vertex, partitioned_graph,
-                             found_list):
-        """ Adds subverts which have a one to one connection
-        :param one_to_one_verts: the list of sorted vertices
-        :param vertex: the destination vertex
-        :param partitioned_graph: the partitioned graph
-        :param found_list: the list of found vertices so far
-        :return:
+    def _find_one_to_one_vertices(vertex, graph):
+        """ Find vertices which have one to one connections with the given\
+            vertex, and where their constraints don't force them onto\
+            different chips.
+
+        :param vertex:  the vertex to use as a basis for one to one connections
+        :param graph: \
+            the graph to look for other one to one vertices
+        :return: set of one to one vertices
         """
+        x, y, _ = ResourceTracker.get_chip_and_core(vertex.constraints)
+        found_vertices = [vertex]
+        vertices_seen = {vertex}
 
-        # locate incoming edges for this vertex
-        incoming_edges = \
-            partitioned_graph.incoming_subedges_from_subvertex(vertex)
+        # look for one to ones leaving this vertex
+        outgoing = graph.get_edges_starting_at_vertex(vertex)
+        vertices_to_try = [edge.post_vertex for edge in outgoing]
+        while len(vertices_to_try) != 0:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen:
+                vertices_seen.add(next_vertex)
+                post_x, post_y, _ = ResourceTracker.get_chip_and_core(
+                    next_vertex.constraints)
+                conflict = False
+                if x is not None and post_x is not None and x != post_x:
+                    conflict = True
+                if y is not None and post_y is not None and y != post_y:
+                    conflict = True
+                edges = graph.get_edges_ending_at_vertex(next_vertex)
 
-        # locate constraints of chip and core for this vertex
-        chip_constraint = utility_calls.locate_constraints_of_type(
-            vertex.constraints, PlacerChipAndCoreConstraint)
+                if utility_calls.is_single(edges) and not conflict:
+                    found_vertices.append(next_vertex)
+                    if post_x is not None:
+                        x = post_x
+                    if post_y is not None:
+                        y = post_y
+                    outgoing = \
+                        graph.get_edges_starting_at_vertex(
+                            next_vertex)
+                    vertices_to_try.extend([
+                        edge.post_vertex for edge in outgoing
+                        if edge.post_vertex not in vertices_seen])
 
-        for incoming_edge in incoming_edges:
-            incoming_vert = incoming_edge.pre_subvertex
-            number_of_outgoing_edges = partitioned_graph.\
-                outgoing_subedges_from_subvertex(incoming_vert)
+        # look for one to ones entering this vertex
+        incoming = graph.get_edges_ending_at_vertex(
+            vertex)
+        vertices_to_try = [
+            edge.pre_vertex for edge in incoming
+            if edge.pre_vertex not in vertices_seen]
+        while len(vertices_to_try) != 0:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen:
+                vertices_seen.add(next_vertex)
+                pre_x, pre_y, _ = ResourceTracker.get_chip_and_core(
+                    next_vertex.constraints)
+                conflict = False
+                if x is not None and pre_x is not None and x != pre_x:
+                    conflict = True
+                if y is not None and pre_y is not None and y != pre_y:
+                    conflict = True
+                edges = graph.get_edges_starting_at_vertex(next_vertex)
 
-            # if only one outgoing edge, decide to put it in same chip pile
-            if (len(number_of_outgoing_edges) == 1 and
-                    incoming_vert not in found_list):
+                if utility_calls.is_single(edges) and not conflict:
+                    found_vertices.append(next_vertex)
+                    if pre_x is not None:
+                        x = pre_x
+                    if pre_y is not None:
+                        y = pre_y
+                    incoming = \
+                        graph.get_edges_ending_at_vertex(
+                            next_vertex)
+                    vertices_to_try.extend([
+                        edge.pre_vertex for edge in incoming
+                        if edge.pre_vertex not in vertices_seen])
 
-                # if the vertex has no constraint, put in
-                if len(chip_constraint) != 0:
-                    one_to_one_verts.append(incoming_vert)
-                    found_list.append(incoming_vert)
-                else:  # if constraint exists, try to satisfy constraints.
-                    chip_constraint_incoming = \
-                        utility_calls.locate_constraints_of_type(
-                            incoming_vert.constraints,
-                            PlacerChipAndCoreConstraint)
-                    if len(chip_constraint_incoming) == 0:
-                        one_to_one_verts.append(incoming_vert)
-                        found_list.append(incoming_vert)
-                    else:
-                        x_level = chip_constraint[0].x == \
-                            chip_constraint_incoming[0].x
-                        y_level = chip_constraint[0].y == \
-                            chip_constraint_incoming[0].y
-                        p_level = chip_constraint[0].p != \
-                            chip_constraint_incoming[0].p
-                        if x_level and y_level and p_level:
-                            one_to_one_verts.append(incoming_vert)
-                            found_list.append(incoming_vert)
+        return found_vertices

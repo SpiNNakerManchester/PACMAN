@@ -13,20 +13,20 @@ import jsonschema
 
 
 class ConvertToMemoryPlacements(object):
-    """ Takes the file-based placements, machine, partitioned graph and\
+    """ Takes the file-based placements, machine, machine graph and\
         constraints and builds a memory placements object
     """
 
-    def __call__(self, placements, allocations, partitioned_graph,
-                 extended_machine, constraints):
+    __slots__ = []
+
+    def __call__(self, extended_machine, placements, allocations,
+                 constraints, vertex_by_id):
         """
 
         :param placements:
         :param allocations:
-        :param partitioned_graph:
         :param extended_machine:
         :param constraints:
-        :return:
         """
 
         # load the json files
@@ -37,17 +37,16 @@ class ConvertToMemoryPlacements(object):
         self._validate_file_read_data(
             file_placements, core_allocations, constraints)
 
-        # drop the type and allocations bit of core allocations
-        # (makes lower code simpler)
-        core_allocations = core_allocations['allocations']
-
         memory_placements = Placements()
 
         # process placements
         for vertex_id in file_placements:
-            subvertex = partitioned_graph.get_subvertex_by_id(vertex_id)
-            if vertex_id not in core_allocations:
-                if subvertex is not None:
+            if str(vertex_id) in vertex_by_id:
+                vertex = vertex_by_id[str(vertex_id)]
+            else:
+                vertex = None
+            if unicode(vertex_id) not in core_allocations:
+                if vertex is not None:
 
                     # virtual chip or tag chip
                     constraints_for_vertex = self._locate_constraints(
@@ -75,26 +74,26 @@ class ConvertToMemoryPlacements(object):
 
                         # create placement
                         placements.add_placement(Placement(
-                            subvertex, destination_chip.x, destination_chip.y,
+                            vertex, destination_chip.x, destination_chip.y,
                             None))
                     else:
                         raise exceptions.PacmanConfigurationException(
                             "I don't recognise this pattern of constraints for"
                             " a vertex which does not have a placement")
             else:
-                if subvertex is None:
+                if vertex is None:
                     raise exceptions.PacmanConfigurationException(
-                        "Failed to locate the partitioned vertex in the "
-                        "partitioned graph with label {}".format(vertex_id))
+                        "Failed to locate the vertex in the "
+                        "graph with id {}".format(vertex_id))
                 else:
                     memory_placements.add_placement(
                         Placement(x=file_placements[vertex_id][0],
                                   y=file_placements[vertex_id][1],
                                   p=core_allocations[vertex_id][0],
-                                  subvertex=subvertex))
+                                  vertex=vertex))
 
         # return the file format
-        return {"placements": memory_placements}
+        return memory_placements
 
     @staticmethod
     def _load_json_files(placements, allocations, constraints):
@@ -103,7 +102,6 @@ class ConvertToMemoryPlacements(object):
         :param placements:
         :param allocations:
         :param constraints:
-        :return:
         """
 
         placments_file = open(placements, "r")
@@ -120,8 +118,9 @@ class ConvertToMemoryPlacements(object):
     def _valid_constraints_for_external_device(constraints_for_vertex):
         """ Search for the constraint pattern which represents an external\
             device
+
         :param constraints_for_vertex: constraints for a vertex
-        :return: bool
+        :rtype: bool
         """
         found_route_end_point = None
         found_placement_constraint = None
