@@ -49,6 +49,7 @@ class PacmanPartitionException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the partitioning
         :type problem: str
         """
@@ -61,6 +62,7 @@ class PacmanPlaceException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the placement
         :type problem: str
         """
@@ -73,6 +75,7 @@ class PacmanPruneException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the pruning
         :type problem: str
         """
@@ -86,6 +89,7 @@ class PacmanRouteInfoAllocationException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the allocation
         :type problem: str
         """
@@ -99,6 +103,7 @@ class PacmanElementAllocationException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the allocation
         :type problem: str
         """
@@ -111,6 +116,7 @@ class PacmanRoutingException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the routing
         :type problem: str
         """
@@ -124,6 +130,7 @@ class PacmanConfigurationException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the routing
         :type problem: str
         """
@@ -138,6 +145,7 @@ class PacmanNotExistException(PacmanException):
 
     def __init__(self, problem):
         """
+
         :param problem: The problem with the routing
         :type problem: str
         """
@@ -202,13 +210,13 @@ class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
     pass
 
 
-class PacmanSubvertexAlreadyPlacedError(ValueError):
-    """Indicates multiple placements are being made for a subvertex."""
+class PacmanAlreadyPlacedError(ValueError):
+    """Indicates multiple placements are being made for a vertex."""
     pass
 
 
-class PacmanSubvertexNotPlacedError(KeyError):
-    """Indicates no placements are made for a subvertex."""
+class PacmanNotPlacedError(KeyError):
+    """Indicates no placements are made for a vertex."""
     pass
 
 

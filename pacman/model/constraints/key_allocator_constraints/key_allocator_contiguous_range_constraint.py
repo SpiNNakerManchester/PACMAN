@@ -1,5 +1,5 @@
-from pacman.model.constraints.abstract_constraints\
-    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
@@ -8,12 +8,7 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
         space.
     """
 
-    def __init__(self):
-        AbstractKeyAllocatorConstraint.__init__(
-            self, "Key allocator constraint to ensure that keys are not split")
-
-    def is_key_allocator_constraint(self):
-        return True
+    __slots__ = []
 
     def __eq__(self, other):
         if not isinstance(other, KeyAllocatorContiguousRangeContraint):
@@ -26,3 +21,6 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
 
     def __hash__(self):
         return hash("KeyAllocatorContiguousRangeContraint")
+
+    def __repr__(self):
+        return "KeyAllocatorContiguousRangeConstraint()"

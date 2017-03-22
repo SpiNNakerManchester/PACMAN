@@ -6,6 +6,25 @@ class MulticastRoutingTable(object):
     """ Represents a routing table for a chip
     """
 
+    __slots__ = [
+        # The x-coordinate of the chip for which this is the routing table
+        "_x",
+
+        # The y-coordinate of the chip for which this is the routing tables
+        "_y",
+
+        # An iterable of routing entries to add to the table
+        "_multicast_routing_entries",
+
+        # dict of multicast routing entries.
+        # (key, mask) -> multicast_routing_entry
+        "_multicast_routing_entries_by_routing_entry_key",
+
+        # counter of how many entries in their multicast routing table are
+        # defaultable
+        "_number_of_defaulted_routing_entries"
+    ]
+
     def __init__(self, x, y, multicast_routing_entries=None):
         """
 
@@ -24,20 +43,20 @@ class MulticastRoutingTable(object):
         """
         self._x = x
         self._y = y
+        self._number_of_defaulted_routing_entries = 0
         self._multicast_routing_entries = list()
         self._multicast_routing_entries_by_routing_entry_key = OrderedDict()
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
-                self.add_mutlicast_routing_entry(multicast_routing_entry)
+                self.add_multicast_routing_entry(multicast_routing_entry)
 
-    def add_mutlicast_routing_entry(self, multicast_routing_entry):
+    def add_multicast_routing_entry(self, multicast_routing_entry):
         """ Adds a routing entry to this table
 
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:\
                     :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
@@ -54,29 +73,9 @@ class MulticastRoutingTable(object):
             multicast_routing_entry
         self._multicast_routing_entries.append(multicast_routing_entry)
 
-    def remove_multicast_routing_entry(self, multicast_routing_entry):
-        """ Remove a multicast entry from this table
-
-        :param multicast_routing_entry: The route to remove
-        :type multicast_routing_entry:\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
-        :return: None
-        :rtype: None
-        :raise pacman.exceptions.PacmanNotExistException: If a routing\
-                    entry with the same key-mask combination already exists
-        """
-        routing_entry_key = multicast_routing_entry.routing_entry_key
-        mask = multicast_routing_entry.mask
-
-        tuple_key = (routing_entry_key, mask)
-        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
-            del self._multicast_routing_entries_by_routing_entry_key[tuple_key]
-            self._multicast_routing_entries.remove(multicast_routing_entry)
-        else:
-            raise exceptions.PacmanNotExistException(
-                "Multicast_routing_entry {} does not exist, and therefore "
-                "cannot be removed from routing table {}"
-                .format(multicast_routing_entry, self))
+        # update default routed counter if required
+        if multicast_routing_entry.defaultable:
+            self._number_of_defaulted_routing_entries += 1
 
     @property
     def x(self):
@@ -111,9 +110,17 @@ class MulticastRoutingTable(object):
     def number_of_entries(self):
         """ The number of multi-cast routing entries there are in the\
             multicast routing table
-        :return:
         """
         return len(self._multicast_routing_entries)
+
+    @property
+    def number_of_defaultable_entries(self):
+        """ The number of  multi-cast routing entries that are set to be
+        defaultable within this multicast routing table
+
+        :return: int
+        """
+        return self._number_of_defaulted_routing_entries
 
     def get_multicast_routing_entry_by_routing_entry_key(
             self, routing_entry_key, mask):
@@ -145,16 +152,10 @@ class MulticastRoutingTable(object):
     def __eq__(self, other):
         if not isinstance(other, MulticastRoutingTable):
             return False
-        else:
-            if self._x != other.x and self._y != other.y:
-                return False
-            else:
-                for this_entry, other_entry in zip(
-                        list(self._multicast_routing_entries),
-                        list(other.multicast_routing_entries)):
-                    if this_entry != other_entry:
-                        return False
-                return True
+        if self._x != other.x and self._y != other.y:
+            return False
+        return self._multicast_routing_entries == \
+            other.multicast_routing_entries
 
     def __ne__(self, other):
         return not self.__eq__(other)

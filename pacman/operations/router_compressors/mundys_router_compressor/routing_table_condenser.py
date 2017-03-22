@@ -27,6 +27,8 @@ class MundyRouterCompressor(object):
     compressor from rig which has been tied into the main tool chain stack.
     """
 
+    __slots__ = []
+
     KeyMask = collections.namedtuple('KeyMask', 'key mask')
     RoutingEntry = collections.namedtuple('RoutingEntry',
                                           'key mask route defaultable')
@@ -64,7 +66,7 @@ class MundyRouterCompressor(object):
         progress_bar.end()
 
         # return
-        return {'routing_tables': compressed_pacman_router_tables}
+        return compressed_pacman_router_tables
 
     @staticmethod
     def _convert_to_mundy_format(pacman_router_table):
@@ -120,7 +122,7 @@ class MundyRouterCompressor(object):
                     len(mundy_compressed_router_table_entries)))
         for entry in mundy_compressed_router_table_entries:
 
-            table.add_mutlicast_routing_entry(
+            table.add_multicast_routing_entry(
                 MulticastRoutingEntry(
                     entry.key, entry.mask,  # Key and mask
                     ((int(c) - 6) for c in entry.route if c.is_core),  # Cores

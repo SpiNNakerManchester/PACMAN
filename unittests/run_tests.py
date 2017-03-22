@@ -4,17 +4,15 @@ runs all pacman unittest scripts
 import unittest
 
 testmodules = [
-    'model_tests.graph_mapper_tests.test_graph_subgraph_mapper',
+    'model_tests.graph_mapper_tests.test_graph_mapper',
     'model_tests.graph_mapper_tests.test_slice',
-    'model_tests.partitioned_graph_tests.test_partitioned_graph_model',
-    'model_tests.partitionable_graph_tests.test_partitionable_edge',
-    'model_tests.partitionable_graph_tests.test_partitionable_graph',
-    'model_tests.partitionable_graph_tests.test_partitionable_vertex',
+    'model_tests.machine_graph_tests.test_machine_graph_model',
+    'model_tests.application_graph_tests.test_application_edge',
+    'model_tests.application_graph_tests.test_application_graph',
+    'model_tests.application_graph_tests.test_application_vertex',
     'model_tests.placement_tests.test_placement_object',
     'model_tests.placement_tests.test_placements_model',
     'model_tests.resources_tests.test_resources_model',
-    'model_tests.routing_info_tests.test_routing_info_model',
-    'model_tests.routing_info_tests.test_subedge_routing_info',
     'model_tests.routing_table_tests.test_multi_cast_routing_entry',
     'model_tests.routing_table_tests.test_routing_tables_model',
     'model_tests.tag_tests.test_tag_infos_model',

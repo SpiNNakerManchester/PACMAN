@@ -1,7 +1,15 @@
 import datetime
 
 
-class Timer:
+class Timer(object):
+    """
+    A timer used for performance measurements
+    """
+
+    __slots__ = [
+        # The start time when the timer was set off
+        "_start_time"
+    ]
 
     def __init__(self):
         self._start_time = None

@@ -23,12 +23,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_edge_groups(partitioned_graph):
-    """ Utility method to get groups of partitioned edges using any\
+def get_edge_groups(machine_graph):
+    """ Utility method to get groups of edges using any\
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
-    :param partitioned_graph: the subgraph
+
+    :param machine_graph: the machine graph
     """
 
     # Keep a dictionary of the group which contains an edge
@@ -38,12 +39,11 @@ def get_edge_groups(partitioned_graph):
     flexi_field_groups = set()
     continuous_groups = set()
     none_continuous_groups = list()
-    for partitioned_vertex in partitioned_graph.subvertices:
+    for vertex in machine_graph.vertices:
         outgoing_edge_partitions = \
-            partitioned_graph.outgoing_edges_partitions_from_vertex(
-                partitioned_vertex)
-        for partition_id in outgoing_edge_partitions:
-            partition = outgoing_edge_partitions[partition_id]
+            machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+                vertex)
+        for partition in outgoing_edge_partitions:
 
             # assume all edges have the same constraints in them. use first one
             # to deduce which group to place it into
@@ -69,14 +69,14 @@ def get_edge_groups(partitioned_graph):
             flexi_field_groups, continuous_groups, none_continuous_groups)
 
 
-def check_types_of_edge_constraint(sub_graph):
-    """ Go through the subgraph for operations and checks that the constraints\
+def check_types_of_edge_constraint(machine_graph):
+    """ Go through the graph for operations and checks that the constraints\
         are compatible.
 
-    :param sub_graph: the subgraph to search through
-    :return:
+    :param machine_graph: the graph to search through
+    :rtype: None:
     """
-    for partition in sub_graph.partitions:
+    for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = utility_calls.locate_constraints_of_type(
             partition.constraints, KeyAllocatorFixedKeyAndMaskConstraint)
 
@@ -93,8 +93,8 @@ def check_types_of_edge_constraint(sub_graph):
                 len(fixed_mask) > 1 or len(flexi_field) > 1):
             raise exceptions.PacmanConfigurationException(
                 "There are more than one of the same constraint type on "
-                "the partition {} for edges {}. Please fix and try again."
-                .format(partition.identifer, partition.edges))
+                "the partition {} starting at {}. Please fix and try again."
+                .format(partition.identifer, partition.pre_vertex))
 
         fixed_key = len(fixed_key) == 1
         fixed_mask = len(fixed_mask) == 1
@@ -105,18 +105,18 @@ def check_types_of_edge_constraint(sub_graph):
         # merged before now
         if fixed_key and fixed_mask:
             raise exceptions.PacmanConfigurationException(
-                "The partition {} with edges {} has a fixed key and fixed "
+                "The partition {} starting at {} has a fixed key and fixed "
                 "mask constraint. These can be merged together, but is "
                 "deemed an error here"
-                .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.pre_vertex))
 
         # check for a fixed key and fixed field, as these are incompatible
         if fixed_key and fixed_field:
             raise exceptions.PacmanConfigurationException(
-                "The partition {} for edges {} has a fixed key and fixed "
+                "The partition {} starting at {} has a fixed key and fixed "
                 "field constraint. These may be merge-able together, but "
                 "is deemed an error here"
-                .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.pre_vertex))
 
         # check that a fixed mask and fixed field have compatible masks
         if fixed_mask and fixed_field:
@@ -126,10 +126,10 @@ def check_types_of_edge_constraint(sub_graph):
         # error
         if flexi_field and (fixed_mask or fixed_key or fixed_field):
             raise exceptions.PacmanConfigurationException(
-                "The partition {} for edges {} has a flexible field and "
+                "The partition {} starting at {} has a flexible field and "
                 "another fixed constraint. These maybe be merge-able, but "
                 "is deemed an error here"
-                .format(partition.identifer, partition.edges))
+                .format(partition.identifer, partition.pre_vertex))
 
 
 def _check_masks_are_correct(partition):
@@ -139,7 +139,7 @@ def _check_masks_are_correct(partition):
 
     :param partition: the outgoing_edge_partition to search for these\
                 constraints
-    :return:
+    :rtype: None:
     """
     fixed_mask = utility_calls.locate_constraints_of_type(
         partition.constraints, KeyAllocatorFixedMaskConstraint)[0]
@@ -164,14 +164,14 @@ def _check_masks_are_correct(partition):
 
 
 def get_fixed_mask(same_key_group):
-    """ Get a fixed mask from a group of partitioned edges if a\
+    """ Get a fixed mask from a group of edges if a\
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorFixedMaskConstraint`\
         constraint exists in any of the edges in the group.
 
-    :param same_key_group: Set of partitioned edges that are to be\
+    :param same_key_group: Set of edges that are to be\
                 assigned the same keys and masks
     :type same_key_group: iterable of\
-                :py:class:`pacman.model.partitioned_graph.partitioned_edge.PartitionedEdge`
+                :py:class:`pacman.model.graph.machine.abstract_machine_edge.AbstractMachineEdge`
     :return: The fixed mask if found, or None
     :raise PacmanValueError: If two edges conflict in their requirements
     """
@@ -184,7 +184,7 @@ def get_fixed_mask(same_key_group):
         for fixed_mask_constraint in fixed_mask_constraints:
             if mask is not None and mask != fixed_mask_constraint.mask:
                 raise PacmanValueError(
-                    "Two Partitioned Edges {} and {} must have the same"
+                    "Two Edges {} and {} must have the same"
                     " key and mask, but have different fixed masks,"
                     " {} and {}".format(edge, edge_with_mask, mask,
                                         fixed_mask_constraint.mask))
@@ -192,7 +192,7 @@ def get_fixed_mask(same_key_group):
                     fixed_mask_constraint.fields is not None and
                     fields != fixed_mask_constraint.fields):
                 raise PacmanValueError(
-                    "Two Partitioned Edges {} and {} must have the same"
+                    "Two Edges {} and {} must have the same"
                     " key and mask, but have different field ranges"
                     .format(edge, edge_with_mask))
             mask = fixed_mask_constraint.mask

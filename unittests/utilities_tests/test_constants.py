@@ -12,5 +12,6 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.EDGES.SOUTH_WEST.value, 4)
         self.assertEqual(constants.EDGES.SOUTH.value, 5)
 
+
 if __name__ == '__main__':
     unittest.main()

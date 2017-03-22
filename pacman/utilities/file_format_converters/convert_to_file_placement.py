@@ -11,6 +11,8 @@ class ConvertToFilePlacement(object):
     """ Converts memory placements to file placements
     """
 
+    __slots__ = []
+
     def __call__(self, placements, file_path):
         """
 
@@ -20,20 +22,23 @@ class ConvertToFilePlacement(object):
         """
 
         # write basic stuff
-        json_placement_dictory_rep = dict()
+        json_placement_directory_rep = dict()
+        vertex_by_id = dict()
 
-        progress_bar = ProgressBar(len(placements.placements) + 1,
+        progress_bar = ProgressBar(len(list(placements.placements)) + 1,
                                    "converting to json placements")
 
         # process placements
         for placement in placements:
-            json_placement_dictory_rep[placement.subvertex.label] = \
-                [placement.x, placement.y]
+            vertex_id = str(id(placement.vertex))
+            vertex_by_id[vertex_id] = placement.vertex
+            json_placement_directory_rep[vertex_id] = [
+                placement.x, placement.y]
             progress_bar.update()
 
         # dump dict into json file
         file_to_write = open(file_path, "w")
-        json.dump(json_placement_dictory_rep, file_to_write)
+        json.dump(json_placement_directory_rep, file_to_write)
         file_to_write.close()
 
         # validate the schema
@@ -45,10 +50,10 @@ class ConvertToFilePlacement(object):
         placements_schema = json.load(file_to_read)
 
         jsonschema.validate(
-            json_placement_dictory_rep, placements_schema)
+            json_placement_directory_rep, placements_schema)
 
         progress_bar.update()
         progress_bar.end()
 
         # return the file format
-        return {"FilePlacements": file_path}
+        return file_path, vertex_by_id
