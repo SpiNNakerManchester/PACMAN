@@ -33,15 +33,15 @@ ROUTING_MASK_BIT = 1
 START_OF_ROUTING_KEY_POSITION = 0
 
 
-def deduce_types(subgraph):
+def deduce_types(graph):
     """
     deducing the number of applications required for this key space
-    :param subgraph:
-    :return:
+
+    :param graph:
     """
     seen_fields = dict()
     known_fields = list()
-    for partition in subgraph.partitions:
+    for partition in graph.outgoing_edge_partitions:
         for constraint in partition.constraints:
             if not isinstance(constraint,
                               KeyAllocatorContiguousRangeContraint):
@@ -84,7 +84,7 @@ def handle_flexi_field(constraint, seen_fields, known_fields):
     :param constraint:
     :param seen_fields:
     :param known_fields:
-    :return:
+    :rtype: None:
     """
     # set the level of search
     current_level = seen_fields
@@ -130,7 +130,6 @@ def convert_mask_into_fields(entity):
     """
 
     :param entity:
-    :return:
     """
     results = list()
     expanded_mask = utility_calls.expand_to_bit_array(entity)

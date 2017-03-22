@@ -1,6 +1,5 @@
-from pacman.model.constraints.abstract_constraints\
-    .abstract_key_allocator_constraint import \
-    AbstractKeyAllocatorConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.partition_routing_info \
@@ -14,37 +13,28 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class DestinationBasedRoutingInfoAllocator(object):
-    """ An algorithm that can produce routing keys and masks for\
-        edges in a partitioned_graph based on the x,y,p of the placement\
-        of the receiving partitioned vertex.
-        Note that no constraints are supported, and that the number of keys\
-        required by each edge must be 2048 or less, and that all edges coming\
-        out of a vertex going to the same destination need to reside\
-        in the same partition.
+    """ A routing key allocator that operates for people who wish to have a
+     separate key for each destination (making a mc into a point-to-point cast.
     """
+
+    __slots__ = []
 
     MAX_KEYS_SUPPORTED = 2048
     MASK = 0xFFFFF800
 
-    def __call__(self, subgraph, placements, n_keys_map, routing_paths):
+    def __call__(self, machine_graph, placements, n_keys_map):
         """
-        Allocates routing information to the partitioned edges in a\
-        partitioned graph
 
-        :param subgraph: The partitioned graph to allocate the routing info for
-        :type subgraph:\
-                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-        :param placements: The placements of the subvertices
+        :param machine_graph: The graph to allocate the routing info for
+        :type machine_graph:\
+            :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+        :param placements: The placements of the vertices
         :type placements:\
                     :py:class:`pacman.model.placements.placements.Placements`
-        :param n_keys_map: A map between the partitioned edges and the number\
+        :param n_keys_map: A map between the edges and the number\
                     of keys required by the edges
         :type n_keys_map:\
-                    :py:class:`pacman.model.routing_info.abstract_partitioned_edge_n_keys_map.AbstractPartitionedEdgeNKeysMap`
-        :param routing_paths: the paths each partitioned edge takes to get\
-                from source to destination.
-        :type routing_paths:
-            :py:class:`pacman.model.routing_paths.multicast_routing_paths.MulticastRoutingPaths
+                    :py:class:`pacman.model.routing_info.abstract_machine_partition_n_keys_map.AbstractMachinePartitionNKeysMap`
         :return: The routing information
         :rtype: :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`,
                 :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
@@ -53,39 +43,43 @@ class DestinationBasedRoutingInfoAllocator(object):
         """
 
         # check that this algorithm supports the constraints put onto the
-        # partitioned_edges
+        # partitions
         supported_constraints = []
         utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=subgraph.subedges,
+            constrained_vertices=machine_graph.partitions,
             supported_constraints=supported_constraints,
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-        # take each subedge and create keys from its placement
-        progress_bar = ProgressBar(len(subgraph.subedges),
-                                   "Allocating routing keys")
+        # take each edge and create keys from its placement
+        progress_bar = ProgressBar(
+            machine_graph.n_outgoing_edge_partitions,
+            "Allocating routing keys")
         routing_infos = RoutingInfo()
         routing_tables = MulticastRoutingTables()
 
-        for subedge in subgraph.subedges:
-            destination = subedge.post_subvertex
-            placement = placements.get_placement_of_subvertex(destination)
-            key = self._get_key_from_placement(placement)
-            keys_and_masks = list([BaseKeyAndMask(base_key=key,
-                                                  mask=self.MASK)])
-            n_keys = n_keys_map.n_keys_for_partitioned_edge(subedge)
-            if n_keys > self.MAX_KEYS_SUPPORTED:
-                raise exceptions.PacmanConfigurationException(
-                    "Only edges which require less than {} keys are supported"
-                    .format(self.MAX_KEYS_SUPPORTED))
+        for partition in machine_graph.outgoing_edge_partitions:
+            for edge in partition.edges:
+                destination = edge.post_vertex
+                placement = placements.get_placement_of_vertex(destination)
+                key = self._get_key_from_placement(placement)
+                keys_and_masks = list([BaseKeyAndMask(base_key=key,
+                                                      mask=self.MASK)])
+                partition = machine_graph\
+                    .get_outgoing_edge_partition_starting_at_vertex(
+                        edge.pre_vertex)
+                n_keys = n_keys_map.n_keys_for_partition(partition)
+                if n_keys > self.MAX_KEYS_SUPPORTED:
+                    raise exceptions.PacmanConfigurationException(
+                        "Only edges which require less than {} keys are"
+                        " supported".format(self.MAX_KEYS_SUPPORTED))
 
-            partition_info = PartitionRoutingInfo(keys_and_masks, subedge)
-            routing_infos.add_partition_info(partition_info)
+                partition_info = PartitionRoutingInfo(keys_and_masks, edge)
+                routing_infos.add_partition_info(partition_info)
 
             progress_bar.update()
         progress_bar.end()
 
-        return {'routing_infos': routing_infos,
-                'routing_tables': routing_tables}
+        return routing_infos, routing_tables
 
     @staticmethod
     def _get_key_from_placement(placement):

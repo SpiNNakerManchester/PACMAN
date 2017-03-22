@@ -1,42 +1,45 @@
-from rig.netlist import Net
+from collections import defaultdict
+
 from rig.machine import Machine, Links
-from rig.routing_table import Routes
-from rig.place_and_route.routing_tree import RoutingTree
+from rig.netlist import Net
 from rig.place_and_route.constraints import \
     LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint
-
-from collections import defaultdict
+from rig.place_and_route.routing_tree import RoutingTree
+from rig.routing_table import Routes
 from six import iteritems
 
-from pacman.utilities import constants
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_radial_placement_from_chip_constraint \
     import PlacerRadialPlacementFromChipConstraint
-from pacman.model.placements.placements import Placements
+from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from rig.place_and_route.constraints import SameChipConstraint
+from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.model.graphs.abstract_spinnaker_link_vertex \
+    import AbstractSpiNNakerLinkVertex
 from pacman.model.placements.placement import Placement
+from pacman.model.placements.placements import Placements
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition \
     import MulticastRoutingTableByPartition
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition_entry  \
     import MulticastRoutingTableByPartitionEntry
-from pacman.model.abstract_classes.virtual_partitioned_vertex \
-    import VirtualPartitionedVertex
-
+from pacman.utilities import constants
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
 ROUTE_LOOKUP = {"core_{}".format(r.core_num) if r.is_core else r.name: r
                 for r in Routes}
 
-CHIP_HOMOGENIOUS_CORES = 18
-CHIP_HOMOGENIOUS_SDRAM = 119275520
-CHIP_HOMOGENIOUS_SRAM = 24320
-CHIP_HOMOGENIOUS_TAGS = 0
+CHIP_HOMOGENEOUS_CORES = 18
+CHIP_HOMOGENEOUS_SDRAM = 119275520
+CHIP_HOMOGENEOUS_SRAM = 24320
+CHIP_HOMOGENEOUS_TAGS = 0
 ROUTER_MAX_NUMBER_OF_LINKS = 6
-ROUTER_HOMOGENIOUS_ENTRIES = 1023
+ROUTER_HOMOGENEOUS_ENTRIES = 1023
 
 N_CORES_PER_VERTEX = 1
 
@@ -44,11 +47,11 @@ N_CORES_PER_VERTEX = 1
 def convert_to_rig_machine(machine):
 
     chip_resources = dict()
-    chip_resources['cores'] = CHIP_HOMOGENIOUS_CORES
-    chip_resources['sdram'] = CHIP_HOMOGENIOUS_SDRAM
-    chip_resources['sram'] = CHIP_HOMOGENIOUS_SRAM
-    chip_resources["router_entries"] = ROUTER_HOMOGENIOUS_ENTRIES
-    chip_resources['tags'] = CHIP_HOMOGENIOUS_TAGS
+    chip_resources['cores'] = CHIP_HOMOGENEOUS_CORES
+    chip_resources['sdram'] = CHIP_HOMOGENEOUS_SDRAM
+    chip_resources['sram'] = CHIP_HOMOGENEOUS_SRAM
+    chip_resources["router_entries"] = ROUTER_HOMOGENEOUS_ENTRIES
+    chip_resources['tags'] = CHIP_HOMOGENEOUS_TAGS
 
     # handle exceptions
     dead_chips = list()
@@ -76,7 +79,7 @@ def convert_to_rig_machine(machine):
                 resource_exceptions = dict()
                 n_processors = len([
                     processor for processor in chip.processors])
-                if n_processors < CHIP_HOMOGENIOUS_CORES:
+                if n_processors < CHIP_HOMOGENEOUS_CORES:
                     resource_exceptions["cores"] = n_processors
 
                 # Add tags if Ethernet chip
@@ -103,45 +106,44 @@ def convert_to_rig_machine(machine):
             for x, y, link in dead_links))
 
 
-def convert_to_rig_partitioned_graph(partitioned_graph):
+def convert_to_rig_graph(machine_graph):
 
     vertices_resources = dict()
     edges_resources = defaultdict()
 
-    for vertex in partitioned_graph.subvertices:
-        vid = str(id(vertex))
+    for vertex in machine_graph.vertices:
 
         # handle external devices
-        if isinstance(vertex, VirtualPartitionedVertex):
+        if isinstance(vertex, AbstractVirtualVertex):
             vertex_resources = dict()
-            vertices_resources[vid] = vertex_resources
+            vertices_resources[vertex] = vertex_resources
             vertex_resources["cores"] = 0
 
         # handle standard vertices
         else:
             vertex_resources = dict()
-            vertices_resources[vid] = vertex_resources
+            vertices_resources[vertex] = vertex_resources
             vertex_resources["cores"] = N_CORES_PER_VERTEX
             vertex_resources["sdram"] = int(
                 vertex.resources_required.sdram.get_value())
         vertex_outgoing_partitions = \
-            partitioned_graph.outgoing_edges_partitions_from_vertex(vertex)
+            machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+                vertex)
 
         # handle the vertex edges
-        for partition_id in vertex_outgoing_partitions:
-            partition = vertex_outgoing_partitions[partition_id]
+        for partition in vertex_outgoing_partitions:
             hyper_edge_dict = dict()
-            edges_resources[str(id(partition))] = hyper_edge_dict
-            hyper_edge_dict["source"] = vid
+            edges_resources[partition] = hyper_edge_dict
+            hyper_edge_dict["source"] = vertex
 
             sinks = list()
             weight = 0
             for edge in partition.edges:
-                sinks.append(str(id(edge.post_subvertex)))
-                weight += edge.weight
+                sinks.append(edge.post_vertex)
+                weight += edge.traffic_weight
             hyper_edge_dict['sinks'] = sinks
             hyper_edge_dict["weight"] = weight
-            hyper_edge_dict["type"] = partition.type.name.lower()
+            hyper_edge_dict["type"] = partition.traffic_type.name.lower()
 
     net_names = {
         Net(edge["source"], edge["sinks"], edge["weight"]): name
@@ -152,23 +154,39 @@ def convert_to_rig_partitioned_graph(partitioned_graph):
     return vertices_resources, nets, net_names
 
 
-def create_rig_partitioned_graph_constraints(partitioned_graph, machine):
+def create_rig_graph_constraints(machine_graph, machine):
 
     constraints = []
-    for vertex in partitioned_graph.subvertices:
-        for constraint in vertex.constraints:
-            if isinstance(constraint, (
-                    PlacerChipAndCoreConstraint,
-                    PlacerRadialPlacementFromChipConstraint)):
-                constraints.append(LocationConstraint(
-                    str(id(vertex)), (constraint.x, constraint.y)))
-
-        if isinstance(vertex, VirtualPartitionedVertex):
+    for vertex in machine_graph.vertices:
+        if isinstance(vertex, AbstractVirtualVertex):
+            link_data = None
+            if isinstance(vertex, AbstractFPGAVertex):
+                link_data = machine.get_fpga_link_with_id(
+                    vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+            elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+                link_data = machine.get_spinnaker_link_with_id(
+                    vertex.spinnaker_link_id, vertex.board_address)
             constraints.append(LocationConstraint(
-                str(id(vertex)), (vertex.real_chip_x, vertex.real_chip_y)))
+                vertex,
+                (link_data.connected_chip_x, link_data.connected_chip_y)))
             constraints.append(RouteEndpointConstraint(
-                str(id(vertex)),
-                LINK_LOOKUP[constants.EDGES(vertex.real_link).name.lower()]))
+                vertex,
+                LINK_LOOKUP[constants.EDGES(
+                    link_data.connected_link).name.lower()]))
+        else:
+            for constraint in vertex.constraints:
+                if isinstance(constraint, (
+                        PlacerChipAndCoreConstraint,
+                        PlacerRadialPlacementFromChipConstraint)):
+                    constraints.append(LocationConstraint(
+                        vertex, (constraint.x, constraint.y)))
+
+    vertices_on_same_chip = \
+        placer_algorithm_utilities.get_same_chip_vertex_groups(
+            machine_graph.vertices)
+    for group in vertices_on_same_chip.values():
+        if len(group) > 1:
+            constraints.append(SameChipConstraint(group))
     return constraints
 
 
@@ -184,47 +202,54 @@ def create_rig_machine_constraints(machine):
     return constraints
 
 
-def convert_to_rig_placements(placements):
-    rig_placements = {
-        str(id(p.subvertex)): (p.x, p.y)
-        if not isinstance(p.subvertex, VirtualPartitionedVertex)
-        else (p.subvertex.real_chip_x, p.subvertex.real_chip_y)
-        for p in placements.placements}
+def convert_to_rig_placements(placements, machine):
+    rig_placements = dict()
+    for placement in placements:
+        if not isinstance(placement.vertex, AbstractVirtualVertex):
+            rig_placements[placement.vertex] = (placement.x, placement.y)
+        else:
+            link_data = None
+            vertex = placement.vertex
+            if isinstance(vertex, AbstractFPGAVertex):
+                link_data = machine.get_fpga_link_with_id(
+                    vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+            elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+                link_data = machine.get_spinnaker_link_with_id(
+                    vertex.spinnaker_link_id, vertex.board_address)
+            rig_placements[placement.vertex] = (
+                link_data.connected_chip_x, link_data.connected_chip_y
+            )
 
     core_allocations = {
-        str(id(p.subvertex)): {"cores": slice(p.p, p.p + 1)}
+        p.vertex: {"cores": slice(p.p, p.p + 1)}
         for p in placements.placements
-        if not isinstance(p.subvertex, VirtualPartitionedVertex)}
+        if not isinstance(p.vertex, AbstractVirtualVertex)}
 
     return rig_placements, core_allocations
 
 
 def convert_from_rig_placements(
-        rig_placements, rig_allocations, partitioned_graph):
+        rig_placements, rig_allocations, machine_graph):
     placements = Placements()
-    for vertex_id in rig_placements:
-        vertex = partitioned_graph.get_subvertex_by_id(vertex_id)
-        if vertex is not None:
-            if isinstance(vertex, VirtualPartitionedVertex):
-                placements.add_placement(Placement(
-                    vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
-                    None))
-            else:
-                x, y = rig_placements[vertex_id]
-                p = rig_allocations[vertex_id]["cores"].start
-                placements.add_placement(Placement(vertex, x, y, p))
+    for vertex in rig_placements:
+        if isinstance(vertex, AbstractVirtualVertex):
+            placements.add_placement(Placement(
+                vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
+                None))
+        else:
+            x, y = rig_placements[vertex]
+            p = rig_allocations[vertex]["cores"].start
+            placements.add_placement(Placement(vertex, x, y, p))
 
     return placements
 
 
-def convert_from_rig_routes(rig_routes, partitioned_graph):
+def convert_from_rig_routes(rig_routes, machine_graph):
     routing_tables = MulticastRoutingTableByPartition()
-    for partition_id in rig_routes:
-        partition = partitioned_graph.get_partition_by_id(partition_id)
-        if partition is not None:
-            partition_route = rig_routes[partition_id]
-            _convert_next_route(
-                routing_tables, partition, 0, None, partition_route)
+    for partition in rig_routes:
+        partition_route = rig_routes[partition]
+        _convert_next_route(
+            routing_tables, partition, 0, None, partition_route)
     return routing_tables
 
 

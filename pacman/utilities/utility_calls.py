@@ -1,18 +1,5 @@
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.exceptions import PacmanConfigurationException
 from pacman.exceptions import PacmanValueError
-
-from pacman.model.constraints.abstract_constraints.\
-    abstract_placer_constraint \
-    import AbstractPlacerConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.tag_allocator_constraints\
-    .tag_allocator_require_iptag_constraint \
-    import TagAllocatorRequireIptagConstraint
-from pacman.model.constraints.tag_allocator_constraints\
-    .tag_allocator_require_reverse_iptag_constraint \
-    import TagAllocatorRequireReverseIptagConstraint
 
 import numpy
 
@@ -76,39 +63,7 @@ def check_algorithm_can_support_constraints(
                         " algorithm")
 
 
-def sort_objects_by_constraint_authority(objects):
-    """ Takes the subverts of a subgraph and orders them into a list\
-        with a order based off rank on the constraint\
-    :param objects: The objects to be sorted. need to have a constraints
-    :type objects: iterable of soem object with constraints
-    :return: A list of ordered objects
-    :rtype: list of objects
-    :raise None: this method does not raise any known exceptions
-    """
-    objects_with_rank = list()
-    for current_object in objects:
-        if not hasattr(current_object, "constraints"):
-            raise PacmanConfigurationException(
-                "the object given to the "
-                "sort_objects_by_constraint_authority method does not "
-                "contain constraints. Every object must have at least a "
-                "max atoms per core constraint")
-        max_rank_so_far = 0
-        for constraint in current_object.constraints:
-            # only store ranks for placer contraints and ones that are better
-            # than already seen
-            if (isinstance(constraint, AbstractPlacerConstraint) and
-                    constraint.get_rank() >= max_rank_so_far):
-                max_rank_so_far = constraint.get_rank()
-        objects_with_rank.append((current_object, max_rank_so_far))
-
-    ordered_objects = sorted(objects_with_rank,
-                             key=lambda cur_item: cur_item[1],
-                             reverse=True)
-    return [item[0] for item in ordered_objects]
-
-
-def _check_constrained_value(value, current_value):
+def check_constrained_value(value, current_value):
     """ Checks that the current value and a new value match
 
     :param value: The value to check
@@ -121,71 +76,6 @@ def _check_constrained_value(value, current_value):
     if value is not None:
         return value
     return current_value
-
-
-def get_chip_and_core(constraints, chips=None):
-    """ Get an assigned chip and core from a set of constraints
-
-    :param constraints: The set of constraints to get the values from.  Note\
-                that any type of constraint can be in the list but only those\
-                relevant will be used
-    :type constraints: iterable of\
-                :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-    :param chips: Optional list of tuples of (x, y) coordinates of chips,\
-                restricting the allowed chips
-    :type chips: iterable of (int, int)
-    :return: tuple of a chip x and y coordinates, and processor id, any of\
-                which might be None
-    :rtype: (tuple of (int, int, int)
-    """
-    x = None
-    y = None
-    p = None
-    for constraint in constraints:
-        if isinstance(constraint, PlacerChipAndCoreConstraint):
-            x = _check_constrained_value(constraint.x, x)
-            y = _check_constrained_value(constraint.y, y)
-            p = _check_constrained_value(constraint.p, p)
-
-    if chips is not None and x is not None and y is not None:
-        if (x, y) not in chips:
-            raise PacmanInvalidParameterException(
-                "x, y and chips",
-                "{}, {} and {}".format(x, y, chips),
-                "The constraint cannot be met with the given chips")
-    return x, y, p
-
-
-def get_ip_tag_info(constraints):
-    """ Get the ip tag constraint information from the constraints
-
-    :param constraints: The set of constraints to get the values from.  Note\
-                that any type of constraint can be in the list but only those\
-                relevant will be used
-    :type constraints: iterable of\
-                :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-    :return: A tuple of board address, iterable of ip tag constraints and \
-                iterable of reverse ip tag constraints
-    :rtype: (str, iterable of\
-                :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_iptag_constraint.TagAllocatorRequireIptagConstraint`,
-                iterable of\
-                :py:class:`pacman.model.constraints.tag_allocator_constraints.tag_allocator_require_reverse_iptag_constraint.TagAllocatorRequireReverseIptagConstraint`)
-    """
-    board_address = None
-    ip_tags = list()
-    reverse_ip_tags = list()
-    for constraint in constraints:
-        if isinstance(constraint,
-                      TagAllocatorRequireIptagConstraint):
-            board_address = _check_constrained_value(
-                constraint.board_address, board_address)
-            ip_tags.append(constraint)
-        if isinstance(constraint,
-                      TagAllocatorRequireReverseIptagConstraint):
-            board_address = _check_constrained_value(
-                constraint.board_address, board_address)
-            reverse_ip_tags.append(constraint)
-    return board_address, ip_tags, reverse_ip_tags
 
 
 def expand_to_bit_array(value):
@@ -225,3 +115,27 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
     expanded_value = numpy.zeros(32, dtype="uint8")
     expanded_value[-len(bit_positions):] = bit_array[bit_positions]
     return compress_from_bit_array(expanded_value)
+
+
+def is_equal_or_None(a, b):
+    """ If a and b are both not None, return True iff they are equal,\
+        otherwise return True
+    """
+    return True if a is None or b is None or a == b else False
+
+
+def is_single(iterable):
+    """ Test if there is exactly one item in the iterable
+    """
+    iterator = iter(iterable)
+
+    # Test if there is a first item, if not return False
+    if next(iterator, None) is None:
+        return False
+
+    # Test if there is a second item, if not return True
+    if next(iterator, None) is None:
+        return True
+
+    # Otherwise return False
+    return False

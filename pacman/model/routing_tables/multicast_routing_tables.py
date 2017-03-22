@@ -5,8 +5,17 @@ class MulticastRoutingTables(object):
     """ Represents the multicast routing tables for a number of chips
     """
 
+    __slots__ = [
+        # set that holds routing tables
+        "_routing_tables",
+
+        # dict of (x,y) -> routing table
+        "_routing_tables_by_chip"
+    ]
+
     def __init__(self, routing_tables=None):
         """
+
         :param routing_tables: The routing tables to add
         :type routing_tables: iterable of\
                     :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
@@ -26,7 +35,6 @@ class MulticastRoutingTables(object):
         :param routing_table: a routing table to add
         :type routing_table:\
                     :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     table already exists for the chip
@@ -41,7 +49,7 @@ class MulticastRoutingTables(object):
                 self._routing_tables_by_chip:
             raise PacmanAlreadyExistsException(
                 "The Routing table for chip {}:{} already exists in this "
-                "collection and thefore is deemed an error to readd it"
+                "collection and therefore is deemed an error to re-add it"
                 .format(routing_table.x, routing_table.y), str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
             routing_table
@@ -59,7 +67,7 @@ class MulticastRoutingTables(object):
         return self._routing_tables
 
     def get_routing_table_for_chip(self, x, y):
-        """ Get a routing table for a paricular chip
+        """ Get a routing table for a particular chip
 
         :param x: The x-coordinate of the chip
         :type x: int
