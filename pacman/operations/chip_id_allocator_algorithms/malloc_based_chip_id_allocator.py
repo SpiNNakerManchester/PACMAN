@@ -32,18 +32,11 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         self._virtual_chips = dict()
 
     def __call__(self, machine, graph=None):
-        """
-
-        :param graph:
-        :param machine:
-        :return:
-        """
-
         if graph is not None:
 
             # Go through the groups and allocate keys
             progress_bar = ProgressBar(
-                (len(graph.vertices) + len(list(machine.chips))),
+                graph.n_vertices + machine.n_chips,
                 "Allocating virtual identifiers")
 
             # allocate standard ids for real chips

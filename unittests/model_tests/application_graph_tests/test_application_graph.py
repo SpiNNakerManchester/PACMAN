@@ -1,6 +1,6 @@
 # pacman imports
-from pacman.model.graphs.application.simple_application_edge \
-    import SimpleApplicationEdge
+from pacman.model.graphs.application.impl.application_edge \
+    import ApplicationEdge
 
 from pacman.model.graphs.application.impl.application_graph \
     import ApplicationGraph
@@ -21,21 +21,22 @@ class TestApplicationGraphModel(unittest.TestCase):
 
         :return:
         """
-        ApplicationGraph()
+        ApplicationGraph("foo")
 
     def test_create_new_graph(self):
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
         vert3 = TestVertex(3, "New AbstractConstrainedVertex 3", 256)
-        edge1 = SimpleApplicationEdge(vert1, vert2, None, "First edge")
-        edge2 = SimpleApplicationEdge(vert2, vert1, None, "First edge")
-        edge3 = SimpleApplicationEdge(vert1, vert3, None, "First edge")
+        edge1 = ApplicationEdge(vert1, vert2, None, "First edge")
+        edge2 = ApplicationEdge(vert2, vert1, None, "First edge")
+        edge3 = ApplicationEdge(vert1, vert3, None, "First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
-        graph = ApplicationGraph("Graph", verts, edges)
-        for i in range(3):
-            self.assertEqual(graph.vertices[i], verts[i])
-            self.assertEqual(graph.edges[i], edges[i])
+        graph = ApplicationGraph("Graph")
+        graph.add_vertices(verts)
+        graph.add_edges(edges, "foo")  # Any old partition label
+        assert frozenset(verts) == frozenset(graph.vertices)
+        assert frozenset(edges) == frozenset(graph.edges)
 
         oev = graph.get_edges_starting_at_vertex(vert1)
         if edge2 in oev:

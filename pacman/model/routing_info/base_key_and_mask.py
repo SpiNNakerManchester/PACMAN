@@ -16,6 +16,7 @@ class BaseKeyAndMask(object):
 
     def __init__(self, base_key, mask):
         """
+
         :param base_key: The routing key
         :type base_key: int
         :param mask: The routing mask
@@ -45,7 +46,6 @@ class BaseKeyAndMask(object):
     @property
     def key_combo(self):
         """ The key combined with the mask
-        :return:
         """
         return self._base_key & self._mask
 

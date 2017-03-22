@@ -4,9 +4,27 @@ matrix:
     - python: "2.7"
     - pytest
 
+cache: pip
+
 virtualenv:
   system_site_packages: true
 
-before_script:
+before_install:
+  - pip install --upgrade pip setuptools wheel
+  - pip install --only-binary=numpy,scipy numpy scipy
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install --upgrade git+git://github.com/project-rig/rig.git@master
+install:
+  - pip install -r requirements-test.txt
+  - pip install -r doc/doc_requirements.txt
   - python ./setup.py install
-script: "py.test ."
+script:
+  - py.test unittests
+  - py.test integration_tests
+  # Code quality check
+  - flake8 pacman
+  - flake8 integration_tests unittests uinit_test_objects
+  - cd doc/source
+  - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
+  - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
+  - sphinx-build -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia

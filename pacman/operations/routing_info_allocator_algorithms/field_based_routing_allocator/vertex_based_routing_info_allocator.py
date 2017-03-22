@@ -94,7 +94,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :return: routing information objects
         """
         progress_bar = ProgressBar(
-            len(machine_graph.outgoing_edge_partitions) * 3,
+            machine_graph.n_outgoing_edge_partitions * 3,
             "Allocating routing keys")
 
         # ensure groups are stable and correct
@@ -108,7 +108,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
         # locate however many types of constraints there are
         seen_fields = field_utilities.deduce_types(machine_graph)
-        progress_bar.update(len(machine_graph.outgoing_edge_partitions))
+        progress_bar.update(machine_graph.n_outgoing_edge_partitions)
 
         if len(seen_fields) > 1:
             self._adds_application_field_to_the_fields(seen_fields)
@@ -154,7 +154,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :param seen_fields: the fields been seen
         :param field_positions: the set of fields that have been allocated\
                     over the entire key space
-        :return: None
+        :rtype: None
         """
 
         # locate the application field if it exists
@@ -210,7 +210,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
         :param seen_fields: the types of fields needed to get this simulation\
                     operating correctly
-        :return: None
         """
 
         application_field = None
@@ -228,12 +227,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _fixed_key_application_field_allocation(
             self, seen_fields, required_bits):
-        """
-
-        :param seen_fields:
-        :param required_bits:
-        :return:
-        """
         fixed_keys = seen_fields[FIXED_KEY_NAME]
         if len(fixed_keys) == 1:
             found = False
@@ -351,8 +344,8 @@ class VertexBasedRoutingInfoAllocator(object):
         :param seen_fields:
         :param application_field:
         :param required_bits:
-        :return: bool true if it was able to adjust to the field,
-        false otherwise
+        :return: bool true if it was able to adjust to the field,\
+            false otherwise
         """
         fixed_mask_masks = \
             seen_fields[FIXED_MASK_NAME]
@@ -1008,7 +1001,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :param bit_field_space: the bit field space
         :param field: the field that needs placing into the bitfield space
         :param fields: ???????
-        :return: None
+        :rtype: None
         """
 
         # field must be a flexible field, work accordingly
@@ -1041,15 +1034,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _determine_groups(self, machine_graph, graph_mapper, graph,
                           n_keys_map, progress_bar):
-        """
-
-        :param machine_graph:
-        :param graph_mapper:
-        :param graph:
-        :param n_keys_map:
-        :return:
-        """
-
         routing_info_allocator_utilities.check_types_of_edge_constraint(
             machine_graph)
 
@@ -1121,12 +1105,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     @staticmethod
     def _deduce_key_value_for_field(key, fixed_key_field):
-        """
-
-        :param key:
-        :param fixed_key_field:
-        :return:
-        """
         new_key = key >> fixed_key_field.lo
         mask = int(math.pow(2, ((fixed_key_field.hi -
                                  fixed_key_field.lo) + 1))) - 1
@@ -1178,17 +1156,12 @@ class VertexBasedRoutingInfoAllocator(object):
         """ Search though the graph adding field constraints for the key\
                     allocator
 
-        :param partition:
-        :param graph_mapper:
-        :param graph:
-        :param n_keys_map:
-        :return:
         """
 
         fields = list()
 
         verts = list(graph.vertices)
-        vertex = partition.edges[0].pre_vertex
+        vertex = partition.pre_vertex
         app_vertex = graph_mapper.get_application_vertex(vertex)
         vertices = list(graph_mapper.get_machine_vertices(app_vertex))
 
@@ -1216,25 +1189,12 @@ class VertexBasedRoutingInfoAllocator(object):
 
     @staticmethod
     def _create_internal_field_space(higher_space, field_value, field):
-        """
-
-        :param higher_space:
-        :param field_value:
-        :param field:
-        :return:
-        """
         inputs = dict()
         inputs[field.name] = field_value
         return higher_space(**inputs)
 
     @staticmethod
     def _locate_field_value_by_name(field_list, field_name):
-        """
-
-        :param field_list:
-        :param field_name:
-        :return:
-        """
         for field in field_list:
             if field.name == field_name:
                 return field.value

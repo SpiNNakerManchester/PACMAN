@@ -25,12 +25,10 @@ class CreateConstraintsToFile(object):
         """
         :param machine_graph: the machine graph
         :param machine: the machine
-        :return:
         """
 
         progress_bar = ProgressBar(
-            (len(machine_graph.vertices)) + 2,
-            "creating json constraints")
+            machine_graph.n_vertices + 2, "creating json constraints")
 
         json_constraints_directory_rep = list()
         self._add_monitor_core_reserve(json_constraints_directory_rep)
@@ -106,7 +104,6 @@ class CreateConstraintsToFile(object):
 
         :param vertex:
         :param machine:
-        :return:
         """
         # locate the chip from the placement constraint
         placement_constraint = utility_calls.locate_constraints_of_type(

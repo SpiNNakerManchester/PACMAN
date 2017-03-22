@@ -5,11 +5,12 @@ from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-
-from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.constraints.placer_constraints\
     .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+from pacman.utilities import utility_calls
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -139,20 +140,20 @@ class OneToOnePlacer(RadialPlacer):
         for vertex in vertices:
             if vertex not in found_list:
 
-                # verts that are one to one connected with vertex and are not
-                # forced off chip
+                # vertices that are one to one connected with vertex and are
+                # not forced off chip
                 connected_vertices = self._find_one_to_one_vertices(
                     vertex, machine_graph)
 
-                # create list for each vertex thats connected havent already
+                # create list for each vertex thats connected haven't already
                 #  been seen before
                 new_list = set()
                 for found_vertex in connected_vertices:
                     if found_vertex not in found_list:
                         new_list.add(found_vertex)
 
-                # looks for verts that have same chip constraints but not found
-                # by the one to one connection search.
+                # looks for vertices that have same chip constraints but not
+                # found by the one to one connection search.
                 same_chip_vertices = list()
                 for found_vertex in new_list:
                     for same_chip_constrained_vertex in \
@@ -161,7 +162,7 @@ class OneToOnePlacer(RadialPlacer):
                             same_chip_vertices.append(
                                 same_chip_constrained_vertex)
 
-                # add these newly found verts to the list
+                # add these newly found vertices to the list
                 new_list.update(same_chip_vertices)
 
                 sorted_vertices.append(new_list)
@@ -203,9 +204,9 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 if y is not None and post_y is not None and y != post_y:
                     conflict = True
-                edges = graph.get_edges_ending_at_vertex(
-                    next_vertex)
-                if len(edges) == 1 and not conflict:
+                edges = graph.get_edges_ending_at_vertex(next_vertex)
+
+                if utility_calls.is_single(edges) and not conflict:
                     found_vertices.append(next_vertex)
                     if post_x is not None:
                         x = post_x
@@ -235,9 +236,9 @@ class OneToOnePlacer(RadialPlacer):
                     conflict = True
                 if y is not None and pre_y is not None and y != pre_y:
                     conflict = True
-                edges = graph.get_edges_starting_at_vertex(
-                    next_vertex)
-                if len(edges) == 1 and not conflict:
+                edges = graph.get_edges_starting_at_vertex(next_vertex)
+
+                if utility_calls.is_single(edges) and not conflict:
                     found_vertices.append(next_vertex)
                     if pre_x is not None:
                         x = pre_x

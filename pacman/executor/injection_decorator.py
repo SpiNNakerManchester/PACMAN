@@ -86,19 +86,20 @@ def inject_items(types):
     :param types: A dict of method argument name to type name to be injected
     """
     def wrap(wrapped_method):
+        exn_arg = None
+        method_args = inspect.getargspec(wrapped_method)
+        for type_arg in types:
+            if type_arg not in method_args.args:
+                # Can't raise exception until run time
+                exn_arg = type_arg
+                break
 
         @wraps(wrapped_method)
         def wrapper(obj, *args, **kwargs):
-
-            method_args = inspect.getargspec(wrapped_method)
-            for type_arg in types:
-                if type_arg not in method_args.args:
-                    raise InjectionException(
-                        "Argument {} does not exist for method {} of"
-                        " {}".format(
-                            type_arg, wrapped_method.__name__,
-                            obj.__class__))
-
+            if exn_arg is not None:
+                raise InjectionException(
+                    "Argument {} does not exist for method {} of {}".format(
+                        exn_arg, wrapped_method.__name__, obj.__class__))
             if _injectables is None:
                 raise InjectionException(
                     "No injectable objects have been provided")
@@ -109,13 +110,12 @@ def inject_items(types):
                         "Cannot find object of type {} to inject into"
                         " method {} of {}".format(
                             arg_type, wrapped_method.__name__, obj.__class__))
-                value = _injectables.get(arg_type)
                 if arg in new_args:
                     raise InjectionException(
                         "Argument {} was already provided to"
                         " method {} of {}".format(
                             arg, wrapped_method.__name, obj.__class__))
-                new_args[arg] = value
+                new_args[arg] = _injectables[arg_type]
             return wrapped_method(obj, *args, **new_args)
         return wrapper
     return wrap
@@ -139,6 +139,66 @@ def clear_injectables():
     _injectables = None
 
 
+class _DictFacade(dict):
+    """ Provides a dict of dict overlay so that container-ship is True if any\
+        one of the dict objects contains the items and the item is returned\
+        from the first dict
+    """
+    def __init__(self, dicts):
+        """
+
+        :param dicts: An iterable of dict objects to be used
+        """
+        self._dicts = dicts
+
+    def get(self, key, default=None):
+        for d in self._dicts:
+            if key in d:
+                return d[key]
+        return default
+
+    def __getitem__(self, key):
+        for d in self._dicts:
+            try:
+                return d.__getitem__(key)
+            except KeyError:
+                pass
+        raise KeyError(key)
+
+    def __contains__(self, item):
+        for d in self._dicts:
+            if item in d:
+                return True
+        return False
+
+
+class injection_context(object):
+    """ Provides a context for injection to use with "with"
+    """
+
+    def __init__(self, injection_dictionary):
+        """
+
+        :param injection_dictionary:\
+            The dictionary of items to inject whilst in the context
+        """
+        self._old = None
+        self._mine = injection_dictionary
+
+    def __enter__(self):
+        global _injectables
+        dicts = [self._mine]
+        if _injectables is not None:
+            dicts.append(_injectables)
+        self._old = _injectables
+        _injectables = _DictFacade(dicts)
+
+    def __exit__(self, a, b, c):
+        global _injectables
+        _injectables = self._old
+        return False
+
+
 def do_injection(objects_to_inject, objects_to_inject_into=None):
     """ Perform the actual injection of objects
 
@@ -150,6 +210,8 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
         instances that have been created
     :type objects_to_inject_into: list
     """
+    if objects_to_inject is None:
+        return
     injectees = objects_to_inject_into
     if objects_to_inject_into is None:
         injectees = _instances

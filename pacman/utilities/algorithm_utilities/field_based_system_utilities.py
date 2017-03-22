@@ -36,8 +36,8 @@ START_OF_ROUTING_KEY_POSITION = 0
 def deduce_types(graph):
     """
     deducing the number of applications required for this key space
+
     :param graph:
-    :return:
     """
     seen_fields = dict()
     known_fields = list()
@@ -84,7 +84,7 @@ def handle_flexi_field(constraint, seen_fields, known_fields):
     :param constraint:
     :param seen_fields:
     :param known_fields:
-    :return:
+    :rtype: None:
     """
     # set the level of search
     current_level = seen_fields
@@ -130,7 +130,6 @@ def convert_mask_into_fields(entity):
     """
 
     :param entity:
-    :return:
     """
     results = list()
     expanded_mask = utility_calls.expand_to_bit_array(entity)

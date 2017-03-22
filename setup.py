@@ -64,6 +64,6 @@ setup(
                   'pacman.utilities.file_format_converters': ['*.xml'],
                   'pacman.utilities.file_format_schemas': ['*.json']},
     install_requires=[
-        'six', 'enum34', 'numpy', 'jsonschema', 'rig >= 2.0.0, < 3.0.0',
-        'SpiNNMachine >= 3.0.0, < 4.0.0']
+        'six', 'enum34', 'numpy', 'lxml', 'jsonschema',
+        'rig >= 2.0.0, < 3.0.0', 'SpiNNMachine >= 3.0.0, < 4.0.0']
 )

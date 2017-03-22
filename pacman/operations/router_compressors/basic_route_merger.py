@@ -138,7 +138,7 @@ class BasicRouteMerger(object):
                         # if masked_key in merged_routes:
                         #     raise Exception(
                         #         "Attempting to merge an existing key")
-                        merged_routes.add_mutlicast_routing_entry(
+                        merged_routes.add_multicast_routing_entry(
                             MulticastRoutingEntry(
                                 new_key, new_mask,
                                 router_entry.processor_ids,
@@ -151,9 +151,9 @@ class BasicRouteMerger(object):
 
                 if not merge_done:
                     # print "Was not able to merge", hex(key)
-                    merged_routes.add_mutlicast_routing_entry(router_entry)
+                    merged_routes.add_multicast_routing_entry(router_entry)
                     keys_merged.add(router_entry.routing_entry_key)
             else:
-                merged_routes.add_mutlicast_routing_entry(router_entry)
+                merged_routes.add_multicast_routing_entry(router_entry)
                 keys_merged.add(router_entry.routing_entry_key)
         return merged_routes

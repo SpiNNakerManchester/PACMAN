@@ -54,10 +54,6 @@ class MulticastRoutingTableByPartition(object):
     def get_entry_on_coords_for_edge(self, partition, router_x, router_y):
         """ Get an entry from a specific coordinate
 
-        :param partition:
-        :param router_x:
-        :param router_y:
-        :return:
         """
         entries = self.get_entries_for_router(router_x, router_y)
         if partition in entries:

@@ -84,7 +84,7 @@ class TestRoutingTable(unittest.TestCase):
                 key_combo + i, mask + i, proc_ids, link_ids, True))
         mrt = MulticastRoutingTable(0, 0, multicast_entries)
         with self.assertRaises(PacmanAlreadyExistsException):
-            mrt.add_mutlicast_routing_entry(multicast_entries[0])
+            mrt.add_multicast_routing_entry(multicast_entries[0])
 
     def test_new_multicast_routing_table_duplicate_key_combo(self):
 

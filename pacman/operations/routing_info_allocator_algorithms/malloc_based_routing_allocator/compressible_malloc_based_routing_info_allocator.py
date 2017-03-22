@@ -79,7 +79,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(
-            len(machine_graph.outgoing_edge_partitions),
+            machine_graph.n_outgoing_edge_partitions,
             "Allocating routing keys")
 
         # allocate the groups that have fixed keys
@@ -225,14 +225,6 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     @staticmethod
     def _update_routing_objects(
             keys_and_masks, routing_infos, group):
-        """
-
-        :param keys_and_masks:
-        :param routing_infos:
-        :param group:
-        :return:
-        """
-
         # Allocate the routing information
         partition_info = PartitionRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)

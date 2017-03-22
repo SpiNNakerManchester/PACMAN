@@ -26,8 +26,8 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     """
 
     # start progress bar
-    progress_bar = ProgressBar(len(machine_graph.vertices),
-                               "Partitioning graph edges")
+    progress_bar = ProgressBar(
+        machine_graph.n_vertices, "Partitioning graph edges")
 
     # Partition edges according to vertex partitioning
     for source_vertex in machine_graph.vertices:

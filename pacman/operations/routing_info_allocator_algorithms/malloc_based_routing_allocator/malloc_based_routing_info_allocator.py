@@ -76,7 +76,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Go through the groups and allocate keys
         progress_bar = ProgressBar(
-            len(machine_graph.outgoing_edge_partitions),
+            machine_graph.n_outgoing_edge_partitions,
             "Allocating routing keys")
 
         # allocate the groups that have fixed keys
@@ -155,14 +155,14 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             vertex_groups = defaultdict(list)
             for partition in continuous_groups:
                 vertex = graph_mapper.get_application_vertex(
-                    partition.edges[0].pre_vertex)
+                    partition.pre_vertex)
                 vertex_groups[vertex].append(partition)
             vertex_partitions = list()
             for vertex_group in vertex_groups.itervalues():
                 sorted_partitions = sorted(
                     vertex_group,
                     key=lambda part: graph_mapper.get_slice(
-                        part.edges[0].pre_vertex))
+                        part.pre_vertex))
                 vertex_partitions.extend(sorted_partitions)
             continuous_groups = vertex_partitions
 
@@ -179,14 +179,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     @staticmethod
     def _update_routing_objects(
             keys_and_masks, routing_infos, group):
-        """
-
-        :param keys_and_masks:
-        :param routing_infos:
-        :param group:
-        :return:
-        """
-
         # Allocate the routing information
         partition_info = PartitionRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)

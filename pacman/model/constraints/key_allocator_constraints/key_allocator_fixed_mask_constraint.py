@@ -16,13 +16,6 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
 
         :param mask: the mask to be used during key allocation
         :type mask: int
-        :param fields: any fields that define regions in the mask with further\
-                    limitations
-        :type fields: iterable of :py:class:`pacman.utilities.field.Field`
-        :raise PacmanInvalidParameterException: if any of the fields are\
-                    outside of the mask i.e. mask & field.mask != field.mask\
-                    or if any of the field masks overlap i.e.\
-                    field.mask & other_field.mask != 0
         """
         self._mask = mask
 

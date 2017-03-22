@@ -11,11 +11,13 @@ class NewPartitionerConstraint(AbstractPartitionerConstraint):
     """
 
     def __init__(self, label):
-        AbstractPartitionerConstraint.__init__(self, label)
+        AbstractPartitionerConstraint.__init__(self)
+        self.label = label
 
     def is_constraint(self):
         """
         helper method for is_instance
+
         :return:
         """
         return True

@@ -43,7 +43,6 @@ class FlexiField(object):
     @property
     def name(self):
         """ The name for this Flexible field
-        :return:
         """
         return self._flexi_field_name
 
