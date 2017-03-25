@@ -179,14 +179,18 @@ class ResourceTracker(object):
                         chip.nearest_ethernet_x, chip.nearest_ethernet_y)
                     if ethernet_connected_chip is not None:
                         ethernet_area_code = ethernet_connected_chip.ip_address
-                        if ethernet_area_code not in self._ethernet_area_codes:
-                            self._ethernet_area_codes[
-                                ethernet_area_code] = OrderedSet()
-                            self._boards_with_ip_tags.add(ethernet_area_code)
-                            self._ethernet_chips[ethernet_area_code] = (
-                                chip.nearest_ethernet_x,
-                                chip.nearest_ethernet_y)
-                        self._ethernet_area_codes[ethernet_area_code].add(key)
+                        if ethernet_area_code is not None:
+                            if (ethernet_area_code not in
+                                    self._ethernet_area_codes):
+                                self._ethernet_area_codes[
+                                    ethernet_area_code] = OrderedSet()
+                                self._boards_with_ip_tags.add(
+                                    ethernet_area_code)
+                                self._ethernet_chips[ethernet_area_code] = (
+                                    chip.nearest_ethernet_x,
+                                    chip.nearest_ethernet_y)
+                            self._ethernet_area_codes[ethernet_area_code].add(
+                                key)
 
     @staticmethod
     def check_constraints(
