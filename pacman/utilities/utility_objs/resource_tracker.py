@@ -1025,7 +1025,9 @@ class ResourceTracker(object):
             total_sdram += resources.sdram.get_value()
 
         # Find the first usable chip which fits all the group resources
+        tried_chips = list()
         for (chip_x, chip_y) in usable_chips:
+            tried_chips.append((chip_x, chip_y))
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
@@ -1069,7 +1071,7 @@ class ResourceTracker(object):
 
         # If no chip is available, raise an exception
         n_cores, n_chips, max_sdram, n_tags = self._available_resources(
-            usable_chips)
+            tried_chips)
         raise exceptions.PacmanValueError(
             "No resources available to allocate the given group resources"
             " within the given constraints:\n"
@@ -1110,7 +1112,9 @@ class ResourceTracker(object):
                                               ip_tags, reverse_ip_tags)
 
         # Find the first usable chip which fits the resources
+        tried_chips = list()
         for (chip_x, chip_y) in usable_chips:
+            tried_chips.append((chip_x, chip_y))
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
@@ -1130,7 +1134,7 @@ class ResourceTracker(object):
 
         # If no chip is available, raise an exception
         n_cores, n_chips, max_sdram, n_tags = \
-            self._available_resources(usable_chips)
+            self._available_resources(tried_chips)
         all_chips = self._get_usable_chips(None, None, None, None)
         all_n_cores, all_n_chips, all_max_sdram, all_n_tags = \
             self._available_resources(all_chips)
