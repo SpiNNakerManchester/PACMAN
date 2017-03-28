@@ -35,6 +35,8 @@ setup(
     packages=packages,
     package_data=package_data,
     install_requires=[
+        'SpiNNUtilities >= 3.0.0, < 4.0.0',
+        'SpiNNMachine >= 3.0.0, < 4.0.0'
         'six', 'enum34', 'numpy', 'lxml', 'jsonschema',
-        'rig >= 2.0.0, < 3.0.0', 'SpiNNMachine >= 3.0.0, < 4.0.0']
+        'rig >= 2.0.0, < 3.0.0']
 )
