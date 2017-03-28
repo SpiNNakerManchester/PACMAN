@@ -558,15 +558,15 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
         machine_graph.n_outgoing_edge_partitions,
         "Generating Routing info report")
 
-    for partition in machine_graph.outgoing_edge_partitions:
-        output.write("Vertex: {} \n".format(partition.pre_vertex))
-        rinfo = routing_infos.get_routing_info_from_partition(
-            partition)
-        for edge in partition.edges:
-            output.write("edge:{}, keys_and_masks:{} \n".format(
-                edge, rinfo.keys_and_masks))
-        output.write("\n\n")
-        progress_bar.update()
+    for vertex in machine_graph.vertices:
+        output.write("Vertex: {}\n".format(vertex))
+        for partition in\
+                machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+                    vertex):
+            rinfo = routing_infos.get_routing_info_from_partition(partition)
+            output.write("    Partition: {}, Routing Info: {}\n".format(
+                partition.identifier, rinfo.keys_and_masks))
+            progress_bar.update()
     progress_bar.end()
     output.flush()
     output.close()
