@@ -53,8 +53,10 @@ class NetworkSpecification(object):
                 f_network_specification.write("    Partition {}:".format(
                     partition.identifier))
                 for edge in partition.edges:
-                    f_network_specification.write("        Edge: {}\n".format(
-                        edge))
+                    f_network_specification.write(
+                        "        Edge: {}, model: {}\n".format(
+                            edge.label, edge.__class__.__name__))
+            f_network_specification.write("\n")
 
         # Close file:
         f_network_specification.close()
