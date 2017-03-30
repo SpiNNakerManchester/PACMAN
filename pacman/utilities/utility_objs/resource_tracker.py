@@ -592,11 +592,13 @@ class ResourceTracker(object):
     def _is_tag_available_on_ethernet_chip(self, ethernet_chip, tag_id):
         if ethernet_chip is None:
             return False
-        addr = ethernet_chip.ip_address
+
         # Having found the board address, it can only be used if a
         # tag is available
-        return addr in self._boards_with_ip_tags and \
-            (tag_id is None or tag_id in self._tags_by_board[addr])
+        addr = ethernet_chip.ip_address
+        return (addr in self._boards_with_ip_tags and
+                (tag_id is None or addr not in self._tags_by_board or
+                 tag_id in self._tags_by_board[addr]))
 
     def _is_ip_tag_available(self, board_address, tag, ip_address, port,
                              strip_sdp, traffic_identifier):
@@ -767,7 +769,7 @@ class ResourceTracker(object):
             eth_chip = self._machine.get_chip_at(
                 chip.nearest_ethernet_x, chip.nearest_ethernet_y)
 
-            # verify if the ethernet chip has the available tag id
+            # verify if the Ethernet chip has the available tag id
             if self._is_tag_available_on_ethernet_chip(eth_chip, tag_id):
                 board_address = eth_chip.ip_address
 
@@ -850,7 +852,7 @@ class ResourceTracker(object):
                     (ip_tag.ip_address, ip_tag.traffic_identifier)
 
                 # Remember how many allocations are sharing this tag
-                # in case an de-allocation is requested
+                # in case an deallocation is requested
                 self._n_ip_tag_allocations[tag_key] = 1
 
                 # Get the chip with the Ethernet
