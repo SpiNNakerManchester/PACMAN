@@ -1,7 +1,7 @@
 import logging
 import os
-from pacman.model.graphs.application.abstract_application_vertex import \
-    AbstractApplicationVertex
+from pacman.model.graphs.application.application_vertex \
+    import ApplicationVertex
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class NetworkSpecification(object):
         # Print information on vertices:
         f_network_specification.write("*** Vertices:\n")
         for vertex in graph.vertices:
-            if isinstance(vertex, AbstractApplicationVertex):
+            if isinstance(vertex, ApplicationVertex):
                 f_network_specification.write(
                     "Vertex {}, size: {}, model: {}\n".format(
                         vertex.label, vertex.n_atoms,
