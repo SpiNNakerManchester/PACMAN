@@ -1,22 +1,17 @@
 from six import add_metaclass
 
-from pacman.model.graphs.common.constrained_object import ConstrainedObject
 from spinn_utilities.abstract_base import \
     AbstractBase, abstractmethod, abstractproperty
 
 
 @add_metaclass(AbstractBase)
-class AbstractGraph(ConstrainedObject):
+class AbstractGraph(object):
     """ A graph
     """
 
-    __slots__ = ("_label")
+    __slots__ = ()
 
-    def __init__(self, label, constraints):
-        ConstrainedObject.__init__(self, constraints)
-        self._label = label
-
-    @property
+    @abstractproperty
     def label(self):
         """ The label of the item
 
@@ -24,7 +19,30 @@ class AbstractGraph(ConstrainedObject):
         :rtype: str
         :raise None: Raises no known exceptions
         """
-        return self._label
+
+    @abstractproperty
+    def constraints(self):
+        """ The constraints of the vertex
+
+        :rtype: iterable of :py:class:`AbstractConstraint`
+        """
+
+    @abstractmethod
+    def add_constraint(self, constraint):
+        """ Add a constraint
+
+        :param constraint: The constraint to add
+        :type constraint: :py:class:`AbstractConstraint`
+        """
+
+    def add_constraints(self, constraints):
+        """ Add a list of constraints
+
+        :param constraints: The list of constraints to add
+        :type constraints: list of :py:class:`AbstractConstraint`
+        """
+        for constraint in constraints:
+            self.add_constraint(constraint)
 
     @abstractmethod
     def add_vertex(self, vertex):

@@ -18,7 +18,10 @@ class MachineEdge(AbstractEdge):
         "_traffic_type",
 
         # The traffic weight of the edge
-        "_traffic_weight"
+        "_traffic_weight",
+
+        # The label of the edge
+        "_label"
     ]
 
     def __init__(
@@ -43,11 +46,16 @@ class MachineEdge(AbstractEdge):
             relative to other edges (default is 1)
         :type traffic_weight: int
         """
-        AbstractEdge.__init__(self, label)
+        self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
         self._traffic_weight = traffic_weight
+
+    @property
+    @overrides(AbstractEdge.label)
+    def label(self):
+        return self._label
 
     @property
     @overrides(AbstractEdge.pre_vertex)

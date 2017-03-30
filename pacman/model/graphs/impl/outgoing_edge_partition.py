@@ -2,9 +2,10 @@ from pacman import exceptions
 from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs import AbstractOutgoingEdgePartition
+from pacman.model.graphs.common.constrained_object import ConstrainedObject
 
 
-class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
+class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key
 
@@ -27,19 +28,27 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         # The type of edges to accept
         "_allowed_edge_types",
         # The weight of traffic going down this partition
-        "_traffic_weight"
+        "_traffic_weight",
+        # The label of the graph
+        "_label"
     ]
 
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
-        AbstractOutgoingEdgePartition.__init__(self, label, constraints)
+        ConstrainedObject.__init__(self, constraints)
+        self._label = label
         self._identifier = identifier
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
         self._pre_vertex = None
         self._traffic_type = None
         self._traffic_weight = traffic_weight
+
+    @property
+    @overrides(AbstractOutgoingEdgePartition.label)
+    def label(self):
+        return self._label
 
     @overrides(AbstractOutgoingEdgePartition.add_edge)
     def add_edge(self, edge):

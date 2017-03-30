@@ -8,12 +8,9 @@ class AbstractEdge(object):
     """ A directed edge in a graph between two vertices
     """
 
-    __slots__ = ("_label")
+    __slots__ = ()
 
-    def __init__(self, label):
-        self._label = label
-
-    @property
+    @abstractproperty
     def label(self):
         """ The label of the edge
 
@@ -21,7 +18,6 @@ class AbstractEdge(object):
         :rtype: str
         :raise None: Raises no known exceptions
         """
-        return self._label
 
     @abstractproperty
     def pre_vertex(self):

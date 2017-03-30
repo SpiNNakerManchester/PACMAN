@@ -1,6 +1,7 @@
 from six import add_metaclass
 import sys
 
+from pacman.model.decorators.overrides import overrides
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
@@ -12,7 +13,7 @@ from spinn_utilities.abstract_base import \
 
 
 @add_metaclass(AbstractBase)
-class ApplicationVertex(AbstractVertex, ConstrainedObject):
+class ApplicationVertex(ConstrainedObject, AbstractVertex):
     """ A vertex that can be broken down into a number of smaller vertices
         based on the resources that the vertex requires
     """
@@ -42,6 +43,11 @@ class ApplicationVertex(AbstractVertex, ConstrainedObject):
         # add a constraint for max partitioning
         self.add_constraint(
             PartitionerMaximumSizeConstraint(max_atoms_per_core))
+
+    @property
+    @overrides(AbstractVertex.label)
+    def label(self):
+        return self._label
 
     def __str__(self):
         return self.label

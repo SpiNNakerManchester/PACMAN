@@ -19,7 +19,10 @@ class ApplicationEdge(AbstractEdge):
         "_traffic_type",
 
         # Machine edge type
-        "_machine_edge_type"
+        "_machine_edge_type",
+
+        # The label
+        "_label"
     ]
 
     def __init__(
@@ -40,11 +43,15 @@ class ApplicationEdge(AbstractEdge):
         :param label: The name of the edge
         :type label: str
         """
-        AbstractEdge.__init__(self, label)
+        self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
         self._machine_edge_type = machine_edge_type
+
+    @overrides(AbstractEdge.label)
+    def label(self):
+        return self._label
 
     def create_machine_edge(self, pre_vertex, post_vertex, label):
         """ Create a machine edge between two machine vertices
