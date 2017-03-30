@@ -93,7 +93,7 @@ class ResourceTracker(object):
                     the set of chips used, or to re-order the chips.  Note\
                     also that on deallocation, the order is no longer\
                     guaranteed.
-        :type chips: iterable of (x, y) tuples of coordinates of chips
+        :type chips: iterable of (int, int) tuples of coordinates of chips
         """
 
         # The amount of SDRAM used by each chip,
@@ -539,10 +539,9 @@ class ResourceTracker(object):
         # Having found the board address, it can only be used if a
         # tag is available
         addr = ethernet_chip.ip_address
-        return (
-            addr in self._boards_with_ip_tags and
-            (tag_id is None or tag_id in self._tags_by_board[addr])
-        )
+        return (addr in self._boards_with_ip_tags and
+                (tag_id is None or addr not in self._tags_by_board or
+                 tag_id in self._tags_by_board[addr]))
 
     def _is_ip_tag_available(self, board_address, tag, ip_address, port,
                              strip_sdp, traffic_identifier):
@@ -657,6 +656,7 @@ class ResourceTracker(object):
 
     def _allocate_sdram(self, key, resources):
         """ Allocates the SDRAM on the given chip
+
         :param key: The (x, y) coordinates of the chip
         :type key: tuple of (int, int)
         :param resources: the resources containing the SDRAM required
@@ -969,7 +969,9 @@ class ResourceTracker(object):
             total_sdram += resources.sdram.get_value()
 
         # Find the first usable chip which fits all the group resources
+        tried_chips = list()
         for (chip_x, chip_y) in usable_chips:
+            tried_chips.append((chip_x, chip_y))
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
@@ -1013,7 +1015,7 @@ class ResourceTracker(object):
 
         # If no chip is available, raise an exception
         n_cores, n_chips, max_sdram, n_tags = self._available_resources(
-            usable_chips)
+            tried_chips)
         raise exceptions.PacmanValueError(
             "No resources available to allocate the given group resources"
             " within the given constraints:\n"
@@ -1054,7 +1056,9 @@ class ResourceTracker(object):
                                               ip_tags, reverse_ip_tags)
 
         # Find the first usable chip which fits the resources
+        tried_chips = list()
         for (chip_x, chip_y) in usable_chips:
+            tried_chips.append((chip_x, chip_y))
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
@@ -1074,7 +1078,7 @@ class ResourceTracker(object):
 
         # If no chip is available, raise an exception
         n_cores, n_chips, max_sdram, n_tags = \
-            self._available_resources(usable_chips)
+            self._available_resources(tried_chips)
         all_chips = self._get_usable_chips(None, None, None, None)
         all_n_cores, all_n_chips, all_max_sdram, all_n_tags = \
             self._available_resources(all_chips)
@@ -1097,7 +1101,7 @@ class ResourceTracker(object):
 
         :param usable_chips: Coordinates of usable chips
         :type usable_chips: iterable of pair(int,int)
-        :return: #cores, #chips, amount of SDRAM, #tags
+        :return: returns #cores, #chips, amount of SDRAM, #tags
         :rtype: 4-tuple of int
         """
         n_cores = 0
@@ -1219,7 +1223,7 @@ class ResourceTracker(object):
         :type ip_tags: iterable of (str, int) or None
         :param reverse_ip_tags: the details of the reverse ip tags allocated
         :type reverse_ip_tags: iterable of (str, int) or None
-        :return: None
+        :rtype: None
         """
 
         self._chips_available.add((chip_x, chip_y))
@@ -1258,7 +1262,7 @@ class ResourceTracker(object):
 
         :param chip_x: the x coord of the chip
         :type chip_x: int
-        :param chip_y:the y coord of the chip
+        :param chip_y: the y coord of the chip
         :type chip_y: int
         :return: True if the chip is available, False otherwise
         :rtype: bool

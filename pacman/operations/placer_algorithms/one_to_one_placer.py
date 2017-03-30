@@ -62,7 +62,7 @@ class OneToOnePlacer(RadialPlacer):
                     self._allocate_individual(
                         vertex, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed)
-                    progress_bar.update()
+                progress_bar.update()
             else:
 
                 try:
@@ -78,7 +78,7 @@ class OneToOnePlacer(RadialPlacer):
                             vertex_list, allocations):
                         placement = Placement(vertex, x, y, p)
                         placements.add_placement(placement)
-                        progress_bar.update()
+                    progress_bar.update()
                 except exceptions.PacmanValueError or \
                         exceptions.PacmanException or \
                         exceptions.PacmanInvalidParameterException:

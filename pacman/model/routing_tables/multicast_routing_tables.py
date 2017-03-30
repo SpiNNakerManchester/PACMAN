@@ -15,6 +15,7 @@ class MulticastRoutingTables(object):
 
     def __init__(self, routing_tables=None):
         """
+
         :param routing_tables: The routing tables to add
         :type routing_tables: iterable of\
                     :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
@@ -34,7 +35,6 @@ class MulticastRoutingTables(object):
         :param routing_table: a routing table to add
         :type routing_table:\
                     :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     table already exists for the chip
