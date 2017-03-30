@@ -70,9 +70,6 @@ class ResourceTracker(object):
         # Note not reverse ip tags
         "_n_ip_tag_allocations",
 
-        # Board address indexed by (x, y) tuple of coordinates of the chip
-        "_ethernet_area_codes",
-
         # (x, y) tuple of coordinates of Ethernet connected chip indexed by
         # board address
         "_ethernet_chips",

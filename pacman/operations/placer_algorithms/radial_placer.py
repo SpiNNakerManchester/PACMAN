@@ -119,6 +119,8 @@ class RadialPlacer(object):
         :param resource_tracker:\
             the resource tracker object which contains what resources of the\
             machine have currently been used
+        :type resource_tracker: None or \
+                :py:class:`ResourceTracker`
         :param start_chip_x:\
             The chip x coordinate to start with for radial iteration
         :param start_chip_y:\
