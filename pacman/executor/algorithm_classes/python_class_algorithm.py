@@ -60,8 +60,8 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             if self._python_method is not None:
                 method = self._python_method
             exc_type, exc_value, exc_trace = sys.exc_info()
-            logger.error("Error when calling {}.{}.{}".format(
-                self._python_module, self._python_class, method))
+            logger.error("Error when calling {}.{}.{} with inputs {}".format(
+                self._python_module, self._python_class, method, inputs))
             raise exc_type, exc_value, exc_trace
 
     def __repr__(self):

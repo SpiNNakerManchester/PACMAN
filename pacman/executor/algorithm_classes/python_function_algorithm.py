@@ -44,8 +44,8 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
             return function(**inputs)
         except Exception:
             exc_type, exc_value, exc_trace = sys.exc_info()
-            logger.error("Error when calling {}.{}".format(
-                self._python_module, self._python_function))
+            logger.error("Error when calling {}.{} with inputs {}".format(
+                self._python_module, self._python_function, inputs))
             raise exc_type, exc_value, exc_trace
 
     def __repr__(self):
