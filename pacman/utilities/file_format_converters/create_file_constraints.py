@@ -25,7 +25,6 @@ class CreateConstraintsToFile(object):
         """
         :param machine_graph: the machine graph
         :param machine: the machine
-        :return:
         """
 
         progress_bar = ProgressBar(
@@ -105,7 +104,6 @@ class CreateConstraintsToFile(object):
 
         :param vertex:
         :param machine:
-        :return:
         """
         # locate the chip from the placement constraint
         placement_constraint = utility_calls.locate_constraints_of_type(

@@ -50,7 +50,6 @@ class RoutingInfo(object):
         :param partition_info: The partition information item to add
         :type partition_info:\
             :py:class:`pacman.model.routing_info.partition_routing_info.PartitionRoutingInfo`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException:\
             If the partition is already in the set of edges
@@ -90,6 +89,7 @@ class RoutingInfo(object):
 
     def get_routing_info_from_partition(self, partition):
         """
+
         :param partition: The partition to set the number of keys for
         :type partition:\
                     :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`

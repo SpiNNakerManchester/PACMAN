@@ -1,8 +1,12 @@
 import importlib
+import sys
+import logging
 
 from pacman.executor.algorithm_classes.abstract_python_algorithm \
     import AbstractPythonAlgorithm
 from pacman.model.decorators.overrides import overrides
+
+logger = logging.getLogger(__name__)
 
 
 class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
@@ -36,7 +40,13 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
             self._python_function)
 
         # Run the algorithm and get the results
-        return function(**inputs)
+        try:
+            return function(**inputs)
+        except Exception:
+            exc_type, exc_value, exc_trace = sys.exc_info()
+            logger.error("Error when calling {}.{} with inputs {}".format(
+                self._python_module, self._python_function, inputs))
+            raise exc_type, exc_value, exc_trace
 
     def __repr__(self):
         return (

@@ -18,6 +18,7 @@ class delegates_to(object):
 
     def __init__(self, variable_name, method_to_call):
         """
+
         :param variable_name:\
             The name of the variable to delegate to e.g.\ if there is a\
             variable self._delegate, this would be "delegate"

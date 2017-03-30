@@ -21,7 +21,7 @@ from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +113,6 @@ class PartitionAndPlacePartitioner(object):
         :param graph: the graph object
         :type graph:\
             :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanPartitionException: if the extra vertex\
                     for partitioning identically has a different number of\
@@ -121,7 +120,7 @@ class PartitionAndPlacePartitioner(object):
         """
 
         partition_together_vertices = \
-            self._locate_vertices_to_partition_now(vertex)
+            self._locate_vertices_to_partition_now(vertex, graph_mapper)
 
         # locate max atoms per core
         possible_max_atoms = list()
@@ -201,11 +200,11 @@ class PartitionAndPlacePartitioner(object):
                 graph_mapper.add_vertex_mapping(
                     machine_vertex, vertex_slice, vertex)
 
-            progress_bar.update(((hi_atom - lo_atom) + 1) * len(vertices))
+                progress_bar.update(vertex_slice.n_atoms)
 
     @staticmethod
     def _reallocate_resources(
-            used_placements, resource_tracker, lo_atom, hi_atom, graph):
+            used_placements, resource_tracker, lo_atom, hi_atom):
         """ readjusts resource allocation and updates the placement list to\
             take into account the new layout of the atoms
 
@@ -219,9 +218,6 @@ class PartitionAndPlacePartitioner(object):
         :type lo_atom: int
         :param hi_atom: the high atom of a slice to be considered
         :type hi_atom: int
-        :param graph: the graph used by the partitioner
-        :type graph:
-                    :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
         :return: the new list of tuples containing placement data
         :rtype: iterable of tuples
         """
@@ -337,7 +333,7 @@ class PartitionAndPlacePartitioner(object):
             if hi_atom < min_hi_atom:
                 min_hi_atom = hi_atom
                 used_placements = self._reallocate_resources(
-                    used_placements, resource_tracker, lo_atom, hi_atom, graph)
+                    used_placements, resource_tracker, lo_atom, hi_atom)
 
             # Attempt to allocate the resources for this vertex on the machine
             try:
@@ -480,11 +476,13 @@ class PartitionAndPlacePartitioner(object):
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
 
     @staticmethod
-    def _locate_vertices_to_partition_now(vertex):
+    def _locate_vertices_to_partition_now(vertex, graph_mapper):
         """ Locate any other vertices that need to be partitioned with the\
             exact same ranges of atoms
 
         :param vertex: the vertex that is currently being partitioned
+        :param graph_mapper: the mapping between application and machine \
+            vertices
         :type vertex:\
                     :py:class:`pacman.model.graph.application.abstract_application_vertex.AbstractApplicationVertex`
         :return: iterable of vertexes that need to be partitioned with the\
@@ -504,5 +502,9 @@ class PartitionAndPlacePartitioner(object):
                 raise exceptions.PacmanPartitionException(
                     "A vertex and its partition-dependent vertices must "
                     "have the same number of atoms")
-            partition_together_vertices.append(constraint.vertex)
+                # check that the vertex hasn't already been partitioned
+            machine_vertices = graph_mapper.get_machine_vertices(
+                constraint.vertex)
+            if machine_vertices is None:
+                partition_together_vertices.append(constraint.vertex)
         return partition_together_vertices

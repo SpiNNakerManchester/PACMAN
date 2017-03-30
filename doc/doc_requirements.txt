@@ -1,3 +1,4 @@
 six
 enum34
+-e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=spinn_utilities
 -e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
