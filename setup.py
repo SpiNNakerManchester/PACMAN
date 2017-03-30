@@ -8,7 +8,7 @@ import os
 
 # Build a list of all project modules, as well as supplementary files
 main_package = "pacman"
-data_extensions = {".aplx", ".xml"}
+data_extensions = {".aplx", ".xml", ".json", ".xsd"}
 main_package_dir = os.path.join(os.path.dirname(__file__), main_package)
 start = len(main_package_dir)
 packages = []
