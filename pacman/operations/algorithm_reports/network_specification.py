@@ -43,19 +43,22 @@ class NetworkSpecification(object):
 
             f_network_specification.write("    Constraints:\n")
             for constraint in vertex.constraints:
-                f_network_specification.write("   {}\n".format(
+                f_network_specification.write("        {}\n".format(
                     str(constraint)))
 
             f_network_specification.write(
                 "    Outgoing Edge Partitions:\n")
-            for partition in graph.outgoing_edge_partitions:
+            for partition in \
+                    graph.get_outgoing_edge_partitions_starting_at_vertex(
+                        vertex):
 
-                f_network_specification.write("    Partition {}:".format(
+                f_network_specification.write("    Partition {}:\n".format(
                     partition.identifier))
                 for edge in partition.edges:
                     f_network_specification.write(
-                        "        Edge: {}, model: {}\n".format(
-                            edge.label, edge.__class__.__name__))
+                        "        Edge: {}, From {} to {}, model: {}\n".format(
+                            edge.label, edge.pre_vertex.label,
+                            edge.post_vertex.label, edge.__class__.__name__))
             f_network_specification.write("\n")
 
         # Close file:
