@@ -32,7 +32,7 @@ class Placement(object):
         :param y: the y-coordinate of the chip on which the vertex is placed
         :type y: int
         :param p: the id of the processor on which the vertex is placed
-        :type p: int
+        :type p: int or None
         """
         self._vertex = vertex
         self._x = x
