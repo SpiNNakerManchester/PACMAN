@@ -88,7 +88,7 @@ class OneToOnePlacer(RadialPlacer):
                         self._allocate_individual(
                             vertex, placements, resource_tracker,
                             same_chip_vertex_groups, all_vertices_placed)
-                        progress_bar.update()
+                    progress_bar.update()
         progress_bar.end()
         return placements
 
