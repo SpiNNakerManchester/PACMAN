@@ -1,11 +1,11 @@
-from abc import ABCMeta
 from six import add_metaclass
 
+from spinn_utilities.abstract_base import AbstractBase
 from pacman.model.constraints.abstract_constraint \
     import AbstractConstraint
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractRouterConstraint(AbstractConstraint):
     """ A constraint on routing
     """

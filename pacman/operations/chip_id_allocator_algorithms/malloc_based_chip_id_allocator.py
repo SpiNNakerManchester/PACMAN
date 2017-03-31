@@ -1,9 +1,7 @@
 # pacman imports
 from pacman import exceptions
-from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
-from pacman.model.graphs.abstract_spinnaker_link_vertex\
-    import AbstractSpiNNakerLinkVertex
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs import AbstractFPGAVertex, AbstractSpiNNakerLinkVertex
+from pacman.model.graphs import AbstractVirtualVertex
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
     import ElementAllocatorAlgorithm

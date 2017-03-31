@@ -5,7 +5,7 @@ A collection of methods which support partitioning algorithms.
 import logging
 
 from pacman.model.constraints.partitioner_constraints\
-    .abstract_partitioner_constraint import AbstractPartitionerConstraint
+    import AbstractPartitionerConstraint
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)

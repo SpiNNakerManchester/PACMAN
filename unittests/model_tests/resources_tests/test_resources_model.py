@@ -3,11 +3,8 @@ test for the resources model
 """
 
 import unittest
-from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.resources.cpu_cycles_per_tick_resource \
-    import CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources import SDRAMResource, CPUCyclesPerTickResource
+from pacman.model.resources import DTCMResource, ResourceContainer
 
 
 class TestResourceModels(unittest.TestCase):

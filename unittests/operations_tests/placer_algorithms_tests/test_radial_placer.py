@@ -1,18 +1,13 @@
 import unittest
 
-from pacman.model.graphs.application.impl.application_edge\
-    import ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from uinit_test_objects.placer_test_support \
     import get_resources_used_by_atoms, MachineVertex, Vertex
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
+from pacman.model.constraints.placer_constraints\
+    import PlacerChipAndCoreConstraint
 from pacman.model.graphs.common.graph_mapper import GraphMapper
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 
 from spinn_machine.chip import Chip

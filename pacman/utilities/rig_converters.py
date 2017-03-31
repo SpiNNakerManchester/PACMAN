@@ -9,18 +9,12 @@ from rig.routing_table import Routes
 from six import iteritems
 
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
-from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+    import PlacerChipAndCoreConstraint, PlacerRadialPlacementFromChipConstraint
+from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
+from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.model.graphs.abstract_spinnaker_link_vertex \
-    import AbstractSpiNNakerLinkVertex
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
+from pacman.model.placements import Placement, Placements
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition \
     import MulticastRoutingTableByPartition
