@@ -49,6 +49,7 @@ class ApplicationEdge(AbstractEdge):
         self._traffic_type = traffic_type
         self._machine_edge_type = machine_edge_type
 
+    @property
     @overrides(AbstractEdge.label)
     def label(self):
         return self._label
