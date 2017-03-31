@@ -34,6 +34,10 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>wall_clock_timer_tick_in_millisecond</param_name>
+                <param_type>WallClockTimerTickInMilliseconds</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>graph</param_name>

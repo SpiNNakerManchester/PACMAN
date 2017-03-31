@@ -35,8 +35,9 @@ class PartitionAndPlacePartitioner(object):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine):
-        """
+    def __call__(self, graph, machine, wall_clock_timer_tick_in_millisecond):
+        """ Partition a partitionable_graph so that each subvertex will fit\
+            on a processor within the machine
 
         :param graph: The application_graph to partition
         :type graph:\
@@ -44,6 +45,10 @@ class PartitionAndPlacePartitioner(object):
         :param machine: The machine with respect to which to partition the\
                     application_graph
         :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param wall_clock_timer_tick_in_millisecond:
+            the timer tick period in milliseconds that the simulation will need
+            per timer tick
+        :type float
         :return: A machine_graph of partitioned vertices and partitioned\
                     edges
         :rtype:\
@@ -73,7 +78,9 @@ class PartitionAndPlacePartitioner(object):
             n_atoms += vertex.n_atoms
         progress_bar = ProgressBar(n_atoms, "Partitioning graph vertices")
 
-        resource_tracker = ResourceTracker(machine)
+        resource_tracker = ResourceTracker(
+            machine, wall_clock_timer_tick_in_millisecond=
+            wall_clock_timer_tick_in_millisecond)
 
         # Partition one vertex at a time
         for vertex in vertices:
@@ -268,7 +275,7 @@ class PartitionAndPlacePartitioner(object):
         :type graph:\
             :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
         :param resource_tracker: Tracker of used resources
-        :type resource_tracker: spinnmachine.machine.Machine object
+        :type resource_tracker: SpiNNMachine.machine.Machine object
         :return: the list of placements made by this method and the new amount\
                     of atoms partitioned
         :rtype: tuple of (iterable of tuples, int)

@@ -15,8 +15,7 @@ from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
     import AbstractPlacerConstraint
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
-
-from spinn_machine.utilities.ordered_set import OrderedSet
+from spinn_utilities.ordered_set import OrderedSet
 
 from collections import defaultdict
 
@@ -79,16 +78,20 @@ class ResourceTracker(object):
         "_chips_available"
     ]
 
-    def __init__(self, machine, chips=None):
+    def __init__(self, machine, chips=None,
+                 wall_clock_timer_tick_in_millisecond=None):
         """
 
         :param machine: The machine to track the usage of
         :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param wall_clock_timer_tick_in_millisecond: the timer tick scope
+        for the simulation.
+        :type: float
         :param chips: If specified, this list of chips will be used\
                     instead of the list from the machine.  Note that the order\
                     will be maintained, so this can be used either to reduce\
                     the set of chips used, or to re-order the chips.  Note\
-                    also that on deallocation, the order is no longer\
+                    also that on de-allocation, the order is no longer\
                     guaranteed.
         :type chips: iterable of (int, int) tuples of coordinates of chips
         """
@@ -144,6 +147,22 @@ class ResourceTracker(object):
         for chip in self._machine.ethernet_connected_chips:
             self._ethernet_chips[chip.ip_address] = (chip.x, chip.y)
             self._boards_with_ip_tags.add(chip.ip_address)
+
+        # set of (x, y, p) tuples of coordinates of processor to cpu
+        # cycles available
+        self._cpu_ticks = dict()
+        for chip in machine.chips:
+            for processor in chip.processors:
+                if not processor.is_monitor:
+                    if wall_clock_timer_tick_in_millisecond is not None:
+                        self._cpu_ticks[
+                            (chip.x, chip.y, processor.processor_id)] = \
+                            processor.cpu_cycles_available * \
+                            wall_clock_timer_tick_in_millisecond
+                    else:
+                        self._cpu_ticks[
+                            (chip.x, chip.y, processor.processor_id)] = \
+                            processor.cpu_cycles_available
 
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors
@@ -1189,7 +1208,8 @@ class ResourceTracker(object):
                                                               processor_id)
                 processor = chip.get_processor_with_id(best_processor_id)
                 max_dtcm_available = processor.dtcm_available
-                max_cpu_available = processor.cpu_cycles_available
+                max_cpu_available = \
+                    self._cpu_ticks[chip_x, chip_y, processor.processor_id]
 
             # If all the SDRAM on the chip is available,
             # this chip is unallocated, so the max must be the max
