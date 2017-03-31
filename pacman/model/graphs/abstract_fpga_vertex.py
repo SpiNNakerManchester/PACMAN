@@ -3,7 +3,6 @@ from abc import abstractproperty
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 
 
-# interface
 class AbstractFPGAVertex(AbstractVirtualVertex):
     """ A vertex connected to an FPGA
     """

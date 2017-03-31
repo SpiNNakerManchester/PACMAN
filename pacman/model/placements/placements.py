@@ -100,7 +100,7 @@ class Placements(object):
 
         :param vertex: The vertex to find the placement of
         :type vertex:\
-                :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
         :return: The placement
         :rtype: :py:class:`pacman.model.placements.placement.Placement`
         :raise PacmanNotPlacedError: If the vertex has not been placed.
