@@ -33,10 +33,10 @@ class ApplicationEdge(AbstractEdge):
 
         :param pre_vertex: the application vertex at the start of the edge
         :type pre_vertex: \
-            :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :param post_vertex: the application vertex at the end of the edge
         :type post_vertex: \
-            :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :param traffic_type: The type of the traffic on the edge
         :type traffic_type:\
             :py:class:`pacman.model.graph.edge_traffic_type.EdgeTrafficType`
@@ -67,7 +67,7 @@ class ApplicationEdge(AbstractEdge):
         :type label: str
         :return: The created machine edge
         :rtype:\
-            :py:class:`pacman.model.graph.machine.impl.machine_edge.MachineEdge`
+            :py:class:`pacman.model.graph.machine.machine_edge.MachineEdge`
         """
         return self._machine_edge_type(
             pre_vertex, post_vertex, self._traffic_type, label=label)

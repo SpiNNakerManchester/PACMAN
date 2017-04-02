@@ -39,7 +39,7 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
                     * Number of keys to generate (may be None)
         :type key_list_function: (iterable of\
                     :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`,\
-                    :py:class:`pacman.model.graph.machine.impl.machine_edge.MachineEdge`,
+                    :py:class:`pacman.model.graph.machine.machine_edge.MachineEdge`,
                     int)\
                     -> iterable of int
         """
