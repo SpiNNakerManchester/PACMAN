@@ -6,7 +6,13 @@ import logging
 
 from pacman.model.constraints.partitioner_constraints\
     import AbstractPartitionerConstraint
+from pacman.model.constraints.partitioner_constraints\
+    .partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
+
 from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
+from pacman.exceptions import PacmanPartitionException
 
 logger = logging.getLogger(__name__)
 
@@ -75,3 +81,75 @@ def get_remaining_constraints(vertex):
         if not isinstance(constraint, AbstractPartitionerConstraint):
             constraints.append(constraint)
     return constraints
+
+
+def get_same_size_vertex_groups(vertices):
+    """ Get a dictionary of vertex to vertex that must be partitioned the same\
+        size
+    """
+
+    # Dict of vertex to list of vertices with same size
+    # (repeated lists expected)
+    same_size_vertices = dict()
+
+    for vertex in vertices:
+
+        # Find all vertices that have a same size constraint associated with
+        #  this vertex
+        same_size_as_vertices = list()
+        for constraint in vertex.constraints:
+            if isinstance(constraint, PartitionerSameSizeAsVertexConstraint):
+                if vertex.n_atoms != constraint.vertex.n_atoms:
+                    raise PacmanPartitionException(
+                        "Vertices {} ({} atoms) and {} ({} atoms) must be of"
+                        " the same size to partition them together".format(
+                            vertex.label, vertex.n_atoms,
+                            constraint.vertex.label,
+                            constraint.vertex.n_atoms))
+                same_size_as_vertices.append(constraint.vertex)
+
+        if len(same_size_as_vertices) > 0:
+
+            # Go through all the vertices that want to have the same size
+            # as the top level vertex
+            for same_size_vertex in same_size_as_vertices:
+
+                # Neither vertex has been seen
+                if (same_size_vertex not in same_size_vertices and
+                        vertex not in same_size_vertices):
+
+                    # add both to a new group
+                    group = OrderedSet([vertex, same_size_vertex])
+                    same_size_vertices[vertex] = group
+                    same_size_vertices[same_size_vertex] = group
+
+                # Both vertices have been seen elsewhere
+                elif (same_size_vertex in same_size_vertices and
+                        vertex in same_size_vertices):
+                    # merge their groups
+                    group_1 = same_size_vertices[vertex]
+                    group_2 = same_size_vertices[same_size_vertex]
+                    group_1.update(group_2)
+                    for vert in group_1:
+                        same_size_vertices[vert] = group_1
+
+                # The current vertex has been seen elsewhere
+                elif vertex in same_size_vertices:
+
+                    # add the new vertex to the existing group
+                    group = same_size_vertices[vertex]
+                    group.add(same_size_vertex)
+                    same_size_vertices[same_size_vertex] = group
+
+                # The other vertex has been seen elsewhere
+                elif same_size_vertex in same_size_vertices:
+
+                    #  so add this vertex to the existing group
+                    group = same_size_vertices[same_size_vertex]
+                    group.add(vertex)
+                    same_size_vertices[vertex] = group
+
+        else:
+            same_size_vertices[vertex] = {vertex}
+
+    return same_size_vertices

@@ -70,6 +70,10 @@ class PartitionAndPlacePartitioner(object):
 
         resource_tracker = ResourceTracker(machine)
 
+        # Group vertices that are supposed to be the same size
+        vertex_groups = partition_algorithm_utilities\
+            .get_same_size_vertex_groups(vertices)
+
         # Partition one vertex at a time
         for vertex in vertices:
 
@@ -80,7 +84,7 @@ class PartitionAndPlacePartitioner(object):
             if machine_vertices is None:
                 self._partition_vertex(
                     vertex, machine_graph, graph_mapper, resource_tracker,
-                    graph, progress_bar)
+                    graph, progress_bar, vertex_groups)
         progress_bar.end()
 
         partition_algorithm_utilities.generate_machine_edges(
@@ -90,7 +94,7 @@ class PartitionAndPlacePartitioner(object):
 
     def _partition_vertex(
             self, vertex, machine_graph, graph_mapper, resource_tracker,
-            graph, progress_bar):
+            graph, progress_bar, vertex_groups):
         """ Partition a single vertex
 
         :param vertex: the vertex to partition
@@ -114,8 +118,7 @@ class PartitionAndPlacePartitioner(object):
                     atoms than its counterpart.
         """
 
-        partition_together_vertices = \
-            self._locate_vertices_to_partition_now(vertex, graph_mapper)
+        partition_together_vertices = list(vertex_groups[vertex])
 
         # locate max atoms per core
         possible_max_atoms = list()
@@ -469,37 +472,3 @@ class PartitionAndPlacePartitioner(object):
         sdram_ratio = PartitionAndPlacePartitioner._ratio(
             resources.sdram, max_resources.sdram)
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
-
-    @staticmethod
-    def _locate_vertices_to_partition_now(vertex, graph_mapper):
-        """ Locate any other vertices that need to be partitioned with the\
-            exact same ranges of atoms
-
-        :param vertex: the vertex that is currently being partitioned
-        :param graph_mapper: the mapping between application and machine \
-            vertices
-        :type vertex:\
-                    :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
-        :return: iterable of vertexes that need to be partitioned with the\
-                    exact same range of atoms
-        :rtype: iterable of\
-                    :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
-        :raise PacmanPartitionException: if the vertices that need to be \
-                    partitioned the same have different numbers of atoms
-        """
-        partition_together_vertices = list()
-        partition_together_vertices.append(vertex)
-        same_size_vertex_constraints = \
-            utility_calls.locate_constraints_of_type(
-                vertex.constraints, PartitionerSameSizeAsVertexConstraint)
-        for constraint in same_size_vertex_constraints:
-            if constraint.vertex.n_atoms != vertex.n_atoms:
-                raise exceptions.PacmanPartitionException(
-                    "A vertex and its partition-dependent vertices must "
-                    "have the same number of atoms")
-                # check that the vertex hasn't already been partitioned
-            machine_vertices = graph_mapper.get_machine_vertices(
-                constraint.vertex)
-            if machine_vertices is None:
-                partition_together_vertices.append(constraint.vertex)
-        return partition_together_vertices
