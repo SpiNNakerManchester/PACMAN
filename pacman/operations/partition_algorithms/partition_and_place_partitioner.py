@@ -95,7 +95,7 @@ class PartitionAndPlacePartitioner(object):
 
         :param vertex: the vertex to partition
         :type vertex:\
-            :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :param machine_graph: the graph to add vertices to
         :type machine_graph:\
             :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
@@ -145,7 +145,7 @@ class PartitionAndPlacePartitioner(object):
             the vertexes that need to be partitioned at the same time
         :type vertices:\
             iterable list of\
-            :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :param n_atoms: the atoms of the first vertex
         :type n_atoms: int
         :param max_atoms_per_core:\
@@ -254,7 +254,7 @@ class PartitionAndPlacePartitioner(object):
             the vertexes that need to be partitioned at the same time
         :type vertices:\
             iterable of\
-            :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :param max_atoms_per_core:\
             the max atoms from all the vertexes considered that have max_atom\
             constraints
@@ -367,7 +367,7 @@ class PartitionAndPlacePartitioner(object):
         :type max_atoms_per_core: int
         :param vertex: the vertexes to scale up the num atoms per core for
         :type vertex:\
-                    :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+                    :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :param resources: the resource estimate for the vertex for a given\
                     number of atoms
         :type resources:\
@@ -416,7 +416,7 @@ class PartitionAndPlacePartitioner(object):
 
         :param vertices: a iterable list of vertices
         :type vertices: iterable of\
-                    :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+                    :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :return: the minimum level of max atoms from all constraints
         :rtype: int
         :raise None: this method does not raise any known exceptions
@@ -479,11 +479,11 @@ class PartitionAndPlacePartitioner(object):
         :param graph_mapper: the mapping between application and machine \
             vertices
         :type vertex:\
-                    :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+                    :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :return: iterable of vertexes that need to be partitioned with the\
                     exact same range of atoms
         :rtype: iterable of\
-                    :py:class:`pacman.model.graph.application.impl.application_vertex.ApplicationVertex`
+                    :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
         :raise PacmanPartitionException: if the vertices that need to be \
                     partitioned the same have different numbers of atoms
         """
