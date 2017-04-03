@@ -36,18 +36,18 @@ class OneToOnePlacer(RadialPlacer):
             machine_graph, same_chip_vertex_groups)
 
         placements = self._do_allocation(
-            sorted_vertices, machine, same_chip_vertex_groups)
+            sorted_vertices, machine, same_chip_vertex_groups, machine_graph)
 
         return placements
 
     def _do_allocation(
-            self, vertices, machine, same_chip_vertex_groups):
+            self, vertices, machine, same_chip_vertex_groups, machine_graph):
 
         placements = Placements()
 
         # Iterate over vertices and generate placements
         progress_bar = ProgressBar(
-            len(vertices), "Placing graph vertices")
+            len(machine_graph.vertices), "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         all_vertices_placed = set()
