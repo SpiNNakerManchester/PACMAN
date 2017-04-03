@@ -3,19 +3,14 @@ test for partitioning
 """
 
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge import \
-    ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException, PacmanValueError
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_maximum_size_constraint import \
-    PartitionerMaximumSizeConstraint
 from pacman.model.constraints.partitioner_constraints\
-    .partitioner_same_size_as_vertex_constraint \
+    import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.partitioner_constraints\
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 
 # spinnMachine imports
@@ -333,7 +328,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine)
-        self.assertEqual(len(list(graph.vertices)), 5)
+        self.assertEqual(len(list(graph.vertices)), 4)
 
     def test_operation_with_same_size_as_vertex_constraint_large_vertices(
             self):
@@ -346,11 +341,10 @@ class TestBasicPartitioner(unittest.TestCase):
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             PartitionerSameSizeAsVertexConstraint(new_large_vertex))
-        self.graph = ApplicationGraph("New graph")
         self.graph.add_vertices([new_large_vertex, constrained_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine)
-        self.assertEqual(len(list(graph.vertices)), 6)
+        self.assertEqual(len(list(graph.vertices)), 7)
 
     def test_operation_same_size_as_vertex_constraint_different_order(self):
         """
@@ -363,12 +357,11 @@ class TestBasicPartitioner(unittest.TestCase):
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             PartitionerSameSizeAsVertexConstraint(new_large_vertex))
-        self.graph = ApplicationGraph("New graph")
         self.graph.add_vertices([constrained_vertex, new_large_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine)
         # split in 256 each, so 4 machine vertices
-        self.assertEqual(len(list(graph.vertices)), 4)
+        self.assertEqual(len(list(graph.vertices)), 7)
 
     def test_operation_with_same_size_as_vertex_constraint_exception(self):
         """

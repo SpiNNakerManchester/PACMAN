@@ -1,13 +1,12 @@
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.placements.placements import Placements
-from pacman.model.placements.placement import Placement
+from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.constraints.placer_constraints\
-    .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+    import PlacerSameChipAsConstraint
 from pacman.utilities import utility_calls
 
 from spinn_machine.utilities.progress_bar import ProgressBar
@@ -56,18 +55,13 @@ class OneToOnePlacer(RadialPlacer):
         # iterate over vertices
         for vertex_list in vertices:
 
-            # ensure largest cores per chip is divisible by 2
-            # (for one to one placement)
-            max_cores_on_chip = \
-                resource_tracker.most_avilable_cores_on_a_chip()
-
             # if too many one to ones to fit on a chip, allocate individually
-            if len(vertex_list) > max_cores_on_chip:
+            if len(vertex_list) > machine.maximum_user_cores_on_chip:
                 for vertex in vertex_list:
                     self._allocate_individual(
                         vertex, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed)
-                    progress_bar.update()
+                progress_bar.update()
             else:
 
                 try:
@@ -83,7 +77,7 @@ class OneToOnePlacer(RadialPlacer):
                             vertex_list, allocations):
                         placement = Placement(vertex, x, y, p)
                         placements.add_placement(placement)
-                        progress_bar.update()
+                    progress_bar.update()
                 except exceptions.PacmanValueError or \
                         exceptions.PacmanException or \
                         exceptions.PacmanInvalidParameterException:
@@ -94,7 +88,7 @@ class OneToOnePlacer(RadialPlacer):
                         self._allocate_individual(
                             vertex, placements, resource_tracker,
                             same_chip_vertex_groups, all_vertices_placed)
-                        progress_bar.update()
+                    progress_bar.update()
         progress_bar.end()
         return placements
 

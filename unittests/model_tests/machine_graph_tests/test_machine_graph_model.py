@@ -1,12 +1,7 @@
-
 # pacman imports
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-
+from pacman.model.graphs.machine \
+    import MachineEdge, MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.graphs.machine.impl.machine_edge import \
-    MachineEdge
 
 # general imports
 import unittest

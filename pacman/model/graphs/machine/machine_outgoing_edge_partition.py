@@ -1,18 +1,13 @@
 from pacman.model.graphs.impl.outgoing_edge_partition\
     import OutgoingEdgePartition
-from pacman.model.graphs.machine.abstract_machine_edge \
-    import AbstractMachineEdge
+from pacman.model.graphs.machine.machine_edge import MachineEdge
 
 
 class MachineOutgoingEdgePartition(OutgoingEdgePartition):
     """ An outgoing edge partition for a Machine Graph
     """
 
-    __slots__ = [
-
-        # The weight of traffic on this partition
-        "_traffic_weight"
-    ]
+    __slots__ = []
 
     def __init__(self, identifier, constraints=None, label=None,
                  traffic_weight=1):
@@ -25,5 +20,5 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
             to other partitions
         """
         OutgoingEdgePartition.__init__(
-            self, identifier, AbstractMachineEdge, constraints, label,
+            self, identifier, MachineEdge, constraints, label,
             traffic_weight=traffic_weight)

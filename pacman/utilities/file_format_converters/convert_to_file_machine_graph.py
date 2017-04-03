@@ -6,7 +6,7 @@ from collections import defaultdict
 import jsonschema
 
 from pacman.utilities import file_format_schemas
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs import AbstractVirtualVertex
 
 from spinn_machine.utilities.progress_bar import ProgressBar
 

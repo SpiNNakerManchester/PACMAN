@@ -1,31 +1,24 @@
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints\
-    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
+    import AbstractKeyAllocatorConstraint, KeyAllocatorFixedFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
+    import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorContiguousRangeContraint
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_key_and_mask_constraint \
-    import KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
-from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.routing_info.partition_routing_info \
-    import PartitionRoutingInfo
+from pacman.model.routing_info \
+    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
 from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities
+    routing_info_allocator_utilities as utilities
 from pacman import exceptions
 
 # general imports
@@ -60,15 +53,14 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # verify that no edge has more than 1 of a constraint ,and that
         # constraints are compatible
-        routing_info_allocator_utilities.\
-            check_types_of_edge_constraint(machine_graph)
+        utilities.check_types_of_edge_constraint(machine_graph)
 
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
         (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
          flexi_field_groups, continuous_groups, none_continuous_groups) = \
-            routing_info_allocator_utilities.get_edge_groups(machine_graph)
+            utilities.get_edge_groups(machine_graph)
 
         # Even non-continuous keys will be continuous
         for group in none_continuous_groups:

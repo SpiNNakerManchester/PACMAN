@@ -1,22 +1,15 @@
 
 # pacman imports
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_flexi_field_constraint import \
-    KeyAllocatorFlexiFieldConstraint
-from pacman.utilities import utility_calls
-from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorFixedFieldConstraint, KeyAllocatorFlexiFieldConstraint
+from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.utilities import utility_calls
+from pacman.exceptions import PacmanValueError
 from pacman import exceptions
 
 import logging
@@ -171,7 +164,7 @@ def get_fixed_mask(same_key_group):
     :param same_key_group: Set of edges that are to be\
                 assigned the same keys and masks
     :type same_key_group: iterable of\
-                :py:class:`pacman.model.graph.machine.abstract_machine_edge.AbstractMachineEdge`
+        :py:class:`pacman.model.graph.machine.machine_edge.MachineEdge`
     :return: The fixed mask if found, or None
     :raise PacmanValueError: If two edges conflict in their requirements
     """

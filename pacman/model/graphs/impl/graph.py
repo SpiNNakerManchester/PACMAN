@@ -3,22 +3,19 @@ from collections import defaultdict
 from pacman import exceptions
 from pacman.exceptions import PacmanAlreadyExistsException
 from spinn_machine.utilities.ordered_set import OrderedSet
-from pacman.model.abstract_classes.impl.constrained_object \
-    import ConstrainedObject
-from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_graph import AbstractGraph
+from pacman.model.graphs import AbstractGraph
+from pacman.model.graphs.common.constrained_object import ConstrainedObject
 from pacman.model.graphs.impl.outgoing_edge_partition \
     import OutgoingEdgePartition
 
 
-class Graph(AbstractGraph):
+class Graph(ConstrainedObject, AbstractGraph):
     """ A graph implementation that specifies the allowed types of the\
         vertices and edges
     """
 
     __slots__ = (
-
         # The classes of vertex that are allowed in this graph
         "_allowed_vertex_types",
 
@@ -47,12 +44,12 @@ class Graph(AbstractGraph):
         # The outgoing edge partitions by traffic type
         "_outgoing_edge_partitions_by_traffic_type",
 
-        # The constraints delegate
-        "_constraints"
+        # The label of the graph
+        "_label"
     )
 
     def __init__(self, allowed_vertex_types, allowed_edge_types,
-                 allowed_partition_types):
+                 allowed_partition_types, label):
         """
 
         :param allowed_vertex_types:\
@@ -61,8 +58,9 @@ class Graph(AbstractGraph):
             A single or tuple of types of edges to be allowed in the graph
         :param allowed_partition_types:\
             A single or tuple of types of partitions to be allowed in the graph
-
+        :param label: The label on the graph, or None
         """
+        ConstrainedObject.__init__(self, None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
@@ -74,20 +72,12 @@ class Graph(AbstractGraph):
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
         self._outgoing_edge_partitions_by_traffic_type = \
             defaultdict(OrderedSet)
+        self._label = label
 
-        self._constraints = ConstrainedObject()
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraint)
-    def add_constraint(self, constraint):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraints)
-    def add_constraints(self, constraints):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.constraints)
-    def constraints(self):
-        pass
+    @property
+    @overrides(AbstractGraph.label)
+    def label(self):
+        return self._label
 
     @overrides(AbstractGraph.add_vertex)
     def add_vertex(self, vertex):
