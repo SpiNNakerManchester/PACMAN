@@ -51,12 +51,10 @@ class ConvertToMemoryPlacements(object):
                         " a vertex which does not have a placement")
 
                 # virtual chip or tag chip
-                constraints_for_vertex = self._locate_constraints(
-                        vertex_id, constraints)
                 external_device_constraints = \
-                        self._valid_constraints_for_external_device(
-                            constraints_for_vertex)
-                if len(external_device_constraints) != 0:
+                    self._valid_constraints_for_external_device(
+                        self._locate_constraints(vertex_id, constraints))
+                if external_device_constraints:
                     # get data for virtual chip
                     route_constraint = \
                         external_device_constraints['end_point']

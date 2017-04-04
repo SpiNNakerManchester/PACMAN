@@ -38,6 +38,8 @@ def validate_routes(machine_graph, placements, routing_infos,
                 detected
 
     """
+    traffic_multicast = (
+        lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST)
     progress = ProgressBar(
         placements.placements,
         "Verifying the routes from each core travel to the correct locations")
@@ -71,10 +73,7 @@ def validate_routes(machine_graph, placements, routing_infos,
 
             # filter for just multicast edges, we don't check other types of
             # edges here.
-            out_going_edges = filter(
-                lambda machine_edge:
-                     machine_edge.traffic_type == EdgeTrafficType.MULTICAST,
-                partition.edges)
+            out_going_edges = filter(traffic_multicast, partition.edges)
 
             # for every outgoing edge, locate its destination and store it.
             for outgoing_edge in out_going_edges:

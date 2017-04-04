@@ -348,7 +348,8 @@ def placement_report_with_application_graph_by_core(
                         pro_id = processor.processor_id
                         vertex = placements.get_vertex_on_processor(
                             chip.x, chip.y, processor.processor_id)
-                        app_vertex = graph_mapper.get_application_vertex(vertex)
+                        app_vertex = graph_mapper.get_application_vertex(
+                            vertex)
                         vertex_label = app_vertex.label
                         vertex_model = app_vertex.__class__.__name__
                         vertex_atoms = app_vertex.n_atoms
@@ -357,9 +358,9 @@ def placement_report_with_application_graph_by_core(
                         num_atoms = hi_atom - lo_atom + 1
                         f.write("  Processor {}: Vertex: '{}', pop size: {}\n"
                                 .format(pro_id, vertex_label, vertex_atoms))
-                        f.write(
-                            "              Slice on this core: {}:{} ({} atoms)\n"
-                            .format(lo_atom, hi_atom, num_atoms))
+                        f.write("              "
+                                "Slice on this core: {}:{} ({} atoms)\n"
+                                .format(lo_atom, hi_atom, num_atoms))
                         f.write("              Model: {}\n\n".format(
                             vertex_model))
     except IOError:
@@ -462,10 +463,10 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
                         f.write(
                             "**** Chip: ({}, {}) has total memory usage of"
                             " {} KB out of a max of "
-                            "{} MB \n\n".format(chip.x, chip.y,
-                                        int(used_sdram / 1024.0),
-                                        int(chip.sdram.size /
-                                            (1024.0 * 1024.0))))
+                            "{} MB \n\n".format(
+                                chip.x, chip.y,
+                                int(used_sdram / 1024.0),
+                                int(chip.sdram.size / (1024.0 * 1024.0))))
                 except KeyError:
                     # Do Nothing
                     pass
@@ -610,7 +611,7 @@ def generate_comparison_router_report(
                 n_entries_uncompressed = table.number_of_entries
                 n_entries_compressed = compressed_table.number_of_entries
                 ratio = ((n_entries_uncompressed - n_entries_compressed) /
-                              float(n_entries_uncompressed))
+                         float(n_entries_uncompressed))
 
                 f.write(
                     "Uncompressed table at {}:{} has {} entries whereas "
