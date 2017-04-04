@@ -6,7 +6,7 @@ from collections import defaultdict
 import jsonschema
 
 from pacman.utilities import file_format_schemas
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs import AbstractVirtualVertex
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -27,7 +27,7 @@ class ConvertToFileMachineGraph(object):
         :return:
         """
         progress = ProgressBar(
-            machine_graph.n_vertices, "Converting to json graph")
+            machine_graph.n_vertices + 1, "Converting to json graph")
 
         # write basic stuff
         json_graph_directory_rep = dict()
@@ -49,6 +49,7 @@ class ConvertToFileMachineGraph(object):
 
         with open(file_path, "w") as file_to_write:
             json.dump(json_graph_directory_rep, file_to_write)
+        progress.update()
 
         # validate the schema
         graph_schema_file_path = os.path.join(

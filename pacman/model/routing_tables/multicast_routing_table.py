@@ -57,7 +57,6 @@ class MulticastRoutingTable(object):
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:\
                     :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
@@ -111,7 +110,6 @@ class MulticastRoutingTable(object):
     def number_of_entries(self):
         """ The number of multi-cast routing entries there are in the\
             multicast routing table
-        :return:
         """
         return len(self._multicast_routing_entries)
 

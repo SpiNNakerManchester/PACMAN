@@ -1,9 +1,9 @@
 import logging
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 
-from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
+from pacman.model.constraints.placer_constraints \
     import AbstractPlacerConstraint
-from pacman.model.placements.placements import Placements
+from pacman.model.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
 from spinn_utilities.progress_bar import ProgressBar

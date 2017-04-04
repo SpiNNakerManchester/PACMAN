@@ -66,7 +66,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
 
     def __repr__(self):
         return (
-            "PythonFunctionAlgorithm(algorithm_id={},"
+            "ExternalAlgorithm(algorithm_id={},"
             " required_inputs={}, optional_inputs={}, outputs={}"
             " command_line_arguments={})".format(
                 self._algorithm_id, self._required_inputs,

@@ -1,8 +1,6 @@
 
-from pacman.model.routing_tables.multicast_routing_table import \
-    MulticastRoutingTable
-from pacman.model.routing_tables.multicast_routing_tables import \
-    MulticastRoutingTables
+from pacman.model.routing_tables \
+    import MulticastRoutingTable, MulticastRoutingTables
 
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 from spinn_utilities.progress_bar import ProgressBar
@@ -25,7 +23,6 @@ class BasicRoutingTableGenerator(object):
         :param routing_infos:
         :param routing_table_by_partitions:
         :param machine:
-        :return:
         """
         progress = ProgressBar(machine.chips, "Generating routing tables")
         routing_tables = MulticastRoutingTables()

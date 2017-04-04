@@ -1,7 +1,5 @@
-from pacman.model.routing_tables.multicast_routing_table\
-    import MulticastRoutingTable
-from pacman.model.routing_tables.multicast_routing_tables\
-    import MulticastRoutingTables
+from pacman.model.routing_tables \
+    import MulticastRoutingTable, MulticastRoutingTables
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry

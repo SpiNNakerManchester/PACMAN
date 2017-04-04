@@ -1,22 +1,15 @@
 
 # pacman imports
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_flexi_field_constraint import \
-    KeyAllocatorFlexiFieldConstraint
-from pacman.utilities import utility_calls
-from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorFixedFieldConstraint, KeyAllocatorFlexiFieldConstraint
+from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.utilities import utility_calls
+from pacman.exceptions import PacmanValueError
 from pacman import exceptions
 
 import logging
@@ -28,6 +21,7 @@ def get_edge_groups(machine_graph):
         :py:class:`pacman.model.constraints.key_allocator_same_key_constraint.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
+
     :param machine_graph: the machine graph
     """
 
@@ -73,7 +67,7 @@ def check_types_of_edge_constraint(machine_graph):
         are compatible.
 
     :param machine_graph: the graph to search through
-    :return:
+    :rtype: None:
     """
     for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = utility_calls.locate_constraints_of_type(
@@ -138,7 +132,7 @@ def _check_masks_are_correct(partition):
 
     :param partition: the outgoing_edge_partition to search for these\
                 constraints
-    :return:
+    :rtype: None:
     """
     fixed_mask = utility_calls.locate_constraints_of_type(
         partition.constraints, KeyAllocatorFixedMaskConstraint)[0]
@@ -170,7 +164,7 @@ def get_fixed_mask(same_key_group):
     :param same_key_group: Set of edges that are to be\
                 assigned the same keys and masks
     :type same_key_group: iterable of\
-                :py:class:`pacman.model.graph.machine.abstract_machine_edge.AbstractMachineEdge`
+        :py:class:`pacman.model.graph.machine.machine_edge.MachineEdge`
     :return: The fixed mask if found, or None
     :raise PacmanValueError: If two edges conflict in their requirements
     """

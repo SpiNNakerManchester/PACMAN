@@ -3,9 +3,8 @@ TestTagsModel
 """
 from __future__ import absolute_import
 # pacman imports
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-from pacman.model.tags.tags import Tags
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.tags import Tags
 
 # spinnmachine imports
 from spinn_machine.tags.iptag import IPTag

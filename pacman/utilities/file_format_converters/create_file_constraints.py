@@ -1,8 +1,6 @@
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints.abstract_placer_constraint\
-    import AbstractPlacerConstraint
+from pacman.model.graphs import AbstractVirtualVertex
+from pacman.model.constraints.placer_constraints\
+    import PlacerChipAndCoreConstraint, AbstractPlacerConstraint
 from pacman import exceptions
 from pacman.utilities import utility_calls
 from pacman.utilities import constants
@@ -25,7 +23,6 @@ class CreateConstraintsToFile(object):
         """
         :param machine_graph: the machine graph
         :param machine: the machine
-        :return:
         """
 
         progress = ProgressBar(
@@ -95,7 +92,6 @@ class CreateConstraintsToFile(object):
 
         :param vertex:
         :param machine:
-        :return:
         """
         # locate the chip from the placement constraint
         placement_constraint = utility_calls.locate_constraints_of_type(

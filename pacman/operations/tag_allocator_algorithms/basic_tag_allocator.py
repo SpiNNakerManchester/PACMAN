@@ -2,7 +2,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 
 # pacman imports
-from pacman.model.tags.tags import Tags
+from pacman.model.tags import Tags
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 # spinn_machine imports

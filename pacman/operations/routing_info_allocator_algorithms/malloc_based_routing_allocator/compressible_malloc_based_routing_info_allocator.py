@@ -1,24 +1,17 @@
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints\
-    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
+    import AbstractKeyAllocatorConstraint, KeyAllocatorFixedFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
+    import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorContiguousRangeContraint
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_key_and_mask_constraint \
-    import KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
-from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.routing_info.partition_routing_info \
-    import PartitionRoutingInfo
+from pacman.model.routing_info \
+    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
     ElementAllocatorAlgorithm
@@ -218,14 +211,6 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     @staticmethod
     def _update_routing_objects(
             keys_and_masks, routing_infos, group):
-        """
-
-        :param keys_and_masks:
-        :param routing_infos:
-        :param group:
-        :return:
-        """
-
         # Allocate the routing information
         partition_info = PartitionRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)

@@ -3,7 +3,7 @@ A collection of methods which support partitioning algorithms.
 """
 
 from pacman.model.constraints.partitioner_constraints\
-    .abstract_partitioner_constraint import AbstractPartitionerConstraint
+    import AbstractPartitionerConstraint
 from spinn_utilities.progress_bar import ProgressBar
 
 

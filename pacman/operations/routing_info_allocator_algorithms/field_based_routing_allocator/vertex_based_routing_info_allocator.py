@@ -1,24 +1,17 @@
 
 # pacman imports
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_contiguous_range_constraint import \
-    KeyAllocatorContiguousRangeContraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_key_and_mask_constraint import \
-    KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_mask_constraint import \
-    KeyAllocatorFixedMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_flexi_field_constraint import \
-    KeyAllocatorFlexiFieldConstraint
-from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.partition_routing_info \
-    import PartitionRoutingInfo
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorContiguousRangeContraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorFixedFieldConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorFlexiFieldConstraint
+from pacman.model.routing_info \
+    import RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
@@ -154,7 +147,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :param seen_fields: the fields been seen
         :param field_positions: the set of fields that have been allocated\
                     over the entire key space
-        :return: None
+        :rtype: None
         """
 
         # locate the application field if it exists
@@ -210,7 +203,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
         :param seen_fields: the types of fields needed to get this simulation\
                     operating correctly
-        :return: None
         """
 
         application_field = None
@@ -228,12 +220,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _fixed_key_application_field_allocation(
             self, seen_fields, required_bits):
-        """
-
-        :param seen_fields:
-        :param required_bits:
-        :return:
-        """
         fixed_keys = seen_fields[FIXED_KEY_NAME]
         if len(fixed_keys) == 1:
             found = False
@@ -351,8 +337,8 @@ class VertexBasedRoutingInfoAllocator(object):
         :param seen_fields:
         :param application_field:
         :param required_bits:
-        :return: bool true if it was able to adjust to the field,
-        false otherwise
+        :return: bool true if it was able to adjust to the field,\
+            false otherwise
         """
         fixed_mask_masks = \
             seen_fields[FIXED_MASK_NAME]
@@ -1008,7 +994,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :param bit_field_space: the bit field space
         :param field: the field that needs placing into the bitfield space
         :param fields: ???????
-        :return: None
+        :rtype: None
         """
 
         # field must be a flexible field, work accordingly
@@ -1041,15 +1027,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _determine_groups(self, machine_graph, graph_mapper, graph,
                           n_keys_map, progress_bar):
-        """
-
-        :param machine_graph:
-        :param graph_mapper:
-        :param graph:
-        :param n_keys_map:
-        :return:
-        """
-
         routing_info_allocator_utilities.check_types_of_edge_constraint(
             machine_graph)
 
@@ -1121,12 +1098,6 @@ class VertexBasedRoutingInfoAllocator(object):
 
     @staticmethod
     def _deduce_key_value_for_field(key, fixed_key_field):
-        """
-
-        :param key:
-        :param fixed_key_field:
-        :return:
-        """
         new_key = key >> fixed_key_field.lo
         mask = int(math.pow(2, ((fixed_key_field.hi -
                                  fixed_key_field.lo) + 1))) - 1
@@ -1178,11 +1149,6 @@ class VertexBasedRoutingInfoAllocator(object):
         """ Search though the graph adding field constraints for the key\
                     allocator
 
-        :param partition:
-        :param graph_mapper:
-        :param graph:
-        :param n_keys_map:
-        :return:
         """
 
         fields = list()
@@ -1216,25 +1182,12 @@ class VertexBasedRoutingInfoAllocator(object):
 
     @staticmethod
     def _create_internal_field_space(higher_space, field_value, field):
-        """
-
-        :param higher_space:
-        :param field_value:
-        :param field:
-        :return:
-        """
         inputs = dict()
         inputs[field.name] = field_value
         return higher_space(**inputs)
 
     @staticmethod
     def _locate_field_value_by_name(field_list, field_name):
-        """
-
-        :param field_list:
-        :param field_name:
-        :return:
-        """
         for field in field_list:
             if field.name == field_name:
                 return field.value

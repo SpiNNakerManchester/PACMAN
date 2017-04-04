@@ -1,9 +1,8 @@
+from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.model.placements.placements import Placements
-from pacman.model.placements.placement import Placement
-from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 # general imports

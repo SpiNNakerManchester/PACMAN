@@ -27,7 +27,6 @@ class ConvertToFileMachine(object):
 
         :param machine:
         :param file_path:
-        :return:
         """
         progress = ProgressBar(
             (machine.max_chip_x + 1) * (machine.max_chip_y + 1) + 2,
@@ -53,9 +52,9 @@ class ConvertToFileMachine(object):
         # write dead chips
         for x_coord in range(0, machine.max_chip_x + 1):
             for y_coord in range(0, machine.max_chip_y + 1):
-                self._add_possibly_dead_chip(json_obj, machine,
-                                             x_coord, y_coord,
-                                             chip_resource_exceptions)
+                self._add_possibly_dead_chip(
+                    json_obj, machine, x_coord, y_coord,
+                    chip_resource_exceptions)
                 progress.update()
 
         # convert dict into list

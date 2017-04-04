@@ -5,17 +5,10 @@ test vertex used in many unit tests
 
 # pacman imports
 
-from pacman.model.graphs.application.impl.application_vertex import \
-    ApplicationVertex
-from pacman.model.graphs.application.abstract_application_vertex import \
-    AbstractApplicationVertex
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource \
-    import CPUCyclesPerTickResource
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import DTCMResource, ResourceContainer, \
+    SDRAMResource, CPUCyclesPerTickResource
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.decorators.overrides import overrides
 
 
@@ -72,13 +65,13 @@ class TestVertex(ApplicationVertex):
         """
         return 1 * vertex_slice.n_atoms
 
-    @overrides(AbstractApplicationVertex.create_machine_vertex)
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         return SimpleMachineVertex(resources_required, label, constraints)
 
     @property
-    @overrides(AbstractApplicationVertex.n_atoms)
+    @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms

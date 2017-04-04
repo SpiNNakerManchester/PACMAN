@@ -1,14 +1,11 @@
 from spinn_utilities.ordered_set import OrderedSet
 from pacman import exceptions
-from pacman.model.abstract_classes.impl.constrained_object \
-    import ConstrainedObject
-from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_outgoing_edge_partition \
-    import AbstractOutgoingEdgePartition
+from pacman.model.graphs import AbstractOutgoingEdgePartition
+from pacman.model.graphs.common.constrained_object import ConstrainedObject
 
 
-class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
+class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key
 
@@ -22,53 +19,31 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
     __slots__ = [
         # The partition identifier
         "_identifier",
-
         # The edges in the partition
         "_edges",
-
         # The vertex at the start of all the edges
         "_pre_vertex",
-
         # The traffic type of all the edges
         "_traffic_type",
-
-        # The constraints delegate
-        "_constraints",
-
-        # The label
-        "_label",
-
         # The type of edges to accept
         "_allowed_edge_types",
-
         # The weight of traffic going down this partition
-        "_traffic_weight"
+        "_traffic_weight",
+        # The label of the graph
+        "_label"
     ]
 
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
+        ConstrainedObject.__init__(self, constraints)
+        self._label = label
         self._identifier = identifier
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
         self._pre_vertex = None
         self._traffic_type = None
-        self._label = label
         self._traffic_weight = traffic_weight
-
-        self._constraints = ConstrainedObject(constraints)
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraint)
-    def add_constraint(self, constraint):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraints)
-    def add_constraints(self, constraints):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.constraints)
-    def constraints(self):
-        pass
 
     @property
     @overrides(AbstractOutgoingEdgePartition.label)

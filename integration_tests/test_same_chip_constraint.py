@@ -1,10 +1,8 @@
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from spinn_machine.virtual_machine import VirtualMachine
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.constraints.placer_constraints\
-    .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+from pacman.model.resources import ResourceContainer
+from pacman.model.constraints.placer_constraints \
+    import PlacerSameChipAsConstraint
 from pacman.operations.rig_algorithms.rig_place import RigPlace
 from pacman.operations.placer_algorithms.one_to_one_placer \
     import OneToOnePlacer

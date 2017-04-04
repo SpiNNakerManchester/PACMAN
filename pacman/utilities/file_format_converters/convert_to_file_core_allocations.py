@@ -21,7 +21,7 @@ class ConvertToFileCoreAllocations(object):
         :return:
         """
 
-        progress = ProgressBar(placements + 1,
+        progress = ProgressBar(len(placements) + 1,
                                "Converting to json core allocations")
 
         # write basic stuff

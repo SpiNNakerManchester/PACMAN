@@ -1,10 +1,8 @@
 # pacman imports
 from pacman.model.constraints.partitioner_constraints\
-    .partitioner_maximum_size_constraint import \
-    PartitionerMaximumSizeConstraint
+    import PartitionerMaximumSizeConstraint
 from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
+from pacman.model.graphs.machine import SimpleMachineVertex
 
 # unit tests imports
 from uinit_test_objects.test_vertex import TestVertex
