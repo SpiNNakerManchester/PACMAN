@@ -1155,7 +1155,7 @@ class ResourceTracker(object):
         :type reverse_ip_tags: iterable of\
                     :py:class:`pacman.model.resources.reverse_iptag_resource.ReverseIptagResource`
         :return: a resource which shows max resources available
-        :rtype: ResourceContainer
+        :rtype: pacman.model.resources.ResourceContainer
         """
         usable_chips = self._get_usable_chips(chips, board_address,
                                               ip_tags, reverse_ip_tags)

@@ -64,7 +64,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :type vertex_slice: :py:class:`pacman.model.graph.slice.Slice`
         :return: a Resource container that contains a \
                     CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: ResourceContainer
+        :rtype: pacman.model.resources.ResourceContainer
         :raise None: this method does not raise any known exception
         """
 

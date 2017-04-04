@@ -37,10 +37,10 @@ def locate_first_constraint_of_type(constraints, constraint_type):
                 :py:class:`pacman.model.constraint.abstract_partitioner_constraint.AbstractPartitionConstraint`
     :return: The first constraint of constraint_type that was\
                 found in the constraints given
-    :rtype: \
-        :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
-    :raises pacman.exceptions.PacmanInvalidParameterException: if no such
-    constraint is present
+    :rtype:\
+                :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
+    :raises pacman.exceptions.PacmanInvalidParameterException: if no such\
+                constraint is present
     """
     for constraint in constraints:
         if isinstance(constraint, constraint_type):
