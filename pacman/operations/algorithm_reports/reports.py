@@ -324,7 +324,7 @@ def placement_report_with_application_graph_by_core(
     file_name = os.path.join(report_folder, "placement_by_core.rpt")
     try:
         with open(file_name, "w") as f:
-            progress = ProgressBar(machine.chips,
+            progress = ProgressBar(machine.n_chips,
                                    "Generating placement by core report")
 
             f.write("        Placement Information by Core\n")
@@ -442,7 +442,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
 
             placements = sorted(placements.placements,
                                 key=lambda x: x.vertex.label)
-            progress = ProgressBar(len(placements) + len(machine.chips),
+            progress = ProgressBar(len(placements) + machine.n_chips,
                                    "Generating SDRAM usage report")
 
             for placement in placements:
