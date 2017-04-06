@@ -24,7 +24,7 @@ class BasicRoutingTableGenerator(object):
         :param routing_table_by_partitions:
         :param machine:
         """
-        progress = ProgressBar(machine.chips, "Generating routing tables")
+        progress = ProgressBar(machine.n_chips, "Generating routing tables")
         routing_tables = MulticastRoutingTables()
         for chip in progress.over(machine.chips):
             partitions_in_table = routing_table_by_partitions.\

@@ -79,7 +79,7 @@ class BasicDijkstraRouting(object):
         self._update_all_weights(nodes_info, machine)
 
         # each vertex represents a core in the board
-        progress = ProgressBar(placements.placements,
+        progress = ProgressBar(placements.n_placements,
                                "Creating routing entries")
 
         for placement in progress.over(placements.placements):
