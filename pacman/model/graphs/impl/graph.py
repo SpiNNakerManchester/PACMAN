@@ -1,8 +1,9 @@
 from collections import defaultdict
 
+from spinn_utilities.ordered_set import OrderedSet
+
 from pacman import exceptions
 from pacman.exceptions import PacmanAlreadyExistsException
-from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs import AbstractGraph
 from pacman.model.graphs.common.constrained_object import ConstrainedObject

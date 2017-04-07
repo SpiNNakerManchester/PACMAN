@@ -35,7 +35,7 @@ def get_same_chip_vertex_groups(vertices):
             if isinstance(constraint, PlacerSameChipAsConstraint):
                 same_chip_as_vertices.append(constraint.vertex)
 
-        if len(same_chip_as_vertices) > 0:
+        if same_chip_as_vertices:
             # Go through all the verts that want to be on the same chip as
             # the top level vert
             for same_as_chip_vertex in same_chip_as_vertices:

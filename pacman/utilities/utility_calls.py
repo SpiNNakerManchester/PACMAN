@@ -26,6 +26,37 @@ def locate_constraints_of_type(constraints, constraint_type):
     return passed_constraints
 
 
+def locate_first_constraint_of_type(constraints, constraint_type):
+    """ Locates the first constraint of a given type out of a list
+
+    :param constraints: The constraints to select from
+    :type constraints: iterable of\
+                :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
+    :param constraint_type: The type of constraints to return
+    :type constraint_type:\
+                :py:class:`pacman.model.constraint.abstract_partitioner_constraint.AbstractPartitionConstraint`
+    :return: The first constraint of constraint_type that was\
+                found in the constraints given
+    :rtype:\
+                :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
+    :raises pacman.exceptions.PacmanInvalidParameterException: if no such\
+                constraint is present
+    """
+    for constraint in constraints:
+        if isinstance(constraint, constraint_type):
+            return constraint
+    raise PacmanInvalidParameterException(
+        "constraints", constraint.__class__,
+        "Constraints of this class are not present")
+
+
+def _is_constraint_supported(constraint, supported_constraints):
+    for supported_constraint in supported_constraints:
+        if isinstance(constraint, supported_constraint):
+            return True
+    return False
+
+
 def check_algorithm_can_support_constraints(
         constrained_vertices, supported_constraints, abstract_constraint_type):
     """ Helper method to find out if an algorithm can support all the\
@@ -38,7 +69,7 @@ def check_algorithm_can_support_constraints(
     :param supported_constraints: The constraints supported
     :type supported_constraints: iterable of\
                 :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
-    :param abstract_constraint_type: The overall abstract constraint type\
+    :param abstract_constraint_type: The overall abstract c type\
                 supported
     :type abstract_constraint_type:\
                 :py:class:`pacman.model.constraints.AbstractConstraint.AbstractConstraint`
@@ -48,17 +79,11 @@ def check_algorithm_can_support_constraints(
                 algorithm cannot support the constraints demanded of it
     """
     for constrained_vertex in constrained_vertices:
-        for constraint in constrained_vertex.constraints:
-            if isinstance(constraint, abstract_constraint_type):
-                found = False
-                for supported_constraint in supported_constraints:
-                    if isinstance(constraint, supported_constraint):
-                        found = True
-                        break
-
-                if not found:
-                    raise PacmanInvalidParameterException(
-                        "constraints", constraint.__class__,
+        for c in constrained_vertex.constraints:
+            if isinstance(c, abstract_constraint_type) and not \
+                    _is_constraint_supported(c, supported_constraints):
+                raise PacmanInvalidParameterException(
+                        "constraints", c.__class__,
                         "Constraints of this class are not supported by this"
                         " algorithm")
 

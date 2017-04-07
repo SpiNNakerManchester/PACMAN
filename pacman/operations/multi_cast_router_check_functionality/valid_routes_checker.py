@@ -8,7 +8,7 @@ from pacman import exceptions
 from pacman.model.constraints.key_allocator_constraints \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 
 logger = logging.getLogger(__name__)
@@ -38,10 +38,12 @@ def validate_routes(machine_graph, placements, routing_infos,
                 detected
 
     """
+    traffic_multicast = (
+        lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST)
     progress = ProgressBar(
-        len(list(placements.placements)),
+        placements.placements,
         "Verifying the routes from each core travel to the correct locations")
-    for placement in placements.placements:
+    for placement in progress.over(placements.placements):
 
         # locate all placements to which this placement/vertex will
         # communicate with for a given key_and_mask and search its
@@ -52,23 +54,14 @@ def validate_routes(machine_graph, placements, routing_infos,
             get_outgoing_edge_partitions_starting_at_vertex(placement.vertex)
 
         if graph_mapper is not None:
-            n_atoms = \
-                graph_mapper.get__slice(placement.vertex).n_atoms
+            n_atoms = graph_mapper.get__slice(placement.vertex).n_atoms
         else:
             n_atoms = 0
 
         for partition in partitions:
             r_info = routing_infos.get_routing_info_from_partition(
                 partition)
-
-            if n_atoms > 0:
-                is_continuous = \
-                    _check_if_partition_has_continuous_keys(partition)
-            else:
-                is_continuous = True
-
             is_continuous = _check_if_partition_has_continuous_keys(partition)
-
             if not is_continuous:
                 logger.warn(
                     "Due to the none continuous nature of the keys in this "
@@ -80,11 +73,7 @@ def validate_routes(machine_graph, placements, routing_infos,
 
             # filter for just multicast edges, we don't check other types of
             # edges here.
-            out_going_edges = \
-                filter(
-                    lambda machine_edge:
-                    machine_edge.traffic_type == EdgeTrafficType.MULTICAST,
-                    partition.edges)
+            out_going_edges = filter(traffic_multicast, partition.edges)
 
             # for every outgoing edge, locate its destination and store it.
             for outgoing_edge in out_going_edges:
@@ -101,15 +90,13 @@ def validate_routes(machine_graph, placements, routing_infos,
                 _search_route(
                     placement, destination_placements, key_and_mask,
                     routing_tables, machine, n_atoms, is_continuous)
-        progress.update()
-    progress.end()
 
 
 def _check_if_partition_has_continuous_keys(partition):
-    continuous_constraints =\
-        utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorContiguousRangeContraint)
-    return not (len(continuous_constraints) == 0)
+    continuous_constraints = utility_calls.locate_constraints_of_type(
+        partition.constraints, KeyAllocatorContiguousRangeContraint)
+    # TODO: Can we do better here?
+    return len(continuous_constraints) > 0
 
 
 def _search_route(source_placement, dest_placements, key_and_mask,
@@ -230,9 +217,7 @@ def _start_trace_via_routing_tables(
     current_router_table = routing_tables.get_routing_table_for_chip(
         source_placement.x, source_placement.y)
     visited_routers = set()
-    current_router_table_tuple = (current_router_table.x,
-                                  current_router_table.y)
-    visited_routers.add(current_router_table_tuple)
+    visited_routers.add((current_router_table.x, current_router_table.y))
 
     # get src router
     entry = _locate_routing_entry(
@@ -306,21 +291,18 @@ def _recursive_trace_to_destinations(
     processor_values = entry.processor_ids
 
     # if goes down a chip link
-    if len(chip_links) > 0:
-
+    if chip_links:
         # also goes to a processor
-        if len(processor_values) > 0:
+        if processor_values:
             _is_dest(processor_values, current_router, reached_placements)
         # only goes to new chip
         for link_id in chip_links:
 
             # locate next chips router
-            machine_router = \
-                machine.get_chip_at(chip_x, chip_y).router
+            machine_router = machine.get_chip_at(chip_x, chip_y).router
             link = machine_router.get_link(link_id)
-            next_router = \
-                routing_tables.get_routing_table_for_chip(
-                    link.destination_x, link.destination_y)
+            next_router = routing_tables.get_routing_table_for_chip(
+                link.destination_x, link.destination_y)
 
             # check that we've not visited this router before
             _check_visited_routers(next_router.x, next_router.y,
@@ -372,8 +354,7 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
             "The routers I've currently visited are {} and the router i'm "
             "visiting is {}"
             .format(visited_routers, visited_routers_router))
-    else:
-        visited_routers.add(visited_routers_router)
+    visited_routers.add(visited_routers_router)
 
 
 def _is_dest(processor_ids, current_router, reached_placements):
@@ -389,8 +370,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
 
     dest_x, dest_y = current_router.x, current_router.y
     for processor_id in processor_ids:
-        reached_placements.add(PlacementTuple(dest_x, dest_y,
-                                              processor_id))
+        reached_placements.add(PlacementTuple(dest_x, dest_y, processor_id))
 
 
 range_masks = {0xFFFFFFFFL - ((2 ** i) - 1) for i in range(33)}
@@ -429,7 +409,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
         elif entry.mask in range_masks:
             last_atom = key + n_atoms
             last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
-            if (min(last_key, last_atom) - max(e_key, key)) + 1 > 0:
+            if min(last_key, last_atom) - max(e_key, key) + 1 > 0:
                 raise Exception(
                     "Key range partially covered:  key:{} key_combo:{} "
                     "mask:{}, last_key:{}, e_key:{}".format(
@@ -437,5 +417,4 @@ def _locate_routing_entry(current_router, key, n_atoms):
                         hex(last_key), hex(e_key)))
     if found_entry is not None:
         return found_entry
-    else:
-        raise exceptions.PacmanRoutingException("no entry located")
+    raise exceptions.PacmanRoutingException("no entry located")

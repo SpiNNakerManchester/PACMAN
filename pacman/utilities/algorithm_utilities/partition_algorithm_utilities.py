@@ -2,13 +2,9 @@
 A collection of methods which support partitioning algorithms.
 """
 
-import logging
-
 from pacman.model.constraints.partitioner_constraints\
     import AbstractPartitionerConstraint
-from spinn_machine.utilities.progress_bar import ProgressBar
-
-logger = logging.getLogger(__name__)
+from spinn_utilities.progress_bar import ProgressBar
 
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):
@@ -26,11 +22,11 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     """
 
     # start progress bar
-    progress_bar = ProgressBar(
+    progress = ProgressBar(
         machine_graph.n_vertices, "Partitioning graph edges")
 
     # Partition edges according to vertex partitioning
-    for source_vertex in machine_graph.vertices:
+    for source_vertex in progress.over(machine_graph.vertices):
 
         # For each out edge of the parent vertex...
         vertex = graph_mapper.get_application_vertex(source_vertex)
@@ -62,8 +58,6 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
                     # update mapping object
                     graph_mapper.add_edge_mapping(
                         machine_edge, application_edge)
-        progress_bar.update()
-    progress_bar.end()
 
 
 def get_remaining_constraints(vertex):

@@ -90,7 +90,7 @@ class PartitionAndPlacePartitioner(object):
 
     def _partition_vertex(
             self, vertex, machine_graph, graph_mapper, resource_tracker,
-            graph, progress_bar):
+            graph, progress):
         """ Partition a single vertex
 
         :param vertex: the vertex to partition
@@ -133,11 +133,11 @@ class PartitionAndPlacePartitioner(object):
         # partition by atoms
         self._partition_by_atoms(
             partition_together_vertices, vertex.n_atoms, max_atoms_per_core,
-            machine_graph, graph, graph_mapper, resource_tracker, progress_bar)
+            machine_graph, graph, graph_mapper, resource_tracker, progress)
 
     def _partition_by_atoms(
             self, vertices, n_atoms, max_atoms_per_core, machine_graph, graph,
-            graph_mapper, resource_tracker, progress_bar):
+            graph_mapper, resource_tracker, progress):
         """ Try to partition vertices on how many atoms it can fit on\
             each vertex
 
@@ -167,7 +167,6 @@ class PartitionAndPlacePartitioner(object):
         """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
-
             lo_atom = n_atoms_placed
             hi_atom = lo_atom + max_atoms_per_core - 1
             if hi_atom >= n_atoms:
@@ -195,7 +194,7 @@ class PartitionAndPlacePartitioner(object):
                 graph_mapper.add_vertex_mapping(
                     machine_vertex, vertex_slice, vertex)
 
-                progress_bar.update(vertex_slice.n_atoms)
+                progress.update(vertex_slice.n_atoms)
 
     @staticmethod
     def _reallocate_resources(
@@ -220,7 +219,6 @@ class PartitionAndPlacePartitioner(object):
         new_used_placements = list()
         for (placed_vertex, x, y, p, placed_resources,
                 ip_tags, reverse_ip_tags) in used_placements:
-
             # Deallocate the existing resources
             resource_tracker.unallocate_resources(
                 x, y, p, placed_resources, ip_tags, reverse_ip_tags)
@@ -290,7 +288,6 @@ class PartitionAndPlacePartitioner(object):
             ratio = self._find_max_ratio(used_resources, resources)
 
             while ratio > 1.0 and hi_atom >= lo_atom:
-
                 # Scale the resources by the ratio
                 old_n_atoms = (hi_atom - lo_atom) + 1
                 new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))

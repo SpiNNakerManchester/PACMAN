@@ -1,5 +1,5 @@
+from spinn_utilities.ordered_set import OrderedSet
 from pacman import exceptions
-from spinn_machine.utilities.ordered_set import OrderedSet
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs import AbstractOutgoingEdgePartition
 from pacman.model.graphs.common.constrained_object import ConstrainedObject
