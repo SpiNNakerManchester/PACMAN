@@ -3,19 +3,13 @@ test basic placer
 """
 
 # pacman imports
-from pacman.model.graphs.application.simple_application_edge import \
-    SimpleApplicationEdge
-from pacman.model.graphs.machine.simple_machine_vertex \
-    import SimpleMachineVertex
-
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.graphs.common.slice import Slice
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
+    import PlacerChipAndCoreConstraint
 from pacman.model.graphs.common.graph_mapper import GraphMapper
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 
 # spinn machine imports
@@ -28,7 +22,10 @@ from spinn_machine.sdram import SDRAM
 
 # general imports
 import unittest
+
+# support imports
 from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.placer_test_support import get_resources_used_by_atoms
 
 
 class TestBasicPlacer(unittest.TestCase):
@@ -36,27 +33,24 @@ class TestBasicPlacer(unittest.TestCase):
     test for basic placement algorithum
     """
     def setUp(self):
-        ########################################################################
-        # Setting up vertices, edges and graph                                 #
-        ########################################################################
+        #######################################################################
+        # Setting up vertices, edges and graph                                #
+        #######################################################################
         self.vert1 = TestVertex(100, "New AbstractConstrainedTestVertex 1")
         self.vert2 = TestVertex(5, "New AbstractConstrainedTestVertex 2")
         self.vert3 = TestVertex(3, "New AbstractConstrainedTestVertex 3")
-        self.edge1 = SimpleApplicationEdge(self.vert1, self.vert2,
-                                                "First edge")
-        self.edge2 = SimpleApplicationEdge(self.vert2, self.vert1,
-                                                "Second edge")
-        self.edge3 = SimpleApplicationEdge(self.vert1, self.vert3,
-                                                "Third edge")
+        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
+        self.edge2 = ApplicationEdge(self.vert2, self.vert1, "Second edge")
+        self.edge3 = ApplicationEdge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph", self.verts, self.edges)
 
-        ########################################################################
-        # Setting up machine                                                   #
-        ########################################################################
+        #######################################################################
+        # Setting up machine                                                  #
+        #######################################################################
         flops = 1000
-        (e, ne, n, w, sw, s) = range(6)
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -81,12 +75,12 @@ class TestBasicPlacer(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
         self.machine = Machine(chips)
-        ########################################################################
-        # Setting up graph and graph_mapper                                 #
-        ########################################################################
+        #######################################################################
+        # Setting up graph and graph_mapper                                   #
+        #######################################################################
         self.vertices = list()
         self.vertex1 = SimpleMachineVertex(
-            0, 1, self.vert1.get_resources_used_by_atoms(0, 1, []),
+            0, 1, self.vert1.get_resources_used_by_atoms(Slice(0, 1)),
             "First vertex")
         self.vertex2 = SimpleMachineVertex(
             1, 5, get_resources_used_by_atoms(1, 5, []), "Second vertex")
@@ -100,8 +94,7 @@ class TestBasicPlacer(unittest.TestCase):
         self.vertices.append(self.vertex3)
         self.vertices.append(self.vertex4)
         self.edges = list()
-        self.graph = MachineGraph(self.vertices,
-                                         self.edges)
+        self.graph = MachineGraph(self.vertices, self.edges)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(self.vertices)
 
@@ -133,15 +126,16 @@ class TestBasicPlacer(unittest.TestCase):
     def test_place_vertex_too_big_with_vertex(self):
         large_vertex = TestVertex(500, "Large vertex 500")
         large_machine_vertex = large_vertex.create_machine_vertex(
-            0, 499, get_resources_used_by_atoms(0, 499, []))#SimpleMachineVertex(0, 499, "Large vertex")
+            0, 499, get_resources_used_by_atoms(0, 499, []))
+        # SimpleMachineVertex(0, 499, "Large vertex")
         self.graph.add_vertex(large_vertex)
-        self.graph = ApplicationGraph("Graph",[large_vertex])
+        self.graph = ApplicationGraph("Graph", [large_vertex])
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices([large_machine_vertex], large_vertex)
         self.bp = BasicPlacer(self.machine, self.graph)
         self.graph = MachineGraph(vertices=[large_machine_vertex])
         with self.assertRaises(PacmanPlaceException):
-            placements = self.bp.place(self.graph, self.graph_mapper)
+            self.bp.place(self.graph, self.graph_mapper)
 
     @unittest.skip("demonstrating skipping")
     def test_try_to_place(self):
@@ -151,7 +145,8 @@ class TestBasicPlacer(unittest.TestCase):
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         self.vertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
-        self.assertIsInstance(self.vertex1.constraints[0], PlacerChipAndCoreConstraint)
+        self.assertIsInstance(self.vertex1.constraints[0],
+                              PlacerChipAndCoreConstraint)
         self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
         self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
         self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 4, 16))
@@ -173,7 +168,8 @@ class TestBasicPlacer(unittest.TestCase):
     def test_deal_with_constraint_placement_vertices_have_vertices(self):
         self.bp = BasicPlacer(self.machine, self.graph)
         self.vertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
-        self.assertIsInstance(self.vertex1.constraints[0], PlacerChipAndCoreConstraint)
+        self.assertIsInstance(self.vertex1.constraints[0],
+                              PlacerChipAndCoreConstraint)
         self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
         self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
         self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 7, 16))
@@ -206,12 +202,12 @@ class TestBasicPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_many_vertices(self):
         vertices = list()
-        for i in range(20 * 17): #50 atoms per each processor on 20 chips
+        for i in range(20 * 17):  # 50 atoms per each processor on 20 chips
             vertices.append(TestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "SimpleMachineVertex " + str(i)))
 
-        self.graph = ApplicationGraph("Graph",vertices)
+        self.graph = ApplicationGraph("Graph", vertices)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(vertices)
         self.bp = BasicPlacer(self.machine, self.graph)
@@ -224,33 +220,34 @@ class TestBasicPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_too_many_vertices(self):
         vertices = list()
-        for i in range(100 * 17): #50 atoms per each processor on 20 chips
+        for i in range(100 * 17):  # 50 atoms per each processor on 20 chips
             vertices.append(TestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "SimpleMachineVertex " + str(i)))
 
-        self.graph = ApplicationGraph("Graph",vertices)
+        self.graph = ApplicationGraph("Graph", vertices)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(vertices)
         self.bp = BasicPlacer(self.machine, self.graph)
         self.graph = MachineGraph(vertices=vertices)
         with self.assertRaises(PacmanPlaceException):
-            placements = self.bp.place(self.graph, self.graph_mapper)
+            self.bp.place(self.graph, self.graph_mapper)
 
     @unittest.skip("demonstrating skipping")
     def test_fill_machine(self):
         vertices = list()
-        for i in range(99 * 17): #50 atoms per each processor on 20 chips
+        for i in range(99 * 17):  # 50 atoms per each processor on 20 chips
             vertices.append(TestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "SimpleMachineVertex " + str(i)))
 
-        self.graph = ApplicationGraph("Graph",vertices)
+        self.graph = ApplicationGraph("Graph", vertices)
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(vertices)
         self.bp = BasicPlacer(self.machine, self.graph)
         self.graph = MachineGraph(vertices=vertices)
-        placements = self.bp.place(self.graph, self.graph_mapper)
+        self.bp.place(self.graph, self.graph_mapper)
+
 
 if __name__ == '__main__':
     unittest.main()

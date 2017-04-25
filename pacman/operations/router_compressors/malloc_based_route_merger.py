@@ -1,8 +1,6 @@
-from pacman.model.routing_tables.multicast_routing_table\
-    import MulticastRoutingTable
-from pacman.model.routing_tables.multicast_routing_tables\
-    import MulticastRoutingTables
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.routing_tables \
+    import MulticastRoutingTable, MulticastRoutingTables
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 import math
@@ -106,7 +104,7 @@ class MallocBasedRouteMerger(object):
                          entries[pos].routing_entry_key + n_keys <
                          entries[next_pos + 1].routing_entry_key)):
                     last_key_added = base_key + n_keys
-                    merged_routes.add_mutlicast_routing_entry(
+                    merged_routes.add_multicast_routing_entry(
                         MulticastRoutingEntry(
                             int(base_key), n_keys_mask,
                             processors, links, defaultable=False))
@@ -114,7 +112,7 @@ class MallocBasedRouteMerger(object):
                     merge_done = True
 
             if not merge_done:
-                merged_routes.add_mutlicast_routing_entry(entries[pos])
+                merged_routes.add_multicast_routing_entry(entries[pos])
                 last_key_added = (
                     entries[pos].routing_entry_key +
                     (~entries[pos].mask & 0xFFFFFFFFL))

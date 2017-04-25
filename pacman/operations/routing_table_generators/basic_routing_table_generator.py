@@ -1,11 +1,9 @@
 
-from pacman.model.routing_tables.multicast_routing_table import \
-    MulticastRoutingTable
-from pacman.model.routing_tables.multicast_routing_tables import \
-    MulticastRoutingTables
+from pacman.model.routing_tables \
+    import MulticastRoutingTable, MulticastRoutingTables
 
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
@@ -25,12 +23,10 @@ class BasicRoutingTableGenerator(object):
         :param routing_infos:
         :param routing_table_by_partitions:
         :param machine:
-        :return:
         """
-        progress_bar = ProgressBar(
-            len(list(machine.chips)), "Generating routing tables")
+        progress = ProgressBar(machine.n_chips, "Generating routing tables")
         routing_tables = MulticastRoutingTables()
-        for chip in machine.chips:
+        for chip in progress.over(machine.chips):
             partitions_in_table = routing_table_by_partitions.\
                 get_entries_for_router(chip.x, chip.y)
             if len(partitions_in_table) != 0:
@@ -46,10 +42,8 @@ class BasicRoutingTableGenerator(object):
                             mask=key_and_mask.mask,
                             link_ids=entry.out_going_links,
                             processor_ids=entry.out_going_processors)
-                        routing_table.add_mutlicast_routing_entry(
+                        routing_table.add_multicast_routing_entry(
                             multicast_routing_entry)
                 routing_tables.add_routing_table(routing_table)
-            progress_bar.update()
-        progress_bar.end()
 
         return routing_tables

@@ -1,14 +1,12 @@
-# pacman imports
-from pacman.model.resources.element_free_space import ElementFreeSpace
-from pacman import exceptions
-
-# general imports
-from abc import ABCMeta
 from six import add_metaclass
 import math
 
+from pacman.model.resources import ElementFreeSpace
+from pacman import exceptions
+from spinn_utilities.abstract_base import AbstractBase
 
-@add_metaclass(ABCMeta)
+
+@add_metaclass(AbstractBase)
 class ElementAllocatorAlgorithm(object):
     """ Abstract element allocator algorithm which allocates elements from\
         a pool of a given size

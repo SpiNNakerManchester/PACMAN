@@ -1,6 +1,6 @@
 import json
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition_entry import \
     MulticastRoutingTableByPartitionEntry
@@ -44,15 +44,14 @@ class ConvertToMemoryMultiCastRoutes(object):
     }
 
     def __call__(self, file_routing_paths, partition_by_id):
-
         # load the json files
         file_routing_paths = self._handle_json_files(file_routing_paths)
-        progress_bar = ProgressBar(
-            len(file_routing_paths), "Converting to PACMAN routes")
+        progress = ProgressBar(file_routing_paths,
+                               "Converting to PACMAN routes")
 
         # iterate though the path for each edge and create entries
         routing_tables = MulticastRoutingTableByPartition()
-        for partition_id in file_routing_paths:
+        for partition_id in progress.over(file_routing_paths):
             partition = partition_by_id[partition_id]
 
             # if the vertex is none, its a vertex with the special skills of
@@ -62,16 +61,12 @@ class ConvertToMemoryMultiCastRoutes(object):
                 self._convert_next_route(
                     routing_tables, partition, 0, None, partition_route)
 
-            progress_bar.update()
-        progress_bar.end()
-
         return routing_tables
 
     @staticmethod
     def _convert_next_route(
             routing_tables, partition, incoming_processor, incoming_link,
             partition_route):
-
         x, y = partition_route["chip"]
 
         next_hops = list()
@@ -107,7 +102,6 @@ class ConvertToMemoryMultiCastRoutes(object):
         """
 
         :param file_routing_paths:
-        :return:
         """
         file_routing_paths_file = open(file_routing_paths, "r")
         file_routing_paths = json.load(file_routing_paths_file)

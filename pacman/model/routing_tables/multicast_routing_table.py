@@ -49,15 +49,14 @@ class MulticastRoutingTable(object):
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
-                self.add_mutlicast_routing_entry(multicast_routing_entry)
+                self.add_multicast_routing_entry(multicast_routing_entry)
 
-    def add_mutlicast_routing_entry(self, multicast_routing_entry):
+    def add_multicast_routing_entry(self, multicast_routing_entry):
         """ Adds a routing entry to this table
 
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:\
                     :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
@@ -111,7 +110,6 @@ class MulticastRoutingTable(object):
     def number_of_entries(self):
         """ The number of multi-cast routing entries there are in the\
             multicast routing table
-        :return:
         """
         return len(self._multicast_routing_entries)
 
@@ -154,16 +152,10 @@ class MulticastRoutingTable(object):
     def __eq__(self, other):
         if not isinstance(other, MulticastRoutingTable):
             return False
-        else:
-            if self._x != other.x and self._y != other.y:
-                return False
-            else:
-                for this_entry, other_entry in zip(
-                        list(self._multicast_routing_entries),
-                        list(other.multicast_routing_entries)):
-                    if this_entry != other_entry:
-                        return False
-                return True
+        if self._x != other.x and self._y != other.y:
+            return False
+        return self._multicast_routing_entries == \
+            other.multicast_routing_entries
 
     def __ne__(self, other):
         return not self.__eq__(other)

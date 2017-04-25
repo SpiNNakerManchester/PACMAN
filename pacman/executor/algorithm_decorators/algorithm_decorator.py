@@ -14,7 +14,7 @@ from pacman import exceptions
 from pacman.executor.algorithm_classes.python_class_algorithm \
     import PythonClassAlgorithm
 from pacman.executor.algorithm_decorators.all_of_input import AllOfInput
-from spinn_machine.utilities.ordered_set import OrderedSet
+from spinn_utilities.ordered_set import OrderedSet
 
 # The dict of algorithm name to algorithm description
 _algorithms = dict()
@@ -338,8 +338,8 @@ def scan_packages(packages, recursive=True):
             if isinstance(package_name, str):
                 try:
                     package = importlib.import_module(package_name, "")
-                except Exception as e:
-                        continue
+                except Exception:
+                    continue
             pkg_path = os.path.dirname(package.__file__)
 
             # Go through the modules and import them
@@ -351,7 +351,7 @@ def scan_packages(packages, recursive=True):
                 else:
                     try:
                         importlib.import_module("." + name, package.__name__)
-                    except Exception as e:
+                    except Exception:
                         continue
 
         new_algorithms = _algorithms

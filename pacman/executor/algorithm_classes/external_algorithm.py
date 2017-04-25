@@ -4,7 +4,7 @@ from pacman import exceptions
 from pacman.executor.algorithm_classes.abstract_algorithm \
     import AbstractAlgorithm
 from pacman.model.decorators.overrides import overrides
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class ExternalAlgorithm(AbstractAlgorithm):
@@ -66,7 +66,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
 
     def __repr__(self):
         return (
-            "PythonFunctionAlgorithm(algorithm_id={},"
+            "ExternalAlgorithm(algorithm_id={},"
             " required_inputs={}, optional_inputs={}, outputs={}"
             " command_line_arguments={})".format(
                 self._algorithm_id, self._required_inputs,

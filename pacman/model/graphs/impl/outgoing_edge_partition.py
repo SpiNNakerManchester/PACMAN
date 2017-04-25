@@ -1,75 +1,49 @@
+from spinn_utilities.ordered_set import OrderedSet
 from pacman import exceptions
-from pacman.model.abstract_classes.impl.constrained_object \
-    import ConstrainedObject
-from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.abstract_outgoing_edge_partition \
-    import AbstractOutgoingEdgePartition
+from pacman.model.graphs import AbstractOutgoingEdgePartition
+from pacman.model.graphs.common.constrained_object import ConstrainedObject
 
 
-class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
-    """ A collection of edges which start at a single vertex which have the\
+class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
+    """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key
+
+    :param identifier: The identifier of the partition
+    :param allowed_edge_types: The types of edges allowed
+    :param constraints: Any initial constraints
+    :param label: An optional label of the partition
+    :param traffic_weight: The weight of traffic going down this partition
     """
 
     __slots__ = [
-
         # The partition identifier
         "_identifier",
-
         # The edges in the partition
         "_edges",
-
         # The vertex at the start of all the edges
         "_pre_vertex",
-
         # The traffic type of all the edges
         "_traffic_type",
-
-        # The constraints delegate
-        "_constraints",
-
-        # The label
-        "_label",
-
         # The type of edges to accept
         "_allowed_edge_types",
-
         # The weight of traffic going down this partition
-        "_traffic_weight"
+        "_traffic_weight",
+        # The label of the graph
+        "_label"
     ]
 
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
-        """
-
-        :param identifier: The identifier of the partition
-        :param allowed_edge_types: The types of edges allowed
-        :param constraints: Any initial constraints
-        :param label: An optional label of the partition
-        """
+        ConstrainedObject.__init__(self, constraints)
+        self._label = label
         self._identifier = identifier
-        self._edges = list()
+        self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
         self._pre_vertex = None
         self._traffic_type = None
-        self._label = label
         self._traffic_weight = traffic_weight
-
-        self._constraints = ConstrainedObject(constraints)
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraint)
-    def add_constraint(self, constraint):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.add_constraints)
-    def add_constraints(self, constraints):
-        pass
-
-    @delegates_to("_constraints", ConstrainedObject.constraints)
-    def constraints(self):
-        pass
 
     @property
     @overrides(AbstractOutgoingEdgePartition.label)
@@ -78,7 +52,6 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
 
     @overrides(AbstractOutgoingEdgePartition.add_edge)
     def add_edge(self, edge):
-
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
             raise exceptions.PacmanInvalidParameterException(
@@ -103,7 +76,7 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
                 "A partition can only contain edges with the same"
                 " traffic_type")
 
-        self._edges.append(edge)
+        self._edges.add(edge)
 
     @property
     @overrides(AbstractOutgoingEdgePartition.identifier)
@@ -114,6 +87,11 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
     @overrides(AbstractOutgoingEdgePartition.edges)
     def edges(self):
         return self._edges
+
+    @property
+    @overrides(AbstractOutgoingEdgePartition.n_edges)
+    def n_edges(self):
+        return len(self._edges)
 
     @property
     @overrides(AbstractOutgoingEdgePartition.pre_vertex)
@@ -134,8 +112,7 @@ class OutgoingEdgePartition(AbstractOutgoingEdgePartition):
         return (
             "OutgoingEdgePartition("
             "identifier={}, edges={}, constraints={}, label={})".format(
-                self._identifier, self._edges, self.constraints, self.label)
-        )
+                self._identifier, self._edges, self.constraints, self.label))
 
     @overrides(AbstractOutgoingEdgePartition.__contains__)
     def __contains__(self, edge):

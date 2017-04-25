@@ -1,27 +1,56 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
-from abc import abstractproperty
 
-from pacman.model.abstract_classes.abstract_has_constraints \
-    import AbstractHasConstraints
-from pacman.model.abstract_classes.abstract_has_label import AbstractHasLabel
+from spinn_utilities.abstract_base import \
+    AbstractBase, abstractmethod, abstractproperty
 
 
-@add_metaclass(ABCMeta)
-class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
+@add_metaclass(AbstractBase)
+class AbstractOutgoingEdgePartition(object):
     """ A group of edges that start at the same vertex and share the same\
         semantics; used to group edges that can use the same multicast key
     """
 
     __slots__ = ()
 
+    @abstractproperty
+    def label(self):
+        """ The label of the item
+
+        :return: The label
+        :rtype: str
+        :raise None: Raises no known exceptions
+        """
+
+    @abstractproperty
+    def constraints(self):
+        """ The constraints of the vertex
+
+        :rtype: iterable of :py:class:`AbstractConstraint`
+        """
+
+    @abstractmethod
+    def add_constraint(self, constraint):
+        """ Add a constraint
+
+        :param constraint: The constraint to add
+        :type constraint: :py:class:`AbstractConstraint`
+        """
+
+    def add_constraints(self, constraints):
+        """ Add a list of constraints
+
+        :param constraints: The list of constraints to add
+        :type constraints: list of :py:class:`AbstractConstraint`
+        """
+        for constraint in constraints:
+            self.add_constraint(constraint)
+
     @abstractmethod
     def add_edge(self, edge):
         """ Add an edge to the partition
 
         :param edge: the edge to add
-        :type: :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
+        :type edge: :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
         :raises:\
             :py:class:`pacman.exceptions.PacmanInvalidParameterException`\
             if the starting vertex of the edge does not match that of the\
@@ -42,6 +71,13 @@ class AbstractOutgoingEdgePartition(AbstractHasConstraints, AbstractHasLabel):
         :rtype:\
             iterable of\
             :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
+        """
+
+    @abstractproperty
+    def n_edges(self):
+        """ The number of edges in the partition
+
+        :rtype: int
         """
 
     @abstractproperty
