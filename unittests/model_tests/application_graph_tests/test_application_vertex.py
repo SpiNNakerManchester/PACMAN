@@ -18,7 +18,6 @@ class TestApplicationGraphModel(unittest.TestCase):
     def test_create_new_vertex(self):
         """
         test initisation of a vertex
-        :return:
         """
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         self.assertEqual(vert.n_atoms, 10)
@@ -27,7 +26,6 @@ class TestApplicationGraphModel(unittest.TestCase):
     def test_create_new_vertex_without_label(self):
         """
         test initisation of a vertex without a label
-        :return:
         """
         vert = TestVertex(10, "Population", 256)
         self.assertEqual(vert.n_atoms, 10)
@@ -37,7 +35,6 @@ class TestApplicationGraphModel(unittest.TestCase):
     def test_create_new_vertex_with_constraint_list(self):
         """
         test initisation of a vertex with a max size constraint
-        :return:
         """
         constraint = PartitionerMaximumSizeConstraint(2)
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
@@ -49,7 +46,6 @@ class TestApplicationGraphModel(unittest.TestCase):
     def test_create_new_vertex_add_constraint(self):
         """
         test creating a vertex and then adding constraints indivusally
-        :return:
         """
         constraint1 = PartitionerMaximumSizeConstraint(2)
         constraint2 = PartitionerMaximumSizeConstraint(3)
@@ -69,7 +65,6 @@ class TestApplicationGraphModel(unittest.TestCase):
     def test_create_new_vertex_add_constraints(self):
         """
         test that  creating a vertex and then adding constraints in a list
-        :return:
         """
         constraint1 = PartitionerMaximumSizeConstraint(2)
         constraint2 = PartitionerMaximumSizeConstraint(3)
@@ -89,7 +84,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         test the create vertex command given by the
         vertex actually works and generates a vertex
         with the same constraints mapped over
-        :return:
         """
         constraint1 = PartitionerMaximumSizeConstraint(2)
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
@@ -103,7 +97,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         test the creating of a vertex by the
         create vertex method will actually create a vertex of the
         vertex type.
-        :return:
         """
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         vertex = vert.create_machine_vertex(
@@ -116,7 +109,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         calcualted by the vertex is the same as what the
         vertex says (given same sizes)
 
-        :return:
         """
         vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
         resources = vert.get_resources_used_by_atoms(Slice(0, 9))
@@ -129,7 +121,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         test that a vertex created from a vertex with
         constraints can have more constraints added to it.
-        :return:
         """
         constraint1 = PartitionerMaximumSizeConstraint(2)
         constraint2 = PartitionerMaximumSizeConstraint(3)

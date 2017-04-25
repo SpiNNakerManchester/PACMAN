@@ -17,7 +17,6 @@ class TestMultiCastRoutingEntry(unittest.TestCase):
     def test_new_multicast_routing_table_entry(self):
         """
         test that creating a multicast routing entry works
-        :return:
         """
         key_combo = 0xff00
         mask = 0xff00

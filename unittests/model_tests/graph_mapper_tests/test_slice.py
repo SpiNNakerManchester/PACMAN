@@ -18,21 +18,18 @@ class TestSliceFunctions(unittest.TestCase):
     def test_create_slice_valid(self):
         """
         test creating a empty slice
-        :return:
         """
         Slice(0, 1)
 
     def test_slice_invalid_neg(self):
         """
         test that a invlaid slice of engative value generates an error
-        :return:
         """
         self.assertRaises(exceptions.PacmanValueError, Slice, -2, 0)
 
     def test_slice_invalid_lo_higher_than_hi(self):
         """
         test that a invlaid slice generates an error
-        :return:
         """
         self.assertRaises(exceptions.PacmanValueError, Slice, 2, 0)
 
