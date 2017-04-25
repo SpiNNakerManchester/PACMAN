@@ -462,11 +462,13 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
                     if used_sdram != 0:
                         f.write(
                             "**** Chip: ({}, {}) has total memory usage of"
-                            " {} KB out of a max of "
-                            "{} MB \n\n".format(
+                            " {} KB ({} bytes) out of a max of "
+                            "{} KB ({} bytes)\n\n".format(
                                 chip.x, chip.y,
                                 int(used_sdram / 1024.0),
-                                int(chip.sdram.size / (1024.0 * 1024.0))))
+                                used_sdram,
+                                int(chip.sdram.size / 1024.0),
+                                chip.sdram.size))
                 except KeyError:
                     # Do Nothing
                     pass
