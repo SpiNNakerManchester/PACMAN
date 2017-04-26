@@ -28,15 +28,15 @@ for dirname, dirnames, filenames in os.walk(main_package_dir):
 
 setup(
     name="SpiNNaker_PACMAN",
-    version="3.0.1",
+    version="1!4.0.0a1",
     description="Partition and Configuration Manager",
     url="https://github.com/SpiNNakerManchester/PACMAN",
     license="GNU GPLv3.0",
     packages=packages,
     package_data=package_data,
     install_requires=[
-        'SpiNNUtilities >= 3.0.0, < 4.0.0',
-        'SpiNNMachine >= 3.0.0, < 4.0.0'
+        'SpiNNUtilities >= 1!4.0.0a1, < 1!5.0.0',
+        'SpiNNMachine >= 1!4.0.0a1, < 1!5.0.0'
         'six', 'enum34', 'numpy', 'lxml', 'jsonschema',
         'rig >= 2.0.0, < 3.0.0']
 )
