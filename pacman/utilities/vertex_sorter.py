@@ -40,7 +40,6 @@ class ConstraintOrder(object):
     def constraint_class(self):
         """
         property method for the constraint class
-        :return:
         """
         return self._constraint_class
 
@@ -48,7 +47,7 @@ class ConstraintOrder(object):
     def relative_order(self):
         """
         property method for the relative order
-        :return:
+
         """
         return self._relative_order
 
@@ -56,7 +55,7 @@ class ConstraintOrder(object):
     def required_optional_properties(self):
         """
         property method for the required optional properties
-        :return:
+
         """
         return self._required_optional_properties
 

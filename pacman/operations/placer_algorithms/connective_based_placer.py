@@ -1,12 +1,12 @@
 import logging
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 
-from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
+from pacman.model.constraints.placer_constraints \
     import AbstractPlacerConstraint
-from pacman.model.placements.placements import Placements
+from pacman.model.placements import Placements
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 from pacman.utilities import utility_calls
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 unconstrained_vertices.add(vertex)
 
         # Iterate over constrained vertices and generate placements
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
@@ -54,7 +54,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 constrained_vertices)
         for vertex in constrained_vertices:
             self._place_vertex(vertex, resource_tracker, machine, placements)
-            progress_bar.update()
+            progress.update()
 
         while len(unconstrained_vertices) > 0:
 
@@ -76,7 +76,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 # Place the vertex
                 self._place_vertex(vertex, resource_tracker, machine,
                                    placements)
-                progress_bar.update()
+                progress.update()
                 unconstrained_vertices.remove(vertex)
                 next_vertices.remove(vertex)
 
@@ -91,7 +91,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
                         next_vertices.add(out_edge.post_vertex)
 
         # finished, so stop progress bar and return placements
-        progress_bar.end()
+        progress.end()
         return placements
 
     def _find_max_connected_vertex(self, vertices, graph):

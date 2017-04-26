@@ -1,10 +1,10 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
-from abc import abstractproperty
+
+from spinn_utilities.abstract_base import \
+    AbstractBase, abstractmethod, abstractproperty
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractInput(object):
     """ An abstract input to an algorithm
     """

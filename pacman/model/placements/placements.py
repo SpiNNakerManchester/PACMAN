@@ -85,7 +85,7 @@ class Placements(object):
         :type p: int
         :return: the vertex placed on the given processor
         :rtype:\
-            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
         :raise PacmanProcessorNotOccupiedError:\
             If the processor is not occupied
         """
@@ -100,7 +100,7 @@ class Placements(object):
 
         :param vertex: The vertex to find the placement of
         :type vertex:\
-                :py:class:`pacman.model.graph.machine.abstract_machine_vertex.AbstractMachineVertex`
+                :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
         :return: The placement
         :rtype: :py:class:`pacman.model.placements.placement.Placement`
         :raise PacmanNotPlacedError: If the vertex has not been placed.
@@ -148,7 +148,6 @@ class Placements(object):
     def __iter__(self):
         """ An iterator for the placements object within
 
-        :return:
         """
         return iter(self.placements)
 

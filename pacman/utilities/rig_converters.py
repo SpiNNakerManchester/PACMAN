@@ -9,18 +9,12 @@ from rig.routing_table import Routes
 from six import iteritems
 
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
-from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+    import PlacerChipAndCoreConstraint, PlacerRadialPlacementFromChipConstraint
+from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
+from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.model.graphs.abstract_spinnaker_link_vertex \
-    import AbstractSpiNNakerLinkVertex
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
+from pacman.model.placements import Placement, Placements
 from pacman.model.routing_table_by_partition\
     .multicast_routing_table_by_partition \
     import MulticastRoutingTableByPartition
@@ -70,7 +64,20 @@ def convert_to_rig_machine(machine):
                 # write dead links
                 for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
                     router = chip.router
+                    is_dead = False
                     if not router.is_link(link_id):
+                        is_dead = True
+                    else:
+                        link = router.get_link(link_id)
+                        if not machine.is_chip_at(
+                                link.destination_x, link.destination_y):
+                            is_dead = True
+                        else:
+                            dest_chip = machine.get_chip_at(
+                                link.destination_x, link.destination_y)
+                            if dest_chip.virtual:
+                                is_dead = True
+                    if is_dead:
                         dead_links.append(
                             [x_coord, y_coord, "{}".format(
                              constants.EDGES(link_id).name.lower())])

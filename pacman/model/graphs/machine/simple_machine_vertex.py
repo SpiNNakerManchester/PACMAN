@@ -1,7 +1,5 @@
-from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.machine.abstract_machine_vertex \
-    import AbstractMachineVertex
 
 
 class SimpleMachineVertex(MachineVertex):
@@ -13,6 +11,6 @@ class SimpleMachineVertex(MachineVertex):
         self._resources = resources
 
     @property
-    @overrides(AbstractMachineVertex.resources_required)
+    @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources

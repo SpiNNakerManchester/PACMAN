@@ -1,18 +1,13 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_contiguous_range_constraint import \
-    KeyAllocatorContiguousRangeContraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_key_and_mask_constraint import \
-    KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_mask_constraint import \
-    KeyAllocatorFixedMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_flexi_field_constraint import \
-    KeyAllocatorFlexiFieldConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import KeyAllocatorContiguousRangeContraint
+from pacman.model.constraints.key_allocator_constraints\
+    import KeyAllocatorFixedFieldConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import KeyAllocatorFlexiFieldConstraint
 from pacman import exceptions
 
 # the different types of field that this system supports
@@ -36,8 +31,8 @@ START_OF_ROUTING_KEY_POSITION = 0
 def deduce_types(graph):
     """
     deducing the number of applications required for this key space
+
     :param graph:
-    :return:
     """
     seen_fields = dict()
     known_fields = list()
@@ -84,7 +79,7 @@ def handle_flexi_field(constraint, seen_fields, known_fields):
     :param constraint:
     :param seen_fields:
     :param known_fields:
-    :return:
+    :rtype: None:
     """
     # set the level of search
     current_level = seen_fields
@@ -130,7 +125,6 @@ def convert_mask_into_fields(entity):
     """
 
     :param entity:
-    :return:
     """
     results = list()
     expanded_mask = utility_calls.expand_to_bit_array(entity)

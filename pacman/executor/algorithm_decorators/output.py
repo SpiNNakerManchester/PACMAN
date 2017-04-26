@@ -3,10 +3,8 @@ class Output(object):
     """
 
     __slots__ = [
-
         # The type of the output
         "_output_type",
-
         # The name of the type holding the file name
         "_file_name_type"
     ]

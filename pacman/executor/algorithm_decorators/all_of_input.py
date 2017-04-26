@@ -7,7 +7,6 @@ class AllOfInput(AbstractInput):
     """
 
     __slots__ = [
-
         # The inputs
         "_inputs"
     ]
@@ -45,10 +44,7 @@ class AllOfInput(AbstractInput):
 
     @overrides(AbstractInput.input_matches)
     def input_matches(self, inputs):
-        return all([
-            input_param.input_matches(inputs)
-            for input_param in self._inputs
-        ])
+        return all(param.input_matches(inputs) for param in self._inputs)
 
     def __repr__(self):
         return "AllOfInput(inputs={})".format(self._inputs)

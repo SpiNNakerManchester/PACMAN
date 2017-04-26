@@ -17,6 +17,7 @@ class PartitionRoutingInfo(object):
 
     def __init__(self, keys_and_masks, partition):
         """
+
         :param keys_and_masks: The keys allocated to the machine partition
         :type keys_and_masks: iterable of\
                     :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`

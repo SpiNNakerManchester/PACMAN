@@ -1,6 +1,6 @@
 from pacman.utilities import file_format_schemas
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 import os
 import json
@@ -21,41 +21,41 @@ class ConvertToFileCoreAllocations(object):
         :return:
         """
 
-        progress_bar = ProgressBar(
-            len(placements), "Converting to json core allocations")
+        progress = ProgressBar(len(placements) + 1,
+                               "Converting to json core allocations")
 
         # write basic stuff
         json_core_allocations_dict = dict()
-
         json_core_allocations_dict['type'] = "cores"
-
         vertex_by_id = dict()
 
         # process placements
         for placement in placements:
-            vertex_id = str(id(placement.vertex))
-            vertex_by_id[vertex_id] = placement.vertex
-            json_core_allocations_dict[vertex_id] = \
-                [placement.p, placement.p + 1]
-            progress_bar.update()
+            self._convert_placement(placement, vertex_by_id,
+                                    json_core_allocations_dict)
+            progress.update()
 
         # dump dict into json file
-        file_to_write = open(file_path, "w")
-        json.dump(json_core_allocations_dict, file_to_write)
-        file_to_write.close()
+        with open(file_path, "w") as file_to_write:
+            json.dump(json_core_allocations_dict, file_to_write)
+        progress.update()
 
         # validate the schema
         core_allocations_schema_file_path = os.path.join(
             os.path.dirname(file_format_schemas.__file__),
-            "core_allocations.json"
-        )
-        file_to_read = open(core_allocations_schema_file_path, "r")
-        core_allocations_schema = json.load(file_to_read)
-        jsonschema.validate(
-            json_core_allocations_dict, core_allocations_schema)
+            "core_allocations.json")
+        with open(core_allocations_schema_file_path, "r") as file_to_read:
+            core_allocations_schema = json.load(file_to_read)
+            jsonschema.validate(
+                json_core_allocations_dict, core_allocations_schema)
 
         # complete progress bar
-        progress_bar.end()
+        progress.end()
 
         # return the file format
         return file_path, vertex_by_id
+
+    def _convert_placement(self, placement, vertex_map, allocations_dict):
+        vertex_id = str(id(placement.vertex))
+        vertex_map[vertex_id] = placement.vertex
+        allocations_dict[vertex_id] = [placement.p, placement.p + 1]

@@ -1,14 +1,9 @@
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
+    import PlacerChipAndCoreConstraint, PlacerSameChipAsConstraint
+from pacman.model.constraints.placer_constraints \
+    import PlacerBoardConstraint, PlacerRadialPlacementFromChipConstraint
 from pacman.utilities.vertex_sorter import VertexSorter
 from pacman.utilities.vertex_sorter import ConstraintOrder
-from pacman.model.constraints.placer_constraints.placer_board_constraint \
-    import PlacerBoardConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
 
 
 def sort_vertices_by_known_constraints(vertices):
@@ -40,7 +35,7 @@ def get_same_chip_vertex_groups(vertices):
             if isinstance(constraint, PlacerSameChipAsConstraint):
                 same_chip_as_vertices.append(constraint.vertex)
 
-        if len(same_chip_as_vertices) > 0:
+        if same_chip_as_vertices:
             # Go through all the verts that want to be on the same chip as
             # the top level vert
             for same_as_chip_vertex in same_chip_as_vertices:

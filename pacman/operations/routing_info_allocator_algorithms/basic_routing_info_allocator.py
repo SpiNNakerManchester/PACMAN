@@ -1,17 +1,12 @@
+from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
-from pacman.model.routing_info.routing_info import RoutingInfo
-from pacman.model.routing_info.partition_routing_info \
-    import PartitionRoutingInfo
+from pacman.model.routing_info \
+    import RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask
 from pacman.utilities import utility_calls
-from spinn_machine.utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.key_allocator_constraints\
-    .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint\
-    import KeyAllocatorContiguousRangeContraint
+    import AbstractKeyAllocatorConstraint, KeyAllocatorContiguousRangeContraint
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
@@ -60,10 +55,10 @@ class BasicRoutingInfoAllocator(object):
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each edge and create keys from its placement
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
-        for vertex in machine_graph.vertices:
+        for vertex in progress.over(machine_graph.vertices):
             partitions = machine_graph.\
                 get_outgoing_edge_partitions_starting_at_vertex(vertex)
             for partition in partitions:
@@ -75,19 +70,14 @@ class BasicRoutingInfoAllocator(object):
                         " allocate keys to {}, which is requesting {} keys"
                         .format(MAX_KEYS_SUPPORTED, partition, n_keys))
                 placement = placements.get_placement_of_vertex(vertex)
-                if placement is not None:
-                    key = self._get_key_from_placement(placement)
-                    keys_and_masks = list([BaseKeyAndMask(base_key=key,
-                                                          mask=MASK)])
-                    routing_info = PartitionRoutingInfo(
-                        keys_and_masks, partition)
-                    routing_infos.add_partition_info(routing_info)
-                else:
+                if placement is None:
                     raise PacmanRouteInfoAllocationException(
                         "The vertex '{}' has no placement".format(vertex))
-
-            progress_bar.update()
-        progress_bar.end()
+                key = self._get_key_from_placement(placement)
+                keys_and_masks = list([BaseKeyAndMask(
+                    base_key=key, mask=MASK)])
+                routing_infos.add_partition_info(PartitionRoutingInfo(
+                    keys_and_masks, partition))
 
         return routing_infos
 
