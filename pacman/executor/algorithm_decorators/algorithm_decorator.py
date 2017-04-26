@@ -25,6 +25,7 @@ _algorithm_lock = RLock()
 
 logger = logging.getLogger(__name__)
 
+
 class AllOf(object):
     """ Indicates that all of the items specified are required
     """
