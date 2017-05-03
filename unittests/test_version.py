@@ -18,4 +18,3 @@ class Test(unittest.TestCase):
 
         self.assertEqual(spinn_machine_parts[0], pacman_parts[0])
         self.assertLessEqual(spinn_machine_parts[1], pacman_parts[1])
-
