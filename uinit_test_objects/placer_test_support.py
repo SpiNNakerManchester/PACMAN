@@ -6,7 +6,7 @@ from pacman.model.resources \
 
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
-    vertex = Vertex(1, None)
+    vertex = FakeVertex(1, None)
     cpu_cycles = vertex.get_cpu_usage_for_atoms(lo_atom, hi_atom)
     dtcm_requirement = vertex.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
     sdram_requirement = vertex.get_sdram_usage_for_atoms(
@@ -18,7 +18,8 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     return resources
 
 
-class Vertex(ApplicationVertex):
+# currently broken
+class FakeVertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
         ApplicationVertex.__init__(self, label=label, max_atoms_per_core=256)
         # What to do with n_atoms?
@@ -35,7 +36,7 @@ class Vertex(ApplicationVertex):
         return 4000 + 50 * (vertex_slice.hi_atom - vertex_slice.lo_atom)
 
 
-class MachineVertex(SimpleMachineVertex):
+class FakeMachineVertex(SimpleMachineVertex):
     def __init__(self, lo_atom, hi_atom, resources_required, label=None,
                  constraints=None):
         SimpleMachineVertex.__init__(self, lo_atom, hi_atom,

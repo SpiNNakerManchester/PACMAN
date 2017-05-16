@@ -1,8 +1,10 @@
 import unittest
 
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-from uinit_test_objects.placer_test_support \
-    import get_resources_used_by_atoms, MachineVertex, Vertex
+from uinit_test_objects.placer_test_support import get_resources_used_by_atoms
+from uinit_test_objects.placer_test_support import FakeMachineVertex as\
+    MachineVertex
+from uinit_test_objects.placer_test_support import FakeVertex as Vertex
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints\
@@ -87,13 +89,13 @@ class TestRadialPlacer(unittest.TestCase):
         self.graph_mapper = GraphMapper()
         self.graph_mapper.add_vertices(self.vertices)
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_new_basic_placer(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.assertEqual(self.bp._machine, self.machine)
         self.assertEqual(self.bp._graph, self.graph)
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_place_where_vertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         placements = self.bp.place(self.graph, self.graph_mapper)
@@ -101,7 +103,7 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_place_where_vertices_have_vertices(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.graph_mapper = GraphMapper()
@@ -111,7 +113,7 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_place_vertex_too_big_with_vertex(self):
         large_vertex = Vertex(500, "Large vertex 500")
         large_machine_vertex = large_vertex.create_machine_vertex(
@@ -125,11 +127,11 @@ class TestRadialPlacer(unittest.TestCase):
         with self.assertRaises(PacmanPlaceException):
             self.bp.place(self.graph, self.graph_mapper)
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_try_to_place(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.vertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
@@ -152,7 +154,7 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_deal_with_constraint_placement_vertices_have_vertices(self):
         self.bp = RadialPlacer(self.machine, self.graph)
         self.vertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
@@ -175,19 +177,19 @@ class TestRadialPlacer(unittest.TestCase):
             print placement.vertex.label, placement.vertex.n_atoms, \
                 'x:', placement.x, 'y:', placement.y, 'p:', placement.p
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_unsupported_non_placer_constraint(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_unsupported_placer_constraint(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_unsupported_placer_constraints(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_many_vertices(self):
         vertices = list()
         for i in range(20 * 17):  # 51 atoms per each processor on 20 chips
@@ -217,7 +219,7 @@ class TestRadialPlacer(unittest.TestCase):
         sorted_info = sorted(unorderdered_info, key=lambda x: int(x[1]))
         pp(sorted_info)
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_too_many_vertices(self):
         vertices = list()
         for i in range(100 * 17):  # 50 atoms per each processor on 20 chips
@@ -233,7 +235,7 @@ class TestRadialPlacer(unittest.TestCase):
         with self.assertRaises(PacmanPlaceException):
             self.bp.place(self.graph, self.graph_mapper)
 
-    @unittest.skip("demonstrating skipping")
+    @unittest.skip("Broken Test")
     def test_fill_machine(self):
         vertices = list()
         for i in range(99 * 17):  # 50 atoms per each processor on 20 chips
