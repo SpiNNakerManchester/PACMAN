@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/SpiNNakerManchester/PACMAN.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/PACMAN)
+
 This package provides utilities for partitioning, placing a routing on a
 SpiNNaker machine
 
@@ -56,4 +58,6 @@ Documentation
 =============
 [PACMAN python documentation](http://pacman.readthedocs.io)
 
-[Combined python documentation](http://spinnakermanchester.readthedocs.io)
+[Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
+
+[Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
