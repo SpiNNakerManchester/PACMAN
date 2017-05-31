@@ -64,11 +64,11 @@ class PreAllocatedResourceContainer(object):
 
     @property
     def specific_cores_resource(self):
-        return _specific_cores_resource
+        return self._specific_cores_resource
 
     @property
     def core_resources(self):
-        return _core_resources
+        return self._core_resources
 
     def extend(self, other):
 
