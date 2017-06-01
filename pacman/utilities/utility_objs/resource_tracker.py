@@ -1170,7 +1170,7 @@ class ResourceTracker(object):
                 n_cores += (len(self._core_tracker[x, y]) -
                             self._previous_allocated_resources[(x, y)])
             else:
-                n_cores += (len(list(chip.n_user_processors)) -
+                n_cores += (chip.n_user_processors -
                             self._previous_allocated_resources[(x, y)])
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:

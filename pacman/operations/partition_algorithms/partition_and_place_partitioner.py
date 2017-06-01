@@ -129,7 +129,8 @@ class PartitionAndPlacePartitioner(object):
                 PartitionerMaximumSizeConstraint)
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
-        max_atoms_per_core = min(possible_max_atoms)
+
+        max_atoms_per_core = int(min(possible_max_atoms))
 
         # partition by atoms
         self._partition_by_atoms(
