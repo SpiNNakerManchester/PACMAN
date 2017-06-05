@@ -36,7 +36,7 @@ class PreAllocatedResourceContainer(object):
         :param core_resources states a number of coers have been pre allocated
          but dont care which ones they are
         :type core_resources: CoreResource
-        :rtype: pacman.models.resources.pre_allocated_resource_container.PreAllocatedResourceContainer
+        :rtype: PreAllocatedResourceContainer
         :raise None: does not raise any known exception
 
         """

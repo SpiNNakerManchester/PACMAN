@@ -1,5 +1,4 @@
 from pacman.model.resources.abstract_resource import AbstractResource
-from pacman.model.decorators.overrides import overrides
 
 
 class SpecificChipSDRAMResource(AbstractResource):
@@ -18,8 +17,8 @@ class SpecificChipSDRAMResource(AbstractResource):
     def __init__(self, chip, sdram_usage):
         """
 
-        :param sdram_usage: 
-            The amount of SDRAM in bytes needed to be pre-allocated
+        :param sdram_usage: The amount of SDRAM in bytes needed to be\
+         pre-allocated
         :type sdram_usage: int
         :param chip: chip of where these cores are to be allocated
         :type chip: SpiNNMachine.chip.Chip

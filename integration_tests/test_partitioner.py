@@ -27,8 +27,8 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph verts which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=
-                [PlacerChipAndCoreConstraint(x=0, y=0)], n_atoms=1))
+                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                n_atoms=1))
 
         # add pre-allocated resources for cores on 0,0
         core_pre = CoreResource(chip=machine.get_chip_at(0, 0), n_cores=5)

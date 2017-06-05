@@ -1,5 +1,4 @@
 from pacman.model.resources.abstract_resource import AbstractResource
-from pacman.model.decorators.overrides import overrides
 
 
 class SpecificCoreResource(AbstractResource):
