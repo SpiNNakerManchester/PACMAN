@@ -1,6 +1,3 @@
-
-import unittest
-
 from pacman.exceptions import PacmanInvalidParameterException, \
     PacmanValueError, PacmanPartitionException
 from pacman.model.constraints.placer_constraints import \
@@ -18,9 +15,8 @@ from uinit_test_objects.test_vertex import TestVertex
 
 
 class TestPartitionerWithPreAllocatedResources(object):
-    """ tests the interaction of the pre allocated res with the partitoner 
-    and place partitioner
-    
+    """ tests the interaction of the pre allocated res with the partitoner\
+     and place partitioner
     """
 
     def test_1_chip_over_pre_allocated(self):
@@ -35,7 +31,7 @@ class TestPartitionerWithPreAllocatedResources(object):
                 [PlacerChipAndCoreConstraint(x=0, y=0)], n_atoms=1))
 
         # add pre-allocated resources for cores on 0,0
-        core_pre = CoreResource(chip= machine.get_chip_at(0, 0), n_cores=5)
+        core_pre = CoreResource(chip=machine.get_chip_at(0, 0), n_cores=5)
         pre_allocated_res = PreAllocatedResourceContainer(
             core_resources=[core_pre])
 
@@ -43,7 +39,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         try:
             partitioner(graph, machine, pre_allocated_res)
             raise Exception("should have blown up here")
-        except PacmanInvalidParameterException as e:
+        except PacmanInvalidParameterException:
             pass
 
     def test_1_chip_under_pre_allocated(self):
@@ -54,8 +50,8 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph verts which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=
-                [PlacerChipAndCoreConstraint(x=0, y=0)], n_atoms=1))
+                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                n_atoms=1))
 
         # add pre-allocated resources for cores on 0,0
         core_pre = CoreResource(chip=machine.get_chip_at(0, 0), n_cores=4)
@@ -76,8 +72,8 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph verts which reside on 0,0
         for p in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=
-                [PlacerChipAndCoreConstraint(x=0, y=0, p=p)], n_atoms=1))
+                constraints=[PlacerChipAndCoreConstraint(x=0, y=0, p=p)],
+                n_atoms=1))
 
         # add pre-allocated resources for cores on 0,0
         core_pre = SpecificCoreResource(
@@ -104,8 +100,8 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph verts which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=
-                [PlacerChipAndCoreConstraint(x=0, y=0)], n_atoms=1,
+                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                n_atoms=1,
                 fixed_sdram_value=eight_meg))
 
         # add pre-allocated resources for cores on 0,0
@@ -134,8 +130,8 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph verts which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=
-                [PlacerChipAndCoreConstraint(x=0, y=0)], n_atoms=1,
+                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                n_atoms=1,
                 fixed_sdram_value=eight_meg))
 
         # add pre-allocated resources for cores on 0,0
