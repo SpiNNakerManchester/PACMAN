@@ -387,7 +387,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         self.assertRaises(PacmanPartitionException, partitioner,
-                          self.graph, self.machine)
+                          self.graph, self.machine,
+                          PreAllocatedResourceContainer())
 
     def test_partitioning_with_2_massive_pops(self):
         self.setup()
@@ -396,7 +397,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = TestVertex(16000, "Constrained")
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
-        partitioner(self.graph, self.machine)
+        partitioner(self.graph, self.machine, PreAllocatedResourceContainer())
 
     @unittest.skip("Test not implemented yet")
     def test_detect_subclass_hierarchy(self):
