@@ -1,9 +1,3 @@
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.sdram_resource import SDRAMResource
-
-
 class PreAllocatedResourceContainer(object):
     """container object for the types of resources so that ordering is no
         longer a risk
