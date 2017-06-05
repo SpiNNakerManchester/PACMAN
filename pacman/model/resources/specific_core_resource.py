@@ -2,12 +2,12 @@ from pacman.model.resources.abstract_resource import AbstractResource
 
 
 class SpecificCoreResource(AbstractResource):
-    """ Represents the number of cores that need to be allocated
+    """ Represents specific cores that need to be allocated
     """
 
     __slots__ = [
 
-        # The number of cores that need to be allocated on a give chip
+        # The number of cores that need to be allocated on a given chip
         "_cores",
 
         # the chip that has these cores allocated
@@ -17,8 +17,9 @@ class SpecificCoreResource(AbstractResource):
     def __init__(self, chip, cores):
         """
 
-        :param cores: The specific cores that need to be allocated (
-        list of processor ids)
+        :param cores:\
+            The specific cores that need to be allocated\
+            (list of processor ids)
         :type cores: iterable of int
         :param chip: chip of where these cores are to be allocated
         :type chip: SpiNNMachine.chip.Chip

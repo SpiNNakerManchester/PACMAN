@@ -1,6 +1,5 @@
 class PreAllocatedResourceContainer(object):
-    """container object for the types of resources so that ordering is no
-        longer a risk
+    """ container object for pre-allocated resources
 
     """
 
@@ -17,7 +16,7 @@ class PreAllocatedResourceContainer(object):
         "_specific_cores_resource",
 
         # A iterable of CoreResource objects that reflect the number of
-        #  cores that have been pre allocated on a chip, but which dont care
+        #  cores that have been pre allocated on a chip, but which don't care
         # which core it uses.
         "_core_resources"
     ]
@@ -27,17 +26,17 @@ class PreAllocatedResourceContainer(object):
             core_resources=None):
         """ Container object for the types of resources
 
-        :param _specific_sdram_usage: iterable of SpecificSDRAMResource
-         which states that specific chips have missing sdram
+        :param _specific_sdram_usage:\
+            iterable of SpecificSDRAMResource which states that specific chips\
+            have missing SDRAM
         :type _specific_sdram_usage: iterable of SpecificSDRAMResource
-        :param  specific_cores_resource: states which cores have been pre
-         allocated
+        :param  specific_cores_resource:\
+            states which cores have been preallocated
         :type specific_cores_resource: iterable of SpecificCoreResource
-        :param core_resources states a number of coers have been pre allocated
-         but dont care which ones they are
+        :param core_resources:\
+            states a number of cores have been pre allocated but don't care
+            which ones they are
         :type core_resources: CoreResource
-        :rtype: PreAllocatedResourceContainer
-        :raise None: does not raise any known exception
 
         """
         self._specific_sdram_usage = specific_sdram_usage

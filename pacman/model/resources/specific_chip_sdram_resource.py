@@ -17,10 +17,10 @@ class SpecificChipSDRAMResource(AbstractResource):
     def __init__(self, chip, sdram_usage):
         """
 
-        :param sdram_usage: The amount of SDRAM in bytes needed to be\
-         pre-allocated
+        :param sdram_usage:\
+            The amount of SDRAM in bytes needed to be pre-allocated
         :type sdram_usage: int
-        :param chip: chip of where these cores are to be allocated
+        :param chip: chip of where the SDRAM is to be allocated
         :type chip: SpiNNMachine.chip.Chip
         :raise None: No known exceptions are raised
         """

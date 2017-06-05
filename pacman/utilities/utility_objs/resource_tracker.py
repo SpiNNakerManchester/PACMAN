@@ -72,10 +72,10 @@ class ResourceTracker(object):
 
         # set of resources that have been pre allocated and therefore need to
         # be taken account of when allocating resources
-        "_previous_allocated_resources"
+        "_preallocated_resources"
     ]
 
-    def __init__(self, machine, chips=None, previous_allocated_resources=None):
+    def __init__(self, machine, chips=None, preallocated_resources=None):
         """
 
         :param machine: The machine to track the usage of
@@ -101,8 +101,8 @@ class ResourceTracker(object):
 
         # set of resources that have been pre allocated and therefore need to
         # be taken account of when allocating resources
-        self._previous_allocated_resources = \
-            self._convert_pre_allocated_resources(previous_allocated_resources)
+        self._preallocated_resources = self._convert_pre_allocated_resources(
+            preallocated_resources)
 
         # The machine object
         self._machine = machine
@@ -157,11 +157,12 @@ class ResourceTracker(object):
                 self._chips_available.add((x, y))
 
     def _convert_pre_allocated_resources(self, pre_allocated_resources):
-        """ allocates pre allocated sdram and specific cores to the trackers.
-        also builds an arbitrary core map for usage throughout resource tracker
+        """ Allocates pre allocated sdram and specific cores to the trackers.
+            Also builds an arbitrary core map for usage throughout\
+            resource tracker
 
-        :param pre_allocated_resources: the pre allocated resources from the\
-         tools
+        :param pre_allocated_resources:\
+            the pre allocated resources from the tools
         :type pre_allocated_resources: PreAllocatedResourceContainer
         :return: a mapping of chip to arbitrary core demands
         :rtype: dict of key (int, int) to int
@@ -284,7 +285,7 @@ class ResourceTracker(object):
 
     def _chip_available(self, x, y):
         pre_allocated_arbitrary_cores = \
-            self._previous_allocated_resources[(x, y)]
+            self._preallocated_resources[(x, y)]
         return (
             self._machine.is_chip_at(x, y) and
             (((x, y) not in self._core_tracker and
@@ -462,7 +463,7 @@ class ResourceTracker(object):
 
                 # check for arbitrary pre allocated cores.
                 if (len(self._core_tracker[key]) -
-                        self._previous_allocated_resources[key] > 0):
+                        self._preallocated_resources[key] > 0):
                     if processor_id in self._core_tracker[key]:
                         return 1
                     return 0
@@ -471,7 +472,7 @@ class ResourceTracker(object):
             elif key not in self._core_tracker:
                 # check for arbitrary pre allocated cores.
                 if (chip.n_user_processors -
-                        self._previous_allocated_resources[key] > 0):
+                        self._preallocated_resources[key] > 0):
                     # verify the processor is not a monitor core
                     processor = chip.get_processor_with_id(processor_id)
                     if processor is not None and not processor.is_monitor:
@@ -482,11 +483,11 @@ class ResourceTracker(object):
 
         elif key in self._core_tracker:
             n_cores = (len(self._core_tracker[key]) -
-                       self._previous_allocated_resources[key])
+                       self._preallocated_resources[key])
         else:
             n_cores = len([
                 proc for proc in chip.processors if not proc.is_monitor])
-            n_cores -= self._previous_allocated_resources[key]
+            n_cores -= self._preallocated_resources[key]
         return n_cores
 
     def _get_matching_ip_tag(
@@ -740,7 +741,7 @@ class ResourceTracker(object):
             processor_id = self._core_tracker[key].pop()
 
         if (len(self._core_tracker[key]) ==
-                0 + self._previous_allocated_resources[key]):
+                0 + self._preallocated_resources[key]):
             self._chips_available.remove(key)
         return processor_id
 
@@ -1168,10 +1169,10 @@ class ResourceTracker(object):
             chip = self._machine.get_chip_at(x, y)
             if (x, y) in self._core_tracker:
                 n_cores += (len(self._core_tracker[x, y]) -
-                            self._previous_allocated_resources[(x, y)])
+                            self._preallocated_resources[(x, y)])
             else:
                 n_cores += (chip.n_user_processors -
-                            self._previous_allocated_resources[(x, y)])
+                            self._preallocated_resources[(x, y)])
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:
                 max_sdram = sdram_available

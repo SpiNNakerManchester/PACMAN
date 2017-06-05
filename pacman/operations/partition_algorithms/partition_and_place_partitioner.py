@@ -30,7 +30,7 @@ class PartitionAndPlacePartitioner(object):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine, previous_allocated_resources):
+    def __call__(self, graph, machine, preallocated_resources=None):
         """
 
         :param graph: The application_graph to partition
@@ -69,7 +69,7 @@ class PartitionAndPlacePartitioner(object):
         progress_bar = ProgressBar(n_atoms, "Partitioning graph vertices")
 
         resource_tracker = ResourceTracker(
-            machine, previous_allocated_resources=previous_allocated_resources)
+            machine, preallocated_resources=preallocated_resources)
 
         # Partition one vertex at a time
         for vertex in vertices:

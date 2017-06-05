@@ -17,7 +17,7 @@ class CoreResource(AbstractResource):
     def __init__(self, chip, n_cores):
         """
 
-        :param n_cores: The amount of cores to allocate
+        :param n_cores: The number of cores to allocate
         :type n_cores: int
         :param chip: chip of where these cores are to be allocated
         :type chip: SpiNNMachine.chip.Chip
