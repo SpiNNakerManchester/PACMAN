@@ -159,11 +159,11 @@ class ResourceTracker(object):
     def _convert_pre_allocated_resources(self, pre_allocated_resources):
         """ allocates pre allocated sdram and specific cores to the trackers.
         also builds an arbitrary core map for usage throughout resource tracker
-        
-        :param pre_allocated_resources: the pre allocated resources from the 
-        tools
-        :type pre_allocated_resources: pacman.model.resources.pre_allocated_resource_container.PreAllocatedResourceContainer
-        :return: a mapping of chip to arbitrary core demands 
+
+        :param pre_allocated_resources: the pre allocated resources from the\
+         tools
+        :type pre_allocated_resources: PreAllocatedResourceContainer
+        :return: a mapping of chip to arbitrary core demands
         :rtype: dict of key (int, int) to int
         """
 
