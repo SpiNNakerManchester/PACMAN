@@ -179,7 +179,7 @@ class ResourceTracker(object):
             self._sdram_tracker[(chip.x, chip.y)] = sdram
 
         # remove specific cores from the tracker
-        specific_cores = pre_allocated_resources.specific_cores_resource
+        specific_cores = pre_allocated_resources.specific_core_resources
         for specific_core in specific_cores:
             chip = specific_core.chip
             processor_ids = specific_core.cores

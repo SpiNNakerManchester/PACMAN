@@ -13,7 +13,7 @@ class PreAllocatedResourceContainer(object):
 
         # A iterable of SpecificCoreResource objects that reflect the number
         # of specific cores that have been pre allocated on a chip.
-        "_specific_cores_resource",
+        "_specific_core_resources",
 
         # A iterable of CoreResource objects that reflect the number of
         #  cores that have been pre allocated on a chip, but which don't care
@@ -22,17 +22,17 @@ class PreAllocatedResourceContainer(object):
     ]
 
     def __init__(
-            self, specific_sdram_usage=None, specific_cores_resource=None,
+            self, specific_sdram_usage=None, specific_core_resources=None,
             core_resources=None):
         """ Container object for the types of resources
 
-        :param _specific_sdram_usage:\
+        :param specific_sdram_usage:\
             iterable of SpecificSDRAMResource which states that specific chips\
             have missing SDRAM
-        :type _specific_sdram_usage: iterable of SpecificSDRAMResource
-        :param  specific_cores_resource:\
+        :type specific_sdram_usage: iterable of SpecificSDRAMResource
+        :param  specific_core_resources:\
             states which cores have been preallocated
-        :type specific_cores_resource: iterable of SpecificCoreResource
+        :type specific_core_resources: iterable of SpecificCoreResource
         :param core_resources:\
             states a number of cores have been pre allocated but don't care
             which ones they are
@@ -40,14 +40,14 @@ class PreAllocatedResourceContainer(object):
 
         """
         self._specific_sdram_usage = specific_sdram_usage
-        self._specific_cores_resource = specific_cores_resource
+        self._specific_core_resources = specific_core_resources
         self._core_resources = core_resources
 
         # check for none resources
         if self._specific_sdram_usage is None:
             self._specific_sdram_usage = []
-        if self._specific_cores_resource is None:
-            self._specific_cores_resource = []
+        if self._specific_core_resources is None:
+            self._specific_core_resources = []
         if self._core_resources is None:
             self._core_resources = []
 
@@ -56,8 +56,8 @@ class PreAllocatedResourceContainer(object):
         return self._specific_sdram_usage
 
     @property
-    def specific_cores_resource(self):
-        return self._specific_cores_resource
+    def specific_core_resources(self):
+        return self._specific_core_resources
 
     @property
     def core_resources(self):
@@ -69,7 +69,7 @@ class PreAllocatedResourceContainer(object):
         self._specific_sdram_usage.extend(other.specific_sdram_usage)
 
         # add specific cores
-        self._specific_cores_resource.extend(other.specific_cores_resource)
+        self._specific_core_resources.extend(other.specific_core_resources)
 
         # add none specific cores
         self._core_resources.extend(other.core_resources)
