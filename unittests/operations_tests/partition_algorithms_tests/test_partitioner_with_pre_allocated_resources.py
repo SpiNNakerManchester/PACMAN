@@ -79,7 +79,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         core_pre = SpecificCoreResource(
             chip=machine.get_chip_at(0, 0), cores=[4])
         pre_allocated_res = PreAllocatedResourceContainer(
-            specific_cores_resource=[core_pre])
+            specific_core_resources=[core_pre])
 
         # run partitioner that should go boom
         try:
