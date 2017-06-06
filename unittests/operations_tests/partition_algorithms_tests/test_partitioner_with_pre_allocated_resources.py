@@ -15,7 +15,7 @@ from uinit_test_objects.test_vertex import TestVertex
 
 
 class TestPartitionerWithPreAllocatedResources(object):
-    """ tests the interaction of the pre allocated res with the partitoner\
+    """ tests the interaction of the pre allocated res with the partitioner\
      and place partitioner
     """
 
@@ -24,7 +24,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
-        # add graph verts which reside on 0,0
+        # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
                 constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
@@ -47,7 +47,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
-        # add graph verts which reside on 0,0
+        # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
                 constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
@@ -69,7 +69,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
-        # add graph verts which reside on 0,0
+        # add graph vertices which reside on 0,0
         for p in range(0, 13):
             graph.add_vertex(TestVertex(
                 constraints=[PlacerChipAndCoreConstraint(x=0, y=0, p=p)],
@@ -97,7 +97,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         eight_meg = 8 * 1024 * 1024
 
-        # add graph verts which reside on 0,0
+        # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
                 constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
@@ -127,7 +127,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         eight_meg = 8 * 1024 * 1024
 
-        # add graph verts which reside on 0,0
+        # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
                 constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
