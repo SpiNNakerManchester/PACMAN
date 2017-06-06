@@ -22,7 +22,6 @@ class TestRoutingTable(unittest.TestCase):
         """
         test that creating a multicast routing entry and adding it to the table
         works
-        :return:
         """
         key_combo = 0xff000
         mask = 0xff000
@@ -58,7 +57,6 @@ class TestRoutingTable(unittest.TestCase):
     def test_new_multicast_routing_table_empty(self):
         """
         tests creating a basic multicast routing table
-        :return:
         """
         MulticastRoutingTable(0, 0)
 
@@ -66,7 +64,6 @@ class TestRoutingTable(unittest.TestCase):
         """
         test that adding multiple identical entries into a multicast table
         causes an error
-        :return:
         """
         key_combo = 0xff35
         mask = 0xff35

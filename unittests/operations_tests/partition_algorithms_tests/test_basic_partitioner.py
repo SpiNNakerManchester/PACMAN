@@ -264,7 +264,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that the partitioner works when its machine is slightly malformed
         in that it has more sdram avilable
-        :return:
         """
         self.setup()
         flops = 20000000
@@ -300,7 +299,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that when a vertex has a constraint that is unrecognised,
         it raises an error
-        :return:
         """
         self.setup()
         constrained_vertex = TestVertex(13, "Constrained")
@@ -315,7 +313,6 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_empty_graph(self):
         """
         test that the partitioner can work with an empty graph
-        :return:
         """
         self.setup()
         self.graph = ApplicationGraph("foo")
