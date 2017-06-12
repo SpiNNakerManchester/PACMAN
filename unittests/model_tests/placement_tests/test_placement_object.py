@@ -18,7 +18,6 @@ class TestPlacement(unittest.TestCase):
     def test_create_new_placement(self):
         """
         test that creating a new placement puts stuff in the right place
-        :return:
         """
         subv = SimpleMachineVertex(None, "")
         pl = Placement(subv, 0, 0, 1)
@@ -30,7 +29,6 @@ class TestPlacement(unittest.TestCase):
     def test_create_new_placements_duplicate_vertex(self):
         """
         check that you cant put a vertex in multiple placements
-        :return:
         """
         subv = SimpleMachineVertex(None, "")
         pl = list()

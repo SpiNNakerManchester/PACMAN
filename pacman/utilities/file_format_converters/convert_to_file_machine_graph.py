@@ -24,7 +24,6 @@ class ConvertToFileMachineGraph(object):
 
         :param machine_graph:
         :param file_path:
-        :return:
         """
         progress = ProgressBar(
             machine_graph.n_vertices + 1, "Converting to json graph")

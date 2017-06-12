@@ -13,10 +13,6 @@ class TestApplicationGraphModel(unittest.TestCase):
     """
 
     def test_create_new_empty_graph(self):
-        """
-
-        :return:
-        """
         ApplicationGraph("foo")
 
     def test_create_new_graph(self):

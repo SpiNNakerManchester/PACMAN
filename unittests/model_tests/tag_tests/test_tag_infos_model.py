@@ -22,14 +22,12 @@ class TestTagsModel(unittest.TestCase):
     def test_new_tag_info(self):
         """
         test that creating a empty tag object works
-        :return:
         """
         Tags()
 
     def test_adding_a_iptag_to_tag_info(self):
         """
         check that adding a tag after initialisation works
-        :return:
         """
         tag_info = Tags()
         iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
@@ -39,7 +37,6 @@ class TestTagsModel(unittest.TestCase):
     def test_adding_a_reverse_iptag(self):
         """
         check that adding a reverse iptag works correctly
-        :return:
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
@@ -49,7 +46,6 @@ class TestTagsModel(unittest.TestCase):
     def test_add_iptag_then_locate_tag(self):
         """
         check that locating a iptag via get_ip_tags_for_vertex function
-        :return:
         """
         tag_info = Tags()
         iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
@@ -62,7 +58,6 @@ class TestTagsModel(unittest.TestCase):
     def test_add_iptag_then_fail_to_locate(self):
         """
         test that asking for a invalid iptag returns a None value
-        :return:
         """
         tag_info = Tags()
         iptag = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
@@ -77,7 +72,6 @@ class TestTagsModel(unittest.TestCase):
         """
         check that asking for a reverse iptag for a specific machine vertex
         works
-        :return:
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
@@ -91,7 +85,6 @@ class TestTagsModel(unittest.TestCase):
         """
         check that asking for a reverse iptag with a incorrect machine vertex
         will cause a none returned
-        :return:
         """
         tag_info = Tags()
         reverse_iptag = ReverseIPTag("", 1, 23, 0, 0, 1, 1)

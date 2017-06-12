@@ -18,7 +18,6 @@ class ConvertToFileCoreAllocations(object):
 
         :param placements:
         :param file_path:
-        :return:
         """
 
         progress = ProgressBar(len(placements) + 1,

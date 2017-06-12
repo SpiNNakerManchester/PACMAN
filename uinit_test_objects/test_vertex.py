@@ -31,8 +31,8 @@ class TestVertex(ApplicationVertex):
         """
         standard method call to get the sdram, cpu and dtcm usage of a
         collection of atoms
+
         :param vertex_slice: the collection of atoms
-        :return:
         """
         return ResourceContainer(
             sdram=SDRAMResource(

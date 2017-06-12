@@ -233,7 +233,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that the partitioner works when its machine is slightly malformed
         in that it has less sdram available
-        :return:
         """
         self.setup()
         flops = 200000000
@@ -269,7 +268,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that the partitioner works when its machine is slightly malformed
         in that it has more sdram available
-        :return:
         """
         self.setup()
         flops = 200000000
