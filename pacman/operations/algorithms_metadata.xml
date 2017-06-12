@@ -45,6 +45,30 @@
             <param_type>NChipsRequired</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="SpreaderPartitioner">
+        <python_module>pacman.operations.partition_algorithms.spreader_partitioner</python_module>
+        <python_class>SpreaderPartitioner</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="BasicPlacer">
         <python_module>pacman.operations.placer_algorithms.basic_placer</python_module>
         <python_class>BasicPlacer</python_class>

@@ -21,6 +21,9 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
         """
         self._size = size
 
+    def is_partitioner_constraint(self):
+        return True
+
     @property
     def size(self):
         """ The maximum number of atoms to split the vertex into

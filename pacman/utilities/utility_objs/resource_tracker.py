@@ -426,6 +426,44 @@ class ResourceTracker(object):
                 proc for proc in chip.processors if not proc.is_monitor])
         return n_cores
 
+    def total_free_processors(self):
+        """
+        exposed method for determining how many processors have not yet been
+        allocated
+        :return: the total number of processors allocated
+        """
+        total_cores = 0
+        for chip_key in self._chips_available:
+            if chip_key in self._core_tracker:
+                total_cores += len(self._core_tracker[chip_key])
+            else:
+                processors = self._machine.get_chip_at(chip_key[0],
+                                                       chip_key[1]).processors
+                for processor in processors:
+                    if not processor.is_monitor:
+                        total_cores += 1
+        return total_cores
+
+    def total_free_processors_on_chip(self, x, y):
+        """
+        returns the number of processors on a given chip
+        :param x: the x coord of the chip
+        :param y: the y coord of the chip.
+        :return: the number of processors on the chip
+        """
+        if (x, y) in self._chips_available:
+            if (x, y) in self._core_tracker:
+                return len(self._core_tracker[(x, y)])
+            else:
+                total_cores = 0
+                processors = self._machine.get_chip_at(x, y).processors
+                for processor in processors:
+                    if not processor.is_monitor:
+                        total_cores += 1
+                return total_cores
+        else:
+            return 0
+
     def _get_matching_ip_tag(
             self, chip, board_address, tag_id, ip_address, port, strip_sdp,
             traffic_identifier):
@@ -1015,9 +1053,9 @@ class ResourceTracker(object):
                 len(group_resources), total_sdram, n_cores, n_tags, n_chips,
                 max_sdram))
 
-    def allocate_resources(self, resources, chips=None,
-                           processor_id=None, board_address=None,
-                           ip_tags=None, reverse_ip_tags=None):
+    def allocate_resources(
+            self, resources, chips=None, processor_id=None, board_address=None,
+            ip_tags=None, reverse_ip_tags=None):
         """ Attempts to use the given resources of the machine.  Can be given\
             specific place to use the resources, or else it will allocate them\
             on the first place that the resources fit.
@@ -1102,7 +1140,9 @@ class ResourceTracker(object):
             if (x, y) in self._core_tracker:
                 n_cores += len(self._core_tracker[x, y])
             else:
-                n_cores += len(list(chip.processors))
+                for processor in chip.processors:
+                    if not processor.is_monitor:
+                        n_cores += 1
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:
                 max_sdram = sdram_available
