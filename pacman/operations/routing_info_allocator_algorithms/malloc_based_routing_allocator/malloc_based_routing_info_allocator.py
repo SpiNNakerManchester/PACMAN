@@ -22,6 +22,7 @@ from pacman.utilities.algorithm_utilities import \
 from pacman import exceptions
 
 # general imports
+import traceback
 import math
 import numpy
 import logging
@@ -54,36 +55,46 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # constraints are compatible
         utilities.check_types_of_edge_constraint(machine_graph)
 
+        # Go through the groups and allocate keys
+        progress = ProgressBar(
+            machine_graph.n_outgoing_edge_partitions,
+            "Allocating routing keys")
+        try:
+            return self._allocate_routing_info(
+                machine_graph, n_keys_map, graph_mapper, progress)
+        except:
+            traceback.print_exc()
+            raise
+        finally:
+            progress.end()
+
+    def _allocate_routing_info(self, machine_graph, n_keys_map, graph_mapper,
+                               progress):
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
         (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-         flexi_field_groups, continuous_groups, none_continuous_groups) = \
+         flexi_field_groups, continuous_groups, noncontinuous_groups) = \
             utilities.get_edge_groups(machine_graph)
 
         # Even non-continuous keys will be continuous
-        for group in none_continuous_groups:
+        for group in noncontinuous_groups:
             continuous_groups.add(group)
-
-        # Go through the groups and allocate keys
-        progress_bar = ProgressBar(
-            machine_graph.n_outgoing_edge_partitions,
-            "Allocating routing keys")
 
         # allocate the groups that have fixed keys
         for group in fixed_key_groups:  # fixed keys groups
             self._allocate_fixed_keys(group, routing_infos, continuous_groups)
-            progress_bar.update()
+            progress.update()
 
         for group in fixed_mask_groups:  # fixed mask groups
             self._allocate_fixed_masks(group, fixed_field_groups, n_keys_map,
                                        routing_infos, continuous_groups)
-            progress_bar.update()
+            progress.update()
 
         for group in fixed_field_groups:
             self._allocate_fixed_fields(group, n_keys_map, routing_infos,
                                         continuous_groups)
-            progress_bar.update()
+            progress.update()
 
         if len(flexi_field_groups) != 0:
             raise exceptions.PacmanConfigurationException(
@@ -113,7 +124,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # update the pacman data objects
             self._update_routing_objects(keys_and_masks, routing_infos, group)
 
-        progress_bar.end()
         return routing_infos
 
     def _allocate_fixed_keys(self, group, routing_infos, continuous_groups):
