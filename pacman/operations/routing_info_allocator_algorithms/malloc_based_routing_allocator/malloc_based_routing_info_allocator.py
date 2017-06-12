@@ -214,6 +214,9 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # with n_keys being 2^len(first_zeros)
         n_sets = 2 ** len(remaining_zeros)
         n_keys = 2 ** len(first_zeros)
+        if len(remaining_zeros) == 0:
+            yield key, n_keys
+            return
         unwrapped_key = utility_calls.expand_to_bit_array(key)
         for value in xrange(n_sets):
             generated_key = numpy.copy(unwrapped_key)
