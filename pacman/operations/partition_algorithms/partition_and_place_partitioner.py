@@ -30,7 +30,7 @@ class PartitionAndPlacePartitioner(object):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine):
+    def __call__(self, graph, machine, preallocated_resources=None):
         """
 
         :param graph: The application_graph to partition
@@ -68,7 +68,8 @@ class PartitionAndPlacePartitioner(object):
             n_atoms += vertex.n_atoms
         progress_bar = ProgressBar(n_atoms, "Partitioning graph vertices")
 
-        resource_tracker = ResourceTracker(machine)
+        resource_tracker = ResourceTracker(
+            machine, preallocated_resources=preallocated_resources)
 
         # Partition one vertex at a time
         for vertex in vertices:
@@ -128,7 +129,8 @@ class PartitionAndPlacePartitioner(object):
                 PartitionerMaximumSizeConstraint)
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
-        max_atoms_per_core = min(possible_max_atoms)
+
+        max_atoms_per_core = int(min(possible_max_atoms))
 
         # partition by atoms
         self._partition_by_atoms(
@@ -219,6 +221,7 @@ class PartitionAndPlacePartitioner(object):
         new_used_placements = list()
         for (placed_vertex, x, y, p, placed_resources,
                 ip_tags, reverse_ip_tags) in used_placements:
+
             # Deallocate the existing resources
             resource_tracker.unallocate_resources(
                 x, y, p, placed_resources, ip_tags, reverse_ip_tags)
