@@ -188,3 +188,7 @@
           about the speed of operation of a function.
 
 """
+from pacman._version import __version__  # NOQA
+from pacman._version import __version_name__  # NOQA
+from pacman._version import __version_month__  # NOQA
+from pacman._version import __version_year__  # NOQA

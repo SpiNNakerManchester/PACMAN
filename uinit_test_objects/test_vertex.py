@@ -18,18 +18,21 @@ class TestVertex(ApplicationVertex):
     """
     _model_based_max_atoms_per_core = None
 
-    def __init__(self, n_atoms, label=None, max_atoms_per_core=256):
-        ApplicationVertex.__init__(self, label=label,
-                                   max_atoms_per_core=max_atoms_per_core)
+    def __init__(self, n_atoms, label="testVertex", max_atoms_per_core=256,
+                 constraints=None, fixed_sdram_value=None):
+        ApplicationVertex.__init__(
+            self, label=label, max_atoms_per_core=max_atoms_per_core,
+            constraints=constraints)
         self._model_based_max_atoms_per_core = max_atoms_per_core
         self._n_atoms = n_atoms
+        self._fixed_sdram_value = fixed_sdram_value
 
     def get_resources_used_by_atoms(self, vertex_slice):
         """
         standard method call to get the sdram, cpu and dtcm usage of a
         collection of atoms
+
         :param vertex_slice: the collection of atoms
-        :return:
         """
         return ResourceContainer(
             sdram=SDRAMResource(
@@ -63,7 +66,10 @@ class TestVertex(ApplicationVertex):
         :param graph: the graph
         :return: the amount of sdram (in bytes this model will use)
         """
-        return 1 * vertex_slice.n_atoms
+        if self._fixed_sdram_value is None:
+            return 1 * vertex_slice.n_atoms
+        else:
+            return self._fixed_sdram_value
 
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(

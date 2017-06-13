@@ -14,7 +14,7 @@ from pacman import exceptions
 from pacman.executor.algorithm_classes.python_class_algorithm \
     import PythonClassAlgorithm
 from pacman.executor.algorithm_decorators.all_of_input import AllOfInput
-from spinn_machine.utilities.ordered_set import OrderedSet
+from spinn_utilities.ordered_set import OrderedSet
 
 # The dict of algorithm name to algorithm description
 _algorithms = dict()

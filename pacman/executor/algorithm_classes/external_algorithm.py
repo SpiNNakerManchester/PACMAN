@@ -4,7 +4,7 @@ from pacman import exceptions
 from pacman.executor.algorithm_classes.abstract_algorithm \
     import AbstractAlgorithm
 from pacman.model.decorators.overrides import overrides
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class ExternalAlgorithm(AbstractAlgorithm):

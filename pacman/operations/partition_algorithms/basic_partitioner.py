@@ -10,7 +10,7 @@ from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 
@@ -52,15 +52,14 @@ class BasicPartitioner(object):
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
-        progress_bar = ProgressBar(
-            graph.n_vertices, "Partitioning graph vertices")
+        progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
         machine_graph = MachineGraph(
             "Machine graph for {}".format(graph.label))
         graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine)
 
         # Partition one vertex at a time
-        for vertex in graph.vertices:
+        for vertex in progress.over(graph.vertices):
 
             # Get the usage of the first atom, then assume that this
             # will be the usage of all the atoms
@@ -95,7 +94,6 @@ class BasicPartitioner(object):
             # Partition into vertices
             counted = 0
             while counted < vertex.n_atoms:
-
                 # Determine vertex size
                 remaining = vertex.n_atoms - counted
                 if remaining > atoms_per_core:
@@ -126,10 +124,6 @@ class BasicPartitioner(object):
                 # update allocated resources
                 resource_tracker.allocate_constrained_resources(
                     resources, vertex.constraints)
-
-            # update and end progress bars as needed
-            progress_bar.update()
-        progress_bar.end()
 
         partition_algorithm_utilities.generate_machine_edges(
             machine_graph, graph_mapper, graph)

@@ -13,8 +13,8 @@ before_install:
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy numpy scipy
   # SpiNNakerManchester internal dependencies; development mode
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
   - pip install --upgrade git+git://github.com/project-rig/rig.git@master
 
 install:
@@ -23,7 +23,8 @@ install:
 
 script:
   - py.test unittests
-  - py.test integration_tests
+  # Currently no integration tests
+  # - py.test integration_tests
   # Code quality check
   - flake8 pacman
   - flake8 integration_tests unittests uinit_test_objects

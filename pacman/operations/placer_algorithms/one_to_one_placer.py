@@ -1,3 +1,4 @@
+from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
 from pacman import exceptions
@@ -8,8 +9,6 @@ from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.constraints.placer_constraints\
     import PlacerSameChipAsConstraint
 from pacman.utilities import utility_calls
-
-from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -35,35 +34,30 @@ class OneToOnePlacer(RadialPlacer):
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
             machine_graph, same_chip_vertex_groups)
 
-        placements = self._do_allocation(
-            sorted_vertices, machine, same_chip_vertex_groups)
-
-        return placements
+        return self._do_allocation(
+            sorted_vertices, machine, same_chip_vertex_groups, machine_graph)
 
     def _do_allocation(
-            self, vertices, machine, same_chip_vertex_groups):
-
+            self, vertices, machine, same_chip_vertex_groups, machine_graph):
         placements = Placements()
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(
-            len(vertices), "Placing graph vertices")
+        progress = ProgressBar(
+            machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         all_vertices_placed = set()
 
         # iterate over vertices
         for vertex_list in vertices:
-
             # if too many one to ones to fit on a chip, allocate individually
             if len(vertex_list) > machine.maximum_user_cores_on_chip:
                 for vertex in vertex_list:
                     self._allocate_individual(
                         vertex, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed)
-                progress_bar.update()
+                    progress.update()
             else:
-
                 try:
                     resource_and_constraint_list = [
                         (vertex.resources_required, vertex.constraints)
@@ -77,7 +71,7 @@ class OneToOnePlacer(RadialPlacer):
                             vertex_list, allocations):
                         placement = Placement(vertex, x, y, p)
                         placements.add_placement(placement)
-                    progress_bar.update()
+                        progress.update()
                 except exceptions.PacmanValueError or \
                         exceptions.PacmanException or \
                         exceptions.PacmanInvalidParameterException:
@@ -88,8 +82,8 @@ class OneToOnePlacer(RadialPlacer):
                         self._allocate_individual(
                             vertex, placements, resource_tracker,
                             same_chip_vertex_groups, all_vertices_placed)
-                    progress_bar.update()
-        progress_bar.end()
+                        progress.update()
+        progress.end()
         return placements
 
     @staticmethod

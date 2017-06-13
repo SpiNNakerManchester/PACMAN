@@ -39,7 +39,6 @@ class ConstrainedObject(object):
         :param constraint: constraint to add
         :type constraint:\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If the\
                     constraint is not valid
@@ -64,7 +63,6 @@ class ConstrainedObject(object):
         :param constraints: iterable of constraints to add
         :type constraints: iterable of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        :return: None
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: If one of \
                     the constraints is not valid

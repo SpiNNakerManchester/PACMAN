@@ -1,10 +1,10 @@
+from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
 from pacman import exceptions
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.model.routing_table_by_partition import \
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
-from spinn_machine.utilities.progress_bar import ProgressBar
 
 # general imports
 import logging
@@ -79,10 +79,10 @@ class BasicDijkstraRouting(object):
         self._update_all_weights(nodes_info, machine)
 
         # each vertex represents a core in the board
-        progress = ProgressBar(len(list(placements.placements)),
+        progress = ProgressBar(placements.n_placements,
                                "Creating routing entries")
 
-        for placement in placements.placements:
+        for placement in progress.over(placements.placements):
             vertex = placement.vertex
             out_going_edges = \
                 machine_graph.get_edges_starting_at_vertex(vertex)
@@ -122,8 +122,6 @@ class BasicDijkstraRouting(object):
                     dest_placement.x, dest_placement.y, dijkstra_tables,
                     dest_placement.p, edge, nodes_info, placement.p,
                     machine_graph)
-            progress.update()
-        progress.end()
         return self._routing_paths
 
     def _initiate_node_info(self, machine):

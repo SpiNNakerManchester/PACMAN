@@ -19,8 +19,8 @@ from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities
 from pacman import exceptions
 
-from spinn_machine.utilities.progress_bar import ProgressBar
-from spinn_machine.utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 
 # general imports
 import math
@@ -71,7 +71,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             continuous_groups.add(group)
 
         # Go through the groups and allocate keys
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_outgoing_edge_partitions,
             "Allocating routing keys")
 
@@ -96,8 +96,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 group)
 
             continuous_groups.remove(group)
-
-            progress_bar.update()
+            progress.update()
 
         for group in fixed_mask_groups:  # fixed mask groups
 
@@ -121,8 +120,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._update_routing_objects(keys_and_masks, routing_infos, group)
 
             continuous_groups.remove(group)
-
-            progress_bar.update()
+            progress.update()
 
         for group in fixed_field_groups:
             fields = utility_calls.locate_constraints_of_type(
@@ -138,8 +136,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._update_routing_objects(keys_and_masks, routing_infos, group)
 
             continuous_groups.remove(group)
-
-            progress_bar.update()
+            progress.update()
 
         if len(flexi_field_groups) != 0:
             raise exceptions.PacmanConfigurationException(
@@ -166,27 +163,23 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     partitions_by_route[entry_hash].add(partition)
 
             for entry_hash, partitions in partitions_by_route.iteritems():
-
                 found_groups = list()
                 for partition in partitions:
                     if partition in partition_groups:
                         found_groups.append(partition_groups[partition])
 
                 if len(found_groups) == 0:
-
                     # If no group was found, create a new one
                     for partition in partitions:
                         partition_groups[partition] = partitions
 
                 elif len(found_groups) == 1:
-
                     # If a single other group was found, merge it
                     for partition in partitions:
                         found_groups[0].add(partition)
                         partition_groups[partition] = found_groups[0]
 
                 else:
-
                     # Merge the groups
                     new_group = partitions
                     for group in found_groups:
@@ -210,9 +203,9 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 # update the pacman data objects
                 self._update_routing_objects(
                     keys_and_masks, routing_infos, partition)
-                progress_bar.update()
+                progress.update()
 
-        progress_bar.end()
+        progress.end()
         return routing_infos
 
     @staticmethod

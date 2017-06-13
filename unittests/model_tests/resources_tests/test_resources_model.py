@@ -16,7 +16,6 @@ class TestResourceModels(unittest.TestCase):
         """
         test that adding a sdram resource to a resoruce container works
         correctly
-        :return:
         """
         sdram = SDRAMResource(128 * (2**20))
         self.assertEqual(sdram.get_value(), 128 * (2**20))
@@ -29,7 +28,6 @@ class TestResourceModels(unittest.TestCase):
         """
         test that adding a dtcm resource to a resoruce container works
         correctly
-        :return:
         """
         dtcm = DTCMResource(128 * (2**20))
         self.assertEqual(dtcm.get_value(), 128 * (2**20))
@@ -42,7 +40,6 @@ class TestResourceModels(unittest.TestCase):
         """
         test that adding a cpu resource to a resoruce container works
         correctly
-        :return:
         """
         cpu = CPUCyclesPerTickResource(128 * (2**20))
         self.assertEqual(cpu.get_value(), 128 * (2**20))
@@ -54,7 +51,6 @@ class TestResourceModels(unittest.TestCase):
     def test_resource_container(self):
         """
         tests that creating multiple resoruce containers doesnt cause issues.
-        :return:
         """
         sdram = SDRAMResource(128 * (2**20))
         dtcm = DTCMResource(128 * (2**20) + 1)

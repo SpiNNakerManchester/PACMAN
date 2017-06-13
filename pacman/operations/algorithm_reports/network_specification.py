@@ -16,8 +16,6 @@ class NetworkSpecification(object):
         :type report_folder: str
         :param graph: the graph generated from the tools
         :type graph: pacman.model.graph.application.application_graph.Graph
-        :param hostname: the machine name
-        :type hostname: str
         :rtype: None
         """
         filename = report_folder + os.sep + "network_specification.rpt"

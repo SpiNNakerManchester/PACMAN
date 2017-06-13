@@ -30,7 +30,7 @@ class PartitionAndPlacePartitioner(object):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine):
+    def __call__(self, graph, machine, preallocated_resources=None):
         """
 
         :param graph: The application_graph to partition
@@ -68,7 +68,8 @@ class PartitionAndPlacePartitioner(object):
             n_atoms += vertex.n_atoms
         progress_bar = ProgressBar(n_atoms, "Partitioning graph vertices")
 
-        resource_tracker = ResourceTracker(machine)
+        resource_tracker = ResourceTracker(
+            machine, preallocated_resources=preallocated_resources)
 
         # Group vertices that are supposed to be the same size
         vertex_groups = partition_algorithm_utilities\
@@ -94,7 +95,7 @@ class PartitionAndPlacePartitioner(object):
 
     def _partition_vertex(
             self, vertex, machine_graph, graph_mapper, resource_tracker,
-            graph, progress_bar, vertex_groups):
+            graph, progress, vertex_groups):
         """ Partition a single vertex
 
         :param vertex: the vertex to partition
@@ -131,16 +132,17 @@ class PartitionAndPlacePartitioner(object):
                 PartitionerMaximumSizeConstraint)
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
-        max_atoms_per_core = min(possible_max_atoms)
+
+        max_atoms_per_core = int(min(possible_max_atoms))
 
         # partition by atoms
         self._partition_by_atoms(
             partition_together_vertices, vertex.n_atoms, max_atoms_per_core,
-            machine_graph, graph, graph_mapper, resource_tracker, progress_bar)
+            machine_graph, graph, graph_mapper, resource_tracker, progress)
 
     def _partition_by_atoms(
             self, vertices, n_atoms, max_atoms_per_core, machine_graph, graph,
-            graph_mapper, resource_tracker, progress_bar):
+            graph_mapper, resource_tracker, progress):
         """ Try to partition vertices on how many atoms it can fit on\
             each vertex
 
@@ -170,7 +172,6 @@ class PartitionAndPlacePartitioner(object):
         """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
-
             lo_atom = n_atoms_placed
             hi_atom = lo_atom + max_atoms_per_core - 1
             if hi_atom >= n_atoms:
@@ -198,7 +199,7 @@ class PartitionAndPlacePartitioner(object):
                 graph_mapper.add_vertex_mapping(
                     machine_vertex, vertex_slice, vertex)
 
-                progress_bar.update(vertex_slice.n_atoms)
+                progress.update(vertex_slice.n_atoms)
 
     @staticmethod
     def _reallocate_resources(
@@ -293,7 +294,6 @@ class PartitionAndPlacePartitioner(object):
             ratio = self._find_max_ratio(used_resources, resources)
 
             while ratio > 1.0 and hi_atom >= lo_atom:
-
                 # Scale the resources by the ratio
                 old_n_atoms = (hi_atom - lo_atom) + 1
                 new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))
