@@ -1352,7 +1352,7 @@ class ResourceTracker(object):
     @property
     def chips_used(self):
         """ deduce the number of chips used in this allocation
-        
-        :return: 
+
+        :return: the number of chips used during the allocation.
         """
         return len(self._chips_used)
