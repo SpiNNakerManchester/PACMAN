@@ -83,9 +83,9 @@ def check_algorithm_can_support_constraints(
             if isinstance(c, abstract_constraint_type) and not \
                     _is_constraint_supported(c, supported_constraints):
                 raise PacmanInvalidParameterException(
-                        "constraints", c.__class__,
-                        "Constraints of this class are not supported by this"
-                        " algorithm")
+                    "constraints", c.__class__,
+                    "Constraints of this class are not supported by this"
+                    " algorithm")
 
 
 def check_constrained_value(value, current_value):
