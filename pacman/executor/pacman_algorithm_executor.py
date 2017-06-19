@@ -51,7 +51,10 @@ class PACMANAlgorithmExecutor(object):
         "_inject_inputs",
 
         # True if direct injection is to be done
-        "_do_direct_injection"
+        "_do_direct_injection",
+
+        # the flag in the provenance area.
+        "_provenance_name"
     ]
 
     def __init__(
@@ -59,7 +62,8 @@ class PACMANAlgorithmExecutor(object):
             xml_paths=None, packages=None, do_timings=True,
             print_timings=False, do_immediate_injection=True,
             do_post_run_injection=False, inject_inputs=True,
-            do_direct_injection=True, use_unscanned_annotated_algorithms=True):
+            do_direct_injection=True, use_unscanned_annotated_algorithms=True,
+            provenance_name=None):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -120,6 +124,11 @@ class PACMANAlgorithmExecutor(object):
         self._do_post_run_injection = do_post_run_injection
         self._inject_inputs = inject_inputs
         self._do_direct_injection = do_direct_injection
+
+        if provenance_name is None:
+            self._provenance_name = "mapping"
+        else:
+            self._provenance_name = provenance_name
 
         self._set_up_pacman_algorithm_listings(
             algorithms, optional_algorithms, xml_paths,
@@ -484,4 +493,5 @@ class PACMANAlgorithmExecutor(object):
         if self._print_timings:
             logger.info("Time {} taken by {}".format(
                 str(time_taken), algorithm.algorithm_id))
-        self._algorithm_timings.append((algorithm.algorithm_id, time_taken))
+        self._algorithm_timings.append(
+            (algorithm.algorithm_id, time_taken, self._provenance_name))
