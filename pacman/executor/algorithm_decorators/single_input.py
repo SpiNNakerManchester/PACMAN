@@ -1,5 +1,5 @@
-from pacman.executor.algorithm_decorators.abstract_input import AbstractInput
-from pacman.model.decorators.overrides import overrides
+from .abstract_input import AbstractInput
+from pacman.model.decorators import overrides
 
 
 class SingleInput(AbstractInput):

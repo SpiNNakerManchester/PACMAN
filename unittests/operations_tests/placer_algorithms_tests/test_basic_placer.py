@@ -5,11 +5,10 @@ test basic placer
 # pacman imports
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice, GraphMapper
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints\
     import PlacerChipAndCoreConstraint
-from pacman.model.graphs.common.graph_mapper import GraphMapper
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 
 # spinn machine imports

@@ -13,10 +13,8 @@ from pacman.operations.routing_info_allocator_algorithms\
 from pacman.model.routing_info \
     import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.utilities import utility_calls
-from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
-    ElementAllocatorAlgorithm
-from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities
+from pacman.utilities.algorithm_utilities \
+    import ElementAllocatorAlgorithm, routing_info_allocator_utilities
 from pacman import exceptions
 
 from spinn_utilities.progress_bar import ProgressBar

@@ -1,6 +1,6 @@
 import unittest
-from pacman.executor.pacman_algorithm_executor import PACMANAlgorithmExecutor
-from pacman.executor.algorithm_decorators.algorithm_decorator import algorithm
+from pacman.executor import PACMANAlgorithmExecutor
+from pacman.executor.algorithm_decorators import algorithm
 
 
 @algorithm({"param": "TestType1"}, ["TestType2"])

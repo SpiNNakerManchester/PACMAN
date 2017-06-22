@@ -13,8 +13,7 @@ from pacman.model.routing_info import PartitionRoutingInfo, RoutingInfo
 # pacman utility imports
 from pacman.utilities.constants import DEFAULT_MASK
 # pacman operations imports
-from pacman.operations.router_algorithms.basic_dijkstra_routing \
-    import BasicDijkstraRouting
+from pacman.operations.router_algorithms import BasicDijkstraRouting
 # spinnmachine imports
 from spinn_machine.processor import Processor
 from spinn_machine.link import Link

@@ -1,15 +1,14 @@
 import logging
 
-from pacman.model.graphs.common.slice import Slice
-
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints \
     import AbstractPartitionerConstraint, PartitionerMaximumSizeConstraint
-from pacman.model.graphs.common.graph_mapper import GraphMapper
+from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs import ResourceTracker
+
 from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)

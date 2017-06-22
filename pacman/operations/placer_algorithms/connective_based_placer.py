@@ -4,10 +4,10 @@ from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.constraints.placer_constraints \
     import AbstractPlacerConstraint
 from pacman.model.placements import Placements
-from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
+from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities import utility_calls
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs import ResourceTracker
 
 logger = logging.getLogger(__name__)
 

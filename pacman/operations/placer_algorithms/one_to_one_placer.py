@@ -4,7 +4,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman import exceptions
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.constraints.placer_constraints\
     import PlacerSameChipAsConstraint

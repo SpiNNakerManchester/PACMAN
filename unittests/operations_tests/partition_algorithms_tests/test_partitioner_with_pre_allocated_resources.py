@@ -3,12 +3,10 @@ from pacman.exceptions import PacmanInvalidParameterException, \
 from pacman.model.constraints.placer_constraints import \
     PlacerChipAndCoreConstraint
 from pacman.model.graphs.application import ApplicationGraph
-from pacman.model.resources.core_resource import CoreResource
-from pacman.model.resources.specific_core_resource import SpecificCoreResource
-from pacman.model.resources.specific_chip_sdram_resource import \
-    SpecificChipSDRAMResource
-from pacman.model.resources.pre_allocated_resource_container import \
-    PreAllocatedResourceContainer
+from pacman.model.resources import CoreResource
+from pacman.model.resources import SpecificCoreResource
+from pacman.model.resources import SpecificChipSDRAMResource
+from pacman.model.resources import PreAllocatedResourceContainer
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from spinn_machine.virtual_machine import VirtualMachine
 from uinit_test_objects.test_vertex import TestVertex

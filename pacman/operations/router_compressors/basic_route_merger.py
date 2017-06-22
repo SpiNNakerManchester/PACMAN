@@ -1,5 +1,6 @@
 from pacman.model.routing_tables \
     import MulticastRoutingTable, MulticastRoutingTables
+from pacman.exceptions import PacmanRoutingException
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
@@ -28,12 +29,12 @@ class BasicRouteMerger(object):
         for router_table in router_tables.routing_tables:
             for entry in router_table.multicast_routing_entries:
                 if entry.mask not in allowed_masks:
-                    raise Exception(
+                    raise PacmanRoutingException(
                         "Only masks without holes are allowed in tables for"
                         " BasicRouteMerger (disallowed mask={})".format(
                             hex(entry.mask)))
 
-        for router_table in router_tables.routing_tables:
+        for router_table in progress.over(router_tables.routing_tables):
             new_table = self._merge_routes(router_table, previous_masks)
             tables.add_routing_table(new_table)
             n_entries = len([
@@ -43,11 +44,10 @@ class BasicRouteMerger(object):
                 len(router_table.multicast_routing_entries),
                 n_entries)
             if n_entries > 1023:
-                raise Exception(
+                raise PacmanRoutingException(
                     "Cannot make table small enough: {} entries".format(
                         n_entries))
-            progress.update()
-        progress.end()
+
         return tables
 
     def _get_merge_masks(self, mask, previous_masks):

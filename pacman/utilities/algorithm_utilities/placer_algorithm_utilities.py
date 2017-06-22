@@ -2,8 +2,7 @@ from pacman.model.constraints.placer_constraints\
     import PlacerChipAndCoreConstraint, PlacerSameChipAsConstraint
 from pacman.model.constraints.placer_constraints \
     import PlacerBoardConstraint, PlacerRadialPlacementFromChipConstraint
-from pacman.utilities.vertex_sorter import VertexSorter
-from pacman.utilities.vertex_sorter import ConstraintOrder
+from pacman.utilities.vertex_sorter import VertexSorter, ConstraintOrder
 
 
 def sort_vertices_by_known_constraints(vertices):

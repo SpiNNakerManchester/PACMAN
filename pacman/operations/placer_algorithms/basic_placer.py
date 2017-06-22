@@ -3,7 +3,7 @@ from spinn_utilities.progress_bar import ProgressBar
 # pacman imports
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements import Placement, Placements
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs import ResourceTracker
 
 # general imports
 import logging

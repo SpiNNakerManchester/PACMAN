@@ -1,7 +1,7 @@
 # pacman imports
 from pacman.model.constraints.partitioner_constraints\
     import PartitionerMaximumSizeConstraint
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 # unit tests imports

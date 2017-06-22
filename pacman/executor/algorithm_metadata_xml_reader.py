@@ -1,17 +1,14 @@
 from lxml import etree
 
-from pacman.executor.algorithm_decorators.one_of_input import OneOfInput
-from pacman.executor.algorithm_decorators.output import Output
-from pacman.executor.algorithm_classes.python_function_algorithm \
-    import PythonFunctionAlgorithm
-from pacman.executor.algorithm_decorators.single_input import SingleInput
+from pacman.executor.algorithm_decorators import OneOfInput
+from pacman.executor.algorithm_decorators import Output
+from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
+from pacman.executor.algorithm_decorators import SingleInput
 
-from pacman import exceptions
-from pacman.executor.algorithm_classes.external_algorithm \
-    import ExternalAlgorithm
-from pacman.executor.algorithm_classes.python_class_algorithm \
-    import PythonClassAlgorithm
-from pacman.executor.algorithm_decorators.all_of_input import AllOfInput
+from pacman.exceptions import PacmanConfigurationException
+from pacman.executor.algorithm_classes import ExternalAlgorithm
+from pacman.executor.algorithm_classes import PythonClassAlgorithm
+from pacman.executor.algorithm_decorators import AllOfInput
 
 
 class AlgorithmMetadataXmlReader(object):
@@ -46,7 +43,7 @@ class AlgorithmMetadataXmlReader(object):
             for element in xml_root.findall(".//algorithm"):
                 name = element.get('name')
                 if name in algorithm_data_objects:
-                    raise exceptions.PacmanConfigurationException(
+                    raise PacmanConfigurationException(
                         "There are two algorithms with the same name {}"
                         " in these xml files {}. Please rectify and try again."
                         .format(name, files_read_so_far))
@@ -57,7 +54,7 @@ class AlgorithmMetadataXmlReader(object):
     @staticmethod
     def _check_allowed_elements(path, element, allowed):
         if any([sub.tag not in allowed for sub in element.iterchildren()]):
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "Error in XML starting at line {} of {}: Only"
                 " one of {} is allowed in {}".format(
                     element.sourceline, path, allowed, element.tag))
@@ -76,7 +73,7 @@ class AlgorithmMetadataXmlReader(object):
 
         algorithm_id = element.get('name')
         if algorithm_id is None:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "Missing algorithm_id in algorithm definition starting on"
                 " line {} of {}".format(element.sourceline, path))
 
@@ -102,7 +99,7 @@ class AlgorithmMetadataXmlReader(object):
         # Get the input definitions
         input_defs = element.find("input_definitions")
         if input_defs is None:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "Missing input_definitions in algorithm definition starting on"
                 " line {} of {}".format(element.sourceline, path))
         input_definitions = self._translate_input_definitions(path, input_defs)
@@ -121,7 +118,7 @@ class AlgorithmMetadataXmlReader(object):
         for input_name in input_definitions.iterkeys():
             if (input_name not in required_seen and
                     input_name not in optional_seen):
-                raise exceptions.PacmanConfigurationException(
+                raise PacmanConfigurationException(
                     "Error in algorithm definition starting on line {} of {}:"
                     " input_definitions contains parameter {} but it is not"
                     " required or optional".format(
@@ -130,7 +127,7 @@ class AlgorithmMetadataXmlReader(object):
         if command_line_args is not None:
             if (python_module is not None or python_class is not None or
                     python_function is not None or python_method is not None):
-                raise exceptions.PacmanConfigurationException(
+                raise PacmanConfigurationException(
                     "Error in algorithm {} specification starting on line {}"
                     " of {}: command_line_args can not be specified with"
                     " python_module, python_class, python_function or"
@@ -142,7 +139,7 @@ class AlgorithmMetadataXmlReader(object):
 
         if python_module is not None and python_function is not None:
             if (python_class is not None or python_method is not None):
-                raise exceptions.PacmanConfigurationException(
+                raise PacmanConfigurationException(
                     "Error in algorithm {} specification starting on line {}"
                     " of {}: python_function can not be specified with"
                     " python_class or python_method".format(
@@ -156,7 +153,7 @@ class AlgorithmMetadataXmlReader(object):
                 algorithm_id, required_inputs, optional_inputs, outputs,
                 python_module, python_class, python_method)
 
-        raise exceptions.PacmanConfigurationException(
+        raise PacmanConfigurationException(
             "Error in algorithm {} specification starting on line {}"
             " of {}: One of command_line_args, [python_module,"
             " python_function] or [python_module, python_class,"
@@ -217,7 +214,7 @@ class AlgorithmMetadataXmlReader(object):
                 if alg_input.tag == "param_name":
                     definition = definitions.get(alg_input.text.strip(), None)
                     if definition is None:
-                        raise exceptions.PacmanConfigurationException(
+                        raise PacmanConfigurationException(
                             "Error in XML on line {} of {}: {} section"
                             " references the parameter {} but this was not"
                             " defined in input_definitions".format(
@@ -250,7 +247,7 @@ class AlgorithmMetadataXmlReader(object):
             for output in outputs_element.findall("param_type"):
                 file_name_type = output.get("file_name_type", default=None)
                 if is_external and file_name_type is None:
-                    raise exceptions.PacmanConfigurationException(
+                    raise PacmanConfigurationException(
                         "Error in XML at line {} of {}: Outputs of "
                         " external algorithms must specify the input type"
                         " from which the file name will be obtained using"

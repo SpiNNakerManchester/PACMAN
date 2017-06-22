@@ -4,7 +4,7 @@ from pacman.model.constraints.placer_constraints \
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements import Placement, Placements
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
 from spinn_utilities.progress_bar import ProgressBar

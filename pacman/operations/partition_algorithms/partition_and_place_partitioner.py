@@ -1,21 +1,18 @@
 import logging
-from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
-    AbstractHasGlobalMaxAtoms
 
-from pacman.model.graphs.common.slice import Slice
-
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman import exceptions
 from pacman.model.constraints.partitioner_constraints \
     import AbstractPartitionerConstraint, PartitionerMaximumSizeConstraint
 from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.graphs.common.graph_mapper import \
-    GraphMapper
+from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs import ResourceTracker
+
 from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)

@@ -7,7 +7,7 @@ from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints\
     import PlacerChipAndCoreConstraint
-from pacman.model.graphs.common.graph_mapper import GraphMapper
+from pacman.model.graphs.common import GraphMapper
 from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
 
 from spinn_machine.chip import Chip
