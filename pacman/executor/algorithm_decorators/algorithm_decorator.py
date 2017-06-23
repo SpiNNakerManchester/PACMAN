@@ -30,7 +30,8 @@ class AllOf(object):
     def __init__(self, *items):
         """
         :param items: The items required
-        :type items: str, AllOf, OneOf
+        :type items: str, pacman.executor.algorithm_decorators.AllOf, \
+            pacman.executor.algorithm_decorators.OneOf
         """
         self._items = items
 
@@ -56,7 +57,8 @@ class OneOf(object):
     def __init__(self, *items):
         """
         :param items: The items required
-        :type items: str, AllOf, OneOf
+        :type items: str, pacman.executor.algorithm_decorators.AllOf, \
+            pacman.executor.algorithm_decorators.OneOf
         """
         self._items = items
 
@@ -78,8 +80,9 @@ def _decode_inputs(input_defs, inputs):
 
     :param input_defs: A dict of algorithm parameter name SingleInput
     :param inputs: A list of inputs to decode
-    :type inputs: list of str, OneOf, AllOf
-    :return: a list of AbstractInput
+    :type inputs: list of str, pacman.executor.algorithm_decorators.OneOf, \
+        pacman.executor.algorithm_decorators.AllOf
+    :return: a list of pacman.executor.algorithm_decorators.AbstractInput
     """
     final_inputs = list()
     for inp in inputs:
@@ -102,9 +105,13 @@ def _decode_algorithm_details(
 
     :param input_definitions: dict of algorithm parameter name to list of types
     :param required_inputs: List of required algorithm parameter names
-    :type required_inputs: list of str, OneOf, AllOf
+    :type required_inputs: list of str, \
+        pacman.executor.algorithm_decorators.OneOf, \
+        pacman.executor.algorithm_decorators.AllOf
     :param optional_inputs: List of optional algorithm parameter names
-    :type optional_inputs: list of str, OneOf, AllOf
+    :type optional_inputs: list of str, \
+        pacman.executor.algorithm_decorators.OneOf, \
+        pacman.executor.algorithm_decorators.AllOf
     :param function: The function to be called by the algorithm
     :param has_self: True if the self parameter is expected
     """
@@ -192,11 +199,15 @@ def algorithm(
     :param required_inputs:\
         Optional list of required algorithm parameter names; if not specified\
         those parameters which have no default values are used.
-    :type required_inputs: list of (str or OneOf or AllOf)
+    :type required_inputs: list of (str or \
+        pacman.executor.algorithm_decorators.OneOf or \
+        pacman.executor.algorithm_decorators.AllOf)
     :param optional_inputs:\
         Optional list of optional algorithm parameter names; if not specified\
         those parameters which have default values are used.
-    :type optional_inputs: list of (str or OneOf or AllOf)
+    :type optional_inputs: list of (str or \
+        pacman.executor.algorithm_decorators.OneOf or \
+        pacman.executor.algorithm_decorators.AllOf)
     :param method:\
         The optional name of the method to call if decorating a class; if not\
         specified, __call__ is used (i.e. it is assumed to be callable).  Must\
