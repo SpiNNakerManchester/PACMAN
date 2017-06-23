@@ -8,7 +8,7 @@ from pacman.model.resources import SpecificCoreResource
 from pacman.model.resources import SpecificChipSDRAMResource
 from pacman.model.resources import PreAllocatedResourceContainer
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
-from spinn_machine.virtual_machine import VirtualMachine
+from spinn_machine import VirtualMachine
 from uinit_test_objects.test_vertex import TestVertex
 
 

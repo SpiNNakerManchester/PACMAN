@@ -1,6 +1,6 @@
 import unittest
 
-from spinn_machine.virtual_machine import VirtualMachine
+from spinn_machine import VirtualMachine
 
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.resources import PreAllocatedResourceContainer

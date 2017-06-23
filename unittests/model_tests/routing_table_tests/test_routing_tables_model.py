@@ -8,7 +8,7 @@ from pacman.model.routing_tables \
 from pacman.exceptions import PacmanAlreadyExistsException
 
 # spinnmanchine imports
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 
 # general imports
 import unittest

@@ -54,10 +54,10 @@ class BasicDijkstraRouting(object):
         :type placements:\
             :py:class:`pacman.model.placements.Placements`
         :param machine: The machine through which the routes are to be found
-        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :type machine: :py:class:`spinn_machine.Machine`
         :param machine_graph: the machine_graph object
         :type machine_graph:\
-            :py:class:`pacman.model.graph.machine_graph.MachineGraph`
+            :py:class:`pacman.model.graph.machine.MachineGraph`
         :return: The discovered routes
         :rtype:\
             :py:class:`pacman.model.routing_tables.MulticastRoutingTables`
@@ -129,7 +129,7 @@ class BasicDijkstraRouting(object):
             machine
 
         :param machine: the machine object
-        :type machine: spinn_machine.machine.Machine
+        :type machine: spinn_machine.Machine
         :return: nodes_info dictionary
         :rtype: dict
         :raise None: this method does not raise any known exceptions
@@ -170,7 +170,7 @@ class BasicDijkstraRouting(object):
             given node
 
         :param machine: the machine object
-        :type machine: the spinn_machine.machine.Machine object
+        :type machine: the spinn_machine.Machine object
         :return: the  Dijkstra's table dictionary
         :rtype: dict
         :raise None: this method does not raise any known exception
@@ -196,7 +196,7 @@ class BasicDijkstraRouting(object):
         :type nodes_info: dict
         :param machine: the machine python object that represents the\
                     structure of the machine
-        :type machine: 'py:class':spinn_machine.machine.Machine
+        :type machine: 'py:class':spinn_machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -213,7 +213,7 @@ class BasicDijkstraRouting(object):
         :param key: the identifier to the object in nodes_info
         :type key: str
         :type nodes_info: dict
-        :type machine: 'py:class':spinn_machine.machine.Machine
+        :type machine: 'py:class':spinn_machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -234,7 +234,7 @@ class BasicDijkstraRouting(object):
         :param bws: the basic weight of the source node
         :param no_routing_table_entries: the number of entries going though\
                 this router
-        :type router: spinn_machine.router.Router
+        :type router: spinn_machine.Router
         :type bws: int
         :type no_routing_table_entries: int
         :return: weight of this router
@@ -500,7 +500,7 @@ class BasicDijkstraRouting(object):
         """ Create a new routing entry
 
         :return: x_current, y_current, previous_routing_entry, made_an_entry
-        :rtype: int, int, spinn_machine.multicast_routing_entry, bool
+        :rtype: int, int, spinn_machine.MulticastRoutingEntry, bool
         :raise PacmanRoutingException: when the bandwidth of a router is\
                 beyond expected parameters
         """

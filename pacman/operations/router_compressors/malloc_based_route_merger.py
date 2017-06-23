@@ -2,7 +2,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables \
     import MulticastRoutingTable, MulticastRoutingTables
 from pacman.exceptions import PacmanRoutingException
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 
 import math
 

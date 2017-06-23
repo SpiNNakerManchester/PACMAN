@@ -12,12 +12,7 @@ from pacman.model.constraints.placer_constraints\
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 
 # spinn machine imports
-from spinn_machine.chip import Chip
-from spinn_machine.link import Link
-from spinn_machine.machine import Machine
-from spinn_machine.processor import Processor
-from spinn_machine.router import Router
-from spinn_machine.sdram import SDRAM
+from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 
 # general imports
 import unittest

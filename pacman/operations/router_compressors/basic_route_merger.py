@@ -3,7 +3,7 @@ from pacman.model.routing_tables \
 from pacman.exceptions import PacmanRoutingException
 
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 
 
 class BasicRouteMerger(object):

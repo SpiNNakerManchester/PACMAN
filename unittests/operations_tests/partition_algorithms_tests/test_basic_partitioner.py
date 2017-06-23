@@ -13,12 +13,7 @@ from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 
 # spinnMachine imports
-from spinn_machine.machine import Machine
-from spinn_machine.processor import Processor
-from spinn_machine.sdram import SDRAM
-from spinn_machine.link import Link
-from spinn_machine.router import Router
-from spinn_machine.chip import Chip
+from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
 
 # general imports
 import unittest

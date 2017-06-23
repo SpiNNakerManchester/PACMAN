@@ -6,7 +6,7 @@ from pacman.model.routing_tables \
 from pacman.exceptions import PacmanElementAllocationException
 
 # spinnMachine imports
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 
 # rig imports
 from rig import routing_table as rig_routing_table

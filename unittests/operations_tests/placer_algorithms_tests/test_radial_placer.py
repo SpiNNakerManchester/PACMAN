@@ -8,14 +8,9 @@ from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints\
     import PlacerChipAndCoreConstraint
 from pacman.model.graphs.common import GraphMapper
-from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
+from pacman.operations.placer_algorithms import RadialPlacer
 
-from spinn_machine.chip import Chip
-from spinn_machine.link import Link
-from spinn_machine.machine import Machine
-from spinn_machine.processor import Processor
-from spinn_machine.router import Router
-from spinn_machine.sdram import SDRAM
+from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 
 from operator import itemgetter
 from pprint import pprint as pp
