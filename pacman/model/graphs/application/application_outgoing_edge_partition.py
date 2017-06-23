@@ -1,6 +1,5 @@
-from pacman.model.graphs.application.application_edge import ApplicationEdge
-from pacman.model.graphs.impl.outgoing_edge_partition \
-    import OutgoingEdgePartition
+from .application_edge import ApplicationEdge
+from pacman.model.graphs.impl import OutgoingEdgePartition
 
 
 class ApplicationOutgoingEdgePartition(OutgoingEdgePartition):

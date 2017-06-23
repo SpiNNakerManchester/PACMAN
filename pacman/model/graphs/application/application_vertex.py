@@ -1,12 +1,11 @@
 from six import add_metaclass
 import sys
 
-from pacman.model.decorators.overrides import overrides
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_maximum_size_constraint import \
+from pacman.model.decorators import overrides
+from pacman.model.constraints.partitioner_constraints import \
     PartitionerMaximumSizeConstraint
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common.constrained_object import ConstrainedObject
+from pacman.model.graphs.common import ConstrainedObject
 
 from spinn_utilities.abstract_base import \
     abstractmethod, abstractproperty, AbstractBase

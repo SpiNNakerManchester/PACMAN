@@ -1,16 +1,14 @@
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.graphs.application.application_vertex\
-    import ApplicationVertex
+    import PlacerChipAndCoreConstraint
+from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
-from pacman.model.decorators.overrides import overrides
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.decorators import overrides
+from pacman.model.resources import ResourceContainer
+from pacman.model.resources import DTCMResource
+from pacman.model.resources import SDRAMResource
 from pacman.model.graphs.machine.machine_fpga_vertex \
     import MachineFPGAVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource \
-    import CPUCyclesPerTickResource
+from pacman.model.resources import CPUCyclesPerTickResource
 
 import sys
 

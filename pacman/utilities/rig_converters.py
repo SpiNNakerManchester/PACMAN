@@ -15,10 +15,8 @@ from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements import Placement, Placements
-from pacman.model.routing_table_by_partition \
-    import MulticastRoutingTableByPartition
-from pacman.model.routing_table_by_partition \
-    import MulticastRoutingTableByPartitionEntry
+from pacman.model.routing_table_by_partition import \
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
 from pacman.utilities.constants import EDGES
 
 # A lookup from link name (string) to Links enum entry.

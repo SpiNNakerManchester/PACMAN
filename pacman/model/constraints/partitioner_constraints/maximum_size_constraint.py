@@ -1,6 +1,5 @@
 # pacman import
-from pacman.model.constraints.partitioner_constraints\
-    .abstract_partitioner_constraint import AbstractPartitionerConstraint
+from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
 class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):

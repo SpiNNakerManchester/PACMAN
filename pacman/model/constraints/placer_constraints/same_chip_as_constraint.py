@@ -1,5 +1,4 @@
-from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
+from .abstract_placer_constraint import AbstractPlacerConstraint
 
 
 class PlacerSameChipAsConstraint(AbstractPlacerConstraint):

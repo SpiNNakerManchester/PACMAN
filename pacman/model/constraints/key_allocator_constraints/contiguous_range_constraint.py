@@ -1,5 +1,4 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
@@ -11,10 +10,7 @@ class KeyAllocatorContiguousRangeContraint(AbstractKeyAllocatorConstraint):
     __slots__ = []
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorContiguousRangeContraint):
-            return False
-        else:
-            return True
+        return isinstance(other, KeyAllocatorContiguousRangeContraint)
 
     def __ne__(self, other):
         return not self.__eq__(other)

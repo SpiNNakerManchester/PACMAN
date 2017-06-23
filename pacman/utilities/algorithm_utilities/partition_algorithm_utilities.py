@@ -12,13 +12,13 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
 
     :param machine_graph: the machine graph to add edges to
     :type machine_graph:\
-        :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+        :py:class:`pacman.model.graph.machine.MachineGraph`
     :param graph_mapper: the mapper graphs
     :type graph_mapper:\
-        :py:class:`pacman.model.graph_mapper.GraphMapper`
+        :py:class:`pacman.model.GraphMapper`
     :param application_graph: the application graph to work with
     :type application_graph:\
-        :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
+        :py:class:`pacman.model.graph.application.ApplicationGraph`
     """
 
     # start progress bar

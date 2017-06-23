@@ -12,7 +12,7 @@ def locate_constraints_of_type(constraints, constraint_type):
                 :py:class:`pacman.model.constraints.AbstractConstraint`
     :param constraint_type: The type of constraints to return
     :type constraint_type:\
-                :py:class:`pacman.model.constraint.abstract_partitioner_constraint.AbstractPartitionConstraint`
+                :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
     :return: The constraints of constraint_type that are\
                 found in the constraints given
     :rtype: iterable of\
@@ -34,7 +34,7 @@ def locate_first_constraint_of_type(constraints, constraint_type):
                 :py:class:`pacman.model.constraints.AbstractConstraint`
     :param constraint_type: The type of constraints to return
     :type constraint_type:\
-                :py:class:`pacman.model.constraint.abstract_partitioner_constraint.AbstractPartitionConstraint`
+                :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
     :return: The first constraint of constraint_type that was\
                 found in the constraints given
     :rtype:\

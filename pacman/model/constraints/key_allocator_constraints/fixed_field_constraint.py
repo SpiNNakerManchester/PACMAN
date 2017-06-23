@@ -1,5 +1,4 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
@@ -39,14 +38,12 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
     def __eq__(self, other):
         if not isinstance(other, KeyAllocatorFixedFieldConstraint):
             return False
-        else:
-            if len(self._fields) != len(other.fields):
+        if len(self._fields) != len(other.fields):
+            return False
+        for field in self._fields:
+            if field not in other.fields:
                 return False
-            else:
-                for field in self._fields:
-                    if field not in other.fields:
-                        return False
-                return True
+        return True
 
     def __ne__(self, other):
         return not self.__eq__(other)
