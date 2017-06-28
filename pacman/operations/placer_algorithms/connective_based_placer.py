@@ -1,5 +1,6 @@
 import logging
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
+    import sort_vertices_by_known_constraints
 
 from pacman.model.constraints.placer_constraints \
     import AbstractPlacerConstraint
@@ -49,15 +50,13 @@ class ConnectiveBasedPlacer(RadialPlacer):
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
-        constrained_vertices = \
-            placer_algorithm_utilities.sort_vertices_by_known_constraints(
-                constrained_vertices)
+        constrained_vertices = sort_vertices_by_known_constraints(
+            constrained_vertices)
         for vertex in constrained_vertices:
             self._place_vertex(vertex, resource_tracker, machine, placements)
             progress.update()
 
         while len(unconstrained_vertices) > 0:
-
             # Keep track of all vertices connected to the currently placed ones
             next_vertices = set()
 
@@ -100,12 +99,10 @@ class ConnectiveBasedPlacer(RadialPlacer):
         for vertex in vertices:
             in_weight = sum([
                 edge.weight
-                for edge in graph.get_edges_starting_at_vertex(
-                    vertex)])
+                for edge in graph.get_edges_starting_at_vertex(vertex)])
             out_weight = sum([
                 edge.weight
-                for edge in graph.get_edges_ending_at_vertex(
-                    vertex)])
+                for edge in graph.get_edges_ending_at_vertex(vertex)])
             weight = in_weight + out_weight
 
             if max_connected_vertex is None or weight > max_weight:

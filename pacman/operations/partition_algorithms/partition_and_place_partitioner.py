@@ -8,9 +8,11 @@ from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
-from pacman.utilities import utility_calls
-from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities import utility_calls as utils
+from pacman.utilities.algorithm_utilities \
+    import partition_algorithm_utilities as partition_utils
+from pacman.utilities.algorithm_utilities \
+    import placer_algorithm_utilities as placer_utils
 from pacman.utilities.utility_objs import ResourceTracker
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -44,7 +46,7 @@ class PartitionAndPlacePartitioner(object):
                    goes wrong with the partitioning
         """
         ResourceTracker.check_constraints(graph.vertices)
-        utility_calls.check_algorithm_can_support_constraints(
+        utils.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             abstract_constraint_type=AbstractPartitionerConstraint,
             supported_constraints=[PartitionerMaximumSizeConstraint,
@@ -56,8 +58,8 @@ class PartitionAndPlacePartitioner(object):
         graph_mapper = GraphMapper()
 
         # sort out vertex's by placement constraints
-        vertices = placer_algorithm_utilities\
-            .sort_vertices_by_known_constraints(graph.vertices)
+        vertices = placer_utils.sort_vertices_by_known_constraints(
+            graph.vertices)
 
         # Set up the progress
         n_atoms = 0
@@ -81,7 +83,7 @@ class PartitionAndPlacePartitioner(object):
                     graph, progress_bar)
         progress_bar.end()
 
-        partition_algorithm_utilities.generate_machine_edges(
+        partition_utils.generate_machine_edges(
             machine_graph, graph_mapper, graph)
 
         return machine_graph, graph_mapper, len(resource_tracker.keys)
@@ -121,7 +123,7 @@ class PartitionAndPlacePartitioner(object):
             possible_max_atoms.append(vertex.get_max_atoms_per_core())
 
         for other_vertex in partition_together_vertices:
-            max_atom_constraints = utility_calls.locate_constraints_of_type(
+            max_atom_constraints = utils.locate_constraints_of_type(
                 other_vertex.constraints,
                 PartitionerMaximumSizeConstraint)
             for constraint in max_atom_constraints:
@@ -185,8 +187,8 @@ class PartitionAndPlacePartitioner(object):
                 machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, used_resources,
                     label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
-                    constraints=partition_algorithm_utilities
-                    .get_remaining_constraints(vertex))
+                    constraints=partition_utils.get_remaining_constraints(
+                        vertex))
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
@@ -373,8 +375,7 @@ class PartitionAndPlacePartitioner(object):
         :type ratio: int
         :return: the new resources used and the new hi_atom
         :rtype: tuple of\
-                    (:py:class:`pacman.model.resources.resource.Resource`,\
-                    int)
+                    (:py:class:`pacman.model.resources.Resource`,int)
         """
 
         previous_used_resources = used_resources
@@ -383,8 +384,8 @@ class PartitionAndPlacePartitioner(object):
         # Keep searching while the ratio is still in range,
         # the next hi_atom value is still less than the number of atoms,
         # and the number of atoms is less than the constrained number of atoms
-        while ((ratio < 1.0) and ((hi_atom + 1) < vertex.n_atoms) and
-                ((hi_atom - lo_atom + 2) < max_atoms_per_core)):
+        while ((ratio < 1.0) and (hi_atom + 1 < vertex.n_atoms) and
+               (hi_atom - lo_atom + 2 < max_atoms_per_core)):
 
             # Update the hi_atom, keeping track of the last hi_atom which
             # resulted in a ratio < 1.0
@@ -486,9 +487,8 @@ class PartitionAndPlacePartitioner(object):
         """
         partition_together_vertices = list()
         partition_together_vertices.append(vertex)
-        same_size_vertex_constraints = \
-            utility_calls.locate_constraints_of_type(
-                vertex.constraints, PartitionerSameSizeAsVertexConstraint)
+        same_size_vertex_constraints = utils.locate_constraints_of_type(
+            vertex.constraints, PartitionerSameSizeAsVertexConstraint)
         for constraint in same_size_vertex_constraints:
             if constraint.vertex.n_atoms != vertex.n_atoms:
                 raise PacmanPartitionException(

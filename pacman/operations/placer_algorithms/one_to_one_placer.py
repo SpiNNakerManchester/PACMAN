@@ -5,10 +5,19 @@ from pacman import exceptions
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.algorithm_utilities \
+    import placer_algorithm_utilities as placer_utils
 from pacman.model.constraints.placer_constraints\
     import PlacerSameChipAsConstraint
-from pacman.utilities import utility_calls
+from pacman.utilities.utility_calls import is_single
+
+
+def _conflict(x, y, post_x, post_y):
+    if x is not None and post_x is not None and x != post_x:
+        return True
+    if y is not None and post_y is not None and y != post_y:
+        return True
+    return False
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -29,8 +38,8 @@ class OneToOnePlacer(RadialPlacer):
             additional_placement_constraints={PlacerSameChipAsConstraint})
 
         # Get which vertices must be placed on the same chip as another vertex
-        same_chip_vertex_groups = placer_algorithm_utilities\
-            .get_same_chip_vertex_groups(machine_graph.vertices)
+        same_chip_vertex_groups = placer_utils.get_same_chip_vertex_groups(
+            machine_graph.vertices)
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
             machine_graph, same_chip_vertex_groups)
 
@@ -122,8 +131,8 @@ class OneToOnePlacer(RadialPlacer):
         found_list = set()
 
         # order vertices based on constraint priority
-        vertices = placer_algorithm_utilities\
-            .sort_vertices_by_known_constraints(machine_graph.vertices)
+        vertices = placer_utils.sort_vertices_by_known_constraints(
+            machine_graph.vertices)
 
         for vertex in vertices:
             if vertex not in found_list:
@@ -169,9 +178,8 @@ class OneToOnePlacer(RadialPlacer):
             vertex, and where their constraints don't force them onto\
             different chips.
 
-        :param vertex:  the vertex to use as a basis for one to one connections
-        :param graph: \
-            the graph to look for other one to one vertices
+        :param vertex: the vertex to use as a basis for one to one connections
+        :param graph: the graph to look for other one to one vertices
         :return: set of one to one vertices
         """
         x, y, _ = ResourceTracker.get_chip_and_core(vertex.constraints)
@@ -187,29 +195,20 @@ class OneToOnePlacer(RadialPlacer):
                 vertices_seen.add(next_vertex)
                 post_x, post_y, _ = ResourceTracker.get_chip_and_core(
                     next_vertex.constraints)
-                conflict = False
-                if x is not None and post_x is not None and x != post_x:
-                    conflict = True
-                if y is not None and post_y is not None and y != post_y:
-                    conflict = True
                 edges = graph.get_edges_ending_at_vertex(next_vertex)
-
-                if utility_calls.is_single(edges) and not conflict:
+                if is_single(edges) and not _conflict(x, y, post_x, post_y):
                     found_vertices.append(next_vertex)
                     if post_x is not None:
                         x = post_x
                     if post_y is not None:
                         y = post_y
-                    outgoing = \
-                        graph.get_edges_starting_at_vertex(
-                            next_vertex)
+                    outgoing = graph.get_edges_starting_at_vertex(next_vertex)
                     vertices_to_try.extend([
                         edge.post_vertex for edge in outgoing
                         if edge.post_vertex not in vertices_seen])
 
         # look for one to ones entering this vertex
-        incoming = graph.get_edges_ending_at_vertex(
-            vertex)
+        incoming = graph.get_edges_ending_at_vertex(vertex)
         vertices_to_try = [
             edge.pre_vertex for edge in incoming
             if edge.pre_vertex not in vertices_seen]
@@ -219,22 +218,14 @@ class OneToOnePlacer(RadialPlacer):
                 vertices_seen.add(next_vertex)
                 pre_x, pre_y, _ = ResourceTracker.get_chip_and_core(
                     next_vertex.constraints)
-                conflict = False
-                if x is not None and pre_x is not None and x != pre_x:
-                    conflict = True
-                if y is not None and pre_y is not None and y != pre_y:
-                    conflict = True
                 edges = graph.get_edges_starting_at_vertex(next_vertex)
-
-                if utility_calls.is_single(edges) and not conflict:
+                if is_single(edges) and not _conflict(x, y, post_x, post_y):
                     found_vertices.append(next_vertex)
                     if pre_x is not None:
                         x = pre_x
                     if pre_y is not None:
                         y = pre_y
-                    incoming = \
-                        graph.get_edges_ending_at_vertex(
-                            next_vertex)
+                    incoming = graph.get_edges_ending_at_vertex(next_vertex)
                     vertices_to_try.extend([
                         edge.pre_vertex for edge in incoming
                         if edge.pre_vertex not in vertices_seen])
