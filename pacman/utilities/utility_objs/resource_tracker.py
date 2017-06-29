@@ -1301,7 +1301,7 @@ class ResourceTracker(object):
 
         # check if chip used needs updating
         if (len(self._core_tracker[(chip_x, chip_y)]) ==
-                self._machine.get_chip_at(chip_x, chip_y).n_processors):
+                self._machine.get_chip_at(chip_x, chip_y).n_user_processors):
             self._chips_used.remove((chip_x, chip_y))
 
         # Deallocate the ip tags
