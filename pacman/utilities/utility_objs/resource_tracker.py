@@ -451,7 +451,7 @@ class ResourceTracker(object):
         :param chip: The chip to check the resources of
         :type chip: :py:class:`spinn_machine.chip.Chip`
         :param key: The (x, y) coordinates of the chip
-        :type key: tuple of (int, int)
+        :type key: (int, int)
         :param processor_id: A constraining fixed processor id
         :type processor_id: int or None
         :return: The number of cores that meet the given constraints
@@ -733,7 +733,7 @@ class ResourceTracker(object):
         :param chip: The chip to allocate the resources of
         :type chip: :py:class:`spinn_machine.chip.Chip`
         :param key: The (x, y) coordinates of the chip
-        :type key: tuple of (int, int)
+        :type key: (int, int)
         :param processor_id: The id of the processor to allocate
         :type processor_id: int
         """
@@ -1296,7 +1296,7 @@ class ResourceTracker(object):
         """
 
         self._chips_available.add((chip_x, chip_y))
-        self._sdram_tracker -= resources.sdram.get_value()
+        self._sdram_tracker[chip_x, chip_y] -= resources.sdram.get_value()
         self._core_tracker[(chip_x, chip_y)].add(processor_id)
 
         # check if chip used needs updating

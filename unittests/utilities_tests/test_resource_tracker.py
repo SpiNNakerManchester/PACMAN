@@ -1,5 +1,6 @@
 import unittest
 
+from pacman.model.resources import ResourceContainer, SDRAMResource
 from spinn_machine.virtual_machine import VirtualMachine
 
 from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
@@ -41,6 +42,43 @@ class TestResourceTracker(unittest.TestCase):
         # Should be 13 cores as one now allocated
         self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 13)
 
+    def test_deallocation_of_resources(self):
+        machine = VirtualMachine(
+            width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
+        chip = machine.get_chip_at(0, 0)
+        tracker = ResourceTracker(machine, preallocated_resources=None)
+
+        sdram_res = SDRAMResource(12345)
+        resources = ResourceContainer(sdram=sdram_res)
+        chip_0 = machine.get_chip_at(0, 0)
+
+        # verfy core tracker is empty
+        if (0, 0) in tracker._core_tracker:
+            raise Exception("shouldnt exist")
+
+        # allocate some res
+        chip_x, chip_y, processor_id, ip_tags, reverse_ip_tags = \
+            tracker.allocate_resources(resources, [(0, 0)])
+
+        # verify chips used is updated
+        cores = list(tracker._core_tracker[(0, 0)])
+        self.assertEqual(len(cores), chip_0.n_user_processors - 1)
+
+        if (0, 0) not in tracker._chips_used:
+            raise Exception("should exist")
+
+        # deallocate res
+        tracker.unallocate_resources(
+            chip_x, chip_y, processor_id, resources, ip_tags, reverse_ip_tags)
+
+        # verify chips used is updated
+        if ((0, 0) in tracker._core_tracker and
+                len(tracker._core_tracker[(0, 0)]) !=
+                    chip_0.n_user_processors):
+            raise Exception("shouldn't exist or should be right size")
+
+        if (0, 0) in tracker._chips_used:
+            raise Exception("shouldnt exist")
 
 if __name__ == '__main__':
     unittest.main()
