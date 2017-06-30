@@ -1,7 +1,8 @@
-import importlib
 import inspect
+import logging
 import os
 import pkgutil
+import sys
 from threading import RLock
 
 from pacman.executor.algorithm_decorators.one_of_input import OneOfInput
@@ -21,6 +22,8 @@ _algorithms = dict()
 
 # A lock of the algorithms
 _algorithm_lock = RLock()
+
+logger = logging.getLogger(__name__)
 
 
 class AllOf(object):
@@ -337,8 +340,11 @@ def scan_packages(packages, recursive=True):
             package = package_name
             if isinstance(package_name, str):
                 try:
-                    package = importlib.import_module(package_name, "")
-                except Exception:
+                    __import__(package_name)
+                    package = sys.modules[package_name]
+                except Exception as ex:
+                    msg = "Failed to import " + package_name + " : " + str(ex)
+                    logger.warning(msg)
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -346,12 +352,15 @@ def scan_packages(packages, recursive=True):
             for _, name, is_pkg in pkgutil.iter_modules([pkg_path]):
 
                 # If recursive and this is a package, recurse
+                module = package.__name__ + "." + name
                 if is_pkg and recursive:
-                    scan_packages([package.__name__ + "." + name], recursive)
+                    scan_packages([module], recursive)
                 else:
                     try:
-                        importlib.import_module("." + name, package.__name__)
-                    except Exception:
+                        __import__(module)
+                    except Exception as ex:
+                        msg = "Failed to import " + module + " : " + str(ex)
+                        logger.warning(msg)
                         continue
 
         new_algorithms = _algorithms
