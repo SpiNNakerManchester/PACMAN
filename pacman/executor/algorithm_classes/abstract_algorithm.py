@@ -115,3 +115,14 @@ class AbstractAlgorithm(object):
         :param inputs: A dict of input type -> value
         :return: A dict of output type -> value
         """
+
+    @abstractmethod
+    def write_provenance_header(self, provenance_file):
+        """
+        Writes the header info for this algorithm
+        So things like name, module, class, function and command_line_arguments
+
+        But not anything about input and outputs as this is done elsewhere
+        :param provenance_file: File to write to
+        :type provenance_file: file
+        """
