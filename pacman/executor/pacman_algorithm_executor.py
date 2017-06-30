@@ -519,7 +519,7 @@ class PACMANAlgorithmExecutor(object):
                         provenance_file.write(
                             "\t\t{}:{}\n".format(output.output_type, the_type))
                 provenance_file.write("\n")
-        except Exception as ex:
+        except Exception:
             logger.error("Exception when attempting to write provenance")
             traceback.print_exc()
 
