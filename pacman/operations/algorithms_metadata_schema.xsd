@@ -18,8 +18,8 @@
 				<xs:sequence>
 					<xs:element name="python_module" type="xs:token" />
 					<xs:choice>
-						<xs:element name="python_class" type="xs:string" />
-						<xs:element name="python_function" type="xs:string" />
+						<xs:element name="python_class" type="xs:token" />
+						<xs:element name="python_function" type="xs:token" />
 					</xs:choice>
 				</xs:sequence>
 			</xs:choice>
@@ -28,15 +28,15 @@
 			<xs:element name="optional_inputs" type="ParamList" minOccurs="0" />
 			<xs:element name="outputs" type="ResultList" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="name" type="xs:token" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="ParameterDefs">
 		<xs:sequence>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="parameter">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="param_name" type="xs:string" />
-						<xs:element name="param_type" type="xs:string"
+						<xs:element name="param_name" type="xs:token" />
+						<xs:element name="param_type" type="xs:token"
 							minOccurs="1" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
@@ -45,7 +45,7 @@
 	</xs:complexType>
 	<xs:complexType name="ParamList">
 		<xs:sequence>
-			<xs:element name="param_name" type="xs:string"
+			<xs:element name="param_name" type="xs:token"
 				minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -56,8 +56,8 @@
 	</xs:complexType>
 	<xs:complexType name="Result">
 		<xs:simpleContent>
-			<xs:extension base="xs:string">
-				<xs:attribute name="file_name_type" type="xs:string" />
+			<xs:extension base="xs:token">
+				<xs:attribute name="file_name_type" type="xs:token" />
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
