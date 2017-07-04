@@ -1,31 +1,36 @@
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified"
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
 		targetNamespace="https://github.com/SpiNNakerManchester/PACMAN"
 		xmlns="https://github.com/SpiNNakerManchester/PACMAN"
 		xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:element name="algorithms">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element maxOccurs="unbounded" minOccurs="0" ref="algorithm" />
+				<xs:element name="algorithm" type="Algorithm"
+					maxOccurs="unbounded" minOccurs="0" />
 			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="algorithm">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:choice>
-					<xs:element name="command_line_command" type="xs:string" />
-					<xs:element name="python_module" type="xs:string" />
-				</xs:choice>
-				<xs:element name="required_inputs" type="ParameterSequence" />
-				<xs:element minOccurs="0" name="parameters" type="xs:string" />
-				<xs:element name="optional_inputs" type="ParameterSequence" />
-				<xs:element name="produces_outputs" type="ResultSequence" />
-			</xs:sequence>
-			<xs:attribute name="name" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 
-	<xs:complexType name="ParameterSequence">
+	<xs:complexType name="Algorithm">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="command_line_args" type="ArgList" />
+				<xs:sequence>
+					<xs:element name="python_module" type="xs:token" />
+					<xs:choice>
+						<xs:element name="python_class" type="xs:string" />
+						<xs:element name="python_function" type="xs:string" />
+					</xs:choice>
+				</xs:sequence>
+			</xs:choice>
+			<xs:element name="input_definitions" type="ParameterDefs" />
+			<xs:element name="required_inputs" type="ParamList" />
+			<xs:element name="optional_inputs" type="ParamList" minOccurs="0" />
+			<xs:element name="outputs" type="ResultList" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="ParameterDefs">
 		<xs:sequence>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="parameter">
 				<xs:complexType>
@@ -38,17 +43,28 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="ResultSequence">
+	<xs:complexType name="ParamList">
 		<xs:sequence>
-			<xs:element minOccurs="0" maxOccurs="unbounded" name="parameter">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="param_name" type="xs:string" />
-						<xs:element name="param_type" type="xs:string" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="param_name" type="xs:string"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ResultList">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" name="param_type" type="Result" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Result">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="file_name_type" type="xs:string" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="ArgList">
+		<xs:sequence>
+			<xs:element name="arg" type="xs:string"
+				minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>
-
