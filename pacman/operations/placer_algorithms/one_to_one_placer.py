@@ -219,7 +219,7 @@ class OneToOnePlacer(RadialPlacer):
                 pre_x, pre_y, _ = ResourceTracker.get_chip_and_core(
                     next_vertex.constraints)
                 edges = graph.get_edges_starting_at_vertex(next_vertex)
-                if is_single(edges) and not _conflict(x, y, post_x, post_y):
+                if is_single(edges) and not _conflict(x, y, pre_x, pre_y):
                     found_vertices.append(next_vertex)
                     if pre_x is not None:
                         x = pre_x
