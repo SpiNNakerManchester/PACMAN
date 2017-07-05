@@ -1,7 +1,7 @@
 <algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
-			../../operations/algorithms_metadata_schema.xsd">
+			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="ConvertToFilePlacement">
         <python_module>pacman.utilities.file_format_converters.convert_to_file_placement</python_module>
         <python_class>ConvertToFilePlacement</python_class>
