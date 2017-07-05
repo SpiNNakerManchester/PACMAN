@@ -1,4 +1,7 @@
-<algorithms>
+<algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+			algorithms_metadata_schema.xsd">
     <algorithm name="BasicPartitioner">
         <python_module>pacman.operations.partition_algorithms.basic_partitioner</python_module>
         <python_class>BasicPartitioner</python_class>
