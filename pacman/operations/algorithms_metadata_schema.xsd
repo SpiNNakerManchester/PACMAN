@@ -24,8 +24,8 @@
 				</xs:sequence>
 			</xs:choice>
 			<xs:element name="input_definitions" type="ParameterDefs" />
-			<xs:element name="required_inputs" type="ParamList" />
-			<xs:element name="optional_inputs" type="ParamList" minOccurs="0" />
+			<xs:element name="required_inputs" type="ParamSet" minOccurs="0" />
+			<xs:element name="optional_inputs" type="ParamSet" minOccurs="0" />
 			<xs:element name="outputs" type="ResultList" minOccurs="0" />
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:token" use="required"/>
@@ -43,15 +43,19 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="ParamList">
-		<xs:sequence>
-			<xs:element name="param_name" type="xs:token"
-				minOccurs="0" maxOccurs="unbounded"/>
+	<xs:complexType name="ParamSet">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:choice>
+				<xs:element name="param_name" type="xs:token"/>
+				<xs:element name="all_of" type="ParamSet" />
+				<xs:element name="one_of" type="ParamSet" />
+			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="ResultList">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" name="param_type" type="Result" />
+			<xs:element name="param_type" type="Result"
+				minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="Result">
@@ -64,7 +68,7 @@
 	<xs:complexType name="ArgList">
 		<xs:sequence>
 			<xs:element name="arg" type="xs:string"
-				minOccurs="1" maxOccurs="unbounded"/>
+				minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>
