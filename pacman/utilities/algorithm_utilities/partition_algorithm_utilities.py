@@ -120,6 +120,7 @@ def get_same_size_vertex_groups(vertices):
                 # Both vertices have been seen elsewhere
                 elif (same_size_vertex in same_size_vertices and
                         vertex in same_size_vertices):
+
                     # merge their groups
                     group_1 = same_size_vertices[vertex]
                     group_2 = same_size_vertices[same_size_vertex]
