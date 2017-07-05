@@ -13,10 +13,6 @@ from pacman.executor.algorithm_classes.python_class_algorithm \
     import PythonClassAlgorithm
 from pacman.executor.algorithm_decorators.all_of_input import AllOfInput
 
-_nsmap = {
-    "pacman": "https://github.com/SpiNNakerManchester/PACMAN"
-}
-
 
 def _check_allowed_elements(path, element, allowed):
     if any([sub.tag.split("}")[-1] not in allowed
@@ -56,8 +52,7 @@ class AlgorithmMetadataXmlReader(object):
         for xml_path in self._xml_paths:
             xml_root = etree.parse(xml_path)
             files_read_so_far.append(xml_path)
-            for element in xml_root.findall(".//pacman:algorithm",
-                                            namespaces=_nsmap):
+            for element in xml_root.findall("{*}algorithm"):
                 name = element.get('name')
                 if name in algorithm_data_objects:
                     raise exceptions.PacmanConfigurationException(
@@ -87,26 +82,25 @@ class AlgorithmMetadataXmlReader(object):
 
         # Determine the type of the algorithm and return the appropriate type
         is_external = False
-        command_line_args = element.find(
-            "command_line_args", namespaces=_nsmap)
+        command_line_args = element.find("{*}command_line_args")
         if command_line_args is not None:
             command_line_args = self._translate_args(path, command_line_args)
             is_external = True
-        python_module = element.find("python_module", namespaces=_nsmap)
+        python_module = element.find("{*}python_module")
         if python_module is not None:
             python_module = python_module.text.strip()
-        python_class = element.find("python_class", namespaces=_nsmap)
+        python_class = element.find("{*}python_class")
         if python_class is not None:
             python_class = python_class.text.strip()
-        python_function = element.find("python_function", namespaces=_nsmap)
+        python_function = element.find("{*}python_function")
         if python_function is not None:
             python_function = python_function.text.strip()
-        python_method = element.find("python_method", namespaces=_nsmap)
+        python_method = element.find("{*}python_method")
         if python_method is not None:
             python_method = python_method.text.strip()
 
         # Get the input definitions
-        input_defs = element.find("input_definitions", namespaces=_nsmap)
+        input_defs = element.find("{*}input_definitions")
         if input_defs is None:
             raise exceptions.PacmanConfigurationException(
                 "Missing input_definitions in algorithm definition starting on"
@@ -114,16 +108,14 @@ class AlgorithmMetadataXmlReader(object):
         input_definitions = self._translate_input_definitions(path, input_defs)
 
         # get other params
-        required_inputs_elem = element.find(
-            "required_inputs", namespaces=_nsmap)
+        required_inputs_elem = element.find("{*}required_inputs")
         required_inputs, required_seen = self._translate_inputs(
             path, algorithm_id, required_inputs_elem, input_definitions)
-        optional_inputs_elem = element.find(
-            "optional_inputs", namespaces=_nsmap)
+        optional_inputs_elem = element.find("{*}optional_inputs")
         optional_inputs, optional_seen = self._translate_inputs(
             path, algorithm_id, optional_inputs_elem, input_definitions)
         outputs = self._translate_outputs(
-            path, element.find("outputs", namespaces=_nsmap), is_external)
+            path, element.find("{*}outputs"), is_external)
 
         # Check that all input definitions have been used
         for input_name in input_definitions.iterkeys():
@@ -180,7 +172,7 @@ class AlgorithmMetadataXmlReader(object):
         translated_args = list()
         if args_element is not None:
             _check_allowed_elements(path, args_element, {"arg"})
-            args = args_element.findall("pacman:arg", namespaces=_nsmap)
+            args = args_element.findall("{*}arg")
             for arg in args:
                 translated_args.append(arg.text.strip())
 
@@ -197,17 +189,14 @@ class AlgorithmMetadataXmlReader(object):
         definitions = dict()
         if defs_element is not None:
             _check_allowed_elements(path, defs_element, {"parameter"})
-            parameters = defs_element.findall(
-                "pacman:parameter", namespaces=_nsmap)
+            parameters = defs_element.findall("{*}parameter")
             for parameter in parameters:
                 _check_allowed_elements(path, parameter, {
                     "param_name", "param_type"})
-                param_name = parameter.find(
-                    "param_name", namespaces=_nsmap).text.strip()
+                param_name = parameter.find("{*}param_name").text.strip()
                 param_types = [
                     param_type.text.strip()
-                    for param_type in parameter.findall(
-                        "pacman:param_type", namespaces=_nsmap)]
+                    for param_type in parameter.findall("{*}param_type")]
                 definitions[param_name] = SingleInput(param_name, param_types)
         return definitions
 
@@ -254,10 +243,8 @@ class AlgorithmMetadataXmlReader(object):
         """
         outputs = list()
         if outputs_element is not None:
-            AlgorithmMetadataXmlReader._check_allowed_elements(
-                path, outputs_element, "param_type")
-            for output in outputs_element.findall(
-                    "pacman:param_type", namespaces=_nsmap):
+            _check_allowed_elements(path, outputs_element, "param_type")
+            for output in outputs_element.findall("{*}param_type"):
                 file_name_type = output.get("file_name_type", default=None)
                 if is_external and file_name_type is None:
                     raise exceptions.PacmanConfigurationException(
