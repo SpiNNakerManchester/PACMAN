@@ -45,14 +45,13 @@ class TestResourceTracker(unittest.TestCase):
     def test_deallocation_of_resources(self):
         machine = VirtualMachine(
             width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
-        chip = machine.get_chip_at(0, 0)
         tracker = ResourceTracker(machine, preallocated_resources=None)
 
         sdram_res = SDRAMResource(12345)
         resources = ResourceContainer(sdram=sdram_res)
         chip_0 = machine.get_chip_at(0, 0)
 
-        # verfy core tracker is empty
+        # verify core tracker is empty
         if (0, 0) in tracker._core_tracker:
             raise Exception("shouldnt exist")
 
@@ -74,11 +73,12 @@ class TestResourceTracker(unittest.TestCase):
         # verify chips used is updated
         if ((0, 0) in tracker._core_tracker and
                 len(tracker._core_tracker[(0, 0)]) !=
-                    chip_0.n_user_processors):
+                chip_0.n_user_processors):
             raise Exception("shouldn't exist or should be right size")
 
         if (0, 0) in tracker._chips_used:
             raise Exception("shouldnt exist")
+
 
 if __name__ == '__main__':
     unittest.main()
