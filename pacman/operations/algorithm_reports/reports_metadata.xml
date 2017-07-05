@@ -1,4 +1,7 @@
-<algorithms>
+<algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="PlacerReportWithApplicationGraph">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>placer_reports_with_application_graph</python_function>
