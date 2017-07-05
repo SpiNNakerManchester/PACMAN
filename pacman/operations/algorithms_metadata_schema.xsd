@@ -39,11 +39,11 @@
 		<xs:sequence>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="parameter">
 				<xs:complexType>
-					<xs:all>
+					<xs:sequence>
 						<xs:element name="param_name" type="xs:token" />
 						<xs:element name="param_type" type="xs:token"
 							minOccurs="1" maxOccurs="unbounded" />
-					</xs:all>
+					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
