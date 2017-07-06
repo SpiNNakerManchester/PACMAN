@@ -1,15 +1,15 @@
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
+    import ContiguousKeyRangeContraint
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorFixedFieldConstraint
+    import FixedKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorFixedKeyAndMaskConstraint
+    import FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorFixedMaskConstraint
+    import FixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorFlexiFieldConstraint
+    import FlexiKeyFieldConstraint
 from pacman.model.routing_info \
     import RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask
 from pacman.utilities import utility_calls
@@ -533,15 +533,15 @@ class VertexBasedRoutingInfoAllocator(object):
         routing_keys_and_masks = list()
         application_keys_and_masks = list()
         fixed_key_constraints = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedKeyAndMaskConstraint)
+            partition.constraints, FixedKeyAndMaskConstraint)
         fixed_mask_constraints = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedMaskConstraint)
+            partition.constraints, FixedMaskConstraint)
         fixed_field_constraints = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedFieldConstraint)
+            partition.constraints, FixedKeyFieldConstraint)
         flexi_field_constraints = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFlexiFieldConstraint)
+            partition.constraints, FlexiKeyFieldConstraint)
         continuous_constraints = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorContiguousRangeContraint)
+            partition.constraints, ContiguousKeyRangeContraint)
 
         if len(fixed_key_constraints) > 0:
             fixed_keys_fields = \
@@ -1023,15 +1023,15 @@ class VertexBasedRoutingInfoAllocator(object):
             fixed_key_constraints = \
                 utility_calls.locate_constraints_of_type(
                     partition.constraints,
-                    KeyAllocatorFixedKeyAndMaskConstraint)
+                    FixedKeyAndMaskConstraint)
             fixed_mask_constraints = \
                 utility_calls.locate_constraints_of_type(
                     partition.constraints,
-                    KeyAllocatorFixedMaskConstraint)
+                    FixedMaskConstraint)
             fixed_field_constraints = \
                 utility_calls.locate_constraints_of_type(
                     partition.constraints,
-                    KeyAllocatorFixedFieldConstraint)
+                    FixedKeyFieldConstraint)
 
             if (len(fixed_key_constraints) == 0 and
                     len(fixed_mask_constraints) == 0 and
@@ -1167,7 +1167,7 @@ class VertexBasedRoutingInfoAllocator(object):
             nested_level=2))
 
         # add constraint to the edge
-        partition.add_constraint(KeyAllocatorFlexiFieldConstraint(fields))
+        partition.add_constraint(FlexiKeyFieldConstraint(fields))
 
     @staticmethod
     def _create_internal_field_space(higher_space, field_value, field):

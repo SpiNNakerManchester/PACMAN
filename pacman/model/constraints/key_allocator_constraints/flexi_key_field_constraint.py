@@ -1,7 +1,7 @@
 from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
-class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
+class FlexiKeyFieldConstraint(AbstractKeyAllocatorConstraint):
     """ Constraint that indicates fields in the mask without a specific size\
         or position
     """
@@ -19,7 +19,7 @@ class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
         return self._fields
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorFlexiFieldConstraint):
+        if not isinstance(other, FlexiKeyFieldConstraint):
             return False
         for field in self._fields:
             if field not in other.fields:
@@ -33,5 +33,5 @@ class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
         return hash(frozenset(self._fields))
 
     def __repr__(self):
-        return "KeyAllocatorFlexiFieldConstraint(fields={})".format(
+        return "FlexiKeyFieldConstraint(fields={})".format(
             self._fields)

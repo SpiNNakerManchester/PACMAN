@@ -3,7 +3,7 @@ import sys
 
 from pacman.model.decorators import overrides
 from pacman.model.constraints.partitioner_constraints import \
-    PartitionerMaximumSizeConstraint
+    MaxVertexAtomsConstraint
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
@@ -41,7 +41,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
 
         # add a constraint for max partitioning
         self.add_constraint(
-            PartitionerMaximumSizeConstraint(max_atoms_per_core))
+            MaxVertexAtomsConstraint(max_atoms_per_core))
 
     @property
     @overrides(AbstractVertex.label)

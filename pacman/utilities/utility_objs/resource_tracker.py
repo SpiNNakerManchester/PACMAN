@@ -1,8 +1,8 @@
 from pacman import exceptions
 from pacman.model.constraints.placer_constraints\
-    import PlacerRadialPlacementFromChipConstraint, PlacerBoardConstraint
+    import RadialPlacementFromChipConstraint, BoardConstraint
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint, AbstractPlacerConstraint
+    import ChipAndCoreConstraint, AbstractPlacerConstraint
 from pacman.model.resources import ResourceContainer, DTCMResource, \
     SDRAMResource, CPUCyclesPerTickResource
 from pacman.utilities import utility_calls
@@ -209,8 +209,8 @@ class ResourceTracker(object):
 
         # These placement constraints are supported by the resource tracker
         placement_constraints = {
-            PlacerChipAndCoreConstraint, PlacerBoardConstraint,
-            PlacerRadialPlacementFromChipConstraint
+            ChipAndCoreConstraint, BoardConstraint,
+            RadialPlacementFromChipConstraint
         }
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
@@ -245,7 +245,7 @@ class ResourceTracker(object):
         reverse_ip_tags = resources.reverse_iptags
 
         for constraint in constraints:
-            if isinstance(constraint, PlacerBoardConstraint):
+            if isinstance(constraint, BoardConstraint):
                 board_address = utility_calls.check_constrained_value(
                     constraint.board_address, board_address)
         return board_address, ip_tags, reverse_ip_tags
@@ -270,7 +270,7 @@ class ResourceTracker(object):
         y = None
         p = None
         for constraint in constraints:
-            if isinstance(constraint, PlacerChipAndCoreConstraint):
+            if isinstance(constraint, ChipAndCoreConstraint):
                 x = utility_calls.check_constrained_value(constraint.x, x)
                 y = utility_calls.check_constrained_value(constraint.y, y)
                 p = utility_calls.check_constrained_value(constraint.p, p)

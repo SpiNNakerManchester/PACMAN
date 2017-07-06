@@ -1,7 +1,7 @@
 from pacman.exceptions import PacmanInvalidParameterException, \
     PacmanValueError, PacmanPartitionException
 from pacman.model.constraints.placer_constraints import \
-    PlacerChipAndCoreConstraint
+    ChipAndCoreConstraint
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.resources import CoreResource
 from pacman.model.resources import SpecificCoreResource
@@ -25,7 +25,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1))
 
         # add pre-allocated resources for cores on 0,0
@@ -48,7 +48,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1))
 
         # add pre-allocated resources for cores on 0,0
@@ -70,7 +70,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph vertices which reside on 0,0
         for p in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=[PlacerChipAndCoreConstraint(x=0, y=0, p=p)],
+                constraints=[ChipAndCoreConstraint(x=0, y=0, p=p)],
                 n_atoms=1))
 
         # add pre-allocated resources for cores on 0,0
@@ -98,7 +98,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
                 fixed_sdram_value=eight_meg))
 
@@ -128,7 +128,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
             graph.add_vertex(TestVertex(
-                constraints=[PlacerChipAndCoreConstraint(x=0, y=0)],
+                constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
                 fixed_sdram_value=eight_meg))
 

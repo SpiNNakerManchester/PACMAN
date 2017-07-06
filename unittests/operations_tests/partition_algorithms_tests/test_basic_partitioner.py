@@ -8,7 +8,7 @@ from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import PacmanInvalidParameterException,\
     PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints\
-    import PartitionerMaximumSizeConstraint
+    import MaxVertexAtomsConstraint
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 
@@ -134,7 +134,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = TestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(PartitionerMaximumSizeConstraint(10))
+        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine)

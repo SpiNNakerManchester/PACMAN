@@ -8,7 +8,7 @@ from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities \
     import placer_algorithm_utilities as placer_utils
 from pacman.model.constraints.placer_constraints\
-    import PlacerSameChipAsConstraint
+    import SameChipAsConstraint
 from pacman.utilities.utility_calls import is_single
 
 
@@ -35,7 +35,7 @@ class OneToOnePlacer(RadialPlacer):
         # check that the algorithm can handle the constraints
         self._check_constraints(
             machine_graph.vertices,
-            additional_placement_constraints={PlacerSameChipAsConstraint})
+            additional_placement_constraints={SameChipAsConstraint})
 
         # Get which vertices must be placed on the same chip as another vertex
         same_chip_vertex_groups = placer_utils.get_same_chip_vertex_groups(

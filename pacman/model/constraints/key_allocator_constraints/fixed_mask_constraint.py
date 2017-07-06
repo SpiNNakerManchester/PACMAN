@@ -1,7 +1,7 @@
 from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
-class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
+class FixedMaskConstraint(AbstractKeyAllocatorConstraint):
     """ A key allocator that fixes the mask to be assigned to an edge
     """
 
@@ -28,7 +28,7 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
         return self._mask
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorFixedMaskConstraint):
+        if not isinstance(other, FixedMaskConstraint):
             return False
         return self._mask == other.mask
 
@@ -39,4 +39,4 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
         return hash(self._mask)
 
     def __repr__(self):
-        return "KeyAllocatorFixedMaskConstraint(mask={})".format(self._mask)
+        return "FixedMaskConstraint(mask={})".format(self._mask)

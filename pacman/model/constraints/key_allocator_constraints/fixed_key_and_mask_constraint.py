@@ -3,7 +3,7 @@ from pacman.model.routing_info import BaseKeyAndMask
 from pacman.exceptions import PacmanConfigurationException
 
 
-class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
+class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
     """ Key allocator constraint that fixes the key and mask of an edge
     """
 
@@ -71,12 +71,12 @@ class KeyAllocatorFixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
 
     def __repr__(self):
         return (
-            "KeyAllocatorFixedKeyAndMaskConstraint("
+            "FixedKeyAndMaskConstraint("
             "keys_and_masks={}, key_list_function={})".format(
                 self._keys_and_masks, self.key_list_function))
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorFixedKeyAndMaskConstraint):
+        if not isinstance(other, FixedKeyAndMaskConstraint):
             return False
         if other.key_list_function != self._key_list_function:
             return False

@@ -1,7 +1,7 @@
 from .abstract_placer_constraint import AbstractPlacerConstraint
 
 
-class PlacerSameChipAsConstraint(AbstractPlacerConstraint):
+class SameChipAsConstraint(AbstractPlacerConstraint):
     """ Indicates that a vertex should be placed on the same chip as another
         vertex
     """
@@ -25,4 +25,4 @@ class PlacerSameChipAsConstraint(AbstractPlacerConstraint):
         return self._vertex
 
     def __repr__(self):
-        return "PlacerSameChipAsConstraint(vertex={})".format(self._vertex)
+        return "SameChipAsConstraint(vertex={})".format(self._vertex)

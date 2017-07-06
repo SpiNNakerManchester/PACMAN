@@ -3,9 +3,9 @@ import logging
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, PartitionerMaximumSizeConstraint
+    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
 from pacman.model.constraints.partitioner_constraints \
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls as utils
@@ -49,8 +49,8 @@ class PartitionAndPlacePartitioner(object):
         utils.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             abstract_constraint_type=AbstractPartitionerConstraint,
-            supported_constraints=[PartitionerMaximumSizeConstraint,
-                                   PartitionerSameSizeAsVertexConstraint])
+            supported_constraints=[MaxVertexAtomsConstraint,
+                                   SameAtomsAsVertexConstraint])
 
         # Load the vertices and create the machine_graph to fill
         machine_graph = MachineGraph(
@@ -125,7 +125,7 @@ class PartitionAndPlacePartitioner(object):
         for other_vertex in partition_together_vertices:
             max_atom_constraints = utils.locate_constraints_of_type(
                 other_vertex.constraints,
-                PartitionerMaximumSizeConstraint)
+                MaxVertexAtomsConstraint)
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
 
@@ -488,7 +488,7 @@ class PartitionAndPlacePartitioner(object):
         partition_together_vertices = list()
         partition_together_vertices.append(vertex)
         same_size_vertex_constraints = utils.locate_constraints_of_type(
-            vertex.constraints, PartitionerSameSizeAsVertexConstraint)
+            vertex.constraints, SameAtomsAsVertexConstraint)
         for constraint in same_size_vertex_constraints:
             if constraint.vertex.n_atoms != vertex.n_atoms:
                 raise PacmanPartitionException(

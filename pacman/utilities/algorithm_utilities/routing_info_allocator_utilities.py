@@ -1,12 +1,12 @@
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints\
-    import KeyAllocatorFixedFieldConstraint, KeyAllocatorFlexiFieldConstraint
+    import FixedKeyFieldConstraint, FlexiKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    import KeyAllocatorContiguousRangeContraint
+    import ContiguousKeyRangeContraint
 from pacman.model.constraints.key_allocator_constraints\
-    import KeyAllocatorFixedMaskConstraint
+    import FixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    import KeyAllocatorFixedKeyAndMaskConstraint
+    import FixedKeyAndMaskConstraint
 from pacman.utilities import utility_calls
 from pacman.exceptions import (PacmanValueError, PacmanConfigurationException,
                                PacmanInvalidParameterException)
@@ -40,17 +40,17 @@ def get_edge_groups(machine_graph):
             constraints = partition.constraints
             is_continuous = False
             for constraint in constraints:
-                if isinstance(constraint, KeyAllocatorFixedMaskConstraint):
+                if isinstance(constraint, FixedMaskConstraint):
                     fixed_mask_groups.add(partition)
                 elif isinstance(constraint,
-                                KeyAllocatorFixedKeyAndMaskConstraint):
+                                FixedKeyAndMaskConstraint):
                     fixed_key_groups.add(partition)
-                elif isinstance(constraint, KeyAllocatorFlexiFieldConstraint):
+                elif isinstance(constraint, FlexiKeyFieldConstraint):
                     flexi_field_groups.add(partition)
-                elif isinstance(constraint, KeyAllocatorFixedFieldConstraint):
+                elif isinstance(constraint, FixedKeyFieldConstraint):
                     fixed_field_groups.add(partition)
                 elif isinstance(constraint,
-                                KeyAllocatorContiguousRangeContraint):
+                                ContiguousKeyRangeContraint):
                     is_continuous = True
                     continuous_groups.add(partition)
             if not is_continuous:
@@ -68,16 +68,16 @@ def check_types_of_edge_constraint(machine_graph):
     """
     for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedKeyAndMaskConstraint)
+            partition.constraints, FixedKeyAndMaskConstraint)
 
         fixed_mask = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedMaskConstraint)
+            partition.constraints, FixedMaskConstraint)
 
         fixed_field = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFixedFieldConstraint)
+            partition.constraints, FixedKeyFieldConstraint)
 
         flexi_field = utility_calls.locate_constraints_of_type(
-            partition.constraints, KeyAllocatorFlexiFieldConstraint)
+            partition.constraints, FlexiKeyFieldConstraint)
 
         if (len(fixed_key) > 1 or len(fixed_field) > 1 or
                 len(fixed_mask) > 1 or len(flexi_field) > 1):
@@ -132,9 +132,9 @@ def _check_masks_are_correct(partition):
     :rtype: None:
     """
     fixed_mask = utility_calls.locate_constraints_of_type(
-        partition.constraints, KeyAllocatorFixedMaskConstraint)[0]
+        partition.constraints, FixedMaskConstraint)[0]
     fixed_field = utility_calls.locate_constraints_of_type(
-        partition.constraints, KeyAllocatorFixedFieldConstraint)[0]
+        partition.constraints, FixedKeyFieldConstraint)[0]
     mask = fixed_mask.mask
     for field in fixed_field.fields:
         if field.mask & mask != field.mask:
@@ -155,7 +155,7 @@ def _check_masks_are_correct(partition):
 
 def get_fixed_mask(same_key_group):
     """ Get a fixed mask from a group of edges if a\
-        :py:class:`pacman.model.constraints.key_allocator_constraints.KeyAllocatorFixedMaskConstraint`\
+        :py:class:`pacman.model.constraints.key_allocator_constraints.FixedMaskConstraint`\
         constraint exists in any of the edges in the group.
 
     :param same_key_group: Set of edges that are to be\
@@ -170,7 +170,7 @@ def get_fixed_mask(same_key_group):
     edge_with_mask = None
     for edge in same_key_group:
         fixed_mask_constraints = utility_calls.locate_constraints_of_type(
-            edge.constraints, KeyAllocatorFixedMaskConstraint)
+            edge.constraints, FixedMaskConstraint)
         for fixed_mask_constraint in fixed_mask_constraints:
             if mask is not None and mask != fixed_mask_constraint.mask:
                 raise PacmanValueError(

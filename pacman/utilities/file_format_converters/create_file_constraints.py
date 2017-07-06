@@ -1,6 +1,6 @@
 from pacman.model.graphs import AbstractVirtualVertex
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint, AbstractPlacerConstraint
+    import ChipAndCoreConstraint, AbstractPlacerConstraint
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities import utility_calls, file_format_schemas
 from pacman.utilities.constants import EDGES
@@ -94,7 +94,7 @@ class CreateConstraintsToFile(object):
         """
         # locate the chip from the placement constraint
         placement_constraint = utility_calls.locate_constraints_of_type(
-            vertex.constraints, PlacerChipAndCoreConstraint)
+            vertex.constraints, ChipAndCoreConstraint)
         router = machine.get_chip_at(
             placement_constraint.x, placement_constraint.y).router
         found_link = False
@@ -118,7 +118,7 @@ class CreateConstraintsToFile(object):
             constraint, json_obj, vertex, vertex_id):
         if not isinstance(vertex, AbstractVirtualVertex):
             if isinstance(constraint, AbstractPlacerConstraint):
-                if not isinstance(constraint, PlacerChipAndCoreConstraint):
+                if not isinstance(constraint, ChipAndCoreConstraint):
                     raise PacmanConfigurationException(
                         "Converter does not recognise placer constraint {}"
                         .format(constraint))

@@ -9,7 +9,7 @@ from rig.routing_table import Routes
 from six import iteritems
 
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint, PlacerRadialPlacementFromChipConstraint
+    import ChipAndCoreConstraint, RadialPlacementFromChipConstraint
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
@@ -177,8 +177,8 @@ def create_rig_graph_constraints(machine_graph, machine):
         else:
             for constraint in vertex.constraints:
                 if isinstance(constraint, (
-                        PlacerChipAndCoreConstraint,
-                        PlacerRadialPlacementFromChipConstraint)):
+                        ChipAndCoreConstraint,
+                        RadialPlacementFromChipConstraint)):
                     constraints.append(LocationConstraint(
                         vertex, (constraint.x, constraint.y)))
 

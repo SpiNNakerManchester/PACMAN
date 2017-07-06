@@ -2,7 +2,7 @@ import logging
 
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, PartitionerMaximumSizeConstraint
+    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
@@ -47,7 +47,7 @@ class BasicPartitioner(object):
         ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
-            supported_constraints=[PartitionerMaximumSizeConstraint],
+            supported_constraints=[MaxVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
@@ -84,7 +84,7 @@ class BasicPartitioner(object):
             max_atom_values = [atoms_per_sdram, atoms_per_dtcm, atoms_per_cpu]
 
             max_atoms_constraints = utility_calls.locate_constraints_of_type(
-                vertex.constraints, PartitionerMaximumSizeConstraint)
+                vertex.constraints, MaxVertexAtomsConstraint)
             for max_atom_constraint in max_atoms_constraints:
                 max_atom_values.append(max_atom_constraint.size)
 

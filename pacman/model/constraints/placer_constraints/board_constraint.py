@@ -1,7 +1,7 @@
 from .abstract_placer_constraint import AbstractPlacerConstraint
 
 
-class PlacerBoardConstraint(AbstractPlacerConstraint):
+class BoardConstraint(AbstractPlacerConstraint):
     """ A constraint on the board on which a placement is made
     """
 
@@ -25,5 +25,5 @@ class PlacerBoardConstraint(AbstractPlacerConstraint):
         return self._board_address
 
     def __repr__(self):
-        return "PlacerBoardConstraint(board_address=\"{}\")".format(
+        return "BoardConstraint(board_address=\"{}\")".format(
             self._board_address)

@@ -8,9 +8,9 @@ from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException, PacmanValueError
 from pacman.model.constraints.partitioner_constraints\
-    import PartitionerMaximumSizeConstraint
+    import MaxVertexAtomsConstraint
 from pacman.model.constraints.partitioner_constraints\
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 from pacman.model.resources.pre_allocated_resource_container import \
     PreAllocatedResourceContainer
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
@@ -136,7 +136,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = TestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(PartitionerMaximumSizeConstraint(10))
+        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine,
@@ -326,7 +326,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         constrained_vertex = TestVertex(5, "Constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(self.vert2))
+            SameAtomsAsVertexConstraint(self.vert2))
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
@@ -343,7 +343,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = TestVertex(300, "Constrained")
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(new_large_vertex))
+            SameAtomsAsVertexConstraint(new_large_vertex))
         self.graph.add_vertices([new_large_vertex, constrained_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
@@ -360,7 +360,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = TestVertex(300, "Constrained")
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(new_large_vertex))
+            SameAtomsAsVertexConstraint(new_large_vertex))
         self.graph.add_vertices([constrained_vertex, new_large_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
@@ -376,7 +376,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         constrained_vertex = TestVertex(100, "Constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(self.vert2))
+            SameAtomsAsVertexConstraint(self.vert2))
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         self.assertRaises(PacmanPartitionException, partitioner,

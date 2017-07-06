@@ -2,7 +2,7 @@ from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from spinn_machine import VirtualMachine
 from pacman.model.resources import ResourceContainer
 from pacman.model.constraints.placer_constraints \
-    import PlacerSameChipAsConstraint
+    import SameChipAsConstraint
 from pacman.operations.rig_algorithms.rig_place import RigPlace
 from pacman.operations.placer_algorithms.one_to_one_placer \
     import OneToOnePlacer
@@ -33,7 +33,7 @@ class TestSameChipConstraint(unittest.TestCase):
             graph.add_vertex(vertex)
             for i in range(0, random.randint(1, 5)):
                 vertex.add_constraint(
-                    PlacerSameChipAsConstraint(
+                    SameChipAsConstraint(
                         vertices[random.randint(0, 99)]))
 
         placements = placer(graph, machine)
@@ -46,7 +46,7 @@ class TestSameChipConstraint(unittest.TestCase):
             )
             placement = placements.get_placement_of_vertex(same)
             for constraint in same.constraints:
-                if isinstance(constraint, PlacerSameChipAsConstraint):
+                if isinstance(constraint, SameChipAsConstraint):
                     other_placement = placements.get_placement_of_vertex(
                         constraint.vertex)
                     self.assert_(

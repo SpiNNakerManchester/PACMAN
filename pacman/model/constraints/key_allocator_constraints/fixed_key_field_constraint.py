@@ -1,7 +1,7 @@
 from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
-class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
+class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
     """ Constraint that indicates fields in the mask of a key
     """
 
@@ -36,7 +36,7 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
         return self._fields
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorFixedFieldConstraint):
+        if not isinstance(other, FixedKeyFieldConstraint):
             return False
         if len(self._fields) != len(other.fields):
             return False
@@ -53,5 +53,5 @@ class KeyAllocatorFixedFieldConstraint(AbstractKeyAllocatorConstraint):
         return hash(frozen_fields)
 
     def __repr__(self):
-        return "KeyAllocatorFixedFieldConstraint(fields={})".format(
+        return "FixedKeyFieldConstraint(fields={})".format(
             self._fields)
