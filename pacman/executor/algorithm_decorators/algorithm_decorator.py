@@ -1,4 +1,3 @@
-import importlib
 import inspect
 import logging
 import os
@@ -350,7 +349,8 @@ def scan_packages(packages, recursive=True):
             package = package_name
             if isinstance(package_name, str):
                 try:
-                    package = importlib.import_module(package_name, "")
+                    __import__(package_name)
+                    package = sys.modules[package_name]
                 except Exception as ex:
                     msg = "Failed to import " + package_name + " : " + str(ex)
                     logger.warning(msg)
@@ -366,7 +366,7 @@ def scan_packages(packages, recursive=True):
                     scan_packages([module], recursive)
                 else:
                     try:
-                        importlib.import_module("." + name, package.__name__)
+                        __import__(module)
                     except Exception as ex:
                         msg = "Failed to import " + module + " : " + str(ex)
                         logger.warning(msg)
