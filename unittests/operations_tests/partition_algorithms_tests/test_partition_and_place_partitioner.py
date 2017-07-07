@@ -392,9 +392,9 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex_1 = TestVertex(10, "Vertex_1", 5)
         vertex_2 = TestVertex(10, "Vertex_2", 4)
         vertex_3 = TestVertex(10, "Vertex_3", 2)
-        vertex_3.add_constraint(PartitionerSameSizeAsVertexConstraint(
+        vertex_3.add_constraint(SameAtomsAsVertexConstraint(
             vertex_2))
-        vertex_2.add_constraint(PartitionerSameSizeAsVertexConstraint(
+        vertex_2.add_constraint(SameAtomsAsVertexConstraint(
             vertex_1))
         graph.add_vertices([vertex_1, vertex_2, vertex_3])
         machine = VirtualMachine(version=3, with_wrap_arounds=None)
