@@ -13,8 +13,7 @@ class RigRoute(object):
         progress_bar = ProgressBar(7, "Routing")
 
         vertices_resources, nets, net_names = \
-            rig_converters.convert_to_rig_graph(
-                machine_graph)
+            rig_converters.convert_to_rig_graph(machine_graph)
         progress_bar.update()
 
         rig_machine = rig_converters.convert_to_rig_machine(machine)

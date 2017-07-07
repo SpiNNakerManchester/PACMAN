@@ -7,8 +7,7 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.tags import Tags
 
 # spinnmachine imports
-from spinn_machine.tags.iptag import IPTag
-from spinn_machine.tags.reverse_iptag import ReverseIPTag
+from spinn_machine.tags import IPTag, ReverseIPTag
 
 # general imports
 import unittest

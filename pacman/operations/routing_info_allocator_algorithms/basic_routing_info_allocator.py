@@ -6,7 +6,7 @@ from pacman.model.routing_info \
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint, KeyAllocatorContiguousRangeContraint
+    import AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
@@ -48,7 +48,7 @@ class BasicRoutingInfoAllocator(object):
         # check that this algorithm supports the constraints put onto the
         # partitions
         supported_constraints = [
-            KeyAllocatorContiguousRangeContraint]
+            ContiguousKeyRangeContraint]
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
             supported_constraints=supported_constraints,

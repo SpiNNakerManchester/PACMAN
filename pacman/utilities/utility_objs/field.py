@@ -1,4 +1,4 @@
-from pacman.utilities.utility_objs.flexi_field import SUPPORTED_TAGS
+from .flexi_field import SUPPORTED_TAGS
 import uuid
 
 

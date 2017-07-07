@@ -1,15 +1,14 @@
 import logging
 
-from pacman.model.graphs.common.slice import Slice
-
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, PartitionerMaximumSizeConstraint
-from pacman.model.graphs.common.graph_mapper import GraphMapper
+    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
+from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities import partition_algorithm_utilities
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_objs import ResourceTracker
+
 from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
@@ -34,21 +33,21 @@ class BasicPartitioner(object):
 
         :param graph: The application_graph to partition
         :type graph:\
-            :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
+            :py:class:`pacman.model.graph.application.ApplicationGraph`
         :param machine:\
             The machine with respect to which to partition the application\
             graph
-        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :type machine: :py:class:`spinn_machine.Machine`
         :return: A machine graph
         :rtype:\
-            :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+            :py:class:`pacman.model.graph.machine.MachineGraph`
         :raise pacman.exceptions.PacmanPartitionException:\
             If something goes wrong with the partitioning
         """
         ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
-            supported_constraints=[PartitionerMaximumSizeConstraint],
+            supported_constraints=[MaxVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
@@ -85,7 +84,7 @@ class BasicPartitioner(object):
             max_atom_values = [atoms_per_sdram, atoms_per_dtcm, atoms_per_cpu]
 
             max_atoms_constraints = utility_calls.locate_constraints_of_type(
-                vertex.constraints, PartitionerMaximumSizeConstraint)
+                vertex.constraints, MaxVertexAtomsConstraint)
             for max_atom_constraint in max_atoms_constraints:
                 max_atom_values.append(max_atom_constraint.size)
 

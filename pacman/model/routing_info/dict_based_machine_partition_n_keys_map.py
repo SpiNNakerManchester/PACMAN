@@ -1,4 +1,4 @@
-from pacman.model.routing_info.abstract_machine_partition_n_keys_map \
+from .abstract_machine_partition_n_keys_map \
     import AbstractMachinePartitionNKeysMap
 
 

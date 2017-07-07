@@ -16,8 +16,7 @@ class RigPlaceAndRoute(object):
         progress_bar = ProgressBar(9, "Placing and Routing")
 
         vertices_resources, nets, net_names = \
-            rig_converters.convert_to_rig_graph(
-                machine_graph)
+            rig_converters.convert_to_rig_graph(machine_graph)
         progress_bar.update()
 
         rig_machine = rig_converters.convert_to_rig_machine(machine)

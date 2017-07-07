@@ -1,11 +1,10 @@
 from spinn_utilities.timer import Timer
 # pacman imports
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 from pacman import operations
-from pacman.executor.injection_decorator import injection_context, do_injection
-from pacman.executor.algorithm_decorators import algorithm_decorator
-from pacman.executor.algorithm_metadata_xml_reader \
-    import AlgorithmMetadataXmlReader
+from .injection_decorator import injection_context, do_injection
+from .algorithm_decorators import scan_packages, get_algorithms
+from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
 from pacman.operations import algorithm_reports
 from pacman.utilities import file_format_converters
 
@@ -176,12 +175,10 @@ class PACMANAlgorithmExecutor(object):
         # Scan for annotated algorithms
         copy_of_packages.append(operations)
         copy_of_packages.append(algorithm_reports)
-        converters.update(algorithm_decorator.scan_packages(
-            [file_format_converters]))
-        algorithm_data_objects.update(
-            algorithm_decorator.scan_packages(copy_of_packages))
+        converters.update(scan_packages([file_format_converters]))
+        algorithm_data_objects.update(scan_packages(copy_of_packages))
         if use_unscanned_algorithms:
-            algorithm_data_objects.update(algorithm_decorator.get_algorithms())
+            algorithm_data_objects.update(get_algorithms())
 
         # get list of all xml's as this is used to exclude xml files from
         # import
@@ -208,7 +205,7 @@ class PACMANAlgorithmExecutor(object):
         algorithms = list()
         for algorithm_name in algorithm_names:
             if algorithm_name not in algorithm_data_objects:
-                raise exceptions.PacmanConfigurationException(
+                raise PacmanConfigurationException(
                     "Cannot find algorithm {}".format(algorithm_name))
             algorithms.append(algorithm_data_objects[algorithm_name])
         return algorithms
@@ -289,7 +286,7 @@ class PACMANAlgorithmExecutor(object):
                             self._deduce_inputs_required_to_run(
                                 algorithm, input_types)
 
-                raise exceptions.PacmanConfigurationException(
+                raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
                     "    Inputs: {}\n"
                     "    Outputs: {}\n"
@@ -310,7 +307,7 @@ class PACMANAlgorithmExecutor(object):
                 failed_to_generate_output_string += ":{}".format(output)
 
         if not all_required_outputs_generated:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "Unable to generate outputs {}".format(
                     failed_to_generate_output_string))
 

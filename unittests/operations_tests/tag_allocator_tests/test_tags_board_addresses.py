@@ -1,12 +1,11 @@
 from __future__ import absolute_import
 import unittest
 from collections import defaultdict
-from spinn_machine.virtual_machine import VirtualMachine
+from spinn_machine import VirtualMachine
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, IPtagResource
-from pacman.operations.tag_allocator_algorithms.basic_tag_allocator\
-    import BasicTagAllocator
+from pacman.operations.tag_allocator_algorithms import BasicTagAllocator
 
 
 class TestTagsBoardAddresses(unittest.TestCase):

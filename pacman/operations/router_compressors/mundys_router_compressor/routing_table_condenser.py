@@ -3,10 +3,10 @@ from spinn_utilities.progress_bar import ProgressBar
 # pacman imports
 from pacman.model.routing_tables \
     import MulticastRoutingTable, MulticastRoutingTables
-from pacman import exceptions
+from pacman.exceptions import PacmanElementAllocationException
 
 # spinnMachine imports
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 
 # rig imports
 from rig import routing_table as rig_routing_table
@@ -108,17 +108,16 @@ class MundyRouterCompressor(object):
         table = MulticastRoutingTable(router_x_coord, router_y_coord)
         if (len(mundy_compressed_router_table_entries) >
                 self.max_supported_length):
-            raise exceptions.PacmanElementAllocationException(
+            raise PacmanElementAllocationException(
                 "The routing table {}:{} after compression will still not fit"
                 " within the machines router ({} entries)".format(
                     router_x_coord, router_y_coord,
                     len(mundy_compressed_router_table_entries)))
-        for entry in mundy_compressed_router_table_entries:
 
-            table.add_multicast_routing_entry(
-                MulticastRoutingEntry(
-                    entry.key, entry.mask,  # Key and mask
-                    ((int(c) - 6) for c in entry.route if c.is_core),  # Cores
-                    (int(l) for l in entry.route if l.is_link),  # Links
-                    False))  # NOT defaultable
+        for entry in mundy_compressed_router_table_entries:
+            table.add_multicast_routing_entry(MulticastRoutingEntry(
+                entry.key, entry.mask,  # Key and mask
+                ((int(c) - 6) for c in entry.route if c.is_core),  # Cores
+                (int(l) for l in entry.route if l.is_link),  # Links
+                False))  # NOT defaultable
         return table

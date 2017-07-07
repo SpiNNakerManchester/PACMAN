@@ -1,22 +1,20 @@
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint, KeyAllocatorFixedFieldConstraint
+    import AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    import KeyAllocatorFixedMaskConstraint
+    import FixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorFixedKeyAndMaskConstraint
+    import FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
+    import ContiguousKeyRangeContraint
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.key_field_generator \
     import KeyFieldGenerator
 from pacman.model.routing_info \
     import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.utilities import utility_calls
-from pacman.utilities.algorithm_utilities.element_allocator_algorithm import \
-    ElementAllocatorAlgorithm
-from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities
+from pacman.utilities.algorithm_utilities \
+    import ElementAllocatorAlgorithm, routing_info_allocator_utilities
 from pacman import exceptions
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -49,9 +47,9 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
             supported_constraints=[
-                KeyAllocatorFixedMaskConstraint,
-                KeyAllocatorFixedKeyAndMaskConstraint,
-                KeyAllocatorContiguousRangeContraint],
+                FixedMaskConstraint,
+                FixedKeyAndMaskConstraint,
+                ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # verify that no edge has more than 1 of a constraint ,and that
@@ -84,7 +82,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             fixed_key_and_mask_constraint = \
                 utility_calls.locate_constraints_of_type(
                     group.constraints,
-                    KeyAllocatorFixedKeyAndMaskConstraint)[0]
+                    FixedKeyAndMaskConstraint)[0]
 
             # attempt to allocate them
             self._allocate_fixed_keys_and_masks(
@@ -102,13 +100,13 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
             # get mask and fields if need be
             fixed_mask = utility_calls.locate_constraints_of_type(
-                group.constraints, KeyAllocatorFixedMaskConstraint)[0].mask
+                group.constraints, FixedMaskConstraint)[0].mask
 
             fields = None
             if group in fixed_field_groups:
                 fields = utility_calls.locate_constraints_of_type(
                     group.constraints,
-                    KeyAllocatorFixedFieldConstraint)[0].fields
+                    FixedKeyFieldConstraint)[0].fields
                 fixed_field_groups.remove(group)
 
             # try to allocate
@@ -125,7 +123,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         for group in fixed_field_groups:
             fields = utility_calls.locate_constraints_of_type(
                 group.constraints,
-                KeyAllocatorFixedFieldConstraint)[0].fields
+                FixedKeyFieldConstraint)[0].fields
 
             # try to allocate
             keys_and_masks = self._allocate_keys_and_masks(

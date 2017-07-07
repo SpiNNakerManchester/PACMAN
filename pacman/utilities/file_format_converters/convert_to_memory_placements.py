@@ -1,9 +1,9 @@
 
 # pacman imports
 from pacman.model.placements import Placement, Placements
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities import file_format_schemas
-from pacman.utilities import constants
+from pacman.utilities.constants import EDGES
 
 # general imports
 import os
@@ -44,9 +44,10 @@ class ConvertToMemoryPlacements(object):
                 vertex = vertex_by_id[str(vertex_id)]
             else:
                 vertex = None
+
             if unicode(vertex_id) not in core_allocations:
                 if vertex is None:
-                    raise exceptions.PacmanConfigurationException(
+                    raise PacmanConfigurationException(
                         "I don't recognise this pattern of constraints for"
                         " a vertex which does not have a placement")
 
@@ -58,7 +59,7 @@ class ConvertToMemoryPlacements(object):
                     # get data for virtual chip
                     route_constraint = \
                         external_device_constraints['end_point']
-                    route_direction = constants.EDGES(
+                    route_direction = EDGES(
                         route_constraint['direction'].upper())
                     placement_constraint = \
                         external_device_constraints['placement']
@@ -76,7 +77,7 @@ class ConvertToMemoryPlacements(object):
                         vertex, destination_chip.x, destination_chip.y, None))
             else:
                 if vertex is None:
-                    raise exceptions.PacmanConfigurationException(
+                    raise PacmanConfigurationException(
                         "Failed to locate the vertex in the "
                         "graph with id {}".format(vertex_id))
                 memory_placements.add_placement(Placement(
@@ -135,13 +136,13 @@ class ConvertToMemoryPlacements(object):
 
         # verify that the files meet the schema.
         # locate schemas
+        schemas = os.path.dirname(file_format_schemas.__file__)
         file_placements_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "placements.json")
+            schemas, "placements.json")
         file_allocations_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__),
-            "core_allocations.json")
+            schemas, "core_allocations.json")
         file_constraints_schema_file_path = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "constraints.json")
+            schemas, "constraints.json")
 
         # open readers for schemas and read in schema
         with open(file_placements_schema_file_path, "r") as file_to_read:

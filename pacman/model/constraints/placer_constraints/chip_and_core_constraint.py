@@ -1,8 +1,7 @@
-from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
+from .abstract_placer_constraint import AbstractPlacerConstraint
 
 
-class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
+class ChipAndCoreConstraint(AbstractPlacerConstraint):
     """ A constraint to place a vertex on a specific chip and, optionally, a\
         specific core on that chip
     """
@@ -77,5 +76,5 @@ class PlacerChipAndCoreConstraint(AbstractPlacerConstraint):
         return {"x": self._x, "y": self._y, "p": self._p}
 
     def __repr__(self):
-        return "PlacerChipAndCoreConstraint(x={}, y={}, p={})".format(
+        return "ChipAndCoreConstraint(x={}, y={}, p={})".format(
             self._x, self._y, self._p)

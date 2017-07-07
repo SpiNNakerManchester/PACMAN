@@ -3,8 +3,8 @@ tests for slice
 """
 
 # pacman imports
-from pacman import exceptions
-from pacman.model.graphs.common.slice import Slice
+from pacman.exceptions import PacmanValueError
+from pacman.model.graphs.common import Slice
 
 # general imports
 import unittest
@@ -23,15 +23,15 @@ class TestSliceFunctions(unittest.TestCase):
 
     def test_slice_invalid_neg(self):
         """
-        test that a invlaid slice of engative value generates an error
+        test that a invalid slice of negative value generates an error
         """
-        self.assertRaises(exceptions.PacmanValueError, Slice, -2, 0)
+        self.assertRaises(PacmanValueError, Slice, -2, 0)
 
     def test_slice_invalid_lo_higher_than_hi(self):
         """
-        test that a invlaid slice generates an error
+        test that a invalid slice generates an error
         """
-        self.assertRaises(exceptions.PacmanValueError, Slice, 2, 0)
+        self.assertRaises(PacmanValueError, Slice, 2, 0)
 
 
 if __name__ == '__main__':

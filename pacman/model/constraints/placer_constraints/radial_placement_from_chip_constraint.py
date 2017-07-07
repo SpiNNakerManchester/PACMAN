@@ -1,8 +1,7 @@
-from pacman.model.constraints.placer_constraints.abstract_placer_constraint \
-    import AbstractPlacerConstraint
+from .abstract_placer_constraint import AbstractPlacerConstraint
 
 
-class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
+class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     """ A constraint that attempts to place a vertex as close to a chip\
         as possible (including on it)
     """
@@ -38,5 +37,5 @@ class PlacerRadialPlacementFromChipConstraint(AbstractPlacerConstraint):
         return self._y
 
     def __repr__(self):
-        return "PlacerRadialPlacementFromChipConstraint(x={}, y={})".format(
+        return "RadialPlacementFromChipConstraint(x={}, y={})".format(
             self._x, self._y)

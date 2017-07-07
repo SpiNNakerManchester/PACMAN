@@ -1,4 +1,4 @@
-from pacman import exceptions
+from pacman.exceptions import PacmanValueError
 from collections import defaultdict
 
 
@@ -56,7 +56,7 @@ class GraphMapper(object):
             If atom selection is out of bounds.
         """
         if vertex_slice.hi_atom >= application_vertex.n_atoms:
-            raise exceptions.PacmanValueError(
+            raise PacmanValueError(
                 "hi_atom {:d} >= maximum {:d}".format(
                     vertex_slice.hi_atom, application_vertex.n_atoms))
 

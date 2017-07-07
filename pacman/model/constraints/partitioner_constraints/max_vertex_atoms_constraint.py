@@ -1,9 +1,8 @@
 # pacman import
-from pacman.model.constraints.partitioner_constraints\
-    .abstract_partitioner_constraint import AbstractPartitionerConstraint
+from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
-class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
+class MaxVertexAtomsConstraint(AbstractPartitionerConstraint):
     """ A constraint which limits the number of atoms on each division of a\
         vertex
     """
@@ -30,4 +29,4 @@ class PartitionerMaximumSizeConstraint(AbstractPartitionerConstraint):
         return self._size
 
     def __repr__(self):
-        return "PartitionerMaximumSizeConstraint(size={})".format(self._size)
+        return "MaxVertexAtomsConstraint(size={})".format(self._size)

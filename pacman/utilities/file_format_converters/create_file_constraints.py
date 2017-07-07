@@ -1,10 +1,9 @@
 from pacman.model.graphs import AbstractVirtualVertex
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint, AbstractPlacerConstraint
-from pacman import exceptions
-from pacman.utilities import utility_calls
-from pacman.utilities import constants
-from pacman.utilities import file_format_schemas
+    import ChipAndCoreConstraint, AbstractPlacerConstraint
+from pacman.exceptions import PacmanConfigurationException
+from pacman.utilities import utility_calls, file_format_schemas
+from pacman.utilities.constants import EDGES
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -80,7 +79,7 @@ class CreateConstraintsToFile(object):
             self._locate_connected_chip_data(vertex, machine)
         r_dict['type'] = "route_endpoint"
         r_dict['vertex'] = vertex_id
-        r_dict['direction'] = constants.EDGES(direction_id)
+        r_dict['direction'] = EDGES(direction_id)
 
         v_dict["type"] = "location"
         v_dict["vertex"] = vertex_id
@@ -95,7 +94,7 @@ class CreateConstraintsToFile(object):
         """
         # locate the chip from the placement constraint
         placement_constraint = utility_calls.locate_constraints_of_type(
-            vertex.constraints, PlacerChipAndCoreConstraint)
+            vertex.constraints, ChipAndCoreConstraint)
         router = machine.get_chip_at(
             placement_constraint.x, placement_constraint.y).router
         found_link = False
@@ -106,7 +105,7 @@ class CreateConstraintsToFile(object):
             else:
                 link_id += 1
         if not found_link:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "Can't find the real chip this virtual chip is connected to."
                 "Please fix and try again.")
         else:
@@ -119,8 +118,8 @@ class CreateConstraintsToFile(object):
             constraint, json_obj, vertex, vertex_id):
         if not isinstance(vertex, AbstractVirtualVertex):
             if isinstance(constraint, AbstractPlacerConstraint):
-                if not isinstance(constraint, PlacerChipAndCoreConstraint):
-                    raise exceptions.PacmanConfigurationException(
+                if not isinstance(constraint, ChipAndCoreConstraint):
+                    raise PacmanConfigurationException(
                         "Converter does not recognise placer constraint {}"
                         .format(constraint))
                 c_dict = dict()

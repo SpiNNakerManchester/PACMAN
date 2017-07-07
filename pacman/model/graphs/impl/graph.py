@@ -2,13 +2,12 @@ from collections import defaultdict
 
 from spinn_utilities.ordered_set import OrderedSet
 
-from pacman import exceptions
-from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.model.decorators.overrides import overrides
+from pacman.exceptions import \
+    PacmanAlreadyExistsException, PacmanInvalidParameterException
+from pacman.model.decorators import overrides
 from pacman.model.graphs import AbstractGraph
-from pacman.model.graphs.common.constrained_object import ConstrainedObject
-from pacman.model.graphs.impl.outgoing_edge_partition \
-    import OutgoingEdgePartition
+from pacman.model.graphs.common import ConstrainedObject
+from .outgoing_edge_partition import OutgoingEdgePartition
 
 
 class Graph(ConstrainedObject, AbstractGraph):
@@ -87,7 +86,7 @@ class Graph(ConstrainedObject, AbstractGraph):
     @overrides(AbstractGraph.add_vertex)
     def add_vertex(self, vertex):
         if not isinstance(vertex, self._allowed_vertex_types):
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "vertex", vertex.__class__,
                 "Vertices of this graph must be one of the following types:"
                 " {}".format(self._allowed_vertex_types))
@@ -97,16 +96,16 @@ class Graph(ConstrainedObject, AbstractGraph):
     def add_edge(self, edge, outgoing_edge_partition_name):
         # verify that the edge is one suitable for this graph
         if not isinstance(edge, self._allowed_edge_types):
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "edge", edge.__class__,
                 "Edges of this graph must be one of the following types:"
                 " {}".format(self._allowed_edge_types))
 
         if edge.pre_vertex not in self._vertices:
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "edge", edge.pre_vertex, "pre-vertex must be known in graph")
         if edge.post_vertex not in self._vertices:
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "edge", edge.post_vertex, "post-vertex must be known in graph")
 
         # Add the edge to the partition
@@ -136,7 +135,7 @@ class Graph(ConstrainedObject, AbstractGraph):
         # verify that this partition is suitable for this graph
         if not isinstance(
                 outgoing_edge_partition, self._allowed_partition_types):
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "outgoing_edge_partition", outgoing_edge_partition.__class__,
                 "Partitions of this graph must be one of the following types:"
                 " {}".format(self._allowed_partition_types))
