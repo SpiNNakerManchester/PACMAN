@@ -5,8 +5,7 @@ A collection of methods which support partitioning algorithms.
 from pacman.model.constraints.partitioner_constraints\
     import AbstractPartitionerConstraint
 from pacman.model.constraints.partitioner_constraints\
-    .partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -92,7 +91,7 @@ def get_same_size_vertex_groups(vertices):
         #  this vertex
         same_size_as_vertices = list()
         for constraint in vertex.constraints:
-            if isinstance(constraint, PartitionerSameSizeAsVertexConstraint):
+            if isinstance(constraint, SameAtomsAsVertexConstraint):
                 if vertex.n_atoms != constraint.vertex.n_atoms:
                     raise PacmanPartitionException(
                         "Vertices {} ({} atoms) and {} ({} atoms) must be of"
