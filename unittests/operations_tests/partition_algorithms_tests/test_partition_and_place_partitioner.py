@@ -23,6 +23,7 @@ import unittest
 from uinit_test_objects.test_partitioning_constraint import \
     NewPartitionerConstraint
 from uinit_test_objects.test_vertex import TestVertex
+from spinn_machine.virtual_machine import VirtualMachine
 
 
 class TestBasicPartitioner(unittest.TestCase):
@@ -382,6 +383,28 @@ class TestBasicPartitioner(unittest.TestCase):
         self.assertRaises(PacmanPartitionException, partitioner,
                           self.graph, self.machine,
                           PreAllocatedResourceContainer())
+
+    def test_operation_with_same_size_as_vertex_constraint_chain(self):
+        """ Test that a chain of same size constraints works even when the\
+            order of vertices is not correct for the chain
+        """
+        graph = ApplicationGraph("Test")
+        vertex_1 = TestVertex(10, "Vertex_1", 5)
+        vertex_2 = TestVertex(10, "Vertex_2", 4)
+        vertex_3 = TestVertex(10, "Vertex_3", 2)
+        vertex_3.add_constraint(PartitionerSameSizeAsVertexConstraint(
+            vertex_2))
+        vertex_2.add_constraint(PartitionerSameSizeAsVertexConstraint(
+            vertex_1))
+        graph.add_vertices([vertex_1, vertex_2, vertex_3])
+        machine = VirtualMachine(version=3, with_wrap_arounds=None)
+        partitioner = PartitionAndPlacePartitioner()
+        _, graph_mapper, _ = partitioner(graph, machine)
+        subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
+        subvertices_2 = list(graph_mapper.get_machine_vertices(vertex_2))
+        subvertices_3 = list(graph_mapper.get_machine_vertices(vertex_3))
+        self.assertEqual(len(subvertices_1), len(subvertices_2))
+        self.assertEqual(len(subvertices_2), len(subvertices_3))
 
     def test_partitioning_with_2_massive_pops(self):
         self.setup()
