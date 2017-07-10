@@ -1,6 +1,5 @@
-
 # pacman imports
-from pacman import exceptions
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 class MulticastRoutingTableByPartitionEntry(object):
@@ -57,13 +56,13 @@ class MulticastRoutingTableByPartitionEntry(object):
 
         if (self._incoming_link is not None and
                 self._incoming_processor is not None):
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "The incoming direction for a path can only be from either "
                 "one link or one processors, not both",
                 str(self._incoming_link), str(self._incoming_processor))
         if (self._incoming_link is not None and
                 not isinstance(self._incoming_link, int)):
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "The incoming direction for a path can only be from either "
                 "one link or one processors, not both",
                 str(self._incoming_link), str(self._incoming_processor))
@@ -144,7 +143,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         :return: a merged MulticastRoutingTableByPartitionEntry
         """
         if not isinstance(other, MulticastRoutingTableByPartitionEntry):
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "other", "type error",
                 "The other parameter is not a instance of "
                 "MulticastRoutingTableByPartitionEntry, and therefore cannot "
@@ -163,7 +162,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             elif self._incoming_processor == other._incoming_processor:
                 valid_incoming_processor = self._incoming_processor
             else:
-                raise exceptions.PacmanInvalidParameterException(
+                raise PacmanInvalidParameterException(
                     "incoming_processor", "invalid merge",
                     "The two MulticastRoutingTableByPartitionEntry have "
                     "different incoming_processors, and so can't be merged")
@@ -180,7 +179,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             elif self._incoming_link == other._incoming_link:
                 valid_incoming_link = self._incoming_link
             else:
-                raise exceptions.PacmanInvalidParameterException(
+                raise PacmanInvalidParameterException(
                     "incoming_link", "invalid merge",
                     "The two MulticastRoutingTableByPartitionEntry have "
                     "different incoming_links, and so can't be merged")

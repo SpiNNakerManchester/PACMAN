@@ -18,7 +18,7 @@ class MulticastRoutingTables(object):
 
         :param routing_tables: The routing tables to add
         :type routing_tables: iterable of\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
+                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
                     routing tables are for the same chip
         """
@@ -34,7 +34,7 @@ class MulticastRoutingTables(object):
 
         :param routing_table: a routing table to add
         :type routing_table:\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
+                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     table already exists for the chip
@@ -61,7 +61,7 @@ class MulticastRoutingTables(object):
 
         :return: an iterable of routing tables
         :rtype: iterable of\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
+                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
         :raise None: does not raise any known exceptions
         """
         return self._routing_tables
@@ -75,7 +75,7 @@ class MulticastRoutingTables(object):
         :type y: int
         :return: The routing table, or None if no such table exists
         :rtype:\
-                    :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`\
+                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`\
                     or None
         :raise None: No known exceptions are raised
         """

@@ -1,8 +1,8 @@
 from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
-from pacman import exceptions
-from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
+from pacman.exceptions import PacmanRoutingException
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import \
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
 
@@ -52,15 +52,15 @@ class BasicDijkstraRouting(object):
 
         :param placements: The placements of the edges
         :type placements:\
-            :py:class:`pacman.model.placements.placements.Placements`
+            :py:class:`pacman.model.placements.Placements`
         :param machine: The machine through which the routes are to be found
-        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :type machine: :py:class:`spinn_machine.Machine`
         :param machine_graph: the machine_graph object
         :type machine_graph:\
-            :py:class:`pacman.model.graph.machine_graph.MachineGraph`
+            :py:class:`pacman.model.graph.machine.MachineGraph`
         :return: The discovered routes
         :rtype:\
-            :py:class:`pacman.model.routing_tables.multicast_routing_tables.MulticastRoutingTables`
+            :py:class:`pacman.model.routing_tables.MulticastRoutingTables`
         :raise pacman.exceptions.PacmanRoutingException: If something\
                    goes wrong with the routing
         """
@@ -129,7 +129,7 @@ class BasicDijkstraRouting(object):
             machine
 
         :param machine: the machine object
-        :type machine: spinn_machine.machine.Machine
+        :type machine: spinn_machine.Machine
         :return: nodes_info dictionary
         :rtype: dict
         :raise None: this method does not raise any known exceptions
@@ -170,7 +170,7 @@ class BasicDijkstraRouting(object):
             given node
 
         :param machine: the machine object
-        :type machine: the spinn_machine.machine.Machine object
+        :type machine: the spinn_machine.Machine object
         :return: the  Dijkstra's table dictionary
         :rtype: dict
         :raise None: this method does not raise any known exception
@@ -196,7 +196,7 @@ class BasicDijkstraRouting(object):
         :type nodes_info: dict
         :param machine: the machine python object that represents the\
                     structure of the machine
-        :type machine: 'py:class':spinn_machine.machine.Machine
+        :type machine: 'py:class':spinn_machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -213,7 +213,7 @@ class BasicDijkstraRouting(object):
         :param key: the identifier to the object in nodes_info
         :type key: str
         :type nodes_info: dict
-        :type machine: 'py:class':spinn_machine.machine.Machine
+        :type machine: 'py:class':spinn_machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
@@ -234,7 +234,7 @@ class BasicDijkstraRouting(object):
         :param bws: the basic weight of the source node
         :param no_routing_table_entries: the number of entries going though\
                 this router
-        :type router: spinn_machine.router.Router
+        :type router: spinn_machine.Router
         :type bws: int
         :type no_routing_table_entries: int
         :return: weight of this router
@@ -344,7 +344,7 @@ class BasicDijkstraRouting(object):
             # but the destination was not reached this iteration,
             # raise an exception
             if graph_lowest_cost is None:
-                raise exceptions.PacmanRoutingException(
+                raise PacmanRoutingException(
                     "Destination could not be activated, ending run")
 
             # Set the next activated node as the deactivated node with the
@@ -369,7 +369,7 @@ class BasicDijkstraRouting(object):
         """
         neighbour_exists = (x_neighbour, y_neighbour) in dijkstra_tables
         if not neighbour_exists:
-            raise exceptions.PacmanRoutingException(
+            raise PacmanRoutingException(
                 "Tried to propagate to ({}, {}), which is not in the"
                 " graph: remove non-existent neighbours"
                 .format(x_neighbour, y_neighbour))
@@ -396,7 +396,7 @@ class BasicDijkstraRouting(object):
 
         if (dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] == 0) \
                 and (x_neighbour != x_source or y_neighbour != y_source):
-            raise exceptions.PacmanRoutingException(
+            raise PacmanRoutingException(
                 "!!!Cost of non-source node ({}, {}) was set to zero!!!"
                 .format(x_neighbour, y_neighbour))
 
@@ -438,9 +438,8 @@ class BasicDijkstraRouting(object):
         routing_entry_route_links = None
 
         # build the multicast entry
-        partitions = \
-            graph.get_outgoing_edge_partitions_starting_at_vertex(
-                edge.pre_vertex)
+        partitions = graph.get_outgoing_edge_partitions_starting_at_vertex(
+            edge.pre_vertex)
 
         previous_routing_entry = None
         for partition in partitions:
@@ -463,33 +462,30 @@ class BasicDijkstraRouting(object):
             while not added_an_entry and neighbour_index < len(neighbours):
                 neighbour = neighbours[neighbour_index]
                 if neighbour is not None:
-
                     x_neighbour, y_neighbour = (neighbour.destination_x,
                                                 neighbour.destination_y)
 
                     # Only check if it can be a preceding node if it actually
                     # exists
-                    if (x_neighbour, y_neighbour) in dijkstra_tables:
-                        dijkstra_table_key = (x_neighbour, y_neighbour)
-                        lowest_cost = \
-                            dijkstra_tables[dijkstra_table_key]["lowest cost"]
-                        if lowest_cost is not None:
-                            (x_current, y_current, previous_routing_entry,
-                                added_an_entry) = self._create_routing_entry(
-                                    x_neighbour, y_neighbour, dijkstra_tables,
-                                    neighbour_index, nodes_info,
-                                    x_current, y_current,
-                                    previous_routing_entry, edge,
-                                    graph)
-                    else:
-                        raise exceptions.PacmanRoutingException(
+                    if (x_neighbour, y_neighbour) not in dijkstra_tables:
+                        raise PacmanRoutingException(
                             "Tried to trace back to node not in "
-                            "graph: remove non-existent"
-                            " neighbours")
+                            "graph: remove non-existent neighbours")
+
+                    dijkstra_table_key = (x_neighbour, y_neighbour)
+                    lowest_cost = \
+                        dijkstra_tables[dijkstra_table_key]["lowest cost"]
+                    if lowest_cost is not None:
+                        (x_current, y_current, previous_routing_entry,
+                            added_an_entry) = self._create_routing_entry(
+                                x_neighbour, y_neighbour, dijkstra_tables,
+                                neighbour_index, nodes_info,
+                                x_current, y_current,
+                                previous_routing_entry, edge, graph)
                 neighbour_index += 1
 
             if x_current == x_check and y_current == y_check:
-                raise exceptions.PacmanRoutingException(
+                raise PacmanRoutingException(
                     "Iterated through all neighbours of tracking node but"
                     " did not find a preceding node! Consider increasing "
                     "acceptable discrepancy between sought traceback cost"
@@ -504,7 +500,7 @@ class BasicDijkstraRouting(object):
         """ Create a new routing entry
 
         :return: x_current, y_current, previous_routing_entry, made_an_entry
-        :rtype: int, int, spinn_machine.multicast_routing_entry, bool
+        :rtype: int, int, spinn_machine.MulticastRoutingEntry, bool
         :raise PacmanRoutingException: when the bandwidth of a router is\
                 beyond expected parameters
         """

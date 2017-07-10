@@ -1,4 +1,4 @@
-from pacman.model.resources.abstract_resource import AbstractResource
+from .abstract_resource import AbstractResource
 
 
 class CoreResource(AbstractResource):

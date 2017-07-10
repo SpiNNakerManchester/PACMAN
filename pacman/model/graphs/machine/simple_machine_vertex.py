@@ -1,5 +1,5 @@
-from pacman.model.graphs.machine.machine_vertex import MachineVertex
-from pacman.model.decorators.overrides import overrides
+from .machine_vertex import MachineVertex
+from pacman.model.decorators import overrides
 
 
 class SimpleMachineVertex(MachineVertex):

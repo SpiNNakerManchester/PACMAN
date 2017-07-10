@@ -8,26 +8,22 @@ from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import PacmanPartitionException, \
     PacmanInvalidParameterException, PacmanValueError
 from pacman.model.constraints.partitioner_constraints\
-    import PartitionerMaximumSizeConstraint
+    import MaxVertexAtomsConstraint
 from pacman.model.constraints.partitioner_constraints\
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 from pacman.model.resources.pre_allocated_resource_container import \
     PreAllocatedResourceContainer
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 
 # spinnMachine imports
-from spinn_machine.machine import Machine
-from spinn_machine.processor import Processor
-from spinn_machine.sdram import SDRAM
-from spinn_machine.link import Link
-from spinn_machine.router import Router
-from spinn_machine.chip import Chip
+from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
 
 # general imports
 import unittest
 from uinit_test_objects.test_partitioning_constraint import \
     NewPartitionerConstraint
 from uinit_test_objects.test_vertex import TestVertex
+from spinn_machine.virtual_machine import VirtualMachine
 
 
 class TestBasicPartitioner(unittest.TestCase):
@@ -141,7 +137,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = TestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(PartitionerMaximumSizeConstraint(10))
+        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine,
@@ -331,7 +327,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         constrained_vertex = TestVertex(5, "Constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(self.vert2))
+            SameAtomsAsVertexConstraint(self.vert2))
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
@@ -348,7 +344,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = TestVertex(300, "Constrained")
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(new_large_vertex))
+            SameAtomsAsVertexConstraint(new_large_vertex))
         self.graph.add_vertices([new_large_vertex, constrained_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
@@ -365,7 +361,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = TestVertex(300, "Constrained")
         new_large_vertex = TestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(new_large_vertex))
+            SameAtomsAsVertexConstraint(new_large_vertex))
         self.graph.add_vertices([constrained_vertex, new_large_vertex])
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
@@ -381,12 +377,34 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         constrained_vertex = TestVertex(100, "Constrained")
         constrained_vertex.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(self.vert2))
+            SameAtomsAsVertexConstraint(self.vert2))
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         self.assertRaises(PacmanPartitionException, partitioner,
                           self.graph, self.machine,
                           PreAllocatedResourceContainer())
+
+    def test_operation_with_same_size_as_vertex_constraint_chain(self):
+        """ Test that a chain of same size constraints works even when the\
+            order of vertices is not correct for the chain
+        """
+        graph = ApplicationGraph("Test")
+        vertex_1 = TestVertex(10, "Vertex_1", 5)
+        vertex_2 = TestVertex(10, "Vertex_2", 4)
+        vertex_3 = TestVertex(10, "Vertex_3", 2)
+        vertex_3.add_constraint(SameAtomsAsVertexConstraint(
+            vertex_2))
+        vertex_2.add_constraint(SameAtomsAsVertexConstraint(
+            vertex_1))
+        graph.add_vertices([vertex_1, vertex_2, vertex_3])
+        machine = VirtualMachine(version=3, with_wrap_arounds=None)
+        partitioner = PartitionAndPlacePartitioner()
+        _, graph_mapper, _ = partitioner(graph, machine)
+        subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
+        subvertices_2 = list(graph_mapper.get_machine_vertices(vertex_2))
+        subvertices_3 = list(graph_mapper.get_machine_vertices(vertex_3))
+        self.assertEqual(len(subvertices_1), len(subvertices_2))
+        self.assertEqual(len(subvertices_2), len(subvertices_3))
 
     def test_partitioning_with_2_massive_pops(self):
         self.setup()

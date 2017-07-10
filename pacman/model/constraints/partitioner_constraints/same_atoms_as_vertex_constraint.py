@@ -1,9 +1,8 @@
 # pacman imports
-from pacman.model.constraints.partitioner_constraints\
-    .abstract_partitioner_constraint import AbstractPartitionerConstraint
+from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
-class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
+class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
     """ A constraint which indicates that a vertex must be split in the\
         same way as another vertex
     """
@@ -35,5 +34,5 @@ class PartitionerSameSizeAsVertexConstraint(AbstractPartitionerConstraint):
         return self._vertex
 
     def __repr__(self):
-        return "PartitionerSameSizeAsVertexConstraint(vertex={})".format(
+        return "SameAtomsAsVertexConstraint(vertex={})".format(
             self._vertex)

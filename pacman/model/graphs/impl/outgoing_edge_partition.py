@@ -1,8 +1,9 @@
 from spinn_utilities.ordered_set import OrderedSet
-from pacman import exceptions
-from pacman.model.decorators.overrides import overrides
+from pacman.exceptions import \
+    PacmanInvalidParameterException, PacmanConfigurationException
+from pacman.model.decorators import overrides
 from pacman.model.graphs import AbstractOutgoingEdgePartition
-from pacman.model.graphs.common.constrained_object import ConstrainedObject
+from pacman.model.graphs.common import ConstrainedObject
 
 
 class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
@@ -54,7 +55,7 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     def add_edge(self, edge):
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
-            raise exceptions.PacmanInvalidParameterException(
+            raise PacmanInvalidParameterException(
                 "edge", edge.__class__,
                 "Edges of this graph must be one of the following types:"
                 " {}".format(self._allowed_edge_types))
@@ -64,7 +65,7 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
             self._pre_vertex = edge.pre_vertex
 
         elif edge.pre_vertex != self._pre_vertex:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "A partition can only contain edges with the same"
                 "pre_vertex")
 
@@ -72,7 +73,7 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
         if self._traffic_type is None:
             self._traffic_type = edge.traffic_type
         elif edge.traffic_type != self._traffic_type:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "A partition can only contain edges with the same"
                 " traffic_type")
 

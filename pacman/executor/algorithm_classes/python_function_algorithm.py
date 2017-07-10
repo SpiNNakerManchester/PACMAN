@@ -2,9 +2,8 @@ import importlib
 import sys
 import logging
 
-from pacman.executor.algorithm_classes.abstract_python_algorithm \
-    import AbstractPythonAlgorithm
-from pacman.model.decorators.overrides import overrides
+from .abstract_python_algorithm import AbstractPythonAlgorithm
+from pacman.model.decorators import overrides
 
 logger = logging.getLogger(__name__)
 

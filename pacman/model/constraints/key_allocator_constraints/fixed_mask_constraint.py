@@ -1,8 +1,7 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
-class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
+class FixedMaskConstraint(AbstractKeyAllocatorConstraint):
     """ A key allocator that fixes the mask to be assigned to an edge
     """
 
@@ -29,13 +28,9 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
         return self._mask
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorFixedMaskConstraint):
+        if not isinstance(other, FixedMaskConstraint):
             return False
-        else:
-            if self._mask == other.mask:
-                return True
-            else:
-                return False
+        return self._mask == other.mask
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -44,4 +39,4 @@ class KeyAllocatorFixedMaskConstraint(AbstractKeyAllocatorConstraint):
         return hash(self._mask)
 
     def __repr__(self):
-        return "KeyAllocatorFixedMaskConstraint(mask={})".format(self._mask)
+        return "FixedMaskConstraint(mask={})".format(self._mask)

@@ -1,8 +1,8 @@
 from six import add_metaclass
 
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common.constrained_object import ConstrainedObject
-from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.common import ConstrainedObject
+from pacman.model.decorators import overrides
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
@@ -21,7 +21,7 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         :param constraints: The optional initial constraints of the vertex
         :type constraints: \
             iterable of\
-            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+            :py:class:`pacman.model.constraints.AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
         """
@@ -46,5 +46,5 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         """ The resources required by the vertex
 
         :rtype:\
-            :py:class:`pacman.model.resources.resource_container.ResourceContainer`
+            :py:class:`pacman.model.resources.ResourceContainer`
         """

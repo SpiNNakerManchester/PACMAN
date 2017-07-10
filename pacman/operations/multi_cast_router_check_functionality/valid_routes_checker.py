@@ -6,8 +6,8 @@ import logging
 
 from pacman import exceptions
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
-from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
+    import ContiguousKeyRangeContraint
+from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 
@@ -94,7 +94,7 @@ def validate_routes(machine_graph, placements, routing_infos,
 
 def _check_if_partition_has_continuous_keys(partition):
     continuous_constraints = utility_calls.locate_constraints_of_type(
-        partition.constraints, KeyAllocatorContiguousRangeContraint)
+        partition.constraints, ContiguousKeyRangeContraint)
     # TODO: Can we do better here?
     return len(continuous_constraints) > 0
 

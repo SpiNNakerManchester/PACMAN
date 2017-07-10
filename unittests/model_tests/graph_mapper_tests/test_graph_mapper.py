@@ -7,8 +7,7 @@ from uinit_test_objects.test_edge import TestEdge
 from uinit_test_objects.test_vertex import TestVertex
 
 # pacman imports
-from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.common.graph_mapper import GraphMapper
+from pacman.model.graphs.common import Slice, GraphMapper
 from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
 
 # general imports

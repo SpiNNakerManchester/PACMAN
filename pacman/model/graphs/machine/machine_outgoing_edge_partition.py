@@ -1,6 +1,5 @@
-from pacman.model.graphs.impl.outgoing_edge_partition\
-    import OutgoingEdgePartition
-from pacman.model.graphs.machine.machine_edge import MachineEdge
+from pacman.model.graphs.impl import OutgoingEdgePartition
+from .machine_edge import MachineEdge
 
 
 class MachineOutgoingEdgePartition(OutgoingEdgePartition):

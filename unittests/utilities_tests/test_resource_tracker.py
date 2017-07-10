@@ -1,13 +1,12 @@
 import unittest
 
+from spinn_machine import VirtualMachine
 from pacman.model.resources import ResourceContainer, SDRAMResource
-from spinn_machine.virtual_machine import VirtualMachine
 
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from pacman.model.resources.pre_allocated_resource_container \
-    import PreAllocatedResourceContainer
-from pacman.model.resources.core_resource import CoreResource
-from pacman.model.resources.specific_core_resource import SpecificCoreResource
+from pacman.utilities.utility_objs import ResourceTracker
+from pacman.model.resources import PreAllocatedResourceContainer
+from pacman.model.resources import CoreResource
+from pacman.model.resources import SpecificCoreResource
 
 
 class TestResourceTracker(unittest.TestCase):

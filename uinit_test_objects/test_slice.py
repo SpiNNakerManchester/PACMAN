@@ -1,6 +1,6 @@
 import unittest
 
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice
 
 
 class TestSlice(unittest.TestCase):

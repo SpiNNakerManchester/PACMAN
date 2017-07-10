@@ -1,8 +1,4 @@
-from spinn_machine.sdram import SDRAM
-from spinn_machine.chip import Chip
-from spinn_machine.link import Link
-from spinn_machine.processor import Processor
-from spinn_machine.router import Router
+from spinn_machine import SDRAM, Chip, Link, Processor, Router
 import sys
 
 
