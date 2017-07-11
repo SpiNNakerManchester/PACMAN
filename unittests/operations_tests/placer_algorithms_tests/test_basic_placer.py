@@ -5,20 +5,14 @@ test basic placer
 # pacman imports
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice, GraphMapper
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint
-from pacman.model.graphs.common.graph_mapper import GraphMapper
+    import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 
 # spinn machine imports
-from spinn_machine.chip import Chip
-from spinn_machine.link import Link
-from spinn_machine.machine import Machine
-from spinn_machine.processor import Processor
-from spinn_machine.router import Router
-from spinn_machine.sdram import SDRAM
+from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 
 # general imports
 import unittest
@@ -144,12 +138,12 @@ class TestBasicPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.bp = BasicPlacer(self.machine, self.graph)
-        self.vertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
+        self.vertex1.add_constraint(ChipAndCoreConstraint(8, 3, 2))
         self.assertIsInstance(self.vertex1.constraints[0],
-                              PlacerChipAndCoreConstraint)
-        self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
-        self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
-        self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 4, 16))
+                              ChipAndCoreConstraint)
+        self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
+        self.vertex3.add_constraint(ChipAndCoreConstraint(2, 4, 6))
+        self.vertex4.add_constraint(ChipAndCoreConstraint(6, 4, 16))
         self.vertices = list()
         self.vertices.append(self.vertex1)
         self.vertices.append(self.vertex2)
@@ -167,12 +161,12 @@ class TestBasicPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_have_vertices(self):
         self.bp = BasicPlacer(self.machine, self.graph)
-        self.vertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
+        self.vertex1.add_constraint(ChipAndCoreConstraint(1, 5, 2))
         self.assertIsInstance(self.vertex1.constraints[0],
-                              PlacerChipAndCoreConstraint)
-        self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
-        self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
-        self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 7, 16))
+                              ChipAndCoreConstraint)
+        self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
+        self.vertex3.add_constraint(ChipAndCoreConstraint(2, 4, 6))
+        self.vertex4.add_constraint(ChipAndCoreConstraint(6, 7, 16))
         self.vertices = list()
         self.vertices.append(self.vertex1)
         self.vertices.append(self.vertex2)

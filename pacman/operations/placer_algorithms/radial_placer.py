@@ -1,10 +1,11 @@
 # pacman imports
 from pacman.model.constraints.placer_constraints \
-    import PlacerRadialPlacementFromChipConstraint, PlacerSameChipAsConstraint
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+    import RadialPlacementFromChipConstraint, SameChipAsConstraint
+from pacman.utilities.algorithm_utilities \
+    import placer_algorithm_utilities as placer_utils
 from pacman.model.placements import Placement, Placements
-from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
+from pacman.utilities.utility_calls import locate_constraints_of_type
+from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -27,17 +28,16 @@ class RadialPlacer(object):
         self._check_constraints(machine_graph.vertices)
 
         placements = Placements()
-        vertices = \
-            placer_algorithm_utilities.sort_vertices_by_known_constraints(
-                machine_graph.vertices)
+        vertices = placer_utils.sort_vertices_by_known_constraints(
+            machine_graph.vertices)
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
-        vertices_on_same_chip = placer_algorithm_utilities\
-            .get_same_chip_vertex_groups(machine_graph.vertices)
+        vertices_on_same_chip = placer_utils.get_same_chip_vertex_groups(
+            machine_graph.vertices)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
@@ -50,7 +50,7 @@ class RadialPlacer(object):
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
         placement_constraints = {
-            PlacerRadialPlacementFromChipConstraint, PlacerSameChipAsConstraint
+            RadialPlacementFromChipConstraint, SameChipAsConstraint
         }
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
@@ -64,8 +64,8 @@ class RadialPlacer(object):
         vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
-        radial_constraints = utility_calls.locate_constraints_of_type(
-            vertices, PlacerRadialPlacementFromChipConstraint)
+        radial_constraints = locate_constraints_of_type(
+            vertices, RadialPlacementFromChipConstraint)
         start_x = None
         start_y = None
         for constraint in radial_constraints:

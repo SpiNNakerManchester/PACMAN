@@ -1,4 +1,4 @@
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 import numpy
 
 
@@ -28,7 +28,7 @@ class BaseKeyAndMask(object):
         self._mask = mask
 
         if base_key & mask != base_key:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "This routing info is invalid as the mask and key together "
                 "alters the key. This is deemed to be a error from "
                 "spynnaker's point of view and therefore please rectify and"

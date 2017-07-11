@@ -1,11 +1,7 @@
-from pacman.model.constraints.partitioner_constraints.\
-    abstract_partitioner_constraint import AbstractPartitionerConstraint
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
+from .abstract_partitioner_constraint import AbstractPartitionerConstraint
+from .max_vertex_atoms_constraint import MaxVertexAtomsConstraint
+from .same_atoms_as_vertex_constraint import SameAtomsAsVertexConstraint
 
 __all__ = ["AbstractPartitionerConstraint",
-           "PartitionerMaximumSizeConstraint",
-           "PartitionerSameSizeAsVertexConstraint"]
+           "MaxVertexAtomsConstraint",
+           "SameAtomsAsVertexConstraint"]

@@ -1,5 +1,5 @@
 import numpy
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 
 
 class PartitionRoutingInfo(object):
@@ -20,10 +20,10 @@ class PartitionRoutingInfo(object):
 
         :param keys_and_masks: The keys allocated to the machine partition
         :type keys_and_masks: iterable of\
-                    :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`
+                    :py:class:`pacman.model.routing_info.BaseKeyAndMask`
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
+                    :py:class:`pacman.model.graph.OutgoingEdgePartition`
         """
         self._keys_and_masks = keys_and_masks
         self._partition = partition
@@ -43,11 +43,10 @@ class PartitionRoutingInfo(object):
 
         if n_keys is None:
             n_keys = max_n_keys
-        else:
-            if max_n_keys < n_keys:
-                raise exceptions.PacmanConfigurationException(
-                    "You asked for {} keys, but the routing info can only "
-                    "provide {} keys.".format(n_keys, max_n_keys))
+        elif max_n_keys < n_keys:
+            raise PacmanConfigurationException(
+                "You asked for {} keys, but the routing info can only "
+                "provide {} keys.".format(n_keys, max_n_keys))
 
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0

@@ -1,9 +1,8 @@
 import subprocess
 
-from pacman import exceptions
-from pacman.executor.algorithm_classes.abstract_algorithm \
-    import AbstractAlgorithm
-from pacman.model.decorators.overrides import overrides
+from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
+from .abstract_algorithm import AbstractAlgorithm
+from pacman.model.decorators import overrides
 from spinn_utilities.progress_bar import ProgressBar
 
 
@@ -50,8 +49,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
         # Detect any errors
         if child.returncode != 0:
             stdout, stderr = child.communicate()
-            raise exceptions.\
-                PacmanExternalAlgorithmFailedToCompleteException(
+            raise PacmanExternalAlgorithmFailedToCompleteException(
                     "Algorithm {} returned a non-zero error code {}\n"
                     "    Inputs: {}\n"
                     "    Output: {}\n"

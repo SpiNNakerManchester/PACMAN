@@ -1,9 +1,8 @@
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint, PlacerSameChipAsConstraint
+    import ChipAndCoreConstraint, SameChipAsConstraint
 from pacman.model.constraints.placer_constraints \
-    import PlacerBoardConstraint, PlacerRadialPlacementFromChipConstraint
-from pacman.utilities.vertex_sorter import VertexSorter
-from pacman.utilities.vertex_sorter import ConstraintOrder
+    import BoardConstraint, RadialPlacementFromChipConstraint
+from pacman.utilities import VertexSorter, ConstraintOrder
 
 
 def sort_vertices_by_known_constraints(vertices):
@@ -11,11 +10,11 @@ def sort_vertices_by_known_constraints(vertices):
         more restrictive constraints come first.
     """
     sorter = VertexSorter([
-        ConstraintOrder(PlacerChipAndCoreConstraint, 1, ["p"]),
-        ConstraintOrder(PlacerChipAndCoreConstraint, 2),
-        ConstraintOrder(PlacerSameChipAsConstraint, 3),
-        ConstraintOrder(PlacerBoardConstraint, 4),
-        ConstraintOrder(PlacerRadialPlacementFromChipConstraint, 5)])
+        ConstraintOrder(ChipAndCoreConstraint, 1, ["p"]),
+        ConstraintOrder(ChipAndCoreConstraint, 2),
+        ConstraintOrder(SameChipAsConstraint, 3),
+        ConstraintOrder(BoardConstraint, 4),
+        ConstraintOrder(RadialPlacementFromChipConstraint, 5)])
     return sorter.sort(vertices)
 
 
@@ -32,7 +31,7 @@ def get_same_chip_vertex_groups(vertices):
         #  this vertex
         same_chip_as_vertices = list()
         for constraint in vertex.constraints:
-            if isinstance(constraint, PlacerSameChipAsConstraint):
+            if isinstance(constraint, SameChipAsConstraint):
                 same_chip_as_vertices.append(constraint.vertex)
 
         if same_chip_as_vertices:

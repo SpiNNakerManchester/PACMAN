@@ -1,8 +1,7 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
-class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
+class FlexiKeyFieldConstraint(AbstractKeyAllocatorConstraint):
     """ Constraint that indicates fields in the mask without a specific size\
         or position
     """
@@ -20,13 +19,12 @@ class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
         return self._fields
 
     def __eq__(self, other):
-        if not isinstance(other, KeyAllocatorFlexiFieldConstraint):
+        if not isinstance(other, FlexiKeyFieldConstraint):
             return False
-        else:
-            for field in self._fields:
-                if field not in other.fields:
-                    return False
-            return True
+        for field in self._fields:
+            if field not in other.fields:
+                return False
+        return True
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -35,5 +33,5 @@ class KeyAllocatorFlexiFieldConstraint(AbstractKeyAllocatorConstraint):
         return hash(frozenset(self._fields))
 
     def __repr__(self):
-        return "KeyAllocatorFlexiFieldConstraint(fields={})".format(
+        return "FlexiKeyFieldConstraint(fields={})".format(
             self._fields)

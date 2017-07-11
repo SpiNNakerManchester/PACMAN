@@ -13,15 +13,9 @@ from pacman.model.routing_info import PartitionRoutingInfo, RoutingInfo
 # pacman utility imports
 from pacman.utilities.constants import DEFAULT_MASK
 # pacman operations imports
-from pacman.operations.router_algorithms.basic_dijkstra_routing \
-    import BasicDijkstraRouting
+from pacman.operations.router_algorithms import BasicDijkstraRouting
 # spinnmachine imports
-from spinn_machine.processor import Processor
-from spinn_machine.link import Link
-from spinn_machine.sdram import SDRAM
-from spinn_machine.router import Router
-from spinn_machine.chip import Chip
-from spinn_machine.machine import Machine
+from spinn_machine import Processor, Link, SDRAM, Router, Chip, Machine
 
 import unittest
 

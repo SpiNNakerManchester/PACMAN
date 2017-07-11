@@ -8,8 +8,8 @@ from pacman.model.graphs.machine \
 from pacman.model.placements import Placement, Placements
 from pacman.model.routing_info import PartitionRoutingInfo, RoutingInfo
 from pacman.operations.router_algorithms import BasicDijkstraRouting
-from pacman.utilities import constants
-from spinn_machine.virtual_machine import VirtualMachine
+from pacman.utilities.constants import DEFAULT_MASK
+from spinn_machine import VirtualMachine
 
 
 class Vertex(ApplicationVertex):
@@ -59,9 +59,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -81,9 +80,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -103,9 +101,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -124,9 +121,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -145,9 +141,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -166,9 +161,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -187,9 +181,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -208,9 +201,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -230,9 +222,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -252,9 +243,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)
@@ -296,9 +286,8 @@ class TestRouter(unittest.TestCase):
         self.placements.add_placement(self.placement2)
         # sort out routing infos
         self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=constants.DEFAULT_MASK,
-                                 edge=self.edge)
+        self.edge_routing_info1 = PartitionRoutingInfo(
+            key=2 << 11, mask=DEFAULT_MASK, edge=self.edge)
         self.routing_info.add_partition_info(self.edge_routing_info1)
         # create machine
         self.machine = VirtualMachine(10, 10, False)

@@ -1,7 +1,6 @@
 import logging
 import os
-from pacman.model.graphs.application.application_vertex \
-    import ApplicationVertex
+from pacman.model.graphs.application import ApplicationVertex
 
 logger = logging.getLogger(__name__)
 

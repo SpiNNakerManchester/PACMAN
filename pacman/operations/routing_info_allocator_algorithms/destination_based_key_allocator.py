@@ -4,7 +4,7 @@ from pacman.model.routing_info \
     import BaseKeyAndMask, RoutingInfo, PartitionRoutingInfo
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.utilities import utility_calls
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -65,7 +65,7 @@ class DestinationBasedRoutingInfoAllocator(object):
                         edge.pre_vertex)
                 n_keys = n_keys_map.n_keys_for_partition(partition)
                 if n_keys > self.MAX_KEYS_SUPPORTED:
-                    raise exceptions.PacmanConfigurationException(
+                    raise PacmanConfigurationException(
                         "Only edges which require less than {} keys are"
                         " supported".format(self.MAX_KEYS_SUPPORTED))
 

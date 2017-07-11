@@ -9,19 +9,15 @@ from rig.routing_table import Routes
 from six import iteritems
 
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint, PlacerRadialPlacementFromChipConstraint
+    import ChipAndCoreConstraint, RadialPlacementFromChipConstraint
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements import Placement, Placements
-from pacman.model.routing_table_by_partition\
-    .multicast_routing_table_by_partition \
-    import MulticastRoutingTableByPartition
-from pacman.model.routing_table_by_partition\
-    .multicast_routing_table_by_partition_entry  \
-    import MulticastRoutingTableByPartitionEntry
-from pacman.utilities import constants
+from pacman.model.routing_table_by_partition import \
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
+from pacman.utilities.constants import EDGES
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
@@ -78,9 +74,8 @@ def convert_to_rig_machine(machine):
                             if dest_chip.virtual:
                                 is_dead = True
                     if is_dead:
-                        dead_links.append(
-                            [x_coord, y_coord, "{}".format(
-                             constants.EDGES(link_id).name.lower())])
+                        dead_links.append([x_coord, y_coord, "{}".format(
+                            EDGES(link_id).name.lower())])
 
                 # Fix the number of processors when there are less
                 resource_exceptions = dict()
@@ -177,14 +172,13 @@ def create_rig_graph_constraints(machine_graph, machine):
                 vertex,
                 (link_data.connected_chip_x, link_data.connected_chip_y)))
             constraints.append(RouteEndpointConstraint(
-                vertex,
-                LINK_LOOKUP[constants.EDGES(
+                vertex, LINK_LOOKUP[EDGES(
                     link_data.connected_link).name.lower()]))
         else:
             for constraint in vertex.constraints:
                 if isinstance(constraint, (
-                        PlacerChipAndCoreConstraint,
-                        PlacerRadialPlacementFromChipConstraint)):
+                        ChipAndCoreConstraint,
+                        RadialPlacementFromChipConstraint)):
                     constraints.append(LocationConstraint(
                         vertex, (constraint.x, constraint.y)))
 

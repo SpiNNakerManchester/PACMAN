@@ -1,5 +1,5 @@
 # pacman imports
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
 
 # unit tests imports

@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from pacman import exceptions
+from pacman.exceptions import \
+    PacmanAlreadyExistsException, PacmanRoutingException
 
 
 class MulticastRoutingTable(object):
@@ -37,7 +38,7 @@ class MulticastRoutingTable(object):
         :param multicast_routing_entries: An iterable of routing entries to\
                     add to the table
         :type multicast_routing_entries: iterable of\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.MulticastRoutingEntry`
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
                     routing entries contain the same key-mask combination
         """
@@ -56,7 +57,7 @@ class MulticastRoutingTable(object):
 
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.MulticastRoutingEntry`
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
                     entry with the same key-mask combination already exists
@@ -66,7 +67,7 @@ class MulticastRoutingTable(object):
 
         tuple_key = (routing_entry_key, mask)
         if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
-            raise exceptions.PacmanAlreadyExistsException(
+            raise PacmanAlreadyExistsException(
                 "Multicast_routing_entry", str(multicast_routing_entry))
 
         self._multicast_routing_entries_by_routing_entry_key[tuple_key] =\
@@ -101,7 +102,7 @@ class MulticastRoutingTable(object):
 
         :return: an iterable of multicast routing entries
         :rtype: iterable of\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.MulticastRoutingEntry`
         :raise None: does not raise any known exceptions
         """
         return self._multicast_routing_entries
@@ -115,7 +116,7 @@ class MulticastRoutingTable(object):
 
     @property
     def number_of_defaultable_entries(self):
-        """ The number of  multi-cast routing entries that are set to be
+        """ The number of  multi-cast routing entries that are set to be\
         defaultable within this multicast routing table
 
         :return: int
@@ -135,10 +136,10 @@ class MulticastRoutingTable(object):
         :return: the routing entry associated with the routing key_combo or\
                     None if no such entry exists
         :rtype:\
-                    :py:class:`spinn_machine.multicast_routing_entry.MulticastRoutingEntry`
+                    :py:class:`spinn_machine.MulticastRoutingEntry`
         """
         if (routing_entry_key & mask) != routing_entry_key:
-            raise exceptions.PacmanRoutingException(
+            raise PacmanRoutingException(
                 "The key {} is changed when masked with the mask {}."
                 " This is determined to be an error in the tool chain. Please "
                 "correct this and try again.".format(routing_entry_key, mask))

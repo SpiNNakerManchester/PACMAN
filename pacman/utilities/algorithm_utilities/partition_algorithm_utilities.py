@@ -5,8 +5,7 @@ A collection of methods which support partitioning algorithms.
 from pacman.model.constraints.partitioner_constraints\
     import AbstractPartitionerConstraint
 from pacman.model.constraints.partitioner_constraints\
-    .partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -18,13 +17,13 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
 
     :param machine_graph: the machine graph to add edges to
     :type machine_graph:\
-        :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+        :py:class:`pacman.model.graph.machine.MachineGraph`
     :param graph_mapper: the mapper graphs
     :type graph_mapper:\
-        :py:class:`pacman.model.graph_mapper.GraphMapper`
+        :py:class:`pacman.model.GraphMapper`
     :param application_graph: the application graph to work with
     :type application_graph:\
-        :py:class:`pacman.model.graph.application.application_graph.ApplicationGraph`
+        :py:class:`pacman.model.graph.application.ApplicationGraph`
     """
 
     # start progress bar
@@ -92,7 +91,7 @@ def get_same_size_vertex_groups(vertices):
         #  this vertex
         same_size_as_vertices = list()
         for constraint in vertex.constraints:
-            if isinstance(constraint, PartitionerSameSizeAsVertexConstraint):
+            if isinstance(constraint, SameAtomsAsVertexConstraint):
                 if vertex.n_atoms != constraint.vertex.n_atoms:
                     raise PacmanPartitionException(
                         "Vertices {} ({} atoms) and {} ({} atoms) must be of"
