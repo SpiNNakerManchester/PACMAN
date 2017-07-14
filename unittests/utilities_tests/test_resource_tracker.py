@@ -6,6 +6,13 @@ from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.resources import PreAllocatedResourceContainer
 from pacman.model.resources import CoreResource
 from pacman.model.resources import SpecificCoreResource
+from spinn_machine.machine import Machine
+from spinn_machine.chip import Chip
+from spinn_machine.router import Router
+from spinn_machine.sdram import SDRAM
+from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.exceptions import PacmanValueError
 
 
 class TestResourceTracker(unittest.TestCase):
@@ -39,6 +46,18 @@ class TestResourceTracker(unittest.TestCase):
 
         # Should be 13 cores as one now allocated
         self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 13)
+
+    def test_allocate_resources_when_chip_used(self):
+        router = Router([])
+        sdram = SDRAM()
+        empty_chip = Chip(
+            0, 0, [], router, sdram, 0, 0, "127.0.0.1",
+            virtual=False, tag_ids=[1])
+        machine = Machine([empty_chip], 0, 0)
+        resource_tracker = ResourceTracker(machine)
+        with self.assertRaises(PacmanValueError):
+            resource_tracker.allocate_resources(
+                ResourceContainer(sdram=SDRAMResource(1024)))
 
 
 if __name__ == '__main__':
