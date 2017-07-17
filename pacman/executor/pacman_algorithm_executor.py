@@ -10,6 +10,7 @@ from pacman.utilities import file_format_converters
 
 # general imports
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +51,10 @@ class PACMANAlgorithmExecutor(object):
         "_inject_inputs",
 
         # True if direct injection is to be done
-        "_do_direct_injection"
+        "_do_direct_injection",
+
+        # If required a file path to append provenace data to
+        "_provenance_path"
     ]
 
     def __init__(
@@ -58,7 +62,8 @@ class PACMANAlgorithmExecutor(object):
             xml_paths=None, packages=None, do_timings=True,
             print_timings=False, do_immediate_injection=True,
             do_post_run_injection=False, inject_inputs=True,
-            do_direct_injection=True, use_unscanned_annotated_algorithms=True):
+            do_direct_injection=True, use_unscanned_annotated_algorithms=True,
+            provenance_path=None):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -96,6 +101,9 @@ class PACMANAlgorithmExecutor(object):
         :param use_unscanned_annotated_algorithms:\
             True if algorithms that have been detected outside of the packages\
             argument specified above should be used
+        :param provenance_path:
+            Path to file to append full provenance data to
+            If None no provenance is written
         """
 
         # algorithm timing information
@@ -124,6 +132,8 @@ class PACMANAlgorithmExecutor(object):
             algorithms, optional_algorithms, xml_paths,
             packages, inputs, required_outputs,
             use_unscanned_annotated_algorithms)
+
+        self._provenance_path = provenance_path
 
     def _set_up_pacman_algorithm_listings(
             self, algorithms, optional_algorithms, xml_paths, packages, inputs,
@@ -430,6 +440,9 @@ class PACMANAlgorithmExecutor(object):
             # Execute the algorithm
             results = algorithm.call(self._internal_type_mapping)
 
+            if self._provenance_path:
+                self._report_full_provenance(algorithm, results)
+
             # handle_prov_data
             if self._do_timing:
                 self._update_timings(timer, algorithm)
@@ -478,3 +491,69 @@ class PACMANAlgorithmExecutor(object):
             logger.info("Time {} taken by {}".format(
                 str(time_taken), algorithm.algorithm_id))
         self._algorithm_timings.append((algorithm.algorithm_id, time_taken))
+
+    def _report_full_provenance(self, algorithm, results):
+        try:
+            with open(self._provenance_path, "a") as provenance_file:
+                algorithm.write_provenance_header(provenance_file)
+                if len(algorithm.required_inputs) > 0:
+                    provenance_file.write("\trequired_inputs:\n")
+                    self._report_inputs(provenance_file,
+                                        algorithm.required_inputs)
+                if len(algorithm.optional_inputs) > 0:
+                    provenance_file.write("\toptional_inputs:\n")
+                    self._report_inputs(provenance_file,
+                                        algorithm.optional_inputs)
+                if len(algorithm.outputs) > 0:
+                    provenance_file.write("\toutputs:\n")
+                    for output in algorithm.outputs:
+                        variable = results[output.output_type]
+                        the_type = self._get_type(variable)
+                        provenance_file.write(
+                            "\t\t{}:{}\n".format(output.output_type, the_type))
+                provenance_file.write("\n")
+        except Exception:
+            logger.error("Exception when attempting to write provenance")
+            traceback.print_exc()
+
+    def _report_inputs(self, provenance_file, inputs):
+        for input in inputs:
+            name = input.name
+            for param_type in input.param_types:
+                if param_type in self._internal_type_mapping:
+                    variable = self._internal_type_mapping[param_type]
+                    the_type = self._get_type(variable)
+                    provenance_file.write(
+                        "\t\t{}   {}:{}\n".format(name, param_type, the_type))
+                    break
+            else:
+                if len(input.param_types) == 1:
+                    provenance_file.write(
+                        "\t\t{}   None of {} provided\n"
+                        "".format(name, input.param_types))
+                else:
+                    provenance_file.write(
+                        "\t\t{}   {} not provided\n"
+                        "".format(name, input.param_types[0]))
+
+    def _get_type(self, variable):
+        if variable is None:
+            return "None"
+        the_type = type(variable)
+        if the_type in [bool, float, int, str]:
+            return variable
+        if the_type == set:
+            if len(variable) == 0:
+                return "Empty set"
+            the_type = "set("
+            for item in variable:
+                the_type += "{},".format(self._get_type(item))
+            the_type += ")"
+            return the_type
+        elif the_type == list:
+            if len(variable) == 0:
+                return "Empty list"
+            first_type = type(variable[0])
+            if all(isinstance(n, first_type) for n in variable):
+                return "list({}) :len{}".format(first_type, len(variable))
+        return the_type
