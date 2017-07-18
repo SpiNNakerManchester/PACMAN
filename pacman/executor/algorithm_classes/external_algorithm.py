@@ -70,3 +70,8 @@ class ExternalAlgorithm(AbstractAlgorithm):
                 self._algorithm_id, self._required_inputs,
                 self._optional_inputs, self._outputs,
                 self._command_line_arguments))
+
+    @overrides(AbstractAlgorithm.write_provenance_header)
+    def write_provenance_header(self, provenance_file):
+        provenance_file.write("{}\n".format(self._algorithm_id))
+        provenance_file.write("\t{}\n".format(self._command_line_arguments))
