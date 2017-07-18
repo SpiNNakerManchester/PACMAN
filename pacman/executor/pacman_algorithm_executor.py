@@ -54,8 +54,7 @@ class PACMANAlgorithmExecutor(object):
         "_do_direct_injection",
 
         # the flag in the provenance area.
-        "_provenance_name"
-        "_do_direct_injection",
+        "_provenance_name",
 
         # If required a file path to append provenace data to
         "_provenance_path"
@@ -67,9 +66,7 @@ class PACMANAlgorithmExecutor(object):
             print_timings=False, do_immediate_injection=True,
             do_post_run_injection=False, inject_inputs=True,
             do_direct_injection=True, use_unscanned_annotated_algorithms=True,
-            provenance_path=None):
-            do_direct_injection=True, use_unscanned_annotated_algorithms=True,
-            provenance_name=None):
+            provenance_path=None, provenance_name=None):
         """
 
         :param algorithms: A list of algorithms that must all be run
