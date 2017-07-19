@@ -60,72 +60,76 @@ class HilbertPlacer(object):
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
 
-    def _generate_hilbert(self, machine, level, angle=1, chip_x=None,
-                          chip_y=None, chip_dx=1, chip_dy=0):
-        """Generator of points along a 2D Hilbert curve.
-
-        This implements the L-system as described on
-        `http://en.wikipedia.org/wiki/Hilbert_curve`.
-
-        Parameters
-        ----------
-        level : int
-            Number of levels of recursion to use in generating the curve.
-            The resulting curve will be `(2**level)-1` wide/tall.
-        angle : int
-            **For internal use only.** `1` if this is the 'positive'
-            expansion of the grammar and `-1` for the 'negative' expansion.
-        """
-
-        level = self._hilbert_chip_order(machine)
-
-        # yield first position
-        if chip_x is None or chip_y is None:
-            place_chip = machine.boot_chip
-            yield (chip_x, chip_y)
-
-        if level <= 0:
-            return
-
-        # Turn left
-        chip_dx, chip_dy = chip_dy * -angle, chip_dx * angle
-
-        # Recurse negative
-        for chip_x, chip_y in (level - 1, angle, chip_x, chip_y):
-            yield (chip_x, chip_y)
-
-        # Move forward
-        chip_x, chip_y = chip_x + chip_dx, chip_y + chip_dy
-        yield (chip_x, chip_y)
-
-        # Turn right
-        chip_dx,chip_dy = chip_dy * angle,chip_dx * -angle
-
-        # Recurse positive
-        for chip_x,chip_y in (level - 1, angle, chip_x, chip_y):
-            yield (chip_x,chip_y)
-
-        # Move forward
-        chip_x,chip_y =chip_x +chip_dx,chip_y +chip_dy
-        yield (chip_x,chip_y)
-
-        # Recurse positive
-        for chip_x, chip_y in (level - 1, angle, chip_x, chip_y):
-            yield (chip_x, chip_y)
-
-        # Turn right
-        chip_dx, chip_dy = chip_dy * angle, chip_dx * -angle
-
-        # Move forward
-        chip_x, chip_y = chip_x + chip_dx, chip_y + chip_dy
-        yield (chip_x, chip_y)
-
-        # Recurse negative
-        for chip_x, chip_y in (level - 1, -angle, chip_x, chip_y):
-            yield (chip_x, chip_y)
-
-        # Turn left
-        chip_dx, chip_dy = chip_dy * -angle, chip_dx * angle
+    # def _generate_hilbert(self, machine):
+    #     """Generator of points along a 2D Hilbert curve.
+    #
+    #     This implements the L-system as described on
+    #     `http://en.wikipedia.org/wiki/Hilbert_curve`.
+    #
+    #     Parameters
+    #     ----------
+    #     level : int
+    #         Number of levels of recursion to use in generating the curve.
+    #         The resulting curve will be `(2**level)-1` wide/tall.
+    #     angle : int
+    #         **For internal use only.** `1` if this is the 'positive'
+    #         expansion of the grammar and `-1` for the 'negative' expansion.
+    #     """
+    #
+    #     level = self._hilbert_chip_order(machine)
+    #     angle = 1
+    #     chip_x = None
+    #     chip_y = None
+    #     chip_dx = 1
+    #     chip_dy = 0
+    #
+    #     # yield first position
+    #     if chip_x is None or chip_y is None:
+    #         place_chip = machine.boot_chip
+    #         yield (chip_x, chip_y)
+    #
+    #     if level <= 0:
+    #         return
+    #
+    #     # Turn left
+    #     chip_dx, chip_dy = chip_dy * -angle, chip_dx * angle
+    #
+    #     # Recurse negative
+    #     for chip_x, chip_y in [level - 1, angle, chip_x, chip_y]:
+    #         yield (chip_x, chip_y)
+    #
+    #     # Move forward
+    #     chip_x, chip_y = chip_x + chip_dx, chip_y + chip_dy
+    #     yield (chip_x, chip_y)
+    #
+    #     # Turn right
+    #     chip_dx,chip_dy = chip_dy * angle,chip_dx * -angle
+    #
+    #     # Recurse positive
+    #     for chip_x,chip_y in [level - 1, angle, chip_x, chip_y]:
+    #         yield (chip_x,chip_y)
+    #
+    #     # Move forward
+    #     chip_x,chip_y =chip_x +chip_dx,chip_y +chip_dy
+    #     yield (chip_x,chip_y)
+    #
+    #     # Recurse positive
+    #     for chip_x, chip_y in [level - 1, angle, chip_x, chip_y]:
+    #         yield (chip_x, chip_y)
+    #
+    #     # Turn right
+    #     chip_dx, chip_dy = chip_dy * angle, chip_dx * -angle
+    #
+    #     # Move forward
+    #     chip_x, chip_y = chip_x + chip_dx, chip_y + chip_dy
+    #     yield (chip_x, chip_y)
+    #
+    #     # Recurse negative
+    #     for chip_x, chip_y in [level - 1, -angle, chip_x, chip_y]:
+    #         yield (chip_x, chip_y)
+    #
+    #     # Turn left
+    #     chip_dx, chip_dy = chip_dy * -angle, chip_dx * angle
 
     def _hilbert_chip_order(self, machine):
         """A generator which iterates over a set of chips in a machine in
