@@ -150,10 +150,11 @@ class ResourceTracker(object):
         self._chips_available = OrderedSet()
         if chips is None:
             for x, y in machine.chip_coordinates:
-                print (x, y)
+                print "hard coded chips {}, {}".format(x, y)
                 self._chips_available.add((x, y))
         else:
             for x, y in chips:
+                print "given chips {}, {}".format(x, y)
                 self._chips_available.add((x, y))
 
     def _convert_pre_allocated_resources(self, pre_allocated_resources):
