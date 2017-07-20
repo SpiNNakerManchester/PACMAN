@@ -8,6 +8,8 @@ from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
+from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
+
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -18,17 +20,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-# An internal (mutable) state object (note: used in place of a
-# closure with nonlocal variables for Python 2 support).
-#class _HilbertState(object):
-#    def __init__(self, x=0, y=0, dx=1, dy=0):
-#        self.x, self.y, self.dx, self.dy = x, y, dx, dy
-
 class HilbertPlacer(object):
 
     def __call__(self, machine_graph, machine):
-        ResourceTracker.check_constraints(machine_graph.vertices)
+        self._check_constraints(machine_graph.vertices)
 
         placements = Placements()
         vertices = \
@@ -39,7 +34,7 @@ class HilbertPlacer(object):
         progress = ProgressBar(machine_graph.n_vertices,
                                "Placing graph vertices")
         resource_tracker = ResourceTracker(machine,
-                               self._generate_hilbert(machine))
+                                self._generate_hilbert_chips(machine))
         vertices_on_same_chip = \
             placer_algorithm_utilities.get_same_chip_vertex_groups(
                     machine_graph.vertices)
@@ -60,78 +55,74 @@ class HilbertPlacer(object):
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
 
-    # def _generate_hilbert(self, machine):
-    #     """Generator of points along a 2D Hilbert curve.
-    #
-    #     This implements the L-system as described on
-    #     `http://en.wikipedia.org/wiki/Hilbert_curve`.
-    #
-    #     Parameters
-    #     ----------
-    #     level : int
-    #         Number of levels of recursion to use in generating the curve.
-    #         The resulting curve will be `(2**level)-1` wide/tall.
-    #     angle : int
-    #         **For internal use only.** `1` if this is the 'positive'
-    #         expansion of the grammar and `-1` for the 'negative' expansion.
-    #     """
-    #
-    #     level = self._hilbert_chip_order(machine)
-    #     angle = 1
-    #     chip_x = None
-    #     chip_y = None
-    #     chip_dx = 1
-    #     chip_dy = 0
-    #
-    #     # yield first position
-    #     if chip_x is None or chip_y is None:
-    #         place_chip = machine.boot_chip
-    #         yield (chip_x, chip_y)
-    #
-    #     if level <= 0:
-    #         return
-    #
-    #     # Turn left
-    #     chip_dx, chip_dy = chip_dy * -angle, chip_dx * angle
-    #
-    #     # Recurse negative
-    #     for chip_x, chip_y in [level - 1, angle, chip_x, chip_y]:
-    #         yield (chip_x, chip_y)
-    #
-    #     # Move forward
-    #     chip_x, chip_y = chip_x + chip_dx, chip_y + chip_dy
-    #     yield (chip_x, chip_y)
-    #
-    #     # Turn right
-    #     chip_dx,chip_dy = chip_dy * angle,chip_dx * -angle
-    #
-    #     # Recurse positive
-    #     for chip_x,chip_y in [level - 1, angle, chip_x, chip_y]:
-    #         yield (chip_x,chip_y)
-    #
-    #     # Move forward
-    #     chip_x,chip_y =chip_x +chip_dx,chip_y +chip_dy
-    #     yield (chip_x,chip_y)
-    #
-    #     # Recurse positive
-    #     for chip_x, chip_y in [level - 1, angle, chip_x, chip_y]:
-    #         yield (chip_x, chip_y)
-    #
-    #     # Turn right
-    #     chip_dx, chip_dy = chip_dy * angle, chip_dx * -angle
-    #
-    #     # Move forward
-    #     chip_x, chip_y = chip_x + chip_dx, chip_y + chip_dy
-    #     yield (chip_x, chip_y)
-    #
-    #     # Recurse negative
-    #     for chip_x, chip_y in [level - 1, -angle, chip_x, chip_y]:
-    #         yield (chip_x, chip_y)
-    #
-    #     # Turn left
-    #     chip_dx, chip_dy = chip_dy * -angle, chip_dx * angle
+    def _hilbert_curve(self, level, angle=1, s=None):
+        """Generator of points along a 2D Hilbert curve.
 
-    def _hilbert_chip_order(self, machine):
+        This implements the L-system as described on
+        `http://en.wikipedia.org/wiki/Hilbert_curve`.
+
+        Parameters
+        ----------
+        level : int
+            Number of levels of recursion to use in generating the curve. The
+            resulting curve will be `(2**level)-1` wide/tall.
+        angle : int
+            **For internal use only.** `1` if this is the 'positive' expansion of
+            the grammar and `-1` for the 'negative' expansion.
+        s : HilbertState
+            **For internal use only.** The current state of the system.
+        """
+
+        # Create state object first time we're called while also yielding first
+        # position
+        if s is None:
+            s = HilbertState()
+            yield s.x, s.y
+
+        if level <= 0:
+            return
+
+        # Turn left
+        s.dx, s.dy = s.dy * -angle, s.dx * angle
+
+        # Recurse negative
+        for s.x, s.y in self._hilbert_curve(level - 1, -angle, s):
+            yield s.x, s.y
+
+        # Move forward
+        s.x, s.y = s.x + s.dx, s.y + s.dy
+        yield s.x, s.y
+
+        # Turn right
+        s.dx, s.dy = s.dy * angle, s.dx * -angle
+
+        # Recurse positive
+        for s.x, s.y in self._hilbert_curve(level - 1, angle, s):
+            yield s.x, s.y
+
+        # Move forward
+        s.x, s.y = s.x + s.dx, s.y + s.dy
+        yield s.x, s.y
+
+        # Recurse positive
+        for s.x, s.y in self._hilbert_curve(level - 1, angle, s):
+            yield s.x, s.y
+
+        # Turn right
+        s.dx, s.dy = s.dy * angle, s.dx * -angle
+
+        # Move forward
+        s.x, s.y = s.x + s.dx, s.y + s.dy
+        yield s.x, s.y
+
+        # Recurse negative
+        for s.x, s.y in self._hilbert_curve(level - 1, -angle, s):
+            yield s.x, s.y
+
+        # Turn left
+        s.dx, s.dy = s.dy * -angle, s.dx * angle
+
+    def _generate_hilbert_chips(self, machine):
         """A generator which iterates over a set of chips in a machine in
         a hilbert path.
 
@@ -140,16 +131,20 @@ class HilbertPlacer(object):
         max_dimen = max(machine.max_chip_x, machine.max_chip_y)
         hilbert_levels = int(ceil(log(max_dimen, 2.0))) if max_dimen >= 1 \
             else 0
-        return hilbert_levels
+        return self._hilbert_curve(hilbert_levels)
 
     def _place_vertex(self, vertex, resource_tracker, machine, placements,
             vertices_on_same_chip):
 
         vertices = vertices_on_same_chip[vertex]
-        chips = self._generate_hilbert(machine)
+
         # Check for placement constraints
-        hilbert_constraints =  locate_constraints_of_type(
+        hilbert_constraints = locate_constraints_of_type(
             vertices, SameChipAsConstraint)
+        for constraint in hilbert_constraints:
+            if isinstance(constraint):
+                raise PacmanPlaceException("Non-matching constraints")
+        chips = self._generate_hilbert_chips(machine)
 
         if len(vertices) > 1:
             assigned_values = \
