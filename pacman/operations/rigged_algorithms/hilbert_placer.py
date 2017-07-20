@@ -1,16 +1,12 @@
-"""A simple placing algorithm using the Hilbert space-filing curve,
+"""A simple placing algorithm using the Hilbert space-filling curve,
 translated from RIG."""
 
 # pacman imports
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements import Placement, Placements
-from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
-from pacman.exceptions import PacmanPlaceException
 from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
-from pacman.model.constraints.placer_constraints.chip_and_core_constraint \
-    import ChipAndCoreConstraint
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -24,6 +20,8 @@ logger = logging.getLogger(__name__)
 class HilbertPlacer(object):
 
     def __call__(self, machine_graph, machine):
+
+        # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 
         placements = Placements()
@@ -50,7 +48,7 @@ class HilbertPlacer(object):
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
-        placement_constraints = {ChipAndCoreConstraint, SameChipAsConstraint}
+        placement_constraints = {SameChipAsConstraint}
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
         ResourceTracker.check_constraints(
@@ -140,13 +138,6 @@ class HilbertPlacer(object):
             vertices_on_same_chip):
 
         vertices = vertices_on_same_chip[vertex]
-
-        # Check for placement constraints
-#        hilbert_constraints = locate_constraints_of_type(
-#            vertices, SameChipAsConstraint)
-#        for constraint in hilbert_constraints:
-#            if isinstance(constraint, ):
-#                raise PacmanPlaceException("Non-matching constraints")
         chips = self._generate_hilbert_chips(machine)
 
         if len(vertices) > 1:
