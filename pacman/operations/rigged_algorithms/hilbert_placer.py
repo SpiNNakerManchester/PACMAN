@@ -10,12 +10,13 @@ from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
 
 from spinn_utilities.progress_bar import ProgressBar
 
-#general imports
+# general imports
 from math import log, ceil
 import logging
 
 
 logger = logging.getLogger(__name__)
+
 
 class HilbertPlacer(object):
 
@@ -33,7 +34,8 @@ class HilbertPlacer(object):
         progress = ProgressBar(machine_graph.n_vertices,
                                "Placing graph vertices")
         resource_tracker = ResourceTracker(machine,
-                                self._generate_hilbert_chips(machine))
+                                           self._generate_hilbert_chips(
+                                               machine))
         vertices_on_same_chip = \
             placer_algorithm_utilities.get_same_chip_vertex_groups(
                     machine_graph.vertices)
@@ -66,8 +68,8 @@ class HilbertPlacer(object):
             Number of levels of recursion to use in generating the curve. The
             resulting curve will be `(2**level)-1` wide/tall.
         angle : int
-            **For internal use only.** `1` if this is the 'positive' expansion of
-            the grammar and `-1` for the 'negative' expansion.
+            **For internal use only.** `1` if this is the 'positive'
+            expansion of the grammar and `-1` for the 'negative' expansion.
         s : HilbertState
             **For internal use only.** The current state of the system.
         """
@@ -135,7 +137,7 @@ class HilbertPlacer(object):
                 yield x, y
 
     def _place_vertex(self, vertex, resource_tracker, machine, placements,
-            vertices_on_same_chip):
+                      vertices_on_same_chip):
 
         vertices = vertices_on_same_chip[vertex]
         chips = self._generate_hilbert_chips(machine)
@@ -156,4 +158,3 @@ class HilbertPlacer(object):
             placements.add_placement(placement)
 
         return vertices
-
