@@ -140,7 +140,7 @@
         </outputs>
     </algorithm>
     <algorithm name="HilbertPlacer">
-        <python_module>pacman.operations.rigged_algorithms.rig_hilbert_placer</python_module>
+        <python_module>pacman.operations.rigged_algorithms.hilbert_placer</python_module>
         <python_class>HilbertPlacer</python_class>
         <input_definitions>
             <parameter>

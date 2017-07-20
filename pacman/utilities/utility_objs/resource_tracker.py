@@ -150,7 +150,6 @@ class ResourceTracker(object):
         self._chips_available = OrderedSet()
         if chips is None:
             for x, y in machine.chip_coordinates:
-                print "hard coded chips {}, {}".format(x, y)
                 self._chips_available.add((x, y))
         else:
             for x, y in chips:

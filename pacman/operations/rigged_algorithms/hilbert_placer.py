@@ -9,7 +9,8 @@ from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
-
+from pacman.model.constraints.placer_constraints.chip_and_core_constraint \
+    import ChipAndCoreConstraint
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -49,7 +50,7 @@ class HilbertPlacer(object):
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
-        placement_constraints = {SameChipAsConstraint}
+        placement_constraints = {ChipAndCoreConstraint, SameChipAsConstraint}
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
         ResourceTracker.check_constraints(
@@ -131,7 +132,9 @@ class HilbertPlacer(object):
         max_dimen = max(machine.max_chip_x, machine.max_chip_y)
         hilbert_levels = int(ceil(log(max_dimen, 2.0))) if max_dimen >= 1 \
             else 0
-        return self._hilbert_curve(hilbert_levels)
+        for x, y in self._hilbert_curve(hilbert_levels):
+            if machine.is_chip_at(x, y):
+                yield x, y
 
     def _place_vertex(self, vertex, resource_tracker, machine, placements,
             vertices_on_same_chip):
@@ -139,11 +142,11 @@ class HilbertPlacer(object):
         vertices = vertices_on_same_chip[vertex]
 
         # Check for placement constraints
-        hilbert_constraints = locate_constraints_of_type(
-            vertices, SameChipAsConstraint)
-        for constraint in hilbert_constraints:
-            if isinstance(constraint):
-                raise PacmanPlaceException("Non-matching constraints")
+#        hilbert_constraints = locate_constraints_of_type(
+#            vertices, SameChipAsConstraint)
+#        for constraint in hilbert_constraints:
+#            if isinstance(constraint, ):
+#                raise PacmanPlaceException("Non-matching constraints")
         chips = self._generate_hilbert_chips(machine)
 
         if len(vertices) > 1:
