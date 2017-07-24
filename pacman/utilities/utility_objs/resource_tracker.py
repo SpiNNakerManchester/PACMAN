@@ -296,7 +296,8 @@ class ResourceTracker(object):
             (((x, y) not in self._core_tracker and
               self._machine.get_chip_at(x, y).n_user_processors >
                 pre_allocated_cores) or
-             len(self._core_tracker[x, y]) > pre_allocated_cores)
+             ((x, y) in self._core_tracker and
+              len(self._core_tracker[x, y]) > pre_allocated_cores))
         )
 
     def _get_usable_chips(
