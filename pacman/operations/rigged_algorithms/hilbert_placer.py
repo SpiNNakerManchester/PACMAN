@@ -45,7 +45,8 @@ class HilbertPlacer(object):
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
-                    vertex, resource_tracker, machine, placements,
+                    vertex, resource_tracker, machine,
+                    placements,
                     # placements_copy,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)

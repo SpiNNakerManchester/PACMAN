@@ -32,7 +32,6 @@ class IsomorphicChecker(object):
         print chips
         return correct
 
-
     def __call__(self, report_folder, placements,
                                      placements_copy):
         file_name = os.path.join(report_folder, "placement_isomorph.rpt")
@@ -45,5 +44,7 @@ class IsomorphicChecker(object):
         if self.check(placements, placements_copy):
             f.write("The two algorithms called have the same set of "
                     "placements.")
+        else:
+            f.write("The two algorithms have different placements data.")
         f.flush()
         f.close()
