@@ -46,7 +46,7 @@ class PlacementsCopy(object):
     def add_placements(self, placements):
         """ Add some placements
 
-        :param placements: The placements to add
+        :param placements: placements to add
         :type placements:\
             iterable of :py:class:`pacman.model.placements.placement.Placement`
         """
@@ -129,7 +129,7 @@ class PlacementsCopy(object):
         return (x, y, p) in self._placements
 
     @property
-    def placements(self):
+    def placements_copy(self):
         """ All of the placements
 
         :return: iterable of placements
@@ -149,7 +149,7 @@ class PlacementsCopy(object):
         """ An iterator for the placements object within
 
         """
-        return iter(self.placements)
+        return iter(self.placements_copy)
 
     def __len__(self):
         return len(self._placements)

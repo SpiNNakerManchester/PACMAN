@@ -4,7 +4,7 @@ translated from RIG."""
 # pacman imports
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.model.placements import Placement, PlacementsCopy
+from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
 
@@ -25,7 +25,9 @@ class HilbertPlacer(object):
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 
-        placements = PlacementsCopy()
+        # in order to test isomorphism:
+        # placements_copy = PlacementsCopy()
+        placements = Placements()
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
@@ -44,8 +46,10 @@ class HilbertPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine, placements,
+                    # placements_copy,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
+        # return placements_copy
         return placements
 
     def _check_constraints(
