@@ -1,7 +1,6 @@
 """A short algorithm to check if there is an isomorphism of the placement of
 vertices by two separate placement algorithms. One of the algorithms must
-output to memory placements_copy (found in
-pacman.model.placements.placements_copy) and
+output to memory placements_copy and
 <param_type>MemoryPlacements2</param_type> in the algorithms_metadata.xml."""
 
 import os

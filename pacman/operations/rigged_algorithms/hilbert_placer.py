@@ -26,7 +26,7 @@ class HilbertPlacer(object):
         self._check_constraints(machine_graph.vertices)
 
         # in order to test isomorphism:
-        # placements_copy = PlacementsCopy()
+        # placements_copy = Placements()
         placements = Placements()
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
@@ -46,8 +46,8 @@ class HilbertPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine,
-                    placements,
                     # placements_copy,
+                    placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
         # return placements_copy

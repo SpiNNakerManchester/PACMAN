@@ -2,7 +2,7 @@ from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.model.placements import Placement, PlacementsCopy
+from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 
 # general imports
@@ -32,7 +32,7 @@ class BasicPlacerTest(object):
         # check that the algorithm can handle the constraints
         ResourceTracker.check_constraints(machine_graph.vertices)
 
-        placements_copy = PlacementsCopy()
+        placements_copy = Placements()
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
