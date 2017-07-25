@@ -1,7 +1,8 @@
 """A short algorithm to check if there is an isomorphism of the placement of
-vertices by two separate placement algorithms. One of the algorithms must output
-to memory placements_copy (found in pacman.model.placements.placements_copy)
-and <param_type>MemoryPlacements2</param_type> in the algorithms_metadata.xml."""
+vertices by two separate placement algorithms. One of the algorithms must
+output to memory placements_copy (found in
+pacman.model.placements.placements_copy) and
+<param_type>MemoryPlacements2</param_type> in the algorithms_metadata.xml."""
 
 import os
 import logging
@@ -33,14 +34,14 @@ class IsomorphicChecker(object):
         return correct
 
     def __call__(self, report_folder, placements,
-                                     placements_copy):
+                 placements_copy):
         file_name = os.path.join(report_folder, "placement_isomorph.rpt")
         f = None
         try:
             f = open(file_name, "w")
         except IOError:
-            logging.getLogger().error("Generate_isomorph_report: Can't open file "
-                                      "{} for writing.".format(file_name))
+            logging.getLogger().error("Generate_isomorph_report: Can't open "
+                                      "file {} for writing.".format(file_name))
         if self.check(placements, placements_copy):
             f.write("The two algorithms called have the same set of "
                     "placements.")
