@@ -160,9 +160,9 @@
             <param_type>MemoryPlacements</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="BasicPlacerTest">
-        <python_module>pacman.operations.rigged_algorithms.basic_test</python_module>
-        <python_class>BasicPlacerTest</python_class>
+    <algorithm name="RandomPlacer">
+        <python_module>pacman.operations.rigged_algorithms.random_placer</python_module>
+        <python_class>RandomPlacer</python_class>
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -178,7 +178,7 @@
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements2</param_type>
+            <param_type>MemoryPlacements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="IsomorphicChecker">

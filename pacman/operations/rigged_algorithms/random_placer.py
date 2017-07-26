@@ -6,6 +6,7 @@ from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from spinn_utilities.progress_bar import ProgressBar
 
 import random as default_random
+import itertools
 
 
 class RandomPlacer(object):
@@ -49,34 +50,29 @@ class RandomPlacer(object):
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
 
-    @staticmethod
-    def _generate_random_chips(
-            machine, resource_tracker=None, random=default_random):
+    def _generate_random_chips(self, machine, random=default_random):
         """ Generates the list of chips in a random order, with the option \
          to provide a starting point.
 
-        :param machine: the spinnaker machine object
-        :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.py`
-        :param resource_tracker: object which tracks which resources of \
-            the machine have been used
-        :type resource_tracker: None or :py:class:`ResourceTracker`
-        :param chips: a set of
-        :return: list of chips.
+        get max x and y dimensions of board
+        check if that chip exists
+        check if it is full
+        attempt to place vertex on that chip
         """
 
+        chips = set()
 
-        location = []
+        for x in range(0, machine.max_chip_x):
+            for y in range(0, machine.max_chip_y):
+                chips.add((x, y))
 
-        for (x, y) in machine.chips():
-            if (resource_tracker is None or
-                    resource_tracker.is_chip_available(x, y)):
-                location.append(random.sample(machine.chips, 1))
-
+        yield random.sample(chips, 1)[0]
 
     def _place_vertex(self, vertex, resource_tracker, machine,
-                      placements, random=default_random):
+                      placements, location):
 
         vertices = location[vertex]
+        #random x and y value within the maximum of the machine
         chips = self._generate_random_chips(machine)
 
         if len(vertices) > 1:
@@ -86,14 +82,12 @@ class RandomPlacer(object):
                     for vert in vertices], chips)
             for (x, y, p, _, _), vert in zip(assigned_values, vertices):
                 if not placements.is_processor_occupied(x, y, p):
-                    placement = random.sample(Placement(vert, x, y, p),1)
+                    placement = Placement(vert, x, y, p)
                     placements.add_placement(placement)
         else:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 vertex.resources_required, vertex.constraints, chips)
-            placement = random.sample(Placement(vertex, x, y, p))
+            placement = Placement(vertex, x, y, p)
             placements.add_placement(placement)
 
         return vertices
-
-
