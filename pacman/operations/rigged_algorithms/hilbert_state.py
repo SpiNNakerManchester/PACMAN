@@ -10,5 +10,7 @@ class HilbertState(object):
             :type ychange: int
     """
     def __init__(self, xpos=0, ypos=0, xchange=1, ychange=0):
-        self.x_pos, self.y_pos, self.change_x, self.change_y = \
-            xpos, ypos, xchange, ychange
+        self.x_pos = xpos
+        self.y_pos = ypos
+        self.change_x = xchange
+        self.change_y = ychange
