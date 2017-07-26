@@ -58,8 +58,6 @@ class IsomorphicChecker(object):
 
         # create sets of the vertices on each processor and compare them
         for (x, y) in chips:
-
-            # 18 cores per chip
             for p in range(0, 18):
                 if placements.is_processor_occupied(x, y, p):
                     chip_vertices.add(placements.get_vertex_on_processor(
@@ -70,6 +68,5 @@ class IsomorphicChecker(object):
         if chip_vertices != chip_vertices_copy:
             correct = False
 
-        # unnecessary to print, simply for visual check
         print chips
         return correct
