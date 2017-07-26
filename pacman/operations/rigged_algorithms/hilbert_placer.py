@@ -112,8 +112,8 @@ class HilbertPlacer(object):
         :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
         :param placements: Placements of vertices on the machine
         :type :py:class:`pacman.model.placements.placements.Placements`
-        :param vertices_on_same_chip: a dictionary where keys are vertices and \
-            values are a list of vertices
+        :param vertices_on_same_chip: a dictionary where keys are vertices \
+            and values are a list of vertices
         :type vertices_on_same_chip: dict
         :return vertices: an iterable of vertices to be placed
         :rtype vertices: list
@@ -221,3 +221,4 @@ class HilbertPlacer(object):
         # Turn left
         state.change_x = state.change_y * -angle
         state.change_y = state.change_x * angle
+
