@@ -221,4 +221,3 @@ class HilbertPlacer(object):
         # Turn left
         state.change_x = state.change_y * -angle
         state.change_y = state.change_x * angle
-
