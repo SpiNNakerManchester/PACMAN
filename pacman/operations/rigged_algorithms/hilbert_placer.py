@@ -85,7 +85,7 @@ class HilbertPlacer(object):
 
         # Turn left
         state.change_x, state.change_y = state.change_y * -angle, \
-                                         state.change_x * angle
+            state.change_x * angle
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(level - 1,
@@ -94,12 +94,12 @@ class HilbertPlacer(object):
 
         # Move forward
         state.x_pos, state.y_pos = state.x_pos + state.change_x, \
-                                   state.y_pos + state.change_y
+            state.y_pos + state.change_y
         yield state.x_pos, state.y_pos
 
         # Turn right
         state.change_x, state.change_y = state.change_y * angle, \
-                                         state.change_x * -angle
+            state.change_x * -angle
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(level - 1,
@@ -108,7 +108,7 @@ class HilbertPlacer(object):
 
         # Move forward
         state.x_pos, state.y_pos = state.x_pos + state.change_x, \
-                                   state.y_pos + state.change_y
+            state.y_pos + state.change_y
         yield state.x_pos, state.y_pos
 
         # Recurse positive
@@ -118,11 +118,11 @@ class HilbertPlacer(object):
 
         # Turn right
         state.change_x, state.change_y = state.change_y * angle, \
-                                         state.change_x * -angle
+            state.change_x * -angle
 
         # Move forward
         state.x_pos, state.y_pos = state.x_pos + state.change_x, \
-                                   state.y_pos + state.change_y
+            state.y_pos + state.change_y
         yield state.x_pos, state.y_pos
 
         # Recurse negative
@@ -132,7 +132,7 @@ class HilbertPlacer(object):
 
         # Turn left
         state.change_x, state.change_y = state.change_y * -angle, \
-                                         state.change_x * angle
+            state.change_x * angle
 
     def _generate_hilbert_chips(self, machine):
         """A generator which iterates over a set of chips in a machine in
