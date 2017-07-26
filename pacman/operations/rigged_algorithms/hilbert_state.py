@@ -1,4 +1,14 @@
-# A mutable state object for the hilbert placer algorithm
 class HilbertState(object):
-    def __init__(self, x=0, y=0, dx=1, dy=0):
-        self.x, self.y, self.dx, self.dy = x, y, dx, dy
+    """ A mutable state object for the hilbert placer algorithm.
+            :param xpos: the x coordinate on the generated curve
+            :param ypos: the y coordinate on the generated curve
+            :param xchange: the change in x coordinate on the generated curve
+            :param ychange: the change in y coordinate on the generated curve
+            :type xpos: int
+            :type ypos: int
+            :type xchange: int
+            :type ychange: int
+    """
+    def __init__(self, xpos=0, ypos=0, xchange=1, ychange=0):
+        self.x_pos, self.y_pos, self.change_x, self.change_y = \
+            xpos, ypos, xchange, ychange

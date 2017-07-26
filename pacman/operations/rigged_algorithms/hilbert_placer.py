@@ -12,10 +12,6 @@ from spinn_utilities.progress_bar import ProgressBar
 
 # general imports
 from math import log, ceil
-import logging
-
-
-logger = logging.getLogger(__name__)
 
 
 class HilbertPlacer(object):
@@ -61,72 +57,82 @@ class HilbertPlacer(object):
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
 
-    def _hilbert_curve(self, level, angle=1, s=None):
+    def _hilbert_curve(self, level, angle=1, state=None):
         """Generator of points along a 2D Hilbert curve.
 
         This implements the L-system as described on
         `http://en.wikipedia.org/wiki/Hilbert_curve`.
 
-        Parameters
-        ----------
-        level : int
-            Number of levels of recursion to use in generating the curve. The
-            resulting curve will be `(2**level)-1` wide/tall.
-        angle : int
-            **For internal use only.** `1` if this is the 'positive'
+        :param level: Number of levels of recursion to use in generating
+            the curve. The resulting curve will be `(2**level)-1` wide/tall.
+        :type level: int
+        :param angle: `1` if this is the 'positive'
             expansion of the grammar and `-1` for the 'negative' expansion.
-        s : HilbertState
-            **For internal use only.** The current state of the system.
+        :type angle: int
+        :param state: The current state of the system in a Hilbert curve.
+        :type state: \
+            :py:class:`pacman.operations.rigged_algorithms.hilbert_state.py`
         """
 
         # Create state object first time we're called while also yielding first
         # position
-        if s is None:
-            s = HilbertState()
-            yield s.x, s.y
+        if state is None:
+            state = HilbertState()
+            yield state.x_pos, state.y_pos
 
         if level <= 0:
             return
 
         # Turn left
-        s.dx, s.dy = s.dy * -angle, s.dx * angle
+        state.change_x, state.change_y = state.change_y * -angle, \
+                                         state.change_x * angle
 
         # Recurse negative
-        for s.x, s.y in self._hilbert_curve(level - 1, -angle, s):
-            yield s.x, s.y
+        for state.x_pos, state.y_pos in self._hilbert_curve(level - 1,
+                                                            -angle, state):
+            yield state.x_pos, state.y_pos
 
         # Move forward
-        s.x, s.y = s.x + s.dx, s.y + s.dy
-        yield s.x, s.y
+        state.x_pos, state.y_pos = state.x_pos + state.change_x, \
+                                   state.y_pos + state.change_y
+        yield state.x_pos, state.y_pos
 
         # Turn right
-        s.dx, s.dy = s.dy * angle, s.dx * -angle
+        state.change_x, state.change_y = state.change_y * angle, \
+                                         state.change_x * -angle
 
         # Recurse positive
-        for s.x, s.y in self._hilbert_curve(level - 1, angle, s):
-            yield s.x, s.y
+        for state.x_pos, state.y_pos in self._hilbert_curve(level - 1,
+                                                            angle, state):
+            yield state.x_pos, state.y_pos
 
         # Move forward
-        s.x, s.y = s.x + s.dx, s.y + s.dy
-        yield s.x, s.y
+        state.x_pos, state.y_pos = state.x_pos + state.change_x, \
+                                   state.y_pos + state.change_y
+        yield state.x_pos, state.y_pos
 
         # Recurse positive
-        for s.x, s.y in self._hilbert_curve(level - 1, angle, s):
-            yield s.x, s.y
+        for state.x_pos, state.y_pos in self._hilbert_curve(level - 1,
+                                                            angle, state):
+            yield state.x_pos, state.y_pos
 
         # Turn right
-        s.dx, s.dy = s.dy * angle, s.dx * -angle
+        state.change_x, state.change_y = state.change_y * angle, \
+                                         state.change_x * -angle
 
         # Move forward
-        s.x, s.y = s.x + s.dx, s.y + s.dy
-        yield s.x, s.y
+        state.x_pos, state.y_pos = state.x_pos + state.change_x, \
+                                   state.y_pos + state.change_y
+        yield state.x_pos, state.y_pos
 
         # Recurse negative
-        for s.x, s.y in self._hilbert_curve(level - 1, -angle, s):
-            yield s.x, s.y
+        for state.x_pos, state.y_pos in self._hilbert_curve(level - 1,
+                                                            -angle, state):
+            yield state.x_pos, state.y_pos
 
         # Turn left
-        s.dx, s.dy = s.dy * -angle, s.dx * angle
+        state.change_x, state.change_y = state.change_y * -angle, \
+                                         state.change_x * angle
 
     def _generate_hilbert_chips(self, machine):
         """A generator which iterates over a set of chips in a machine in
