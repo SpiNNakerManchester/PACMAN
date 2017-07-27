@@ -68,5 +68,5 @@ class IsomorphicChecker(object):
         if chip_vertices != chip_vertices_copy:
             correct = False
 
-        print chips
+        # print chips
         return correct

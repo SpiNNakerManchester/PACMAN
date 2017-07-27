@@ -1,9 +1,11 @@
 # pacman imports
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
+from pacman import exceptions
 
 # spinn_utils imports
 from spinn_utilities.progress_bar import ProgressBar
@@ -29,7 +31,9 @@ class HilbertPlacer(object):
         """
 
         # check that the algorithm can handle the constraints
-        self._check_constraints(machine_graph.vertices)
+        self._check_constraints(
+            machine_graph.vertices,
+            additional_placement_constraints={SameChipAsConstraint})
 
         # in order to test isomorphism include:
         # placements_copy = Placements()
@@ -37,6 +41,7 @@ class HilbertPlacer(object):
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
+
 
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
@@ -70,7 +75,7 @@ class HilbertPlacer(object):
         :param additional_placement_constraints:\
             Additional placement constraints supported by the algorithm doing\
             this check
-        :type additional_placement_constraints: dict
+        :type additional_placement_constraints: set
         """
 
         placement_constraints = {SameChipAsConstraint}
@@ -118,7 +123,7 @@ class HilbertPlacer(object):
         :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
         :param placements: Placements of vertices on the machine
         :type :py:class:`pacman.model.placements.placements.Placements`
-        :param vertices_on_same_chip: a dictionary where keys are vertices \
+        :param vertices_on_same_chip: a dictionary where keys are a vertex \
             and values are a list of vertices
         :type vertices_on_same_chip: dict
         :return vertices: an iterable of vertices to be placed
@@ -126,21 +131,16 @@ class HilbertPlacer(object):
         """
 
         vertices = vertices_on_same_chip[vertex]
-        chips = self._generate_hilbert_chips(machine)
 
         # prioritize vertices that should be on the same chip
-        if len(vertices) > 1:
-            assigned_values = \
-                resource_tracker.allocate_constrained_group_resources([
-                    (vert.resources_required, vert.constraints)
-                    for vert in vertices
-                ], chips)
-            for (x, y, p, _, _), vert in zip(assigned_values, vertices):
-                placement = Placement(vert, x, y, p)
-                placements.add_placement(placement)
-        else:
+        # split vertices into ?
+        # ask resource tracker how many are left
+
+        chips = self._generate_hilbert_chips(machine)
+
+        for vertex in vertices_on_same_chip:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-                vertex.resources_required, vertex.constraints, chips)
+                    vertex.resources_required, vertex.constraints, None)
             placement = Placement(vertex, x, y, p)
             placements.add_placement(placement)
 
