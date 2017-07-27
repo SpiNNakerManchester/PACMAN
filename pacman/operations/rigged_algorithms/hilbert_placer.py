@@ -65,6 +65,12 @@ class HilbertPlacer(object):
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
         """ Ensure that the algorithm conforms to any required constraints.
+        :param vertices: The vertices for which to check the constraints
+        :type vertices: object
+        :param additional_placement_constraints:\
+            Additional placement constraints supported by the algorithm doing\
+            this check
+        :type additional_placement_constraints: dict
         """
 
         placement_constraints = {SameChipAsConstraint}
