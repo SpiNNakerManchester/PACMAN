@@ -11,8 +11,6 @@ from spinn_machine.machine import Machine
 from spinn_machine.chip import Chip
 from spinn_machine.router import Router
 from spinn_machine.sdram import SDRAM
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.exceptions import PacmanValueError
 
 
