@@ -146,4 +146,4 @@ class RoutingInfo(object):
 
         :return: a iterator of partition routing information
         """
-        return iter(self._partition_infos_by_key)
+        return self._partition_info_by_partition.itervalues()
