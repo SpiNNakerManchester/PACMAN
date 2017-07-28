@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from spinn_utilities.ordered_set import OrderedSet
 
@@ -69,7 +69,7 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._allowed_partition_types = allowed_partition_types
 
         self._vertices = OrderedSet()
-        self._outgoing_edge_partitions_by_name = dict()
+        self._outgoing_edge_partitions_by_name = OrderedDict()
         self._outgoing_edges = defaultdict(OrderedSet)
         self._incoming_edges = defaultdict(OrderedSet)
         self._incoming_edges_by_partition_name = defaultdict(list)
