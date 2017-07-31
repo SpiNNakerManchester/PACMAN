@@ -52,20 +52,27 @@ class HilbertPlacer(object):
                                                machine))
 
         # get vertices which must be placed on the same chip
-        vertices_on_same_chip = \
-            placer_algorithm_utilities.get_same_chip_vertex_groups(
-                machine_graph.vertices)
+        # vertices_on_same_chip = \
+        #    placer_algorithm_utilities.get_same_chip_vertex_groups(
+        #        machine_graph.vertices)
+
+
 
         # iterate over vertices and generate placements
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
-                vertices_placed = self._place_vertex(
-                    vertex, resource_tracker, machine,
+                (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
+                    vertex.resources_required, vertex.constraints, None)
+                placement = Placement(vertex, x, y, p)
+                placements.add_placement(placement)
+
+                #vertices_placed = self._place_vertex(
+                #    vertex, resource_tracker, machine,
                     # placements_copy,
-                    placements,
-                    vertices_on_same_chip)
-                all_vertices_placed.update(vertices_placed)
+                #    placements)
+                    # vertices_on_same_chip)
+                #all_vertices_placed.update(vertices_placed)
         # return placements_copy
         return placements
 
@@ -111,8 +118,8 @@ class HilbertPlacer(object):
             if machine.is_chip_at(x, y):
                 yield x, y
 
-    def _place_vertex(self, vertex, resource_tracker, machine, placements,
-                      vertices_on_same_chip):
+    def _place_vertex(self, vertex, resource_tracker, machine, placements):
+                      #vertices_on_same_chip):
         """ Creates placements and returns list of vertices placed.
 
         :param vertex: the vertex that is placed
@@ -132,22 +139,22 @@ class HilbertPlacer(object):
         :rtype vertices: list
         """
 
-        vertices = vertices_on_same_chip[vertex]
+        #vertices = vertices_on_same_chip[vertex]
 
         # prioritize vertices that should be on the same chip
         # split vertices into ?
         # ask resource tracker how many are left
 
-        chips = self._generate_hilbert_chips(machine)
+        #chips = self._generate_hilbert_chips(machine)
 
-        for vertex in vertices_on_same_chip:
-            (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-                    vertex.resources_required, vertex.constraints, None)
-            placement = Placement(vertex, x, y, p)
-            placements.add_placement(placement)
+        #for vertex in vertices_on_same_chip:
+        #    (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
+        #            vertex.resources_required, vertex.constraints, None)
+        #    placement = Placement(vertex, x, y, p)
+        #    placements.add_placement(placement)
 
         # returns list of vertices placed
-        return vertices
+        #return vertices
 
     def _hilbert_curve(self, level, angle=1, state=None):
         """Generator of points along a 2D Hilbert curve.
