@@ -7,10 +7,32 @@ from pacman.model.routing_table_by_partition import \
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
 
 # general imports
+import itertools
 import logging
-
+import sys
 
 logger = logging.getLogger(__name__)
+
+
+class _NodeInfo(object):
+    __slots__ = ["neighbours", "bws", "weights"]
+
+    def __init__(self):
+        self.neighbours = list()
+        self.bws = list()
+        self.weights = list()
+
+    @property
+    def neighweights(self):
+        return itertools.izip(self.neighbours, self.weights)
+
+
+class _DijkstraInfo(object):
+    __slots__ = ["activated", "cost"]
+
+    def __init__(self):
+        self.activated = False
+        self.cost = None
 
 
 class BasicDijkstraRouting(object):
@@ -75,7 +97,7 @@ class BasicDijkstraRouting(object):
         self._machine = machine
 
         nodes_info = self._initiate_node_info(machine)
-        dijkstra_tables = self._initiate_dijkstra_tables(machine)
+        tables = self._initiate_dijkstra_tables(machine)
         self._update_all_weights(nodes_info, machine)
 
         # each vertex represents a core in the board
@@ -83,43 +105,33 @@ class BasicDijkstraRouting(object):
                                "Creating routing entries")
 
         for placement in progress.over(placements.placements):
-            vertex = placement.vertex
-            out_going_edges = \
-                machine_graph.get_edges_starting_at_vertex(vertex)
-            out_going_edges = \
-                filter(
-                    lambda application_edge:
-                    application_edge.traffic_type == EdgeTrafficType.MULTICAST,
-                    out_going_edges)
+            out_going_edges = filter(
+                lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
+                machine_graph.get_edges_starting_at_vertex(placement.vertex))
 
             dest_chips = set()
             edges_to_route = list()
 
             for edge in out_going_edges:
                 destination = edge.post_vertex
-                destination_placement = placements.get_placement_of_vertex(
-                    destination)
-
-                chip = machine.get_chip_at(destination_placement.x,
-                                           destination_placement.y)
+                dest_place = placements.get_placement_of_vertex(destination)
+                chip = machine.get_chip_at(dest_place.x, dest_place.y)
                 dest_chips.add((chip.x, chip.y))
                 edges_to_route.append(edge)
 
             if len(dest_chips) != 0:
                 self._update_all_weights(nodes_info, machine)
-                self._reset_tables(dijkstra_tables)
-                dijkstra_tables[
-                    (placement.x, placement.y)]["activated?"] = True
-                dijkstra_tables[(placement.x, placement.y)]["lowest cost"] = 0
+                self._reset_tables(tables)
+                tables[placement.x, placement.y].activated = True
+                tables[placement.x, placement.y].cost = 0
                 self._propagate_costs_until_reached_destinations(
-                    dijkstra_tables, nodes_info, dest_chips, placement.x,
-                    placement.y)
+                    tables, nodes_info, dest_chips, placement.x, placement.y)
 
             for edge in edges_to_route:
                 dest = edge.post_vertex
                 dest_placement = placements.get_placement_of_vertex(dest)
                 self._retrace_back_to_source(
-                    dest_placement.x, dest_placement.y, dijkstra_tables,
+                    dest_placement.x, dest_placement.y, tables,
                     dest_placement.p, edge, nodes_info, placement.p,
                     machine_graph)
         return self._routing_paths
@@ -136,32 +148,15 @@ class BasicDijkstraRouting(object):
         """
         nodes_info = dict()
         for chip in machine.chips:
-            x, y = chip.x, chip.y
-
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
-            nodes_info[(x, y)] = dict()
-
-            nodes_info[(x, y)]["neighbours"] = list()
+            node = _NodeInfo()
             for source_id in range(6):
-                nodes_info[(x, y)]["neighbours"].append(
-                    chip.router.get_link(source_id))
-
-            nodes_info[(x, y)]["bws"] = []
-
-            nodes_info[(x, y)]["weights"] = []
-
-            for i in range(len(nodes_info[(x, y)]["neighbours"])):
-
-                nodes_info[(x, y)]["weights"].append(None)
-
-                if nodes_info[(x, y)]["neighbours"][i] is None:
-
-                    nodes_info[(x, y)]["bws"].append(None)
-
-                else:
-
-                    nodes_info[(x, y)]["bws"].append(self._max_bw)
+                n = chip.router.get_link(source_id)
+                node.neighbours.append(n)
+                node.weights.append(None)
+                node.bws.append(None if n is None else self._max_bw)
+            nodes_info[chip.x, chip.y] = node
         return nodes_info
 
     @staticmethod
@@ -177,17 +172,10 @@ class BasicDijkstraRouting(object):
         """
         # Holds all the information about nodes within one full run of
         # Dijkstra's algorithm
-        dijkstra_tables = dict()
-
+        tables = dict()
         for chip in machine.chips:
-            x, y = chip.x, chip.y
-
-            # Each node has a dictionary, or 'table'
-            dijkstra_tables[(x, y)] = dict()
-
-            dijkstra_tables[(x, y)]["lowest cost"] = None
-            dijkstra_tables[(x, y)]["activated?"] = False
-        return dijkstra_tables
+            tables[chip.x, chip.y] = _DijkstraInfo()
+        return tables
 
     def _update_all_weights(self, nodes_info, machine):
         """ Change the weights of the neighbouring nodes
@@ -217,72 +205,61 @@ class BasicDijkstraRouting(object):
         :rtype: None
         :raise None: this method does not raise any known exception
         """
-        for n in range(len(nodes_info[key]["neighbours"])):
-            if nodes_info[key]["neighbours"][n] is not None:
-                neighbour = nodes_info[key]["neighbours"][n]
+        for n, neighbour in enumerate(nodes_info[key].neighbours):
+            if neighbour is not None:
                 xn, yn = neighbour.destination_x, neighbour.destination_y
                 entries = self._routing_paths.get_entries_for_router(xn, yn)
-                nodes_info[key]["weights"][n] = self._get_weight(
+                nodes_info[key].weights[n] = self._get_weight(
                     machine.get_chip_at(xn, yn).router,
-                    nodes_info[key]["bws"][n],
-                    len(entries))
+                    nodes_info[key].bws[n], len(entries))
 
-    def _get_weight(self, router, bws, no_routing_table_entries):
+    def _get_weight(self, router, bws, num_entries):
         """ Get the weight based on basic heuristics
 
         :param router: the router to assess the weight of
         :param bws: the basic weight of the source node
-        :param no_routing_table_entries: the number of entries going though\
-                this router
+        :param num_entries: the number of entries going though this router
         :type router: spinn_machine.Router
         :type bws: int
-        :type no_routing_table_entries: int
+        :type num_entries: int
         :return: weight of this router
         :rtype: int
         :raise None: does not raise any known exception
         """
-        free_entries = (router.ROUTER_DEFAULT_AVAILABLE_ENTRIES -
-                        no_routing_table_entries)
-
+        free_entries = router.ROUTER_DEFAULT_AVAILABLE_ENTRIES - num_entries
         q = 0
         if self._l > 0:
-            q = float(self._l *
-                      (1 / float(free_entries) - 1 /
-                       float(router.ROUTER_DEFAULT_AVAILABLE_ENTRIES)))
-
+            q = self._l * (
+                1.0/free_entries - 1.0/router.ROUTER_DEFAULT_AVAILABLE_ENTRIES)
         t = 0
         if self._m > 0:
-            t = self._m * (1 / float(bws) - 1 / float(self._max_bw))
-
-        weight = self._k + q + t
-        return weight
+            t = self._m * (1.0/bws - 1.0/self._max_bw)
+        return self._k + q + t
 
     @staticmethod
-    def _reset_tables(dijkstra_tables):
+    def _reset_tables(tables):
         """ Reset the Dijkstra tables for a new path search
 
-        :param dijkstra_tables: the dictionary object for the Dijkstra-tables
-        :type dijkstra_tables: dict
+        :param tables: the dictionary object for the Dijkstra-tables
+        :type tables: dict
         :rtype: None
         :raise None: this method does not raise any known exception
         """
-        for key in dijkstra_tables:
-            dijkstra_tables[key]["lowest cost"] = None
-            dijkstra_tables[key]["activated?"] = False
+        for key in tables:
+            tables[key] = _DijkstraInfo()
 
     def _propagate_costs_until_reached_destinations(
-            self, dijkstra_tables, nodes_info, dest_chips,
-            x_source, y_source):
+            self, tables, nodes_info, dest_chips, x_source, y_source):
         """ Propagate the weights till the destination nodes of the source\
             nodes are retraced
 
-         :param dijkstra_tables: the dictionary object for the Dijkstra-tables
+         :param tables: the dictionary object for the Dijkstra-tables
          :param nodes_info: the dictionary object for the nodes inside a route\
                     scope
          :param dest_chips:
          :param x_source:
          :param y_source:
-         :type dijkstra_tables: dict
+         :type tables: dict
          :type nodes_info: dict
          :type dest_chips:
          :type x_source: int
@@ -293,132 +270,106 @@ class BasicDijkstraRouting(object):
         """
 
         dest_chips_to_find = set(dest_chips)
-        try:
-            dest_chips_to_find.remove((x_source, y_source))
-        except KeyError:
-            # Ignore this - it just isn't in the set of destinations
-            pass
+        source = (x_source, y_source)
+        dest_chips_to_find.discard(source)
 
-        x_current = x_source
-        y_current = y_source
+        current = source
 
         # Iterate only if the destination node hasn't been activated
-        while len(dest_chips_to_find) > 0:
-
+        while dest_chips_to_find:
             # PROPAGATE!
-            for i in range(len(
-                    nodes_info[(x_current, y_current)]["neighbours"])):
-                neighbour = nodes_info[(x_current, y_current)]["neighbours"][i]
-                weight = nodes_info[(x_current, y_current)]["weights"][i]
-
-                # "neighbours" is a list of 6 links or None objects.
-                # There is a None object where there is no connection to
-                # that neighbour.
-                if ((neighbour is not None) and
+            for neighbour, weight in nodes_info[current].neighweights:
+                # "neighbours" is a list of 6 links or None objects. There is
+                # a None object where there is no connection to that neighbour
+                if (neighbour is not None and
                         not (neighbour.destination_x == x_source and
                              neighbour.destination_y == y_source)):
 
                     # These variables change with every look at a new neighbour
                     self._update_neighbour(
-                        dijkstra_tables, neighbour.destination_x,
-                        neighbour.destination_y, x_current, y_current,
-                        x_source, y_source, weight)
-
-            # This is the lowest cost across ALL
-            # deactivated nodes in the graph.
-            graph_lowest_cost = None
-
-            # Find the next node to be activated
-            for key in dijkstra_tables:
-
-                # Don't continue if the node hasn't even been touched yet
-                if (dijkstra_tables[key]["lowest cost"] is not None and
-                        not dijkstra_tables[key]["activated?"] and
-                        (graph_lowest_cost is not None and
-                         (dijkstra_tables[key]["lowest cost"] <
-                          graph_lowest_cost) or graph_lowest_cost is None)):
-                    graph_lowest_cost = dijkstra_tables[key]["lowest cost"]
-                    x_current, y_current = int(key[0]), int(key[1])
-
-            # If there were no deactivated nodes with costs,
-            # but the destination was not reached this iteration,
-            # raise an exception
-            if graph_lowest_cost is None:
-                raise PacmanRoutingException(
-                    "Destination could not be activated, ending run")
+                        tables, neighbour, current,
+                        source, weight)
 
             # Set the next activated node as the deactivated node with the
-            #  lowest current cost
-            dijkstra_tables[(x_current, y_current)]["activated?"] = True
-            try:
-                dest_chips_to_find.remove((x_current, y_current))
-            except KeyError:
-                # Ignore the error - it just isn't a destination chip
-                pass
+            # lowest current cost
+            current = self._minimum(tables)
+            tables[current].activated = True
+            dest_chips_to_find.discard(current)
 
     @staticmethod
-    def _update_neighbour(
-            dijkstra_tables, x_neighbour, y_neighbour, x_current, y_current,
-            x_source, y_source, weight):
-        """ Update the lowest cost for each neighbour of a node
+    def _minimum(tables):
+        # This is the lowest cost across ALL deactivated nodes in the graph.
+        lowest_cost = sys.maxint
+        lowest = None
+
+        # Find the next node to be activated
+        for key in tables:
+            # Don't continue if the node hasn't even been touched yet
+            if (tables[key].cost is not None and not tables[key].activated
+                    and tables[key].cost < lowest_cost):
+                lowest_cost = tables[key].cost
+                lowest = key
+
+        # If there were no deactivated nodes with costs, but the destination
+        # was not reached this iteration, raise an exception
+        if lowest is None:
+            raise PacmanRoutingException(
+                "Destination could not be activated, ending run")
+
+        return int(lowest[0]), int(lowest[1])
+
+    @staticmethod
+    def _update_neighbour(tables, neighbour, current, source, weight):
+        """ Update the lowest cost for each neighbour_xy of a node
 
         :rtype: None
         :raise PacmanRoutingException: when the algorithm goes to a node that\
                     doesn't exist in the machine or the node's cost was set\
                     too low.
         """
-        neighbour_exists = (x_neighbour, y_neighbour) in dijkstra_tables
-        if not neighbour_exists:
+        neighbour_xy = (neighbour.destination_x, neighbour.destination_y)
+        if neighbour_xy not in tables:
             raise PacmanRoutingException(
                 "Tried to propagate to ({}, {}), which is not in the"
                 " graph: remove non-existent neighbours"
-                .format(x_neighbour, y_neighbour))
+                .format(neighbour.destination_x, neighbour.destination_y))
 
-        neighbour_activated =\
-            dijkstra_tables[(x_neighbour, y_neighbour)]["activated?"]
-        chip_lowest_cost =\
-            dijkstra_tables[(x_current, y_current)]["lowest cost"]
-        neighbour_lowest_cost =\
-            dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"]
+        chip_cost = tables[current].cost
+        neighbour_cost = tables[neighbour_xy].cost
 
-        # Only try to update if the neighbour is within the graph
-        #  and the cost if the node hasn't already been activated
-        # and the lowest cost if the new cost is less, or if
-        # there is no current cost
-        new_weight = float(chip_lowest_cost + weight)
-        if (not neighbour_activated and
-                (neighbour_lowest_cost is None or
-                 new_weight < neighbour_lowest_cost)):
-
+        # Only try to update if the neighbour_xy is within the graph and the
+        # cost if the node hasn't already been activated and the lowest cost
+        # if the new cost is less, or if there is no current cost.
+        new_weight = float(chip_cost + weight)
+        if (not tables[neighbour_xy].activated and
+                (neighbour_cost is None or new_weight < neighbour_cost)):
             # update Dijkstra table
-            dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] =\
-                new_weight
+            tables[neighbour_xy].cost = new_weight
 
-        if (dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"] == 0) \
-                and (x_neighbour != x_source or y_neighbour != y_source):
+        if tables[neighbour_xy].cost == 0 and neighbour_xy != source:
             raise PacmanRoutingException(
                 "!!!Cost of non-source node ({}, {}) was set to zero!!!"
-                .format(x_neighbour, y_neighbour))
+                .format(neighbour.destination_x, neighbour.destination_y))
 
     def _retrace_back_to_source(
-            self, x_destination, y_destination, dijkstra_tables,
-            processor_dest, edge, nodes_info, source_processor,
-            graph):
+            self, x_dest, y_dest, tables, processor_dest, edge, nodes_info,
+            source_processor, graph):
         """
 
-        :param x_destination:
-        :param y_destination:
-        :param dijkstra_tables:
+        :param x_dest:
+        :param y_dest:
+        :param tables:
         :param processor_dest:
         :param edge:
         :param nodes_info:
-        :type nodes_info:
-        :type edge:
-        :type x_destination:
-        :type y_destination:
-        :type dijkstra_tables:
-        :type processor_dest:
+        :param source_processor:
         :param graph:
+        :type nodes_info: dict( _NodeInfo )
+        :type edge:
+        :type x_dest: int
+        :type y_dest: int
+        :type tables: dict( _DijkstraInfo )
+        :type processor_dest:
         :type graph:
         :return: the next coordinates to look into
         :rtype: int int
@@ -429,7 +380,7 @@ class BasicDijkstraRouting(object):
                     that's not considered in the weighted search
         """
         # Set the tracking node to the destination to begin with
-        x_current, y_current = x_destination, y_destination
+        x, y = x_dest, y_dest
         routing_entry_route_processors = []
 
         # if the processor is None, don't add to router path entry
@@ -441,111 +392,91 @@ class BasicDijkstraRouting(object):
         partitions = graph.get_outgoing_edge_partitions_starting_at_vertex(
             edge.pre_vertex)
 
-        previous_routing_entry = None
+        prev_entry = None
         for partition in partitions:
             if edge in partition:
                 entry = MulticastRoutingTableByPartitionEntry(
                     out_going_links=routing_entry_route_links,
                     outgoing_processors=routing_entry_route_processors)
-
                 self._routing_paths.add_path_entry(
-                    entry, x_destination, y_destination, partition)
-                previous_routing_entry = entry
+                    entry, x_dest, y_dest, partition)
+                prev_entry = entry
 
-        while dijkstra_tables[(x_current, y_current)]["lowest cost"] != 0:
-
-            x_check, y_check = x_current, y_current
-
-            neighbours = nodes_info[(x_current, y_current)]["neighbours"]
-            neighbour_index = 0
-            added_an_entry = False
-            while not added_an_entry and neighbour_index < len(neighbours):
-                neighbour = neighbours[neighbour_index]
+        while tables[x, y].cost != 0:
+            for idx, neighbour in enumerate(nodes_info[x, y].neighbours):
                 if neighbour is not None:
-                    x_neighbour, y_neighbour = (neighbour.destination_x,
-                                                neighbour.destination_y)
+                    n_xy = (neighbour.destination_x, neighbour.destination_y)
 
                     # Only check if it can be a preceding node if it actually
                     # exists
-                    if (x_neighbour, y_neighbour) not in dijkstra_tables:
+                    if n_xy not in tables:
                         raise PacmanRoutingException(
                             "Tried to trace back to node not in "
                             "graph: remove non-existent neighbours")
 
-                    dijkstra_table_key = (x_neighbour, y_neighbour)
-                    lowest_cost = \
-                        dijkstra_tables[dijkstra_table_key]["lowest cost"]
-                    if lowest_cost is not None:
-                        (x_current, y_current, previous_routing_entry,
-                            added_an_entry) = self._create_routing_entry(
-                                x_neighbour, y_neighbour, dijkstra_tables,
-                                neighbour_index, nodes_info,
-                                x_current, y_current,
-                                previous_routing_entry, edge, graph)
-                neighbour_index += 1
-
-            if x_current == x_check and y_current == y_check:
+                    if tables[n_xy].cost is not None:
+                        x, y, prev_entry, added = self._create_routing_entry(
+                            n_xy, tables, idx, nodes_info, x, y,
+                            prev_entry, edge, graph)
+                        if added:
+                            break
+            else:
                 raise PacmanRoutingException(
                     "Iterated through all neighbours of tracking node but"
                     " did not find a preceding node! Consider increasing "
                     "acceptable discrepancy between sought traceback cost"
                     " and actual cost at node. Terminating...")
-        previous_routing_entry.incoming_processor = source_processor
-        return x_current, y_current
+        prev_entry.incoming_processor = source_processor
+        return x, y
 
     def _create_routing_entry(
-            self, x_neighbour, y_neighbour, dijkstra_tables, neighbour_index,
-            nodes_info, x_current, y_current, previous_routing_entry, edge,
-            graph):
+            self, neighbour_xy, tables, neighbour_index,
+            nodes_info, x, y, previous_entry, edge, graph):
         """ Create a new routing entry
 
-        :return: x_current, y_current, previous_routing_entry, made_an_entry
+        :return: x, y, previous_entry, made_an_entry
         :rtype: int, int, spinn_machine.MulticastRoutingEntry, bool
         :raise PacmanRoutingException: when the bandwidth of a router is\
                 beyond expected parameters
         """
 
-        # Set the direction of the routing other_entry as that which
-        # is from the preceding node to the current tracking node
-        # x_neighbour, y_neighbour are the 'old' coordinates since they are
-        # from the preceding node. x_current and y_current are the 'new'
-        # coordinates since they are where the router should send the packet to
+        # Set the direction of the routing other_entry as that which is from
+        # the preceding node to the current tracking node.
+        # neighbour_xy is the 'old' coordinates since it is from the preceding
+        # node. x and y are the 'new' coordinates since they are where the
+        # router should send the packet to.
         dec_direction = self._get_reverse_direction(neighbour_index)
         made_an_entry = False
 
-        neighbour_weight = \
-            nodes_info[(x_neighbour, y_neighbour)]["weights"][dec_direction]
-        chip_sought_cost = \
-            (dijkstra_tables[(x_current, y_current)]["lowest cost"] -
-             neighbour_weight)
-        neighbours_lowest_cost = \
-            dijkstra_tables[(x_neighbour, y_neighbour)]["lowest cost"]
+        neighbour_weight = nodes_info[neighbour_xy].weights[dec_direction]
+        chip_sought_cost = tables[x, y].cost - neighbour_weight
+        neighbours_lowest_cost = tables[neighbour_xy].cost
 
         if (neighbours_lowest_cost is not None and
-                abs(neighbours_lowest_cost - chip_sought_cost) <
-                0.00000000001):
-
+                self._close_enough(neighbours_lowest_cost, chip_sought_cost)):
             # build the multicast entry
-            partitions = graph.\
-                get_outgoing_edge_partitions_starting_at_vertex(
+            partns = graph.get_outgoing_edge_partitions_starting_at_vertex(
                     edge.pre_vertex)
             entry = None
-            for partition in partitions:
+            for partition in partns:
                 if edge in partition:
                     entry = MulticastRoutingTableByPartitionEntry(
-                        out_going_links=dec_direction,
-                        outgoing_processors=None)
-                    previous_routing_entry.incoming_link = neighbour_index
+                        dec_direction, None)
+                    previous_entry.incoming_link = neighbour_index
                     # add entry for next hop going backwards into path
                     self._routing_paths.add_path_entry(
-                        entry, x_neighbour, y_neighbour, partition)
-            previous_routing_entry = entry
+                        entry, neighbour_xy[0], neighbour_xy[1], partition)
+            previous_entry = entry
             made_an_entry = True
 
             # Finally move the tracking node
-            x_current, y_current = x_neighbour, y_neighbour
+            x, y = neighbour_xy
 
-        return x_current, y_current, previous_routing_entry, made_an_entry
+        return x, y, previous_entry, made_an_entry
+
+    @staticmethod
+    def _close_enough(v1, v2, delta=0.00000000001):
+        return abs(v1 - v2) < delta
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
