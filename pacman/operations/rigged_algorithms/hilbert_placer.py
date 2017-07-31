@@ -12,6 +12,8 @@ from spinn_utilities.progress_bar import ProgressBar
 
 # general imports
 from math import log, ceil
+import logging
+logger = logging.getLogger(__name__)
 
 
 class HilbertPlacer(object):
@@ -166,6 +168,7 @@ class HilbertPlacer(object):
         :rtype HilbertState object \
             :py:class:`pacman.operations.rigged_algorithms.hilbert_state.HilbertState`
         """
+        # TODO: break steps into methods
 
         # Create state object first time we're called while also yielding
         # first position
