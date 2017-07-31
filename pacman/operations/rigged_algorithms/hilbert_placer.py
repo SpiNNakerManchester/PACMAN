@@ -108,9 +108,10 @@ class HilbertPlacer(object):
 
         # return generated coordinates of chip if one exists there
         for x, y in self._hilbert_curve(hilbert_levels):
-            if (resource_tracker is None or
-                    resource_tracker.is_chip_available(x, y)):
-                yield x, y
+            if machine.is_chip_at(x, y):
+                if (resource_tracker is None or
+                        resource_tracker.is_chip_available(x, y)):
+                    yield x, y
 
     def _place_vertex(self, vertex, resource_tracker, machine, placements,
                       vertices_on_same_chip):
@@ -134,7 +135,7 @@ class HilbertPlacer(object):
         """
 
         vertices = vertices_on_same_chip[vertex]
-        chips = self._generate_hilbert_chips(machine)
+        chips = self._generate_hilbert_chips(machine, resource_tracker)
 
         # prioritize vertices that should be on the same chip
         if len(vertices) > 1:
