@@ -14,6 +14,7 @@ from spinn_utilities.progress_bar import ProgressBar
 # general imports
 from math import log, ceil
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +63,7 @@ class HilbertPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine,
-                   # placements_copy,
+                    # placements_copy,
                     placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
@@ -85,76 +86,6 @@ class HilbertPlacer(object):
             placement_constraints.update(additional_placement_constraints)
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
-
-    def _generate_hilbert_chips(self, machine, resource_tracker=None):
-        """ A generator which iterates over a set of chips in a machine in
-        a hilbert path.
-
-        For use as a chip ordering for the sequential placer.
-
-        :param machine: A SpiNNaker machine object.
-        :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
-        :return x, y coordinates of chips to place
-        :rtype int, int
-        """
-
-        # set size of curve based on number of chips on machine
-        max_dimen = max(machine.max_chip_x, machine.max_chip_y)
-
-        if max_dimen >= 1:
-            hilbert_levels = int(ceil(log(max_dimen, 2.0)))
-        else:
-            hilbert_levels = 0
-
-        # return generated coordinates of chip if one exists there
-        for x, y in self._hilbert_curve(hilbert_levels):
-            if machine.is_chip_at(x, y):
-                if (resource_tracker is None or
-                        resource_tracker.is_chip_available(x, y)):
-                    yield x, y
-
-    def _place_vertex(self, vertex, resource_tracker, machine, placements,
-                      vertices_on_same_chip):
-        """ Creates placements and returns list of vertices placed.
-
-        :param vertex: the vertex that is placed
-        :type vertex: \
-            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
-        :param resource_tracker: tracks the usage of resources of a machine
-        :type resource_tracker: \
-            :py:class:`pacman.utilities.utility_objs.resource_tracker.ResourceTracker`
-        :param machine: A SpiNNaker machine object.
-        :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
-        :param placements: Placements of vertices on the machine
-        :type :py:class:`pacman.model.placements.placements.Placements`
-        :param vertices_on_same_chip: a dictionary where keys are a vertex \
-            and values are a list of vertices
-        :type vertices_on_same_chip: dict
-        :return vertices: an iterable of vertices to be placed
-        :rtype vertices: list
-        """
-
-        vertices = vertices_on_same_chip[vertex]
-        chips = self._generate_hilbert_chips(machine, resource_tracker)
-
-        # prioritize vertices that should be on the same chip
-        if len(vertices) > 1:
-            assigned_values = \
-                resource_tracker.allocate_constrained_group_resources([
-                    (vert.resources_required, vert.constraints)
-                    for vert in vertices
-                ], chips)
-            for (x, y, p, _, _), vert in zip(assigned_values, vertices):
-                placement = Placement(vert, x, y, p)
-                placements.add_placement(placement)
-        else:
-            (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-                vertex.resources_required, vertex.constraints, chips)
-            placement = Placement(vertex, x, y, p)
-            placements.add_placement(placement)
-
-        # returns list of vertices placed
-        return vertices
 
     def _hilbert_curve(self, level, angle=1, state=None):
         """Generator of points along a 2D Hilbert curve.
@@ -188,8 +119,8 @@ class HilbertPlacer(object):
             return
 
         # Turn left
-        state.change_x = state.change_y * -angle
-        state.change_y = state.change_x * angle
+        state.change_x, state.change_y = (
+            state.change_y * -angle, state.change_x * angle)
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -202,8 +133,8 @@ class HilbertPlacer(object):
         yield state.x_pos, state.y_pos
 
         # Turn right
-        state.change_x = state.change_y * angle
-        state.change_y = state.change_x * -angle
+        state.change_x, state.change_y = (
+            state.change_y * angle, state.change_x * -angle)
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -221,8 +152,8 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn right
-        state.change_x = state.change_y * angle
-        state.change_y = state.change_x * -angle
+        state.change_x, state.change_y = (
+            state.change_y * angle, state.change_x * -angle)
 
         # Move forward
         state.x_pos = state.x_pos + state.change_x
@@ -235,5 +166,70 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn left
-        state.change_x = state.change_y * -angle
-        state.change_y = state.change_x * angle
+        state.change_x, state.change_y = (
+            state.change_y * -angle, state.change_x * angle)
+
+    def _generate_hilbert_chips(self, machine):
+        """ A generator which iterates over a set of chips in a machine in
+        a hilbert path.
+
+        For use as a chip ordering for the sequential placer.
+
+        :param machine: A SpiNNaker machine object.
+        :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
+        :return x, y coordinates of chips to place
+        :rtype int, int
+        """
+
+        # set size of curve based on number of chips on machine
+        max_dimen = max(machine.max_chip_x, machine.max_chip_y)
+        if max_dimen >= 1:
+            hilbert_levels = int(ceil(log(max_dimen, 2.0)))
+        else:
+            hilbert_levels = 0
+        for x, y in self._hilbert_curve(hilbert_levels):
+            if machine.is_chip_at(x, y):
+                yield x, y
+
+    def _place_vertex(self, vertex, resource_tracker, machine, placements,
+                      vertices_on_same_chip):
+        """ Creates placements and returns list of vertices placed.
+
+        :param vertex: the vertex that is placed
+        :type vertex: \
+            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+        :param resource_tracker: tracks the usage of resources of a machine
+        :type resource_tracker: \
+            :py:class:`pacman.utilities.utility_objs.resource_tracker.ResourceTracker`
+        :param machine: A SpiNNaker machine object.
+        :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
+        :param placements: Placements of vertices on the machine
+        :type :py:class:`pacman.model.placements.placements.Placements`
+        :param vertices_on_same_chip: a dictionary where keys are a vertex \
+            and values are a list of vertices
+        :type vertices_on_same_chip: dict
+        :return vertices: an iterable of vertices to be placed
+        :rtype vertices: list
+        """
+
+        vertices = vertices_on_same_chip[vertex]
+        chips = self._generate_hilbert_chips(machine)
+
+        # prioritize vertices that should be on the same chip
+        if len(vertices) > 1:
+            assigned_values = \
+                resource_tracker.allocate_constrained_group_resources([
+                    (vert.resources_required, vert.constraints)
+                    for vert in vertices
+                ], chips)
+            for (x, y, p, _, _), vert in zip(assigned_values, vertices):
+                placement = Placement(vert, x, y, p)
+                placements.add_placement(placement)
+        else:
+            (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
+                vertex.resources_required, vertex.constraints, chips)
+            placement = Placement(vertex, x, y, p)
+            placements.add_placement(placement)
+
+        # returns list of vertices placed
+        return vertices
