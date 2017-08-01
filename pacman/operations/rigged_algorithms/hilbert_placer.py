@@ -10,6 +10,9 @@ from spinn_utilities.progress_bar import ProgressBar
 
 # general imports
 from math import log, ceil
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class HilbertPlacer(object):
@@ -29,11 +32,13 @@ class HilbertPlacer(object):
         """
 
         # check that the algorithm can handle the constraints
-        self._check_constraints(machine_graph.vertices)
+        self._check_constraints(
+            machine_graph.vertices,
+            additional_placement_constraints={SameChipAsConstraint})
 
         # in order to test isomorphism include:
-        # placements_copy = Placements()
-        placements = Placements()
+        placements_copy = Placements()
+        # placements = Placements()
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
@@ -55,12 +60,12 @@ class HilbertPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine,
-                    # placements_copy,
-                    placements,
+                    placements_copy,
+                    # placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
-        # return placements_copy
-        return placements
+        return placements_copy
+        # return placements
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
@@ -70,7 +75,7 @@ class HilbertPlacer(object):
         :param additional_placement_constraints:\
             Additional placement constraints supported by the algorithm doing\
             this check
-        :type additional_placement_constraints: dict
+        :type additional_placement_constraints: set
         """
 
         placement_constraints = {SameChipAsConstraint}
@@ -93,13 +98,10 @@ class HilbertPlacer(object):
 
         # set size of curve based on number of chips on machine
         max_dimen = max(machine.max_chip_x, machine.max_chip_y)
-
         if max_dimen >= 1:
             hilbert_levels = int(ceil(log(max_dimen, 2.0)))
         else:
             hilbert_levels = 0
-
-        # return generated coordinates of chip if one exists there
         for x, y in self._hilbert_curve(hilbert_levels):
             if machine.is_chip_at(x, y):
                 yield x, y
@@ -118,7 +120,7 @@ class HilbertPlacer(object):
         :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
         :param placements: Placements of vertices on the machine
         :type :py:class:`pacman.model.placements.placements.Placements`
-        :param vertices_on_same_chip: a dictionary where keys are vertices \
+        :param vertices_on_same_chip: a dictionary where keys are a vertex \
             and values are a list of vertices
         :type vertices_on_same_chip: dict
         :return vertices: an iterable of vertices to be placed
@@ -166,6 +168,7 @@ class HilbertPlacer(object):
         :rtype HilbertState object \
             :py:class:`pacman.operations.rigged_algorithms.hilbert_state.HilbertState`
         """
+        # TODO: break steps into methods
 
         # Create state object first time we're called while also yielding
         # first position
@@ -178,8 +181,8 @@ class HilbertPlacer(object):
             return
 
         # Turn left
-        state.change_x = state.change_y * -angle
-        state.change_y = state.change_x * angle
+        state.change_x, state.change_y = (
+            state.change_y * -angle, state.change_x * angle)
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -192,8 +195,8 @@ class HilbertPlacer(object):
         yield state.x_pos, state.y_pos
 
         # Turn right
-        state.change_x = state.change_y * angle
-        state.change_y = state.change_x * -angle
+        state.change_x, state.change_y = (
+            state.change_y * angle, state.change_x * -angle)
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -211,8 +214,8 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn right
-        state.change_x = state.change_y * angle
-        state.change_y = state.change_x * -angle
+        state.change_x, state.change_y = (
+            state.change_y * angle, state.change_x * -angle)
 
         # Move forward
         state.x_pos = state.x_pos + state.change_x
@@ -225,5 +228,5 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn left
-        state.change_x = state.change_y * -angle
-        state.change_y = state.change_x * angle
+        state.change_x, state.change_y = (
+            state.change_y * -angle, state.change_x * angle)
