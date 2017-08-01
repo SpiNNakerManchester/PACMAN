@@ -37,8 +37,8 @@ class HilbertPlacer(object):
             additional_placement_constraints={SameChipAsConstraint})
 
         # in order to test isomorphism include:
-        placements_copy = Placements()
-        # placements = Placements()
+        # placements_copy = Placements()
+        placements = Placements()
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
@@ -60,12 +60,12 @@ class HilbertPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine,
-                    placements_copy,
-                    # placements,
+                    # placements_copy,
+                    placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
-        return placements_copy
-        # return placements
+        # return placements_copy
+        return placements
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
@@ -102,6 +102,7 @@ class HilbertPlacer(object):
             hilbert_levels = int(ceil(log(max_dimen, 2.0)))
         else:
             hilbert_levels = 0
+
         for x, y in self._hilbert_curve(hilbert_levels):
             if machine.is_chip_at(x, y):
                 yield x, y
