@@ -1,8 +1,6 @@
 language: python
-matrix:
-  include:
-    - python: "2.7"
-    - pytest
+dist: trusty
+python: "2.7"
 
 cache: pip
 
@@ -12,7 +10,7 @@ virtualenv:
 addons:
   apt:
     packages:
-      - libxml2
+      - libxml2-utils
 
 before_install:
   - pip install --upgrade pip setuptools wheel
