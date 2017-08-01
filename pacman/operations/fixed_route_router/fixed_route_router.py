@@ -5,7 +5,7 @@ from spinn_machine import MulticastRoutingEntry
 
 class FixedRouteRouter(object):
     """ fixed router that makes a mirror path on every board based off the
-    below diagram. It assumed there's a core on the ethernet connected chip 
+    below diagram. It assumed there's a core on the ethernet connected chip
     that is of the destination class.
 
 
