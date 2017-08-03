@@ -50,7 +50,6 @@ class IsomorphicChecker(object):
         chip_vertices = set()
         chip_vertices_copy = set()
         chips = set()
-        correct = True
 
         # create a list of processors with assigned vertices
         for x, y, p in placements.get_placed_processors():
@@ -65,8 +64,6 @@ class IsomorphicChecker(object):
                 if placements_copy.is_processor_occupied(x, y, p):
                     chip_vertices_copy.add(
                         placements_copy.get_vertex_on_processor(x, y, p))
-        if chip_vertices != chip_vertices_copy:
-            correct = False
 
-        # print chips
-        return correct
+        # if the two sets are not
+        return chip_vertices != chip_vertices_copy
