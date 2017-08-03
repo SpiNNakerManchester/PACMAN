@@ -165,6 +165,73 @@
             <param_type>MemoryPlacements</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="HilbertPlacer">
+        <python_module>pacman.operations.rigged_algorithms.hilbert_placer</python_module>
+        <python_class>HilbertPlacer</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>machine</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryPlacements2</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="RandomPlacer">
+        <python_module>pacman.operations.rigged_algorithms.random_placer</python_module>
+        <python_class>RandomPlacer</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>machine</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryPlacements</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="IsomorphicChecker">
+        <python_module>pacman.operations.rigged_algorithms.isomorph_check</python_module>
+        <python_class>IsomorphicChecker</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements_copy</param_name>
+                <param_type>MemoryPlacements2</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>placements</param_name>
+            <param_name>placements_copy</param_name>
+        </required_inputs>
+        <outputs>
+        </outputs>
+    </algorithm>
     <algorithm name="BasicDijkstraRouting">
         <python_module>pacman.operations.router_algorithms.basic_dijkstra_routing</python_module>
         <python_class>BasicDijkstraRouting</python_class>
