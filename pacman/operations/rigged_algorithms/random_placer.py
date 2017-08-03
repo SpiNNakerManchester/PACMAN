@@ -60,13 +60,17 @@ class RandomPlacer(object):
         attempt to place vertex on that chip
         """
 
-        chips = set()
+        chips = set(machine)
 
         for x in range(0, machine.max_chip_x):
             for y in range(0, machine.max_chip_y):
                 chips.add((x, y))
 
-        yield random.sample(chips, 1)[0]
+        randomized_chips = random.sample(chips, 1)
+
+        for x, y in randomized_chips:
+            if machine.is_chip_at(x, y):
+                yield x, y
 
     def _place_vertex(self, vertex, resource_tracker, machine,
                       placements, location):
@@ -87,7 +91,8 @@ class RandomPlacer(object):
         else:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 vertex.resources_required, vertex.constraints, chips)
-            placement = Placement(vertex, x, y, p)
-            placements.add_placement(placement)
+            if not placements.is_processor_occupied(x, y, p):
+                placement = Placement(vertex, x, y, p)
+                placements.add_placement(placement)
 
         return vertices
