@@ -1,5 +1,5 @@
 class HilbertState(object):
-    """ A mutable state object for the hilbert placer algorithm.
+    """ A mutable self object for the hilbert placer algorithm.
     """
 
     def __init__(self, xpos=0, ypos=0, xchange=1, ychange=0):
@@ -19,3 +19,25 @@ class HilbertState(object):
         self.y_pos = ypos
         self.change_x = xchange
         self.change_y = ychange
+
+    def _turn_left(self, angle=1):
+        self.change_x, self.change_y = (
+            self.change_y * -angle, self.change_x * angle)
+
+    def _turn_right(self, angle=1):
+        self.change_x, self.change_y = (
+            self.change_y * angle, self.change_x * -angle)
+
+    def _move_forward(self):
+        self.x_pos = self.x_pos + self.change_x
+        self.y_pos = self.y_pos + self.change_y
+
+    def get_turn_left(self):
+        yield self.change_x, self.change_y in self._turn_left()
+
+    def get_turn_right(self):
+        yield self.change_x, self.change_y in self._turn_right()
+
+    def get_move_forward(self):
+        yield self.x_pos, self.y_pos in self._move_forward()
+
