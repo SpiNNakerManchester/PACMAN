@@ -181,7 +181,7 @@ class HilbertPlacer(object):
             return
 
         # Turn left
-        HilbertState.get_turn_left(state)
+        HilbertState._turn_left(state)
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -189,10 +189,10 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Move forward
-        HilbertState.get_move_forward(state)
+        HilbertState._move_forward(state)
 
         # Turn right
-        HilbertState.get_turn_right(state)
+        HilbertState._turn_right(state)
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -200,7 +200,7 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Move forward
-        HilbertState.get_move_forward(state)
+        HilbertState._move_forward(state)
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -208,10 +208,11 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn right
-        HilbertState.get_turn_right(state)
+        HilbertState._turn_right(state)
 
         # Move forward
-        HilbertState.get_move_forward(state)
+        HilbertState._move_forward(state)
+        yield state.x_pos, state.y_pos
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -219,4 +220,4 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn left
-        HilbertState.get_turn_left(state)
+        HilbertState._turn_left(state)
