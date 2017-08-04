@@ -35,7 +35,7 @@ class MyTestCase(unittest.TestCase):
         """
         This method discovers all the routing keys covered by this route
 
-        Starts of wwith the assumption thsat the key is always covered/
+        Starts of with the assumption thsat the key is always covered/
 
         Whenever a mask bit is zero the list of covered keys is doubled to
             include both the key with a aero and a one at that place
@@ -63,7 +63,29 @@ class MyTestCase(unittest.TestCase):
                     covers.append(covers[j] + bit_value)
         return covers
 
-    def all_covers(self, table, length=4):
+    def pattern(self, route, length=4):
+        mask = route.mask
+        routing_entry_key = route.routing_entry_key
+        covers = ""
+        # Check each bit in the mask
+        for i in reversed(range(length)):
+            bit_value = 2**i
+            if mask & bit_value == 0:
+                if routing_entry_key & bit_value == 0:
+                    covers += "X"
+                else:
+                    # Safety key 1 with mask 0 is an error
+                    msg = "Bit {} on the mask:{} is 0 but 1 in the key:{}" \
+                          "".format(i, bin(mask), bin(routing_entry_key))
+                    raise AssertionError(msg)
+            else:
+                if routing_entry_key & bit_value == 0:
+                    covers += "0"
+                else:
+                    covers += "1"
+        return covers
+
+    def all_pattern(self, table, length=4):
         """
         This method discovers all the routing keys covered by this
             routing table
@@ -76,7 +98,8 @@ class MyTestCase(unittest.TestCase):
         """
         covers = set()
         for route in table.multicast_routing_entries:
-            covers.update(self.covers(route))
+            print route, "*", self.pattern(route)
+            covers.add(self.pattern(route))
         return covers
 
     def test(self):
@@ -126,8 +149,8 @@ class MyTestCase(unittest.TestCase):
 
         # Minimise as far as possible
         assert compressed_table.number_of_entries == 5
-        covers = self.all_covers(original_table)
-        self.table_compare(original_table, compressed_table, covers)
+        patterns = self.all_pattern(original_table)
+        #self.table_compare(original_table, compressed_table, covers)
 
 
 if __name__ == '__main__':
