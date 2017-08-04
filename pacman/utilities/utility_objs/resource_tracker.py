@@ -71,7 +71,10 @@ class ResourceTracker(object):
         "_chips_available",
 
         # Number of cores preallocated on each chip (by x, y coordinates)
-        "_n_cores_preallocated"
+        "_n_cores_preallocated",
+
+        # counter of chips that have had processors allocated to them
+        "_chips_used"
     ]
 
     def __init__(self, machine, chips=None, preallocated_resources=None):
@@ -105,6 +108,9 @@ class ResourceTracker(object):
 
         # The machine object
         self._machine = machine
+
+        # tracker for chips used
+        self._chips_used = set()
 
         # Set of tags available indexed by board address
         # Note that entries are only added when a board is first used
@@ -446,7 +452,7 @@ class ResourceTracker(object):
         :param chip: The chip to check the resources of
         :type chip: :py:class:`spinn_machine.Chip`
         :param key: The (x, y) coordinates of the chip
-        :type key: tuple of (int, int)
+        :type key: (int, int)
         :param processor_id: A constraining fixed processor id
         :type processor_id: int or None
         :return: The number of cores that meet the given constraints
@@ -728,7 +734,7 @@ class ResourceTracker(object):
         :param chip: The chip to allocate the resources of
         :type chip: :py:class:`spinn_machine.Chip`
         :param key: The (x, y) coordinates of the chip
-        :type key: tuple of (int, int)
+        :type key: (int, int)
         :param processor_id: The id of the processor to allocate
         :type processor_id: int
         """
@@ -743,6 +749,11 @@ class ResourceTracker(object):
 
         if len(self._core_tracker[key]) == self._n_cores_preallocated[key]:
             self._chips_available.remove(key)
+
+        # update chip tracker
+        self._chips_used.add(key)
+
+        # return processor id
         return processor_id
 
     def _fill_in_core_tracker_for_chip(self, key, chip):
@@ -1286,8 +1297,13 @@ class ResourceTracker(object):
         """
 
         self._chips_available.add((chip_x, chip_y))
-        self._sdram_tracker -= resources.sdram.get_value()
+        self._sdram_tracker[chip_x, chip_y] -= resources.sdram.get_value()
         self._core_tracker[(chip_x, chip_y)].add(processor_id)
+
+        # check if chip used needs updating
+        if (len(self._core_tracker[(chip_x, chip_y)]) ==
+                self._machine.get_chip_at(chip_x, chip_y).n_user_processors):
+            self._chips_used.remove((chip_x, chip_y))
 
         # Deallocate the ip tags
         if ip_tags is not None:
@@ -1333,3 +1349,11 @@ class ResourceTracker(object):
         """ The chip coordinates assigned
         """
         return self._sdram_tracker.keys()
+
+    @property
+    def chips_used(self):
+        """ deduce the number of chips used in this allocation
+
+        :return: the number of chips used during the allocation.
+        """
+        return len(self._chips_used)
