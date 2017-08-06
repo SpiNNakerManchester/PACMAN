@@ -181,7 +181,7 @@ class HilbertPlacer(object):
             return
 
         # Turn left
-        HilbertState.get_turn_left(state)
+        HilbertState.get_turn_left(state, angle)
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
