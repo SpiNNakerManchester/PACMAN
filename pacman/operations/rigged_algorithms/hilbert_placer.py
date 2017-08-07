@@ -75,7 +75,8 @@ class HilbertPlacer(object):
         :param additional_placement_constraints:\
             Additional placement constraints supported by the algorithm doing\
             this check
-        :type additional_placement_constraints: set
+        :type additional_placement_constraints: :py:class:\
+            `pacman.model.constraints.placer_constraints.abstract_placer_constraint`
         """
 
         placement_constraints = {SameChipAsConstraint}
