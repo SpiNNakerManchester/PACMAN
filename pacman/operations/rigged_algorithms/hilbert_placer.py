@@ -71,11 +71,12 @@ class HilbertPlacer(object):
             self, vertices, additional_placement_constraints=None):
         """ Ensure that the algorithm conforms to any required constraints.
         :param vertices: The vertices for which to check the constraints
-        :type vertices: object
+        :type vertices: dictionary object of vertices and associated constraints
         :param additional_placement_constraints:\
             Additional placement constraints supported by the algorithm doing\
             this check
-        :type additional_placement_constraints: set
+        :type additional_placement_constraints: set of :py:class:\
+            `pacman.model.constraints.placer_constraints.abstract_placer_constraint`
         """
 
         placement_constraints = {SameChipAsConstraint}
