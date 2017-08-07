@@ -182,7 +182,6 @@ class HilbertPlacer(object):
         if level <= 0:
             return
 
-        # Turn left
         state.turn_left(angle)
 
         # Recurse negative
@@ -190,10 +189,8 @@ class HilbertPlacer(object):
                         level - 1, -angle, state):
             yield state.x_pos, state.y_pos
 
-        # Move forward
         yield state.move_forward()
 
-        # Turn right
         state.turn_right(angle)
 
         # Recurse positive
@@ -201,7 +198,6 @@ class HilbertPlacer(object):
                         level - 1, angle, state):
             yield state.x_pos, state.y_pos
 
-        # Move forward
         yield state.move_forward()
 
         # Recurse positive
@@ -209,10 +205,8 @@ class HilbertPlacer(object):
                         level - 1, angle, state):
             yield state.x_pos, state.y_pos
 
-        # Turn right
         state.turn_right(angle)
 
-        # Move forward
         yield state.move_forward()
 
         # Recurse negative
@@ -220,5 +214,4 @@ class HilbertPlacer(object):
                         level - 1, -angle, state):
             yield state.x_pos, state.y_pos
 
-        # Turn left
         state.turn_left(angle)
