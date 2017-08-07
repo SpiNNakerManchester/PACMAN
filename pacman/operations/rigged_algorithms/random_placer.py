@@ -73,9 +73,8 @@ class RandomPlacer(object):
                 chips.add((x, y))
 
         for x, y in chips:
-            randomized_chips = random.sample(chips, 1)
-            if (resource_tracker is None or
-                    resource_tracker.is_chip_available(x, y)):
+            randomized_chips = random.sample(chips, 1)[0]
+            if machine.is_chip_at(x, y):
                 yield x, y in randomized_chips
 
     def _place_vertex(self, vertex, resource_tracker, machine,
@@ -91,14 +90,12 @@ class RandomPlacer(object):
                     (vert.resources_required, vert.constraints)
                     for vert in vertices], chips)
             for (x, y, p, _, _), vert in zip(assigned_values, vertices):
-                if not placements.is_processor_occupied(x, y, p):
-                    placement = Placement(vert, x, y, p)
-                    placements.add_placement(placement)
+                placement = Placement(vert, x, y, p)
+                placements.add_placement(placement)
         else:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 vertex.resources_required, vertex.constraints, chips)
-            if not placements.is_processor_occupied(x, y, p):
-                placement = Placement(vertex, x, y, p)
-                placements.add_placement(placement)
+            placement = Placement(vertex, x, y, p)
+            placements.add_placement(placement)
 
         return vertices
