@@ -169,7 +169,6 @@ class HilbertPlacer(object):
         :rtype HilbertState object \
             :py:class:`pacman.operations.rigged_algorithms.hilbert_state.HilbertState`
         """
-        # TODO: break steps into methods
 
         # Create state object first time we're called while also yielding
         # first position
@@ -182,8 +181,7 @@ class HilbertPlacer(object):
             return
 
         # Turn left
-        state.change_x, state.change_y = (
-            state.change_y * -angle, state.change_x * angle)
+        state.turn_left(angle)
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -191,13 +189,10 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Move forward
-        state.x_pos = state.x_pos + state.change_x
-        state.y_pos = state.y_pos + state.change_y
-        yield state.x_pos, state.y_pos
+        yield state.move_forward()
 
         # Turn right
-        state.change_x, state.change_y = (
-            state.change_y * angle, state.change_x * -angle)
+        state.turn_right(angle)
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -205,9 +200,7 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Move forward
-        state.x_pos = state.x_pos + state.change_x
-        state.y_pos = state.y_pos + state.change_y
-        yield state.x_pos, state.y_pos
+        yield state.move_forward()
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -215,13 +208,10 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn right
-        state.change_x, state.change_y = (
-            state.change_y * angle, state.change_x * -angle)
+        state.turn_right(angle)
 
         # Move forward
-        state.x_pos = state.x_pos + state.change_x
-        state.y_pos = state.y_pos + state.change_y
-        yield state.x_pos, state.y_pos
+        yield state.move_forward()
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -229,5 +219,4 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn left
-        state.change_x, state.change_y = (
-            state.change_y * -angle, state.change_x * angle)
+        state.turn_left(angle)
