@@ -14,11 +14,8 @@ class RandomPlacer(object):
     def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
-        ResourceTracker.check_constraints(
-            machine_graph.vertices,
-            additional_placement_constraints={SameChipAsConstraint})
+        ResourceTracker.check_constraints(machine_graph.vertices)
 
-        # placements_copy = Placements()
         placements = Placements()
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
@@ -33,8 +30,6 @@ class RandomPlacer(object):
         vertices_on_same_chip = \
             placer_algorithm_utilities.get_same_chip_vertex_groups(
                     machine_graph.vertices)
-
-        # iterate over vertices and generate placements
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
@@ -71,9 +66,11 @@ class RandomPlacer(object):
             for y in range(0, machine.max_chip_y):
                 chips.add((x, y))
 
-        for x, y in chips:
+        randomized_chips = random.sample(chips, 1)
+
+        for x, y in randomized_chips:
             if machine.is_chip_at(x, y):
-                yield random.sample(chips, 1)[0]
+                yield x, y
 
     def _place_vertex(self, vertex, resource_tracker, machine,
                       placements, location):
@@ -81,7 +78,6 @@ class RandomPlacer(object):
         vertices = location[vertex]
         #random x and y value within the maximum of the machine
         chips = self._generate_random_chips(machine)
-        print chips
 
         if len(vertices) > 1:
             assigned_values = \
@@ -95,7 +91,8 @@ class RandomPlacer(object):
         else:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 vertex.resources_required, vertex.constraints, chips)
-            placement = Placement(vertex, x, y, p)
-            placements.add_placement(placement)
+            if not placements.is_processor_occupied(x, y, p):
+                placement = Placement(vertex, x, y, p)
+                placements.add_placement(placement)
 
         return vertices
