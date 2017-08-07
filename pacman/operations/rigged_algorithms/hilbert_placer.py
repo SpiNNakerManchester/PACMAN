@@ -45,8 +45,9 @@ class HilbertPlacer(object):
 
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
-        resource_tracker = ResourceTracker(
-            machine, self._generate_hilbert_chips(machine))
+        resource_tracker = ResourceTracker(machine,
+                                           self._generate_hilbert_chips(
+                                               machine))
 
         # get vertices which must be placed on the same chip
         vertices_on_same_chip = \
@@ -58,10 +59,11 @@ class HilbertPlacer(object):
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
-                    vertex, resource_tracker, machine, placements,
+                    vertex, resource_tracker, machine,
+                    # placements_copy,
+                    placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
-
         # return placements_copy
         return placements
 
@@ -132,10 +134,10 @@ class HilbertPlacer(object):
         # prioritize vertices that should be on the same chip
         if len(vertices) > 1:
             assigned_values = \
-                resource_tracker.allocate_constrained_group_resources(
-                    [(vert.resources_required, vert.constraints)
-                     for vert in vertices],
-                    chips)
+                resource_tracker.allocate_constrained_group_resources([
+                    (vert.resources_required, vert.constraints)
+                    for vert in vertices
+                ], chips)
             for (x, y, p, _, _), vert in zip(assigned_values, vertices):
                 placement = Placement(vert, x, y, p)
                 placements.add_placement(placement)
@@ -179,7 +181,7 @@ class HilbertPlacer(object):
             return
 
         # Turn left
-        HilbertState.get_turn_left(state, angle)
+        state.turn_left(angle)
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -187,10 +189,10 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Move forward
-        HilbertState.get_move_forward(state)
+        yield state.move_forward()
 
         # Turn right
-        HilbertState.get_turn_right(state)
+        state.turn_right(angle)
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -198,7 +200,7 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Move forward
-        HilbertState.get_move_forward(state)
+        yield state.move_forward()
 
         # Recurse positive
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -206,11 +208,10 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn right
-        HilbertState.get_turn_right(state)
+        state.turn_right(angle)
 
         # Move forward
-        HilbertState.get_move_forward(state)
-        yield state.x_pos, state.y_pos
+        yield state.move_forward()
 
         # Recurse negative
         for state.x_pos, state.y_pos in self._hilbert_curve(
@@ -218,4 +219,4 @@ class HilbertPlacer(object):
             yield state.x_pos, state.y_pos
 
         # Turn left
-        HilbertState.get_turn_left(state)
+        state.turn_left(angle)
