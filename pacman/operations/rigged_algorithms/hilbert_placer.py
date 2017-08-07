@@ -60,11 +60,9 @@ class HilbertPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine,
-                    # placements_copy,
                     placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
-        # return placements_copy
         return placements
 
     def _check_constraints(
