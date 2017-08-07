@@ -15,31 +15,41 @@ class HilbertState(object):
         :type ychange: int
         """
 
-        self.x_pos = xpos
-        self.y_pos = ypos
-        self.change_x = xchange
-        self.change_y = ychange
+        self._x_pos = xpos
+        self._y_pos = ypos
+        self._change_x = xchange
+        self._change_y = ychange
+        self._angle = angle
 
-    def _turn_left(self, angle):
-        self.change_x, self.change_y = (
-            self.change_y * -angle, self.change_x * angle)
+    def turn_left(self, angle):
+        self._change_x, self._change_y = (
+            self._change_y * -angle, self._change_x * angle)
+        return self._change_x, self._change_y
 
-    def _turn_right(self):
-        self.change_x, self.change_y = (
-            self.change_y * 1, self.change_x * -1)
+    def turn_right(self, angle):
+        self._change_x, self._change_y = (
+            self._change_y * angle, self._change_x * -angle)
+        return self._change_x, self._change_y
 
-    def _move_forward(self):
-        xp = self.x_pos
-        yp = self.y_pos
-        self.x_pos = xp + self.change_x
-        self.y_pos = yp + self.change_y
+    def move_forward(self):
+        xp = self._x_pos
+        yp = self._y_pos
+        self._x_pos = xp + self._change_x
+        self._y_pos = yp + self._change_y
+        return self._x_pos, self._y_pos
 
-    def get_turn_left(self, angle):
-        yield self.change_x, self.change_y in self._turn_left(angle)
+    @property
+    def x_pos(self):
+        return self._x_pos
 
-    def get_turn_right(self):
-        yield self.change_x, self.change_y in self._turn_right()
+    @x_pos.setter
+    def x_pos(self, new_value):
+        self._x_pos = new_value
 
-    def get_move_forward(self):
-        yield self.x_pos, self.y_pos in self._move_forward()
+    @property
+    def y_pos(self):
+        return self._y_pos
 
+    @y_pos.setter
+    def y_pos(self, new_value):
+        self._y_pos = new_value
