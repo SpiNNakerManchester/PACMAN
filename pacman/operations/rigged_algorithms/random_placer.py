@@ -50,9 +50,15 @@ class RandomPlacer(object):
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
 
-    def _generate_random_chips(self, machine, random=default_random):
+    def _generate_random_chips(self, machine, random=default_random,
+                               resource_tracker=None):
         """ Generates the list of chips in a random order, with the option \
          to provide a starting point.
+        :param resource_tracker:\
+            the resource tracker object which contains what resources of the\
+            machine have currently been used
+        :type resource_tracker: None or \
+                :py:class:`ResourceTracker`
 
         get max x and y dimensions of board
         check if that chip exists
@@ -66,11 +72,11 @@ class RandomPlacer(object):
             for y in range(0, machine.max_chip_y):
                 chips.add((x, y))
 
-        randomized_chips = random.sample(chips, 1)
-
-        for x, y in randomized_chips:
-            if machine.is_chip_at(x, y):
-                yield x, y
+        for x, y in chips:
+            randomized_chips = random.sample(chips, 1)
+            if (resource_tracker is None or
+                    resource_tracker.is_chip_available(x, y)):
+                yield x, y in randomized_chips
 
     def _place_vertex(self, vertex, resource_tracker, machine,
                       placements, location):
