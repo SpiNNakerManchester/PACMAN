@@ -1,5 +1,5 @@
 from pacman.utilities import rig_converters
-from rig.place_and_route.place.hilbert import place
+from rig.place_and_route.place.rand import place
 from rig.place_and_route.allocate.greedy import allocate
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.timer import Timer
