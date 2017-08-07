@@ -68,6 +68,8 @@ class RandomPlacer(object):
 
         chips = set(machine)
 
+        # FIXME: problem is here, only yielding x value and bool at end
+        # of method for some reason
         for x in range(0, machine.max_chip_x):
             for y in range(0, machine.max_chip_y):
                 chips.add((x, y))
