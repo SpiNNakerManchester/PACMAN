@@ -68,8 +68,8 @@ class RandomPlacer(object):
 
         chips = set(machine)
 
-        # FIXME: problem is here, only yielding x value and bool at end
-        # of method for some reason
+        # FIXME: for some reason this adds (x,y) and second line
+        # adds a machine object
         for x in range(0, machine.max_chip_x):
             for y in range(0, machine.max_chip_y):
                 chips.add((x, y))
@@ -77,7 +77,7 @@ class RandomPlacer(object):
         for x, y in chips:
             randomized_chips = random.sample(chips, 1)[0]
             if machine.is_chip_at(x, y):
-                yield x, y in randomized_chips
+                yield randomized_chips
 
     def _place_vertex(self, vertex, resource_tracker, machine,
                       placements, location):
