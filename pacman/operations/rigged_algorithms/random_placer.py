@@ -68,15 +68,13 @@ class RandomPlacer(object):
 
         chips = set(machine)
 
-        # FIXME: for some reason this adds (x,y) and second line
-        # adds a machine object
         for x in range(0, machine.max_chip_x):
             for y in range(0, machine.max_chip_y):
                 chips.add((x, y))
 
         for x, y in chips:
             randomized_chips = random.sample(chips, 1)[0]
-            if machine.is_chip_at(x, y):
+            if machine.is_chip_at(randomized_chips[0], randomized_chips[1]):
                 yield randomized_chips
 
     def _place_vertex(self, vertex, resource_tracker, machine,
