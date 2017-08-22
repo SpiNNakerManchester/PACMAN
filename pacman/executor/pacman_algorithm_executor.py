@@ -10,7 +10,6 @@ from pacman.utilities import file_format_converters
 
 # general imports
 import logging
-import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -522,11 +521,11 @@ class PACMANAlgorithmExecutor(object):
                             "\t\t{}:{}\n".format(output.output_type, the_type))
                 provenance_file.write("\n")
         except Exception:
-            logger.error("Exception when attempting to write provenance")
-            traceback.print_exc()
+            logger.error("Exception when attempting to write provenance",
+                         exc_info=True)
 
     def _report_inputs(self, provenance_file, inputs):
-        for input in inputs:
+        for input in inputs:  # @ReservedAssignment
             name = input.name
             for param_type in input.param_types:
                 if param_type in self._internal_type_mapping:
