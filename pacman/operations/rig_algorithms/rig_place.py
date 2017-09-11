@@ -1,8 +1,7 @@
 from pacman.utilities import rig_converters
-from rig.place_and_route.place.rand import place
+from rig.place_and_route.place.sa import place
 from rig.place_and_route.allocate.greedy import allocate
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.timer import Timer
 
 
 class RigPlace(object):
@@ -31,13 +30,8 @@ class RigPlace(object):
                 machine_graph, rig_machine))
         progress_bar.update()
 
-        time = Timer()
-        time.start_timing()
-
         rig_placements = place(
             vertices_resources, nets, rig_machine, rig_constraints)
-        x = time.take_sample()
-        print x
         progress_bar.update()
 
         rig_allocations = allocate(
