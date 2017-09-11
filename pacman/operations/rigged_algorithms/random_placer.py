@@ -66,13 +66,13 @@ class RandomPlacer(object):
         attempt to place vertex on that chip
         """
 
-        chips = set(machine)
+        chips = set()
 
         for x in range(0, machine.max_chip_x):
             for y in range(0, machine.max_chip_y):
                 chips.add((x, y))
 
-        for x, y in chips:
+        for _ in chips:
             randomized_chips = random.sample(chips, 1)[0]
             if machine.is_chip_at(randomized_chips[0], randomized_chips[1]):
                 yield randomized_chips
