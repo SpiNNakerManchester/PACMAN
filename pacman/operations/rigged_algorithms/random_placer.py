@@ -1,11 +1,11 @@
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements import Placement, Placements
-from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 
 from spinn_utilities.progress_bar import ProgressBar
 
-import random as default_random
+import random
+import numpy
 
 
 class RandomPlacer(object):
@@ -41,15 +41,8 @@ class RandomPlacer(object):
         return placements_copy
         # return placements
 
-    def _check_constraints(
-            self, vertices, additional_placement_constraints=None):
-        placement_constraints = {SameChipAsConstraint}
-        if additional_placement_constraints is not None:
-            placement_constraints.update(additional_placement_constraints)
-        ResourceTracker.check_constraints(
-            vertices, additional_placement_constraints=placement_constraints)
-
-    def _generate_random_chips(self, machine, random=default_random):
+    @staticmethod
+    def _generate_random_chips(machine, np=numpy, random_generator=random):
         """Generates the list of chips in a random order, with the option \
          to provide a starting point.
 
@@ -61,17 +54,37 @@ class RandomPlacer(object):
         :rtype (int, int)
         """
 
-        chips = set()
-        random.seed(2)
+        # Create a numpy array of size equal or greater to size of machine,
+        # populated with all false values
+        rand_array = np.ones((machine.max_chip_x, machine.max_chip_y), dtype=bool)
+        i = 0
+        max_x = machine.max_chip_x-1
+        max_y = machine.max_chip_y-1
 
-        for x in range(0, machine.max_chip_x):
-            for y in range(0, machine.max_chip_y):
-                chips.add((x, y))
+        # The following method is used to optimise the runtime of this
+        # algorithm for large machines:
+        # Choose an arbitrary number of times the generator is allowed to
+        # pick an already used chip. Once the array begins to run out of
+        # unused chips, create a list of the remainder and shuffle it.
+        while i < 3:
+            x = random_generator.randint(0, max_x)
+            y = random_generator.randint(0, max_y)
+            if rand_array[x][y]:
+                i = 0
+                rand_array[x][y] = 0
+                if machine.is_chip_at(x, y):
+                    yield x, y
+            else:
+                i += 1
 
-        for _ in chips:
-            randomized_chips = random.sample(chips, 1)[0]
-            if machine.is_chip_at(randomized_chips[0], randomized_chips[1]):
-                yield randomized_chips
+        remaining_chips = list()
+        (xs, ys) = rand_array.nonzero()
+        for (x, y) in zip(xs, ys):
+            remaining_chips.append((x, y))
+
+        random_generator.shuffle(remaining_chips)
+        for (x, y) in remaining_chips:
+            yield x, y
 
     def _place_vertex(self, vertex, resource_tracker, machine,
                       placements, location):
