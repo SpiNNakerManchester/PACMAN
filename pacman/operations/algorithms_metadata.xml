@@ -204,7 +204,7 @@
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>MemoryPlacements2</param_type>
         </outputs>
     </algorithm>
     <algorithm name="IsomorphicChecker">

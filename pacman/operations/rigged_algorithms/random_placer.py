@@ -15,7 +15,7 @@ class RandomPlacer(object):
         # check that the algorithm can handle the constraints
         ResourceTracker.check_constraints(machine_graph.vertices)
 
-        placements = Placements()
+        placements_copy = Placements()
         vertices = \
             placer_algorithm_utilities.sort_vertices_by_known_constraints(
                 machine_graph.vertices)
@@ -34,12 +34,12 @@ class RandomPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine,
-                    # placements_copy,
-                    placements,
+                    placements_copy,
+                    # placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
-        # return placements_copy
-        return placements
+        return placements_copy
+        # return placements
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
@@ -62,6 +62,7 @@ class RandomPlacer(object):
         """
 
         chips = set()
+        random.seed(2)
 
         for x in range(0, machine.max_chip_x):
             for y in range(0, machine.max_chip_y):
