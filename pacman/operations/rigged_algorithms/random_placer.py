@@ -6,7 +6,6 @@ from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from spinn_utilities.progress_bar import ProgressBar
 
 import random as default_random
-import itertools
 
 
 class RandomPlacer(object):
@@ -57,6 +56,7 @@ class RandomPlacer(object):
         :param machine: A SpiNNaker machine object.
         :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
         :param random: Python's random number generator
+        :type random: :py:class:`random.Random`
         :return x, y coordinates of chips for placement
         :rtype (int, int)
         """
@@ -76,7 +76,7 @@ class RandomPlacer(object):
                       placements, location):
 
         vertices = location[vertex]
-        #random x and y value within the maximum of the machine
+        # random x and y value within the maximum of the machine
         chips = self._generate_random_chips(machine)
 
         if len(vertices) > 1:
