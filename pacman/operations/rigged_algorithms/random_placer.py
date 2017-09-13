@@ -10,6 +10,14 @@ import numpy
 
 class RandomPlacer(object):
 
+    # This placer chooses chips on a machine on which to place vertices at
+    # random, and tracks those which have already been used.
+    # THRESHOLD is an arbitrary number of times the generator is allowed to
+    # pick an already used chip. Once past this threshold is it assumed the
+    # algorithm begins to run out of unused chips and switches to picking from
+    # a list.
+    THRESHOLD = 3
+
     def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints
@@ -41,8 +49,7 @@ class RandomPlacer(object):
         return placements
         # return placements
 
-    @staticmethod
-    def _generate_random_chips(machine, np=numpy, random_generator=random):
+    def _generate_random_chips(self, machine, np=numpy, random_generator=random):
         """Generates the list of chips in a random order, with the option \
          to provide a starting point.
 
@@ -59,7 +66,6 @@ class RandomPlacer(object):
         rand_array = np.ones((machine.max_chip_x, machine.max_chip_y),
                              dtype=bool)
         tries = 0
-        threshold = 3
         max_x = machine.max_chip_x - 1
         max_y = machine.max_chip_y - 1
 
@@ -69,7 +75,7 @@ class RandomPlacer(object):
         # pick an already used chip. Once past this threshold (the array
         # begins to run out of unused chips), create a list of the
         # remainder and shuffle it.
-        while tries < threshold:
+        while tries < self.THRESHOLD:
             x = random_generator.randint(0, max_x)
             y = random_generator.randint(0, max_y)
             if rand_array[x][y]:
