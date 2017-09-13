@@ -56,32 +56,38 @@ class RandomPlacer(object):
 
         # Create a numpy array of size equal or greater to size of machine,
         # populated with all false values
-        rand_array = np.ones((machine.max_chip_x, machine.max_chip_y), dtype=bool)
-        i = 0
-        max_x = machine.max_chip_x-1
-        max_y = machine.max_chip_y-1
+        rand_array = np.ones((machine.max_chip_x, machine.max_chip_y),
+                             dtype=bool)
+        tries = 0
+        threshold = 3
+        max_x = machine.max_chip_x - 1
+        max_y = machine.max_chip_y - 1
 
         # The following method is used to optimise the runtime of this
         # algorithm for large machines:
         # Choose an arbitrary number of times the generator is allowed to
-        # pick an already used chip. Once the array begins to run out of
-        # unused chips, create a list of the remainder and shuffle it.
-        while i < 3:
+        # pick an already used chip. Once past this threshold (the array
+        # begins to run out of unused chips), create a list of the
+        # remainder and shuffle it.
+        while tries < threshold:
             x = random_generator.randint(0, max_x)
             y = random_generator.randint(0, max_y)
             if rand_array[x][y]:
-                i = 0
+                tries = 0
                 rand_array[x][y] = 0
                 if machine.is_chip_at(x, y):
                     yield x, y
             else:
-                i += 1
+                tries += 1
 
+        # Array is running out of unused chips. Create a list of those
+        # remaining (still are True, or nonzero)
         remaining_chips = list()
         (xs, ys) = rand_array.nonzero()
         for (x, y) in zip(xs, ys):
             remaining_chips.append((x, y))
 
+        # Shuffle list of unused chips for randomness
         random_generator.shuffle(remaining_chips)
         for (x, y) in remaining_chips:
             yield x, y
