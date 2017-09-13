@@ -49,7 +49,8 @@ class RandomPlacer(object):
         return placements
         # return placements
 
-    def _generate_random_chips(self, machine, np=numpy, random_generator=random):
+    def _generate_random_chips(self, machine, np=numpy,
+                               random_generator=random):
         """Generates the list of chips in a random order, with the option \
          to provide a starting point.
 
@@ -75,7 +76,7 @@ class RandomPlacer(object):
         # pick an already used chip. Once past this threshold (the array
         # begins to run out of unused chips), create a list of the
         # remainder and shuffle it.
-        while tries < self.THRESHOLD:
+        while tries < RandomPlacer.THRESHOLD:
             x = random_generator.randint(0, max_x)
             y = random_generator.randint(0, max_y)
             if rand_array[x][y]:
