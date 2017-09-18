@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 
 class MulticastRoutingTableByPartition(object):
     """ A set of multicast routing path objects
@@ -9,7 +11,7 @@ class MulticastRoutingTableByPartition(object):
     ]
 
     def __init__(self):
-        self._router_to_entries_map = dict()
+        self._router_to_entries_map = OrderedDict()
 
     def add_path_entry(self, entry, router_x, router_y, partition):
         """ Adds a multicast routing path entry
@@ -25,7 +27,7 @@ class MulticastRoutingTableByPartition(object):
         # update router_to_entries_map
         key = (router_x, router_y)
         if key not in self._router_to_entries_map:
-            self._router_to_entries_map[key] = dict()
+            self._router_to_entries_map[key] = OrderedDict()
 
         if partition not in self._router_to_entries_map[key]:
             self._router_to_entries_map[key][partition] = entry
