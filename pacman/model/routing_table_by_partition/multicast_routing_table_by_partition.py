@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+
 class MulticastRoutingTableByPartition(object):
     """ A set of multicast routing path objects
     """
