@@ -116,6 +116,13 @@ class BaseKeyAndMask(object):
             numpy.asarray([self._mask], dtype=">u4").view(dtype="uint8"))
         zeros = numpy.where(unwrapped_mask == 0)[0]
 
+        # If there are no zeros, there is only one key in the range, so
+        # return that
+        if len(zeros) == 0:
+            key_array = numpy.zeros(1, dtype=">u4")
+            key_array[0] = self._base_key
+            return key_array, 1
+
         # We now know how many values there are - 2^len(zeros)
         max_n_keys = 2 ** len(zeros)
         if key_array is not None and len(key_array) < max_n_keys:
