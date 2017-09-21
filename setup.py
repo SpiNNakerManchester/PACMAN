@@ -12,7 +12,8 @@ assert __version__
 
 # Build a list of all project modules, as well as supplementary files
 main_package = "pacman"
-data_extensions = {".aplx", ".xml", ".json", ".xsd"}
+data_extensions = {".aplx", ".boot", ".json", ".xml", ".xsd"}
+config_extensions = {".cfg", ".template"}
 main_package_dir = os.path.join(os.path.dirname(__file__), main_package)
 start = len(main_package_dir)
 packages = []
@@ -27,6 +28,10 @@ for dirname, dirnames, filenames in os.walk(main_package_dir):
         _, ext = os.path.splitext(filename)
         if ext in data_extensions:
             ext_set.add(ext)
+        if ext in config_extensions:
+            package = "{}{}".format(
+                main_package, dirname[start:].replace(os.sep, '.'))
+            package_data[package].append(filename)
     for ext in ext_set:
         package = "{}{}".format(
             main_package, dirname[start:].replace(os.sep, '.'))
