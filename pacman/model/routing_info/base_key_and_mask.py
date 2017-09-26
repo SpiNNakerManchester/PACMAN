@@ -119,8 +119,9 @@ class BaseKeyAndMask(object):
         # If there are no zeros, there is only one key in the range, so
         # return that
         if len(zeros) == 0:
-            key_array = numpy.zeros(1, dtype=">u4")
-            key_array[0] = self._base_key
+            if key_array is None:
+                key_array = numpy.zeros(1, dtype=">u4")
+            key_array[offset] = self._base_key
             return key_array, 1
 
         # We now know how many values there are - 2^len(zeros)
