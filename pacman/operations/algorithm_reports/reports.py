@@ -547,6 +547,17 @@ def router_report_from_compressed_router_tables(report_folder, routing_tables):
             _generate_routing_table(routing_table, top_level_folder)
 
 
+def format_route(entry):
+    line_format = "0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}"
+
+    key = entry.routing_entry_key
+    mask = entry.mask
+    route = _reduce_route_value(entry.processor_ids, entry.link_ids)
+    route_txt = _expand_route_value(entry.processor_ids, entry.link_ids)
+    return line_format.format(key, mask, route, str(entry.defaultable),
+                              route_txt)
+
+
 def _generate_routing_table(routing_table, top_level_folder):
     file_name = "routing_table_{}_{}.rpt".format(
         routing_table.x, routing_table.y)
@@ -561,20 +572,13 @@ def _generate_routing_table(routing_table, top_level_folder):
             f.write(
                 "{:-<5s} {:-<10s} {:-<10s} {:-<10s} {:-<7s} {:-<14s}\n".format(
                     "", "", "", "", "", ""))
-            line_format = "{: >5d} 0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}\n"
+            line_format = "{: >5d} {}\n"
 
             entry_count = 0
             n_defaultable = 0
             for entry in routing_table.multicast_routing_entries:
                 index = entry_count & 0xFFFF
-                key = entry.routing_entry_key
-                mask = entry.mask
-                route = _reduce_route_value(
-                    entry.processor_ids, entry.link_ids)
-                route_txt = _expand_route_value(
-                    entry.processor_ids, entry.link_ids)
-                entry_str = line_format.format(
-                    index, key, mask, route, str(entry.defaultable), route_txt)
+                entry_str = line_format.format(index, format_route(entry))
                 entry_count += 1
                 if entry.defaultable:
                     n_defaultable += 1

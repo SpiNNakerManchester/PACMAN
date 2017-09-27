@@ -4,11 +4,13 @@ import os
 
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRoutingException
+from pacman.operations.algorithm_reports import reports
 
 logger = logging.getLogger(__name__)
 
 
 WILDCARD = "*"
+LINE_FORMAT = "0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}\n"
 
 
 def codify(route, length=32):
@@ -90,7 +92,7 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
         c_code = keys[i]
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
-            f.write("\t\t{}\n".format(c_route))
+            f.write("\t\t{}\n".format(reports.format_route(c_route)))
             if o_route.defaultable != c_route.defaultable:
                 msg = "Compressed route {} covers orignal route {} but has " \
                       "a different defaulatable value." \
@@ -113,7 +115,6 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
             return
         compare_route(f, o_route, compressed_dict, o_code=o_code, start=i+1)
         return
-
 
 def generate_routing_compression_checker_report(
         report_folder, routing_tables, compressed_routing_tables):
@@ -151,7 +152,7 @@ def generate_routing_compression_checker_report(
                     get_routing_table_for_chip(x, y)
                 compressed_dict = codify_table(compressed_table)
                 for o_route in original.multicast_routing_entries:
-                    f.write("\t{}\n".format(o_route))
+                    f.write("\t{}\n".format(reports.format_route(o_route)))
                     compare_route(f, o_route, compressed_dict)
 
     except IOError:
