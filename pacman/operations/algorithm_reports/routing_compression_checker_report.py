@@ -88,11 +88,9 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
     keys = compressed_dict.keys()
     for i in range(start, len(keys)):
         c_code = keys[i]
-        print o_code, c_code
         if covers(o_code, c_code):
-            print "covers"
             c_route = compressed_dict[c_code]
-            f.write("\t\t{}".format(c_route))
+            f.write("\t\t{}\n".format(c_route))
             if o_route.defaultable != c_route.defaultable:
                 msg = "Compressed route {} covers orignal route {} but has " \
                       "a different defaulatable value." \
@@ -109,7 +107,6 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
                       "".format(c_route, o_route)
                 PacmanRoutingException(msg)
             remainders = calc_remainders(o_code, c_code)
-            print remainders
             for remainder in remainders:
                 compare_route(f, o_route, compressed_dict, o_code=remainder,
                               start=i + 1)
@@ -128,9 +125,8 @@ def generate_routing_compression_checker_report(
     :param compressed_routing_tables: the compressed routing tables
     :rtype: None
     """
-    here = 1/0
     file_name = os.path.join(
-        report_folder, "routing_compression_checker_report")
+        report_folder, "routing_compression_checker_report.rpt")
 
     try:
         with open(file_name, "w") as f:
@@ -149,12 +145,13 @@ def generate_routing_compression_checker_report(
             for original in progress.over(routing_tables.routing_tables):
                 x = original.x
                 y = original.y
-                f.write("Chip: X:{} Y:{} ".format(x, y))
+                f.write("Chip: X:{} Y:{} \n".format(x, y))
 
                 compressed_table = compressed_routing_tables.\
                     get_routing_table_for_chip(x, y)
                 compressed_dict = codify_table(compressed_table)
                 for o_route in original.multicast_routing_entries:
+                    f.write("\t{}\n".format(o_route))
                     compare_route(f, o_route, compressed_dict)
 
     except IOError:
