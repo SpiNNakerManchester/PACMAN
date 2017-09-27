@@ -10,26 +10,15 @@ import unittest
 
 WILDCARD = "*"
 
-def check_route(o_route, compressed):
-    for c_route in compressed.multicast_routing_entries:
-        if o_route.routing_entry_key == c_route.routing_entry_key:
-            if o_route.mask == c_route.mask:
-                print "\tsame: ", c_route
-                return True
-            if c_route.mask & o_route.mask == c_route.mask:
-                print "\twider mask: ", c_route
-                return True
-        xor_route = o_route.routing_entry_key ^ c_route.routing_entry_key
-        if xor_route & c_route.mask == 0:
-            print "\tmask covers difference: ", c_route
-            return True
-        #print "\t", c_route
-        #print "\t\t", xor_route, xor_route & o_route.mask
+def calc_length(original, compressed):
+    max_key = 0
+    for route in original.multicast_routing_entries:
+        max_key = max(max_key, route.mask, route.routing_entry_key)
+    for route in compressed.multicast_routing_entries:
+        max_key = max(max_key, route.mask, route.routing_entry_key)
 
-    print "DANGER"
-    return False
 
-def codify(route, length=4):
+def codify(route, length=32):
     """
     This method discovers all the routing keys covered by this route
 
@@ -65,34 +54,37 @@ def codify(route, length=4):
                 code = "1" + code
     return code
 
-def codify_table(table, length=4):
+def codify_table(table, length=32):
     code_dict = OrderedDict()
     for route in table.multicast_routing_entries:
         code_dict[codify(route)]= route
     return code_dict
 
-"""
-def remainder(original, compressed):
-    if original == compressed:
-        # Same so no remainder
-        return []
-    if len(original) == 1:
-        # Covered by wildcard so no remainder
-        if compressed == WILDCARD:
-            return []
-        # No match so original stays
-        return [original]
-    if original[0] == compressed[0]:
-        for remain in remainder(original[1:], compressed[1:]):
-            pass
-"""
-
 def covers(o_code, c_code):
+    if o_code == c_code:
+        return True
+    for o_char, c_char in zip(o_code, c_code):
+        if o_char == "1" and c_char == "0":
+            return False
+        if o_char == "0" and c_char == "1":
+            return False
+        # o_char = c_char or either wildcard is some cover
     return True
 
 
 def calc_remainders(o_code, c_code):
-    return []
+    if o_code == c_code:
+        # "" = "" so also the terminator case
+        return []
+    remainders = []
+    for tail in calc_remainders(o_code[1:], c_code[1:]):
+        remainders.append(o_code[0] + tail)
+    if o_code[0] == WILDCARD:
+        if c_code[0] == "0":
+            remainders.append("1" + o_code[1:])
+        if c_code[0] == "1":
+            remainders.append("0" + o_code[1:])
+    return remainders
 
 
 def compare_route(o_route, compressed_dict, o_code=None, start=0):
@@ -103,23 +95,29 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0):
         c_code = keys[i]
         print o_code, c_code
         if covers(o_code, c_code):
+            print "covers"
             c_route = compressed_dict[c_code]
             if o_route.defaultable != c_route.defaultable:
                 msg = "Compressed route {} covers orignal route {} but has " \
                       "a different defaulatable value." \
                       "".format(c_route, o_route)
                 PacmanRoutingException(msg)
-        if o_route.processor_ids != c_route.processor_ids:
-            msg = "Compressed route {} covers orignal route {} but has " \
-                  "a different processor_ids." \
-                  "".format(c_route, o_route)
-            PacmanRoutingException(msg)
-        if o_route.link_ids != c_route.link_ids:
-            msg = "Compressed route {} covers orignal route {} but has " \
-                  "a different link_ids." \
-                  "".format(c_route, o_route)
-            PacmanRoutingException(msg)
-        remainders = calc_remainders(o_code, c_code)
+            if o_route.processor_ids != c_route.processor_ids:
+                msg = "Compressed route {} covers orignal route {} but has " \
+                      "a different processor_ids." \
+                      "".format(c_route, o_route)
+                PacmanRoutingException(msg)
+            if o_route.link_ids != c_route.link_ids:
+                msg = "Compressed route {} covers orignal route {} but has " \
+                      "a different link_ids." \
+                      "".format(c_route, o_route)
+                PacmanRoutingException(msg)
+            remainders = calc_remainders(o_code, c_code)
+            print remainders
+            for remainder in remainders:
+                compare_route(o_route, compressed_dict, o_code=remainder,
+                              start=i + 1)
+            return
         compare_route(o_route, compressed_dict, o_code=o_code, start=i+1)
         return
 
@@ -130,14 +128,7 @@ def compare_table(original, compressed):
     print "-------------"
     for o_route in original.multicast_routing_entries:
         compare_route(o_route, compressed_dict)
-    #print type(original.multicast_routing_entries)
-    #for o_route in original.multicast_routing_entries:
-    #    print o_route
-    #    print codify(c_route)
-    #    print bin(o_route.routing_entry_key), bin(o_route.mask)
-    #    check_route(o_route, compressed)
 
-#           self._routing_entry_key, self._mask, self._defaultable,  self._processor_ids, self._link_ids)
 
 class MyTestCase(unittest.TestCase):
 
