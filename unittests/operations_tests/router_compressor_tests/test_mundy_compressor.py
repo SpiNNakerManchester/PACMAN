@@ -10,6 +10,7 @@ import unittest
 
 WILDCARD = "*"
 
+
 def calc_length(original, compressed):
     max_key = 0
     for route in original.multicast_routing_entries:
@@ -54,11 +55,13 @@ def codify(route, length=32):
                 code = "1" + code
     return code
 
+
 def codify_table(table, length=32):
     code_dict = OrderedDict()
     for route in table.multicast_routing_entries:
-        code_dict[codify(route)]= route
+        code_dict[codify(route)] = route
     return code_dict
+
 
 def covers(o_code, c_code):
     if o_code == c_code:
@@ -194,6 +197,7 @@ class MyTestCase(unittest.TestCase):
         assert compressed_table.number_of_entries == 5
         # assert compressed_table == result_table_expected
         compare_table(original_table, compressed_table)
+
 
 if __name__ == '__main__':
     unittest.main()

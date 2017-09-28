@@ -53,7 +53,7 @@ def codify(route, length=32):
 def codify_table(table, length=32):
     code_dict = OrderedDict()
     for route in table.multicast_routing_entries:
-        code_dict[codify(route)]= route
+        code_dict[codify(route)] = route
     return code_dict
 
 
@@ -116,6 +116,7 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
         compare_route(f, o_route, compressed_dict, o_code=o_code, start=i+1)
         return
 
+
 def generate_routing_compression_checker_report(
         report_folder, routing_tables, compressed_routing_tables):
     """ Make a full report of how the compressed covers all routes in the
@@ -138,7 +139,7 @@ def generate_routing_compression_checker_report(
             f.write("If this table did not raise an exception compression "
                     "was fully checked. \n\n")
 
-            f.write("The format is:\n" 
+            f.write("The format is:\n"
                     "Chip x, y\n"
                     "\t Uncompressed Route\n"
                     "\t\tCompressed Route\n\n")
@@ -158,4 +159,3 @@ def generate_routing_compression_checker_report(
     except IOError:
         logger.error("Generate_router_comparison_reports: Can't open file"
                      " {} for writing.".format(file_name))
-
