@@ -1,3 +1,6 @@
+from pacman import exceptions
+
+
 class PreAllocatedResourceContainer(object):
     """ container object for pre-allocated resources
 
@@ -18,12 +21,22 @@ class PreAllocatedResourceContainer(object):
         # A iterable of CoreResource objects that reflect the number of
         #  cores that have been pre allocated on a chip, but which don't care
         # which core it uses.
-        "_core_resources"
+        "_core_resources",
+
+        # A iterable of SpecificIPTagResource objects that reflect the iptag
+        # details that have been pre allocated on a board.
+        "_specific_iptag_resources",
+        
+        # A iterable of SpecificReverseIPTagResource objects that reflect the
+        # reverse iptag details that have been pre allocated on a board.
+        "_specific_reverse_iptag_resources",
+        
     ]
 
     def __init__(
             self, specific_sdram_usage=None, specific_core_resources=None,
-            core_resources=None):
+            core_resources=None, specific_iptag_resources=None,
+            specific_reverse_iptag_resources=None):
         """ Container object for the types of resources
 
         :param specific_sdram_usage:\
@@ -38,12 +51,16 @@ class PreAllocatedResourceContainer(object):
         :param core_resources:\
             states a number of cores have been pre allocated but don't care
             which ones they are
-        :type core_resources: pacman.model.resources.CoreResource
+        :type core_resources: iterable of pacman.model.resources.CoreResource
+        
 
         """
         self._specific_sdram_usage = specific_sdram_usage
         self._specific_core_resources = specific_core_resources
         self._core_resources = core_resources
+        self._specific_iptag_resources = specific_iptag_resources
+        self._specific_reverse_iptag_resources = \
+            specific_reverse_iptag_resources
 
         # check for none resources
         if self._specific_sdram_usage is None:
@@ -52,6 +69,10 @@ class PreAllocatedResourceContainer(object):
             self._specific_core_resources = []
         if self._core_resources is None:
             self._core_resources = []
+        if self._specific_iptag_resources is None:
+            self._specific_iptag_resources = []
+        if self._specific_reverse_iptag_resources is None:
+            self._specific_reverse_iptag_resources = []
 
     @property
     def specific_sdram_usage(self):
@@ -65,7 +86,19 @@ class PreAllocatedResourceContainer(object):
     def core_resources(self):
         return self._core_resources
 
+    @property
+    def specific_iptag_resources(self):
+        return self._specific_iptag_resources
+
+    @property
+    def specific_reverse_iptag_resources(self):
+        return self._specific_reverse_iptag_resources
+
     def extend(self, other):
+        if not isinstance(other, PreAllocatedResourceContainer):
+            raise exceptions.PacmanConfigurationException(
+                "Only another pre allocated resource container can extend a "
+                "pre allocated resource container")
 
         # add specific sdram usage
         self._specific_sdram_usage.extend(other.specific_sdram_usage)
@@ -75,3 +108,10 @@ class PreAllocatedResourceContainer(object):
 
         # add none specific cores
         self._core_resources.extend(other.core_resources)
+
+        # add iptag resources
+        self._specific_iptag_resources.extend(other.specific_iptag_resources)
+
+        # add reverse iptags
+        self._specific_reverse_iptag_resources.extend(
+            other.specific_reverse_iptag_resources)
