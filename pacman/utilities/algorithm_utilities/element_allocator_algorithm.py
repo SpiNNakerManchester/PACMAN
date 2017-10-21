@@ -1,14 +1,12 @@
-# pacman imports
-from pacman.model.resources.element_free_space import ElementFreeSpace
-from pacman import exceptions
-
-# general imports
-from abc import ABCMeta
 from six import add_metaclass
 import math
 
+from pacman.model.resources import ElementFreeSpace
+from pacman.exceptions import PacmanElementAllocationException
+from spinn_utilities.abstract_base import AbstractBase
 
-@add_metaclass(ABCMeta)
+
+@add_metaclass(AbstractBase)
 class ElementAllocatorAlgorithm(object):
     """ Abstract element allocator algorithm which allocates elements from\
         a pool of a given size
@@ -34,7 +32,7 @@ class ElementAllocatorAlgorithm(object):
 
         index = self._find_slot(base_element_id)
         if index is None:
-            raise exceptions.PacmanElementAllocationException(
+            raise PacmanElementAllocationException(
                 "Space for {} elements starting at {} has already "
                 "been allocated".format(n_elements, base_element_id))
 
@@ -74,13 +72,13 @@ class ElementAllocatorAlgorithm(object):
 
         free_space_slot = self._free_space_tracker[index]
         if free_space_slot.start_address > base_element_id:
-            raise exceptions.PacmanElementAllocationException(
+            raise PacmanElementAllocationException(
                 "Trying to allocate a element in the wrong slot!")
 
         # Check if there is enough space to allocate
         space = self._check_allocation(index, base_element_id, n_elements)
         if space is None:
-            raise exceptions.PacmanElementAllocationException(
+            raise PacmanElementAllocationException(
                 "Not enough space to allocate {} elements starting at {}"
                 .format(n_elements, hex(base_element_id)))
 
@@ -133,7 +131,7 @@ class ElementAllocatorAlgorithm(object):
                  (base_element_id - free_space_slot.start_address))
 
         if free_space_slot.start_address > base_element_id:
-            raise exceptions.PacmanElementAllocationException(
+            raise PacmanElementAllocationException(
                 "Trying to allocate a element id in the wrong slot!")
 
         # Check if there is enough space for the elements

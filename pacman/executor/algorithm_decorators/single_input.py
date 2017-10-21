@@ -1,5 +1,5 @@
-from pacman.executor.algorithm_decorators.abstract_input import AbstractInput
-from pacman.model.decorators.overrides import overrides
+from .abstract_input import AbstractInput
+from pacman.model.decorators import overrides
 
 
 class SingleInput(AbstractInput):
@@ -7,7 +7,6 @@ class SingleInput(AbstractInput):
     """
 
     __slots__ = [
-
         # The name of the input parameter
         "_name",
 
@@ -45,7 +44,7 @@ class SingleInput(AbstractInput):
 
     @overrides(AbstractInput.input_matches)
     def input_matches(self, inputs):
-        return any([param_type in inputs for param_type in self._param_types])
+        return any(param_type in inputs for param_type in self._param_types)
 
     def __repr__(self):
         return "SingleInput(name={}, param_types={})".format(

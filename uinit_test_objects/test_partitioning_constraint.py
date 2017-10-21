@@ -2,7 +2,7 @@
 test constraint
 """
 from pacman.model.constraints.partitioner_constraints\
-    .abstract_partitioner_constraint import AbstractPartitionerConstraint
+    import AbstractPartitionerConstraint
 
 
 class NewPartitionerConstraint(AbstractPartitionerConstraint):
@@ -18,7 +18,6 @@ class NewPartitionerConstraint(AbstractPartitionerConstraint):
         """
         helper method for is_instance
 
-        :return:
         """
         return True
 

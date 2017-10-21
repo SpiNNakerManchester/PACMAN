@@ -1,5 +1,5 @@
-from pacman.model.resources.abstract_resource import AbstractResource
-from pacman.model.decorators.overrides import overrides
+from .abstract_resource import AbstractResource
+from pacman.model.decorators import overrides
 
 
 class DTCMResource(AbstractResource):

@@ -1,4 +1,4 @@
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 import numpy
 
 
@@ -28,7 +28,7 @@ class BaseKeyAndMask(object):
         self._mask = mask
 
         if base_key & mask != base_key:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "This routing info is invalid as the mask and key together "
                 "alters the key. This is deemed to be a error from "
                 "spynnaker's point of view and therefore please rectify and"
@@ -115,6 +115,14 @@ class BaseKeyAndMask(object):
         unwrapped_mask = numpy.unpackbits(
             numpy.asarray([self._mask], dtype=">u4").view(dtype="uint8"))
         zeros = numpy.where(unwrapped_mask == 0)[0]
+
+        # If there are no zeros, there is only one key in the range, so
+        # return that
+        if len(zeros) == 0:
+            if key_array is None:
+                key_array = numpy.zeros(1, dtype=">u4")
+            key_array[offset] = self._base_key
+            return key_array, 1
 
         # We now know how many values there are - 2^len(zeros)
         max_n_keys = 2 ** len(zeros)

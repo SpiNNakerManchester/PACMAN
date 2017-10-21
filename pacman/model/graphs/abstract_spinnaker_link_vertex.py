@@ -1,7 +1,8 @@
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from .abstract_virtual_vertex import AbstractVirtualVertex
 from abc import abstractproperty
 
 
+# interface
 class AbstractSpiNNakerLinkVertex(AbstractVirtualVertex):
     """ A vertex connected to a SpiNNaker Link
     """

@@ -5,18 +5,11 @@ test vertex used in many unit tests
 
 # pacman imports
 
-from pacman.model.graphs.application.impl.application_vertex import \
-    ApplicationVertex
-from pacman.model.graphs.application.abstract_application_vertex import \
-    AbstractApplicationVertex
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource \
-    import CPUCyclesPerTickResource
-from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import DTCMResource, ResourceContainer, \
+    SDRAMResource, CPUCyclesPerTickResource
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.decorators import overrides
 
 
 class TestVertex(ApplicationVertex):
@@ -25,18 +18,21 @@ class TestVertex(ApplicationVertex):
     """
     _model_based_max_atoms_per_core = None
 
-    def __init__(self, n_atoms, label=None, max_atoms_per_core=256):
-        ApplicationVertex.__init__(self, label=label,
-                                   max_atoms_per_core=max_atoms_per_core)
+    def __init__(self, n_atoms, label="testVertex", max_atoms_per_core=256,
+                 constraints=None, fixed_sdram_value=None):
+        ApplicationVertex.__init__(
+            self, label=label, max_atoms_per_core=max_atoms_per_core,
+            constraints=constraints)
         self._model_based_max_atoms_per_core = max_atoms_per_core
         self._n_atoms = n_atoms
+        self._fixed_sdram_value = fixed_sdram_value
 
     def get_resources_used_by_atoms(self, vertex_slice):
         """
         standard method call to get the sdram, cpu and dtcm usage of a
         collection of atoms
+
         :param vertex_slice: the collection of atoms
-        :return:
         """
         return ResourceContainer(
             sdram=SDRAMResource(
@@ -70,15 +66,18 @@ class TestVertex(ApplicationVertex):
         :param graph: the graph
         :return: the amount of sdram (in bytes this model will use)
         """
-        return 1 * vertex_slice.n_atoms
+        if self._fixed_sdram_value is None:
+            return 1 * vertex_slice.n_atoms
+        else:
+            return self._fixed_sdram_value
 
-    @overrides(AbstractApplicationVertex.create_machine_vertex)
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         return SimpleMachineVertex(resources_required, label, constraints)
 
     @property
-    @overrides(AbstractApplicationVertex.n_atoms)
+    @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms

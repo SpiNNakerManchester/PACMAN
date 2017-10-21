@@ -3,10 +3,8 @@ tests for placements
 """
 
 # pacman imports
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.placements import Placement, Placements
 
 # general imports
 import unittest
@@ -20,7 +18,6 @@ class TestPlacements(unittest.TestCase):
     def test_create_new_placements(self):
         """
         test creating a placements object
-        :return:
         """
         subv = SimpleMachineVertex(None, "")
         pl = Placement(subv, 0, 0, 1)
@@ -29,7 +26,6 @@ class TestPlacements(unittest.TestCase):
     def test_create_new_empty_placements(self):
         """
         checks that creating an empty placements object is valid
-        :return:
         """
         pls = Placements()
         self.assertEqual(pls._placements, dict())
@@ -38,7 +34,6 @@ class TestPlacements(unittest.TestCase):
     def test_get_placement_of_vertex(self):
         """
         checks the placements get placement method
-        :return:
         """
         subv = list()
         for i in range(5):
@@ -56,7 +51,6 @@ class TestPlacements(unittest.TestCase):
         """
         checks that from a placements object, you can get to the correct
         vertex using the get_vertex_on_processor() method
-        :return:
         """
         subv = list()
         for i in range(5):
@@ -75,7 +69,6 @@ class TestPlacements(unittest.TestCase):
     def test_get_placements(self):
         """
         tests the placements iterator functionality.
-        :return:
         """
         subv = list()
         for i in range(5):

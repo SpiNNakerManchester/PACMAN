@@ -3,25 +3,17 @@ test for partitioning
 """
 
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge import \
-    ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 
 from pacman.exceptions import PacmanInvalidParameterException,\
     PacmanPartitionException
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
+from pacman.model.constraints.partitioner_constraints\
+    import MaxVertexAtomsConstraint
 from pacman.operations.partition_algorithms.basic_partitioner \
     import BasicPartitioner
 
 # spinnMachine imports
-from spinn_machine.machine import Machine
-from spinn_machine.processor import Processor
-from spinn_machine.sdram import SDRAM
-from spinn_machine.link import Link
-from spinn_machine.router import Router
-from spinn_machine.chip import Chip
+from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
 
 # general imports
 import unittest
@@ -142,7 +134,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = TestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(PartitionerMaximumSizeConstraint(10))
+        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine)
@@ -267,7 +259,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that the partitioner works when its machine is slightly malformed
         in that it has more sdram avilable
-        :return:
         """
         self.setup()
         flops = 20000000
@@ -303,7 +294,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that when a vertex has a constraint that is unrecognised,
         it raises an error
-        :return:
         """
         self.setup()
         constrained_vertex = TestVertex(13, "Constrained")
@@ -318,7 +308,6 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_empty_graph(self):
         """
         test that the partitioner can work with an empty graph
-        :return:
         """
         self.setup()
         self.graph = ApplicationGraph("foo")

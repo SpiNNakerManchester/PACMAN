@@ -1,42 +1,23 @@
 # pacman model imports
-from pacman.model.graphs.application.impl.application_edge \
-    import ApplicationEdge
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
+from pacman.model.graphs.application \
+    import ApplicationVertex, ApplicationEdge, ApplicationGraph
+from pacman.model.graphs.machine \
+    import MachineEdge, MachineGraph, SimpleMachineVertex
+from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
+from pacman.model.resources import ResourceContainer, SDRAMResource
 
 from pacman.exceptions import PacmanRoutingException
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
-from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
-from pacman.model.routing_info.partition_routing_info \
-    import PartitionRoutingInfo
-from pacman.model.routing_info.routing_info import RoutingInfo
+from pacman.model.placements import Placement, Placements
+from pacman.model.routing_info import PartitionRoutingInfo, RoutingInfo
 
 # pacman utility imports
 from pacman.utilities.constants import DEFAULT_MASK
 # pacman operations imports
-from pacman.operations.router_algorithms.basic_dijkstra_routing \
-    import BasicDijkstraRouting
+from pacman.operations.router_algorithms import BasicDijkstraRouting
 # spinnmachine imports
-from spinn_machine.processor import Processor
-from spinn_machine.link import Link
-from spinn_machine.sdram import SDRAM
-from spinn_machine.router import Router
-from spinn_machine.chip import Chip
-from spinn_machine.machine import Machine
+from spinn_machine import Processor, Link, SDRAM, Router, Chip, Machine
 
 import unittest
-
-from pacman.model.graphs.application.abstract_application_vertex import \
-    AbstractApplicationVertex
 
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
@@ -52,10 +33,10 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     return resources
 
 
-class Vertex(AbstractApplicationVertex):
+class Vertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
-        AbstractApplicationVertex.__init__(self, label=label, n_atoms=n_atoms,
-                                           max_atoms_per_core=256)
+        ApplicationVertex.__init__(self, label=label, max_atoms_per_core=256)
+        # Ignoring n_atoms?
 
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 10 * (hi_atom - lo_atom)

@@ -1,10 +1,9 @@
 import subprocess
 
-from pacman import exceptions
-from pacman.executor.algorithm_classes.abstract_algorithm \
-    import AbstractAlgorithm
-from pacman.model.decorators.overrides import overrides
-from spinn_machine.utilities.progress_bar import ProgressBar
+from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
+from .abstract_algorithm import AbstractAlgorithm
+from pacman.model.decorators import overrides
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class ExternalAlgorithm(AbstractAlgorithm):
@@ -50,8 +49,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
         # Detect any errors
         if child.returncode != 0:
             stdout, stderr = child.communicate()
-            raise exceptions.\
-                PacmanExternalAlgorithmFailedToCompleteException(
+            raise PacmanExternalAlgorithmFailedToCompleteException(
                     "Algorithm {} returned a non-zero error code {}\n"
                     "    Inputs: {}\n"
                     "    Output: {}\n"
@@ -72,3 +70,8 @@ class ExternalAlgorithm(AbstractAlgorithm):
                 self._algorithm_id, self._required_inputs,
                 self._optional_inputs, self._outputs,
                 self._command_line_arguments))
+
+    @overrides(AbstractAlgorithm.write_provenance_header)
+    def write_provenance_header(self, provenance_file):
+        provenance_file.write("{}\n".format(self._algorithm_id))
+        provenance_file.write("\t{}\n".format(self._command_line_arguments))

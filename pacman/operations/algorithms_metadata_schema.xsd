@@ -1,64 +1,74 @@
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-                     xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="algorithms">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="algorithm" maxOccurs="unbounded" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:choice>
-                                 <xs:element type="xs:string" name="command_line_command"/>
-                                 <xs:element type="xs:string" name="python_module"/>
-                            </xs:choice>
-                            <xs:element name="required_inputs">
-                                <xs:complexType>
-                                    <xs:sequence>
-                                        <xs:element name="parameter" maxOccurs="unbounded" minOccurs="0">
-                                            <xs:complexType>
-                                                <xs:sequence>
-                                                    <xs:element type="xs:string" name="param_name"/>
-                                                    <xs:element type="xs:string" name="param_type"/>
-                                                </xs:sequence>
-                                            </xs:complexType>
-                                        </xs:element>
-                                    </xs:sequence>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element type="xs:string" name="parameters" minOccurs="0"/>
-                            <xs:element name="optional_inputs" minOccurs="0">
-                                <xs:complexType>
-                                    <xs:sequence>
-                                        <xs:element name="parameter" maxOccurs="unbounded" minOccurs="0">
-                                            <xs:complexType>
-                                                <xs:sequence>
-                                                    <xs:element type="xs:string" name="param_name"/>
-                                                    <xs:element type="xs:string" name="param_type"/>
-                                                </xs:sequence>
-                                            </xs:complexType>
-                                        </xs:element>
-                                    </xs:sequence>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element name="produces_outputs">
-                                <xs:complexType>
-                                    <xs:sequence>
-                                        <xs:element name="parameter" maxOccurs="unbounded" minOccurs="0">
-                                            <xs:complexType>
-                                                <xs:sequence>
-                                                    <xs:element type="xs:string" name="param_name"/>
-                                                    <xs:element type="xs:string" name="param_type"/>
-                                                </xs:sequence>
-                                            </xs:complexType>
-                                        </xs:element>
-                                    </xs:sequence>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:sequence>
-                        <xs:attribute type="xs:string" name="name"/>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-</xs:schema>
+		targetNamespace="https://github.com/SpiNNakerManchester/PACMAN"
+		xmlns="https://github.com/SpiNNakerManchester/PACMAN"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="algorithms">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="algorithm" type="Algorithm"
+					maxOccurs="unbounded" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
+	<xs:complexType name="Algorithm">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="command_line_args" type="ArgList" />
+				<xs:sequence>
+					<xs:element name="python_module" type="xs:token" />
+					<xs:choice>
+						<xs:element name="python_class" type="xs:token" />
+						<xs:element name="python_function" type="xs:token" />
+					</xs:choice>
+				</xs:sequence>
+			</xs:choice>
+			<xs:element name="input_definitions" type="ParameterDefs" />
+			<xs:element name="required_inputs" type="ParamSet" minOccurs="0" />
+			<xs:element name="optional_inputs" type="ParamSet" minOccurs="0" />
+			<xs:element name="outputs" type="ResultList" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:token" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="ParameterDefs">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="parameter">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="param_name" type="xs:token" />
+						<xs:element name="param_type" type="xs:token"
+							minOccurs="1" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ParamSet">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:choice>
+				<xs:element name="param_name" type="xs:token"/>
+				<xs:element name="all_of" type="ParamSet" />
+				<xs:element name="one_of" type="ParamSet" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ResultList">
+		<xs:sequence>
+			<xs:element name="param_type" type="Result"
+				minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Result">
+		<xs:simpleContent>
+			<xs:extension base="xs:token">
+				<xs:attribute name="file_name_type" type="xs:token" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="ArgList">
+		<xs:sequence>
+			<xs:element name="arg" type="xs:string"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

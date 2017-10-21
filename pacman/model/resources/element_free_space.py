@@ -1,5 +1,3 @@
-
-
 class ElementFreeSpace(object):
 
     def __init__(self, start_address, size):

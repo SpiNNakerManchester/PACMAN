@@ -7,13 +7,8 @@ from uinit_test_objects.test_edge import TestEdge
 from uinit_test_objects.test_vertex import TestVertex
 
 # pacman imports
-from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.common.graph_mapper \
-    import GraphMapper
-from pacman.model.graphs.machine.impl.machine_edge import \
-    MachineEdge
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
+from pacman.model.graphs.common import Slice, GraphMapper
+from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
 
 # general imports
 import unittest
@@ -27,14 +22,12 @@ class TestGraphMapper(unittest.TestCase):
     def test_create_new_mapper(self):
         """
         test creating a empty graph mapper
-        :return:
         """
         GraphMapper()
 
     def test_get_edges_from_edge(self):
         """
         test getting the edges from a graph mapper from a edge
-        :return:
         """
         vertices = list()
         edges = list()
@@ -56,7 +49,6 @@ class TestGraphMapper(unittest.TestCase):
     def test_get_vertices_from_vertex(self):
         """
         test getting the vertex from a graph mapper via the vertex
-        :return:
         """
         vertices = list()
         vertices.append(SimpleMachineVertex(None, ""))
@@ -86,7 +78,6 @@ class TestGraphMapper(unittest.TestCase):
     def test_get_vertex_from_vertex(self):
         """
         test that the graph mapper can retrieve a vertex from a given vertex
-        :return:
         """
         vertices = list()
         vertices.append(SimpleMachineVertex(None, ""))
@@ -115,7 +106,6 @@ class TestGraphMapper(unittest.TestCase):
     def test_get_edge_from_machine_edge(self):
         """
         test that tests getting a edge from a graph mapper
-        :return:
         """
         vertices = list()
         vertices.append(SimpleMachineVertex(None, ""))

@@ -1,5 +1,4 @@
-from pacman.executor.algorithm_classes.python_function_algorithm \
-    import PythonFunctionAlgorithm
+from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
 
 # general imports
 import unittest

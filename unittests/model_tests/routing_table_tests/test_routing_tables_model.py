@@ -3,14 +3,12 @@ TestRoutingInfo
 """
 
 # pacman imports
-from pacman.model.routing_tables.multicast_routing_table import \
-    MulticastRoutingTable
-from pacman.model.routing_tables.multicast_routing_tables import \
-    MulticastRoutingTables
+from pacman.model.routing_tables \
+    import MulticastRoutingTable, MulticastRoutingTables
 from pacman.exceptions import PacmanAlreadyExistsException
 
 # spinnmanchine imports
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 
 # general imports
 import unittest
@@ -24,7 +22,6 @@ class TestRoutingTable(unittest.TestCase):
         """
         test that creating a multicast routing entry and adding it to the table
         works
-        :return:
         """
         key_combo = 0xff000
         mask = 0xff000
@@ -60,7 +57,6 @@ class TestRoutingTable(unittest.TestCase):
     def test_new_multicast_routing_table_empty(self):
         """
         tests creating a basic multicast routing table
-        :return:
         """
         MulticastRoutingTable(0, 0)
 
@@ -68,7 +64,6 @@ class TestRoutingTable(unittest.TestCase):
         """
         test that adding multiple identical entries into a multicast table
         causes an error
-        :return:
         """
         key_combo = 0xff35
         mask = 0xff35

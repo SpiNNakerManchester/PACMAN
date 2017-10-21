@@ -9,25 +9,15 @@ from rig.routing_table import Routes
 from six import iteritems
 
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
-from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+    import ChipAndCoreConstraint, RadialPlacementFromChipConstraint
+from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
+from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
-from pacman.model.graphs.abstract_spinnaker_link_vertex \
-    import AbstractSpiNNakerLinkVertex
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
-from pacman.model.routing_table_by_partition\
-    .multicast_routing_table_by_partition \
-    import MulticastRoutingTableByPartition
-from pacman.model.routing_table_by_partition\
-    .multicast_routing_table_by_partition_entry  \
-    import MulticastRoutingTableByPartitionEntry
-from pacman.utilities import constants
+from pacman.model.placements import Placement, Placements
+from pacman.model.routing_table_by_partition import \
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
+from pacman.utilities.constants import EDGES
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
@@ -70,10 +60,22 @@ def convert_to_rig_machine(machine):
                 # write dead links
                 for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
                     router = chip.router
+                    is_dead = False
                     if not router.is_link(link_id):
-                        dead_links.append(
-                            [x_coord, y_coord, "{}".format(
-                             constants.EDGES(link_id).name.lower())])
+                        is_dead = True
+                    else:
+                        link = router.get_link(link_id)
+                        if not machine.is_chip_at(
+                                link.destination_x, link.destination_y):
+                            is_dead = True
+                        else:
+                            dest_chip = machine.get_chip_at(
+                                link.destination_x, link.destination_y)
+                            if dest_chip.virtual:
+                                is_dead = True
+                    if is_dead:
+                        dead_links.append([x_coord, y_coord, "{}".format(
+                            EDGES(link_id).name.lower())])
 
                 # Fix the number of processors when there are less
                 resource_exceptions = dict()
@@ -170,14 +172,13 @@ def create_rig_graph_constraints(machine_graph, machine):
                 vertex,
                 (link_data.connected_chip_x, link_data.connected_chip_y)))
             constraints.append(RouteEndpointConstraint(
-                vertex,
-                LINK_LOOKUP[constants.EDGES(
+                vertex, LINK_LOOKUP[EDGES(
                     link_data.connected_link).name.lower()]))
         else:
             for constraint in vertex.constraints:
                 if isinstance(constraint, (
-                        PlacerChipAndCoreConstraint,
-                        PlacerRadialPlacementFromChipConstraint)):
+                        ChipAndCoreConstraint,
+                        RadialPlacementFromChipConstraint)):
                     constraints.append(LocationConstraint(
                         vertex, (constraint.x, constraint.y)))
 

@@ -1,15 +1,13 @@
 # pacman imports
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineEdge
 
 # unit tests imports
 from uinit_test_objects.test_edge import TestEdge
 from uinit_test_objects.test_vertex import TestVertex
 
-
 # general imports
 import unittest
-from pacman.model.graphs.machine.impl.machine_edge import \
-    MachineEdge
 
 
 class TestApplicationEdgeModel(unittest.TestCase):
@@ -20,7 +18,6 @@ class TestApplicationEdgeModel(unittest.TestCase):
     def test_create_new_edge(self):
         """
         test that you can create a edge between two vertices
-        :return:
         """
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
@@ -31,7 +28,6 @@ class TestApplicationEdgeModel(unittest.TestCase):
     def test_create_new_edge_without_label(self):
         """
         test initisation of a edge without a label
-        :return:
         """
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
@@ -45,7 +41,6 @@ class TestApplicationEdgeModel(unittest.TestCase):
         test the creating of a edge by the TestEdge
         create edge method will actually create a edge of the
         edge type.
-        :return:
         """
         vert1 = TestVertex(10, "New AbstractConstrainedVertex", 256)
         v_from_vert1 = vert1.create_machine_vertex(
@@ -64,7 +59,6 @@ class TestApplicationEdgeModel(unittest.TestCase):
         """
         test that you can use the TestEdge.create-edge
         method and not cause errors
-        :return:
         """
         vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
         v_from_vert1 = vert1.create_machine_vertex(

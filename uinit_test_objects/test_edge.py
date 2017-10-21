@@ -1,5 +1,4 @@
-from pacman.model.graphs.application.impl.application_edge \
-    import ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge
 
 
 class TestEdge(ApplicationEdge):

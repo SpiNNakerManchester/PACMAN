@@ -1,9 +1,9 @@
-from abc import abstractproperty
-from abc import abstractmethod
+from abc import abstractproperty, abstractmethod
 
-from pacman.model.graphs.abstract_vertex import AbstractVertex
+from .abstract_vertex import AbstractVertex
 
 
+# interface
 class AbstractVirtualVertex(AbstractVertex):
     """ A vertex which exists outside of the machine
     """

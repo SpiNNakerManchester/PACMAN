@@ -1,5 +1,5 @@
-from pacman.executor.algorithm_decorators.abstract_input import AbstractInput
-from pacman.model.decorators.overrides import overrides
+from .abstract_input import AbstractInput
+from pacman.model.decorators import overrides
 
 
 class OneOfInput(AbstractInput):
@@ -7,7 +7,6 @@ class OneOfInput(AbstractInput):
     """
 
     __slots__ = [
-
         # The inputs
         "_inputs"
     ]
@@ -35,7 +34,6 @@ class OneOfInput(AbstractInput):
     def get_inputs_by_name(self, inputs):
         for input_type in self._inputs:
             match = input_type.get_inputs_by_name(inputs)
-
             # If the match was found, return it
             if match is not None:
                 return match
@@ -43,10 +41,7 @@ class OneOfInput(AbstractInput):
 
     @overrides(AbstractInput.input_matches)
     def input_matches(self, inputs):
-        return any([
-            input_param.input_matches(inputs)
-            for input_param in self._inputs
-        ])
+        return any(param.input_matches(inputs) for param in self._inputs)
 
     def __repr__(self):
         return "OneOfInput(inputs={})".format(self._inputs)

@@ -1,9 +1,9 @@
 import importlib
 import logging
+import sys
 
-from pacman.executor.algorithm_classes.abstract_python_algorithm \
-    import AbstractPythonAlgorithm
-from pacman.model.decorators.overrides import overrides
+from .abstract_python_algorithm import AbstractPythonAlgorithm
+from pacman.model.decorators import overrides
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,16 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         method = instance
         if self._python_method is not None:
             method = getattr(instance, self._python_method)
-        return method(**inputs)
+        try:
+            return method(**inputs)
+        except Exception:
+            method = "__call__"
+            if self._python_method is not None:
+                method = self._python_method
+            exc_type, exc_value, exc_trace = sys.exc_info()
+            logger.error("Error when calling {}.{}.{} with inputs {}".format(
+                self._python_module, self._python_class, method, inputs))
+            raise exc_type, exc_value, exc_trace
 
     def __repr__(self):
         return (
@@ -62,3 +71,14 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
                 self._algorithm_id, self._required_inputs,
                 self._optional_inputs, self._outputs, self._python_module,
                 self._python_class, self._python_method))
+
+    @overrides(AbstractPythonAlgorithm.write_provenance_header)
+    def write_provenance_header(self, provenance_file):
+        provenance_file.write("{}\n".format(self._algorithm_id))
+        if self._python_method:
+            provenance_file.write("\t{}.{}.{}\n".format(self._python_module,
+                                                        self._python_class,
+                                                        self._python_method))
+        else:
+            provenance_file.write("\t{}.{}\n".format(self._python_module,
+                                                     self._python_class))

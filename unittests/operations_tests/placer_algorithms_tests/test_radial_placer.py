@@ -1,26 +1,16 @@
 import unittest
 
-from pacman.model.graphs.application.impl.application_edge\
-    import ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from uinit_test_objects.placer_test_support \
     import get_resources_used_by_atoms, MachineVertex, Vertex
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.graphs.application.impl.application_graph \
-    import ApplicationGraph
-from pacman.model.graphs.common.graph_mapper import GraphMapper
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
-from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
+from pacman.model.constraints.placer_constraints\
+    import ChipAndCoreConstraint
+from pacman.model.graphs.common import GraphMapper
+from pacman.operations.placer_algorithms import RadialPlacer
 
-from spinn_machine.chip import Chip
-from spinn_machine.link import Link
-from spinn_machine.machine import Machine
-from spinn_machine.processor import Processor
-from spinn_machine.router import Router
-from spinn_machine.sdram import SDRAM
+from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 
 from operator import itemgetter
 from pprint import pprint as pp
@@ -137,12 +127,12 @@ class TestRadialPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.vertex1.add_constraint(PlacerChipAndCoreConstraint(8, 3, 2))
+        self.vertex1.add_constraint(ChipAndCoreConstraint(8, 3, 2))
         self.assertIsInstance(self.vertex1.constraints[0],
-                              PlacerChipAndCoreConstraint)
-        self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
-        self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
-        self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 4, 16))
+                              ChipAndCoreConstraint)
+        self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
+        self.vertex3.add_constraint(ChipAndCoreConstraint(2, 4, 6))
+        self.vertex4.add_constraint(ChipAndCoreConstraint(6, 4, 16))
         self.vertices = list()
         self.vertices.append(self.vertex1)
         self.vertices.append(self.vertex2)
@@ -160,12 +150,12 @@ class TestRadialPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_have_vertices(self):
         self.bp = RadialPlacer(self.machine, self.graph)
-        self.vertex1.add_constraint(PlacerChipAndCoreConstraint(1, 5, 2))
+        self.vertex1.add_constraint(ChipAndCoreConstraint(1, 5, 2))
         self.assertIsInstance(self.vertex1.constraints[0],
-                              PlacerChipAndCoreConstraint)
-        self.vertex2.add_constraint(PlacerChipAndCoreConstraint(3, 5, 7))
-        self.vertex3.add_constraint(PlacerChipAndCoreConstraint(2, 4, 6))
-        self.vertex4.add_constraint(PlacerChipAndCoreConstraint(6, 7, 16))
+                              ChipAndCoreConstraint)
+        self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
+        self.vertex3.add_constraint(ChipAndCoreConstraint(2, 4, 6))
+        self.vertex4.add_constraint(ChipAndCoreConstraint(6, 7, 16))
         self.vertices = list()
         self.vertices.append(self.vertex1)
         self.vertices.append(self.vertex2)

@@ -1,16 +1,23 @@
+from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
 from pacman import exceptions
-from pacman.model.placements.placements import Placements
-from pacman.model.placements.placement import Placement
+from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
-from pacman.utilities.utility_objs.resource_tracker import ResourceTracker
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.utility_objs import ResourceTracker
+from pacman.utilities.algorithm_utilities \
+    import placer_algorithm_utilities as placer_utils
 from pacman.model.constraints.placer_constraints\
-    .placer_same_chip_as_constraint import PlacerSameChipAsConstraint
-from pacman.utilities import utility_calls
+    import SameChipAsConstraint
+from pacman.utilities.utility_calls import is_single
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+
+def _conflict(x, y, post_x, post_y):
+    if x is not None and post_x is not None and x != post_x:
+        return True
+    if y is not None and post_y is not None and y != post_y:
+        return True
+    return False
 
 
 class OneToOnePlacer(RadialPlacer):
@@ -28,48 +35,38 @@ class OneToOnePlacer(RadialPlacer):
         # check that the algorithm can handle the constraints
         self._check_constraints(
             machine_graph.vertices,
-            additional_placement_constraints={PlacerSameChipAsConstraint})
+            additional_placement_constraints={SameChipAsConstraint})
 
         # Get which vertices must be placed on the same chip as another vertex
-        same_chip_vertex_groups = placer_algorithm_utilities\
-            .get_same_chip_vertex_groups(machine_graph.vertices)
+        same_chip_vertex_groups = placer_utils.get_same_chip_vertex_groups(
+            machine_graph.vertices)
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
             machine_graph, same_chip_vertex_groups)
 
-        placements = self._do_allocation(
-            sorted_vertices, machine, same_chip_vertex_groups)
-
-        return placements
+        return self._do_allocation(
+            sorted_vertices, machine, same_chip_vertex_groups, machine_graph)
 
     def _do_allocation(
-            self, vertices, machine, same_chip_vertex_groups):
-
+            self, vertices, machine, same_chip_vertex_groups, machine_graph):
         placements = Placements()
 
         # Iterate over vertices and generate placements
-        progress_bar = ProgressBar(
-            len(vertices), "Placing graph vertices")
+        progress = ProgressBar(
+            machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         all_vertices_placed = set()
 
         # iterate over vertices
         for vertex_list in vertices:
-
-            # ensure largest cores per chip is divisible by 2
-            # (for one to one placement)
-            max_cores_on_chip = \
-                resource_tracker.most_avilable_cores_on_a_chip()
-
             # if too many one to ones to fit on a chip, allocate individually
-            if len(vertex_list) > max_cores_on_chip:
+            if len(vertex_list) > machine.maximum_user_cores_on_chip:
                 for vertex in vertex_list:
                     self._allocate_individual(
                         vertex, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed)
-                    progress_bar.update()
+                    progress.update()
             else:
-
                 try:
                     resource_and_constraint_list = [
                         (vertex.resources_required, vertex.constraints)
@@ -83,7 +80,7 @@ class OneToOnePlacer(RadialPlacer):
                             vertex_list, allocations):
                         placement = Placement(vertex, x, y, p)
                         placements.add_placement(placement)
-                        progress_bar.update()
+                        progress.update()
                 except exceptions.PacmanValueError or \
                         exceptions.PacmanException or \
                         exceptions.PacmanInvalidParameterException:
@@ -94,8 +91,8 @@ class OneToOnePlacer(RadialPlacer):
                         self._allocate_individual(
                             vertex, placements, resource_tracker,
                             same_chip_vertex_groups, all_vertices_placed)
-                        progress_bar.update()
-        progress_bar.end()
+                        progress.update()
+        progress.end()
         return placements
 
     @staticmethod
@@ -134,8 +131,8 @@ class OneToOnePlacer(RadialPlacer):
         found_list = set()
 
         # order vertices based on constraint priority
-        vertices = placer_algorithm_utilities\
-            .sort_vertices_by_known_constraints(machine_graph.vertices)
+        vertices = placer_utils.sort_vertices_by_known_constraints(
+            machine_graph.vertices)
 
         for vertex in vertices:
             if vertex not in found_list:
@@ -181,9 +178,8 @@ class OneToOnePlacer(RadialPlacer):
             vertex, and where their constraints don't force them onto\
             different chips.
 
-        :param vertex:  the vertex to use as a basis for one to one connections
-        :param graph: \
-            the graph to look for other one to one vertices
+        :param vertex: the vertex to use as a basis for one to one connections
+        :param graph: the graph to look for other one to one vertices
         :return: set of one to one vertices
         """
         x, y, _ = ResourceTracker.get_chip_and_core(vertex.constraints)
@@ -199,29 +195,20 @@ class OneToOnePlacer(RadialPlacer):
                 vertices_seen.add(next_vertex)
                 post_x, post_y, _ = ResourceTracker.get_chip_and_core(
                     next_vertex.constraints)
-                conflict = False
-                if x is not None and post_x is not None and x != post_x:
-                    conflict = True
-                if y is not None and post_y is not None and y != post_y:
-                    conflict = True
                 edges = graph.get_edges_ending_at_vertex(next_vertex)
-
-                if utility_calls.is_single(edges) and not conflict:
+                if is_single(edges) and not _conflict(x, y, post_x, post_y):
                     found_vertices.append(next_vertex)
                     if post_x is not None:
                         x = post_x
                     if post_y is not None:
                         y = post_y
-                    outgoing = \
-                        graph.get_edges_starting_at_vertex(
-                            next_vertex)
+                    outgoing = graph.get_edges_starting_at_vertex(next_vertex)
                     vertices_to_try.extend([
                         edge.post_vertex for edge in outgoing
                         if edge.post_vertex not in vertices_seen])
 
         # look for one to ones entering this vertex
-        incoming = graph.get_edges_ending_at_vertex(
-            vertex)
+        incoming = graph.get_edges_ending_at_vertex(vertex)
         vertices_to_try = [
             edge.pre_vertex for edge in incoming
             if edge.pre_vertex not in vertices_seen]
@@ -231,22 +218,14 @@ class OneToOnePlacer(RadialPlacer):
                 vertices_seen.add(next_vertex)
                 pre_x, pre_y, _ = ResourceTracker.get_chip_and_core(
                     next_vertex.constraints)
-                conflict = False
-                if x is not None and pre_x is not None and x != pre_x:
-                    conflict = True
-                if y is not None and pre_y is not None and y != pre_y:
-                    conflict = True
                 edges = graph.get_edges_starting_at_vertex(next_vertex)
-
-                if utility_calls.is_single(edges) and not conflict:
+                if is_single(edges) and not _conflict(x, y, pre_x, pre_y):
                     found_vertices.append(next_vertex)
                     if pre_x is not None:
                         x = pre_x
                     if pre_y is not None:
                         y = pre_y
-                    incoming = \
-                        graph.get_edges_ending_at_vertex(
-                            next_vertex)
+                    incoming = graph.get_edges_ending_at_vertex(next_vertex)
                     vertices_to_try.extend([
                         edge.pre_vertex for edge in incoming
                         if edge.pre_vertex not in vertices_seen])

@@ -2,11 +2,9 @@
 tests for placement
 """
 # pacman imports
-from pacman import exceptions
-from pacman.model.graphs.machine.impl.simple_machine_vertex \
-    import SimpleMachineVertex
-from pacman.model.placements.placement import Placement
-from pacman.model.placements.placements import Placements
+from pacman.exceptions import PacmanAlreadyPlacedError
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.placements import Placement, Placements
 
 # general imports
 import unittest
@@ -20,7 +18,6 @@ class TestPlacement(unittest.TestCase):
     def test_create_new_placement(self):
         """
         test that creating a new placement puts stuff in the right place
-        :return:
         """
         subv = SimpleMachineVertex(None, "")
         pl = Placement(subv, 0, 0, 1)
@@ -32,13 +29,12 @@ class TestPlacement(unittest.TestCase):
     def test_create_new_placements_duplicate_vertex(self):
         """
         check that you cant put a vertex in multiple placements
-        :return:
         """
         subv = SimpleMachineVertex(None, "")
         pl = list()
         for i in range(4):
             pl.append(Placement(subv, 0, 0, i))
-        with self.assertRaises(exceptions.PacmanAlreadyPlacedError):
+        with self.assertRaises(PacmanAlreadyPlacedError):
             Placements(pl)
 
 

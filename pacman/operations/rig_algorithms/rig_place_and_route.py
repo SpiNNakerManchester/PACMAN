@@ -2,7 +2,7 @@ from pacman.utilities import rig_converters
 from rig.place_and_route.place.sa import place
 from rig.place_and_route.allocate.greedy import allocate
 from rig.place_and_route.route.ner import route
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class RigPlaceAndRoute(object):
@@ -16,8 +16,7 @@ class RigPlaceAndRoute(object):
         progress_bar = ProgressBar(9, "Placing and Routing")
 
         vertices_resources, nets, net_names = \
-            rig_converters.convert_to_rig_graph(
-                machine_graph)
+            rig_converters.convert_to_rig_graph(machine_graph)
         progress_bar.update()
 
         rig_machine = rig_converters.convert_to_rig_machine(machine)

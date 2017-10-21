@@ -1,13 +1,10 @@
 # pacman imports
 from pacman import exceptions
-from pacman.model.graphs.abstract_fpga_vertex import AbstractFPGAVertex
-from pacman.model.graphs.abstract_spinnaker_link_vertex\
-    import AbstractSpiNNakerLinkVertex
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs import AbstractFPGAVertex, AbstractSpiNNakerLinkVertex
+from pacman.model.graphs import AbstractVirtualVertex
 from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
-from pacman.utilities.algorithm_utilities.element_allocator_algorithm \
-    import ElementAllocatorAlgorithm
-from spinn_machine.utilities.progress_bar import ProgressBar
+from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
+from spinn_utilities.progress_bar import ProgressBar
 
 # general imports
 import logging
@@ -40,8 +37,8 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                 "Allocating virtual identifiers")
 
             # allocate standard ids for real chips
-            for chip in machine.chips:
-                expected_chip_id = (chip.x << 8) + chip.y
+            for x, y in machine.chip_coordinates:
+                expected_chip_id = (x << 8) + y
                 self._allocate_elements(expected_chip_id, 1)
                 progress_bar.update()
 

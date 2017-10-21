@@ -1,32 +1,38 @@
 language: python
-matrix:
-  include:
-    - python: "2.7"
-    - pytest
+dist: trusty
+python: "2.7"
 
 cache: pip
 
 virtualenv:
   system_site_packages: true
 
+addons:
+  apt:
+    packages:
+      - libxml2-utils
+
 before_install:
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy numpy scipy
   # SpiNNakerManchester internal dependencies; development mode
-  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
-  - pip install -q --upgrade git+git://github.com/project-rig/rig.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install --upgrade git+git://github.com/project-rig/rig.git@master
 
 install:
   - pip install -r requirements-test.txt
-  - pip install -r doc/doc_requirements.txt
   - python ./setup.py install
+  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
 
 script:
   - py.test unittests
-  - py.test integration_tests
+  # Currently no integration tests
+  # - py.test integration_tests
   # Code quality check
   - flake8 pacman
   - flake8 integration_tests unittests uinit_test_objects
+  - find pacman -name '*.xml' | xargs -n 1 support/validate-xml.sh 
   - cd doc/source
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json

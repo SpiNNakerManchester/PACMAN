@@ -8,3 +8,4 @@ build/
 dist/
 PACMAN.egg-info
 /SpiNNaker_PACMAN.egg-info/
+/.cache

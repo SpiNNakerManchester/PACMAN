@@ -1,18 +1,48 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
-from abc import abstractproperty
 
-from pacman.model.abstract_classes.abstract_has_constraints\
-    import AbstractHasConstraints
+from spinn_utilities.abstract_base import \
+    AbstractBase, abstractmethod, abstractproperty
 
 
-@add_metaclass(ABCMeta)
-class AbstractGraph(AbstractHasConstraints):
+@add_metaclass(AbstractBase)
+class AbstractGraph(object):
     """ A graph
     """
 
     __slots__ = ()
+
+    @abstractproperty
+    def label(self):
+        """ The label of the item
+
+        :return: The label
+        :rtype: str
+        :raise None: Raises no known exceptions
+        """
+
+    @abstractproperty
+    def constraints(self):
+        """ The constraints of the vertex
+
+        :rtype: iterable of :py:class:`AbstractConstraint`
+        """
+
+    @abstractmethod
+    def add_constraint(self, constraint):
+        """ Add a constraint
+
+        :param constraint: The constraint to add
+        :type constraint: :py:class:`AbstractConstraint`
+        """
+
+    def add_constraints(self, constraints):
+        """ Add a list of constraints
+
+        :param constraints: The list of constraints to add
+        :type constraints: list of :py:class:`AbstractConstraint`
+        """
+        for constraint in constraints:
+            self.add_constraint(constraint)
 
     @abstractmethod
     def add_vertex(self, vertex):
@@ -144,6 +174,22 @@ class AbstractGraph(AbstractHasConstraints):
         :type vertex:\
             :py:class:`pacman.model.graphs.abstract_vertex.AbstractVertex`
         :rtype:\
+            iterable of\
+            :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
+        """
+
+    @abstractmethod
+    def get_edges_ending_at_vertex_with_partition_name(
+            self, vertex, partition_name):
+        """ Get all the edges that end at the given vertex, and reside in the
+         correct partition id
+
+        :param vertex:  The vertex at which the edges to get end
+        :type vertex:\
+            :py:class:`pacman.model.graphs.abstract_vertex.AbstractVertex`
+        :param partition_name: the label for the partition
+        :type partition_name: str
+        :return: \
             iterable of\
             :py:class:`pacman.model.graphs.abstract_edge.AbstractEdge`
         """

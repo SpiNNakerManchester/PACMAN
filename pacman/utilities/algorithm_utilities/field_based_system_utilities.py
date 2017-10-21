@@ -1,23 +1,18 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_contiguous_range_constraint import \
-    KeyAllocatorContiguousRangeContraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_key_and_mask_constraint import \
-    KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_mask_constraint import \
-    KeyAllocatorFixedMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_flexi_field_constraint import \
-    KeyAllocatorFlexiFieldConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import ContiguousKeyRangeContraint
+from pacman.model.constraints.key_allocator_constraints\
+    import FixedKeyFieldConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import FixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import FixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    import FlexiKeyFieldConstraint
 from pacman import exceptions
 
 # the different types of field that this system supports
 from pacman.utilities import utility_calls
-from pacman.utilities.utility_objs.field import Field
+from pacman.utilities.utility_objs import Field
 from pacman.utilities.utility_objs.flexi_field import SUPPORTED_TAGS
 
 from enum import Enum
@@ -44,17 +39,17 @@ def deduce_types(graph):
     for partition in graph.outgoing_edge_partitions:
         for constraint in partition.constraints:
             if not isinstance(constraint,
-                              KeyAllocatorContiguousRangeContraint):
-                if isinstance(constraint, KeyAllocatorFlexiFieldConstraint):
+                              ContiguousKeyRangeContraint):
+                if isinstance(constraint, FlexiKeyFieldConstraint):
                     handle_flexi_field(constraint, seen_fields, known_fields)
                 if isinstance(constraint,
-                              KeyAllocatorFixedKeyAndMaskConstraint):
+                              FixedKeyAndMaskConstraint):
                     if TYPES_OF_FIELDS.FIXED_KEY.name not in seen_fields:
                         seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name] = list()
                     for key_mask in constraint.keys_and_masks:
                         seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name].\
                             append(key_mask)
-                if isinstance(constraint, KeyAllocatorFixedMaskConstraint):
+                if isinstance(constraint, FixedMaskConstraint):
                     fields = convert_mask_into_fields(constraint.mask)
                     if TYPES_OF_FIELDS.FIXED_MASK.name not in seen_fields:
                         seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name] = dict()
@@ -70,7 +65,7 @@ def deduce_types(graph):
                                 TYPES_OF_FIELDS.FIXED_MASK.name][
                                 field.value].append(field)
 
-                if isinstance(constraint, KeyAllocatorFixedFieldConstraint):
+                if isinstance(constraint, FixedKeyFieldConstraint):
                     if TYPES_OF_FIELDS.FIXED_FIELD not in seen_fields:
                         seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name] = list()
                     seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name].append(

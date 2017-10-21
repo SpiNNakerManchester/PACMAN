@@ -1,17 +1,15 @@
+from spinn_utilities.timer import Timer
 # pacman imports
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 from pacman import operations
-from pacman.executor.injection_decorator import injection_context, do_injection
-from pacman.executor.algorithm_decorators import algorithm_decorator
-from pacman.executor.algorithm_metadata_xml_reader \
-    import AlgorithmMetadataXmlReader
+from .injection_decorator import injection_context, do_injection
+from .algorithm_decorators import scan_packages, get_algorithms
+from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
 from pacman.operations import algorithm_reports
 from pacman.utilities import file_format_converters
-from pacman.utilities.utility_objs.timer import Timer
 
 # general imports
 import logging
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +50,13 @@ class PACMANAlgorithmExecutor(object):
         "_inject_inputs",
 
         # True if direct injection is to be done
-        "_do_direct_injection"
+        "_do_direct_injection",
+
+        # the flag in the provenance area.
+        "_provenance_name",
+
+        # If required a file path to append provenace data to
+        "_provenance_path"
     ]
 
     def __init__(
@@ -60,7 +64,8 @@ class PACMANAlgorithmExecutor(object):
             xml_paths=None, packages=None, do_timings=True,
             print_timings=False, do_immediate_injection=True,
             do_post_run_injection=False, inject_inputs=True,
-            do_direct_injection=True, use_unscanned_annotated_algorithms=True):
+            do_direct_injection=True, use_unscanned_annotated_algorithms=True,
+            provenance_path=None, provenance_name=None):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -98,6 +103,9 @@ class PACMANAlgorithmExecutor(object):
         :param use_unscanned_annotated_algorithms:\
             True if algorithms that have been detected outside of the packages\
             argument specified above should be used
+        :param provenance_path:
+            Path to file to append full provenance data to
+            If None no provenance is written
         """
 
         # algorithm timing information
@@ -122,10 +130,17 @@ class PACMANAlgorithmExecutor(object):
         self._inject_inputs = inject_inputs
         self._do_direct_injection = do_direct_injection
 
+        if provenance_name is None:
+            self._provenance_name = "mapping"
+        else:
+            self._provenance_name = provenance_name
+
         self._set_up_pacman_algorithm_listings(
             algorithms, optional_algorithms, xml_paths,
             packages, inputs, required_outputs,
             use_unscanned_annotated_algorithms)
+
+        self._provenance_path = provenance_path
 
     def _set_up_pacman_algorithm_listings(
             self, algorithms, optional_algorithms, xml_paths, packages, inputs,
@@ -162,35 +177,25 @@ class PACMANAlgorithmExecutor(object):
 
         # set up XML reader for standard PACMAN algorithms XML file reader
         # (used in decode_algorithm_data_objects function)
-        copy_of_xml_paths.append(os.path.join(
-            os.path.dirname(operations.__file__),
-            "algorithms_metadata.xml"))
-        copy_of_xml_paths.append(os.path.join(
-            os.path.dirname(operations.__file__),
-            "rigs_algorithm_metadata.xml"))
-        copy_of_xml_paths.append(os.path.join(
-            os.path.dirname(algorithm_reports.__file__),
-            "reports_metadata.xml"))
+        copy_of_xml_paths.append(operations.algorithms_metdata_file)
+        copy_of_xml_paths.append(operations.rigs_algorithm_metadata_file)
+        copy_of_xml_paths.append(algorithm_reports.reports_metadata_file)
 
         # decode the algorithms specs
         xml_decoder = AlgorithmMetadataXmlReader(copy_of_xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
         converter_xml_path = \
-            os.path.join(os.path.dirname(file_format_converters.__file__),
-                         "converter_algorithms_metadata.xml")
+            file_format_converters.converter_algorithms_metadata_file
         converter_decoder = AlgorithmMetadataXmlReader([converter_xml_path])
         converters = converter_decoder.decode_algorithm_data_objects()
 
         # Scan for annotated algorithms
         copy_of_packages.append(operations)
         copy_of_packages.append(algorithm_reports)
-        converters.update(algorithm_decorator.scan_packages(
-            [file_format_converters]))
-        algorithm_data_objects.update(
-            algorithm_decorator.scan_packages(copy_of_packages))
+        converters.update(scan_packages([file_format_converters]))
+        algorithm_data_objects.update(scan_packages(copy_of_packages))
         if use_unscanned_algorithms:
-            algorithm_data_objects.update(
-                algorithm_decorator.get_algorithms())
+            algorithm_data_objects.update(get_algorithms())
 
         # get list of all xml's as this is used to exclude xml files from
         # import
@@ -198,20 +203,16 @@ class PACMANAlgorithmExecutor(object):
         all_xml_paths.extend(copy_of_xml_paths)
         all_xml_paths.append(converter_xml_path)
 
-        converter_names = list()
-        for converter in converters.iterkeys():
-            converter_names.append(converter)
-
         # filter for just algorithms we want to use
         algorithm_data = self._get_algorithm_data(
             algorithms_names, algorithm_data_objects)
         optional_algorithms_datas = self._get_algorithm_data(
             copy_of_optional_algorithms, algorithm_data_objects)
         converter_algorithms_datas = self._get_algorithm_data(
-            converter_names, converters)
+            converters.keys(), converters)
 
         # sort_out_order_of_algorithms for execution
-        self._sort_out_order_of_algorithms(
+        self._determine_algorithm_order(
             inputs, required_outputs, algorithm_data,
             optional_algorithms_datas, converter_algorithms_datas)
 
@@ -220,14 +221,13 @@ class PACMANAlgorithmExecutor(object):
             algorithm_names, algorithm_data_objects):
         algorithms = list()
         for algorithm_name in algorithm_names:
-            if algorithm_name in algorithm_data_objects:
-                algorithms.append(algorithm_data_objects[algorithm_name])
-            else:
-                raise exceptions.PacmanConfigurationException(
+            if algorithm_name not in algorithm_data_objects:
+                raise PacmanConfigurationException(
                     "Cannot find algorithm {}".format(algorithm_name))
+            algorithms.append(algorithm_data_objects[algorithm_name])
         return algorithms
 
-    def _sort_out_order_of_algorithms(
+    def _determine_algorithm_order(
             self, inputs, required_outputs, algorithm_data,
             optional_algorithm_data, converter_algorithms_datas):
         """ Takes the algorithms and determines which order they need to be\
@@ -252,30 +252,26 @@ class PACMANAlgorithmExecutor(object):
         outputs_to_find = self._remove_outputs_which_are_inputs(
             required_outputs, inputs)
 
-        while ((len(algorithms_to_find) > 0 or len(outputs_to_find) > 0)):
-
+        while algorithms_to_find or outputs_to_find:
             # Find a usable algorithm
             suitable_algorithm, algorithm_list = \
                 self._locate_suitable_algorithm(
                     algorithms_to_find, input_types, None)
-            if suitable_algorithm is None:
 
-                # If no algorithm, find a usable optional algorithm
+            # If no algorithm, find a usable optional algorithm
+            if suitable_algorithm is None:
                 suitable_algorithm, algorithm_list = \
                     self._locate_suitable_algorithm(
                         optionals_to_use, input_types, generated_outputs)
 
+            # if still no suitable algorithm, try using a converter algorithm
             if suitable_algorithm is None:
-
-                # if still no suitable algorithm, try using a converter
-                # algorithm
                 suitable_algorithm, algorithm_list = \
                     self._locate_suitable_algorithm(
                         converter_algorithms_datas, input_types,
                         generated_outputs)
 
             if suitable_algorithm is not None:
-
                 # Remove the value
                 self._remove_algorithm_and_update_outputs(
                     algorithm_list, suitable_algorithm, input_types,
@@ -307,7 +303,7 @@ class PACMANAlgorithmExecutor(object):
                             self._deduce_inputs_required_to_run(
                                 algorithm, input_types)
 
-                raise exceptions.PacmanConfigurationException(
+                raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
                     "    Inputs: {}\n"
                     "    Outputs: {}\n"
@@ -328,7 +324,7 @@ class PACMANAlgorithmExecutor(object):
                 failed_to_generate_output_string += ":{}".format(output)
 
         if not all_required_outputs_generated:
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "Unable to generate outputs {}".format(
                     failed_to_generate_output_string))
 
@@ -350,19 +346,15 @@ class PACMANAlgorithmExecutor(object):
         return copy_required_outputs
 
     def _deduce_inputs_required_to_run(self, algorithm, inputs):
-        left_over_inputs = "            {}: ".format(algorithm.algorithm_id)
-        first = True
+        left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
+        separator = ""
         for an_input in algorithm.required_inputs:
             unfound_types = [
                 param_type for param_type in an_input.param_types
-                if param_type not in inputs
-            ]
-            if len(unfound_types) > 0:
-                if first:
-                    left_over_inputs += "['{}'".format(unfound_types)
-                    first = False
-                else:
-                    left_over_inputs += ", '{}'".format(unfound_types)
+                if param_type not in inputs]
+            if unfound_types:
+                left_over_inputs += "{}'{}'".format(separator, unfound_types)
+                separator = ", "
         left_over_inputs += "]\n"
         return left_over_inputs
 
@@ -455,6 +447,9 @@ class PACMANAlgorithmExecutor(object):
             # Execute the algorithm
             results = algorithm.call(self._internal_type_mapping)
 
+            if self._provenance_path:
+                self._report_full_provenance(algorithm, results)
+
             # handle_prov_data
             if self._do_timing:
                 self._update_timings(timer, algorithm)
@@ -482,7 +477,9 @@ class PACMANAlgorithmExecutor(object):
                     returned
         :return: the returned item
         """
-        return self._internal_type_mapping.get(item_type)
+        if item_type not in self._internal_type_mapping:
+            return None
+        return self._internal_type_mapping[item_type]
 
     def get_items(self):
         """ Get all the outputs from a execution
@@ -500,4 +497,71 @@ class PACMANAlgorithmExecutor(object):
         if self._print_timings:
             logger.info("Time {} taken by {}".format(
                 str(time_taken), algorithm.algorithm_id))
-        self._algorithm_timings.append((algorithm.algorithm_id, time_taken))
+        self._algorithm_timings.append(
+            (algorithm.algorithm_id, time_taken, self._provenance_name))
+
+    def _report_full_provenance(self, algorithm, results):
+        try:
+            with open(self._provenance_path, "a") as provenance_file:
+                algorithm.write_provenance_header(provenance_file)
+                if len(algorithm.required_inputs) > 0:
+                    provenance_file.write("\trequired_inputs:\n")
+                    self._report_inputs(provenance_file,
+                                        algorithm.required_inputs)
+                if len(algorithm.optional_inputs) > 0:
+                    provenance_file.write("\toptional_inputs:\n")
+                    self._report_inputs(provenance_file,
+                                        algorithm.optional_inputs)
+                if len(algorithm.outputs) > 0:
+                    provenance_file.write("\toutputs:\n")
+                    for output in algorithm.outputs:
+                        variable = results[output.output_type]
+                        the_type = self._get_type(variable)
+                        provenance_file.write(
+                            "\t\t{}:{}\n".format(output.output_type, the_type))
+                provenance_file.write("\n")
+        except Exception:
+            logger.error("Exception when attempting to write provenance",
+                         exc_info=True)
+
+    def _report_inputs(self, provenance_file, inputs):
+        for input in inputs:  # @ReservedAssignment
+            name = input.name
+            for param_type in input.param_types:
+                if param_type in self._internal_type_mapping:
+                    variable = self._internal_type_mapping[param_type]
+                    the_type = self._get_type(variable)
+                    provenance_file.write(
+                        "\t\t{}   {}:{}\n".format(name, param_type, the_type))
+                    break
+            else:
+                if len(input.param_types) == 1:
+                    provenance_file.write(
+                        "\t\t{}   None of {} provided\n"
+                        "".format(name, input.param_types))
+                else:
+                    provenance_file.write(
+                        "\t\t{}   {} not provided\n"
+                        "".format(name, input.param_types[0]))
+
+    def _get_type(self, variable):
+        if variable is None:
+            return "None"
+        the_type = type(variable)
+        if the_type in [bool, float, int, str]:
+            return variable
+        if the_type == set:
+            if len(variable) == 0:
+                return "Empty set"
+            the_type = "set("
+            for item in variable:
+                the_type += "{},".format(self._get_type(item))
+            the_type += ")"
+            return the_type
+        elif the_type == list:
+            if len(variable) == 0:
+                return "Empty list"
+            first_type = type(variable[0])
+            if all(isinstance(n, first_type) for n in variable):
+                return "list({}) :len{}".format(first_type, len(variable))
+        return the_type

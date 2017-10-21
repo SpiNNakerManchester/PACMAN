@@ -2,7 +2,7 @@ import unittest
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
     import MallocBasedRoutingInfoAllocator
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.routing_info import BaseKeyAndMask
 
 
 class MyTestCase(unittest.TestCase):
