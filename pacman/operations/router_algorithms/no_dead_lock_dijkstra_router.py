@@ -94,8 +94,8 @@ class NoDeadLockDijkstraRouter(BasicDijkstraRouting):
                 links=new_links,
                 emergency_routing_enabled=router.emergency_routing_enabled,
                 clock_speed=router.clock_speed,
-                n_available_multicast_entries=
-                router.n_available_multicast_entries)
+                n_available_multicast_entries=(
+                    router.n_available_multicast_entries))
 
             # build new chip
             new_machine.add_chip(Chip(
