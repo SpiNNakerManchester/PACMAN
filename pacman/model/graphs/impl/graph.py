@@ -44,9 +44,6 @@ class Graph(ConstrainedObject, AbstractGraph):
         # The outgoing edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
 
-        # The outgoing edge partitions by traffic type
-        "_outgoing_edge_partitions_by_traffic_type",
-
         # The label of the graph
         "_label"
     )
@@ -74,8 +71,6 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._incoming_edges = defaultdict(OrderedSet)
         self._incoming_edges_by_partition_name = defaultdict(list)
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
-        self._outgoing_edge_partitions_by_traffic_type = \
-            defaultdict(OrderedSet)
         self._label = label
 
     @property
@@ -213,7 +208,3 @@ class Graph(ConstrainedObject, AbstractGraph):
             self, vertex, outgoing_edge_partition_name):
         return self._outgoing_edge_partitions_by_name.get(
             (vertex, outgoing_edge_partition_name), None)
-
-    @overrides(AbstractGraph.get_outgoing_edge_partitions_with_traffic_type)
-    def get_outgoing_edge_partitions_with_traffic_type(self, traffic_type):
-        return self._outgoing_edge_partitions_by_traffic_type[traffic_type]
