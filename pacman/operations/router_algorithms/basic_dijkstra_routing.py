@@ -207,9 +207,6 @@ class BasicDijkstraRouting(object):
         """
         for n in range(len(nodes_info[key]["neighbours"])):
             if nodes_info[key]["neighbours"][n] is not None:
-                neighbour = nodes_info[key]["neighbours"][n]
-                xn, yn = neighbour.destination_x, neighbour.destination_y
-                entries = self._routing_paths.get_entries_for_router(xn, yn)
                 nodes_info[key]["weights"][n] = 1
 
     @staticmethod
