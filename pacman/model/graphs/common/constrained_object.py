@@ -52,7 +52,7 @@ class ConstrainedObject(object):
 
         try:
             self._constraints.add(constraint)
-        except:
+        except Exception:
             self._constraints = set()
             self._constraints.add(constraint)
 
@@ -82,5 +82,5 @@ class ConstrainedObject(object):
         """
         try:
             return self._constraints
-        except:
+        except Exception:
             return set()

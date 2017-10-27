@@ -133,16 +133,6 @@ class MyTestCase(unittest.TestCase):
         self.machine = Machine(chips)
 
     @unittest.skip("demonstrating skipping")
-    def test_new_basic_router(self):
-        dijkstra_router = BasicDijkstraRouting()
-        self.assertEqual(dijkstra_router._k, 1)
-        self.assertEqual(dijkstra_router._l, 0)
-        self.assertEqual(dijkstra_router._m, 0)
-        self.assertEqual(dijkstra_router._bw_per_route_entry,
-                         dijkstra_router.BW_PER_ROUTE_ENTRY)
-        self.assertEqual(dijkstra_router._max_bw, dijkstra_router.MAX_BW)
-
-    @unittest.skip("demonstrating skipping")
     def test_run_basic_routing_off_chip_custom_100_node_machine(self):
         dijkstra_router = BasicDijkstraRouting()
         routing_tables = dijkstra_router.route(
