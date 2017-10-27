@@ -46,15 +46,6 @@ class BasicDijkstraRouting(object):
         "_routing_paths",
 
         # parameter to control ...........
-        "_k",
-
-        # parameter to control ...........
-        "_l",
-
-        # parameter to control ...........
-        "_m",
-
-        # parameter to control ...........
         "_bw_per_route_entry",
 
         # parameter to control ...........
@@ -67,7 +58,7 @@ class BasicDijkstraRouting(object):
     BW_PER_ROUTE_ENTRY = 0.01
     MAX_BW = 250
 
-    def __call__(self, placements, machine, machine_graph, k=1, l=0, m=0,
+    def __call__(self, placements, machine, machine_graph,
                  bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
         """ Find routes between the edges with the allocated information,
             placed in the given places
@@ -89,16 +80,13 @@ class BasicDijkstraRouting(object):
 
         # set up basic data structures
         self._routing_paths = MulticastRoutingTableByPartition()
-        self._k = k
-        self._l = l
-        self._m = m
         self._bw_per_route_entry = bw_per_route_entry
         self._max_bw = max_bw
         self._machine = machine
 
         nodes_info = self._initiate_node_info(machine)
         tables = self._initiate_dijkstra_tables(machine)
-        self._update_all_weights(nodes_info, machine)
+        self._update_all_weights(nodes_info)
 
         # each vertex represents a core in the board
         progress = ProgressBar(placements.n_placements,
@@ -120,7 +108,7 @@ class BasicDijkstraRouting(object):
                 edges_to_route.append(edge)
 
             if len(dest_chips) != 0:
-                self._update_all_weights(nodes_info, machine)
+                self._update_all_weights(nodes_info)
                 self._reset_tables(tables)
                 tables[placement.x, placement.y].activated = True
                 tables[placement.x, placement.y].cost = 0
@@ -177,64 +165,31 @@ class BasicDijkstraRouting(object):
             tables[chip.x, chip.y] = _DijkstraInfo()
         return tables
 
-    def _update_all_weights(self, nodes_info, machine):
+    def _update_all_weights(self, nodes_info):
         """ Change the weights of the neighbouring nodes
 
         :param nodes_info: the node info dictionary
         :type nodes_info: dict
-        :param machine: the machine python object that represents the\
-                    structure of the machine
-        :type machine: 'py:class':spinn_machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
         for key in nodes_info:
             if nodes_info[key] is not None:
-                self._update_neighbour_weights(nodes_info, machine, key)
+                self._update_neighbour_weights(nodes_info, key)
 
-    def _update_neighbour_weights(self, nodes_info, machine, key):
+    def _update_neighbour_weights(self, nodes_info, key):
         """ Change the weights of the neighbouring nodes
 
         :param nodes_info: the node info dictionary
-        :param machine: the machine python object that represents the\
-                    structure of the machine
         :param key: the identifier to the object in nodes_info
         :type key: str
         :type nodes_info: dict
-        :type machine: 'py:class':spinn_machine.Machine
         :rtype: None
         :raise None: this method does not raise any known exception
         """
         for n, neighbour in enumerate(nodes_info[key].neighbours):
             if neighbour is not None:
-                xn, yn = neighbour.destination_x, neighbour.destination_y
-                entries = self._routing_paths.get_entries_for_router(xn, yn)
-                nodes_info[key].weights[n] = self._get_weight(
-                    machine.get_chip_at(xn, yn).router,
-                    nodes_info[key].bws[n], len(entries))
-
-    def _get_weight(self, router, bws, num_entries):
-        """ Get the weight based on basic heuristics
-
-        :param router: the router to assess the weight of
-        :param bws: the basic weight of the source node
-        :param num_entries: the number of entries going though this router
-        :type router: spinn_machine.Router
-        :type bws: int
-        :type num_entries: int
-        :return: weight of this router
-        :rtype: int
-        :raise None: does not raise any known exception
-        """
-        free_entries = router.ROUTER_DEFAULT_AVAILABLE_ENTRIES - num_entries
-        q = 0
-        if self._l > 0:
-            q = self._l * (
-                1.0/free_entries - 1.0/router.ROUTER_DEFAULT_AVAILABLE_ENTRIES)
-        t = 0
-        if self._m > 0:
-            t = self._m * (1.0/bws - 1.0/self._max_bw)
-        return self._k + q + t
+                nodes_info[key].weights[n] = 1
 
     @staticmethod
     def _reset_tables(tables):
