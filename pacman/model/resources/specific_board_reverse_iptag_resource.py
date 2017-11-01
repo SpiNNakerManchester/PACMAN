@@ -24,10 +24,9 @@ class ReverseIPtagResource(AbstractResource):
         "_board"
     ]
 
-    def __init__(
-            self, board, port=None, sdp_port=1, tag=None):
+    def __init__(self, board, port=None, sdp_port=1, tag=None):
         """
-        
+
         :param board: a board ip address which is where this reverse iptag is\
          to be placed
         :type board: str

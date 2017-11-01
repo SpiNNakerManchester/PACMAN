@@ -107,7 +107,7 @@ class SpecificBoardTagResource(AbstractResource):
     @property
     def board(self):
         """ the board ip address that this tag is to reside on
-        
+
         :return: ip address
         """
         return self._board

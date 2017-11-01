@@ -825,21 +825,20 @@ class ResourceTracker(object):
         return board_address, tag_id
 
     def _setup_board_tags(self, board_address):
-        """
-        sorts out the stae for a given ethernet chip if needed
-        :param board_address: the board address to find the \
-        ethernet chip of
-        :rtype: None 
+        """ Establish the state for a given ethernet chip if needed.
+
+        :param board_address: the board address to find the ethernet chip of
+        :rtype: None
         """
 
         if board_address not in self._tags_by_board:
-            (e_chip_x, e_chip_y) = self._ethernet_chips[board_address]
+            e_chip_x, e_chip_y = self._ethernet_chips[board_address]
             e_chip = self._machine.get_chip_at(e_chip_x, e_chip_y)
             self._tags_by_board[board_address] = set(e_chip.tag_ids)
 
     def _allocate_tag_id(self, tag_id, board_address):
         """ locates a tag id for the iptag
-        
+
         :param tag_id: tag id to get, or None
         :param board_address: board address
         :return: tag id allocated
@@ -952,7 +951,7 @@ class ResourceTracker(object):
 
     def _update_structures_for_reverse_ip_tag(self, board_address, tag, port):
         """ updates the structures for reverse iptags
-        
+
         :param board_address: the board its going to be placed on
         :param tag: the tag id
         :param port: the port number
