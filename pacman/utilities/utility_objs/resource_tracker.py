@@ -35,31 +35,31 @@ class ResourceTracker(object):
         # Note that entries are only added when a board is first used
         "_tags_by_board",
 
-        # Set of boards with available ip tags
+        # Set of boards with available IP tags
         "_boards_with_ip_tags",
 
-        # Set of (board_address, tag) assigned to an ip tag indexed by
-        # (ip address, traffic identifier) - Note not reverse ip tags
+        # Set of (board_address, tag) assigned to an IP tag indexed by
+        # (IP address, traffic identifier) - Note not reverse IP tags
         "_ip_tags_address_traffic",
 
-        # The (ip address, traffic identifier) assigned to an ip tag indexed by
+        # The (IP address, traffic identifier) assigned to an IP tag indexed by
         # (board address, tag)
         "_address_and_traffic_ip_tag",
 
-        # The (strip_sdp, port) assigned to an ip tag indexed by
+        # The (strip_sdp, port) assigned to an IP tag indexed by
         # (board address, tag)
         "_ip_tags_strip_sdp_and_port",
 
         # The (board address, port) combinations already assigned to a
-        # reverse ip tag - Note not ip tags
+        # reverse IP tag - Note not IP tags
         "_reverse_ip_tag_listen_port",
 
-        # The port assigned to a reverse ip tag, indexed by
-        # (board address, tag) - Note not ip tags
+        # The port assigned to a reverse IP tag, indexed by
+        # (board address, tag) - Note not IP tags
         "_listen_port_reverse_ip_tag",
 
-        # A count of how many allocations are sharing the same ip tag -
-        # Note not reverse ip tags
+        # A count of how many allocations are sharing the same IP tag -
+        # Note not reverse IP tags
         "_n_ip_tag_allocations",
 
         # (x, y) tuple of coordinates of Ethernet connected chip indexed by
@@ -111,32 +111,32 @@ class ResourceTracker(object):
         # Note that entries are only added when a board is first used
         self._tags_by_board = dict()
 
-        # Set of boards with available ip tags
+        # Set of boards with available IP tags
         self._boards_with_ip_tags = OrderedSet()
 
         # Set of (board_address, tag) assigned
-        # to any ip tag, indexed by (ip address, traffic_identifier)
-        # - Note not reverse ip tags
+        # to any IP tag, indexed by (IP address, traffic_identifier)
+        # - Note not reverse IP tags
         self._ip_tags_address_traffic = defaultdict(set)
 
-        # The (ip address, traffic identifier) assigned to an ip tag indexed by
+        # The (IP address, traffic identifier) assigned to an IP tag indexed by
         # (board address, tag)
         self._address_and_traffic_ip_tag = dict()
 
-        # The (strip_sdp, port) assigned to an ip tag indexed by
+        # The (strip_sdp, port) assigned to an IP tag indexed by
         # (board address, tag)
         self._ip_tags_strip_sdp_and_port = dict()
 
         # The (board address, port) combinations already assigned to a
-        # reverse ip tag - Note not ip tags
+        # reverse IP tag - Note not IP tags
         self._reverse_ip_tag_listen_port = set()
 
-        # The port assigned to a reverse ip tag, indexed by
-        # (board address, tag) - Note not ip tags
+        # The port assigned to a reverse IP tag, indexed by
+        # (board address, tag) - Note not IP tags
         self._listen_port_reverse_ip_tag = dict()
 
-        # A count of how many allocations are sharing the same ip tag -
-        # Note not reverse ip tags
+        # A count of how many allocations are sharing the same IP tag -
+        # Note not reverse IP tags
         self._n_ip_tag_allocations = dict()
 
         # (x, y) tuple of coordinates of Ethernet connected chip indexed by
@@ -182,7 +182,7 @@ class ResourceTracker(object):
         for sdram_pre_allocated in sdram_allocations:
             chip = sdram_pre_allocated.chip
             sdram = sdram_pre_allocated.sdram_usage
-            self._sdram_tracker[(chip.x, chip.y)] = sdram
+            self._sdram_tracker[chip.x, chip.y] = sdram
 
         # remove specific cores from the tracker
         specific_cores = pre_allocated_resources.specific_core_resources
@@ -191,14 +191,14 @@ class ResourceTracker(object):
             processor_ids = specific_core.cores
             self._fill_in_core_tracker_for_chip((chip.x, chip.y), chip)
             for processor_id in processor_ids:
-                self._core_tracker[(chip.x, chip.y)].remove(processor_id)
+                self._core_tracker[chip.x, chip.y].remove(processor_id)
 
         # create random_core_map
         chip_to_arbitrary_core_requirement = defaultdict(lambda: 0)
         for arbitrary_core in pre_allocated_resources.core_resources:
             chip = arbitrary_core.chip
             n_cores = arbitrary_core.n_cores
-            chip_to_arbitrary_core_requirement[(chip.x, chip.y)] = n_cores
+            chip_to_arbitrary_core_requirement[chip.x, chip.y] = n_cores
 
         # handle specific iptags
         specific_ip_tags = pre_allocated_resources.specific_iptag_resources
@@ -253,7 +253,7 @@ class ResourceTracker(object):
 
     @staticmethod
     def get_ip_tag_info(resources, constraints):
-        """ Get the ip tag resource information
+        """ Get the IP tag resource information
 
         :param resources: The resources to get the values from
         :type resources:\
@@ -263,8 +263,8 @@ class ResourceTracker(object):
             list of\
             :py:class:`pacman.model.constraints.AbstractConstraint`
         :return:\
-            A tuple of board address, iterable of ip tag resources and \
-            iterable of reverse ip tag resources
+            A tuple of board address, iterable of IP tag resources and \
+            iterable of reverse IP tag resources
         :rtype: (str, iterable of\
                     :py:class:`pacman.model.resources.IptagResource`,
                     iterable of\
@@ -314,7 +314,7 @@ class ResourceTracker(object):
         return x, y, p
 
     def _chip_available(self, x, y):
-        pre_allocated_cores = self._n_cores_preallocated[(x, y)]
+        pre_allocated_cores = self._n_cores_preallocated[x, y]
         return (
             self._machine.is_chip_at(x, y) and
             (((x, y) not in self._core_tracker and
@@ -334,10 +334,10 @@ class ResourceTracker(object):
         :type chips: iterable of (int, int)
         :param board_address: the board address to check for usable chips on
         :type board_address: str or None
-        :param ip_tags: list of ip tag resources
+        :param ip_tags: list of IP tag resources
         :type ip_tags: list of\
                     :py:class:`pacman.model.resources.IptagResource`
-        :param reverse_ip_tags: list of reverse ip tag resources
+        :param reverse_ip_tags: list of reverse IP tag resources
         :type reverse_ip_tags: list of\
                     :py:class:`pacman.model.resources.ReverseIptagResource`
         :return: iterable of tuples of (x, y) coordinates of usable chips
@@ -532,7 +532,7 @@ class ResourceTracker(object):
         :type board_address: str or None
         :param tag_id: the tag id to locate
         :type tag_id: int or None
-        :param ip_address: The ip address of the tag
+        :param ip_address: The IP address of the tag
         :type ip_address: str
         :param port: The port of the tag or None if not assigned
         :type port: int or None
@@ -545,7 +545,7 @@ class ResourceTracker(object):
         :rtype: tuple of (str, int, (int or None)) or (None, None, None)
         """
 
-        # If there is no tag for the given ip address - traffic identifier
+        # If there is no tag for the given IP address - traffic identifier
         # combination, return
         if ((ip_address, traffic_identifier) not in
                 self._ip_tags_address_traffic):
@@ -563,10 +563,10 @@ class ResourceTracker(object):
         found_tag = None
         found_port = None
         existing_tags = self._ip_tags_address_traffic[
-            (ip_address, traffic_identifier)]
+            ip_address, traffic_identifier]
         for (other_board_address, other_tag) in existing_tags:
             (other_strip_sdp, other_port) = self._ip_tags_strip_sdp_and_port[
-                (other_board_address, other_tag)]
+                other_board_address, other_tag]
             if (utility_calls.is_equal_or_None(
                     other_board_address, board_address) and
                     utility_calls.is_equal_or_None(other_tag, tag_id) and
@@ -635,7 +635,7 @@ class ResourceTracker(object):
         :type board_address: str or None
         :param tag: the tag id to locate
         :type tag: int or None
-        :param ip_address: the ip address of the tag to be assigned
+        :param ip_address: the IP address of the tag to be assigned
         :type ip_address: str
         :param port: the port number of the tag to be assigned
         :type port: int or None
@@ -647,7 +647,7 @@ class ResourceTracker(object):
         :rtype: bool
         """
 
-        # If equivalent traffic is being used by another ip tag, re-use it
+        # If equivalent traffic is being used by another IP tag, re-use it
         (b_address, _, _) = self._get_matching_ip_tag(
             None, board_address, tag, ip_address, port, strip_sdp,
             traffic_identifier)
@@ -661,9 +661,9 @@ class ResourceTracker(object):
         """ Check if the set of tags are available using the given chip,\
             given the constraints
 
-        :param board_address: the board to allocate ip tags on
+        :param board_address: the board to allocate IP tags on
         :type board_address: str or None
-        :param ip_tags: The ip tag resource
+        :param ip_tags: The IP tag resource
         :type ip_tags: iterable of\
                     :py:class:`pacman.model.resource.IptagResource`
         :return: True if the tags can be allocated, False otherwise
@@ -682,7 +682,7 @@ class ResourceTracker(object):
         return True
 
     def _is_reverse_ip_tag_available(self, board_address, tag, port):
-        """ Check if the reverse ip tag is available given the constraints
+        """ Check if the reverse IP tag is available given the constraints
 
         :param board_address: The board address to use
         :type board_address: str or None
@@ -718,11 +718,11 @@ class ResourceTracker(object):
 
     def _are_reverse_ip_tags_available(
             self, board_address, reverse_ip_tags):
-        """ Check if this chip can be used given the reverse ip tag resources
+        """ Check if this chip can be used given the reverse IP tag resources
 
-        :param board_address: the board to allocate ip tags on
+        :param board_address: the board to allocate IP tags on
         :type board_address: str or None
-        :param reverse_ip_tags: The reverse ip tag resource to be met
+        :param reverse_ip_tags: The reverse IP tag resource to be met
         :type reverse_ip_tags: iterable of \
                     :py:class:`pacman.model.resources.ReverseIptagResource`
         :return: True if the chip can be used, False otherwise
@@ -850,13 +850,13 @@ class ResourceTracker(object):
             return tag_id
 
     def _allocate_ip_tags(self, chip, board_address, ip_tags):
-        """ Allocate the given set of ip tag resources
+        """ Allocate the given set of IP tag resources
 
         :param chip: The chip to allocate the tags for
         :type chip: :py:class:`spinn_machine.Chip`
         :param board_address: The board address to allocate on
         :type board_address: str or None
-        :param ip_tags: The ip tag resources to allocate
+        :param ip_tags: The IP tag resources to allocate
         :type ip_tags: iterable of\
                     :py:class:`pacman.model.resources.IptagResource`
         :return: iterable of tuples of (board address, tag) assigned
@@ -883,16 +883,16 @@ class ResourceTracker(object):
                 allocations.append((b_address, a_tag, e_chip_x, e_chip_y))
 
                 # Add to the number of things allocated to the tag
-                self._n_ip_tag_allocations[(b_address, a_tag)] += 1
+                self._n_ip_tag_allocations[b_address, a_tag] += 1
 
                 # If the port is None and the requested port is not None,
                 # update the port number
                 if a_port is None and ip_tag.port is not None:
-                    self._ip_tags_strip_sdp_and_port[(b_address, a_tag)] =\
+                    self._ip_tags_strip_sdp_and_port[b_address, a_tag] =\
                         (ip_tag.strip_sdp, a_port)
             else:
 
-                # Allocate an ip tag
+                # Allocate an IP tag
                 (board_address, tag) = self._allocate_tag(
                     chip, board_address, ip_tag.tag)
                 self._update_data_structures_for_iptag(
@@ -911,7 +911,7 @@ class ResourceTracker(object):
                                           traffic_identifier, strip_sdp, port):
         tag_key = (board_address, tag)
         existing_tags = self._ip_tags_address_traffic[
-            (ip_address, traffic_identifier)]
+            ip_address, traffic_identifier]
         existing_tags.add(tag_key)
         self._ip_tags_strip_sdp_and_port[tag_key] = (strip_sdp, port)
         self._address_and_traffic_ip_tag[tag_key] = \
@@ -922,13 +922,13 @@ class ResourceTracker(object):
         self._n_ip_tag_allocations[tag_key] = 1
 
     def _allocate_reverse_ip_tags(self, chip, board_address, reverse_ip_tags):
-        """ Allocate reverse ip tags with the given constraints
+        """ Allocate reverse IP tags with the given constraints
 
         :param chip: The chip to allocate the tags for
         :type chip: :py:class:`spinn_machine.Chip`
         :param board_address: the board address to allocate on
         :type board_address: str or None
-        :param reverse_ip_tags: The reverse ip tag resources
+        :param reverse_ip_tags: The reverse IP tag resources
         :type reverse_ip_tags: iterable of\
                     :py:class:`pacman.model.resources.ReverseIptagResource`
         :return: iterable of tuples of (board address, tag) assigned
@@ -959,7 +959,7 @@ class ResourceTracker(object):
         """
         if port is not None:
             self._reverse_ip_tag_listen_port.add((board_address, port))
-            self._listen_port_reverse_ip_tag[(board_address, tag)] = port
+            self._listen_port_reverse_ip_tag[board_address, tag] = port
 
     def allocate_constrained_resources(
             self, resources, constraints, chips=None):
@@ -980,7 +980,7 @@ class ResourceTracker(object):
         :type chips: iterable of (int, int)
         :return:\
             The x and y coordinates of the used chip, the processor_id,\
-            and the ip tag and reverse ip tag allocation tuples
+            and the IP tag and reverse IP tag allocation tuples
         :rtype: (int, int, int, list((int, int)), list((int, int)))
         :raise PacmanValueError: \
             If the constraints cannot be met given the\
@@ -1004,7 +1004,7 @@ class ResourceTracker(object):
             A list of tuples of (resources, list of constraints) to allocate
         :param chips: a list of chips that can be used
         :return: list of The x and y coordinates of the used chip,
-                    the processor_id, and the ip tag and reverse ip tag
+                    the processor_id, and the IP tag and reverse IP tag
                     allocation tuples
         :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
         """
@@ -1068,15 +1068,15 @@ class ResourceTracker(object):
         :type processor_ids: list of (int or None)
         :param board_address: the board address to allocate resources of a chip
         :type board_address: str
-        :param group_ip_tags: list of lists of ip tag resources
+        :param group_ip_tags: list of lists of IP tag resources
         :type group_ip_tags: list of lists of\
                     :py:class:`pacman.model.resources.IptagResource`
-        :param group_reverse_ip_tags: list of lists of reverse ip tag \
+        :param group_reverse_ip_tags: list of lists of reverse IP tag \
                     resources
         :type group_reverse_ip_tags: list of lists of\
                     :py:class:`pacman.model.resources.ReverseIptagResource`
         :return: An iterable of tuples of the x and y coordinates of the used\
-                     chip, the processor_id, and the ip tag and reverse ip tag\
+                     chip, the processor_id, and the IP tag and reverse IP tag\
                      allocation tuples
         :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
         """
@@ -1165,14 +1165,14 @@ class ResourceTracker(object):
         :type processor_id: int
         :param board_address: the board address to allocate resources of a chip
         :type board_address: str
-        :param ip_tags: iterable of ip tag resources
+        :param ip_tags: iterable of IP tag resources
         :type ip_tags: iterable of\
                     :py:class:`pacman.model.resources.IptagResource`
-        :param reverse_ip_tags: iterable of reverse ip tag resources
+        :param reverse_ip_tags: iterable of reverse IP tag resources
         :type reverse_ip_tags: iterable of\
                     :py:class:`pacman.model.resources.ReverseIPtagResource`
         :return: The x and y coordinates of the used chip, the processor_id,\
-                 and the ip tag and reverse ip tag allocation tuples
+                 and the IP tag and reverse IP tag allocation tuples
         :rtype: (int, int, int, list((int, int, int, int)), list((int, int)))
         """
         usable_chips = self._get_usable_chips(chips, board_address,
@@ -1235,10 +1235,10 @@ class ResourceTracker(object):
             chip = self._machine.get_chip_at(x, y)
             if (x, y) in self._core_tracker:
                 n_cores += (len(self._core_tracker[x, y]) -
-                            self._n_cores_preallocated[(x, y)])
+                            self._n_cores_preallocated[x, y])
             else:
                 n_cores += (chip.n_user_processors -
-                            self._n_cores_preallocated[(x, y)])
+                            self._n_cores_preallocated[x, y])
             sdram_available = self._sdram_available(chip, (x, y))
             if sdram_available > max_sdram:
                 max_sdram = sdram_available
@@ -1284,10 +1284,10 @@ class ResourceTracker(object):
         :type processor_id: int
         :param board_address: the board address for locating max resources from
         :type board_address: str
-        :param ip_tags: iterable of ip tag resources
+        :param ip_tags: iterable of IP tag resources
         :type ip_tags: iterable of\
                     :py:class:`pacman.model.resources.IptagResource`
-        :param reverse_ip_tags: iterable of reverse ip tag resources
+        :param reverse_ip_tags: iterable of reverse IP tag resources
         :type reverse_ip_tags: iterable of\
                     :py:class:`pacman.model.resources.ReverseIptagResource`
         :return: a resource which shows max resources available
@@ -1313,8 +1313,8 @@ class ResourceTracker(object):
             if (sdram_available > max_sdram_available and
                     ip_tags_available and reverse_ip_tags_available):
                 max_sdram_available = sdram_available
-                best_processor_id = self._best_core_available(chip, key,
-                                                              processor_id)
+                best_processor_id = self._best_core_available(
+                    chip, key, processor_id)
                 processor = chip.get_processor_with_id(best_processor_id)
                 max_dtcm_available = processor.dtcm_available
                 max_cpu_available = processor.cpu_cycles_available
@@ -1344,23 +1344,23 @@ class ResourceTracker(object):
         :param resources: The resources to be unallocated
         :type resources:\
                     :py:class:`pacman.model.resources.ResourceContainer`
-        :param ip_tags: the details of the ip tags allocated
+        :param ip_tags: the details of the IP tags allocated
         :type ip_tags: iterable of (str, int) or None
-        :param reverse_ip_tags: the details of the reverse ip tags allocated
+        :param reverse_ip_tags: the details of the reverse IP tags allocated
         :type reverse_ip_tags: iterable of (str, int) or None
         :rtype: None
         """
 
         self._chips_available.add((chip_x, chip_y))
         self._sdram_tracker[chip_x, chip_y] -= resources.sdram.get_value()
-        self._core_tracker[(chip_x, chip_y)].add(processor_id)
+        self._core_tracker[chip_x, chip_y].add(processor_id)
 
         # check if chip used needs updating
-        if (len(self._core_tracker[(chip_x, chip_y)]) ==
+        if (len(self._core_tracker[chip_x, chip_y]) ==
                 self._machine.get_chip_at(chip_x, chip_y).n_user_processors):
             self._chips_used.remove((chip_x, chip_y))
 
-        # Deallocate the ip tags
+        # Deallocate the IP tags
         if ip_tags is not None:
             for (board_address, tag, _, _) in ip_tags:
                 self._boards_with_ip_tags.add(board_address)
@@ -1375,7 +1375,7 @@ class ResourceTracker(object):
                     self._tags_by_board[board_address].add(tag)
                     del self._ip_tags_strip_sdp_and_port[tag_key]
 
-        # Deallocate the reverse ip tags
+        # Deallocate the reverse IP tags
         if reverse_ip_tags is not None:
             for (board_address, tag) in reverse_ip_tags:
                 self._boards_with_ip_tags.add(board_address)
@@ -1383,7 +1383,7 @@ class ResourceTracker(object):
                 port = self._listen_port_reverse_ip_tag.get(
                     (board_address, tag), None)
                 if port is not None:
-                    del self._listen_port_reverse_ip_tag[(board_address, tag)]
+                    del self._listen_port_reverse_ip_tag[board_address, tag]
                     self._reverse_ip_tag_listen_port.remove(
                         (board_address, port))
 
