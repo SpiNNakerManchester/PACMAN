@@ -24,15 +24,6 @@ class BasicDijkstraRouting(object):
         "_routing_paths",
 
         # parameter to control ...........
-        "_k",
-
-        # parameter to control ...........
-        "_l",
-
-        # parameter to control ...........
-        "_m",
-
-        # parameter to control ...........
         "_bw_per_route_entry",
 
         # parameter to control ...........
@@ -45,7 +36,7 @@ class BasicDijkstraRouting(object):
     BW_PER_ROUTE_ENTRY = 0.01
     MAX_BW = 250
 
-    def __call__(self, placements, machine, machine_graph, k=1, l=0, m=0,
+    def __call__(self, placements, machine, machine_graph,
                  bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
         """ Find routes between the edges with the allocated information,
             placed in the given places
@@ -67,9 +58,6 @@ class BasicDijkstraRouting(object):
 
         # set up basic data structures
         self._routing_paths = MulticastRoutingTableByPartition()
-        self._k = k
-        self._l = l
-        self._m = m
         self._bw_per_route_entry = bw_per_route_entry
         self._max_bw = max_bw
         self._machine = machine
@@ -219,43 +207,7 @@ class BasicDijkstraRouting(object):
         """
         for n in range(len(nodes_info[key]["neighbours"])):
             if nodes_info[key]["neighbours"][n] is not None:
-                neighbour = nodes_info[key]["neighbours"][n]
-                xn, yn = neighbour.destination_x, neighbour.destination_y
-                entries = self._routing_paths.get_entries_for_router(xn, yn)
-                nodes_info[key]["weights"][n] = self._get_weight(
-                    machine.get_chip_at(xn, yn).router,
-                    nodes_info[key]["bws"][n],
-                    len(entries))
-
-    def _get_weight(self, router, bws, no_routing_table_entries):
-        """ Get the weight based on basic heuristics
-
-        :param router: the router to assess the weight of
-        :param bws: the basic weight of the source node
-        :param no_routing_table_entries: the number of entries going though\
-                this router
-        :type router: spinn_machine.Router
-        :type bws: int
-        :type no_routing_table_entries: int
-        :return: weight of this router
-        :rtype: int
-        :raise None: does not raise any known exception
-        """
-        free_entries = (router.ROUTER_DEFAULT_AVAILABLE_ENTRIES -
-                        no_routing_table_entries)
-
-        q = 0
-        if self._l > 0:
-            q = float(self._l *
-                      (1 / float(free_entries) - 1 /
-                       float(router.ROUTER_DEFAULT_AVAILABLE_ENTRIES)))
-
-        t = 0
-        if self._m > 0:
-            t = self._m * (1 / float(bws) - 1 / float(self._max_bw))
-
-        weight = self._k + q + t
-        return weight
+                nodes_info[key]["weights"][n] = 1
 
     @staticmethod
     def _reset_tables(dijkstra_tables):
