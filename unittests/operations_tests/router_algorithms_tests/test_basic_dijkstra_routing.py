@@ -1,288 +1,76 @@
-# pacman model imports
-from pacman.model.graphs.application \
-    import ApplicationVertex, ApplicationEdge, ApplicationGraph
-from pacman.model.graphs.machine \
-    import MachineEdge, MachineGraph, SimpleMachineVertex
-from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
-
-from pacman.exceptions import PacmanRoutingException
-from pacman.model.placements import Placement, Placements
-from pacman.model.routing_info import PartitionRoutingInfo, RoutingInfo
-
-# pacman utility imports
-from pacman.utilities.constants import DEFAULT_MASK
-# pacman operations imports
-from pacman.operations.router_algorithms import BasicDijkstraRouting
-# spinnmachine imports
-from spinn_machine import Processor, Link, SDRAM, Router, Chip, Machine
-
 import unittest
+from collections import deque
 
+from spinn_machine.virtual_machine import VirtualMachine
 
-def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
-    vertex = Vertex(1, None)
-    cpu_cycles = vertex.get_cpu_usage_for_atoms(lo_atom, hi_atom)
-    dtcm_requirement = vertex.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
-    sdram_requirement = \
-        vertex.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
-    # noinspection PyTypeChecker
-    resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
-                                  dtcm=DTCMResource(dtcm_requirement),
-                                  sdram=SDRAMResource(sdram_requirement))
-    return resources
-
-
-class Vertex(ApplicationVertex):
-    def __init__(self, n_atoms, label):
-        ApplicationVertex.__init__(self, label=label, max_atoms_per_core=256)
-        # Ignoring n_atoms?
-
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        return 10 * (hi_atom - lo_atom)
-
-    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
-        return 200 * (hi_atom - lo_atom)
-
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
-        return 4000 + (50 * (hi_atom - lo_atom))
+from pacman.model.graphs.machine import \
+    MachineGraph, MachineEdge, SimpleMachineVertex
+from pacman.operations.router_algorithms import BasicDijkstraRouting
+from pacman.model.resources import ResourceContainer
+from pacman.model.placements import Placements, Placement
 
 
 class MyTestCase(unittest.TestCase):
-    def setUp(self):
-        # sort out graph
-        self.vert1 = Vertex(10, "New AbstractConstrainedVertex 1")
-        self.vert2 = Vertex(5, "New AbstractConstrainedVertex 2")
-        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
-        self.verts = [self.vert1, self.vert2]
-        self.edges = [self.edge1]
-        self.graph = ApplicationGraph("Graph", self.verts, self.edges)
-        # sort out graph
-        self.graph = MachineGraph()
-        self.vertex1 = SimpleMachineVertex(
-            0, 10, get_resources_used_by_atoms(0, 10, []))
-        self.vertex2 = SimpleMachineVertex(
-            0, 5, get_resources_used_by_atoms(0, 10, []))
-        self.edge = MachineEdge(self.vertex1, self.vertex2)
-        self.graph.add_vertex(self.vertex1)
-        self.graph.add_vertex(self.vertex2)
-        self.graph.add_edge(self.edge, "TEST")
-        # sort out placements
-        self.placements = Placements()
-        self.placement1 = Placement(x=0, y=0, p=2, vertex=self.vertex1)
-        self.placement2 = Placement(x=1, y=1, p=2, vertex=self.vertex2)
-        self.placements.add_placement(self.placement1)
-        self.placements.add_placement(self.placement2)
-        # sort out routing infos
-        self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
-                                 edge=self.edge)
-        self.routing_info.add_partition_info(self.edge_routing_info1)
-        # create machine
-        flops = 1000
-        (_, _, n, _, _, s) = range(6)
 
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
-        _sdram = SDRAM(128 * (2 ** 20))
-        ip = "192.162.240.253"
-        chips = list()
-        for x in range(10):
-            for y in range(10):
-                links = list()
-
-                links.append(Link(x, y, 0, (x + 1) % 10, y, n, n))
-                links.append(Link(x, y, 1, (x + 1) % 10, (y + 1) % 10, s, s))
-                links.append(Link(x, y, 2, x, (y + 1) % 10, n, n))
-                links.append(Link(x, y, 3, (x - 1) % 10, y, s, s))
-                links.append(Link(x, y, 4, (x - 1) % 10, (y - 1) % 10, n, n))
-                links.append(Link(x, y, 5, x, (y - 1) % 10, s, s))
-
-                r = Router(links, False, 100, 1024)
-                chips.append(Chip(x, y, processors, r, _sdram, ip))
-
-        self.machine = Machine(chips)
-
-    @unittest.skip("demonstrating skipping")
-    def set_up_4_node_board(self):
-        flops = 1000
-        (_, _, n, _, _, s) = range(6)
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
-        _sdram = SDRAM(128 * (2 ** 20))
-        ip = "192.162.240.253"
-        chips = list()
-        for x in range(2):
-            for y in range(2):
-                links = list()
-
-                links.append(Link(x, y, 0, (x + 1) % 2, y, n, n))
-                links.append(Link(x, y, 1, (x + 1) % 2, (y + 1) % 2, s, s))
-                links.append(Link(x, y, 2, x, (y + 1) % 2, n, n))
-                links.append(Link(x, y, 3, (x - 1) % 2, y, s, s))
-                links.append(Link(x, y, 4, (x - 1) % 2, (y - 1) % 2, n, n))
-                links.append(Link(x, y, 5, x, (y - 1) % 2, s, s))
-
-                r = Router(links, False, 100, 1024)
-                chips.append(Chip(x, y, processors, r, _sdram, ip))
-
-        self.machine = Machine(chips)
-
-    @unittest.skip("demonstrating skipping")
-    def test_run_basic_routing_off_chip_custom_100_node_machine(self):
-        dijkstra_router = BasicDijkstraRouting()
-        routing_tables = dijkstra_router.route(
-            machine=self.machine, placements=self.placements,
-            machine_graph=self.graph,
-            routing_info_allocation=self.routing_info)
-        for entry in routing_tables.routing_tables:
-            print entry.x, entry.y
-            for routing_entry in entry.multicast_routing_entries:
-                print "\t\tProcessor_ids:{}, Link_ids:{}".format(
-                    routing_entry.processor_ids,
-                    routing_entry.link_ids)
-
-    @unittest.skip("demonstrating skipping")
-    def test_run_basic_routing_off_chip_custom_4_node_machine(self):
-        self.set_up_4_node_board()
-        dijkstra_router = BasicDijkstraRouting()
-        routing_tables = dijkstra_router.route(
-            machine=self.machine, placements=self.placements,
-            machine_graph=self.graph,
-            routing_info_allocation=self.routing_info)
-
-        for entry in routing_tables.routing_tables:
-            print entry.x, entry.y
-            for routing_entry in entry.multicast_routing_entries:
-                print "\t\tProcessor_ids:{}, Link_ids:{}".format(
-                    routing_entry.processor_ids,
-                    routing_entry.link_ids)
-
-    @unittest.skip("demonstrating skipping")
-    def test_bad_machine_setup(self):
-        # create machine
-        flops = 1000
-        (e, _, n, w, _, s) = range(6)
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
-
-        links = list()
-        links.append(Link(0, 0, 0, 0, 1, s, s))
-
-        _sdram = SDRAM(128 * (2 ** 20))
-
-        links = list()
-
-        links.append(Link(0, 0, 0, 1, 1, n, n))
-        links.append(Link(0, 1, 1, 1, 0, s, s))
-        links.append(Link(1, 1, 2, 0, 0, e, e))
-        links.append(Link(1, 0, 3, 0, 1, w, w))
-        r = Router(links, False, 100, 1024)
-
-        ip = "192.162.240.253"
-        chips = list()
-        for x in range(5):
-            for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, ip))
-        self.machine = Machine(chips)
-        dijkstra_router = BasicDijkstraRouting()
-
-        with self.assertRaises(PacmanRoutingException):
-            dijkstra_router.route(
-                machine=self.machine, placements=self.placements,
-                machine_graph=self.graph,
-                routing_info_allocation=self.routing_info)
-
-    @unittest.skip("demonstrating skipping")
-    def test_routing_on_chip_custom_4_node_machine(self):
-        self.placements = Placements()
-        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
-        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
-        self.placements.add_placement(self.placement1)
-        self.placements.add_placement(self.placement2)
-        # sort out routing infos
-        self.routing_info = RoutingInfo()
-        self.edge_routing_info1 = \
-            PartitionRoutingInfo(key=2 << 11, mask=DEFAULT_MASK,
-                                 edge=self.edge)
-        self.routing_info.add_partition_info(self.edge_routing_info1)
-
-        self.set_up_4_node_board()
-
-        dijkstra_router = BasicDijkstraRouting()
-        routing_tables = dijkstra_router.route(
-            machine=self.machine, placements=self.placements,
-            machine_graph=self.graph,
-            routing_info_allocation=self.routing_info)
-
-        for entry in routing_tables.routing_tables:
-            print entry.x, entry.y
-            for routing_entry in entry.multicast_routing_entries:
-                print "\t\tProcessor_ids:{}, Link_ids:{}".format(
-                    routing_entry.processor_ids,
-                    routing_entry.link_ids)
-
-    @unittest.skip("demonstrating skipping")
-    def test_full_machine_routing(self):
+    def test_routing(self):
+        graph = MachineGraph("Test")
+        machine = VirtualMachine(2, 2)
         placements = Placements()
-        self.placement1 = Placement(x=1, y=0, p=2, vertex=self.vertex1)
-        self.placement2 = Placement(x=1, y=0, p=3, vertex=self.vertex2)
         vertices = list()
-        for i in range(4 * 17):  # 51 atoms per each processor on 20 chips
-            vertices.append(SimpleMachineVertex(
-                0, 50, get_resources_used_by_atoms(0, 50, []),
-                "vertex " + str(i)))
-        edges = list()
-        for i in range(len(vertices)):
-            edges.append(MachineEdge(
-                vertices[i], vertices[(i + 1) % len(vertices)]))
-        graph = MachineGraph(vertices, edges)
-        p = 1
-        x = 0
-        y = 0
+
+        for x in range(machine.max_chip_x + 1):
+            for y in range(machine.max_chip_y + 1):
+                chip = machine.get_chip_at(x, y)
+                if chip is not None:
+                    for processor in chip.processors:
+                        if not processor.is_monitor:
+                            vertex = SimpleMachineVertex(
+                                resources=ResourceContainer())
+                            graph.add_vertex(vertex)
+                            placements.add_placement(Placement(
+                                vertex, x, y, processor.processor_id))
+                            vertices.append(vertex)
+
         for vertex in vertices:
-            placements.add_placement(Placement(vertex, x, y, p))
-            p = (p + 1) % 18
-            if p == 0:
-                p += 1
-                y += 1
-                if y == 2:
-                    y = 0
-                    x += 1
+            for vertex_to in vertices:
+                if vertex != vertex_to:
+                    graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
-        routing_info = RoutingInfo()
-        edge_routing_info = list()
-        for i in range(len(edges)):
-            edge_routing_info.append(PartitionRoutingInfo(
-                edges[i], i << 11, DEFAULT_MASK))
+        router = BasicDijkstraRouting()
+        routing_paths = router.__call__(placements, machine, graph)
 
-        for edge_info in edge_routing_info:
-            routing_info.add_partition_info(edge_info)
+        for vertex in vertices:
+            vertices_reached = set()
+            queue = deque()
+            seen_entries = set()
+            placement = placements.get_placement_of_vertex(vertex)
+            partition = graph.get_outgoing_edge_partition_starting_at_vertex(
+                vertex, "Test")
+            entry = routing_paths.get_entry_on_coords_for_edge(
+                partition, placement.x, placement.y)
+            self.assertEqual(entry.incoming_processor, placement.p)
+            queue.append((placement.x, placement.y))
+            while len(queue) > 0:
+                x, y = queue.pop()
+                entry = routing_paths.get_entry_on_coords_for_edge(
+                    partition, x, y)
+                self.assertIsNotNone(entry)
+                chip = machine.get_chip_at(x, y)
+                for p in entry.out_going_processors:
+                    self.assertIsNotNone(chip.get_processor_with_id(p))
+                    vertex_found = placements.get_vertex_on_processor(x, y, p)
+                    vertices_reached.add(vertex_found)
+                seen_entries.add((x, y))
+                for link_id in entry.out_going_links:
+                    link = chip.router.get_link(link_id)
+                    self.assertIsNotNone(link)
+                    dest_x, dest_y = link.destination_x, link.destination_y
+                    if (dest_x, dest_y) not in seen_entries:
+                        queue.append((dest_x, dest_y))
 
-        self.set_up_4_node_board()
-
-        dijkstra_router = BasicDijkstraRouting()
-        routing_tables = dijkstra_router.route(
-            machine=self.machine, placements=placements,
-            machine_graph=graph,
-            routing_info_allocation=routing_info)
-
-        for entry in routing_tables.routing_tables:
-            print entry.x, entry.y
-            for routing_entry in entry.multicast_routing_entries:
-                print "\t\tProcessor_ids:{}, Link_ids:{}".format(
-                    routing_entry.processor_ids,
-                    routing_entry.link_ids)
-
-    @unittest.skip("demonstrating skipping")
-    def test_routing_to_other_machine(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+            for vertex_to in vertices:
+                if vertex != vertex_to:
+                    self.assertIn(vertex_to, vertices_reached)
 
 
 if __name__ == '__main__':
