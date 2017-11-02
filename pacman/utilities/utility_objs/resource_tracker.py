@@ -148,7 +148,7 @@ class ResourceTracker(object):
 
         # set of resources that have been pre allocated and therefore need to
         # be taken account of when allocating resources
-        self._n_cores_preallocated = self._convert_pre_allocated_resources(
+        self._n_cores_preallocated = self._convert_preallocated_resources(
             preallocated_resources)
 
         # Set of (x, y) tuples of coordinates of chips which have available
@@ -161,31 +161,31 @@ class ResourceTracker(object):
             for x, y in chips:
                 self._chips_available.add((x, y))
 
-    def _convert_pre_allocated_resources(self, pre_allocated_resources):
+    def _convert_preallocated_resources(self, preallocated_resources):
         """ Allocates pre allocated sdram and specific cores to the trackers.
             Also builds an arbitrary core map for usage throughout\
             resource tracker
 
-        :param pre_allocated_resources:\
+        :param preallocated_resources:\
             the pre allocated resources from the tools
-        :type pre_allocated_resources: PreAllocatedResourceContainer
+        :type preallocated_resources: PreAllocatedResourceContainer
         :return: a mapping of chip to arbitrary core demands
         :rtype: dict of key (int, int) to int
         """
 
         # If there are no resources, return an empty dict which returns 0
-        if pre_allocated_resources is None:
+        if preallocated_resources is None:
             return defaultdict(lambda: 0)
 
         # remove sdram by adding the cost into the sdram tracker already
-        sdram_allocations = pre_allocated_resources.specific_sdram_usage
+        sdram_allocations = preallocated_resources.specific_sdram_usage
         for sdram_pre_allocated in sdram_allocations:
             chip = sdram_pre_allocated.chip
             sdram = sdram_pre_allocated.sdram_usage
             self._sdram_tracker[chip.x, chip.y] = sdram
 
         # remove specific cores from the tracker
-        specific_cores = pre_allocated_resources.specific_core_resources
+        specific_cores = preallocated_resources.specific_core_resources
         for specific_core in specific_cores:
             chip = specific_core.chip
             processor_ids = specific_core.cores
@@ -195,13 +195,13 @@ class ResourceTracker(object):
 
         # create random_core_map
         chip_to_arbitrary_core_requirement = defaultdict(lambda: 0)
-        for arbitrary_core in pre_allocated_resources.core_resources:
+        for arbitrary_core in preallocated_resources.core_resources:
             chip = arbitrary_core.chip
             n_cores = arbitrary_core.n_cores
             chip_to_arbitrary_core_requirement[chip.x, chip.y] = n_cores
 
         # handle specific iptags
-        specific_ip_tags = pre_allocated_resources.specific_iptag_resources
+        specific_ip_tags = preallocated_resources.specific_iptag_resources
         for board_specific_ip_tag in specific_ip_tags:
             self._setup_board_tags(board_specific_ip_tag.board)
             tag = self._allocate_tag_id(board_specific_ip_tag.tag,
@@ -214,7 +214,7 @@ class ResourceTracker(object):
 
         # handle specific reverse iptags
         specific_reverse_ip_tags = \
-            pre_allocated_resources.specific_reverse_iptag_resources
+            preallocated_resources.specific_reverse_iptag_resources
         for specific_reverse_ip_tag in specific_reverse_ip_tags:
             self._setup_board_tags(board_specific_ip_tag.board)
             tag = self._allocate_tag_id(board_specific_ip_tag.tag,
@@ -314,15 +314,13 @@ class ResourceTracker(object):
         return x, y, p
 
     def _chip_available(self, x, y):
-        pre_allocated_cores = self._n_cores_preallocated[x, y]
+        prealloc = self._n_cores_preallocated[x, y]
         return (
             self._machine.is_chip_at(x, y) and
             (((x, y) not in self._core_tracker and
-              self._machine.get_chip_at(x, y).n_user_processors >
-                pre_allocated_cores) or
+              self._machine.get_chip_at(x, y).n_user_processors > prealloc) or
              ((x, y) in self._core_tracker and
-              len(self._core_tracker[x, y]) > pre_allocated_cores))
-        )
+              len(self._core_tracker[x, y]) > prealloc)))
 
     def _get_usable_chips(
             self, chips, board_address, ip_tags, reverse_ip_tags):
@@ -1093,10 +1091,10 @@ class ResourceTracker(object):
 
         # Find the first usable chip which fits all the group resources
         tried_chips = list()
-        for (chip_x, chip_y) in usable_chips:
-            tried_chips.append((chip_x, chip_y))
+        for key in usable_chips:
+            (chip_x, chip_y) = key
+            tried_chips.append(key)
             chip = self._machine.get_chip_at(chip_x, chip_y)
-            key = (chip_x, chip_y)
 
             # No point in continuing if the chip doesn't have space for
             # everything
@@ -1175,13 +1173,9 @@ class ResourceTracker(object):
                  and the IP tag and reverse IP tag allocation tuples
         :rtype: (int, int, int, list((int, int, int, int)), list((int, int)))
         """
-        usable_chips = self._get_usable_chips(chips, board_address,
-                                              ip_tags, reverse_ip_tags)
-
         # Find the first usable chip which fits the resources
-        tried_chips = list()
-        for (chip_x, chip_y) in usable_chips:
-            tried_chips.append((chip_x, chip_y))
+        for (chip_x, chip_y) in self._get_usable_chips(
+                chips, board_address, ip_tags, reverse_ip_tags):
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
 
@@ -1200,6 +1194,8 @@ class ResourceTracker(object):
                         reverse_ip_tags_allocated)
 
         # If no chip is available, raise an exception
+        tried_chips = self._get_usable_chips(
+            chips, board_address, ip_tags, reverse_ip_tags)
         n_cores, n_chips, max_sdram, n_tags = \
             self._available_resources(tried_chips)
         all_chips = self._get_usable_chips(None, None, None, None)
@@ -1293,16 +1289,14 @@ class ResourceTracker(object):
         :return: a resource which shows max resources available
         :rtype: pacman.model.resources.ResourceContainer
         """
-        usable_chips = self._get_usable_chips(chips, board_address,
-                                              ip_tags, reverse_ip_tags)
-
         # If the chip is not fixed, find the maximum SDRAM
         # TODO: Also check for the best core
         max_sdram_available = 0
         max_dtcm_available = 0
         max_cpu_available = 0
-        for (chip_x, chip_y) in usable_chips:
-            key = (chip_x, chip_y)
+        for key in self._get_usable_chips(
+                chips, board_address, ip_tags, reverse_ip_tags):
+            (chip_x, chip_y) = key
             chip = self._machine.get_chip_at(chip_x, chip_y)
             sdram_available = self._sdram_available(chip, key)
             ip_tags_available = self._are_ip_tags_available(
