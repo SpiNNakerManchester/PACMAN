@@ -34,8 +34,8 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         return self._label
 
     def __str__(self):
-        l = self.label
-        return self.__repr__() if l is None else l
+        _l = self.label
+        return self.__repr__() if _l is None else _l
 
     def __repr__(self):
         return "MachineVertex(label={}, constraints={}".format(
