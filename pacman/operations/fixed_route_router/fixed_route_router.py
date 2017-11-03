@@ -1,5 +1,6 @@
 from spinn_machine.fixed_route_entry import FixedRouteEntry
 from pacman import exceptions
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class FixedRouteRouter(object):
@@ -42,7 +43,7 @@ class FixedRouteRouter(object):
         ]}
 
     # dict of source and destination to create fixed route router when not
-    # default 4
+    # default 4 0 = E 1 = NE 2 = N 3 = W 4 = SW 5 = S
     joins = {(0, 1): [5], (0, 2): [5], (0, 3): [5], (2, 1): [3], (1, 0): [3],
              (2, 0): [3], (3, 0): [3], (4, 0): [3], (5, 6): [5], (6, 6): [5]}
 
@@ -55,11 +56,16 @@ class FixedRouteRouter(object):
         :return: router tables for fixed route paths
         """
 
+        progress_bar = ProgressBar(
+            len(machine.ethernet_connected_chips),
+            "generating fixed router routes.")
+
         # lazy cheat
         fixed_route_tables = dict()
 
         # handle per board
-        for ethernet_connected_chip in machine.ethernet_connected_chips:
+        for ethernet_connected_chip in progress_bar.over(
+                machine.ethernet_connected_chips):
             ethernet_chip_x = ethernet_connected_chip.x
             ethernet_chip_y = ethernet_connected_chip.y
 
