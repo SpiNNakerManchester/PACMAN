@@ -15,13 +15,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_edge_groups(machine_graph):
+def get_edge_groups(machine_graph, traffic_type):
     """ Utility method to get groups of edges using any\
         :py:class:`pacman.model.constraints.key_allocator_constraints.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
 
     :param machine_graph: the machine graph
+    :param traffic_type: the traffic type to group
     """
 
     # Keep a dictionary of the group which contains an edge
@@ -35,26 +36,27 @@ def get_edge_groups(machine_graph):
         for partition in \
                 machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     vertex):
-            # assume all edges have the same constraints in them. use first one
-            # to deduce which group to place it into
-            constraints = partition.constraints
-            is_continuous = False
-            for constraint in constraints:
-                if isinstance(constraint, FixedMaskConstraint):
-                    fixed_mask_groups.add(partition)
-                elif isinstance(constraint,
-                                FixedKeyAndMaskConstraint):
-                    fixed_key_groups.add(partition)
-                elif isinstance(constraint, FlexiKeyFieldConstraint):
-                    flexi_field_groups.add(partition)
-                elif isinstance(constraint, FixedKeyFieldConstraint):
-                    fixed_field_groups.add(partition)
-                elif isinstance(constraint,
-                                ContiguousKeyRangeContraint):
-                    is_continuous = True
-                    continuous_groups.add(partition)
-            if not is_continuous:
-                none_continuous_groups.append(partition)
+            if partition.traffic_type == traffic_type:
+                # assume all edges have the same constraints in them. use \
+                # first one to deduce which group to place it into
+                constraints = partition.constraints
+                is_continuous = False
+                for constraint in constraints:
+                    if isinstance(constraint, FixedMaskConstraint):
+                        fixed_mask_groups.add(partition)
+                    elif isinstance(constraint,
+                                    FixedKeyAndMaskConstraint):
+                        fixed_key_groups.add(partition)
+                    elif isinstance(constraint, FlexiKeyFieldConstraint):
+                        flexi_field_groups.add(partition)
+                    elif isinstance(constraint, FixedKeyFieldConstraint):
+                        fixed_field_groups.add(partition)
+                    elif isinstance(constraint,
+                                    ContiguousKeyRangeContraint):
+                        is_continuous = True
+                        continuous_groups.add(partition)
+                if not is_continuous:
+                    none_continuous_groups.append(partition)
     return (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
             flexi_field_groups, continuous_groups, none_continuous_groups)
 

@@ -102,7 +102,8 @@ class BasicDijkstraRouting(object):
 
             for edge in out_going_edges:
                 destination = edge.post_vertex
-                dest_place = placements.get_placement_of_vertex(destination)
+                dest_place = \
+                    placements.get_placement_of_vertex(destination)
                 chip = machine.get_chip_at(dest_place.x, dest_place.y)
                 dest_chips.add((chip.x, chip.y))
                 edges_to_route.append(edge)

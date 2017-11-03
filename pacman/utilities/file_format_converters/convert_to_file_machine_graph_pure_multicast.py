@@ -5,6 +5,7 @@ from collections import defaultdict
 
 import jsonschema
 
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.utilities import file_format_schemas
 from pacman.model.graphs import AbstractVirtualVertex
 
@@ -13,7 +14,7 @@ from spinn_utilities.progress_bar import ProgressBar
 DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX = 1
 
 
-class ConvertToFileMachineGraph(object):
+class ConvertToFileMachineGraphPureMulticast(object):
     """ Converts a memory based graph into a file based graph
     """
 
@@ -107,19 +108,20 @@ class ConvertToFileMachineGraph(object):
         # handle the vertex edges
         for partition in machine_graph\
                 .get_outgoing_edge_partitions_starting_at_vertex(vertex):
-            p_id = str(id(partition))
-            partition_by_id[p_id] = partition
+            if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                p_id = str(id(partition))
+                partition_by_id[p_id] = partition
 
-            hyper_edge = dict()
-            edges[p_id] = hyper_edge
-            hyper_edge["source"] = str(id(vertex))
+                hyper_edge = dict()
+                edges[p_id] = hyper_edge
+                hyper_edge["source"] = str(id(vertex))
 
-            sinks_string = []
-            weight = 0
+                sinks_string = []
+                weight = 0
 
-            for edge in partition.edges:
-                sinks_string.append(str(id(edge.post_vertex)))
-                weight += edge.traffic_weight
-            hyper_edge['sinks'] = sinks_string
-            hyper_edge["weight"] = weight
-            hyper_edge["type"] = partition.traffic_type.name.lower()
+                for edge in partition.edges:
+                    sinks_string.append(str(id(edge.post_vertex)))
+                    weight += edge.traffic_weight
+                hyper_edge['sinks'] = sinks_string
+                hyper_edge["weight"] = weight
+                hyper_edge["type"] = partition.traffic_type.name.lower()
