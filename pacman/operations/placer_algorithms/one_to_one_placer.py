@@ -1,4 +1,5 @@
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 
 # pacman imports
 from pacman import exceptions
@@ -144,7 +145,7 @@ class OneToOnePlacer(RadialPlacer):
 
                 # create list for each vertex thats connected haven't already
                 #  been seen before
-                new_list = set()
+                new_list = OrderedSet()
                 for found_vertex in connected_vertices:
                     if found_vertex not in found_list:
                         new_list.add(found_vertex)
