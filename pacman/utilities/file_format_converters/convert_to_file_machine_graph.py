@@ -1,11 +1,6 @@
 import hashlib
 import json
-import os
 from collections import defaultdict
-
-import jsonschema
-
-from pacman.utilities import file_format_schemas
 from pacman.model.graphs import AbstractVirtualVertex
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -49,14 +44,6 @@ class ConvertToFileMachineGraph(object):
         with open(file_path, "w") as file_to_write:
             json.dump(json_graph_directory_rep, file_to_write)
         progress.update()
-
-        # validate the schema
-        #graph_schema_file_path = os.path.join(
-        #    os.path.dirname(file_format_schemas.__file__),
-        #    "machine_graph.json")
-        #with open(graph_schema_file_path, "r") as file_to_read:
-        #    graph_schema = json.load(file_to_read)
-        #    jsonschema.validate(json_graph_directory_rep, graph_schema)
 
         progress.end()
 
