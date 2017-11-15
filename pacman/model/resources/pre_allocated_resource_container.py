@@ -7,30 +7,27 @@ class PreAllocatedResourceContainer(object):
     """
 
     __slots__ = [
-
-
-        # a iterable of SpecificSDRAMResource object that reflects the amount
-        # of SDRAM (in bytes) pre allocated on a specific chip on the SpiNNaker
+        # An iterable of SpecificSDRAMResource object that reflects the amount
+        # of SDRAM (in bytes) preallocated on a specific chip on the SpiNNaker
         #  machine
         "_specific_sdram_usage",
 
-        # A iterable of SpecificCoreResource objects that reflect the number
-        # of specific cores that have been pre allocated on a chip.
+        # An iterable of SpecificCoreResource objects that reflect the number
+        # of specific cores that have been preallocated on a chip.
         "_specific_core_resources",
 
-        # A iterable of CoreResource objects that reflect the number of
-        #  cores that have been pre allocated on a chip, but which don't care
+        # An iterable of CoreResource objects that reflect the number of
+        # cores that have been preallocated on a chip, but which don't care
         # which core it uses.
         "_core_resources",
 
-        # A iterable of SpecificIPTagResource objects that reflect the iptag
-        # details that have been pre allocated on a board.
+        # An iterable of SpecificIPTagResource objects that reflect the iptag
+        # details that have been preallocated on a board.
         "_specific_iptag_resources",
-        
-        # A iterable of SpecificReverseIPTagResource objects that reflect the
-        # reverse iptag details that have been pre allocated on a board.
+
+        # An iterable of SpecificReverseIPTagResource objects that reflect the
+        # reverse iptag details that have been preallocated on a board.
         "_specific_reverse_iptag_resources",
-        
     ]
 
     def __init__(
@@ -52,8 +49,6 @@ class PreAllocatedResourceContainer(object):
             states a number of cores have been pre allocated but don't care
             which ones they are
         :type core_resources: iterable of pacman.model.resources.CoreResource
-        
-
         """
         self._specific_sdram_usage = specific_sdram_usage
         self._specific_core_resources = specific_core_resources

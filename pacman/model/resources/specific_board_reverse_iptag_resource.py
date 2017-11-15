@@ -19,25 +19,23 @@ class ReverseIPtagResource(AbstractResource):
         # A fixed tag id to assign, or None if any tag is OK
         "_tag",
 
-        # a board ip address which is where this reverse iptag is to be \
+        # A board IP address which is where this reverse IPTag is to be \
         # placed
         "_board"
     ]
 
-    def __init__(
-            self, board, port=None, sdp_port=1, tag=None):
+    def __init__(self, board, port=None, sdp_port=1, tag=None):
         """
-        
-        :param board: a board ip address which is where this reverse iptag is\
-         to be placed
+
+        :param board: A board IP address which is where this reverse IPTag is\
+                to be placed
         :type board: str
         :param port: The target port of the tag or None to assign elsewhere
         :type port: int or None
         :param port: The UDP port to listen to on the board for this tag
         :type port: int
-        :param sdp_port:\
-            The SDP port number to be used when constructing SDP packets from\
-            the received UDP packets for this tag
+        :param sdp_port: The SDP port number to be used when constructing \
+                SDP packets from the received UDP packets for this tag.
         :type sdp_port: int
         :param tag: A fixed tag id to assign, or None if any tag is OK
         :type tag: int or None
@@ -59,7 +57,7 @@ class ReverseIPtagResource(AbstractResource):
     @property
     def sdp_port(self):
         """ The SDP port to use when constructing the SDP message from the\
-            received UDP message
+            received UDP message.
         """
         return self._sdp_port
 
@@ -75,7 +73,8 @@ class ReverseIPtagResource(AbstractResource):
     @property
     def board(self):
         """
-        a board ip address which is where this reverse iptag is to be placed
+        A board IP address which is where this reverse IPTag is to be placed
+
         :return: str
         """
         return self._board
@@ -85,7 +84,5 @@ class ReverseIPtagResource(AbstractResource):
         return [self._board, self._port, self._sdp_port, self._tag]
 
     def __repr__(self):
-        return (
-            "ReverseIPTagResource(board={}, port={}, sdp_port={}, tag={})"
-            .format(self._board, self._port, self._sdp_port, self._tag)
-        )
+        return ("ReverseIPTagResource(board={}, port={}, sdp_port={}, tag={})"
+                .format(self._board, self._port, self._sdp_port, self._tag))
