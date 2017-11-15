@@ -220,12 +220,3 @@ class AbstractGraph(object):
         :rtype:\
             :py:class:`pacman.model.graphs.abstract_outgoing_edge_partition.AbstractOutgoingEdgePartition`
         """
-
-    @abstractmethod
-    def get_outgoing_edge_partitions_with_traffic_type(self, traffic_type):
-        """ Get the outgoing edge partitions with a given traffic type
-
-        :param traffic_type: The traffic type to look for
-        :type traffic_type:\
-            :py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
-        """
