@@ -56,12 +56,16 @@ class FixedRouteRouter(object):
         :return: router tables for fixed route paths
         """
 
+        # lazy cheat
+        fixed_route_tables = dict()
+
         progress_bar = ProgressBar(
             len(machine.ethernet_connected_chips),
             "generating fixed router routes.")
 
-        # lazy cheat
-        fixed_route_tables = dict()
+        if destination_class is None:
+            progress_bar.end()
+            return fixed_route_tables
 
         if destination_class is None:
             return fixed_route_tables
