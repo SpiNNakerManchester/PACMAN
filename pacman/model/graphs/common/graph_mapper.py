@@ -1,5 +1,6 @@
 from pacman.exceptions import PacmanValueError
 from collections import defaultdict
+from spinn_utilities.ordered_set import OrderedSet
 
 
 class GraphMapper(object):
@@ -35,8 +36,8 @@ class GraphMapper(object):
         self._application_vertex_by_machine_vertex = dict()
         self._application_edge_by_machine_edge = dict()
 
-        self._machine_vertices_by_application_vertex = defaultdict(set)
-        self._machine_edges_by_application_edge = defaultdict(set)
+        self._machine_vertices_by_application_vertex = defaultdict(OrderedSet)
+        self._machine_edges_by_application_edge = defaultdict(OrderedSet)
 
         self._index_by_machine_vertex = dict()
         self._slice_by_machine_vertex = dict()
