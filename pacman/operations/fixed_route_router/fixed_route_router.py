@@ -67,9 +67,6 @@ class FixedRouteRouter(object):
             progress_bar.end()
             return fixed_route_tables
 
-        if destination_class is None:
-            return fixed_route_tables
-
         # handle per board
         for ethernet_connected_chip in progress_bar.over(
                 machine.ethernet_connected_chips):
