@@ -225,4 +225,56 @@
             </param_type>
         </outputs>
     </algorithm>
+    <algorithm name="RigMCRouter">
+        <command_line_args>
+            <arg>rig_route.py</arg>
+            <arg>--graph={graph}</arg>
+            <arg>--constraints={constraints}</arg>
+            <arg>--machine={machine}</arg>
+            <arg>--placements={placements}</arg>
+            <arg>--allocations=cores:{allocations}</arg>
+            <arg>--algorithm=ner</arg>
+            <arg>--core-resource=cores</arg>
+            <arg>--routes={routing_paths_file_path}</arg>
+        </command_line_args>
+        <input_definitions>
+            <parameter>
+                <param_name>graph</param_name>
+                <param_type>FileMachineGraphPureMulticast</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>FileMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>constraints</param_name>
+                <param_type>FileConstraints</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>FilePlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>allocations</param_name>
+                <param_type>FileCoreAllocations</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_paths_file_path</param_name>
+                <param_type>FileRoutingPathsFilePath</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>constraints</param_name>
+            <param_name>placements</param_name>
+            <param_name>allocations</param_name>
+            <param_name>routing_paths_file_path</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type file_name_type="FileRoutingPathsFilePath">
+                FileRoutingPaths
+            </param_type>
+        </outputs>
+    </algorithm>
 </algorithms>
