@@ -54,12 +54,13 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # constraints are compatible
         utilities.check_types_of_edge_constraint(machine_graph)
 
+        # final keys allocations
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-         flexi_field_groups, continuous_groups, none_continuous_groups) = \
-            utilities.get_edge_groups(machine_graph, EdgeTrafficType.MULTICAST)
+        (fixed_key_groups, share_key_groups, fixed_mask_groups,
+         fixed_field_groups, flexi_field_groups, continuous_groups,
+         none_continuous_groups) = utilities.get_edge_groups(machine_graph)
 
         # Even non-continuous keys will be continuous
         for group in none_continuous_groups:

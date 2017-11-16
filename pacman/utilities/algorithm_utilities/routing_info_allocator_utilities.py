@@ -27,6 +27,8 @@ def get_edge_groups(machine_graph, traffic_type):
 
     # Keep a dictionary of the group which contains an edge
     fixed_key_groups = set()
+    shared_key_groups = set()
+    fixed_key_shared_key_groups = set()
     fixed_mask_groups = set()
     fixed_field_groups = set()
     flexi_field_groups = set()
@@ -57,7 +59,7 @@ def get_edge_groups(machine_graph, traffic_type):
                         continuous_groups.add(partition)
                 if not is_continuous:
                     none_continuous_groups.append(partition)
-    return (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
+    return (fixed_key_groups, shared_key_groups, fixed_mask_groups, fixed_field_groups,
             flexi_field_groups, continuous_groups, none_continuous_groups)
 
 
