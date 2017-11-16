@@ -4,6 +4,7 @@ import time
 
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
+from pacman.model.graphs.common import EdgeTrafficType
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -499,10 +500,11 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
                 for partition in machine_graph.\
                         get_outgoing_edge_partitions_starting_at_vertex(
                             vertex):
-                    rinfo = routing_infos.get_routing_info_from_partition(
-                        partition)
-                    f.write("    Partition: {}, Routing Info: {}\n".format(
-                        partition.identifier, rinfo.keys_and_masks))
+                    if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                        rinfo = routing_infos.get_routing_info_from_partition(
+                            partition)
+                        f.write("    Partition: {}, Routing Info: {}\n".format(
+                            partition.identifier, rinfo.keys_and_masks))
                     progress.update()
             progress.end()
     except IOError:
