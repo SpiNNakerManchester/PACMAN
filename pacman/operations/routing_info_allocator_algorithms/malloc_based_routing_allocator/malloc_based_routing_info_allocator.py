@@ -60,7 +60,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # Get the edges grouped by those that require the same key
         (fixed_key_groups, share_key_groups, fixed_mask_groups,
          fixed_field_groups, flexi_field_groups, continuous_groups,
-         none_continuous_groups) = utilities.get_edge_groups(machine_graph)
+         none_continuous_groups) = utilities.get_edge_groups(
+            machine_graph, EdgeTrafficType.MULTICAST)
 
         # Even non-continuous keys will be continuous
         for group in none_continuous_groups:
