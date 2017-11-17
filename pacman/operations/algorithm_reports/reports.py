@@ -115,9 +115,9 @@ def router_report_from_paths(
                 if partition.traffic_type == EdgeTrafficType.MULTICAST:
                     source_placement = placements.get_placement_of_vertex(
                         partition.pre_vertex)
-                    key_and_mask = routing_infos.\
-                        get_routing_info_from_partition(partition)
-                    key_and_mask = key_and_mask.first_key_and_mask
+                    key_and_mask = \
+                        routing_infos.get_routing_info_from_partition(
+                            partition).first_key_and_mask
                     for edge in partition.edges:
                         destination_placement = \
                             placements.get_placement_of_vertex(
