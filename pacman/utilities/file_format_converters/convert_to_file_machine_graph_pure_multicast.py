@@ -1,6 +1,7 @@
 import hashlib
 import json
 from collections import defaultdict
+
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractVirtualVertex
 
