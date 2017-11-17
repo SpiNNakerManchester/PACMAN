@@ -3,7 +3,7 @@ from rig.place_and_route.route.ner import route
 from spinn_utilities.progress_bar import ProgressBar
 
 
-class RigRoute(object):
+class RigMCRoute(object):
     """ Performs routing using rig algorithm
     """
 
@@ -13,7 +13,7 @@ class RigRoute(object):
         progress_bar = ProgressBar(7, "Routing")
 
         vertices_resources, nets, net_names = \
-            rig_converters.convert_to_rig_graph(machine_graph)
+            rig_converters.convert_to_rig_graph_pure_mc(machine_graph)
         progress_bar.update()
 
         rig_machine = rig_converters.convert_to_rig_machine(machine)

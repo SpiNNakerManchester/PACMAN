@@ -1,6 +1,6 @@
-from pacman.model.routing_tables import MulticastRoutingTables
-from pacman.model.routing_tables import MulticastRoutingTable
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine.fixed_route_entry import FixedRouteEntry
+from pacman import exceptions
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class FixedRouteRouter(object):
@@ -43,7 +43,7 @@ class FixedRouteRouter(object):
         ]}
 
     # dict of source and destination to create fixed route router when not
-    # default 4
+    # default 4 0 = E 1 = NE 2 = N 3 = W 4 = SW 5 = S
     joins = {(0, 1): [5], (0, 2): [5], (0, 3): [5], (2, 1): [3], (1, 0): [3],
              (2, 0): [3], (3, 0): [3], (4, 0): [3], (5, 6): [5], (6, 6): [5]}
 
@@ -57,10 +57,19 @@ class FixedRouteRouter(object):
         """
 
         # lazy cheat
-        fixed_route_tables = MulticastRoutingTables()
+        fixed_route_tables = dict()
+
+        progress_bar = ProgressBar(
+            len(machine.ethernet_connected_chips),
+            "generating fixed router routes.")
+
+        if destination_class is None:
+            progress_bar.end()
+            return fixed_route_tables
 
         # handle per board
-        for ethernet_connected_chip in machine.ethernet_connected_chips:
+        for ethernet_connected_chip in progress_bar.over(
+                machine.ethernet_connected_chips):
             ethernet_chip_x = ethernet_connected_chip.x
             ethernet_chip_y = ethernet_connected_chip.y
 
@@ -71,22 +80,16 @@ class FixedRouteRouter(object):
                 for (path_chip_x, path_chip_y) in \
                         self.router_path_chips[path_id]:
 
-                    # build table
-                    table = MulticastRoutingTable(
-                        x=path_chip_x + ethernet_chip_x,
-                        y=path_chip_y + ethernet_chip_y)
-
                     # figure link ids (default is [4])
                     link_ids = [4]
                     if (path_chip_x, path_chip_y) in self.joins:
                         link_ids = self.joins[(path_chip_x, path_chip_y)]
 
                     # build entry and add to table and add to tables
-                    fixed_route_entry = MulticastRoutingEntry(
-                        routing_entry_key=0x0, mask=0x0, link_ids=link_ids,
-                        processor_ids=[], defaultable=False)
-                    table.add_multicast_routing_entry(fixed_route_entry)
-                    fixed_route_tables.add_routing_table(table)
+                    fixed_route_entry = FixedRouteEntry(
+                        link_ids=link_ids, processor_ids=[])
+                    fixed_route_tables[(path_chip_x, path_chip_y)] = \
+                        fixed_route_entry
 
             # locate destination vertex on ethernet connected chip  to send
             # fixed data to
@@ -100,15 +103,16 @@ class FixedRouteRouter(object):
                     if isinstance(
                             placements.get_vertex_on_processor(
                                 ethernet_chip_x, ethernet_chip_y,
-                                processor_id),
-                            destination_class):
+                                processor_id), destination_class):
 
                         # build entry and add to table and add to tables
-                        fixed_route_entry = MulticastRoutingEntry(
-                            routing_entry_key=0x0, mask=0x0, link_ids=[],
-                            processor_ids=[processor_id], defaultable=False)
-                        table.add_multicast_routing_entry(fixed_route_entry)
-                        fixed_route_tables.add_routing_table(table)
+                        fixed_route_entry = FixedRouteEntry(
+                            link_ids=[], processor_ids=[processor_id])
+                        key = (ethernet_chip_x, ethernet_chip_y)
+                        if key in fixed_route_tables:
+                            raise exceptions.PacmanAlreadyExistsException(
+                                "fixed route entry", str(key))
+                        fixed_route_tables[key] = fixed_route_entry
 
         # hand back fixed route tables
         return fixed_route_tables

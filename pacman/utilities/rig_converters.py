@@ -13,6 +13,8 @@ from pacman.model.constraints.placer_constraints\
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
+
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
 from pacman.model.placements import Placement, Placements
 from pacman.model.routing_table_by_partition import \
@@ -156,6 +158,55 @@ def convert_to_rig_graph(machine_graph):
     return vertices_resources, nets, net_names
 
 
+def convert_to_rig_graph_pure_mc(machine_graph):
+
+    vertices_resources = dict()
+    edges_resources = defaultdict()
+
+    for vertex in machine_graph.vertices:
+
+        # handle external devices
+        if isinstance(vertex, AbstractVirtualVertex):
+            vertex_resources = dict()
+            vertices_resources[vertex] = vertex_resources
+            vertex_resources["cores"] = 0
+
+        # handle standard vertices
+        else:
+            vertex_resources = dict()
+            vertices_resources[vertex] = vertex_resources
+            vertex_resources["cores"] = N_CORES_PER_VERTEX
+            vertex_resources["sdram"] = int(
+                vertex.resources_required.sdram.get_value())
+        vertex_outgoing_partitions = \
+            machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+                vertex)
+
+        # handle the vertex edges
+        for partition in vertex_outgoing_partitions:
+            if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                hyper_edge_dict = dict()
+                edges_resources[partition] = hyper_edge_dict
+                hyper_edge_dict["source"] = vertex
+
+                sinks = list()
+                weight = 0
+                for edge in partition.edges:
+                    sinks.append(edge.post_vertex)
+                    weight += edge.traffic_weight
+                hyper_edge_dict['sinks'] = sinks
+                hyper_edge_dict["weight"] = weight
+                hyper_edge_dict["type"] = partition.traffic_type.name.lower()
+
+    net_names = {
+        Net(edge["source"], edge["sinks"], edge["weight"]): name
+        for name, edge in iteritems(edges_resources)
+    }
+    nets = list(net_names)
+
+    return vertices_resources, nets, net_names
+
+
 def create_rig_graph_constraints(machine_graph, machine):
 
     constraints = []
@@ -245,7 +296,7 @@ def convert_from_rig_placements(
     return placements
 
 
-def convert_from_rig_routes(rig_routes, machine_graph):
+def convert_from_rig_routes(rig_routes):
     routing_tables = MulticastRoutingTableByPartition()
     for partition in rig_routes:
         partition_route = rig_routes[partition]
