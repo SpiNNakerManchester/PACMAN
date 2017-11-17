@@ -112,26 +112,29 @@ def router_report_from_paths(
 
             for partition in progress.over(
                     machine_graph.outgoing_edge_partitions):
-                source_placement = placements.get_placement_of_vertex(
-                    partition.pre_vertex)
-                key_and_mask = routing_infos.get_routing_info_from_partition(
-                    partition).first_key_and_mask
-                for edge in partition.edges:
-                    destination_placement = placements.get_placement_of_vertex(
-                        edge.post_vertex)
-                    path, number_of_entries = _search_route(
-                        source_placement, destination_placement, key_and_mask,
-                        routing_tables, machine)
-                    text = ("**** Edge '{}', from vertex: '{}'"
-                            " to vertex: '{}'".format(
-                                edge.label, edge.pre_vertex.label,
-                                edge.post_vertex.label))
-                    text += " Takes path \n {}\n".format(path)
-                    f.write(text)
-                    f.write("Route length: {}\n".format(number_of_entries))
+                if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                    source_placement = placements.get_placement_of_vertex(
+                        partition.pre_vertex)
+                    key_and_mask = \
+                        routing_infos.get_routing_info_from_partition(
+                            partition).first_key_and_mask
+                    for edge in partition.edges:
+                        destination_placement = \
+                            placements.get_placement_of_vertex(
+                                edge.post_vertex)
+                        path, number_of_entries = _search_route(
+                            source_placement, destination_placement,
+                            key_and_mask, routing_tables, machine)
+                        text = ("**** Edge '{}', from vertex: '{}'"
+                                " to vertex: '{}'".format(
+                                    edge.label, edge.pre_vertex.label,
+                                    edge.post_vertex.label))
+                        text += " Takes path \n {}\n".format(path)
+                        f.write(text)
+                        f.write("Route length: {}\n".format(number_of_entries))
 
-                    # End one entry:
-                    f.write("\n")
+                        # End one entry:
+                        f.write("\n")
     except IOError:
         logger.error("Generate_routing_reports: Can't open file {} for "
                      "writing.".format(file_name))
