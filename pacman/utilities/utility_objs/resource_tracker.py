@@ -1265,10 +1265,11 @@ class ResourceTracker(object):
                 try:
                     max_dtcm_available = processor.dtcm_available
                     max_cpu_available = processor.cpu_cycles_available
-                except AttributeError:
+                except AttributeError as ae:
                     if processor is None:
                         raise PacmanProcessorNotAvailableError(
                             chip_x, chip_y, best_processor_id)
+                    raise ae
 
             # If all the SDRAM on the chip is available,
             # this chip is unallocated, so the max must be the max
