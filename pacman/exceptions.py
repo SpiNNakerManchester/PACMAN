@@ -230,6 +230,17 @@ class PacmanProcessorNotOccupiedError(KeyError):
     pass
 
 
+class PacmanProcessorNotAvailableError(PacmanException):
+    def __init__(self, x, y, p):
+
+        msg = "The processor {} {} {} is not available. " \
+              "This may be caused by a clash between a ChipAndCoreConstraint"\
+              " and the processor still being in use from a previous run" \
+              "".format(x, y, p)
+        # Call the base class constructor with the parameters it needs
+        PacmanException.__init__(self, msg)
+
+
 class PacmanValueError(ValueError, PacmanException):
     """Indicates that a value is invalid for some reason."""
     pass
