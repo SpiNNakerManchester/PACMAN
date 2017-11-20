@@ -5,7 +5,7 @@ from pacman.model.constraints.key_allocator_constraints import \
 class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
     """
     constraint to allow the same keys to be allocated to multiple edges 
-    via partitions and vertice mapping
+    via partitions
     """
 
     __slots__ = [

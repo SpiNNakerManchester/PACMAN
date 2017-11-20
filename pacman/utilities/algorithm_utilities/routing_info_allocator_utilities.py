@@ -1,4 +1,6 @@
 # pacman imports
+from collections import defaultdict
+
 from pacman.model.constraints.key_allocator_constraints\
     import FixedKeyFieldConstraint, FlexiKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
@@ -7,9 +9,13 @@ from pacman.model.constraints.key_allocator_constraints\
     import FixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints\
     import FixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    share_key_constraint import \
+    ShareKeyConstraint
 from pacman.utilities import utility_calls
 from pacman.exceptions import (PacmanValueError, PacmanConfigurationException,
                                PacmanInvalidParameterException)
+from spinn_utilities.ordered_set import OrderedSet
 
 import logging
 logger = logging.getLogger(__name__)
@@ -26,14 +32,13 @@ def get_edge_groups(machine_graph, traffic_type):
     """
 
     # Keep a dictionary of the group which contains an edge
-    fixed_key_groups = set()
-    shared_key_groups = set()
-    fixed_key_shared_key_groups = set()
-    fixed_mask_groups = set()
-    fixed_field_groups = set()
-    flexi_field_groups = set()
-    continuous_groups = set()
-    none_continuous_groups = list()
+    fixed_key_groups = OrderedSet()
+    shared_key_groups = defaultdict(list)
+    fixed_mask_groups = OrderedSet()
+    fixed_field_groups = OrderedSet()
+    flexi_field_groups = OrderedSet()
+    continuous_groups = OrderedSet()
+    none_continuous_groups = OrderedSet()
     for vertex in machine_graph.vertices:
         for partition in \
                 machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
@@ -42,25 +47,97 @@ def get_edge_groups(machine_graph, traffic_type):
                 # assume all edges have the same constraints in them. use \
                 # first one to deduce which group to place it into
                 constraints = partition.constraints
-                is_continuous = False
-                for constraint in constraints:
-                    if isinstance(constraint, FixedMaskConstraint):
-                        fixed_mask_groups.add(partition)
-                    elif isinstance(constraint,
-                                    FixedKeyAndMaskConstraint):
-                        fixed_key_groups.add(partition)
-                    elif isinstance(constraint, FlexiKeyFieldConstraint):
-                        flexi_field_groups.add(partition)
-                    elif isinstance(constraint, FixedKeyFieldConstraint):
-                        fixed_field_groups.add(partition)
-                    elif isinstance(constraint,
-                                    ContiguousKeyRangeContraint):
-                        is_continuous = True
+
+                is_continuous, is_fixed_mask,  is_fixed_key, is_flexi_field, \
+                    is_fixed_field, is_shared_key, n_set = \
+                    _check_types_of_constraints(constraints)
+
+                # if its got a share key, verify what else it has
+                if is_shared_key:
+                    if n_set == 1:  # only a share key constraint
+                        shared_key_groups["plain"].append(partition)
+                        none_continuous_groups.add(partition)
+                    else:
+                        if is_continuous:
+                            continuous_groups.add(partition)
+                            if n_set == 2:  # only share and continuous
+                                shared_key_groups['plain'].append(partition)
+                            else:  # got some interesting combo
+                                linked_shared_constraints(
+                                    fixed_key_groups, fixed_mask_groups,
+                                    fixed_field_groups, flexi_field_groups,
+                                    is_fixed_mask, is_fixed_key,
+                                    is_flexi_field, is_fixed_field,
+                                    shared_key_groups)
+                        else:  # got a none continuous key
+                            none_continuous_groups.add(partition)
+                            linked_shared_constraints(
+                                fixed_key_groups, fixed_mask_groups,
+                                fixed_field_groups, flexi_field_groups,
+                                is_fixed_mask, is_fixed_key, is_flexi_field,
+                                is_fixed_field, shared_key_groups)
+                else:
+                    if is_continuous:
                         continuous_groups.add(partition)
-                if not is_continuous:
-                    none_continuous_groups.append(partition)
-    return (fixed_key_groups, shared_key_groups, fixed_mask_groups, fixed_field_groups,
-            flexi_field_groups, continuous_groups, none_continuous_groups)
+                        if n_set != 1:
+                            linked_shared_constraints(
+                                fixed_key_groups, fixed_mask_groups,
+                                fixed_field_groups, flexi_field_groups,
+                                is_fixed_mask, is_fixed_key, is_flexi_field,
+                                is_fixed_field)
+                    else:
+                        none_continuous_groups.add(partition)
+                        if n_set != 0:
+                            linked_shared_constraints(
+                                fixed_key_groups, fixed_mask_groups,
+                                fixed_field_groups, flexi_field_groups,
+                                is_fixed_mask, is_fixed_key, is_flexi_field,
+                                is_fixed_field)
+
+    return (fixed_key_groups, shared_key_groups,
+            fixed_mask_groups, fixed_field_groups, flexi_field_groups,
+            continuous_groups, none_continuous_groups)
+
+def linked_shared_constraints(
+        fixed_key_groups, fixed_mask_groups, fixed_field_groups,
+        flexi_field_groups, is_fixed_mask, is_fixed_key, is_flexi_field,
+        is_fixed_field, shared_key_groups=None):
+
+
+
+
+def _check_types_of_constraints(constraints):
+    is_continuous = False
+    is_fixed_mask = False
+    is_fixed_key = False
+    is_flexi_field = False
+    is_fixed_field = False
+    is_shared_key = False
+
+    # locate types of constraints to consider
+    for constraint in constraints:
+        if isinstance(constraint, FixedMaskConstraint):
+            is_fixed_mask = True
+        elif isinstance(constraint, FixedKeyAndMaskConstraint):
+            is_fixed_key = True
+        elif isinstance(constraint, FlexiKeyFieldConstraint):
+            is_flexi_field = True
+        elif isinstance(constraint, FixedKeyFieldConstraint):
+            is_fixed_field = True
+        elif isinstance(constraint, ContiguousKeyRangeContraint):
+            is_continuous = True
+        elif isinstance(constraint, ShareKeyConstraint):
+            is_shared_key = True
+
+    # find how many are set
+    n_set = 0
+    for check in [is_continuous, is_fixed_mask, is_fixed_key,
+                  is_flexi_field, is_fixed_field, is_shared_key]:
+        if check:
+            n_set += 1
+
+    return is_continuous, is_fixed_mask, is_fixed_key, is_flexi_field, \
+           is_fixed_field, is_shared_key, n_set
 
 
 def check_types_of_edge_constraint(machine_graph):
