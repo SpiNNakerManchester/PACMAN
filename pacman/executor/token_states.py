@@ -1,6 +1,3 @@
-from pacman.executor.algorithm_decorators.token import Token
-
-
 class _TokenState(object):
     """ Determines whether a token has been fulfilled or not
     """
@@ -11,8 +8,7 @@ class _TokenState(object):
         "_incomplete_parts"
     ]
 
-    def __init__(self, name):
-        self._name = name
+    def __init__(self):
         self._incomplete_parts = set()
         self._complete_parts = set()
 
@@ -41,13 +37,6 @@ class _TokenState(object):
             return len(self._incomplete_parts) == 0
         return part in self._complete_parts
 
-    def add_complete_parts(self, tokens):
-        if len(self._incomplete_parts) == 0:
-            tokens.append(Token(self._name))
-        else:
-            tokens.extend(
-                [Token(self._name, part) for part in self._complete_parts])
-
 
 class TokenStates(object):
     """ Keeps track of multiple token state objects to determine if they\
@@ -67,7 +56,7 @@ class TokenStates(object):
         """ Start tracking a token
         """
         if token.name not in self._tokens:
-            self._tokens[token.name] = _TokenState(token.name)
+            self._tokens[token.name] = _TokenState()
         self._tokens[token.name].track_token_part(token.part)
 
     def process_output_token(self, output_token):
@@ -82,7 +71,7 @@ class TokenStates(object):
         """
         # If the token is not tracked, is assumed to be complete
         if token.name not in self._tokens:
-            return True
+            return False
 
         # The token is complete if the token part is complete or the token
         # as a whole is complete
@@ -92,7 +81,7 @@ class TokenStates(object):
     def get_completed_tokens(self):
         """ Get a list of tokens that have been completed
         """
-        tokens = list()
-        for token in self._tokens.itervalues():
-            token.add_complete_parts(tokens)
-        return tokens
+        return [
+            name for name, token in self._tokens.iteritems()
+            if token.is_complete()
+        ]

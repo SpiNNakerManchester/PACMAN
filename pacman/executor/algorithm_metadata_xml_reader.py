@@ -116,9 +116,9 @@ class AlgorithmMetadataXmlReader(object):
         outputs = self._translate_outputs(
             path, element.find("{*}outputs"), is_external)
         required_input_tokens = self._translate_tokens(
-            element.find("{*}required_input_tokens"))
+            path, element.find("{*}required_input_tokens"))
         generated_output_tokens = self._translate_tokens(
-            element.find("{*}generated_output_tokens"))
+            path, element.find("{*}generated_output_tokens"))
 
         # Check that all input definitions have been used
         for input_name in input_definitions.iterkeys():

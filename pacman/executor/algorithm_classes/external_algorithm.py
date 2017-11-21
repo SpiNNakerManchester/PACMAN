@@ -18,7 +18,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
 
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
-
+            required_input_tokens, generated_output_tokens,
             command_line_arguments):
         AbstractAlgorithm.__init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,

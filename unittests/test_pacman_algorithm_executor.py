@@ -69,7 +69,8 @@ class Test(unittest.TestCase):
             algorithms=["TestAlgorithm"],
             optional_algorithms=["TestNoChangesAlgorithm", "TestAlgorithm3"],
             inputs=inputs,
-            required_outputs=["TestType3"])
+            required_outputs=["TestType3"],
+            tokens=[], required_output_tokens=[])
         executor.execute_mapping()
         self.assertTrue(TestAlgorithm.called)
         self.assertFalse(TestNoChangesAlgorithm.called)
