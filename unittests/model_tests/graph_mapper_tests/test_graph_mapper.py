@@ -3,8 +3,8 @@ tests for graph mapper
 """
 
 # unit test objects
-from uinit_test_objects.simple_test_edge import TestEdge
-from uinit_test_objects.simple_test_vertex import TestVertex
+from uinit_test_objects.simple_test_edge import SimpleTestEdge
+from uinit_test_objects.simple_test_vertex import SimpleTestVertex
 
 # pacman imports
 from pacman.model.graphs.common import Slice, GraphMapper
@@ -38,7 +38,7 @@ class TestGraphMapper(unittest.TestCase):
         sube = MachineEdge(vertices[1], vertices[0])
         edges.append(sube)
         graph = GraphMapper()
-        edge = TestEdge(TestVertex(10, "pre"), TestVertex(5, "post"))
+        edge = SimpleTestEdge(SimpleTestVertex(10, "pre"), SimpleTestVertex(5, "post"))
         graph.add_edge_mapping(sube, edge)
         graph.add_edge_mapping(edges[0], edge)
         edges_from_edge = graph.get_machine_edges(edge)
@@ -61,7 +61,7 @@ class TestGraphMapper(unittest.TestCase):
         edges.append(MachineEdge(vertices[1], vertices[1]))
 
         graph_mapper = GraphMapper()
-        vert = TestVertex(4, "Some testing vertex")
+        vert = SimpleTestVertex(4, "Some testing vertex")
 
         vertex_slice = Slice(0, 1)
         graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
@@ -87,7 +87,7 @@ class TestGraphMapper(unittest.TestCase):
         vertex2 = SimpleMachineVertex(None, "")
 
         graph_mapper = GraphMapper()
-        vert = TestVertex(10, "Some testing vertex")
+        vert = SimpleTestVertex(10, "Some testing vertex")
 
         vertex_slice = Slice(0, 1)
         graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
@@ -121,7 +121,7 @@ class TestGraphMapper(unittest.TestCase):
         # Create the graph mapper
         graph = GraphMapper()
 
-        edge = TestEdge(TestVertex(10, "pre"), TestVertex(5, "post"))
+        edge = SimpleTestEdge(SimpleTestVertex(10, "pre"), SimpleTestVertex(5, "post"))
         graph.add_edge_mapping(sube, edge)
         graph.add_edge_mapping(edges[0], edge)
 

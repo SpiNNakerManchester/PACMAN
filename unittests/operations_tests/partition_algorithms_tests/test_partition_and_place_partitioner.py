@@ -22,7 +22,7 @@ from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
 import unittest
 from uinit_test_objects.test_partitioning_constraint import \
     NewPartitionerConstraint
-from uinit_test_objects.simple_test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import SimpleTestVertex
 from spinn_machine.virtual_machine import VirtualMachine
 
 
@@ -34,9 +34,9 @@ class TestBasicPartitioner(unittest.TestCase):
     def setup(self):
         """setup for all basic partitioner tests
         """
-        self.vert1 = TestVertex(10, "New AbstractConstrainedVertex 1")
-        self.vert2 = TestVertex(5, "New AbstractConstrainedVertex 2")
-        self.vert3 = TestVertex(3, "New AbstractConstrainedVertex 3")
+        self.vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
+        self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
+        self.vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3")
         self.edge1 = ApplicationEdge(self.vert1, self.vert2, None,
                                      "First edge")
         self.edge2 = ApplicationEdge(self.vert2, self.vert1, None,
@@ -108,7 +108,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that partitioning 1 large vertex can make it into 2 small ones
         """
         self.setup()
-        large_vertex = TestVertex(300, "Large vertex")
+        large_vertex = SimpleTestVertex(300, "Large vertex")
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine,
@@ -122,7 +122,7 @@ class TestBasicPartitioner(unittest.TestCase):
         ones
         """
         self.setup()
-        large_vertex = TestVertex(500, "Large vertex")
+        large_vertex = SimpleTestVertex(500, "Large vertex")
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -136,7 +136,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that fixed partitioning causes correct number of vertices
         """
         self.setup()
-        large_vertex = TestVertex(1000, "Large vertex")
+        large_vertex = SimpleTestVertex(1000, "Large vertex")
         large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -176,7 +176,7 @@ class TestBasicPartitioner(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
         self.machine = Machine(chips, 0, 0)
-        singular_vertex = TestVertex(450, "Large vertex", max_atoms_per_core=1)
+        singular_vertex = SimpleTestVertex(450, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
@@ -218,7 +218,7 @@ class TestBasicPartitioner(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
         self.machine = Machine(chips, 0, 0)
-        large_vertex = TestVertex(3000, "Large vertex", max_atoms_per_core=1)
+        large_vertex = SimpleTestVertex(3000, "Large vertex", max_atoms_per_core=1)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -301,7 +301,7 @@ class TestBasicPartitioner(unittest.TestCase):
         it raises an error
         """
         self.setup()
-        constrained_vertex = TestVertex(13, "Constrained")
+        constrained_vertex = SimpleTestVertex(13, "Constrained")
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
         graph = ApplicationGraph("Graph")
@@ -325,7 +325,7 @@ class TestBasicPartitioner(unittest.TestCase):
         constraints ona  vertex that is split into one core
         """
         self.setup()
-        constrained_vertex = TestVertex(5, "Constrained")
+        constrained_vertex = SimpleTestVertex(5, "Constrained")
         constrained_vertex.add_constraint(
             SameAtomsAsVertexConstraint(self.vert2))
         self.graph.add_vertex(constrained_vertex)
@@ -341,8 +341,8 @@ class TestBasicPartitioner(unittest.TestCase):
         constraints on a vertex which has to be split over many cores
         """
         self.setup()
-        constrained_vertex = TestVertex(300, "Constrained")
-        new_large_vertex = TestVertex(300, "Non constrained")
+        constrained_vertex = SimpleTestVertex(300, "Constrained")
+        new_large_vertex = SimpleTestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             SameAtomsAsVertexConstraint(new_large_vertex))
         self.graph.add_vertices([new_large_vertex, constrained_vertex])
@@ -358,8 +358,8 @@ class TestBasicPartitioner(unittest.TestCase):
         the order of the vertices being added is different.
         """
         self.setup()
-        constrained_vertex = TestVertex(300, "Constrained")
-        new_large_vertex = TestVertex(300, "Non constrained")
+        constrained_vertex = SimpleTestVertex(300, "Constrained")
+        new_large_vertex = SimpleTestVertex(300, "Non constrained")
         constrained_vertex.add_constraint(
             SameAtomsAsVertexConstraint(new_large_vertex))
         self.graph.add_vertices([constrained_vertex, new_large_vertex])
@@ -375,7 +375,7 @@ class TestBasicPartitioner(unittest.TestCase):
         causes errors
         """
         self.setup()
-        constrained_vertex = TestVertex(100, "Constrained")
+        constrained_vertex = SimpleTestVertex(100, "Constrained")
         constrained_vertex.add_constraint(
             SameAtomsAsVertexConstraint(self.vert2))
         self.graph.add_vertex(constrained_vertex)
@@ -389,9 +389,9 @@ class TestBasicPartitioner(unittest.TestCase):
             order of vertices is not correct for the chain
         """
         graph = ApplicationGraph("Test")
-        vertex_1 = TestVertex(10, "Vertex_1", 5)
-        vertex_2 = TestVertex(10, "Vertex_2", 4)
-        vertex_3 = TestVertex(10, "Vertex_3", 2)
+        vertex_1 = SimpleTestVertex(10, "Vertex_1", 5)
+        vertex_2 = SimpleTestVertex(10, "Vertex_2", 4)
+        vertex_3 = SimpleTestVertex(10, "Vertex_3", 2)
         vertex_3.add_constraint(SameAtomsAsVertexConstraint(
             vertex_2))
         vertex_2.add_constraint(SameAtomsAsVertexConstraint(
@@ -408,9 +408,9 @@ class TestBasicPartitioner(unittest.TestCase):
 
     def test_partitioning_with_2_massive_pops(self):
         self.setup()
-        constrained_vertex = TestVertex(16000, "Constrained")
+        constrained_vertex = SimpleTestVertex(16000, "Constrained")
         self.graph.add_vertex(constrained_vertex)
-        constrained_vertex = TestVertex(16000, "Constrained")
+        constrained_vertex = SimpleTestVertex(16000, "Constrained")
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         partitioner(self.graph, self.machine, PreAllocatedResourceContainer())

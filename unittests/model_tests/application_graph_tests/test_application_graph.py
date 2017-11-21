@@ -1,7 +1,7 @@
 # pacman imports
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 # uinit test object imports
-from uinit_test_objects.simple_test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import SimpleTestVertex
 
 # general imports
 import unittest
@@ -16,9 +16,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         ApplicationGraph("foo")
 
     def test_create_new_graph(self):
-        vert1 = TestVertex(10, "New AbstractConstrainedVertex 1", 256)
-        vert2 = TestVertex(5, "New AbstractConstrainedVertex 2", 256)
-        vert3 = TestVertex(3, "New AbstractConstrainedVertex 3", 256)
+        vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1", 256)
+        vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2", 256)
+        vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3", 256)
         edge1 = ApplicationEdge(vert1, vert2, None, "First edge")
         edge2 = ApplicationEdge(vert2, vert1, None, "First edge")
         edge3 = ApplicationEdge(vert1, vert3, None, "First edge")
