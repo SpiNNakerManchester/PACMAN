@@ -24,6 +24,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
     @overrides(AbstractPythonAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
+            required_input_tokens, generated_output_tokens,
             python_module, python_class, python_method=None):
         """
 
@@ -33,7 +34,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         """
         AbstractPythonAlgorithm.__init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
-            python_module)
+            required_input_tokens, generated_output_tokens, python_module)
         self._python_class = python_class
         self._python_method = python_method
 

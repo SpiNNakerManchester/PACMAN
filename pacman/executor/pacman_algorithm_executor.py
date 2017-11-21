@@ -10,6 +10,7 @@ from pacman.utilities import file_format_converters
 
 # general imports
 import logging
+from pacman.executor.token_states import TokenStates
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ class PACMANAlgorithmExecutor(object):
         # the flag in the provenance area.
         "_provenance_name",
 
-        # If required a file path to append provenace data to
+        # If required a file path to append provenance data to
         "_provenance_path"
     ]
 
@@ -65,7 +66,7 @@ class PACMANAlgorithmExecutor(object):
             print_timings=False, do_immediate_injection=True,
             do_post_run_injection=False, inject_inputs=True,
             do_direct_injection=True, use_unscanned_annotated_algorithms=True,
-            provenance_path=None, provenance_name=None):
+            provenance_path=None, provenance_name=None, tokens=None):
         """
 
         :param algorithms: A list of algorithms that must all be run
@@ -103,9 +104,11 @@ class PACMANAlgorithmExecutor(object):
         :param use_unscanned_annotated_algorithms:\
             True if algorithms that have been detected outside of the packages\
             argument specified above should be used
-        :param provenance_path:
+        :param provenance_path:\
             Path to file to append full provenance data to
             If None no provenance is written
+        :param tokens: A list of tokens that should be considered to have\
+            been generated
         """
 
         # algorithm timing information
@@ -114,6 +117,12 @@ class PACMANAlgorithmExecutor(object):
         # pacman mapping objects
         self._algorithms = list()
         self._inputs = inputs
+
+        # Set up the token tracking and make all specified tokens complete
+        self._tokens = TokenStates()
+        for token in tokens:
+            self._tokens.track_token(token)
+            self._tokens.process_output_token(token)
 
         # define mapping between types and internal values
         self._internal_type_mapping = dict()
@@ -242,6 +251,13 @@ class PACMANAlgorithmExecutor(object):
         :rtype: None
         """
 
+        # Go through the algorithms and add in the tokens that can be completed
+        # by any of the algorithms
+        for algorithm in algorithm_data:
+            for token in algorithm.generated_output_tokens:
+                if not self._tokens.is_token_complete(token):
+                    self._tokens.track_token(token)
+
         input_types = set(inputs.iterkeys())
 
         allocated_algorithms = list()
@@ -280,6 +296,10 @@ class PACMANAlgorithmExecutor(object):
                 # add the suitable algorithms to the list and take the outputs
                 # as new inputs
                 allocated_algorithms.append(suitable_algorithm)
+
+                # Mark any tokens generated as complete
+                for output_token in suitable_algorithm.generated_output_tokens:
+                    self._tokens.process_output_token(output_token)
             else:
 
                 # Failed to find an algorithm to run!
@@ -380,7 +400,7 @@ class PACMANAlgorithmExecutor(object):
 
     @staticmethod
     def _locate_suitable_algorithm(
-            algorithm_list, inputs, generated_outputs):
+            algorithm_list, inputs, generated_outputs, tokens):
         """ Locates a suitable algorithm
 
         :param algorithm_list: the list of algorithms to choose from
@@ -404,6 +424,12 @@ class PACMANAlgorithmExecutor(object):
                     all_inputs_match = False
                     break
 
+            # check all required tokens
+            if all_inputs_match:
+                for token in algorithm.required_input_tokens:
+                    if not tokens.is_token_complete(token):
+                        all_inputs_match = False
+
             # verify that a new output is being generated.
             if all_inputs_match:
                 # If the list of generated outputs is given, only use the
@@ -415,6 +441,13 @@ class PACMANAlgorithmExecutor(object):
                         if (output.output_type not in generated_outputs and
                                 output.output_type not in inputs):
                             return algorithm, algorithm_list
+
+                    # If the algorithm doesn't generate a unique output,
+                    # check if it generates a unique token
+                    if algorithm.generated_output_tokens:
+                        for token in algorithm.generated_output_tokens:
+                            if not tokens.is_token_complete(token):
+                                return algorithm, algorithm_list
                 else:
                     return algorithm, algorithm_list
 
@@ -487,6 +520,13 @@ class PACMANAlgorithmExecutor(object):
         :return: dictionary of types as keys and values.
         """
         return self._internal_type_mapping
+
+    def get_completed_tokens(self):
+        """ Get all of the tokens that have completed as part of this execution
+
+        :return: A list of tokens
+        """
+        return self._tokens.get_completed_tokens()
 
     @property
     def algorithm_timings(self):

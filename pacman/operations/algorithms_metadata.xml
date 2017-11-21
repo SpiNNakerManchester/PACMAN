@@ -1,7 +1,7 @@
 <algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
-			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+            https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="FixedRouteRouter">
         <python_module>pacman.operations.fixed_route_router.fixed_route_router</python_module>
         <python_class>FixedRouteRouter</python_class>
@@ -32,6 +32,9 @@
         <outputs>
             <param_type>MemoryFixedRoutes</param_type>
         </outputs>
+        <generated_output_tokens>
+            <token part="FixedRouteRouting">MappingCompleted</token>
+        </generated_output_tokens>
     </algorithm>
     <algorithm name="BasicPartitioner">
         <python_module>pacman.operations.partition_algorithms.basic_partitioner</python_module>

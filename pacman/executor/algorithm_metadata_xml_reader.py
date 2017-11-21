@@ -9,6 +9,7 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.algorithm_classes import ExternalAlgorithm
 from pacman.executor.algorithm_classes import PythonClassAlgorithm
 from pacman.executor.algorithm_decorators import AllOfInput
+from pacman.executor.algorithm_decorators.token import Token
 
 
 def _check_allowed_elements(path, element, allowed):
@@ -69,7 +70,8 @@ class AlgorithmMetadataXmlReader(object):
         _check_allowed_elements(path, element, {
             "input_definitions", "required_inputs", "optional_inputs",
             "outputs", "command_line_args", "python_module", "python_class",
-            "python_method", "python_function"})
+            "python_method", "python_function", "required_input_tokens",
+            "generated_output_tokens"})
 
         algorithm_id = element.get('name')
         if algorithm_id is None:
@@ -113,6 +115,10 @@ class AlgorithmMetadataXmlReader(object):
             path, algorithm_id, optional_inputs_elem, input_definitions)
         outputs = self._translate_outputs(
             path, element.find("{*}outputs"), is_external)
+        required_input_tokens = self._translate_tokens(
+            element.find("{*}required_input_tokens"))
+        generated_output_tokens = self._translate_tokens(
+            element.find("{*}generated_output_tokens"))
 
         # Check that all input definitions have been used
         for input_name in input_definitions.iterkeys():
@@ -135,6 +141,7 @@ class AlgorithmMetadataXmlReader(object):
                         algorithm_id, element.sourceline, path))
             return ExternalAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
+                required_input_tokens, generated_output_tokens,
                 command_line_args)
 
         if python_module is not None and python_function is not None:
@@ -146,11 +153,13 @@ class AlgorithmMetadataXmlReader(object):
                         algorithm_id, element.sourceline, path))
             return PythonFunctionAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
+                required_input_tokens, generated_output_tokens,
                 python_module, python_function)
 
         if python_module is not None and python_class is not None:
             return PythonClassAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
+                required_input_tokens, generated_output_tokens,
                 python_module, python_class, python_method)
 
         raise PacmanConfigurationException(
@@ -240,7 +249,7 @@ class AlgorithmMetadataXmlReader(object):
         """
         outputs = list()
         if outputs_element is not None:
-            _check_allowed_elements(path, outputs_element, "param_type")
+            _check_allowed_elements(path, outputs_element, {"param_type"})
             for output in outputs_element.findall("{*}param_type"):
                 file_name_type = output.get("file_name_type", default=None)
                 if is_external and file_name_type is None:
@@ -251,3 +260,14 @@ class AlgorithmMetadataXmlReader(object):
                         " the file_name_type attribute")
                 outputs.append(Output(output.text.strip(), file_name_type))
         return outputs
+
+    @staticmethod
+    def _translate_tokens(path, tokens_element):
+        tokens = list()
+        if tokens_element is not None:
+            _check_allowed_elements(path, tokens_element, {"token"})
+            for token_element in tokens_element.findall("{*}token"):
+                part = token_element.get("part", default=None)
+                name = token_element.text.strip()
+                tokens.append(Token(name, part))
+        return tokens

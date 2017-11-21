@@ -17,13 +17,14 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
     @overrides(AbstractAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
-            python_module):
+            required_input_tokens, generated_output_tokens, python_module):
         """
 
         :param python_module: The module containing the python code to execute
         """
         AbstractAlgorithm.__init__(
-            self, algorithm_id, required_inputs, optional_inputs, outputs)
+            self, algorithm_id, required_inputs, optional_inputs, outputs,
+            required_input_tokens, generated_output_tokens)
         self._python_module = python_module
 
     @abstractmethod
