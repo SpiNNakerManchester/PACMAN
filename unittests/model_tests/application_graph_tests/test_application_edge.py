@@ -3,8 +3,8 @@ from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
 
 # unit tests imports
-from uinit_test_objects.test_edge import TestEdge
-from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.simple_test_edge import TestEdge
+from uinit_test_objects.simple_test_vertex import TestVertex
 
 # general imports
 import unittest

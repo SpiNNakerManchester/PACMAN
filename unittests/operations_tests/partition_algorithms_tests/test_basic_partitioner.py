@@ -17,9 +17,9 @@ from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
 
 # general imports
 import unittest
-from uinit_test_objects.test_partitioning_constraint import \
+from uinit_test_objects.simple_test_partitioning_constraint import \
     NewPartitionerConstraint
-from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import TestVertex
 
 
 class TestBasicPartitioner(unittest.TestCase):

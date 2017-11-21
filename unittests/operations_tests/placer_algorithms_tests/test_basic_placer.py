@@ -18,7 +18,7 @@ from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 import unittest
 
 # support imports
-from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import TestVertex
 from uinit_test_objects.placer_test_support import get_resources_used_by_atoms
 
 

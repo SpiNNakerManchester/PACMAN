@@ -9,7 +9,7 @@ from pacman.model.resources import SpecificChipSDRAMResource
 from pacman.model.resources import PreAllocatedResourceContainer
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from spinn_machine import VirtualMachine
-from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import TestVertex
 
 
 class TestPartitionerWithPreAllocatedResources(object):
