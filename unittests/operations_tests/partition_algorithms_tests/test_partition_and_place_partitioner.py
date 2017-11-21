@@ -176,7 +176,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
         self.machine = Machine(chips, 0, 0)
-        singular_vertex = SimpleTestVertex(450, "Large vertex", max_atoms_per_core=1)
+        singular_vertex = SimpleTestVertex(450, "Large vertex",
+                                           max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
@@ -218,7 +219,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
 
         self.machine = Machine(chips, 0, 0)
-        large_vertex = SimpleTestVertex(3000, "Large vertex", max_atoms_per_core=1)
+        large_vertex = SimpleTestVertex(3000, "Large vertex",
+                                        max_atoms_per_core=1)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)

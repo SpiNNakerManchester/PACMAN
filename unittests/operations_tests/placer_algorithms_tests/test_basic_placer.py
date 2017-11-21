@@ -30,7 +30,8 @@ class TestBasicPlacer(unittest.TestCase):
         #######################################################################
         # Setting up vertices, edges and graph                                #
         #######################################################################
-        self.vert1 = SimpleTestVertex(100, "New AbstractConstrainedTestVertex 1")
+        self.vert1 = SimpleTestVertex(
+            100, "New AbstractConstrainedTestVertex 1")
         self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedTestVertex 2")
         self.vert3 = SimpleTestVertex(3, "New AbstractConstrainedTestVertex 3")
         self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")

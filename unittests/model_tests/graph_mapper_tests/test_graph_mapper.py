@@ -38,7 +38,8 @@ class TestGraphMapper(unittest.TestCase):
         sube = MachineEdge(vertices[1], vertices[0])
         edges.append(sube)
         graph = GraphMapper()
-        edge = SimpleTestEdge(SimpleTestVertex(10, "pre"), SimpleTestVertex(5, "post"))
+        edge = SimpleTestEdge(SimpleTestVertex(10, "pre"),
+                              SimpleTestVertex(5, "post"))
         graph.add_edge_mapping(sube, edge)
         graph.add_edge_mapping(edges[0], edge)
         edges_from_edge = graph.get_machine_edges(edge)
@@ -121,7 +122,8 @@ class TestGraphMapper(unittest.TestCase):
         # Create the graph mapper
         graph = GraphMapper()
 
-        edge = SimpleTestEdge(SimpleTestVertex(10, "pre"), SimpleTestVertex(5, "post"))
+        edge = SimpleTestEdge(SimpleTestVertex(10, "pre"),
+                              SimpleTestVertex(5, "post"))
         graph.add_edge_mapping(sube, edge)
         graph.add_edge_mapping(edges[0], edge)
 
