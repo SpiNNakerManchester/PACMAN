@@ -51,7 +51,8 @@ class Test(unittest.TestCase):
         executor = PACMANAlgorithmExecutor(
             algorithms=[
                 "TestAlgorithm3", "TestAlgorithm", "TestNoChangesAlgorithm"],
-            optional_algorithms=[], inputs=inputs, required_outputs=[])
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
         executor.execute_mapping()
         self.assertTrue(TestAlgorithm.called)
         self.assertTrue(TestNoChangesAlgorithm.called)

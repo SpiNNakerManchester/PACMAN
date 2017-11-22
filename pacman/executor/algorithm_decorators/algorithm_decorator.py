@@ -287,20 +287,27 @@ def algorithm(
         # variable
         final_outputs = [Output(output_type) for output_type in outputs]
 
+        final_input_tokens = required_input_tokens
+        if final_input_tokens is None:
+            final_input_tokens = []
+        final_output_tokens = generated_output_tokens
+        if final_output_tokens is None:
+            final_output_tokens = []
+
         # Add the algorithm
         if is_class_method:
             with _algorithm_lock:
                 _algorithms[final_algorithm_id] = PythonClassAlgorithm(
                     final_algorithm_id, final_required_inputs,
                     final_optional_inputs, final_outputs,
-                    required_input_tokens, generated_output_tokens,
+                    final_input_tokens, final_output_tokens,
                     module, algorithm_class, function_name)
         else:
             with _algorithm_lock:
                 _algorithms[final_algorithm_id] = PythonFunctionAlgorithm(
                     final_algorithm_id, final_required_inputs,
                     final_optional_inputs, final_outputs,
-                    required_input_tokens, generated_output_tokens,
+                    final_input_tokens, final_output_tokens,
                     module, function_name)
 
         return algorithm
