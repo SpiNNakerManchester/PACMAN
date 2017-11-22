@@ -6,7 +6,8 @@ from pacman.model.constraints.placer_constraints\
 from pacman.model.resources import ResourceContainer, DTCMResource, \
     SDRAMResource, CPUCyclesPerTickResource
 from pacman.utilities import utility_calls
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import PacmanInvalidParameterException, \
+    PacmanProcessorNotAvailableError
 
 from spinn_utilities.ordered_set import OrderedSet
 
@@ -1310,8 +1311,14 @@ class ResourceTracker(object):
                 best_processor_id = self._best_core_available(
                     chip, key, processor_id)
                 processor = chip.get_processor_with_id(best_processor_id)
-                max_dtcm_available = processor.dtcm_available
-                max_cpu_available = processor.cpu_cycles_available
+                try:
+                    max_dtcm_available = processor.dtcm_available
+                    max_cpu_available = processor.cpu_cycles_available
+                except AttributeError:
+                    if processor is None:
+                        raise PacmanProcessorNotAvailableError(
+                            chip_x, chip_y, best_processor_id)
+                    raise
 
             # If all the SDRAM on the chip is available,
             # this chip is unallocated, so the max must be the max
