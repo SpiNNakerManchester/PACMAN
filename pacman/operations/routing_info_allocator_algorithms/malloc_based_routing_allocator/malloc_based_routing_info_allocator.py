@@ -92,23 +92,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             raise exceptions.PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
-        # If there is a graph, group by source vertex and sort by vertex slice
-        # (lo_atom)
-        if graph_mapper is not None:
-            vertex_groups = defaultdict(list)
-            for partition in continuous_groups:
-                vertex = graph_mapper.get_application_vertex(
-                    partition.pre_vertex)
-                vertex_groups[vertex].append(partition)
-            vertex_partitions = list()
-            for vertex_group in vertex_groups.itervalues():
-                sorted_partitions = sorted(
-                    vertex_group,
-                    key=lambda part: graph_mapper.get_slice(
-                        part.pre_vertex))
-                vertex_partitions.extend(sorted_partitions)
-            continuous_groups = vertex_partitions
-
         for group in continuous_groups:
             keys_and_masks = self._allocate_keys_and_masks(
                 None, None, n_keys_map.n_keys_for_partition(group))
@@ -122,55 +105,58 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     def _allocate_fixed_keys(self, group, routing_infos, continuous_groups):
         # Get any fixed keys and masks from the group and attempt to
         # allocate them
-        fixed_mask = None
         fixed_key_and_mask_constraint = \
             utility_calls.locate_first_constraint_of_type(
-                group.constraints, FixedKeyAndMaskConstraint)
+                group.peek().constraints, FixedKeyAndMaskConstraint)
 
-        # attempt to allocate them
+        fixed_mask = None
         self._allocate_fixed_keys_and_masks(
             fixed_key_and_mask_constraint.keys_and_masks, fixed_mask)
 
-        # update the pacman data objects
-        self._update_routing_objects(
-            fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
-            group)
-
-        continuous_groups.remove(group)
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(
+                fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
+                partition)
+            continuous_groups.remove(partition)
 
     def _allocate_fixed_masks(self, group, fixed_field_groups, n_keys_map,
                               routing_infos, continuous_groups):
+
         # get mask and fields if need be
         fixed_mask = utility_calls.locate_first_constraint_of_type(
-            group.constraints, FixedMaskConstraint).mask
+            group.peek().constraints, FixedMaskConstraint).mask
 
         fields = None
         if group in fixed_field_groups:
             fields = utility_calls.locate_first_constraint_of_type(
-                group.constraints, FixedKeyFieldConstraint).fields
+                group.peek().constraints, FixedKeyFieldConstraint).fields
             fixed_field_groups.remove(group)
 
         # try to allocate
         keys_and_masks = self._allocate_keys_and_masks(
-            fixed_mask, fields, n_keys_map.n_keys_for_partition(group))
+            fixed_mask, fields, n_keys_map.n_keys_for_partition(group.peek()))
 
-        # update the pacman data objects
-        self._update_routing_objects(keys_and_masks, routing_infos, group)
-
-        continuous_groups.remove(group)
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, partition)
+            continuous_groups.remove(partition)
 
     def _allocate_fixed_fields(self, group, n_keys_map, routing_infos,
                                continuous_groups):
         fields = utility_calls.locate_first_constraint_of_type(
-            group.constraints, FixedKeyFieldConstraint).fields
+            group.peek().constraints, FixedKeyFieldConstraint).fields
 
         # try to allocate
         keys_and_masks = self._allocate_keys_and_masks(
-            None, fields, n_keys_map.n_keys_for_partition(group))
+            None, fields, n_keys_map.n_keys_for_partition(group.peek()))
 
-        # update the pacman data objects
-        self._update_routing_objects(keys_and_masks, routing_infos, group)
-        continuous_groups.remove(group)
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, partition)
+            continuous_groups.remove(partition)
 
     @staticmethod
     def _update_routing_objects(
@@ -233,6 +219,13 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return [(((1 << n_ones) - 1) << n_zeros)]
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
+        """ allocate fixed keys and masks
+        
+        :param keys_and_masks: the fixed keys and masks combos
+        :param fixed_mask: fixed mask
+        :type fixed_mask: None or FixedMask object
+        :return: 
+        """
         # If there are fixed keys and masks, allocate them
         for key_and_mask in keys_and_masks:
             # If there is a fixed mask, check it doesn't clash
