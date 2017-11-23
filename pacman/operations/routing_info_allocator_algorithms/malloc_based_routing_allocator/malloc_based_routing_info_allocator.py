@@ -92,6 +92,11 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             raise exceptions.PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
+        for group in share_key_groups:
+            self._allocate_share_key(
+                group, routing_infos, n_keys_map, continuous_groups)
+            progress_bar.update()
+
         for group in continuous_groups:
             keys_and_masks = self._allocate_keys_and_masks(
                 None, None, n_keys_map.n_keys_for_partition(group))
@@ -101,6 +106,17 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         progress_bar.end()
         return routing_infos
+
+    def _allocate_share_key(
+            self, group, routing_infos, n_keys_map, continuous_groups):
+        keys_and_masks = self._allocate_keys_and_masks(
+            None, None, n_keys_map.n_keys_for_partition(group.peek()))
+
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(keys_and_masks, routing_infos,
+                                         partition)
+            continuous_groups.remove(partition)
 
     def _allocate_fixed_keys(self, group, routing_infos, continuous_groups):
         # Get any fixed keys and masks from the group and attempt to
