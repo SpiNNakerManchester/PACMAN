@@ -5,7 +5,10 @@ class _TokenState(object):
     __slots = [
 
         # The parts of the token that have not yet completed
-        "_incomplete_parts"
+        "_incomplete_parts",
+
+        # The parts of the token that have completed
+        "_complete_parts"
     ]
 
     def __init__(self):
