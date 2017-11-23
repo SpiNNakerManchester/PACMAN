@@ -9,7 +9,7 @@ from pacman.model.resources import SpecificChipSDRAMResource
 from pacman.model.resources import PreAllocatedResourceContainer
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from spinn_machine import VirtualMachine
-from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import SimpleTestVertex
 
 
 class TestPartitionerWithPreAllocatedResources(object):
@@ -24,7 +24,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(TestVertex(
+            graph.add_vertex(SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1))
 
@@ -47,7 +47,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(TestVertex(
+            graph.add_vertex(SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1))
 
@@ -69,7 +69,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # add graph vertices which reside on 0,0
         for p in range(0, 13):
-            graph.add_vertex(TestVertex(
+            graph.add_vertex(SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0, p=p)],
                 n_atoms=1))
 
@@ -97,7 +97,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(TestVertex(
+            graph.add_vertex(SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
                 fixed_sdram_value=eight_meg))
@@ -127,7 +127,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(TestVertex(
+            graph.add_vertex(SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
                 fixed_sdram_value=eight_meg))

@@ -5,7 +5,7 @@ from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 # unit tests imports
-from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import SimpleTestVertex
 
 # general imports
 import unittest
@@ -19,7 +19,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         test initisation of a vertex
         """
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
 
@@ -27,7 +27,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         test initisation of a vertex without a label
         """
-        vert = TestVertex(10, "Population", 256)
+        vert = SimpleTestVertex(10, "Population", 256)
         self.assertEqual(vert.n_atoms, 10)
         pieces = vert.label.split(" ")
         self.assertIn(pieces[0], "Population n")
@@ -37,7 +37,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         test initisation of a vertex with a max size constraint
         """
         constraint = MaxVertexAtomsConstraint(2)
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
@@ -52,7 +52,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint2)
         vert.add_constraint(constraint1)
         self.assertEqual(vert.n_atoms, 10)
@@ -71,7 +71,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraints(constr)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
@@ -86,7 +86,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         with the same constraints mapped over
         """
         constraint1 = MaxVertexAtomsConstraint(2)
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9)))
@@ -98,7 +98,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         create vertex method will actually create a vertex of the
         vertex type.
         """
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vertex = vert.create_machine_vertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9)))
@@ -110,7 +110,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vertex says (given same sizes)
 
         """
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         resources = vert.get_resources_used_by_atoms(Slice(0, 9))
         subv_from_vert = vert.create_machine_vertex(Slice(0, 9), resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
@@ -124,7 +124,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         constraint1 = MaxVertexAtomsConstraint(2)
         constraint2 = MaxVertexAtomsConstraint(3)
-        vert = TestVertex(10, "New AbstractConstrainedVertex", 256)
+        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint([constraint1])
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
