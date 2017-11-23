@@ -2,7 +2,7 @@ class _TokenState(object):
     """ Determines whether a token has been fulfilled or not
     """
 
-    __slots = [
+    __slots__ = [
 
         # The parts of the token that have not yet completed
         "_incomplete_parts",
