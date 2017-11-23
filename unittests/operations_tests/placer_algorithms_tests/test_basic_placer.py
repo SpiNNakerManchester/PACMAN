@@ -18,7 +18,7 @@ from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 import unittest
 
 # support imports
-from uinit_test_objects.test_vertex import TestVertex
+from uinit_test_objects.simple_test_vertex import SimpleTestVertex
 from uinit_test_objects.placer_test_support import get_resources_used_by_atoms
 
 
@@ -30,9 +30,10 @@ class TestBasicPlacer(unittest.TestCase):
         #######################################################################
         # Setting up vertices, edges and graph                                #
         #######################################################################
-        self.vert1 = TestVertex(100, "New AbstractConstrainedTestVertex 1")
-        self.vert2 = TestVertex(5, "New AbstractConstrainedTestVertex 2")
-        self.vert3 = TestVertex(3, "New AbstractConstrainedTestVertex 3")
+        self.vert1 = SimpleTestVertex(
+            100, "New AbstractConstrainedTestVertex 1")
+        self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedTestVertex 2")
+        self.vert3 = SimpleTestVertex(3, "New AbstractConstrainedTestVertex 3")
         self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
         self.edge2 = ApplicationEdge(self.vert2, self.vert1, "Second edge")
         self.edge3 = ApplicationEdge(self.vert1, self.vert3, "Third edge")
@@ -118,7 +119,7 @@ class TestBasicPlacer(unittest.TestCase):
 
     @unittest.skip("demonstrating skipping")
     def test_place_vertex_too_big_with_vertex(self):
-        large_vertex = TestVertex(500, "Large vertex 500")
+        large_vertex = SimpleTestVertex(500, "Large vertex 500")
         large_machine_vertex = large_vertex.create_machine_vertex(
             0, 499, get_resources_used_by_atoms(0, 499, []))
         # SimpleMachineVertex(0, 499, "Large vertex")
@@ -197,7 +198,7 @@ class TestBasicPlacer(unittest.TestCase):
     def test_many_vertices(self):
         vertices = list()
         for i in range(20 * 17):  # 50 atoms per each processor on 20 chips
-            vertices.append(TestVertex(
+            vertices.append(SimpleTestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "SimpleMachineVertex " + str(i)))
 
@@ -215,7 +216,7 @@ class TestBasicPlacer(unittest.TestCase):
     def test_too_many_vertices(self):
         vertices = list()
         for i in range(100 * 17):  # 50 atoms per each processor on 20 chips
-            vertices.append(TestVertex(
+            vertices.append(SimpleTestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "SimpleMachineVertex " + str(i)))
 
@@ -231,7 +232,7 @@ class TestBasicPlacer(unittest.TestCase):
     def test_fill_machine(self):
         vertices = list()
         for i in range(99 * 17):  # 50 atoms per each processor on 20 chips
-            vertices.append(TestVertex(
+            vertices.append(SimpleTestVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "SimpleMachineVertex " + str(i)))
 

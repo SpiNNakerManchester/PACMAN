@@ -1,7 +1,7 @@
 from pacman.model.graphs.application import ApplicationEdge
 
 
-class TestEdge(ApplicationEdge):
+class SimpleTestEdge(ApplicationEdge):
     """
     test class for creating edges
     """
