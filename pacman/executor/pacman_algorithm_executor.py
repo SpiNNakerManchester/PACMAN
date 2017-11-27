@@ -684,6 +684,14 @@ class PACMANAlgorithmExecutor(object):
                     provenance_file.write("\toptional_inputs:\n")
                     self._report_inputs(provenance_file,
                                         algorithm.optional_inputs)
+                if len(algorithm.required_input_tokens) > 0:
+                    provenance_file.write("\trequired_tokens:\n")
+                    self._report_tokens(
+                        provenance_file, algorithm.required_input_tokens)
+                if len(algorithm.optional_input_tokens) > 0:
+                    provenance_file.write("\toptional_tokens:\n")
+                    self._report_tokens(
+                        provenance_file, algorithm.optional_input_tokens)
                 if len(algorithm.outputs) > 0:
                     provenance_file.write("\toutputs:\n")
                     for output in algorithm.outputs:
@@ -691,15 +699,20 @@ class PACMANAlgorithmExecutor(object):
                         the_type = self._get_type(variable)
                         provenance_file.write(
                             "\t\t{}:{}\n".format(output.output_type, the_type))
+                if len(algorithm.generated_output_tokens) > 0:
+                    provenance_file.write("\tgenerated_tokens:\n")
+                    self._report_tokens(
+                        provenance_file, algorithm.generated_output_tokens)
+
                 provenance_file.write("\n")
         except Exception:
             logger.error("Exception when attempting to write provenance",
                          exc_info=True)
 
     def _report_inputs(self, provenance_file, inputs):
-        for input in inputs:  # @ReservedAssignment
-            name = input.name
-            for param_type in input.param_types:
+        for input_parameter in inputs:
+            name = input_parameter.name
+            for param_type in input_parameter.param_types:
                 if param_type in self._internal_type_mapping:
                     variable = self._internal_type_mapping[param_type]
                     the_type = self._get_type(variable)
@@ -707,14 +720,21 @@ class PACMANAlgorithmExecutor(object):
                         "\t\t{}   {}:{}\n".format(name, param_type, the_type))
                     break
             else:
-                if len(input.param_types) == 1:
+                if len(input_parameter.param_types) == 1:
                     provenance_file.write(
                         "\t\t{}   None of {} provided\n"
-                        "".format(name, input.param_types))
+                        "".format(name, input_parameter.param_types))
                 else:
                     provenance_file.write(
                         "\t\t{}   {} not provided\n"
-                        "".format(name, input.param_types[0]))
+                        "".format(name, input_parameter.param_types[0]))
+
+    def _report_tokens(self, provenance_file, tokens):
+        for token in tokens:
+            part = token.part if token.part is not None else ""
+            if part == "":
+                part = " ({})".format(part)
+            provenance_file.write("\t\t{}{}".format(token.name, part))
 
     def _get_type(self, variable):
         if variable is None:
