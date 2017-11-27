@@ -67,6 +67,15 @@ class TestWholeTokenRequired(object):
         TestWholeTokenRequired.called = True
 
 
+@algorithm({}, [], optional_input_tokens=[Token("Test")])
+class TestWholeTokenOptional(object):
+
+    called = False
+
+    def __call__(self):
+        TestWholeTokenOptional.called = True
+
+
 class Test(unittest.TestCase):
 
     def test_basic_workflow(self):
@@ -123,7 +132,7 @@ class Test(unittest.TestCase):
         self.assertTrue(TestPartTokenOutput2.called)
         self.assertTrue(TestWholeTokenRequired.called)
 
-    def test_optional_token_workflow(self):
+    def test_optional_algorithm_token_workflow(self):
         """ Tests that a workflow with tokens works with optional algorithms
         """
         TestPartTokenOutput1.called = False
@@ -156,6 +165,23 @@ class Test(unittest.TestCase):
         self.assertFalse(TestPartTokenOutput1.called)
         self.assertFalse(TestPartTokenOutput2.called)
         self.assertTrue(TestWholeTokenRequired.called)
+
+    def test_optional_token_workflow(self):
+        """ Tests that a workflow with tokens works with optional tokens
+        """
+        TestPartTokenOutput1.called = False
+        TestPartTokenOutput2.called = False
+        TestWholeTokenOptional.called = False
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["TestWholeTokenOptional"],
+            optional_algorithms=[
+                "TestPartTokenOutput2", "TestPartTokenOutput1"],
+            inputs={}, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        executor.execute_mapping()
+        self.assertTrue(TestPartTokenOutput1.called)
+        self.assertTrue(TestPartTokenOutput2.called)
+        self.assertTrue(TestWholeTokenOptional.called)
 
 
 if __name__ == "__main__":

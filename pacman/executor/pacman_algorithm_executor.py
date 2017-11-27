@@ -289,7 +289,9 @@ class PACMANAlgorithmExecutor(object):
         # Go through the algorithms and add a fake token for any algorithm that
         # requires an optional token that can't be provided and a fake input
         # for any algorithm that requires an optional input that can't be
-        # provided
+        # provided.  This allows us to require the other optional inputs and
+        # tokens so that algorithms that provide those items are run before
+        # those that can make use of them.
         fake_inputs = set()
         fake_tokens = TokenStates()
         for algorithms in (algorithm_data, optional_algorithm_data):
@@ -332,17 +334,22 @@ class PACMANAlgorithmExecutor(object):
                 # Check required algorithms forcing optional inputs
                 (algorithms_to_find, False, True),
 
-                # Check required algorithms without optional inputs
-                (algorithms_to_find, False, False),
-
                 # Check optional algorithms forcing optional inputs
                 (optionals_to_use, True, True),
 
+                # Check required algorithms without optional inputs
+                # - shouldn't need to do this, but might if an optional input
+                # is also a generated output of the same algorithm
+                (algorithms_to_find, False, False),
+
                 # Check optional algorithms without optional inputs
+                # - as above, it shouldn't be necessary but might be if an
+                # optional input is also an output of the same algorithm
                 (optionals_to_use, True, False),
 
                 # Check converter algorithms
-                (converter_algorithms_datas, False, False)
+                # (only if they generate something new)
+                (converter_algorithms_datas, True, False)
             ]
 
             for (algorithms, check_outputs, force_required) in order:
