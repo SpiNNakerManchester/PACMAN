@@ -7,11 +7,12 @@ from .algorithm_decorators import scan_packages, get_algorithms
 from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
 from pacman.operations import algorithm_reports
 from pacman.utilities import file_format_converters
+from pacman.executor.token_states import TokenStates
+from pacman.executor.algorithm_decorators.token import Token
 
 # general imports
 import logging
-from pacman.executor.token_states import TokenStates
-from pacman.executor.algorithm_decorators.token import Token
+from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -263,6 +264,13 @@ class PACMANAlgorithmExecutor(object):
         :rtype: None
         """
 
+        # Go through the algorithms and get all possible outputs
+        all_outputs = set(inputs.iterkeys())
+        for algorithms in (algorithm_data, optional_algorithm_data):
+            for algorithm in algorithms:
+                all_outputs.update(
+                    {output.output_type for output in algorithm.outputs})
+
         # Set up the token tracking and make all specified tokens complete
         token_states = TokenStates()
         for token_name in tokens:
@@ -272,14 +280,29 @@ class PACMANAlgorithmExecutor(object):
 
         # Go through the algorithms and add in the tokens that can be completed
         # by any of the algorithms
-        for algorithm in algorithm_data:
-            for token in algorithm.generated_output_tokens:
-                if not token_states.is_token_complete(token):
-                    token_states.track_token(token)
-        for algorithm in optional_algorithm_data:
-            for token in algorithm.generated_output_tokens:
-                if not token_states.is_token_complete(token):
-                    token_states.track_token(token)
+        for algorithms in (algorithm_data, optional_algorithm_data):
+            for algorithm in algorithms:
+                for token in algorithm.generated_output_tokens:
+                    if not token_states.is_token_complete(token):
+                        token_states.track_token(token)
+
+        # Go through the algorithms and add a fake token for any algorithm that
+        # requires an optional token that can't be provided and a fake input
+        # for any algorithm that requires an optional input that can't be
+        # provided
+        fake_inputs = set()
+        fake_tokens = TokenStates()
+        for algorithms in (algorithm_data, optional_algorithm_data):
+            for algorithm in algorithms:
+                for input_parameter in algorithm.optional_inputs:
+                    if not input_parameter.input_matches(all_outputs):
+                        fake_inputs.update(
+                            input_parameter.get_fake_inputs(all_outputs))
+                for token in algorithm.optional_input_tokens:
+                    if (not token_states.is_tracking_token(token) and
+                            not fake_tokens.is_token_complete(token)):
+                        fake_tokens.track_token(token)
+                        fake_tokens.process_output_token(token)
 
         input_types = set(inputs.iterkeys())
 
@@ -294,24 +317,42 @@ class PACMANAlgorithmExecutor(object):
             token_states, required_output_tokens)
 
         while algorithms_to_find or outputs_to_find or tokens_to_find:
-            # Find a usable algorithm
-            suitable_algorithm, algorithm_list = \
-                self._locate_suitable_algorithm(
-                    algorithms_to_find, input_types, None, token_states)
 
-            # If no algorithm, find a usable optional algorithm
-            if suitable_algorithm is None:
+            suitable_algorithm = None
+            algorithm_list = None
+
+            # Order of searching - each combination will be attempted in order;
+            # the first matching algorithm will be used (and search will stop)
+            # Elements are:
+            #  1. Algorithm list to search,
+            #  2. check generated outputs,
+            #  3. require optional inputs)
+            order = [
+
+                # Check required algorithms forcing optional inputs
+                (algorithms_to_find, False, True),
+
+                # Check required algorithms without optional inputs
+                (algorithms_to_find, False, False),
+
+                # Check optional algorithms forcing optional inputs
+                (optionals_to_use, True, True),
+
+                # Check optional algorithms without optional inputs
+                (optionals_to_use, True, False),
+
+                # Check converter algorithms
+                (converter_algorithms_datas, False, False)
+            ]
+
+            for (algorithms, check_outputs, force_required) in order:
                 suitable_algorithm, algorithm_list = \
                     self._locate_suitable_algorithm(
-                        optionals_to_use, input_types, generated_outputs,
-                        token_states)
-
-            # if still no suitable algorithm, try using a converter algorithm
-            if suitable_algorithm is None:
-                suitable_algorithm, algorithm_list = \
-                    self._locate_suitable_algorithm(
-                        converter_algorithms_datas, input_types,
-                        generated_outputs, token_states)
+                        algorithms, input_types, generated_outputs,
+                        token_states, fake_inputs, fake_tokens,
+                        check_outputs, force_required)
+                if suitable_algorithm is not None:
+                    break
 
             if suitable_algorithm is not None:
                 # Remove the value
@@ -351,21 +392,33 @@ class PACMANAlgorithmExecutor(object):
                         algorithm_input_requirement_breakdown += \
                             self._deduce_inputs_required_to_run(
                                 algorithm, input_types)
+                algorithms_by_output = defaultdict(list)
+                for algorithms in (algorithm_data, optional_algorithm_data):
+                    for algorithm in algorithms:
+                        for output in algorithm.outputs:
+                            algorithms_by_output[output.output_type].append(
+                                algorithm.algorithm_id)
 
                 raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
                     "    Inputs: {}\n"
-                    "    Outputs: {}\n"
-                    "    Tokens Complete: {}\n"
-                    "    Tokens to Find: {}\n"
+                    "    Fake Inputs: {}\n"
+                    "    Outputs to find: {}\n"
+                    "    Tokens complete: {}\n"
+                    "    Fake tokens complete: {}\n"
+                    "    Tokens to find: {}\n"
                     "    Functions available: {}\n"
                     "    Functions used: {}\n"
+                    "    Algorithm by outputs: {}\n"
                     "    Inputs required per function: \n{}\n".format(
                         input_types,
+                        fake_inputs,
                         outputs_to_find,
                         token_states.get_completed_tokens(),
+                        fake_tokens.get_completed_tokens(),
                         tokens_to_find,
                         algorithms_left_names, algorithms_used,
+                        algorithms_by_output,
                         algorithm_input_requirement_breakdown))
 
         # Test that the outputs are generated
@@ -408,13 +461,17 @@ class PACMANAlgorithmExecutor(object):
     def _deduce_inputs_required_to_run(self, algorithm, inputs):
         left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
         separator = ""
-        for an_input in algorithm.required_inputs:
-            unfound_types = [
-                param_type for param_type in an_input.param_types
-                if param_type not in inputs]
-            if unfound_types:
-                left_over_inputs += "{}'{}'".format(separator, unfound_types)
-                separator = ", "
+        for algorithm_inputs, extra in (
+                (algorithm.required_inputs, ""),
+                (algorithm.optional_inputs, " (optional)")):
+            for an_input in algorithm_inputs:
+                unfound_types = [
+                    param_type for param_type in an_input.param_types
+                    if param_type not in inputs]
+                if unfound_types:
+                    left_over_inputs += "{}'{}'{}".format(
+                        separator, unfound_types, extra)
+                    separator = ", "
         left_over_inputs += "]\n"
         return left_over_inputs
 
@@ -440,12 +497,22 @@ class PACMANAlgorithmExecutor(object):
 
     @staticmethod
     def _locate_suitable_algorithm(
-            algorithm_list, inputs, generated_outputs, tokens):
+            algorithm_list, inputs, generated_outputs, tokens,
+            fake_inputs, fake_tokens, check_generated_outputs,
+            force_optionals):
         """ Locates a suitable algorithm
 
         :param algorithm_list: the list of algorithms to choose from
         :param inputs: the inputs available currently
         :param generated_outputs: the current outputs expected to be generated
+        :param tokens: the current token tracker
+        :param fake_inputs: the optional inputs that will never be available
+        :param fake_tokens: the optional tokens that will never be available
+        :param check_generated_outputs:\
+            True if an algorithm should only be selected if it generates\
+            an output not in the list of generated outputs
+        :param force_optionals:\
+            True if optional inputs/tokens should be considered required
         :return: a suitable algorithm which uses the inputs
         """
 
@@ -457,6 +524,7 @@ class PACMANAlgorithmExecutor(object):
 
         # Find the next algorithm which can run now
         for algorithm in algorithm_list:
+
             # check all inputs
             all_inputs_match = True
             for input_parameter in algorithm.required_inputs:
@@ -469,18 +537,35 @@ class PACMANAlgorithmExecutor(object):
                 for token in algorithm.required_input_tokens:
                     if not tokens.is_token_complete(token):
                         all_inputs_match = False
+                        break
 
-            # verify that a new output is being generated.
+            # check all optional inputs
+            if all_inputs_match and force_optionals:
+                for input_parameter in algorithm.optional_inputs:
+                    if (not input_parameter.input_matches(inputs) and
+                            not input_parameter.input_matches(fake_inputs)):
+                        all_inputs_match = False
+
+            # check all optional tokens
+            if all_inputs_match and force_optionals:
+                for token in algorithm.optional_input_tokens:
+                    if (not tokens.is_token_complete(token) and
+                            not fake_tokens.is_token_complete(token)):
+                        all_inputs_match = False
+                        break
+
             if all_inputs_match:
+
                 # If the list of generated outputs is given, only use the
                 # algorithm if it generates something new, assuming the
                 # algorithm generates any outputs at all
                 # (otherwise just use it)
-                if algorithm.outputs and generated_outputs is not None:
-                    for output in algorithm.outputs:
-                        if (output.output_type not in generated_outputs and
-                                output.output_type not in inputs):
-                            return algorithm, algorithm_list
+                if check_generated_outputs:
+                    if algorithm.outputs:
+                        for output in algorithm.outputs:
+                            if (output.output_type not in generated_outputs and
+                                    output.output_type not in inputs):
+                                return algorithm, algorithm_list
 
                     # If the algorithm doesn't generate a unique output,
                     # check if it generates a unique token

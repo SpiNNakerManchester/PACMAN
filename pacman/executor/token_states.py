@@ -15,6 +15,11 @@ class _TokenState(object):
         self._incomplete_parts = set()
         self._complete_parts = set()
 
+    def is_tracking_token_part(self, part):
+        """ Determine if the given part is being tracked
+        """
+        return part in self._incomplete_parts or part in self._complete_parts
+
     def track_token_part(self, part):
         """ Indicates that this state should start tracking the completion\
             of a part of a token.  Part can be None to indicate the tracking\
@@ -54,6 +59,15 @@ class TokenStates(object):
 
     def __init__(self):
         self._tokens = dict()
+
+    def is_tracking_token(self, token):
+        """ Determine if the token is being tracked
+        """
+        if token.name not in self._tokens:
+            return False
+        if token.part is None:
+            return True
+        return self._tokens[token.name].is_tracking_token_part(token.part)
 
     def track_token(self, token):
         """ Start tracking a token

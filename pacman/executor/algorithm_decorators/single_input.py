@@ -46,6 +46,13 @@ class SingleInput(AbstractInput):
     def input_matches(self, inputs):
         return any(param_type in inputs for param_type in self._param_types)
 
+    @overrides(AbstractInput.get_fake_inputs)
+    def get_fake_inputs(self, inputs):
+        return {
+            param_type for param_type in self._param_types
+            if param_type not in inputs
+        }
+
     def __repr__(self):
         return "SingleInput(name={}, param_types={})".format(
             self._name, self._param_types)

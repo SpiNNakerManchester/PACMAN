@@ -24,11 +24,9 @@
                 </xs:sequence>
             </xs:choice>
             <xs:element name="input_definitions" type="ParameterDefs" />
-            <xs:element name="required_inputs" type="ParamSet" minOccurs="0" />
-            <xs:element name="optional_inputs" type="ParamSet" minOccurs="0" />
+            <xs:element name="required_inputs" type="ParamSetWithTokens" minOccurs="0" />
+            <xs:element name="optional_inputs" type="ParamSetWithTokens" minOccurs="0" />
             <xs:element name="outputs" type="ResultList" minOccurs="0" />
-            <xs:element name="required_input_tokens" type="TokenList" minOccurs="0"/>
-            <xs:element name="generated_output_tokens" type="TokenList" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:token" use="required"/>
     </xs:complexType>
@@ -45,6 +43,16 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+    <xs:complexType name="ParamSetWithTokens">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:choice>
+                <xs:element name="param_name" type="xs:token"/>
+                <xs:element name="all_of" type="ParamSet" />
+                <xs:element name="one_of" type="ParamSet" />
+                <xs:element name="token" type="Token" />
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
     <xs:complexType name="ParamSet">
         <xs:sequence maxOccurs="unbounded">
             <xs:choice>
@@ -55,9 +63,11 @@
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="ResultList">
-        <xs:sequence>
-            <xs:element name="param_type" type="Result"
-                minOccurs="0" maxOccurs="unbounded" />
+        <xs:sequence maxOccurs="unbounded" >
+            <xs:choice>
+                <xs:element name="param_type" type="Result"/>
+                <xs:element name="token" type="Token" />
+            </xs:choice>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="Result">
@@ -71,12 +81,6 @@
         <xs:sequence>
             <xs:element name="arg" type="xs:string"
                 minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="TokenList">
-        <xs:sequence>
-            <xs:element name="token" type="Token"
-                minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="Token">
