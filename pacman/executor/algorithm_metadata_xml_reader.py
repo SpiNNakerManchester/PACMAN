@@ -9,6 +9,7 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.algorithm_classes import ExternalAlgorithm
 from pacman.executor.algorithm_classes import PythonClassAlgorithm
 from pacman.executor.algorithm_decorators import AllOfInput
+from pacman.executor.algorithm_decorators.token import Token
 
 
 def _check_allowed_elements(path, element, allowed):
@@ -69,7 +70,8 @@ class AlgorithmMetadataXmlReader(object):
         _check_allowed_elements(path, element, {
             "input_definitions", "required_inputs", "optional_inputs",
             "outputs", "command_line_args", "python_module", "python_class",
-            "python_method", "python_function"})
+            "python_method", "python_function", "required_input_tokens",
+            "generated_output_tokens"})
 
         algorithm_id = element.get('name')
         if algorithm_id is None:
@@ -106,12 +108,16 @@ class AlgorithmMetadataXmlReader(object):
 
         # get other params
         required_inputs_elem = element.find("{*}required_inputs")
-        required_inputs, required_seen = self._translate_inputs(
-            path, algorithm_id, required_inputs_elem, input_definitions)
+        required_inputs, required_seen, required_tokens = \
+            self._translate_inputs(
+                path, algorithm_id, required_inputs_elem, input_definitions,
+                allow_tokens=True)
         optional_inputs_elem = element.find("{*}optional_inputs")
-        optional_inputs, optional_seen = self._translate_inputs(
-            path, algorithm_id, optional_inputs_elem, input_definitions)
-        outputs = self._translate_outputs(
+        optional_inputs, optional_seen, optional_tokens = \
+            self._translate_inputs(
+                path, algorithm_id, optional_inputs_elem, input_definitions,
+                allow_tokens=True)
+        outputs, output_tokens = self._translate_outputs(
             path, element.find("{*}outputs"), is_external)
 
         # Check that all input definitions have been used
@@ -135,6 +141,7 @@ class AlgorithmMetadataXmlReader(object):
                         algorithm_id, element.sourceline, path))
             return ExternalAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
+                required_tokens, optional_tokens, output_tokens,
                 command_line_args)
 
         if python_module is not None and python_function is not None:
@@ -146,11 +153,13 @@ class AlgorithmMetadataXmlReader(object):
                         algorithm_id, element.sourceline, path))
             return PythonFunctionAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
+                required_tokens, optional_tokens, output_tokens,
                 python_module, python_function)
 
         if python_module is not None and python_class is not None:
             return PythonClassAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
+                required_tokens, optional_tokens, output_tokens,
                 python_module, python_class, python_method)
 
         raise PacmanConfigurationException(
@@ -198,15 +207,20 @@ class AlgorithmMetadataXmlReader(object):
         return definitions
 
     @staticmethod
-    def _translate_inputs(path, algorithm_id, inputs_element, definitions):
+    def _translate_inputs(
+            path, algorithm_id, inputs_element, definitions,
+            allow_tokens=False):
         """ Convert an XML inputs section (required or optional) into a list\
             of AbstractInput
         """
         inputs = list()
         seen_inputs = set()
+        tokens = set()
         if inputs_element is not None:
-            _check_allowed_elements(path, inputs_element, {
-                "param_name", "one_of", "all_of"})
+            allowed_elements = {"param_name", "one_of", "all_of"}
+            if allow_tokens:
+                allowed_elements.add("token")
+            _check_allowed_elements(path, inputs_element, allowed_elements)
             for alg_input in inputs_element.iterchildren():
                 tag = alg_input.tag.split("}")[-1]
                 if tag == "param_name":
@@ -221,33 +235,47 @@ class AlgorithmMetadataXmlReader(object):
                     inputs.append(definition)
                     seen_inputs.add(definition.name)
                 elif tag == "one_of":
-                    children, seen = \
+                    children, seen, _ = \
                         AlgorithmMetadataXmlReader._translate_inputs(
                             path, algorithm_id, alg_input, definitions)
                     seen_inputs.update(seen)
                     inputs.append(OneOfInput(children))
                 elif tag == "all_of":
-                    children, seen = \
+                    children, seen, _ = \
                         AlgorithmMetadataXmlReader._translate_inputs(
                             path, algorithm_id, alg_input, definitions)
                     seen_inputs.update(seen)
                     inputs.append(AllOfInput(children))
-        return inputs, seen_inputs
+                elif tag == "token":
+                    part = alg_input.get("part", default=None)
+                    name = alg_input.text.strip()
+                    tokens.add(Token(name, part))
+        return inputs, seen_inputs, tokens
 
     @staticmethod
     def _translate_outputs(path, outputs_element, is_external):
         """ Convert an XML outputs section into a list of str
         """
         outputs = list()
+        tokens = set()
         if outputs_element is not None:
-            _check_allowed_elements(path, outputs_element, "param_type")
-            for output in outputs_element.findall("{*}param_type"):
-                file_name_type = output.get("file_name_type", default=None)
-                if is_external and file_name_type is None:
-                    raise PacmanConfigurationException(
-                        "Error in XML at line {} of {}: Outputs of "
-                        " external algorithms must specify the input type"
-                        " from which the file name will be obtained using"
-                        " the file_name_type attribute")
-                outputs.append(Output(output.text.strip(), file_name_type))
-        return outputs
+            _check_allowed_elements(
+                path, outputs_element, {"param_type", "token"})
+            for alg_output in outputs_element.iterchildren():
+                tag = alg_output.tag.split("}")[-1]
+                if tag == "param_type":
+                    file_name_type = alg_output.get(
+                        "file_name_type", default=None)
+                    if is_external and file_name_type is None:
+                        raise PacmanConfigurationException(
+                            "Error in XML at line {} of {}: Outputs of "
+                            " external algorithms must specify the input type"
+                            " from which the file name will be obtained using"
+                            " the file_name_type attribute")
+                    outputs.append(
+                        Output(alg_output.text.strip(), file_name_type))
+                elif tag == "token":
+                    part = alg_output.get("part", default=None)
+                    name = alg_output.text.strip()
+                    tokens.add(Token(name, part))
+        return outputs, tokens

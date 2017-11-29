@@ -18,9 +18,12 @@ class ExternalAlgorithm(AbstractAlgorithm):
 
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
-            command_line_arguments):
+            required_input_tokens, optional_input_tokens,
+            generated_output_tokens, command_line_arguments):
         AbstractAlgorithm.__init__(
-            self, algorithm_id, required_inputs, optional_inputs, outputs)
+            self, algorithm_id, required_inputs, optional_inputs, outputs,
+            required_input_tokens, optional_input_tokens,
+            generated_output_tokens)
         self._command_line_arguments = command_line_arguments
 
     @overrides(AbstractAlgorithm.call)
