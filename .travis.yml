@@ -4,9 +4,6 @@ python: "2.7"
 
 cache: pip
 
-virtualenv:
-  system_site_packages: true
-
 addons:
   apt:
     packages:
@@ -15,15 +12,16 @@ addons:
 before_install:
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy numpy scipy
+  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   # SpiNNakerManchester internal dependencies; development mode
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
+  # Which version of rig should we really use?
   - pip install --upgrade git+git://github.com/project-rig/rig.git@master
 
 install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
-  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
 
 script:
   - py.test unittests
