@@ -25,7 +25,6 @@ from pacman import exceptions
 import math
 import numpy
 import logging
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
