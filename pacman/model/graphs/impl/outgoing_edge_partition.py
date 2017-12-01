@@ -110,11 +110,16 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
         return self._traffic_weight
 
     def __repr__(self):
+        edges = ""
+        for edge in self._edges:
+            edges += edge.label + ","
         return (
             "OutgoingEdgePartition("
-            "identifier={}, edges={}, constraints={}, label={})".format(
-                self._identifier, self._edges, self.constraints, self.label))
+            "identifier={}, edges={} constraints={}, label={})".format(
+                self._identifier, edges, self.constraints, self.label))
 
+    def __str__(self):
+        return self.__repr__()
     @overrides(AbstractOutgoingEdgePartition.__contains__)
     def __contains__(self, edge):
         """ Check if the edge is contained within this partition

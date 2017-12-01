@@ -30,6 +30,16 @@ SHARE_KEY_FLAGS = Enum(
         ("FIXED_FIELD", 3),
         ("FLEXI_FIELD", 4)])
 
+
+class LabeledList(list):
+    def __init__(self, label):
+        self._label = label
+        list.__init__(self)
+
+    def __repr__(self):
+        return self._label + list.__repr__(self)
+
+
 def get_edge_groups(machine_graph, traffic_type):
     """ Utility method to get groups of edges using any\
         :py:class:`pacman.model.constraints.key_allocator_constraints.KeyAllocatorSameKeyConstraint`\
@@ -41,13 +51,13 @@ def get_edge_groups(machine_graph, traffic_type):
     """
 
     # Keep a dictionary of the group which contains an edge
-    fixed_key_groups = list()
-    shared_key_groups = list()
-    fixed_mask_groups = list()
-    fixed_field_groups = list()
-    flexi_field_groups = list()
-    continuous_groups = OrderedSet()
-    none_continuous_groups = OrderedSet()
+    fixed_key_groups = LabeledList("fixed_key")
+    shared_key_groups = LabeledList("share_key")
+    fixed_mask_groups = LabeledList("fixed_mask")
+    fixed_field_groups = LabeledList("fixed_field")
+    flexi_field_groups = LabeledList("flexi_field")
+    continuous_groups = LabeledList("continious")
+    none_continuous_groups = LabeledList("none_continious")
 
     share_key_mappings = dict()
 
@@ -64,21 +74,17 @@ def get_edge_groups(machine_graph, traffic_type):
 
                 # get types of constraints from this partition
                 is_continuous, is_fixed_mask, is_fixed_key, is_flexi_field, \
-                    is_fixed_field, is_shared_key, n_set = \
+                    is_fixed_field, is_shared_key = \
                     _check_types_of_constraints(constraints)
-
-                # place in correct continuous block
-                if is_continuous:
-                    continuous_groups.add(partition)
-                else:
-                    none_continuous_groups.add(partition)
 
                 # process the partition into the correct fields
                 _process_partition(
-                    fixed_key_groups, shared_key_groups, fixed_mask_groups,
-                    fixed_field_groups, flexi_field_groups, is_fixed_mask,
+                    fixed_key_groups, shared_key_groups,
+                    fixed_mask_groups,
+                    fixed_field_groups, flexi_field_groups, continuous_groups,
+                    none_continuous_groups, is_fixed_mask,
                     is_fixed_key, is_flexi_field, is_fixed_field,
-                    is_shared_key, n_set, partition, share_key_mappings)
+                    is_shared_key, is_continuous, partition, share_key_mappings)
 
     # return the set of groups
     return (fixed_key_groups, shared_key_groups,
@@ -88,144 +94,171 @@ def get_edge_groups(machine_graph, traffic_type):
 
 def _process_partition(
         fixed_key_groups, shared_key_groups, fixed_mask_groups,
-        fixed_field_groups, flexi_field_groups, is_fixed_mask,
+        fixed_field_groups, flexi_field_groups, continuous_groups,
+        none_continuous_groups, is_fixed_mask,
         is_fixed_key, is_flexi_field, is_fixed_field,
-        is_shared_key, n_set, partition, share_key_mappings):
+        is_shared_key, is_continuous, partition, share_key_mappings):
 
     # this partition already in a share key somewhere, merge in
     if partition in share_key_mappings:
 
         # locate previous referral
-        tracked_set, other_constraint = share_key_mappings[partition]
+        tracked_set, group = share_key_mappings[partition]
+
+        if group == shared_key_groups and not is_shared_key:
+            _, group = _linked_shared_constraints(
+                fixed_key_groups, fixed_mask_groups, fixed_field_groups,
+                flexi_field_groups, continuous_groups,
+                none_continuous_groups, is_fixed_mask, is_fixed_key,
+                is_flexi_field, is_fixed_field, partition, share_key_mappings,
+                shared_key_groups, is_shared_key, is_continuous)
 
         # if share key, locate and find partitions to merge
         if is_shared_key:
-
             # get share key constraint that must be there
-            share_key_constraint = \
+            other_partitions = \
                 utility_calls.locate_first_constraint_of_type(
-                    partition.constraints, ShareKeyConstraint)
+                    partition.constraints, ShareKeyConstraint).other_partitions
+        else:
+            other_partitions = tracked_set
 
-            # search for merging groups
-            _search_for_merger(
-                share_key_constraint, partition, share_key_mappings,
-                tracked_set, fixed_key_groups, fixed_mask_groups,
-                fixed_field_groups, flexi_field_groups, is_fixed_mask,
-                is_fixed_key, is_flexi_field, is_fixed_field,
-                shared_key_groups, is_shared_key)
+        # search for merging groups
+        _search_for_merger(
+            other_partitions, partition,
+            share_key_mappings, tracked_set, group, fixed_key_groups,
+            fixed_mask_groups, fixed_field_groups, flexi_field_groups,
+            continuous_groups, none_continuous_groups, is_fixed_mask,
+            is_fixed_key, is_flexi_field, is_fixed_field,
+            shared_key_groups, is_shared_key, is_continuous)
 
-            # verify constraints are correct
-            _verify_constraints(
-                partition, is_fixed_mask, is_fixed_key,
-                is_flexi_field, is_fixed_field, tracked_set)
-        else:  # need to check constraint matching
-            _verify_constraints(partition, is_fixed_mask, is_fixed_key,
-                                is_flexi_field, is_fixed_field, tracked_set)
+        # verify constraints are correct
+        _verify_constraints(
+            partition, is_fixed_mask, is_fixed_key, is_flexi_field,
+            is_fixed_field, is_shared_key, is_continuous, tracked_set)
 
     else:  # not in a share key already. explore its own components
         if is_shared_key:  # if is share key, look for any already in existence
 
             # get share key
-            share_key_constraint = \
+            other_partitions = \
                 utility_calls.locate_first_constraint_of_type(
-                    partition.constraints, ShareKeyConstraint)
+                    partition.constraints, ShareKeyConstraint).other_partitions
+            new_set = OrderedSet()
+            new_set.add(partition)
+            shared_key_groups.append(new_set)
+            share_key_mappings[partition] = (new_set, shared_key_groups)
 
             # search for merger
             tracked_set = _search_for_merger(
-                share_key_constraint, partition, share_key_mappings, None,
+                other_partitions, partition,
+                share_key_mappings, new_set, shared_key_groups,
                 fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-                flexi_field_groups, is_fixed_mask, is_fixed_key,
+                flexi_field_groups, continuous_groups,
+                none_continuous_groups, is_fixed_mask, is_fixed_key,
                 is_flexi_field, is_fixed_field, shared_key_groups,
-                is_shared_key)
-
-            # verify the constraints of the tracked set
-            _verify_constraints(partition, is_fixed_mask, is_fixed_key,
-                                is_flexi_field, is_fixed_field, tracked_set)
-
+                is_shared_key, is_continuous)
         else:  # no share, not already in, so just add as new one
-            _linked_shared_constraints(
+            tracked_set, _ = _linked_shared_constraints(
                 fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-                flexi_field_groups, is_fixed_mask, is_fixed_key,
+                flexi_field_groups, continuous_groups,
+                none_continuous_groups, is_fixed_mask, is_fixed_key,
                 is_flexi_field, is_fixed_field, partition, share_key_mappings,
-                shared_key_groups, is_shared_key)
+                shared_key_groups, is_shared_key, is_continuous)
+
+        # verify the constraints of the tracked set
+        _verify_constraints(
+            partition, is_fixed_mask, is_fixed_key, is_flexi_field,
+            is_fixed_field, is_shared_key, is_continuous, tracked_set)
 
 
 def _search_for_merger(
-        share_key_constraint, partition, share_key_mappings, tracked_set,
-        fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-        flexi_field_groups, is_fixed_mask, is_fixed_key,
-        is_flexi_field, is_fixed_field, shared_key_groups, is_shared_key):
-
-    found_track_list = tracked_set
-    found_other_constraint = None
+        other_partitions, partition, share_key_mappings, found_track_list,
+        group, fixed_key_groups, fixed_mask_groups, fixed_field_groups,
+        flexi_field_groups, continuous_groups, none_continuous_groups,
+        is_fixed_mask, is_fixed_key, is_flexi_field,
+        is_fixed_field, shared_key_groups, is_shared_key, is_continuous):
 
     # locate merge-able track list partition
-    for other_partition in share_key_constraint.other_partitions:
+    for other_partition in other_partitions:
         # check that no merger
         if other_partition in share_key_mappings:
 
             # get other mapped version
-            other_track_list, found_other_constraint = \
+            other_track_list, other_group = \
                 share_key_mappings[other_partition]
 
-
-            if found_track_list is None:
+            if found_track_list is None:  # im not in, but my mix is
                 other_track_list.add(partition)
-                share_key_mappings[partition] = other_track_list
+                share_key_mappings[partition] = (other_track_list, other_group)
                 found_track_list = other_track_list
                 _verify_constraints(
                     partition, is_fixed_mask, is_fixed_key,
-                    is_flexi_field, is_fixed_field, found_track_list)
-            else:
-                found_track_list.update(other_track_list)
-                for partition in other_track_list:
-                    share_key_mappings[]
+                    is_flexi_field, is_fixed_field, is_shared_key,
+                    is_continuous, found_track_list)
+
+            else:  # is in and is share key
+
+                # merge the other into me, as i am placed
+                if found_track_list != other_track_list:
+                    found_track_list.update(other_track_list)
+
+                    # remove mapping for other set, as now its in my set
+                    other_group.remove(other_track_list)
+
+                    # update partition to set mapping
+                    for other_track_list_partition in other_track_list:
+                        share_key_mappings[other_track_list_partition] = \
+                            (found_track_list, group)
+
+                    # check all constraints match again
+                    _verify_constraints(
+                        partition, is_fixed_mask, is_fixed_key,
+                        is_flexi_field, is_fixed_field, is_shared_key,
+                        is_continuous, found_track_list)
+        else:
+            if partition != other_partition:
+                found_track_list.add(other_partition)
+                share_key_mappings[other_partition] = (found_track_list, group)
+
+    return found_track_list
 
 
-
-
-
-
-
-
-    if found_track_list is None and found_other_constraint is None:
-        _linked_shared_constraints(
-            fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-            flexi_field_groups, is_fixed_mask, is_fixed_key,
-            is_flexi_field, is_fixed_field, partition,
-            share_key_mappings, shared_key_groups, is_shared_key)
-
-    share_key_mappings[other_partition] = tracked_set
-
-        # if merger found
-        if partition in share_key_mappings:
-            found_track_list, found_other_constraint = \
-                share_key_mappings[partition]
-
-    if found_track_list is None and found_other_constraint is None:
-        _linked_shared_constraints(
-            fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-            flexi_field_groups, is_fixed_mask, is_fixed_key,
-            is_flexi_field, is_fixed_field, partition,
-            share_key_mappings, shared_key_groups)
-
-
-def _verify_constraints(partition, is_fixed_mask, is_fixed_key,
-                        is_flexi_field, is_fixed_field, tracked_set):
+def _verify_constraints(
+        partition, is_fixed_mask, is_fixed_key, is_flexi_field, is_fixed_field,
+        is_share_key, is_continious, tracked_set):
     constraint = None
     valid = None
     if is_fixed_key:
         valid = _search_for_failed_mix_of_constraints(
-            FixedKeyAndMaskConstraint, tracked_set)
+            FixedKeyAndMaskConstraint, tracked_set,
+            utility_calls.locate_first_constraint_of_type(
+                partition.constraints, FixedKeyAndMaskConstraint))
     if is_fixed_mask:
         valid = _search_for_failed_mix_of_constraints(
-            FixedMaskConstraint, tracked_set)
+            FixedMaskConstraint, tracked_set,
+            utility_calls.locate_first_constraint_of_type(
+                partition.constraints, FixedMaskConstraint))
     if is_flexi_field:
         valid = _search_for_failed_mix_of_constraints(
-            FlexiKeyFieldConstraint, tracked_set)
+            FlexiKeyFieldConstraint, tracked_set,
+            utility_calls.locate_first_constraint_of_type(
+                partition.constraints, FlexiKeyFieldConstraint))
     if is_fixed_field:
         valid = _search_for_failed_mix_of_constraints(
-            FixedKeyFieldConstraint, tracked_set)
+            FixedKeyFieldConstraint, tracked_set,
+            utility_calls.locate_first_constraint_of_type(
+                partition.constraints, FixedKeyFieldConstraint))
+    if is_share_key:
+        valid = True
+    if is_continious:
+        valid = _search_for_failed_mix_of_constraints(
+            ContiguousKeyRangeContraint, tracked_set,
+            utility_calls.locate_first_constraint_of_type(
+                partition.constraints, ContiguousKeyRangeContraint))
+    if (not is_continious and not is_fixed_key and not is_fixed_mask
+            and not is_flexi_field and not is_fixed_field
+            and not is_share_key):
+        valid = True
     if not valid:
         raise Exception(
             "The merger of {} into the set {} failed as constraint {} is not "
@@ -233,37 +266,56 @@ def _verify_constraints(partition, is_fixed_mask, is_fixed_key,
                 partition, tracked_set, constraint))
 
 
-def _search_for_failed_mix_of_constraints(constraint_type, set_of_partitions):
-    constraint_to_test_against = utility_calls.locate_first_constraint_of_type(
-        set_of_partitions.peek().constraints, constraint_type)
-
+def _search_for_failed_mix_of_constraints(
+        constraint_type, set_of_partitions, constraint_to_test_against):
     for partition in set_of_partitions:
-        other_constraint = utility_calls.locate_first_constraint_of_type(
-            partition.constraints, constraint_type)
-        if constraint_to_test_against != other_constraint:
-            return False
+        for other_constraint in utility_calls.locate_constraints_of_type(
+                partition.constraints, constraint_type):
+            if constraint_to_test_against != other_constraint:
+                return False
     return True
 
 
 def _linked_shared_constraints(
         fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-        flexi_field_groups, is_fixed_mask, is_fixed_key, is_flexi_field,
+        flexi_field_groups, continuous_groups, none_continuous_groups,
+        is_fixed_mask, is_fixed_key, is_flexi_field,
         is_fixed_field, partition, shared_key_mappings, shared_key_groups,
-        is_shared_key):
+        is_shared_key, is_continuous):
+
     new_set = OrderedSet()
     new_set.add(partition)
-    shared_key_mappings[partition] = new_set
 
+    group = _find_group(
+        fixed_key_groups, fixed_mask_groups, fixed_field_groups,
+        flexi_field_groups, continuous_groups, none_continuous_groups,
+        shared_key_groups, is_fixed_mask, is_fixed_key, is_flexi_field,
+        is_fixed_field, is_shared_key, is_continuous)
+
+    shared_key_mappings[partition] = (new_set, group)
+    group.append(new_set)
+    return new_set, group
+
+def _find_group(
+        fixed_key_groups, fixed_mask_groups, fixed_field_groups,
+        flexi_field_groups, continuous_groups, none_continuous_groups,
+        shared_key_groups, is_fixed_mask, is_fixed_key, is_flexi_field,
+        is_fixed_field, is_shared_key, is_continuous):
     if is_fixed_key:
-        fixed_key_groups.append(new_set)
-    if is_fixed_mask:
-        fixed_mask_groups.add(new_set)
-    if is_flexi_field:
-        flexi_field_groups.add(new_set)
-    if is_fixed_field:
-        fixed_field_groups.add(new_set)
-    if is_shared_key:
-        shared_key_groups.add(new_set)
+        return fixed_key_groups
+    elif is_fixed_mask:
+        return fixed_mask_groups
+    elif is_flexi_field:
+        return flexi_field_groups
+    elif is_fixed_field:
+        return fixed_field_groups
+    elif is_shared_key:
+        return shared_key_groups
+    elif is_continuous:
+        return continuous_groups
+    else:
+        return none_continuous_groups
+
 
 def _check_types_of_constraints(constraints):
     is_continuous = False
@@ -288,15 +340,8 @@ def _check_types_of_constraints(constraints):
         elif isinstance(constraint, ShareKeyConstraint):
             is_shared_key = True
 
-    # find how many are set
-    n_set = 0
-    for check in [is_continuous, is_fixed_mask, is_fixed_key,
-                  is_flexi_field, is_fixed_field, is_shared_key]:
-        if check:
-            n_set += 1
-
     return is_continuous, is_fixed_mask, is_fixed_key, is_flexi_field, \
-        is_fixed_field, is_shared_key, n_set
+        is_fixed_field, is_shared_key
 
 
 def check_types_of_edge_constraint(machine_graph):
