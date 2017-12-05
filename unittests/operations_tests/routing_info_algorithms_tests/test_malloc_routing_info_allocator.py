@@ -1,5 +1,6 @@
 import unittest
 
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import \
     FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints.\
@@ -120,7 +121,29 @@ class MyTestCase(unittest.TestCase):
         machine_graph.add_edge(e3, "part2")
         machine_graph.add_edge(e4, "part2")
 
+        for partition in machine_graph.outgoing_edge_partitions:
+            n_keys_map.set_n_keys_for_partition(partition, 24)
+
         return machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4
+
+    def test_share_key_with_conflicting_fixed_key_on_partitions(self):
+        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
+            self._intergration_setup()
+
+        partition = machine_graph.\
+            get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
+        other_partition = machine_graph.\
+            get_outgoing_edge_partition_starting_at_vertex(v2, "part2")
+        other_partition.add_constraint(ShareKeyConstraint([partition]))
+
+        other_partition.add_constraint(FixedKeyAndMaskConstraint(
+            [BaseKeyAndMask(base_key=30, mask=0xFFFFFFF)]))
+        partition.add_constraint(FixedKeyAndMaskConstraint(
+            [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
+
+        allocator = MallocBasedRoutingInfoAllocator()
+        with self.assertRaises(PacmanRouteInfoAllocationException):
+            allocator(machine_graph, n_keys_map)
 
     def test_share_key_with_fixed_key_on_new_partitions_other_order(self):
         machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
@@ -133,9 +156,6 @@ class MyTestCase(unittest.TestCase):
         other_partition.add_constraint(ShareKeyConstraint([partition]))
         partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
-
-        for partition in machine_graph.outgoing_edge_partitions:
-            n_keys_map.set_n_keys_for_partition(partition, 24)
 
         allocator = MallocBasedRoutingInfoAllocator()
         results = allocator(machine_graph, n_keys_map)
@@ -154,7 +174,6 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(edge3_key, key)
         self.assertNotEqual(edge4_key, key)
 
-
     def test_share_key_with_fixed_key_on_new_partitions(self):
         machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
             self._intergration_setup()
@@ -166,9 +185,6 @@ class MyTestCase(unittest.TestCase):
         partition.add_constraint(ShareKeyConstraint([other_partition]))
         other_partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
-
-        for partition in machine_graph.outgoing_edge_partitions:
-            n_keys_map.set_n_keys_for_partition(partition, 24)
 
         allocator = MallocBasedRoutingInfoAllocator()
         results = allocator(machine_graph, n_keys_map)
@@ -197,9 +213,6 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v1, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        for partition in machine_graph.outgoing_edge_partitions:
-            n_keys_map.set_n_keys_for_partition(partition, 24)
-
         allocator = MallocBasedRoutingInfoAllocator()
         results = allocator(machine_graph, n_keys_map)
 
@@ -226,9 +239,6 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v2, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        for partition in machine_graph.outgoing_edge_partitions:
-            n_keys_map.set_n_keys_for_partition(partition, 24)
-
         allocator = MallocBasedRoutingInfoAllocator()
         results = allocator(machine_graph, n_keys_map)
 
@@ -249,15 +259,13 @@ class MyTestCase(unittest.TestCase):
         machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
             self._intergration_setup()
 
-        for partition in machine_graph.outgoing_edge_partitions:
-            n_keys_map.set_n_keys_for_partition(partition, 24)
-
         allocator = MallocBasedRoutingInfoAllocator()
         results = allocator(machine_graph, n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
                 v1, "part1"))
+
         edge1_key = results.get_first_key_for_edge(e1)
         edge2_key = results.get_first_key_for_edge(e2)
         edge3_key = results.get_first_key_for_edge(e3)

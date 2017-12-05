@@ -15,7 +15,8 @@ from pacman.model.constraints.key_allocator_constraints.\
     ShareKeyConstraint
 from pacman.utilities import utility_calls
 from pacman.exceptions import (PacmanValueError, PacmanConfigurationException,
-                               PacmanInvalidParameterException)
+                               PacmanInvalidParameterException,
+                               PacmanRouteInfoAllocationException)
 from spinn_utilities.ordered_set import OrderedSet
 
 import logging
@@ -178,7 +179,7 @@ def _process_partition(
                 is_fixed_field, is_shared_key, is_continuous, tracked_set,
                 real_group)
 
-    else:  # not in a share key already. store itself and then search
+    else:  # not in a group already. store itself and then search
         tracked_set, real_group = _linked_shared_constraints(
             fixed_key_groups, fixed_mask_groups, fixed_field_groups,
             flexi_field_groups, continuous_groups,
@@ -196,7 +197,7 @@ def _process_partition(
             # search for merger
             tracked_set, real_group = _search_for_merger(
                 other_partitions, partition,
-                partition_mappings, tracked_set, shared_key_groups,
+                partition_mappings, tracked_set, real_group,
                 fixed_key_groups, fixed_mask_groups, fixed_field_groups,
                 flexi_field_groups, continuous_groups,
                 none_continuous_groups, is_fixed_mask, is_fixed_key,
@@ -217,6 +218,9 @@ def _locate_chief_group(group_1, group_1_list, group_2, group_2_list,
     elif group_1 != share_key_group and group_2 == share_key_group:
         return group_1, group_1_list, group_2, group_2_list
     elif group_1 == share_key_group and group_2 == share_key_group:
+        return group_1, group_1_list, group_2, group_2_list
+    elif (group_1 != share_key_group and group_2 != share_key_group and
+            (id(group_1) == id(group_2))):
         return group_1, group_1_list, group_2, group_2_list
     else:
         raise Exception(
@@ -305,7 +309,7 @@ def _verify_constraints(
             utility_calls.locate_first_constraint_of_type(
                 constraints, constraint_type))
         if not valid:
-            raise Exception(
+            raise PacmanRouteInfoAllocationException(
                 "The merged set of {} failed as their constraints {} are "
                 " not compatible with the sets group of {}".format(
                     tracked_set, constraints, constraint_type))
