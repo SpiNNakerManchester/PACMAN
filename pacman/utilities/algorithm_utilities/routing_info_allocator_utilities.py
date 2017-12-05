@@ -290,6 +290,8 @@ def _locate_constraint_type(
         return ShareKeyConstraint
     if id(group) == id(continious_key_groups):
         return ContiguousKeyRangeContraint
+    else:
+        raise Exception("broken")
 
 
 def _verify_constraints(

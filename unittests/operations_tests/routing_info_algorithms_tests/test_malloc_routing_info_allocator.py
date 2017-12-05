@@ -126,6 +126,45 @@ class MyTestCase(unittest.TestCase):
 
         return machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4
 
+    def test_share_key_with_2_nests(self):
+        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
+            self._intergration_setup()
+        e5 = MachineEdge(v4, v2, label="e1")
+        machine_graph.add_edge(e5, "part3")
+        partition2 = machine_graph.\
+            get_outgoing_edge_partition_starting_at_vertex(v4, "part3")
+        n_keys_map.set_n_keys_for_partition(partition2, 24)
+
+        partition1 = machine_graph.\
+            get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
+        partition4 = machine_graph.\
+            get_outgoing_edge_partition_starting_at_vertex(v1, "part2")
+        partition3 = machine_graph.\
+            get_outgoing_edge_partition_starting_at_vertex(v2, "part2")
+
+        partition1.add_constraint(ShareKeyConstraint([partition4]))
+        partition2.add_constraint(ShareKeyConstraint([partition3]))
+        partition3.add_constraint(ShareKeyConstraint([partition1]))
+
+        allocator = MallocBasedRoutingInfoAllocator()
+        results = allocator(machine_graph, n_keys_map)
+
+        key = results.get_first_key_from_partition(
+            machine_graph.get_outgoing_edge_partition_starting_at_vertex(
+                v1, "part1"))
+
+        edge1_key = results.get_first_key_for_edge(e1)
+        edge2_key = results.get_first_key_for_edge(e2)
+        edge3_key = results.get_first_key_for_edge(e3)
+        edge4_key = results.get_first_key_for_edge(e4)
+        edge5_key = results.get_first_key_for_edge(e5)
+
+        self.assertEqual(edge1_key, key)
+        self.assertEqual(edge2_key, key)
+        self.assertEqual(edge3_key, key)
+        self.assertEqual(edge4_key, key)
+        self.assertEqual(edge5_key, key)
+
     def test_share_key_with_conflicting_fixed_key_on_partitions(self):
         machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
             self._intergration_setup()
