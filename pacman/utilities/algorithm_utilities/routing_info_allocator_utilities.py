@@ -84,7 +84,7 @@ def _process_partition(
         none_continuous_groups, partition, partition_mappings):
     """ handles the discovery of this partitions key group based off previous\
     processed and its constraints
-    
+
     :param fixed_key_groups: the group of sets of fixed key partitions, where \
     each set is a set of partitions which share the same key
     :param shared_key_groups: the group of sets of partitions with only share \
@@ -99,11 +99,11 @@ def _process_partition(
     :param continuous_groups: the group of sets of continuous key partitions, \
     where each set is a set of partitions which share the same key.
     :param none_continuous_groups: the group of sets of none continuous key \
-    partitions, where each set is a set of partitions which share the same key. 
+    partitions, where each set is a set of partitions which share the same key.
     :param partition: The partition to place in the correct group.
     :param partition_mappings: the mapping between partition and (set of \
-    partitions which share the same key, constraint group) 
-    :rtype: None 
+    partitions which share the same key, constraint group)
+    :rtype: None
     """
 
     # get types of constraints from this partition
@@ -213,13 +213,13 @@ def _locate_chief_group(
         group_1, group_1_set, group_2, group_2_set, share_key_group):
     """ from 2 groups, decides which one should be merged into which, based
     off the heuristic that share key group is to be merged into none share key
-    
+
     :param group_1: list of ordered sets of partitions which share same key
     :param group_1_set: the set of partitions that share a same key in group 1
     :param group_2: list of ordered sets of partitions which share same key
     :param group_2_set: the set of partitions that share a same key in group 2
     :param share_key_group: the group that is known to be the share key group
-    :return: ordered group and set for which to merge into each other. 
+    :return: ordered group and set for which to merge into each other.
     :rtype: to merge into group, to merge into set, to be merged group,\
      to be merged set.
     """
@@ -247,9 +247,9 @@ def _search_for_merger(
         mergable_group, fixed_key_groups, fixed_mask_groups,
         fixed_field_groups, flexi_field_groups, continuous_groups,
         shared_key_groups):
-    """ takes a list of other partitions and determines if they need merging 
-    into one group 
-    
+    """ takes a list of other partitions and determines if they need merging \
+    into one group
+
     :param other_partitions: The other partitions to check mergeability
     :param partition_mappings: the mapping between partitions and set and \
     group
@@ -317,8 +317,8 @@ def _search_for_merger(
 def _locate_constraint_type(
         group, fixed_mask_groups, fixed_key_groups, flexi_field_groups,
         fixed_field_groups, share_key_groups, continuous_groups):
-    """ takes a group and determines its associated constraint 
-    
+    """ takes a group and determines its associated constraint
+
     :param group: the group to figure out its constraint type it considers
     :param fixed_key_groups: the group of sets of fixed key partitions, where \
     each set is a set of partitions which share the same key
@@ -334,7 +334,7 @@ def _locate_constraint_type(
     :param continuous_groups: the group of sets of continuous key partitions, \
     where each set is a set of partitions which share the same key.
     :return: the associated constraint type, or None if there is no associated\
-     constraint for this group (none continuous as an example) 
+     constraint for this group (none continuous as an example)
     """
     if id(group) == id(fixed_key_groups):
         return FixedKeyAndMaskConstraint
@@ -356,8 +356,8 @@ def _verify_constraints(
         fixed_mask_groups, fixed_key_groups, flexi_field_groups,
         fixed_field_groups, share_key_groups, continious_key_groups,
         tracked_set, group):
-    """ verify that the constraints on the partitions within a set are 
-    
+    """ verify that the constraints on the partitions within a set are
+
     :param fixed_key_groups: the group of sets of fixed key partitions, where \
     each set is a set of partitions which share the same key
     :param share_key_groups: the group of sets of partitions with only share \
@@ -371,10 +371,10 @@ def _verify_constraints(
     where each set is a set of partitions which share the same key.
     :param continuous_groups: the group of sets of continuous key partitions, \
     where each set is a set of partitions which share the same key.
-    :param tracked_set: the set of partitions that need to be checked for 
+    :param tracked_set: the set of partitions that need to be checked for \
     conflicting constraints
     :param group: the group to which this set resides
-    :rtype: None 
+    :rtype: None
     """
 
     constraint_type = _locate_constraint_type(
@@ -405,12 +405,12 @@ def _verify_constraints(
 def _search_for_failed_mix_of_constraints(
         constraint_type, constraints, constraint_to_test_against):
     """ goes though a set of constraints and looks for constraints that cannot\
-     reside with another given constraint. 
-    
+     reside with another given constraint.
+
     :param constraint_type: the type of constraint that resides already
     :param constraints: the constraints to search
     :param constraint_to_test_against: the actual constraint to test against \
-    if there's two of the same type. 
+    if there's two of the same type.
     :return: true if there's no conflict, false otherwise
     :rtype: bool
     """
@@ -434,8 +434,9 @@ def _linked_shared_constraints(
         is_fixed_mask, is_fixed_key, is_flexi_field,
         is_fixed_field, partition, partition_mapping, shared_key_groups,
         is_shared_key, is_continuous):
-    """
-    
+    """ places a partition in its own set and its valid group. pre curser for\
+    merging
+
     :param fixed_key_groups: the group of sets of fixed key partitions, where \
     each set is a set of partitions which share the same key
     :param fixed_mask_groups: the group of sets of fixed masks partitions, \
@@ -490,7 +491,7 @@ def _find_group(
         shared_key_groups, is_fixed_mask, is_fixed_key, is_flexi_field,
         is_fixed_field, is_shared_key, is_continuous):
     """ given the flags, finds the group it should reside in
-    
+
     :param fixed_key_groups: the group of sets of fixed key partitions, where \
     each set is a set of partitions which share the same key
     :param fixed_mask_groups: the group of sets of fixed masks partitions, \
@@ -540,7 +541,7 @@ def _find_group(
 def _check_types_of_constraints(constraints):
     """ helper method for the partition grouping. Iterates though the \
     constraints and determines what functionality it represents in the end.
-    
+
     :param constraints: the list of constraints to check
     :return: 6 booleans each of which covers if a specific functional\
      constraint exists in the set

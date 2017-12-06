@@ -1,5 +1,5 @@
-from pacman.model.constraints.key_allocator_constraints.share_key_constraint import \
-    ShareKeyConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    share_key_constraint import ShareKeyConstraint
 from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -105,8 +105,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     def _allocate_continuous_groups(self, group, routing_infos, n_keys_map):
         keys_and_masks = self._allocate_keys_and_masks(
-                None, None, n_keys_map.n_keys_for_partition(
-                group.peek(last=False)))
+            None, None,
+            n_keys_map.n_keys_for_partition(group.peek(last=False)))
         for partition in group:
             self._update_routing_objects(
                 keys_and_masks, routing_infos, partition)
@@ -240,11 +240,11 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
         """ allocate fixed keys and masks
-        
+
         :param keys_and_masks: the fixed keys and masks combos
         :param fixed_mask: fixed mask
         :type fixed_mask: None or FixedMask object
-        :return: 
+        :rtype: None
         """
         # If there are fixed keys and masks, allocate them
         for key_and_mask in keys_and_masks:

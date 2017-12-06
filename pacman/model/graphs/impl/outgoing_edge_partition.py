@@ -120,6 +120,7 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
 
     def __str__(self):
         return self.__repr__()
+
     @overrides(AbstractOutgoingEdgePartition.__contains__)
     def __contains__(self, edge):
         """ Check if the edge is contained within this partition

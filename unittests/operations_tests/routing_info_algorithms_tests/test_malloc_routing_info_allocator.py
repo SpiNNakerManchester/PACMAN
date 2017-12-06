@@ -315,5 +315,6 @@ class MyTestCase(unittest.TestCase):
         self.assertNotEqual(edge3_key, key)
         self.assertNotEqual(edge4_key, key)
 
+
 if __name__ == '__main__':
     unittest.main()
