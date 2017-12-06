@@ -115,7 +115,7 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
             if edge.label is not None:
                 edges += edge.label + ","
             else:
-                edges += edge + ","
+                edges += str(edge) + ","
         return (
             "OutgoingEdgePartition("
             "identifier={}, edges={} constraints={}, label={})".format(
