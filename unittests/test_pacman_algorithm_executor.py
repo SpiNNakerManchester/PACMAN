@@ -95,26 +95,6 @@ class Test(unittest.TestCase):
         self.assertTrue(TestNoChangesAlgorithm.called)
         self.assertTrue(TestAlgorithm3.called)
 
-    def test_optional_workflow(self):
-        """ Tests that an optional algorithm that doesn't do anything doesn't
-            get called
-        """
-        TestAlgorithm.called = False
-        TestNoChangesAlgorithm.called = False
-        TestAlgorithm3.called = False
-        inputs = {"TestType1": "TestType1"}
-        executor = PACMANAlgorithmExecutor(
-            algorithms=["TestAlgorithm"],
-            optional_algorithms=["TestNoChangesAlgorithm", "TestAlgorithm3"],
-            inputs=inputs,
-            required_outputs=["TestType3"],
-            tokens=[], required_output_tokens=[])
-        executor.execute_mapping()
-        self.assertTrue(TestAlgorithm.called)
-        self.assertFalse(TestNoChangesAlgorithm.called)
-        self.assertTrue(TestAlgorithm3.called)
-        self.assertEqual(executor.get_item("TestType3"), "TestType3")
-
     def test_token_workflow(self):
         """ Tests that a workflow with tokens works
         """
