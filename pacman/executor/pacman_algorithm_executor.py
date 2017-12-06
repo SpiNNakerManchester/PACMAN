@@ -332,15 +332,10 @@ class PACMANAlgorithmExecutor(object):
             order = [
 
                 # Check required algorithms forcing optional inputs
-                (algorithms_to_find, False, True),
+                (algorithms_to_find, False, False),
 
                 # Check optional algorithms forcing optional inputs
                 (optionals_to_use, True, True),
-
-                # Check required algorithms without optional inputs
-                # - shouldn't need to do this, but might if an optional input
-                # is also a generated output of the same algorithm
-                (algorithms_to_find, False, False),
 
                 # Check optional algorithms without optional inputs
                 # - as above, it shouldn't be necessary but might be if an

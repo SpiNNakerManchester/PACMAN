@@ -21,15 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class _LabeledList(list):
-    def __init__(self, label):
-        self._label = label
-        list.__init__(self)
-
-    def __repr__(self):
-        return self._label + list.__repr__(self)
-
-
 def get_edge_groups(machine_graph, traffic_type):
     """ Utility method to get groups of edges using any\
         :py:class:`pacman.model.constraints.key_allocator_constraints.KeyAllocatorSameKeyConstraint`\
@@ -41,13 +32,13 @@ def get_edge_groups(machine_graph, traffic_type):
     """
 
     # Keep a dictionary of the group which contains an edge
-    fixed_key_groups = _LabeledList("fixed_key")
-    shared_key_groups = _LabeledList("share_key")
-    fixed_mask_groups = _LabeledList("fixed_mask")
-    fixed_field_groups = _LabeledList("fixed_field")
-    flexi_field_groups = _LabeledList("flexi_field")
-    continuous_groups = _LabeledList("continious")
-    none_continuous_groups = _LabeledList("none_continious")
+    fixed_key_groups = list()
+    shared_key_groups = list()
+    fixed_mask_groups = list()
+    fixed_field_groups = list()
+    flexi_field_groups = list()
+    continuous_groups = list()
+    none_continuous_groups = list()
 
     # mapping between partition, set of partitions sharing key, and
     # constraint group

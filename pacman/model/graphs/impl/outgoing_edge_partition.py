@@ -112,7 +112,10 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     def __repr__(self):
         edges = ""
         for edge in self._edges:
-            edges += edge.label + ","
+            if edge.label is not None:
+                edges += edge.label + ","
+            else:
+                edges += edge + ","
         return (
             "OutgoingEdgePartition("
             "identifier={}, edges={} constraints={}, label={})".format(

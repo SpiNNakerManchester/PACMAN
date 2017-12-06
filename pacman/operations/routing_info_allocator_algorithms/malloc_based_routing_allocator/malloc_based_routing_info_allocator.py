@@ -85,8 +85,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             progress_bar.update()
 
         for group in fixed_field_groups:
-            self._allocate_fixed_fields(group, n_keys_map, routing_infos,
-                                        continuous_groups)
+            self._allocate_fixed_fields(group, n_keys_map, routing_infos)
             progress_bar.update()
 
         if len(flexi_field_groups) != 0:
@@ -163,8 +162,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._update_routing_objects(
                 keys_and_masks, routing_infos, partition)
 
-    def _allocate_fixed_fields(self, group, n_keys_map, routing_infos,
-                               continuous_groups):
+    def _allocate_fixed_fields(self, group, n_keys_map, routing_infos):
         fields = utility_calls.locate_first_constraint_of_type(
             group.peek(last=False).constraints, FixedKeyFieldConstraint).fields
 
