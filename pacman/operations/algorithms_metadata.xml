@@ -1,7 +1,7 @@
 <algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
-			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+            https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="FixedRouteRouter">
         <python_module>pacman.operations.fixed_route_router.fixed_route_router</python_module>
         <python_class>FixedRouteRouter</python_class>
