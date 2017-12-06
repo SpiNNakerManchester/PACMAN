@@ -21,13 +21,15 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
     @overrides(AbstractPythonAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
-            python_module, python_function):
+            required_input_tokens, optional_input_tokens,
+            generated_output_tokens, python_module, python_function):
         """
         :python_function: The name of the function to call
         """
         AbstractPythonAlgorithm.__init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
-            python_module)
+            required_input_tokens, optional_input_tokens,
+            generated_output_tokens, python_module)
         self._python_function = python_function
 
     @overrides(AbstractPythonAlgorithm.call_python)

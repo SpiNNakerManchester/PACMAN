@@ -46,5 +46,12 @@ class AllOfInput(AbstractInput):
     def input_matches(self, inputs):
         return all(param.input_matches(inputs) for param in self._inputs)
 
+    @overrides(AbstractInput.get_fake_inputs)
+    def get_fake_inputs(self, inputs):
+        fake_inputs = set()
+        for param in self._inputs:
+            fake_inputs.update(param.get_fake_inputs(inputs))
+        return fake_inputs
+
     def __repr__(self):
         return "AllOfInput(inputs={})".format(self._inputs)
