@@ -53,6 +53,13 @@ class SingleInput(AbstractInput):
             if param_type not in inputs
         }
 
+    @overrides(AbstractInput.get_matching_inputs)
+    def get_matching_inputs(self, inputs):
+        return {
+            param_type for param_type in self._param_types
+            if param_type in inputs
+        }
+
     def __repr__(self):
         return "SingleInput(name={}, param_types={})".format(
             self._name, self._param_types)

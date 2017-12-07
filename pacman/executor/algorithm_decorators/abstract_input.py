@@ -40,10 +40,18 @@ class AbstractInput(object):
 
     @abstractmethod
     def get_fake_inputs(self, inputs):
-        """ Adds fake inputs to satisfy this input's optional requirements
+        """ Get input types that are not in inputs but which satisfy this input
 
         :param inputs: A set of input types
         :return:\
-            A set of input parameter names that are optional inputs but which\
-            are not available in inputs
+            A set of input parameter names that are not available in inputs
+        """
+
+    @abstractmethod
+    def get_matching_inputs(self, inputs):
+        """ Get input types that are in inputs and satisfy this input
+
+        :param inputs: A set of input types
+        :return:\
+            A set of input parameter names that are available in inputs
         """
