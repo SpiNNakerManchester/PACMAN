@@ -13,8 +13,8 @@ from pacman.executor.algorithm_decorators.token import Token
 
 
 def _check_allowed_elements(path, element, allowed):
-    if any([sub.tag.split("}")[-1] not in allowed
-            for sub in element.iterchildren()]):
+    if any(sub.tag.split("}")[-1] not in allowed
+           for sub in element.iterchildren()):
         raise PacmanConfigurationException(
             "Error in XML starting at line {} of {}: Only"
             " one of {} is allowed in {}".format(

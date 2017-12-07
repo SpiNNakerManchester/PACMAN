@@ -153,9 +153,8 @@ def _decode_algorithm_details(
     final_required_inputs = None
     if required_inputs is None:
         final_required_inputs = [
-            input_defs[arg] for arg in required_args
-            if (not has_self or arg != "self")
-        ]
+            input_defs[arg]
+            for arg in required_args if not has_self or arg != "self"]
     else:
         final_required_inputs = _decode_inputs(input_defs, required_inputs)
 
@@ -163,9 +162,9 @@ def _decode_algorithm_details(
     final_optional_inputs = None
     if optional_inputs is None:
         final_optional_inputs = [
-            input_defs[arg] for arg in optional_args
-            if (not has_self or arg != "self") and arg in input_defs
-        ]
+            input_defs[arg]
+            for arg in optional_args
+            if (not has_self or arg != "self") and arg in input_defs]
     else:
         final_optional_inputs = _decode_inputs(input_defs, optional_inputs)
 
@@ -180,7 +179,7 @@ def algorithm(
         the PacmanAlgorithmExecutor.
 
         Can be used to decorate either a class or a function (not a method).\
-        If this decorates a class, the class must be callable (i.e. have a\
+        If this decorates a class, the class must be callable (i.e., have a\
         __call__ method), or else a method must be specified to call to run\
         the algorithm.
 
@@ -227,23 +226,14 @@ def algorithm(
     """
 
     def wrap(algorithm):
-
         # Get the algorithm id
-        final_algorithm_id = algorithm_id
-        if algorithm_id is None:
-            final_algorithm_id = algorithm.__name__
-
-        if algorithm_id in _algorithms:
+        algo_id = algorithm_id or algorithm.__name__
+        if algo_id in _algorithms:
             raise PacmanConfigurationException(
                 "Multiple algorithms with id {} found: {} and {}".format(
-                    algorithm_id, algorithm, _algorithms[algorithm_id]))
+                    algo_id, algorithm, _algorithms[algo_id]))
 
         # Get the details of the method or function
-        function = None
-        function_name = None
-        algorithm_class = None
-        is_class_method = False
-        module = None
         if inspect.isclass(algorithm):
             if hasattr(algorithm, "__init__"):
                 init = getattr(algorithm, "__init__")
@@ -252,7 +242,7 @@ def algorithm(
                     n_init_defaults = 0
                     if init_args.defaults is not None:
                         n_init_defaults = len(init_args.defaults)
-                    if (len(init_args.args) - n_init_defaults) != 1:
+                    if len(init_args.args) - n_init_defaults != 1:
                         raise PacmanConfigurationException(
                             "Algorithm class initialiser cannot take"
                             " arguments")
@@ -272,6 +262,7 @@ def algorithm(
                     "Cannot specify a method when decorating a function")
             function = algorithm
             function_name = algorithm.__name__
+            algorithm_class = None
             is_class_method = False
             module = algorithm.__module__
         else:
@@ -279,44 +270,32 @@ def algorithm(
                 "Decorating an unknown object type")
 
         # Get the inputs
-        final_required_inputs, final_optional_inputs = \
-            _decode_algorithm_details(
-                input_definitions, required_inputs, optional_inputs,
-                function, has_self=is_class_method)
+        _inputs, _options = _decode_algorithm_details(
+            input_definitions, required_inputs, optional_inputs, function,
+            has_self=is_class_method)
 
         # Get the outputs
         # TODO: Support file name type outputs - is there a use case? Note
         # that python algorithms can output the actual file name in the
         # variable
-        final_outputs = [Output(output_type) for output_type in outputs]
+        _outputs = [Output(output_type) for output_type in outputs]
 
-        final_input_tokens = required_input_tokens
-        if final_input_tokens is None:
-            final_input_tokens = []
-        final_optional_tokens = optional_input_tokens
-        if final_optional_tokens is None:
-            final_optional_tokens = []
-        final_output_tokens = generated_output_tokens
-        if final_output_tokens is None:
-            final_output_tokens = []
+        # https://stackoverflow.com/questions/7338501/python-assign-value-if-none-exists
+        _in_toks = required_input_tokens or []
+        _opt_toks = optional_input_tokens or []
+        _out_toks = generated_output_tokens or []
 
         # Add the algorithm
         if is_class_method:
             with _algorithm_lock:
-                _algorithms[final_algorithm_id] = PythonClassAlgorithm(
-                    final_algorithm_id, final_required_inputs,
-                    final_optional_inputs, final_outputs,
-                    final_input_tokens, final_optional_tokens,
-                    final_output_tokens,
-                    module, algorithm_class, function_name)
+                _algorithms[algo_id] = PythonClassAlgorithm(
+                    algo_id, _inputs, _options, _outputs, _in_toks, _opt_toks,
+                    _out_toks, module, algorithm_class, function_name)
         else:
             with _algorithm_lock:
-                _algorithms[final_algorithm_id] = PythonFunctionAlgorithm(
-                    final_algorithm_id, final_required_inputs,
-                    final_optional_inputs, final_outputs,
-                    final_input_tokens, final_optional_tokens,
-                    final_output_tokens,
-                    module, function_name)
+                _algorithms[algo_id] = PythonFunctionAlgorithm(
+                    algo_id, _inputs, _options, _outputs, _in_toks, _opt_toks,
+                    _out_toks, module, function_name)
 
         return algorithm
     return wrap
@@ -354,7 +333,7 @@ def scan_packages(packages, recursive=True):
     """ Scan packages for algorithms
 
     :param packages:\
-        The names of the packages to scan (using dotted notation),
+        The names of the packages to scan (using dotted notation),\
         or the actual package modules
     :param recursive: True if sub-packages should be examined
     :return: A dict of algorithm name -> algorithm data

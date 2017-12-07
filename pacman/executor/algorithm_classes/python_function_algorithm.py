@@ -1,5 +1,4 @@
 import importlib
-import sys
 import logging
 
 from .abstract_python_algorithm import AbstractPythonAlgorithm
@@ -24,8 +23,9 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, python_module, python_function):
         """
-        :python_function: The name of the function to call
+        :param python_function: The name of the function to call
         """
+        # pylint: disable=too-many-arguments
         AbstractPythonAlgorithm.__init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
@@ -44,10 +44,9 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
         try:
             return function(**inputs)
         except Exception:
-            exc_type, exc_value, exc_trace = sys.exc_info()
-            logger.error("Error when calling {}.{} with inputs {}".format(
-                self._python_module, self._python_function, inputs))
-            raise exc_type, exc_value, exc_trace
+            logger.error("Error when calling %s.%s with inputs %s",
+                         self._python_module, self._python_function, inputs)
+            raise
 
     def __repr__(self):
         return (

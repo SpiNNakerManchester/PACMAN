@@ -124,75 +124,73 @@ class MulticastRoutingTableByPartitionEntry(object):
     def defaultable(self):
         """ The defaultable status of the entry
         """
-
-        if (self._incoming_link is not None and
-                self._incoming_processor is None and
-                len(self._out_going_links) == 1 and
-                len(self._out_going_processors) == 0):
-            outgoing_link = next(iter(self._out_going_links))
-            return (self._incoming_link + 3) % 6 == outgoing_link
-        else:
+        if (self._incoming_link is None
+                or self._incoming_processor is not None
+                or len(self._out_going_links) != 1
+                or self._out_going_processors):
             return False
+        outgoing_link = next(iter(self._out_going_links))
+        return (self._incoming_link + 3) % 6 == outgoing_link
 
     def merge_entry(self, other):
         """ Merges the another entry with this one and returns a new\
             MulticastRoutingTableByPartitionEntry
 
-        :param other: the MulticastRoutingTableByPartitionEntry to merge into\
-                    this one
+        :param other: \
+            the MulticastRoutingTableByPartitionEntry to merge into this one
         :return: a merged MulticastRoutingTableByPartitionEntry
         """
+        # pylint: disable=protected-access
         if not isinstance(other, MulticastRoutingTableByPartitionEntry):
             raise PacmanInvalidParameterException(
                 "other", "type error",
                 "The other parameter is not a instance of "
                 "MulticastRoutingTableByPartitionEntry, and therefore cannot "
                 "be merged.")
+        # validate fixed things
+        if (self._incoming_processor is None and
+                other.incoming_processor is None):
+            valid_incoming_processor = None
+        elif (self._incoming_processor is not None and
+                other._incoming_processor is None):
+            valid_incoming_processor = self._incoming_processor
+        elif (self._incoming_processor is None and
+                other.incoming_processor is not None):
+            valid_incoming_processor = other.incoming_processor
+        elif self._incoming_processor == other._incoming_processor:
+            valid_incoming_processor = self._incoming_processor
         else:
-            # validate fixed things
-            if (self._incoming_processor is None and
-                    other.incoming_processor is None):
-                valid_incoming_processor = None
-            elif (self._incoming_processor is not None and
-                    other._incoming_processor is None):
-                valid_incoming_processor = self._incoming_processor
-            elif (self._incoming_processor is None and
-                    other.incoming_processor is not None):
-                valid_incoming_processor = other.incoming_processor
-            elif self._incoming_processor == other._incoming_processor:
-                valid_incoming_processor = self._incoming_processor
-            else:
-                raise PacmanInvalidParameterException(
-                    "incoming_processor", "invalid merge",
-                    "The two MulticastRoutingTableByPartitionEntry have "
-                    "different incoming_processors, and so can't be merged")
+            raise PacmanInvalidParameterException(
+                "incoming_processor", "invalid merge",
+                "The two MulticastRoutingTableByPartitionEntry have "
+                "different incoming_processors, and so can't be merged")
 
-            if (self._incoming_link is None and
-                    other.incoming_link is None):
-                valid_incoming_link = None
-            elif (self._incoming_link is not None and
-                    other._incoming_link is None):
-                valid_incoming_link = self._incoming_link
-            elif (self._incoming_link is None and
-                    other.incoming_link is not None):
-                valid_incoming_link = other.incoming_link
-            elif self._incoming_link == other._incoming_link:
-                valid_incoming_link = self._incoming_link
-            else:
-                raise PacmanInvalidParameterException(
-                    "incoming_link", "invalid merge",
-                    "The two MulticastRoutingTableByPartitionEntry have "
-                    "different incoming_links, and so can't be merged")
+        if (self._incoming_link is None and
+                other.incoming_link is None):
+            valid_incoming_link = None
+        elif (self._incoming_link is not None and
+                other._incoming_link is None):
+            valid_incoming_link = self._incoming_link
+        elif (self._incoming_link is None and
+                other.incoming_link is not None):
+            valid_incoming_link = other.incoming_link
+        elif self._incoming_link == other._incoming_link:
+            valid_incoming_link = self._incoming_link
+        else:
+            raise PacmanInvalidParameterException(
+                "incoming_link", "invalid merge",
+                "The two MulticastRoutingTableByPartitionEntry have "
+                "different incoming_links, and so can't be merged")
 
-            # merge merge-able things
-            merged_outgoing_processors = self._out_going_processors.union(
-                other._out_going_processors)
-            merged_outgoing_links = self._out_going_links.union(
-                other._out_going_links)
+        # merge merge-able things
+        merged_outgoing_processors = self._out_going_processors.union(
+            other._out_going_processors)
+        merged_outgoing_links = self._out_going_links.union(
+            other._out_going_links)
 
-            return MulticastRoutingTableByPartitionEntry(
-                merged_outgoing_links, merged_outgoing_processors,
-                valid_incoming_processor, valid_incoming_link)
+        return MulticastRoutingTableByPartitionEntry(
+            merged_outgoing_links, merged_outgoing_processors,
+            valid_incoming_processor, valid_incoming_link)
 
     def __repr__(self):
         return "{}:{}:{}:{}:{}".format(
