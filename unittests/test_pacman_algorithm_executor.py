@@ -28,6 +28,20 @@ class TestNoChangesAlgorithm(object):
         return param
 
 
+@algorithm({"param": "TestType1", "param_2": "TestType2"}, ["TestType2"])
+class TestRecursiveOptionalAlgorithm(object):
+
+    called = False
+
+    def __call__(self, param, param_2=None):
+        if param != "TestType1":
+            raise Exception("Unexpected Param")
+        if param_2 is not None and param_2 != "TestType2":
+            raise Exception("Unexpected Optional Param")
+        TestRecursiveOptionalAlgorithm.called = True
+        return "TestType2"
+
+
 @algorithm({"param": "TestType2"}, ["TestType3"])
 class TestAlgorithm3(object):
 
@@ -162,6 +176,24 @@ class Test(unittest.TestCase):
         self.assertTrue(TestPartTokenOutput1.called)
         self.assertTrue(TestPartTokenOutput2.called)
         self.assertTrue(TestWholeTokenOptional.called)
+
+    def test_recursive_optional_workflow(self):
+        """ Test the basic operation of the executor
+        """
+        TestRecursiveOptionalAlgorithm.called = False
+        TestAlgorithm3.called = False
+        inputs = {"TestType1": "TestType1"}
+        executor = PACMANAlgorithmExecutor(
+            algorithms=[
+                "TestRecursiveOptionalAlgorithm", "TestAlgorithm3"],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        executor.execute_mapping()
+        self.assertTrue(TestRecursiveOptionalAlgorithm.called)
+        self.assertTrue(TestAlgorithm3.called)
+        self.assertEqual(
+            [algorithm.algorithm_id for algorithm in executor._algorithms],
+            ["TestRecursiveOptionalAlgorithm", "TestAlgorithm3"])
 
 
 if __name__ == "__main__":

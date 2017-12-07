@@ -268,8 +268,17 @@ class PACMANAlgorithmExecutor(object):
         all_outputs = set(inputs.iterkeys())
         for algorithms in (algorithm_data, optional_algorithm_data):
             for algorithm in algorithms:
-                all_outputs.update(
-                    {output.output_type for output in algorithm.outputs})
+
+                # Get the algorithm output types
+                alg_outputs = {
+                    output.output_type for output in algorithm.outputs}
+
+                # Remove from the outputs any optional input that is also an
+                # output
+                for alg_input in algorithm.optional_inputs:
+                    for matching in alg_input.get_matching_inputs(alg_outputs):
+                        alg_outputs.discard(matching)
+                all_outputs.update(alg_outputs)
 
         # Set up the token tracking and make all specified tokens complete
         token_states = TokenStates()
