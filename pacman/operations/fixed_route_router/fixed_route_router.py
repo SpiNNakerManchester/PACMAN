@@ -185,7 +185,7 @@ class FixedRouteRouter(object):
         """
 
         # process each path separately
-        if board_version == 3 or board_version == 4:
+        if board_version == 5 or board_version == 4:
             paths = self.router_path_chips_48
             joins = self.joins_48
         else:
