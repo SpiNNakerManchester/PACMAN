@@ -40,7 +40,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
         for vertex in machine_graph.vertices:
             placement_constraints = utility_calls.locate_constraints_of_type(
                 vertex.constraints, AbstractPlacerConstraint)
-            if len(placement_constraints) > 0:
+            if placement_constraints:
                 constrained_vertices.append(vertex)
             else:
                 unconstrained_vertices.add(vertex)
@@ -65,29 +65,27 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 unconstrained_vertices, machine_graph)
             next_vertices.add(max_connected_vertex)
 
-            while len(next_vertices) > 0:
+            while next_vertices:
 
                 # Find the vertex most connected to the currently placed
                 # vertices
-                vertex = self._find_max_connected_vertex(next_vertices,
-                                                         machine_graph)
+                vertex = self._find_max_connected_vertex(
+                    next_vertices, machine_graph)
 
                 # Place the vertex
-                self._place_vertex(vertex, resource_tracker, machine,
-                                   placements)
+                self._place_vertex(
+                    vertex, resource_tracker, machine, placements)
                 progress.update()
                 unconstrained_vertices.remove(vertex)
                 next_vertices.remove(vertex)
 
                 # Add all vertices connected to this one to the set
-                for in_edge in (machine_graph
-                                .get_edges_ending_at_vertex(vertex)):
-                    if in_edge.pre_vertex in unconstrained_vertices:
-                        next_vertices.add(in_edge.pre_vertex)
-                for out_edge in (machine_graph
-                                 .get_edges_starting_at_vertex(vertex)):
-                    if out_edge.post_vertex in unconstrained_vertices:
-                        next_vertices.add(out_edge.post_vertex)
+                for edge in machine_graph.get_edges_ending_at_vertex(vertex):
+                    if edge.pre_vertex in unconstrained_vertices:
+                        next_vertices.add(edge.pre_vertex)
+                for edge in machine_graph.get_edges_starting_at_vertex(vertex):
+                    if edge.post_vertex in unconstrained_vertices:
+                        next_vertices.add(edge.post_vertex)
 
         # finished, so stop progress bar and return placements
         progress.end()
@@ -97,12 +95,12 @@ class ConnectiveBasedPlacer(RadialPlacer):
         max_connected_vertex = None
         max_weight = 0
         for vertex in vertices:
-            in_weight = sum([
+            in_weight = sum(
                 edge.weight
-                for edge in graph.get_edges_starting_at_vertex(vertex)])
-            out_weight = sum([
+                for edge in graph.get_edges_starting_at_vertex(vertex))
+            out_weight = sum(
                 edge.weight
-                for edge in graph.get_edges_ending_at_vertex(vertex)])
+                for edge in graph.get_edges_ending_at_vertex(vertex))
             weight = in_weight + out_weight
 
             if max_connected_vertex is None or weight > max_weight:

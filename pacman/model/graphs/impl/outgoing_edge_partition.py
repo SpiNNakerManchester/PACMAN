@@ -5,6 +5,9 @@ from pacman.model.decorators import overrides
 from pacman.model.graphs import AbstractOutgoingEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 
+_REPR_TEMPLATE = \
+    "OutgoingEdgePartition(identifier={}, edges={}, constraints={}, label={})"
+
 
 class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     """ A collection of edges which start at a single vertex which have the
@@ -110,10 +113,8 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
         return self._traffic_weight
 
     def __repr__(self):
-        return (
-            "OutgoingEdgePartition("
-            "identifier={}, edges={}, constraints={}, label={})".format(
-                self._identifier, self._edges, self.constraints, self.label))
+        return _REPR_TEMPLATE.format(
+            self._identifier, self._edges, self.constraints, self.label)
 
     @overrides(AbstractOutgoingEdgePartition.__contains__)
     def __contains__(self, edge):

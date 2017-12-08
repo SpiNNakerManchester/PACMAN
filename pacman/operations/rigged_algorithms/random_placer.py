@@ -1,5 +1,6 @@
 from pacman.utilities.utility_objs import ResourceTracker
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import \
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints
 from pacman.model.placements import Placement, Placements
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -24,30 +25,22 @@ class RandomPlacer(object):
         ResourceTracker.check_constraints(machine_graph.vertices)
 
         placements = Placements()
-        vertices = \
-            placer_algorithm_utilities.sort_vertices_by_known_constraints(
-                machine_graph.vertices)
+        vertices = sort_vertices_by_known_constraints(machine_graph.vertices)
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(machine_graph.n_vertices,
                                "Placing graph vertices")
-        resource_tracker = ResourceTracker(machine,
-                                           self._generate_random_chips(
-                                               machine))
-        vertices_on_same_chip = \
-            placer_algorithm_utilities.get_same_chip_vertex_groups(
-                    machine_graph.vertices)
+        resource_tracker = ResourceTracker(
+            machine, self._generate_random_chips(machine))
+        vertices_on_same_chip = get_same_chip_vertex_groups(
+            machine_graph.vertices)
         vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in vertices_placed:
-                vertices_placed = self._place_vertex(
-                    vertex, resource_tracker, machine,
-                    placements,
-                    # placements,
-                    vertices_on_same_chip)
-                vertices_placed.update(vertices_placed)
+                vertices_placed.update(self._place_vertex(
+                    vertex, resource_tracker, machine, placements,
+                    vertices_on_same_chip))
         return placements
-        # return placements
 
     def _generate_random_chips(self, machine, np=numpy,
                                random_generator=random):
@@ -56,9 +49,10 @@ class RandomPlacer(object):
 
         :param machine: A SpiNNaker machine object.
         :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
-        :param random: Python's random number generator
-        :type random: :py:class:`random.Random`
-        :return x, y coordinates of chips for placement
+        :param random_generator: Python's random number generator
+        :type random_generator: :py:class:`random.Random`
+        :param np: Numpy module
+        :return: x, y coordinates of chips for placement
         :rtype (int, int)
         """
 
@@ -101,7 +95,6 @@ class RandomPlacer(object):
 
     def _place_vertex(self, vertex, resource_tracker, machine,
                       placements, location):
-
         vertices = location[vertex]
         # random x and y value within the maximum of the machine
         chips = self._generate_random_chips(machine)

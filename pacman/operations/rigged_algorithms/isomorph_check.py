@@ -14,35 +14,35 @@ class IsomorphicChecker(object):
         """Outputs the result of the isomorphic check to a report file.
 
         :param report_folder: the folder to which the reports are being written
-        :return placement_isomorph.rpt
-        :rtype report file
+        :return: None
         """
 
         file_name = os.path.join(report_folder, "placement_isomorph.rpt")
-        report = None
         try:
-            report = open(file_name, "w")
+            with open(file_name, "w") as report:
+                if self.check(placements, placements_copy):
+                    report.write(
+                        "The two algorithms called have the same set of "
+                        "placements.")
+                else:
+                    report.write(
+                        "The two algorithms have different placements data.")
         except IOError:
             logging.getLogger().error(
                 "Generate_isomorph_report: Can't open file {} for "
                 "writing.".format(file_name))
-        if self.check(placements, placements_copy):
-            report.write(
-                "The two algorithms called have the same set of placements.")
-        else:
-            report.write("The two algorithms have different placements data.")
-        report.flush()
-        report.close()
 
     def check(self, placements, placements_copy):
-        """Checks if the placements on each processor are the same for
+        """Checks if the placements on each processor are the same for\
         two placement algorithms.
 
         :param placements: Placements of vertices on the machine
-        :type :py:class:`pacman.model.placements.placements.Placements`
-        :param placements_copy: memory copy of placements of vertices \
-            on the machine
-        :type :py:class:`pacman.model.placements.placements.Placements`
+        :type placements: \
+            :py:class:`pacman.model.placements.placements.Placements`
+        :param placements_copy: \
+            memory copy of placements of vertices on the machine
+        :type placements_copy: \
+            :py:class:`pacman.model.placements.placements.Placements`
         :return True if the placements are the same
         :rtype bool
         """

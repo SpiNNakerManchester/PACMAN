@@ -60,23 +60,12 @@ class RadialPlacer(object):
     def _place_vertex(
             self, vertex, resource_tracker, machine, placements,
             vertices_on_same_chip):
-
         vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
         radial_constraints = locate_constraints_of_type(
             vertices, RadialPlacementFromChipConstraint)
-        start_x = None
-        start_y = None
-        for constraint in radial_constraints:
-            if start_x is None:
-                start_x = constraint.x
-            elif start_x != constraint.x:
-                raise PacmanPlaceException("Non-matching constraints")
-            if start_y is None:
-                start_y = constraint.y
-            elif start_y != constraint.y:
-                raise PacmanPlaceException("Non-matching constraints")
+        start_x, start_y = self._get_start(radial_constraints)
         chips = None
         if start_x is not None and start_y is not None:
             chips = self._generate_radial_chips(
@@ -98,6 +87,21 @@ class RadialPlacer(object):
             placements.add_placement(placement)
 
         return vertices
+
+    @staticmethod
+    def _get_start(radial_constraints):
+        x = None
+        y = None
+        for constraint in radial_constraints:
+            if x is None:
+                x = constraint.x
+            elif x != constraint.x:
+                raise PacmanPlaceException("Non-matching constraints")
+            if y is None:
+                y = constraint.y
+            elif y != constraint.y:
+                raise PacmanPlaceException("Non-matching constraints")
+        return x, y
 
     @staticmethod
     def _generate_radial_chips(

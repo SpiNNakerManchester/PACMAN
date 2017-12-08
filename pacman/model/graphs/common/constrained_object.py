@@ -21,7 +21,6 @@ class ConstrainedObject(object):
 
     def __init__(self, constraints=None):
         """
-
         :param constraints: Any initial constraints
         """
 
@@ -37,14 +36,14 @@ class ConstrainedObject(object):
 
         :param constraint: constraint to add
         :type constraint:\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If the\
-                    constraint is not valid
+        :raise pacman.exceptions.PacmanInvalidParameterException: \
+            If the constraint is not valid
         """
         if constraint is None:
-            raise PacmanInvalidParameterException("constraint", constraint,
-                                                  "must not be None")
+            raise PacmanInvalidParameterException(
+                "constraint", constraint, "must not be None")
         if not isinstance(constraint, AbstractConstraint):
             raise PacmanInvalidParameterException(
                 "constraint", constraint,
@@ -61,10 +60,10 @@ class ConstrainedObject(object):
 
         :param constraints: iterable of constraints to add
         :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: If one of \
-                    the constraints is not valid
+        :raise pacman.exceptions.PacmanInvalidParameterException: \
+            If one of the constraints is not valid
         """
         if constraints is not None:
             for next_constraint in constraints:
@@ -76,8 +75,7 @@ class ConstrainedObject(object):
 
         :return: iterable of constraints
         :rtype: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint\
-                    .AbstractConstraint`
+            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :raise None: Raises no known exceptions
         """
         try:

@@ -1,7 +1,8 @@
 from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
+    import sort_vertices_by_known_constraints
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 
@@ -25,17 +26,15 @@ class BasicPlacer(object):
             :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.placements.Placements`
-        :raise pacman.exceptions.PacmanPlaceException: If something\
-                   goes wrong with the placement
+        :raise pacman.exceptions.PacmanPlaceException: \
+            If something goes wrong with the placement
         """
 
         # check that the algorithm can handle the constraints
         ResourceTracker.check_constraints(machine_graph.vertices)
 
         placements = Placements()
-        vertices = \
-            placer_algorithm_utilities.sort_vertices_by_known_constraints(
-                machine_graph.vertices)
+        vertices = sort_vertices_by_known_constraints(machine_graph.vertices)
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(vertices, "Placing graph vertices")

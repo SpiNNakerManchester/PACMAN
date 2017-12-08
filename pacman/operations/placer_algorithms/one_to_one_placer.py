@@ -2,7 +2,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 
 # pacman imports
-from pacman import exceptions
+from pacman.exceptions import \
+    PacmanException, PacmanInvalidParameterException, PacmanValueError
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
@@ -82,9 +83,9 @@ class OneToOnePlacer(RadialPlacer):
                         placement = Placement(vertex, x, y, p)
                         placements.add_placement(placement)
                         progress.update()
-                except exceptions.PacmanValueError or \
-                        exceptions.PacmanException or \
-                        exceptions.PacmanInvalidParameterException:
+                except PacmanValueError or \
+                        PacmanException or \
+                        PacmanInvalidParameterException:
 
                     # If something goes wrong, try to allocate each
                     # individually
@@ -190,7 +191,7 @@ class OneToOnePlacer(RadialPlacer):
         # look for one to ones leaving this vertex
         outgoing = graph.get_edges_starting_at_vertex(vertex)
         vertices_to_try = [edge.post_vertex for edge in outgoing]
-        while len(vertices_to_try) != 0:
+        while vertices_to_try:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
                 vertices_seen.add(next_vertex)
@@ -213,7 +214,7 @@ class OneToOnePlacer(RadialPlacer):
         vertices_to_try = [
             edge.pre_vertex for edge in incoming
             if edge.pre_vertex not in vertices_seen]
-        while len(vertices_to_try) != 0:
+        while vertices_to_try:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
                 vertices_seen.add(next_vertex)

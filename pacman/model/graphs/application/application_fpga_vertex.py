@@ -17,14 +17,13 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
     """ A virtual vertex on an FPGA link
     """
 
-    __slots__ = (
+    __slots__ = [
         "_fpga_id",
         "_fpga_link_id",
         "_board_address",
         "_virtual_chip_x",
         "_virtual_chip_y",
-        "_n_atoms"
-    )
+        "_n_atoms"]
 
     def __init__(
             self, n_atoms, fpga_id, fpga_link_id, board_address=None,
