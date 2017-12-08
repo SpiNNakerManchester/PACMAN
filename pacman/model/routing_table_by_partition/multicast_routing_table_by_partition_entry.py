@@ -36,20 +36,18 @@ class MulticastRoutingTableByPartitionEntry(object):
         if isinstance(out_going_links, int):
             self._out_going_links = set()
             self._out_going_links.add(out_going_links)
+        elif out_going_links is not None:
+            self._out_going_links = set(out_going_links)
         else:
-            if out_going_links is not None:
-                self._out_going_links = set(out_going_links)
-            else:
-                self._out_going_links = set()
+            self._out_going_links = set()
 
         if isinstance(outgoing_processors, int):
             self._out_going_processors = set()
             self._out_going_processors.add(outgoing_processors)
+        elif outgoing_processors is not None:
+            self._out_going_processors = set(outgoing_processors)
         else:
-            if outgoing_processors is not None:
-                self._out_going_processors = set(outgoing_processors)
-            else:
-                self._out_going_processors = set()
+            self._out_going_processors = set()
 
         self._incoming_link = incoming_link
         self._incoming_processor = incoming_processor

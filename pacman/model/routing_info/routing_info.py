@@ -24,10 +24,10 @@ class RoutingInfo(object):
 
         :param partition_info_items: The partition information items to add
         :type partition_info_items: iterable of\
-                    :py:class:`pacman.model.routing_info.PartitionRoutingInfo`
-                    or none
+            :py:class:`pacman.model.routing_info.PartitionRoutingInfo`
+            or None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If there are \
-                    two partition information objects with the same partition
+            two partition information objects with the same partition
         """
 
         # Partition information indexed by partition
@@ -77,7 +77,7 @@ class RoutingInfo(object):
 
         :param partition: The partition to get the first key of
         :type partition:\
-                :py:class:`pacman.model.graph.OutgoingEdgePartition`
+            :py:class:`pacman.model.graph.OutgoingEdgePartition`
         :return: The routing key or None if the partition does not exist
         :rtype: int
         :raise None: does not raise any known exceptions
@@ -92,7 +92,7 @@ class RoutingInfo(object):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-                    :py:class:`pacman.model.graph.OutgoingEdgePartition`
+            :py:class:`pacman.model.graph.OutgoingEdgePartition`
         :return: the partition_routing_info for the partition
         """
         if partition in self._partition_info_by_partition:
@@ -101,11 +101,11 @@ class RoutingInfo(object):
 
     def get_routing_info_from_pre_vertex(self, vertex, partition_id):
         """ Get routing information for edges with a given partition_id from\
-            a pre vertex
+            a pre-vertex
 
         :param vertex: The pre_vertex to search for
         :param partition_id: The id of the partition for which to get\
-                    the routing information
+            the routing information
         """
         if (vertex, partition_id) in self._partition_info_by_pre_vertex:
             return self._partition_info_by_pre_vertex[vertex, partition_id]
@@ -116,7 +116,7 @@ class RoutingInfo(object):
 
         :param vertex: The vertex which the partition starts at
         :param partition_id: The id of the partition for which to get\
-                    the routing information
+            the routing information
         :return: The routing key of the partition
         :rtype: int
         """

@@ -11,16 +11,12 @@ class Tags(object):
     __slots__ = [
         # Mapping of (board address, tag) to IPTag
         "_ip_tags",
-
         # Mapping of (board address, tag) to ReverseIPTag
         "_reverse_ip_tags",
-
         # Mapping of vertex to list of IPTag
         "_ip_tags_by_vertex",
-
         # Mapping of vertex to list of ReverseIPTag
         "_reverse_ip_tags_by_vertex",
-
         # Set of ports already assigned on a board
         "_ports_assigned"
     ]
@@ -139,7 +135,7 @@ class Tags(object):
 
         :return: iterable of ReverseIPTag
         :rtype: iterable of \
-                    :py:class:`spinn_machine.tags.ReverseIPTag`
+            :py:class:`spinn_machine.tags.ReverseIPTag`
         """
         return self._reverse_ip_tags.itervalues()
 
