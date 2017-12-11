@@ -302,14 +302,13 @@ class ResourceTracker(object):
         return x, y, p
 
     def _chip_available(self, x, y):
-        prealloc = self._n_cores_preallocated[x, y]
-        return (
-            self._machine.is_chip_at(x, y)
-            and (((x, y) not in self._core_tracker
-                  and self._machine.get_chip_at(x, y).n_user_processors
-                      > prealloc)
-                 or ((x, y) in self._core_tracker and
-                     len(self._core_tracker[x, y]) > prealloc)))
+        if not self._machine.is_chip_at(x, y):
+            return False
+        if (x, y) in self._core_tracker:
+            projected_id = len(self._core_tracker[x, y])
+        else:
+            projected_id = self._machine.get_chip_at(x, y).n_user_processors
+        return projected_id > self._n_cores_preallocated[x, y]
 
     def _get_usable_chips(
             self, chips, board_address, ip_tags, reverse_ip_tags):

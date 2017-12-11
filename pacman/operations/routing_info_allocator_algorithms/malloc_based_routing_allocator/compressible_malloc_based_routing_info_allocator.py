@@ -313,7 +313,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 break
 
         # If we found a working key and mask that can be assigned,
-        # allocate them. Otherwise raise an exception 
+        # allocate them. Otherwise raise an exception
         if key_found is None or mask_found is None:
             raise PacmanRouteInfoAllocationException(
                 "Could not find space to allocate keys")

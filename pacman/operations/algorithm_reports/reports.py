@@ -491,7 +491,8 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
 
             for vertex in machine_graph.vertices:
                 f.write("Vertex: {}\n".format(vertex))
-                for partition in progress.over(machine_graph.\
+                for partition in progress.over(
+                        machine_graph.
                         get_outgoing_edge_partitions_starting_at_vertex(
                             vertex), False):
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
