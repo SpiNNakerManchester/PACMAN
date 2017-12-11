@@ -120,8 +120,9 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     :raise PacmanRoutingException: when the trace completes and there are\
         still destinations not visited
     """
-    for dest in dest_placements:
-        logger.debug("[{}:{}:{}]".format(dest.x, dest.y, dest.p))
+    if logger.isEnabledFor(logging.DEBUG):
+        for dest in dest_placements:
+            logger.debug("[%d:%d:%d]", dest.x, dest.y, dest.p)
 
     located_destinations = set()
 

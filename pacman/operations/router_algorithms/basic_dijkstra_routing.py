@@ -107,7 +107,7 @@ class BasicDijkstraRouting(object):
                 dest_chips.add((chip.x, chip.y))
                 edges_to_route.append(edge)
 
-            if len(dest_chips) != 0:
+            if dest_chips:
                 self._update_all_weights(nodes_info)
                 self._reset_tables(tables)
                 tables[placement.x, placement.y].activated = True

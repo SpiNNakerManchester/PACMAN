@@ -1,13 +1,13 @@
 import logging
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
-    import sort_vertices_by_known_constraints
+from spinn_utilities.progress_bar import ProgressBar
 
 from pacman.model.constraints.placer_constraints \
     import AbstractPlacerConstraint
 from pacman.model.placements import Placements
 from pacman.operations.placer_algorithms import RadialPlacer
-from pacman.utilities import utility_calls
-from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
+    import sort_vertices_by_known_constraints
+from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 
 logger = logging.getLogger(__name__)
@@ -38,9 +38,8 @@ class ConnectiveBasedPlacer(RadialPlacer):
         constrained_vertices = list()
         unconstrained_vertices = set()
         for vertex in machine_graph.vertices:
-            placement_constraints = utility_calls.locate_constraints_of_type(
-                vertex.constraints, AbstractPlacerConstraint)
-            if placement_constraints:
+            if locate_constraints_of_type(
+                    vertex.constraints, AbstractPlacerConstraint):
                 constrained_vertices.append(vertex)
             else:
                 unconstrained_vertices.add(vertex)
@@ -52,11 +51,10 @@ class ConnectiveBasedPlacer(RadialPlacer):
             machine, self._generate_radial_chips(machine))
         constrained_vertices = sort_vertices_by_known_constraints(
             constrained_vertices)
-        for vertex in constrained_vertices:
+        for vertex in progress.over(constrained_vertices, False):
             self._place_vertex(vertex, resource_tracker, machine, placements)
-            progress.update()
 
-        while len(unconstrained_vertices) > 0:
+        while unconstrained_vertices:
             # Keep track of all vertices connected to the currently placed ones
             next_vertices = set()
 

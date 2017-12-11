@@ -129,16 +129,16 @@ class RadialPlacer(object):
             first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
         done_chips = {first_chip}
         search = deque([first_chip])
-        while len(search) > 0:
+        while search:
             chip = search.pop()
             if (resource_tracker is None or
                     resource_tracker.is_chip_available(chip.x, chip.y)):
-                yield (chip.x, chip.y)
+                yield chip.x, chip.y
 
             # Examine the links of the chip to find the next chips
             for link in chip.router.links:
-                next_chip = machine.get_chip_at(link.destination_x,
-                                                link.destination_y)
+                next_chip = machine.get_chip_at(
+                    link.destination_x, link.destination_y)
 
                 # Don't search done chips again
                 if next_chip not in done_chips:

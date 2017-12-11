@@ -3,6 +3,7 @@ from pacman.model.constraints.key_allocator_constraints\
     import AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
     import FixedMaskConstraint
+from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.model.constraints.key_allocator_constraints \
     import FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
@@ -15,8 +16,9 @@ from pacman.model.routing_info \
 from pacman.utilities.utility_calls import \
     check_algorithm_can_support_constraints, locate_constraints_of_type, \
     compress_from_bit_array, expand_to_bit_array
-from pacman.utilities.algorithm_utilities \
-    import ElementAllocatorAlgorithm, routing_info_allocator_utilities
+from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
+from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
+    import check_types_of_edge_constraint, get_edge_groups
 from pacman.exceptions import \
     PacmanConfigurationException, PacmanRouteInfoAllocationException
 
@@ -56,22 +58,21 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # verify that no edge has more than 1 of a constraint ,and that
         # constraints are compatible
-        routing_info_allocator_utilities.\
-            check_types_of_edge_constraint(machine_graph)
+        check_types_of_edge_constraint(machine_graph)
 
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-         flexi_field_groups, continuous_groups, none_continuous_groups) = \
-            routing_info_allocator_utilities.get_edge_groups(machine_graph)
-        if flexi_field_groups:
+        (fixed_keys, fixed_masks, fixed_fields, flexi_fields,
+         continuous, noncontinuous) = \
+            get_edge_groups(machine_graph, EdgeTrafficType.MULTICAST)
+        if flexi_fields:
             raise PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
         # Even non-continuous keys will be continuous
-        for group in none_continuous_groups:
-            continuous_groups.add(group)
+        for group in noncontinuous:
+            continuous.add(group)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(
@@ -79,8 +80,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             "Allocating routing keys")
 
         # allocate the groups that have fixed keys
-        for group in progress.over(fixed_key_groups, False):
-
+        for group in progress.over(fixed_keys, False):
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
             fixed_mask = None
@@ -95,19 +95,18 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._update_routing_objects(
                 fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
                 group)
+            continuous.remove(group)
 
-            continuous_groups.remove(group)
-
-        for group in progress.over(fixed_mask_groups, False):
+        for group in progress.over(fixed_masks, False):
             # get mask and fields if need be
             fixed_mask = locate_constraints_of_type(
                 group.constraints, FixedMaskConstraint)[0].mask
 
             fields = None
-            if group in fixed_field_groups:
+            if group in fixed_fields:
                 fields = locate_constraints_of_type(
                     group.constraints, FixedKeyFieldConstraint)[0].fields
-                fixed_field_groups.remove(group)
+                fixed_fields.remove(group)
 
             # try to allocate
             keys_and_masks = self._allocate_keys_and_masks(
@@ -115,11 +114,9 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
             # update the pacman data objects
             self._update_routing_objects(keys_and_masks, routing_infos, group)
+            continuous.remove(group)
 
-            continuous_groups.remove(group)
-            progress.update()
-
-        for group in progress.over(fixed_field_groups, False):
+        for group in progress.over(fixed_fields, False):
             fields = locate_constraints_of_type(
                 group.constraints, FixedKeyFieldConstraint)[0].fields
 
@@ -129,8 +126,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
             # update the pacman data objects
             self._update_routing_objects(keys_and_masks, routing_infos, group)
-
-            continuous_groups.remove(group)
+            continuous.remove(group)
 
         # Sort the rest of the groups, using the routing tables for guidance
         # Group partitions by those which share routes in any table
@@ -145,7 +141,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             partitions_by_route = defaultdict(OrderedSet)
             routing_table = routing_tables.get_entries_for_router(x, y)
             for partition, entry in routing_table.iteritems():
-                if partition in continuous_groups:
+                if partition in continuous:
                     entry_hash = sum(
                         1 << i
                         for i in entry.out_going_links)
@@ -160,7 +156,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     if partition in partition_groups:
                         found_groups.append(partition_groups[partition])
 
-                if len(found_groups) == 0:
+                if not found_groups:
                     # If no group was found, create a new one
                     for partition in partitions:
                         partition_groups[partition] = partitions
@@ -181,13 +177,10 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                         partition_groups[partition] = new_group
 
         # Sort partitions by largest group
-        continuous_groups = OrderedSet(
-            tuple(group) for group in partition_groups.itervalues())
-        continuous_groups = reversed(sorted(
-            [group for group in continuous_groups],
-            key=lambda group: len(group)))
+        continuous = list(OrderedSet(
+            tuple(group) for group in partition_groups.itervalues()))
 
-        for group in continuous_groups:
+        for group in reversed(sorted(continuous, key=len)):
             for partition in progress.over(group, False):
                 keys_and_masks = self._allocate_keys_and_masks(
                     None, None, n_keys_map.n_keys_for_partition(partition))

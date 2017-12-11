@@ -63,63 +63,53 @@ class OneToOnePlacer(RadialPlacer):
         for vertex_list in vertices:
             # if too many one to ones to fit on a chip, allocate individually
             if len(vertex_list) > machine.maximum_user_cores_on_chip:
-                for vertex in vertex_list:
+                for vertex in progress.over(vertex_list, False):
                     self._allocate_individual(
                         vertex, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed)
-                    progress.update()
+                continue
+            allocations = self._get_allocations(resource_tracker, vertex_list)
+            if allocations is not None:
+                # allocate cores to vertices
+                for vertex, (x, y, p, _, _) in progress.over(zip(
+                        vertex_list, allocations), False):
+                    placements.add_placement(Placement(vertex, x, y, p))
             else:
-                try:
-                    resource_and_constraint_list = [
-                        (vertex.resources_required, vertex.constraints)
-                        for vertex in vertex_list]
-                    allocations = \
-                        resource_tracker.allocate_constrained_group_resources(
-                            resource_and_constraint_list)
-
-                    # allocate cores to vertices
-                    for vertex, (x, y, p, _, _) in zip(
-                            vertex_list, allocations):
-                        placement = Placement(vertex, x, y, p)
-                        placements.add_placement(placement)
-                        progress.update()
-                except PacmanValueError or \
-                        PacmanException or \
-                        PacmanInvalidParameterException:
-
-                    # If something goes wrong, try to allocate each
-                    # individually
-                    for vertex in vertex_list:
-                        self._allocate_individual(
-                            vertex, placements, resource_tracker,
-                            same_chip_vertex_groups, all_vertices_placed)
-                        progress.update()
+                # Something went wrong, try to allocate each individually
+                for vertex in progress.over(vertex_list, False):
+                    self._allocate_individual(
+                        vertex, placements, resource_tracker,
+                        same_chip_vertex_groups, all_vertices_placed)
         progress.end()
         return placements
 
     @staticmethod
+    def _get_allocations(resource_tracker, vertices):
+        try:
+            return resource_tracker.allocate_constrained_group_resources(
+                [(v.resources_required, v.constraints) for v in vertices])
+        except (PacmanValueError, PacmanException,
+                PacmanInvalidParameterException):
+            return None
+
+    @staticmethod
     def _allocate_individual(
-            vertex, placements, resource_tracker, same_chip_vertex_groups,
+            vertex, placements, tracker, same_chip_vertex_groups,
             all_vertices_placed):
         if vertex not in all_vertices_placed:
             vertices = same_chip_vertex_groups[vertex]
 
             if len(vertices) > 1:
-                resources = \
-                    resource_tracker.allocate_constrained_group_resources([
-                        (vert.resources_required, vert.constraints)
-                        for vert in vertices
-                    ])
-                for (x, y, p, _, _), vert in zip(resources, vertices):
-                    placement = Placement(vert, x, y, p)
-                    placements.add_placement(placement)
-                    all_vertices_placed.add(vert)
+                resources = tracker.allocate_constrained_group_resources([
+                    (v.resources_required, v.constraints) for v in vertices])
+                for (x, y, p, _, _), v in zip(resources, vertices):
+                    placements.add_placement(Placement(v, x, y, p))
+                    all_vertices_placed.add(v)
             else:
-                (x, y, p, _, _) = resource_tracker.\
+                (x, y, p, _, _) = tracker.\
                     allocate_constrained_resources(
                         vertex.resources_required, vertex.constraints)
-                placement = Placement(vertex, x, y, p)
-                placements.add_placement(placement)
+                placements.add_placement(Placement(vertex, x, y, p))
                 all_vertices_placed.add(vertex)
 
     def _sort_vertices_for_one_to_one_connection(

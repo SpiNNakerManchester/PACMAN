@@ -55,7 +55,7 @@ class KeyFieldGenerator(object):
 
         # If there are no fields, add the mask as a field
         the_fields = fields
-        if fields is None or len(fields) == 0:
+        if fields is None or not fields:
             n_ones = 32 - len(zeros)
             field_max = (2 ** n_ones) - 1
             the_fields = [Field(0, field_max, fixed_mask)]

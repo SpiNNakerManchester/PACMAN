@@ -257,7 +257,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             key_generator = KeyFieldGenerator(
                 mask, fields, self._free_space_tracker)
             for key in key_generator:
-                logger.debug("Trying key {}".format(hex(key)))
+                logger.debug("Trying key %s", hex(key))
 
                 # Check if all the key ranges can be allocated
                 matched_all = True

@@ -11,7 +11,7 @@ class IsomorphicChecker(object):
     algorithms_metadata.xml."""
 
     def __call__(self, report_folder, placements, placements_copy):
-        """Outputs the result of the isomorphic check to a report file.
+        """Outputs the result of the isomorphic check to a f file.
 
         :param report_folder: the folder to which the reports are being written
         :return: None
@@ -19,18 +19,18 @@ class IsomorphicChecker(object):
 
         file_name = os.path.join(report_folder, "placement_isomorph.rpt")
         try:
-            with open(file_name, "w") as report:
+            with open(file_name, "w") as f:
                 if self.check(placements, placements_copy):
-                    report.write(
+                    f.write(
                         "The two algorithms called have the same set of "
                         "placements.")
                 else:
-                    report.write(
+                    f.write(
                         "The two algorithms have different placements data.")
         except IOError:
             logging.getLogger().error(
-                "Generate_isomorph_report: Can't open file {} for "
-                "writing.".format(file_name))
+                "Generate_isomorph_report: Can't open file %s for writing.",
+                file_name)
 
     def check(self, placements, placements_copy):
         """Checks if the placements on each processor are the same for\
