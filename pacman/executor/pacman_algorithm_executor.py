@@ -402,18 +402,25 @@ class PACMANAlgorithmExecutor(object):
                     if algorithm.algorithm_id in algorithms_left_names:
                         algorithm_input_requirement_breakdown += \
                             self._deduce_inputs_required_to_run(
-                                algorithm, input_types)
+                                algorithm, input_types, token_states,
+                                fake_inputs, fake_tokens)
                 for algorithm in optionals_to_use:
                     if algorithm.algorithm_id in algorithms_left_names:
                         algorithm_input_requirement_breakdown += \
                             self._deduce_inputs_required_to_run(
-                                algorithm, input_types)
+                                algorithm, input_types, token_states,
+                                fake_inputs, fake_tokens)
                 algorithms_by_output = defaultdict(list)
+                algorithms_by_token = defaultdict(list)
                 for algorithms in (algorithm_data, optional_algorithm_data):
                     for algorithm in algorithms:
                         for output in algorithm.outputs:
                             algorithms_by_output[output.output_type].append(
                                 algorithm.algorithm_id)
+                        for token in algorithm.generated_output_tokens:
+                            algorithms_by_token[token.name].append(
+                                "{}: part={}".format(
+                                    algorithm.algorithm_id, token.part))
 
                 raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
@@ -426,6 +433,7 @@ class PACMANAlgorithmExecutor(object):
                     "    Functions available: {}\n"
                     "    Functions used: {}\n"
                     "    Algorithm by outputs: {}\n"
+                    "    Algorithm by tokens: {}\n"
                     "    Inputs required per function: \n{}\n".format(
                         input_types,
                         fake_inputs,
@@ -434,7 +442,7 @@ class PACMANAlgorithmExecutor(object):
                         fake_tokens.get_completed_tokens(),
                         tokens_to_find,
                         algorithms_left_names, algorithms_used,
-                        algorithms_by_output,
+                        algorithms_by_output, algorithms_by_token,
                         algorithm_input_requirement_breakdown))
 
         # Test that the outputs are generated
@@ -474,7 +482,8 @@ class PACMANAlgorithmExecutor(object):
             if not tokens.is_token_complete(Token(token))
         }
 
-    def _deduce_inputs_required_to_run(self, algorithm, inputs):
+    def _deduce_inputs_required_to_run(
+            self, algorithm, inputs, tokens, fake_inputs, fake_tokens):
         left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
         separator = ""
         for algorithm_inputs, extra in (
@@ -483,10 +492,23 @@ class PACMANAlgorithmExecutor(object):
             for an_input in algorithm_inputs:
                 unfound_types = [
                     param_type for param_type in an_input.param_types
-                    if param_type not in inputs]
+                    if param_type not in inputs and
+                    param_type not in fake_inputs]
+                found_types = [
+                    param_type for param_type in an_input.param_types
+                    if param_type in inputs or param_type in fake_inputs]
                 if unfound_types:
                     left_over_inputs += "{}'{}'{}".format(
                         separator, unfound_types, extra)
+                    if found_types:
+                        left_over_inputs += " (but found '{}')".format(
+                            found_types)
+                    separator = ", "
+            for a_token in algorithm.required_input_tokens:
+                if (not tokens.is_token_complete(a_token) and
+                        not fake_tokens.is_token_complete(a_token)):
+                    left_over_inputs += "{}'{}'".format(
+                        separator, a_token)
                     separator = ", "
         left_over_inputs += "]\n"
         return left_over_inputs
