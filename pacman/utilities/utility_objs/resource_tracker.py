@@ -367,12 +367,6 @@ class ResourceTracker(object):
                     chip_found = True
                     yield (chip_x, chip_y)
             if not chip_found:
-                for (chip_x, chip_y) in chips:
-                    if ((area_code is None or (
-                    chip_x, chip_y) in area_code) and
-                            self._chip_available(chip_x, chip_y)):
-                        chip_found = True
-                        yield (chip_x, chip_y)
                 raise exceptions.PacmanInvalidParameterException(
                     "chips and board_address",
                     "{} and {}".format(chips, board_address),
