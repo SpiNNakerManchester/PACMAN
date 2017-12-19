@@ -154,8 +154,7 @@ class FixedRouteRouter(object):
             fake_placements, machine, graph)
 
         # convert to fr entries
-        for (chip_x, chip_y) in machine.get_chips_on_board(
-                ethernet_connected_chip):
+        for (chip_x, chip_y) in routing_tables_by_partition.get_routers():
             mc_entries = routing_tables_by_partition.get_entries_for_router(
                 chip_x, chip_y)
             # only want the first entry, as that will all be the same.
@@ -205,8 +204,9 @@ class FixedRouteRouter(object):
                 # build entry and add to table and add to tables
                 fixed_route_entry = FixedRouteEntry(
                     link_ids=link_ids, processor_ids=[])
-                fixed_route_tables[(path_chip_x, path_chip_y)] = \
-                    fixed_route_entry
+                fixed_route_tables[
+                    (path_chip_x + ethernet_chip_x,
+                     path_chip_y + ethernet_chip_y)] = fixed_route_entry
 
         # locate where to plonk data
         processor_id = self._locate_destination(
