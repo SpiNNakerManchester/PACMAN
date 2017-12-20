@@ -8,9 +8,9 @@ from spinn_utilities.progress_bar import ProgressBar
 
 
 class FixedRouteRouter(object):
-    """ fixed router that makes a mirror path on every board based off the
-    below diagram. It assumed there's a core on the ethernet connected chip
-    that is of the destination class.
+    """ fixed router that makes a mirror path on every board based off the\
+        below diagram. It assumed there's a core on the ethernet connected\
+        chip that is of the destination class.
 
 
             [] [] [] []
@@ -117,7 +117,7 @@ class FixedRouteRouter(object):
         :param placements: placements
         :param ethernet_connected_chip: the chip to consider for this routing
         :param destination_class: the class at the ethernet connected chip\
-         for receiving all these routes.
+            for receiving all these routes.
         :param machine: SpiNNMachine instance
         :rtype: None
         """
@@ -182,7 +182,7 @@ class FixedRouteRouter(object):
         :param ethernet_chip_x: chip x of the ethernet connected chip
         :param ethernet_chip_y: chip y of the ethernet connected chip
         :param destination_class: the class of the vertex to route to at \
-        the ethernet connected chip
+            the ethernet connected chip
         :param machine: spinnMachine instance
         :rtype: None
         """
@@ -233,7 +233,7 @@ class FixedRouteRouter(object):
             ethernet_chip_x, ethernet_chip_y, destination_class, placements,
             machine):
         """ locate destination vertex on ethernet connected chip to send\
-        fixed data to
+            fixed data to
 
         :param ethernet_chip_x: chip x to search
         :param ethernet_chip_y: chip y to search
@@ -264,7 +264,7 @@ class FixedRouteRouter(object):
 
         :param machine: the spiNNMachine instance
         :param ethernet_connected_chip: the chip which supports a ethernet\
-         connection
+            connection
         :param board_version: what type of SpiNNaker board we're working with
         :return: bool
         """
@@ -299,8 +299,6 @@ class FixedRouteRouter(object):
                     if not machine.is_link_at(
                             chip_x, chip_y, self.DEFAULT_LINK_ID):
                         return False
-
-
         return True
 
 
