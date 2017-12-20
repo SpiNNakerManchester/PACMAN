@@ -183,13 +183,7 @@ class FixedRouteRouter(object):
         :rtype: None
         """
 
-        # process each path separately
-        if board_version == 5 or board_version == 4:
-            paths = self.router_path_chips_48
-            joins = self.joins_48
-        else:
-            paths = self.router_path_chips_4
-            joins = self.joins_4
+        joins, paths = self._get_joins_paths(board_version)
 
         for path_id in paths.keys():
 
@@ -222,6 +216,13 @@ class FixedRouteRouter(object):
                 "fixed route entry", str(key))
         fixed_route_tables[key] = fixed_route_entry
 
+    def _get_joins_paths(self, board_version):
+        # process each path separately
+        if board_version == 5 or board_version == 4:
+            return self.joins_48, self.router_path_chips_48
+        else:
+            return self.joins_4, self.router_path_chips_4
+
     @staticmethod
     def _locate_destination(
             ethernet_chip_x, ethernet_chip_y, destination_class, placements):
@@ -250,9 +251,8 @@ class FixedRouteRouter(object):
             "no destination vertex found on ethernet chip {}:{}".format(
                 ethernet_chip_x, ethernet_chip_y))
 
-    @staticmethod
     def _detect_failed_chips_on_board(
-            machine, ethernet_connected_chip, board_version):
+            self, machine, ethernet_connected_chip, board_version):
         """ detects if all chips on the board are alive
 
         :param machine: the spiNNMachine instance
@@ -261,13 +261,37 @@ class FixedRouteRouter(object):
         :param board_version: what type of SpiNNaker board we're working with
         :return: bool
         """
-        return (
+        # correct n chips
+        correct_n_chips = (
             ((board_version == 2 or board_version == 3) and
              len(list(machine.get_chips_on_board(
                  ethernet_connected_chip))) == 4)
             or ((board_version == 4 or board_version == 5) and
                 len(list(machine.get_chips_on_board(
                     ethernet_connected_chip))) == 48))
+
+        if not correct_n_chips:
+            return False
+
+        # figure correct links
+        joins, _ = self._get_joins_paths(board_version)
+        for ethernet_connected_chip in machine.ethernet_connected_chips:
+            ethernet_chip_x = ethernet_connected_chip.x
+            ethernet_chip_y = ethernet_connected_chip.y
+            for (chip_x, chip_y) in machine.get_chips_on_board(
+                    ethernet_connected_chip):
+                join_chip_x = chip_x - ethernet_chip_x
+                join_chip_y = chip_y - ethernet_chip_y
+                if (join_chip_x, join_chip_y) in joins:
+                    if not machine.is_link_at(
+                            chip_x, chip_y, joins[(join_chip_x, join_chip_y)]):
+                        return False
+                else:
+                    if not machine.is_link_at(chip_x, chip_y, 4):
+                        return False
+
+
+        return True
 
 
 class RoutingMachineVertex(MachineVertex):
