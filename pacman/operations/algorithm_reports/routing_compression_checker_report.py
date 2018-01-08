@@ -5,8 +5,9 @@ import os
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRoutingException
 from pacman.operations.algorithm_reports import reports
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 WILDCARD = "*"
@@ -157,4 +158,4 @@ def generate_routing_compression_checker_report(
                     compare_route(f, o_route, compressed_dict)
     except IOError:
         logger.error("Generate_router_comparison_reports: Can't open file"
-                     " %s for writing.", file_name)
+                     " {} for writing.", file_name)

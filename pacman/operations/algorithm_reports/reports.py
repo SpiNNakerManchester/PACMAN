@@ -7,8 +7,9 @@ from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 from pacman.model.graphs.common import EdgeTrafficType
 
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def tag_allocator_report(report_folder, tag_infos):
@@ -32,7 +33,7 @@ def tag_allocator_report(report_folder, tag_infos):
             for reverse_ip_tag in progress.over(tag_infos.reverse_ip_tags):
                 f.write(str(reverse_ip_tag) + "\n")
     except IOError:
-        logger.error("Generate_tag_report: Can't open file %s for "
+        logger.error("Generate_tag_report: Can't open file {} for "
                      "writing.", file_name)
 
 
@@ -131,7 +132,7 @@ def router_report_from_paths(
                         # End one entry:
                         f.write("\n")
     except IOError:
-        logger.error("Generate_routing_reports: Can't open file %s for "
+        logger.error("Generate_routing_reports: Can't open file {} for "
                      "writing.", file_name)
 
 
@@ -178,7 +179,7 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
                     f.write(my_string)
                 f.write("\n")
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file %s for"
+        logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.", file_name)
 
 
@@ -248,7 +249,7 @@ def placement_report_with_application_graph_by_vertex(
                             .format(lo_atom, hi_atom, num_atoms, x, y, p))
                 f.write("\n")
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file %s for"
+        logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.", file_name)
 
 
@@ -301,7 +302,7 @@ def placement_report_without_application_graph_by_vertex(
                 used_processors_by_chip.update({key: used_pros})
                 f.write(" Placed on core ({}, {}, {})\n\n".format(x, y, p))
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file %s for"
+        logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.", file_name)
 
 
@@ -363,7 +364,7 @@ def placement_report_with_application_graph_by_core(
                         f.write("              Model: {}\n\n".format(
                             vertex_model))
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file %s for "
+        logger.error("Generate_placement_reports: Can't open file {} for "
                      "writing.", file_name)
 
 
@@ -413,7 +414,7 @@ def placement_report_without_application_graph_by_core(
                                 .format(vertex.__class__.__name__))
                         f.write("\n")
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file %s for "
+        logger.error("Generate_placement_reports: Can't open file {} for "
                      "writing.", file_name)
 
 
@@ -470,7 +471,7 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
                     # Do Nothing
                     pass
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file %s for "
+        logger.error("Generate_placement_reports: Can't open file {} for "
                      "writing.", file_name)
 
 
@@ -503,7 +504,7 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
             progress.end()
     except IOError:
         logger.error("generate virtual key space information report: "
-                     "Can't open file %s for writing.", file_name)
+                     "Can't open file {} for writing.", file_name)
 
 
 def router_report_from_router_tables(report_folder, routing_tables):
@@ -582,7 +583,7 @@ def _generate_routing_table(routing_table, top_level_folder):
             f.write("{} Defaultable entries\n".format(n_defaultable))
     except IOError:
         logger.error("Generate_placement_reports: Can't open file"
-                     " %s for writing.", file_path)
+                     " {} for writing.", file_path)
 
 
 def generate_comparison_router_report(
@@ -623,7 +624,7 @@ def generate_comparison_router_report(
                         ratio * 100))
     except IOError:
         logger.error("Generate_router_comparison_reports: Can't open file"
-                     " %s for writing.", file_name)
+                     " {} for writing.", file_name)
 
 
 def _reduce_route_value(processors_ids, link_ids):

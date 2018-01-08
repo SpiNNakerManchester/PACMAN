@@ -13,8 +13,9 @@ from pacman.executor.algorithm_decorators.token import Token
 # general imports
 import logging
 from collections import defaultdict
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PACMANAlgorithmExecutor(object):
@@ -661,7 +662,7 @@ class PACMANAlgorithmExecutor(object):
     def _update_timings(self, timer, algorithm):
         time_taken = timer.take_sample()
         if self._print_timings:
-            logger.info("Time %s taken by %s",
+            logger.info("Time {} taken by {}",
                         time_taken, algorithm.algorithm_id)
         self._algorithm_timings.append(
             (algorithm.algorithm_id, time_taken, self._provenance_name))

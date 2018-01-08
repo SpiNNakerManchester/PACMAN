@@ -1,5 +1,6 @@
 import os
 import logging
+from spinn_utilities.log import FormatAdapter
 
 
 class IsomorphicChecker(object):
@@ -28,8 +29,8 @@ class IsomorphicChecker(object):
                     f.write(
                         "The two algorithms have different placements data.")
         except IOError:
-            logging.getLogger().error(
-                "Generate_isomorph_report: Can't open file %s for writing.",
+            FormatAdapter(logging.getLogger()).error(
+                "Generate_isomorph_report: Can't open file {} for writing.",
                 file_name)
 
     def check(self, placements, placements_copy):

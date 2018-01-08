@@ -5,6 +5,7 @@ from collections import namedtuple
 import logging
 
 from pacman.exceptions import PacmanRoutingException
+from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.model.graphs.common import EdgeTrafficType
@@ -12,7 +13,7 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # Define an internal class for placements
 PlacementTuple = namedtuple('PlacementTuple', 'x y p')
@@ -66,7 +67,7 @@ def validate_routes(machine_graph, placements, routing_infos,
             if not is_continuous:
                 logger.warn(
                     "Due to the none continuous nature of the keys in this "
-                    "partition %s, we cannot check all atoms will be routed "
+                    "partition {}, we cannot check all atoms will be routed "
                     "correctly, but will check the base key instead",
                     partition)
 
@@ -122,7 +123,7 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     """
     if logger.isEnabledFor(logging.DEBUG):
         for dest in dest_placements:
-            logger.debug("[%d:%d:%d]", dest.x, dest.y, dest.p)
+            logger.debug("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
     located_destinations = set()
 
@@ -189,7 +190,7 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     # raise error if required
     if error_message != "":
         raise PacmanRoutingException(error_message)
-    logger.debug("successful test between %s and %s",
+    logger.debug("successful test between {} and {}",
                  source_placement.vertex.label, dest_placements)
 
 
@@ -387,7 +388,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
                 found_entry = entry
             else:
                 logger.warn(
-                    "Found more than one entry for key %s. This could be "
+                    "Found more than one entry for key {}. This could be "
                     "an error, as currently no router supports overloading"
                     " of entries.", hex(key))
             if entry.mask in range_masks:

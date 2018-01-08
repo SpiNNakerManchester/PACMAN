@@ -3,8 +3,9 @@ import logging
 
 from .abstract_python_algorithm import AbstractPythonAlgorithm
 from pacman.model.decorators import overrides
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
@@ -44,7 +45,7 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
         try:
             return function(**inputs)
         except Exception:
-            logger.error("Error when calling %s.%s with inputs %s",
+            logger.error("Error when calling {}.{} with inputs {}",
                          self._python_module, self._python_function, inputs)
             raise
 

@@ -1,8 +1,9 @@
 import logging
 import os
 from pacman.model.graphs.application import ApplicationVertex
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NetworkSpecification(object):
@@ -24,7 +25,7 @@ class NetworkSpecification(object):
                 for vertex in graph.vertices:
                     self._write_report(f, vertex, graph)
         except IOError:
-            logger.error("Generate_placement_reports: Can't open file %s"
+            logger.error("Generate_placement_reports: Can't open file {}"
                          " for writing.", filename)
 
     @staticmethod

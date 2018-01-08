@@ -3,8 +3,9 @@ import logging
 
 from .abstract_python_algorithm import AbstractPythonAlgorithm
 from pacman.model.decorators import overrides
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PythonClassAlgorithm(AbstractPythonAlgorithm):
@@ -60,7 +61,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             method = "__call__"
             if self._python_method is not None:
                 method = self._python_method
-            logger.error("Error when calling %s.%s.%s with inputs %s",
+            logger.error("Error when calling {}.{}.{} with inputs {}",
                          self._python_module, self._python_class, method,
                          inputs)
             raise
