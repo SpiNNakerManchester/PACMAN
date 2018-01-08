@@ -31,8 +31,9 @@ import numpy
 import logging
 from collections import defaultdict
 from collections import OrderedDict
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
@@ -276,39 +277,39 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         key_found = None
         mask = None
         for mask in masks_available:
-            logger.debug("Trying mask %s for %d keys",
+            logger.debug("Trying mask {} for {} keys",
                          hex(mask), partition_n_keys)
 
             key_found = None
             for key in KeyFieldGenerator(
                     mask, fields, self._free_space_tracker):
-                logger.debug("Trying key %s", hex(key))
+                logger.debug("Trying key {}", hex(key))
 
                 # Check if all the key ranges can be allocated
                 matched_all = True
                 index = 0
                 for (base_key, n_keys) in self._get_key_ranges(key, mask):
-                    logger.debug("Finding slot for %s, n_keys=%d",
+                    logger.debug("Finding slot for {}, n_keys={}",
                                  hex(base_key), n_keys)
                     index = self._find_slot(base_key, lo=index)
-                    logger.debug("Slot for %s is %s", hex(base_key), index)
+                    logger.debug("Slot for {} is {}", hex(base_key), index)
                     if index is None:
                         matched_all = False
                         break
                     space = self._check_allocation(index, base_key, n_keys)
-                    logger.debug("Space for %s is %s", hex(base_key), space)
+                    logger.debug("Space for {} is {}", hex(base_key), space)
                     if space is None:
                         matched_all = False
                         break
 
                 if matched_all:
-                    logger.debug("Matched key %s", hex(key))
+                    logger.debug("Matched key {}", hex(key))
                     key_found = key
                     break
 
             # If we found a matching key, store the mask that worked
             if key_found is not None:
-                logger.debug("Matched mask %s", hex(mask))
+                logger.debug("Matched mask {}", hex(mask))
                 mask_found = mask
                 break
 
