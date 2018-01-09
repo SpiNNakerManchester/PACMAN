@@ -33,39 +33,27 @@ class ConvertToFileMachine(object):
             "Converting to json machine")
 
         # write basic stuff
-        json_obj = dict()
-        json_obj['width'] = machine.max_chip_x + 1
-        json_obj['height'] = machine.max_chip_y + 1
-        json_obj['chip_resources'] = dict()
-        json_obj['chip_resources']['cores'] = CHIP_HOMOGENEOUS_CORES
-        json_obj['chip_resources']['sdram'] = CHIP_HOMOGENEOUS_SDRAM
-        json_obj['chip_resources']['sram'] = CHIP_HOMOGENEOUS_SRAM
-        json_obj['chip_resources']["router_entries"] = \
-            ROUTER_HOMOGENEOUS_ENTRIES
-        json_obj['chip_resources']['tags'] = CHIP_HOMOGENEOUS_TAGS
+        json_obj = {
+            "width": machine.max_chip_x + 1,
+            "height": machine.max_chip_y + 1,
+            "chip_resources": {
+                "cores": CHIP_HOMOGENEOUS_CORES,
+                "sdram": CHIP_HOMOGENEOUS_SDRAM,
+                "sram": CHIP_HOMOGENEOUS_SRAM,
+                "router_entries": ROUTER_HOMOGENEOUS_ENTRIES,
+                "tags": CHIP_HOMOGENEOUS_TAGS},
+            "dead_chips": [],
+            "dead_links": []}
 
-        # handle exceptions
-        json_obj['dead_chips'] = list()
-        json_obj['dead_links'] = list()
-        chip_resource_exceptions = defaultdict()
-
-        # write dead chips
-        for x_coord in range(0, machine.max_chip_x + 1):
-            for y_coord in range(0, machine.max_chip_y + 1):
+        # handle exceptions (dead chips)
+        exceptions = defaultdict()
+        for x in range(0, machine.max_chip_x + 1):
+            for y in progress.over(range(0, machine.max_chip_y + 1), False):
                 self._add_possibly_dead_chip(
-                    json_obj, machine, x_coord, y_coord,
-                    chip_resource_exceptions)
-                progress.update()
-
-        # convert dict into list
-        chip_resource_exceptions_list = []
-        for (chip_x, chip_y) in chip_resource_exceptions:
-            chip_resource_exceptions_list.append(
-                [chip_x, chip_y, chip_resource_exceptions[(chip_x, chip_y)]])
+                    json_obj, machine, x, y, exceptions)
+        json_obj["exceptions"] = [
+            [x, y, exceptions[x, y]] for x, y in exceptions]
         progress.update()
-
-        # store exceptions into json form
-        json_obj['chip_resource_exceptions'] = chip_resource_exceptions_list
 
         # dump to json file
         with open(file_path, "w") as file_to_write:
@@ -96,30 +84,23 @@ class ConvertToFileMachine(object):
                     [x, y, "{}".format(constants.EDGES(link_id).name.lower())])
 
         chip = machine.get_chip_at(x, y)
+        # locate number of monitor cores
+        num_monitors = self._locate_no_monitors(chip)
         if not chip.is_processor_with_id(CHIP_HOMOGENEOUS_CORES - 1):
             # locate the highest core id
-            no_processors = self._locate_core_id(machine, x, y)
-            # locate number of monitor cores
-            no_monitors = self._locate_no_monitors(chip)
-            chip_exceptions = dict()
-            chip_exceptions["cores"] = no_processors - no_monitors
-            exceptions[(x, y)] = chip_exceptions
-
-        else:
-            no_monitors = self._locate_no_monitors(chip)
-
+            num_processors = self._locate_core_id(machine, x, y)
+            exceptions[x, y] = {
+                "cores": num_processors - num_monitors}
+        elif num_monitors:
             # if monitors exist, remove them from top level
-            if no_monitors > 0:
-                chip_exceptions = dict()
-                chip_exceptions["cores"] = \
-                    CHIP_HOMOGENEOUS_CORES - 1 - no_monitors
-                exceptions[(x, y)] = chip_exceptions
+            exceptions[x, y] = {
+                "cores": CHIP_HOMOGENEOUS_CORES - 1 - num_monitors}
 
         # search for Ethernet connected chips
         for chip in machine.ethernet_connected_chips:
             if (chip.x, chip.y) not in exceptions:
-                exceptions[(chip.x, chip.y)] = dict()
-            exceptions[(chip.x, chip.y)]['tags'] = len(chip.tag_ids)
+                exceptions[chip.x, chip.y] = dict()
+            exceptions[chip.x, chip.y]['tags'] = len(chip.tag_ids)
 
     @staticmethod
     def _locate_core_id(machine, x, y):

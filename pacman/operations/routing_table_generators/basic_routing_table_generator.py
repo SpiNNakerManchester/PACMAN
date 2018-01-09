@@ -28,7 +28,7 @@ class BasicRoutingTableGenerator(object):
         for chip in progress.over(machine.chips):
             partitions_in_table = routing_table_by_partitions.\
                 get_entries_for_router(chip.x, chip.y)
-            if len(partitions_in_table) != 0:
+            if partitions_in_table:
                 routing_table = MulticastRoutingTable(chip.x, chip.y)
                 for partition in partitions_in_table:
                     r_info = routing_infos.get_routing_info_from_partition(

@@ -14,12 +14,11 @@ class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
         """
 
         :param fields: any fields that define regions in the mask with further\
-                    limitations
+            limitations
         :type fields: iterable of :py:class:`pacman.utilities.field.Field`
         :raise PacmanInvalidParameterException: if any of the fields are\
-                    outside of the mask i.e. mask & field.mask != field.mask\
-                    or if any of the field masks overlap i.e.\
-                    field.mask & other_field.mask != 0
+            outside of the mask i.e. mask & field.mask != field.mask or if any\
+            of the field masks overlap i.e. field.mask & other_field.mask != 0
         """
         self._fields = sorted(fields, key=lambda field: field.mask,
                               reverse=True)
@@ -30,7 +29,7 @@ class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
             further limitations
 
         :return: Iterable of fields, ordered by mask with the highest bit\
-                    range first
+            range first
         :rtype: iterable of :py:class:`pacman.utilities.field.Field`
         """
         return self._fields
@@ -40,10 +39,7 @@ class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
             return False
         if len(self._fields) != len(other.fields):
             return False
-        for field in self._fields:
-            if field not in other.fields:
-                return False
-        return True
+        return all(field in other.fields for field in self._fields)
 
     def __ne__(self, other):
         return not self.__eq__(other)

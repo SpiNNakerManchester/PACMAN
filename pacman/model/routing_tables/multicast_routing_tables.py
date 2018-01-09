@@ -8,7 +8,6 @@ class MulticastRoutingTables(object):
     __slots__ = [
         # set that holds routing tables
         "_routing_tables",
-
         # dict of (x,y) -> routing table
         "_routing_tables_by_chip"
     ]
@@ -18,9 +17,9 @@ class MulticastRoutingTables(object):
 
         :param routing_tables: The routing tables to add
         :type routing_tables: iterable of\
-                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
-                    routing tables are for the same chip
+            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+        :raise pacman.exceptions.PacmanAlreadyExistsException: \
+            If any two routing tables are for the same chip
         """
         self._routing_tables = set()
         self._routing_tables_by_chip = dict()
@@ -34,10 +33,10 @@ class MulticastRoutingTables(object):
 
         :param routing_table: a routing table to add
         :type routing_table:\
-                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
         :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
-                    table already exists for the chip
+        :raise pacman.exceptions.PacmanAlreadyExistsException: \
+            If a routing table already exists for the chip
         """
         if routing_table in self._routing_tables:
             raise PacmanAlreadyExistsException(
@@ -45,8 +44,7 @@ class MulticastRoutingTables(object):
                 " before and therefore already exists".format(routing_table),
                 str(routing_table))
 
-        if (routing_table.x, routing_table.y) in \
-                self._routing_tables_by_chip:
+        if (routing_table.x, routing_table.y) in self._routing_tables_by_chip:
             raise PacmanAlreadyExistsException(
                 "The Routing table for chip {}:{} already exists in this "
                 "collection and therefore is deemed an error to re-add it"
@@ -61,7 +59,7 @@ class MulticastRoutingTables(object):
 
         :return: an iterable of routing tables
         :rtype: iterable of\
-                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
         :raise None: does not raise any known exceptions
         """
         return self._routing_tables
@@ -75,13 +73,11 @@ class MulticastRoutingTables(object):
         :type y: int
         :return: The routing table, or None if no such table exists
         :rtype:\
-                    :py:class:`pacman.model.routing_tables.MulticastRoutingTable`\
-                    or None
+            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`\
+            or None
         :raise None: No known exceptions are raised
         """
-        if (x, y) in self._routing_tables_by_chip:
-            return self._routing_tables_by_chip[(x, y)]
-        return None
+        return self._routing_tables_by_chip.get((x, y), None)
 
     def __iter__(self):
         """ returns a iterator for the multicast routing tables stored within

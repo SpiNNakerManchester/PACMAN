@@ -31,6 +31,7 @@ class Token(object):
         return str(self._name + ":" + str(self._part)).__hash__()
 
     def __eq__(self, other):
+        # pylint: disable=protected-access
         if not isinstance(other, Token):
             return False
         return self._name == other._name and self._part == other._part

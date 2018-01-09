@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from pacman import exceptions
+from pacman.exceptions import PacmanAlgorithmFailedToGenerateOutputsException
 from .abstract_algorithm import AbstractAlgorithm
 from pacman.model.decorators import overrides
 
@@ -23,6 +23,7 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
 
         :param python_module: The module containing the python code to execute
         """
+        # pylint: disable=too-many-arguments
         AbstractAlgorithm.__init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
@@ -50,13 +51,13 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
             results = (results,)
 
         # If there are no results and there are not meant to be, return
-        if results is None and len(self._outputs) == 0:
+        if results is None and not self._outputs:
             return None
 
         # Check the results are valid
-        if ((results is None and len(self._outputs) > 0) or
+        if ((results is None and self._outputs) or
                 len(self._outputs) != len(results)):
-            raise exceptions.PacmanAlgorithmFailedToGenerateOutputsException(
+            raise PacmanAlgorithmFailedToGenerateOutputsException(
                 "Algorithm {} returned {} but specified {} output types"
                 .format(self._algorithm_id, results, len(self._outputs)))
 

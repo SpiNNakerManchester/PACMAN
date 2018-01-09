@@ -4,6 +4,33 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_table_by_partition import \
     MulticastRoutingTableByPartitionEntry, MulticastRoutingTableByPartition
 
+_route_translation = {
+    "CORE_0": (True, 0),
+    "CORE_1": (True, 1),
+    "CORE_2": (True, 2),
+    "CORE_3": (True, 3),
+    "CORE_4": (True, 4),
+    "CORE_5": (True, 5),
+    "CORE_6": (True, 6),
+    "CORE_7": (True, 7),
+    "CORE_8": (True, 8),
+    "CORE_9": (True, 9),
+    "CORE_10": (True, 10),
+    "CORE_11": (True, 11),
+    "CORE_12": (True, 12),
+    "CORE_13": (True, 13),
+    "CORE_14": (True, 14),
+    "CORE_15": (True, 15),
+    "CORE_16": (True, 16),
+    "CORE_17": (True, 17),
+    "EAST": (False, 0),
+    "NORTH_EAST": (False, 1),
+    "NORTH": (False, 2),
+    "WEST": (False, 3),
+    "SOUTH_WEST": (False, 4),
+    "SOUTH": (False, 5)
+}
+
 
 class ConvertToMemoryMultiCastRoutes(object):
     """ Converts between file routing paths and the pacman representation of\
@@ -11,33 +38,6 @@ class ConvertToMemoryMultiCastRoutes(object):
     """
 
     __slots__ = []
-
-    route_translation = {
-        "CORE_0": (True, 0),
-        "CORE_1": (True, 1),
-        "CORE_2": (True, 2),
-        "CORE_3": (True, 3),
-        "CORE_4": (True, 4),
-        "CORE_5": (True, 5),
-        "CORE_6": (True, 6),
-        "CORE_7": (True, 7),
-        "CORE_8": (True, 8),
-        "CORE_9": (True, 9),
-        "CORE_10": (True, 10),
-        "CORE_11": (True, 11),
-        "CORE_12": (True, 12),
-        "CORE_13": (True, 13),
-        "CORE_14": (True, 14),
-        "CORE_15": (True, 15),
-        "CORE_16": (True, 16),
-        "CORE_17": (True, 17),
-        "EAST": (False, 0),
-        "NORTH_EAST": (False, 1),
-        "NORTH": (False, 2),
-        "WEST": (False, 3),
-        "SOUTH_WEST": (False, 4),
-        "SOUTH": (False, 5)
-    }
 
     def __call__(self, file_routing_paths, partition_by_id):
         # load the json files
@@ -72,9 +72,7 @@ class ConvertToMemoryMultiCastRoutes(object):
             route = child["route"]
             next_hop = child["next_hop"]
             if route is not None:
-                is_core, route_id = \
-                    ConvertToMemoryMultiCastRoutes.route_translation[
-                        route.upper()]
+                is_core, route_id = _route_translation[route.upper()]
                 if is_core:
                     processor_ids.append(route_id)
                 else:
@@ -99,8 +97,8 @@ class ConvertToMemoryMultiCastRoutes(object):
 
         :param file_routing_paths:
         """
-        file_routing_paths_file = open(file_routing_paths, "r")
-        file_routing_paths = json.load(file_routing_paths_file)
+        with open(file_routing_paths, "r") as f:
+            return json.load(f)
 
         # TODO: Routing Path validation is currently not possible due to
         #       recursion
@@ -118,4 +116,4 @@ class ConvertToMemoryMultiCastRoutes(object):
         # jsonschema.validate(
         #    file_routing_paths, routing_paths_schema)
 
-        return file_routing_paths
+        # return file_routing_paths

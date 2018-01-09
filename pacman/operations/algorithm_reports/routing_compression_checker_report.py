@@ -5,8 +5,9 @@ import os
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRoutingException
 from pacman.operations.algorithm_reports import reports
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 WILDCARD = "*"
@@ -15,11 +16,11 @@ LINE_FORMAT = "0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}\n"
 
 def codify(route, length=32):
     """
-    This method discovers all the routing keys covered by this route
+    This method discovers all the routing keys covered by this route.
 
-    Starts of with the assumption thsat the key is always covered/
+    Starts of with the assumption that the key is always covered.
 
-    Whenever a mask bit is zero the list of covered keys is doubled to
+    Whenever a mask bit is zero the list of covered keys is doubled to\
         include both the key with a aero and a one at that place
 
     :param route: single routing Entry
@@ -155,7 +156,6 @@ def generate_routing_compression_checker_report(
                 for o_route in original.multicast_routing_entries:
                     f.write("\t{}\n".format(reports.format_route(o_route)))
                     compare_route(f, o_route, compressed_dict)
-
     except IOError:
         logger.error("Generate_router_comparison_reports: Can't open file"
-                     " {} for writing.".format(file_name))
+                     " {} for writing.", file_name)

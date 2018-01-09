@@ -24,14 +24,12 @@ class Field(object):
     ]
 
     def __init__(self, lo, hi, value, tag=SUPPORTED_TAGS.ROUTING, name=None):
+        # pylint: disable=too-many-arguments
         self._lo = lo
         self._hi = hi
         self._value = value
         self._tag = tag
-        if name is None:
-            self._name = uuid.uuid4()
-        else:
-            self._name = name
+        self._name = uuid.uuid4() if name is None else name
 
     @property
     def lo(self):
@@ -79,12 +77,11 @@ class Field(object):
     def __eq__(self, other_field):
         if not isinstance(other_field, Field):
             return False
-        else:
-            return (
-                self._lo == other_field.lo and self._hi == other_field.hi and
-                self._value == other_field.value and
-                self._tag == other_field.tag and
-                self._name == other_field.name)
+        return (
+            self._lo == other_field.lo and self._hi == other_field.hi and
+            self._value == other_field.value and
+            self._tag == other_field.tag and
+            self._name == other_field.name)
 
     def __ne__(self, other):
         return not self.__eq__(other)

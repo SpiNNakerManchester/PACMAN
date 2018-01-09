@@ -40,54 +40,52 @@ class ConvertToMemoryPlacements(object):
 
         # process placements
         for vertex_id in file_placements:
-            if str(vertex_id) in vertex_by_id:
-                vertex = vertex_by_id[str(vertex_id)]
-            else:
-                vertex = None
-
-            if unicode(vertex_id) not in core_allocations:
-                if vertex is None:
+            if str(vertex_id) not in vertex_by_id:
+                if unicode(vertex_id) not in core_allocations:
                     raise PacmanConfigurationException(
                         "I don't recognise this pattern of constraints for"
                         " a vertex which does not have a placement")
+                else:
+                    raise PacmanConfigurationException(
+                        "Failed to locate the vertex in the "
+                        "graph with id {}".format(vertex_id))
 
+            if unicode(vertex_id) in core_allocations:
+                memory_placements.add_placement(Placement(
+                    x=file_placements[vertex_id][0],
+                    y=file_placements[vertex_id][1],
+                    p=core_allocations[vertex_id][0],
+                    vertex=vertex_by_id[str(vertex_id)]))
+            else:
                 # virtual chip or tag chip
                 external_device_constraints = \
                     self._valid_constraints_for_external_device(
                         self._locate_constraints(vertex_id, constraints))
                 if external_device_constraints:
-                    # get data for virtual chip
-                    route_constraint = \
-                        external_device_constraints['end_point']
-                    route_direction = EDGES(
-                        route_constraint['direction'].upper())
-                    placement_constraint = \
-                        external_device_constraints['placement']
-                    coords = placement_constraint['location']
-
-                    # locate virtual chip
-                    link = extended_machine.get_chip_at(
-                        coords[0], coords[1]).router.get_link(
-                        route_direction.value)
-                    destination_chip = extended_machine.get_chip_at(
-                        link.destination_x, link.destination_y)
-
-                    # create placement
-                    placements.add_placement(Placement(
-                        vertex, destination_chip.x, destination_chip.y, None))
-            else:
-                if vertex is None:
-                    raise PacmanConfigurationException(
-                        "Failed to locate the vertex in the "
-                        "graph with id {}".format(vertex_id))
-                memory_placements.add_placement(Placement(
-                    x=file_placements[vertex_id][0],
-                    y=file_placements[vertex_id][1],
-                    p=core_allocations[vertex_id][0],
-                    vertex=vertex))
+                    placements.add(self._make_virtual_placement(
+                        extended_machine, vertex_by_id[str(vertex_id)],
+                        external_device_constraints))
 
         # return the file format
         return memory_placements
+
+    @staticmethod
+    def _make_virtual_placement(machine, vertex, constraints):
+        # get data for virtual chip
+        route_constraint = constraints['end_point']
+        route_direction = EDGES(route_constraint['direction'].upper())
+        placement_constraint = constraints['placement']
+        coords = placement_constraint['location']
+
+        # locate virtual chip
+        link = machine.get_chip_at(
+            coords[0], coords[1]).router.get_link(
+            route_direction.value)
+        destination_chip = machine.get_chip_at(
+            link.destination_x, link.destination_y)
+
+        # create placement
+        return Placement(vertex, destination_chip.x, destination_chip.y, None)
 
     @staticmethod
     def _load_json_files(placements, allocations, constraints):
@@ -116,19 +114,17 @@ class ConvertToMemoryPlacements(object):
         :param constraints_for_vertex: constraints for a vertex
         :rtype: bool
         """
-        found_route_end_point = None
-        found_placement_constraint = None
+        route_end_point = None
+        placement_constraint = None
         for constraint in constraints_for_vertex:
             if constraint['type'] == "location":
-                found_placement_constraint = constraint
+                placement_constraint = constraint
             if constraint['type'] == "route_endpoint":
-                found_route_end_point = constraint
-        if (found_placement_constraint is not None and
-                found_route_end_point is not None):
-            return {'end_point': found_route_end_point,
-                    'placement': found_placement_constraint}
-        else:
+                route_end_point = constraint
+        if placement_constraint is None or route_end_point is None:
             return {}
+        return {'end_point': route_end_point,
+                'placement': placement_constraint}
 
     @staticmethod
     def _validate_file_read_data(

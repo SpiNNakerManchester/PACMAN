@@ -15,38 +15,28 @@ class Graph(ConstrainedObject, AbstractGraph):
         vertices and edges
     """
 
-    __slots__ = (
+    __slots__ = [
         # The classes of vertex that are allowed in this graph
         "_allowed_vertex_types",
-
         # The classes of edges that are allowed in this graph
         "_allowed_edge_types",
-
         # The classes of outgoing edge partition that are allowed in this
         # graph
         "_allowed_partition_types",
-
         # The vertices of the graph
         "_vertices",
-
         # The outgoing edge partitions of the graph by name
         "_outgoing_edge_partitions_by_name",
-
         # The outgoing edges by pre-vertex
         "_outgoing_edges",
-
         # The incoming edges by post-vertex
         "_incoming_edges",
-
         # map between incoming edges and their associated partitions
         "_incoming_edges_by_partition_name",
-
         # The outgoing edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
-
         # The label of the graph
-        "_label"
-    )
+        "_label"]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types,
                  allowed_partition_types, label):
@@ -166,8 +156,7 @@ class Graph(ConstrainedObject, AbstractGraph):
         return [
             edge
             for partition in self._outgoing_edge_partitions_by_name.values()
-            for edge in partition.edges
-        ]
+            for edge in partition.edges]
 
     @property
     @overrides(AbstractGraph.outgoing_edge_partitions)
@@ -185,19 +174,17 @@ class Graph(ConstrainedObject, AbstractGraph):
 
     @overrides(AbstractGraph.get_edges_ending_at_vertex)
     def get_edges_ending_at_vertex(self, vertex):
-        if vertex in self._incoming_edges:
-            return self._incoming_edges[vertex]
-        else:
+        if vertex not in self._incoming_edges:
             return []
+        return self._incoming_edges[vertex]
 
     @overrides(AbstractGraph.get_edges_ending_at_vertex_with_partition_name)
     def get_edges_ending_at_vertex_with_partition_name(
             self, vertex, partition_name):
-        if (vertex, partition_name) in self._incoming_edges_by_partition_name:
-            return self._incoming_edges_by_partition_name[
-                (vertex, partition_name)]
-        else:
+        key = (vertex, partition_name)
+        if key not in self._incoming_edges_by_partition_name:
             return []
+        return self._incoming_edges_by_partition_name[key]
 
     @overrides(AbstractGraph.get_outgoing_edge_partitions_starting_at_vertex)
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):

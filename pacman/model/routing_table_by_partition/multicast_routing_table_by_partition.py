@@ -50,8 +50,7 @@ class MulticastRoutingTableByPartition(object):
         key = (router_x, router_y)
         if key not in self._router_to_entries_map:
             return ()
-        else:
-            return self._router_to_entries_map[key]
+        return self._router_to_entries_map[key]
 
     def get_entry_on_coords_for_edge(self, partition, router_x, router_y):
         """ Get an entry from a specific coordinate
@@ -60,5 +59,4 @@ class MulticastRoutingTableByPartition(object):
         entries = self.get_entries_for_router(router_x, router_y)
         if partition in entries:
             return entries[partition]
-        else:
-            return None
+        return None

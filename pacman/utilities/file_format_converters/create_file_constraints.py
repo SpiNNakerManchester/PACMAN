@@ -57,10 +57,9 @@ class CreateConstraintsToFile(object):
         for vertex in machine_graph.vertices:
             vertex_id = str(id(vertex))
             vertex_by_id[vertex_id] = vertex
-            for constraint in vertex.constraints:
+            for constraint in progress.over(vertex.constraints, False):
                 self._handle_vertex_constraint(
                     constraint, json_obj, vertex, vertex_id)
-                progress.update()
             self._handle_vertex_resources(
                 vertex.resources_required, json_obj, vertex_id)
             if isinstance(vertex, AbstractVirtualVertex):
@@ -68,22 +67,17 @@ class CreateConstraintsToFile(object):
                     vertex, vertex_id, json_obj, machine)
         return vertex_by_id
 
-    def _handle_virtual_vertex(
-            self, vertex, vertex_id, json_obj, machine):
-        r_dict = dict()
-        v_dict = dict()
-        json_obj.append(r_dict)
-        json_obj.append(v_dict)
-
-        (real_chip_id, direction_id) = \
+    def _handle_virtual_vertex(self, vertex, vertex_id, json_obj, machine):
+        chip_id, direction_id = \
             self._locate_connected_chip_data(vertex, machine)
-        r_dict['type'] = "route_endpoint"
-        r_dict['vertex'] = vertex_id
-        r_dict['direction'] = EDGES(direction_id)
-
-        v_dict["type"] = "location"
-        v_dict["vertex"] = vertex_id
-        v_dict["location"] = real_chip_id
+        json_obj.append({
+            "type": "route_endpoint",
+            "vertex": vertex_id,
+            "direction": EDGES(direction_id)})
+        json_obj.append({
+            "type": "location",
+            "vertex": vertex_id,
+            "location": chip_id})
 
     @staticmethod
     def _locate_connected_chip_data(vertex, machine):
@@ -97,81 +91,65 @@ class CreateConstraintsToFile(object):
             vertex.constraints, ChipAndCoreConstraint)
         router = machine.get_chip_at(
             placement_constraint.x, placement_constraint.y).router
-        found_link = False
-        link_id = 0
-        while not found_link or link_id < 5:
-            if router.is_link(link_id):
-                found_link = True
-            else:
-                link_id += 1
-        if not found_link:
+        link = next(
+            (router.get_link(i) for i in range(6) if router.is_link(i)),
+            None)
+        if link is None:
             raise PacmanConfigurationException(
                 "Can't find the real chip this virtual chip is connected to."
                 "Please fix and try again.")
-        else:
-            return ("[{}, {}]".format(router.get_link(link_id).destination_x,
-                                      router.get_link(link_id).destination_y),
-                    router.get_link(link_id).multicast_default_from)
+        return (str([link.destination_x, link.destination_y]),
+                link.multicast_default_from)
 
     @staticmethod
-    def _handle_vertex_constraint(
-            constraint, json_obj, vertex, vertex_id):
+    def _handle_vertex_constraint(constraint, json_obj, vertex, vertex_id):
         if not isinstance(vertex, AbstractVirtualVertex):
             if isinstance(constraint, AbstractPlacerConstraint):
                 if not isinstance(constraint, ChipAndCoreConstraint):
                     raise PacmanConfigurationException(
                         "Converter does not recognise placer constraint {}"
                         .format(constraint))
-                c_dict = dict()
-                c_dict['type'] = "location"
-                c_dict['vertex'] = vertex_id
-                c_dict['location'] = [constraint.x, constraint.y]
-                json_obj.append(c_dict)
+                json_obj.append({
+                    "type": "location",
+                    "vertex": vertex_id,
+                    "location": [constraint.x, constraint.y]})
                 if constraint.p is not None:
-                    c_dict = dict()
-                    c_dict['type'] = "resource"
-                    c_dict['vertex'] = vertex_id
-                    c_dict['resource'] = "cores"
-                    c_dict['range'] = "[{}, {}]".format(
-                        constraint.p, constraint.p + 1)
-                    json_obj.append(c_dict)
+                    json_obj.append({
+                        "type": "resource",
+                        "vertex": vertex_id,
+                        "resource": "cores",
+                        "range": str([constraint.p, constraint.p + 1])})
 
     @staticmethod
-    def _handle_vertex_resources(
-            resources_required, json_obj, vertex_id):
+    def _handle_vertex_resources(resources_required, json_obj, vertex_id):
         for _ in resources_required.iptags:
-            c_dict = dict()
-            c_dict['type'] = "resource"
-            c_dict['vertex'] = vertex_id
-            c_dict['resource'] = "iptag"
-            c_dict['range'] = [0, 1]
-            json_obj.append(c_dict)
+            json_obj.append({
+                "type": "resource",
+                "vertex": vertex_id,
+                "resource": "iptag",
+                "range": [0, 1]})
         for _ in resources_required.reverse_iptags:
-            c_dict = dict()
-            c_dict['type'] = "resource"
-            c_dict['vertex'] = vertex_id
-            c_dict['resource'] = "reverse_iptag"
-            c_dict['range'] = [0, 1]
-            json_obj.append(c_dict)
+            json_obj.append({
+                "type": "resource",
+                "vertex": vertex_id,
+                "resource": "reverse_iptag",
+                "range": [0, 1]})
 
     @staticmethod
     def _add_extra_monitor_cores(json_obj, machine):
         for chip in machine.chips:
-            for processor in chip.processors:
-                if processor.processor_id != 0 and processor.is_monitor:
-                    m_dict = dict()
-                    m_dict['type'] = "reserve_resource"
-                    m_dict['resource'] = "cores"
-                    m_dict['reservation'] = \
-                        [processor.processor_id, processor.processor_id + 1]
-                    m_dict['location'] = [chip.x, chip.y]
-                    json_obj.append(m_dict)
+            for p in chip.processors:
+                if p.processor_id and p.is_monitor:
+                    json_obj.append({
+                        "type": "reserve_resource",
+                        "resource": "cores",
+                        "reservation": [p.processor_id, p.processor_id + 1],
+                        "location": [chip.x, chip.y]})
 
     @staticmethod
     def _add_monitor_core_reserve(json_obj):
-        reserve_monitor = dict()
-        reserve_monitor['type'] = "reserve_resource"
-        reserve_monitor['resource'] = "cores"
-        reserve_monitor['reservation'] = [0, 1]
-        reserve_monitor['location'] = None
-        json_obj.append(reserve_monitor)
+        json_obj.append({
+            'type': "reserve_resource",
+            'resource': "cores",
+            'reservation': [0, 1],
+            'location': None})

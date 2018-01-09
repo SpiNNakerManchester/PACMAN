@@ -18,13 +18,12 @@ class ApplicationSpiNNakerLinkVertex(
     """ A virtual vertex on a SpiNNaker Link
     """
 
-    __slots__ = (
+    __slots__ = [
         "_n_atoms",
         "_spinnaker_link_id",
         "_board_address",
         "_virtual_chip_x",
-        "_virtual_chip_y"
-    )
+        "_virtual_chip_y"]
 
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,

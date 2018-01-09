@@ -1,6 +1,7 @@
 # pacman imports
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
-from pacman.utilities.algorithm_utilities import placer_algorithm_utilities
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import \
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
@@ -39,20 +40,16 @@ class HilbertPlacer(object):
         # in order to test isomorphism include:
         # placements_copy = Placements()
         placements = Placements()
-        vertices = \
-            placer_algorithm_utilities.sort_vertices_by_known_constraints(
-                machine_graph.vertices)
+        vertices = sort_vertices_by_known_constraints(machine_graph.vertices)
 
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
-        resource_tracker = ResourceTracker(machine,
-                                           self._generate_hilbert_chips(
-                                               machine))
+        resource_tracker = ResourceTracker(
+            machine, self._generate_hilbert_chips(machine))
 
         # get vertices which must be placed on the same chip
         vertices_on_same_chip = \
-            placer_algorithm_utilities.get_same_chip_vertex_groups(
-                machine_graph.vertices)
+            get_same_chip_vertex_groups(machine_graph.vertices)
 
         # iterate over vertices and generate placements
         all_vertices_placed = set()
@@ -60,8 +57,7 @@ class HilbertPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine,
-                    placements,
-                    vertices_on_same_chip)
+                    placements, vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
         return placements
 

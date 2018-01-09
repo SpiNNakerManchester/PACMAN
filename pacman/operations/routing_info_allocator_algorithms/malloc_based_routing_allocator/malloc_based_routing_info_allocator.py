@@ -6,6 +6,7 @@ from pacman.model.constraints.key_allocator_constraints\
     import AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
     import FixedMaskConstraint
+from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints.key_allocator_constraints \
     import FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
@@ -15,11 +16,14 @@ from pacman.operations.routing_info_allocator_algorithms\
     import KeyFieldGenerator
 from pacman.model.routing_info \
     import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
-from pacman.utilities import utility_calls
+from pacman.utilities.utility_calls import \
+    check_algorithm_can_support_constraints, locate_first_constraint_of_type,\
+    compress_from_bit_array, expand_to_bit_array
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities as utilities
-from pacman import exceptions
+from pacman.exceptions \
+    import PacmanConfigurationException, PacmanRouteInfoAllocationException
 
 # general imports
 import math
@@ -27,7 +31,7 @@ import numpy
 import logging
 from collections import defaultdict
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
@@ -38,11 +42,11 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     __slots__ = []
 
     def __init__(self):
-        ElementAllocatorAlgorithm.__init__(self, 0, math.pow(2, 32))
+        ElementAllocatorAlgorithm.__init__(self, 0, 2 ** 32)
 
     def __call__(self, machine_graph, n_keys_map, graph_mapper=None):
         # check that this algorithm supports the constraints
-        utility_calls.check_algorithm_can_support_constraints(
+        check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
             supported_constraints=[
                 FixedMaskConstraint,
@@ -66,27 +70,24 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             continuous_groups.add(group)
 
         # Go through the groups and allocate keys
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_outgoing_edge_partitions,
             "Allocating routing keys")
 
         # allocate the groups that have fixed keys
-        for group in fixed_key_groups:  # fixed keys groups
+        for group in progress.over(fixed_key_groups, False):
             self._allocate_fixed_keys(group, routing_infos, continuous_groups)
-            progress_bar.update()
 
-        for group in fixed_mask_groups:  # fixed mask groups
+        for group in progress.over(fixed_mask_groups, False):
             self._allocate_fixed_masks(group, fixed_field_groups, n_keys_map,
                                        routing_infos, continuous_groups)
-            progress_bar.update()
 
-        for group in fixed_field_groups:
+        for group in progress.over(fixed_field_groups, False):
             self._allocate_fixed_fields(group, n_keys_map, routing_infos,
                                         continuous_groups)
-            progress_bar.update()
 
-        if len(flexi_field_groups) != 0:
-            raise exceptions.PacmanConfigurationException(
+        if flexi_field_groups:
+            raise PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
         # If there is a graph, group by source vertex and sort by vertex slice
@@ -99,11 +100,9 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 vertex_groups[vertex].append(partition)
             vertex_partitions = list()
             for vertex_group in vertex_groups.itervalues():
-                sorted_partitions = sorted(
+                vertex_partitions.extend(sorted(
                     vertex_group,
-                    key=lambda part: graph_mapper.get_slice(
-                        part.pre_vertex))
-                vertex_partitions.extend(sorted_partitions)
+                    key=lambda part: graph_mapper.get_slice(part.pre_vertex)))
             continuous_groups = vertex_partitions
 
         for group in continuous_groups:
@@ -113,16 +112,15 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # update the pacman data objects
             self._update_routing_objects(keys_and_masks, routing_infos, group)
 
-        progress_bar.end()
+        progress.end()
         return routing_infos
 
     def _allocate_fixed_keys(self, group, routing_infos, continuous_groups):
         # Get any fixed keys and masks from the group and attempt to
         # allocate them
         fixed_mask = None
-        fixed_key_and_mask_constraint = \
-            utility_calls.locate_first_constraint_of_type(
-                group.constraints, FixedKeyAndMaskConstraint)
+        fixed_key_and_mask_constraint = locate_first_constraint_of_type(
+            group.constraints, FixedKeyAndMaskConstraint)
 
         # attempt to allocate them
         self._allocate_fixed_keys_and_masks(
@@ -138,12 +136,12 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     def _allocate_fixed_masks(self, group, fixed_field_groups, n_keys_map,
                               routing_infos, continuous_groups):
         # get mask and fields if need be
-        fixed_mask = utility_calls.locate_first_constraint_of_type(
+        fixed_mask = locate_first_constraint_of_type(
             group.constraints, FixedMaskConstraint).mask
 
         fields = None
         if group in fixed_field_groups:
-            fields = utility_calls.locate_first_constraint_of_type(
+            fields = locate_first_constraint_of_type(
                 group.constraints, FixedKeyFieldConstraint).fields
             fixed_field_groups.remove(group)
 
@@ -158,7 +156,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     def _allocate_fixed_fields(self, group, n_keys_map, routing_infos,
                                continuous_groups):
-        fields = utility_calls.locate_first_constraint_of_type(
+        fields = locate_first_constraint_of_type(
             group.constraints, FixedKeyFieldConstraint).fields
 
         # try to allocate
@@ -184,7 +182,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         :param key: The base key
         :param mask: The mask
         """
-        unwrapped_mask = utility_calls.expand_to_bit_array(mask)
+        unwrapped_mask = expand_to_bit_array(mask)
         first_zeros = list()
         remaining_zeros = list()
         pos = len(unwrapped_mask) - 1
@@ -204,16 +202,15 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # with n_keys being 2^len(first_zeros)
         n_sets = 2 ** len(remaining_zeros)
         n_keys = 2 ** len(first_zeros)
-        if len(remaining_zeros) == 0:
+        if not remaining_zeros:
             yield key, n_keys
             return
-        unwrapped_key = utility_calls.expand_to_bit_array(key)
+        unwrapped_key = expand_to_bit_array(key)
         for value in xrange(n_sets):
             generated_key = numpy.copy(unwrapped_key)
-            unwrapped_value = utility_calls.expand_to_bit_array(value)[
-                -len(remaining_zeros):]
-            generated_key[remaining_zeros] = unwrapped_value
-            yield utility_calls.compress_from_bit_array(generated_key), n_keys
+            generated_key[remaining_zeros] = \
+                expand_to_bit_array(value)[-len(remaining_zeros):]
+            yield compress_from_bit_array(generated_key), n_keys
 
     @staticmethod
     def _get_possible_masks(n_keys):
@@ -221,10 +218,9 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         :param n_keys: The number of keys to generate a mask for
         """
-
-        # TODO: Generate all the masks - currently only the obvious
-        # mask with the zeros at the bottom is generated but the zeros
-        # could actually be anywhere
+        # TODO: Generate all the masks. Currently only the obvious mask with
+        # the zeros at the bottom is generated but the zeros could actually be
+        # anywhere
         n_zeros = int(math.ceil(math.log(n_keys, 2)))
         n_ones = 32 - n_zeros
         return [(((1 << n_ones) - 1) << n_zeros)]
@@ -234,7 +230,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         for key_and_mask in keys_and_masks:
             # If there is a fixed mask, check it doesn't clash
             if fixed_mask is not None and fixed_mask != key_and_mask.mask:
-                raise exceptions.PacmanRouteInfoAllocationException(
+                raise PacmanRouteInfoAllocationException(
                     "Cannot meet conflicting constraints")
 
             # Go through the mask sets and allocate
@@ -255,54 +251,51 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         key_found = None
         mask = None
         for mask in masks_available:
-            logger.debug("Trying mask {} for {} keys".format(
-                hex(mask), partition_n_keys))
+            logger.debug("Trying mask {} for {} keys",
+                         hex(mask), partition_n_keys)
 
             key_found = None
             key_generator = KeyFieldGenerator(
                 mask, fields, self._free_space_tracker)
             for key in key_generator:
-                logger.debug("Trying key {}".format(hex(key)))
+                logger.debug("Trying key {}", hex(key))
 
                 # Check if all the key ranges can be allocated
                 matched_all = True
                 index = 0
                 for (base_key, n_keys) in self._get_key_ranges(key, mask):
-                    logger.debug("Finding slot for {}, n_keys={}".format(
-                        hex(base_key), n_keys))
+                    logger.debug("Finding slot for {}, n_keys={}",
+                                 hex(base_key), n_keys)
                     index = self._find_slot(base_key, lo=index)
-                    logger.debug("Slot for {} is {}".format(
-                        hex(base_key), index))
+                    logger.debug("Slot for {} is {}", hex(base_key), index)
                     if index is None:
                         matched_all = False
                         break
                     space = self._check_allocation(index, base_key, n_keys)
-                    logger.debug("Space for {} is {}".format(
-                        hex(base_key), space))
+                    logger.debug("Space for {} is {}", hex(base_key), space)
                     if space is None:
                         matched_all = False
                         break
 
                 if matched_all:
-                    logger.debug("Matched key {}".format(hex(key)))
+                    logger.debug("Matched key {}", hex(key))
                     key_found = key
                     break
 
             # If we found a matching key, store the mask that worked
             if key_found is not None:
-                logger.debug("Matched mask {}".format(hex(mask)))
+                logger.debug("Matched mask {}", hex(mask))
                 mask_found = mask
                 break
 
         # If we found a working key and mask that can be assigned,
         # Allocate them
         if key_found is not None and mask_found is not None:
-            for (base_key, n_keys) in self._get_key_ranges(
-                    key_found, mask):
+            for (base_key, n_keys) in self._get_key_ranges(key_found, mask):
                 self._allocate_elements(base_key, n_keys)
 
             # If we get here, we can assign the keys to the edges
-            return list([BaseKeyAndMask(base_key=key_found, mask=mask)])
+            return [BaseKeyAndMask(base_key=key_found, mask=mask)]
 
-        raise exceptions.PacmanRouteInfoAllocationException(
+        raise PacmanRouteInfoAllocationException(
             "Could not find space to allocate keys")

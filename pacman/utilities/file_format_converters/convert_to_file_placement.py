@@ -29,11 +29,10 @@ class ConvertToFilePlacement(object):
                                "converting to json placements")
 
         # process placements
-        for placement in placements:
+        for placement in progress.over(placements, False):
             vertex_id = str(id(placement.vertex))
             vertex_by_id[vertex_id] = placement.vertex
             json_obj[vertex_id] = [placement.x, placement.y]
-            progress.update()
 
         # dump dict into json file
         with open(file_path, "w") as file_to_write:
@@ -43,10 +42,9 @@ class ConvertToFilePlacement(object):
         placements_schema_file_path = os.path.join(
             os.path.dirname(file_format_schemas.__file__), "placements.json")
 
+        progress.update()
         with open(placements_schema_file_path, "r") as file_to_read:
             jsonschema.validate(json_obj, json.load(file_to_read))
-
-        progress.update()
         progress.end()
 
         # return the file format

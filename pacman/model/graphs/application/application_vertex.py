@@ -17,7 +17,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         based on the resources that the vertex requires
     """
 
-    __slots__ = ("_label")
+    __slots__ = ["_label"]
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxint):
@@ -33,7 +33,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
         :raise pacman.exceptions.PacmanInvalidParameterException:\
-                    * If one of the constraints is not valid
+            * If one of the constraints is not valid
         """
 
         ConstrainedObject.__init__(self, constraints)
@@ -62,7 +62,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :param vertex_slice: the low value of atoms to calculate resources from
         :type vertex_slice: :py:class:`pacman.model.graph.slice.Slice`
         :return: a Resource container that contains a \
-                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
+            CPUCyclesPerTickResource, DTCMResource and SDRAMResource
         :rtype: pacman.model.resources.ResourceContainer
         :raise None: this method does not raise any known exception
         """
