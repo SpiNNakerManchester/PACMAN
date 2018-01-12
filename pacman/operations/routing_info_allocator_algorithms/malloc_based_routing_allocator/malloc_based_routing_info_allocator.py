@@ -19,7 +19,7 @@ from pacman.operations.routing_info_allocator_algorithms\
 from pacman.model.routing_info \
     import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.utilities.utility_calls import \
-    check_algorithm_can_support_constraints, locate_first_constraint_of_type,\
+    check_algorithm_can_support_constraints, \
     compress_from_bit_array, expand_to_bit_array
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities import \
@@ -79,10 +79,10 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             "Allocating routing keys")
 
         # allocate the groups that have fixed keys
-        for group in progress.over(fixed_key_groups, False):  # fixed keys groups
+        for group in progress.over(fixed_key_groups, False):
             self._allocate_fixed_keys(group, routing_infos)
 
-        for group in progress.over(fixed_mask_groups, False):  # fixed mask groups
+        for group in progress.over(fixed_mask_groups, False):
             self._allocate_fixed_masks(group, n_keys_map, routing_infos)
 
         for group in progress.over(fixed_field_groups, False):
@@ -128,10 +128,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         fixed_key_and_mask_constraint = group.constraint
 
         fixed_mask = None
-        fixed_key_and_mask_constraint = locate_first_constraint_of_type(
-            group.constraints, FixedKeyAndMaskConstraint)
-
-        # attempt to allocate them
         self._allocate_fixed_keys_and_masks(
             fixed_key_and_mask_constraint.keys_and_masks, fixed_mask)
 
