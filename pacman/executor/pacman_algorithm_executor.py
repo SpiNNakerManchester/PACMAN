@@ -13,8 +13,9 @@ from pacman.executor.algorithm_decorators.token import Token
 # general imports
 import logging
 from collections import defaultdict
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PACMANAlgorithmExecutor(object):
@@ -562,57 +563,51 @@ class PACMANAlgorithmExecutor(object):
 
         # Find the next algorithm which can run now
         for algorithm in algorithm_list:
-
             # check all inputs
-            all_inputs_match = True
-            for input_parameter in algorithm.required_inputs:
-                if not input_parameter.input_matches(inputs):
-                    all_inputs_match = False
-                    break
+            all_inputs_match = all(
+                input_parameter.input_matches(inputs)
+                for input_parameter in algorithm.required_inputs)
 
             # check all required tokens
             if all_inputs_match:
-                for token in algorithm.required_input_tokens:
-                    if not tokens.is_token_complete(token):
-                        all_inputs_match = False
-                        break
+                all_inputs_match = all(
+                    tokens.is_token_complete(token)
+                    for token in algorithm.required_input_tokens)
 
             # check all optional inputs
             if all_inputs_match and force_optionals:
-                for input_parameter in algorithm.optional_inputs:
-                    if (not input_parameter.input_matches(inputs) and
-                            not input_parameter.input_matches(fake_inputs)):
-                        all_inputs_match = False
+                all_inputs_match = all(
+                    input_parameter.input_matches(inputs)
+                    or input_parameter.input_matches(fake_inputs)
+                    for input_parameter in algorithm.optional_inputs)
 
             # check all optional tokens
             if all_inputs_match and force_optionals:
-                for token in algorithm.optional_input_tokens:
-                    if (not tokens.is_token_complete(token) and
-                            not fake_tokens.is_token_complete(token)):
-                        all_inputs_match = False
-                        break
+                all_inputs_match = all(
+                    tokens.is_token_complete(token)
+                    or fake_tokens.is_token_complete(token)
+                    for token in algorithm.optional_input_tokens)
 
             if all_inputs_match:
+                # If the list of generated outputs is not given, we're done now
+                if not check_generated_outputs:
+                    return algorithm, algorithm_list
 
-                # If the list of generated outputs is given, only use the
+                # The list of generated outputs is given, so only use the
                 # algorithm if it generates something new, assuming the
                 # algorithm generates any outputs at all
-                # (otherwise just use it)
-                if check_generated_outputs:
-                    if algorithm.outputs:
-                        for output in algorithm.outputs:
-                            if (output.output_type not in generated_outputs and
-                                    output.output_type not in inputs):
-                                return algorithm, algorithm_list
+                if algorithm.outputs:
+                    for output in algorithm.outputs:
+                        if (output.output_type not in generated_outputs
+                                and output.output_type not in inputs):
+                            return algorithm, algorithm_list
 
-                    # If the algorithm doesn't generate a unique output,
-                    # check if it generates a unique token
-                    if algorithm.generated_output_tokens:
-                        for token in algorithm.generated_output_tokens:
-                            if not tokens.is_token_complete(token):
-                                return algorithm, algorithm_list
-                else:
-                    return algorithm, algorithm_list
+                # If the algorithm doesn't generate a unique output,
+                # check if it generates a unique token
+                if algorithm.generated_output_tokens:
+                    for token in algorithm.generated_output_tokens:
+                        if not tokens.is_token_complete(token):
+                            return algorithm, algorithm_list
 
         # If no algorithms are available, return None
         return None, algorithm_list
@@ -698,8 +693,8 @@ class PACMANAlgorithmExecutor(object):
     def _update_timings(self, timer, algorithm):
         time_taken = timer.take_sample()
         if self._print_timings:
-            logger.info("Time {} taken by {}".format(
-                str(time_taken), algorithm.algorithm_id))
+            logger.info("Time {} taken by {}",
+                        time_taken, algorithm.algorithm_id)
         self._algorithm_timings.append(
             (algorithm.algorithm_id, time_taken, self._provenance_name))
 
@@ -707,30 +702,30 @@ class PACMANAlgorithmExecutor(object):
         try:
             with open(self._provenance_path, "a") as provenance_file:
                 algorithm.write_provenance_header(provenance_file)
-                if len(algorithm.required_inputs) > 0:
+                if algorithm.required_inputs:
                     provenance_file.write("\trequired_inputs:\n")
                     self._report_inputs(provenance_file,
                                         algorithm.required_inputs)
-                if len(algorithm.optional_inputs) > 0:
+                if algorithm.optional_inputs:
                     provenance_file.write("\toptional_inputs:\n")
                     self._report_inputs(provenance_file,
                                         algorithm.optional_inputs)
-                if len(algorithm.required_input_tokens) > 0:
+                if algorithm.required_input_tokens:
                     provenance_file.write("\trequired_tokens:\n")
                     self._report_tokens(
                         provenance_file, algorithm.required_input_tokens)
-                if len(algorithm.optional_input_tokens) > 0:
+                if algorithm.optional_input_tokens:
                     provenance_file.write("\toptional_tokens:\n")
                     self._report_tokens(
                         provenance_file, algorithm.optional_input_tokens)
-                if len(algorithm.outputs) > 0:
+                if algorithm.outputs:
                     provenance_file.write("\toutputs:\n")
                     for output in algorithm.outputs:
                         variable = results[output.output_type]
                         the_type = self._get_type(variable)
                         provenance_file.write(
                             "\t\t{}:{}\n".format(output.output_type, the_type))
-                if len(algorithm.generated_output_tokens) > 0:
+                if algorithm.generated_output_tokens:
                     provenance_file.write("\tgenerated_tokens:\n")
                     self._report_tokens(
                         provenance_file, algorithm.generated_output_tokens)
@@ -774,7 +769,7 @@ class PACMANAlgorithmExecutor(object):
         if the_type in [bool, float, int, str]:
             return variable
         if the_type == set:
-            if len(variable) == 0:
+            if not variable:
                 return "Empty set"
             the_type = "set("
             for item in variable:
@@ -782,7 +777,7 @@ class PACMANAlgorithmExecutor(object):
             the_type += ")"
             return the_type
         elif the_type == list:
-            if len(variable) == 0:
+            if not variable:
                 return "Empty list"
             first_type = type(variable[0])
             if all(isinstance(n, first_type) for n in variable):

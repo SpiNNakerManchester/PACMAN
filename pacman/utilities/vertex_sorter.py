@@ -79,16 +79,14 @@ class VertexSorter(object):
 
         # Group constraints based on the class
         self._constraints = defaultdict(list)
-        for constraint in constraint_order:
-            self._constraints[constraint.constraint_class].append(
-                (constraint.relative_order,
-                    constraint.required_optional_properties)
-            )
+        for c in constraint_order:
+            self._constraints[c.constraint_class].append(
+                (c.relative_order, c.required_optional_properties))
 
         # Sort each list of constraint by the number of optional properties,
         # largest first
         for constraints in self._constraints.itervalues():
-            constraints.sort(key=lambda con: len(con), reverse=True)
+            constraints.sort(key=len, reverse=True)
 
     def sort(self, vertices):
         """ Sort the given set of vertices by the constraint ordering
@@ -101,13 +99,13 @@ class VertexSorter(object):
 
             # Get all the ranks of the constraints
             ranks = [sys.maxint]
-            for constraint in vertex.constraints:
+            for c in vertex.constraints:
 
                 # If the constraint is one to sort by
-                if constraint.__class__ in self._constraints:
-                    current_ranks = self._constraints[constraint.__class__]
+                if c.__class__ in self._constraints:
+                    current_ranks = self._constraints[c.__class__]
                     for (rank, required_param) in current_ranks:
-                        if self._matches(constraint, required_param):
+                        if self._matches(c, required_param):
                             ranks.append(rank)
 
             # Sort and store the ranks for overall ordering
@@ -126,9 +124,5 @@ class VertexSorter(object):
         """
         if opts is None:
             return True
-
-        for opt in opts:
-            if getattr(constraint, opt) is None:
-                return False
-
-        return True
+        return all(getattr(constraint, opt) is not None
+                   for opt in opts)

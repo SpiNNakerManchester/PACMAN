@@ -60,23 +60,12 @@ class RadialPlacer(object):
     def _place_vertex(
             self, vertex, resource_tracker, machine, placements,
             vertices_on_same_chip):
-
         vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
         radial_constraints = locate_constraints_of_type(
             vertices, RadialPlacementFromChipConstraint)
-        start_x = None
-        start_y = None
-        for constraint in radial_constraints:
-            if start_x is None:
-                start_x = constraint.x
-            elif start_x != constraint.x:
-                raise PacmanPlaceException("Non-matching constraints")
-            if start_y is None:
-                start_y = constraint.y
-            elif start_y != constraint.y:
-                raise PacmanPlaceException("Non-matching constraints")
+        start_x, start_y = self._get_start(radial_constraints)
         chips = None
         if start_x is not None and start_y is not None:
             chips = self._generate_radial_chips(
@@ -98,6 +87,21 @@ class RadialPlacer(object):
             placements.add_placement(placement)
 
         return vertices
+
+    @staticmethod
+    def _get_start(radial_constraints):
+        x = None
+        y = None
+        for constraint in radial_constraints:
+            if x is None:
+                x = constraint.x
+            elif x != constraint.x:
+                raise PacmanPlaceException("Non-matching constraints")
+            if y is None:
+                y = constraint.y
+            elif y != constraint.y:
+                raise PacmanPlaceException("Non-matching constraints")
+        return x, y
 
     @staticmethod
     def _generate_radial_chips(
@@ -125,16 +129,16 @@ class RadialPlacer(object):
             first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
         done_chips = {first_chip}
         search = deque([first_chip])
-        while len(search) > 0:
+        while search:
             chip = search.pop()
             if (resource_tracker is None or
                     resource_tracker.is_chip_available(chip.x, chip.y)):
-                yield (chip.x, chip.y)
+                yield chip.x, chip.y
 
             # Examine the links of the chip to find the next chips
             for link in chip.router.links:
-                next_chip = machine.get_chip_at(link.destination_x,
-                                                link.destination_y)
+                next_chip = machine.get_chip_at(
+                    link.destination_x, link.destination_y)
 
                 # Don't search done chips again
                 if next_chip not in done_chips:

@@ -12,7 +12,7 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
     """ A machine graph vertex
     """
 
-    __slots__ = ("_label")
+    __slots__ = ["_label"]
 
     def __init__(self, label=None, constraints=None):
         """
@@ -23,7 +23,7 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
             iterable of\
             :py:class:`pacman.model.constraints.AbstractConstraint`
         :raise pacman.exceptions.PacmanInvalidParameterException:
-                    * If one of the constraints is not valid
+            * If one of the constraints is not valid
         """
         ConstrainedObject.__init__(self, constraints)
         self._label = label

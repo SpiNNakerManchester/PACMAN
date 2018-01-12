@@ -21,8 +21,8 @@ class BaseKeyAndMask(object):
         :type base_key: int
         :param mask: The routing mask
         :type mask: int
-        :raise PacmanConfigurationException: If key & mask != key i.e. the key\
-                    is not valid for the given mask
+        :raise PacmanConfigurationException: \
+            If key & mask != key i.e. the key is not valid for the given mask
         """
         self._base_key = base_key
         self._mask = mask
@@ -61,9 +61,8 @@ class BaseKeyAndMask(object):
     def __eq__(self, key_and_mask):
         if not isinstance(key_and_mask, BaseKeyAndMask):
             return False
-        else:
-            return (self._base_key == key_and_mask.key and
-                    self._mask == key_and_mask.mask)
+        return (self._base_key == key_and_mask.key and
+                self._mask == key_and_mask.mask)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -97,18 +96,18 @@ class BaseKeyAndMask(object):
     def get_keys(self, key_array=None, offset=0, n_keys=None):
         """ Get the ordered list of keys that the combination allows
 
-        :param key_array: Optional array into which the returned keys will be\
-                    placed
+        :param key_array: \
+            Optional array into which the returned keys will be placed
         :type key_array: array-like of int
-        :param offset: Optional offset into the array at which to start\
-                    placing keys
+        :param offset: \
+            Optional offset into the array at which to start placing keys
         :type offset: int
-        :param n_keys: Optional limit on the number of keys returned.  If less\
-                    than this number of keys are available, only the keys\
-                    available will be added
+        :param n_keys: \
+            Optional limit on the number of keys returned. If less than this\
+            number of keys are available, only the keys available will be added
         :type n_keys: int
         :return: A tuple of an array of keys and the number of keys added to\
-                    the array
+            the array
         :rtype: (array-like of int, int)
         """
         # Get the position of the zeros in the mask - assume 32-bits

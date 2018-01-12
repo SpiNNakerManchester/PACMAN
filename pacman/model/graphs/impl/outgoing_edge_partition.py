@@ -5,6 +5,9 @@ from pacman.model.decorators import overrides
 from pacman.model.graphs import AbstractOutgoingEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 
+_REPR_TEMPLATE = \
+    "OutgoingEdgePartition(identifier={}, edges={}, constraints={}, label={})"
+
 
 class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     """ A collection of edges which start at a single vertex which have the
@@ -116,10 +119,8 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
                 edges += edge.label + ","
             else:
                 edges += str(edge) + ","
-        return (
-            "OutgoingEdgePartition("
-            "identifier={}, edges={} constraints={}, label={})".format(
-                self._identifier, edges, self.constraints, self.label))
+        return _REPR_TEMPLATE.format(
+            self._identifier, edges, self.constraints, self.label)
 
     def __str__(self):
         return self.__repr__()

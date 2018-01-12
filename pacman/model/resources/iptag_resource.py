@@ -35,20 +35,21 @@ class IPtagResource(AbstractResource):
         """
 
         :param ip_address: The ip address of the host that will receive data\
-                    from this tag
+            from this tag
         :type ip_address: str
         :param port: The port that will
         :type port: int or None
         :param strip_sdp: Whether the tag requires that SDP headers are\
-                    stripped before transmission of data
+            stripped before transmission of data
         :type strip_sdp: bool
         :param tag: A fixed tag id to assign, or None if any tag is OK
         :type tag: int
         :param traffic_identifier: The traffic to be sent using this tag; \
-                    traffic with the same traffic_identifier can be sent using\
-                    the same tag
+            traffic with the same traffic_identifier can be sent using\
+            the same tag
         :type traffic_identifier: str
         """
+        # pylint: disable=too-many-arguments
         self._ip_address = ip_address
         self._port = port
         self._strip_sdp = strip_sdp
@@ -110,5 +111,4 @@ class IPtagResource(AbstractResource):
             "IPTagResource(ip_address={}, port={}, strip_sdp={}, tag={}, "
             "traffic_identifier={})".format(
                 self._ip_address, self._port, self._strip_sdp, self._tag,
-                self._traffic_identifier)
-        )
+                self._traffic_identifier))

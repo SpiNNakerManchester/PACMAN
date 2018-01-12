@@ -1,11 +1,11 @@
 import importlib
 import logging
-import sys
 
 from .abstract_python_algorithm import AbstractPythonAlgorithm
 from pacman.model.decorators import overrides
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PythonClassAlgorithm(AbstractPythonAlgorithm):
@@ -28,11 +28,11 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             generated_output_tokens, python_module, python_class,
             python_method=None):
         """
-
         :param python_class: The class of the algorithm
         :param python_method:\
             The method of the algorithm, or None if the class is callable
         """
+        # pylint: disable=too-many-arguments
         AbstractPythonAlgorithm.__init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
@@ -61,10 +61,10 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             method = "__call__"
             if self._python_method is not None:
                 method = self._python_method
-            exc_type, exc_value, exc_trace = sys.exc_info()
-            logger.error("Error when calling {}.{}.{} with inputs {}".format(
-                self._python_module, self._python_class, method, inputs))
-            raise exc_type, exc_value, exc_trace
+            logger.error("Error when calling {}.{}.{} with inputs {}",
+                         self._python_module, self._python_class, method,
+                         inputs)
+            raise
 
     def __repr__(self):
         return (
@@ -79,9 +79,8 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
     def write_provenance_header(self, provenance_file):
         provenance_file.write("{}\n".format(self._algorithm_id))
         if self._python_method:
-            provenance_file.write("\t{}.{}.{}\n".format(self._python_module,
-                                                        self._python_class,
-                                                        self._python_method))
+            provenance_file.write("\t{}.{}.{}\n".format(
+                self._python_module, self._python_class, self._python_method))
         else:
-            provenance_file.write("\t{}.{}\n".format(self._python_module,
-                                                     self._python_class))
+            provenance_file.write("\t{}.{}\n".format(
+                self._python_module, self._python_class))

@@ -1,8 +1,9 @@
 import logging
 import os
 from pacman.model.graphs.application import ApplicationVertex
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NetworkSpecification(object):
@@ -18,45 +19,36 @@ class NetworkSpecification(object):
         :rtype: None
         """
         filename = report_folder + os.sep + "network_specification.rpt"
-        f_network_specification = None
         try:
-            f_network_specification = open(filename, "w")
+            with open(filename, "w") as f:
+                f.write("*** Vertices:\n")
+                for vertex in graph.vertices:
+                    self._write_report(f, vertex, graph)
         except IOError:
             logger.error("Generate_placement_reports: Can't open file {}"
-                         " for writing.".format(filename))
+                         " for writing.", filename)
 
-        # Print information on vertices:
-        f_network_specification.write("*** Vertices:\n")
-        for vertex in graph.vertices:
-            if isinstance(vertex, ApplicationVertex):
-                f_network_specification.write(
-                    "Vertex {}, size: {}, model: {}\n".format(
-                        vertex.label, vertex.n_atoms,
-                        vertex.__class__.__name__))
-            else:
-                f_network_specification.write(
-                    "Vertex {}, model: {}\n".format(
-                        vertex.label, vertex.__class__.__name__))
+    @staticmethod
+    def _write_report(f, vertex, graph):
+        if isinstance(vertex, ApplicationVertex):
+            f.write("Vertex {}, size: {}, model: {}\n".format(
+                vertex.label, vertex.n_atoms, vertex.__class__.__name__))
+        else:
+            f.write("Vertex {}, model: {}\n".format(
+                vertex.label, vertex.__class__.__name__))
 
-            f_network_specification.write("    Constraints:\n")
-            for constraint in vertex.constraints:
-                f_network_specification.write("        {}\n".format(
-                    str(constraint)))
+        f.write("    Constraints:\n")
+        for constraint in vertex.constraints:
+            f.write("        {}\n".format(
+                str(constraint)))
 
-            f_network_specification.write(
-                "    Outgoing Edge Partitions:\n")
-            for partition in \
-                    graph.get_outgoing_edge_partitions_starting_at_vertex(
-                        vertex):
-
-                f_network_specification.write("    Partition {}:\n".format(
-                    partition.identifier))
-                for edge in partition.edges:
-                    f_network_specification.write(
-                        "        Edge: {}, From {} to {}, model: {}\n".format(
-                            edge.label, edge.pre_vertex.label,
-                            edge.post_vertex.label, edge.__class__.__name__))
-            f_network_specification.write("\n")
-
-        # Close file:
-        f_network_specification.close()
+        f.write("    Outgoing Edge Partitions:\n")
+        for partition in graph.get_outgoing_edge_partitions_starting_at_vertex(
+                vertex):
+            f.write("    Partition {}:\n".format(
+                partition.identifier))
+            for edge in partition.edges:
+                f.write("        Edge: {}, From {} to {}, model: {}\n".format(
+                    edge.label, edge.pre_vertex.label,
+                    edge.post_vertex.label, edge.__class__.__name__))
+        f.write("\n")

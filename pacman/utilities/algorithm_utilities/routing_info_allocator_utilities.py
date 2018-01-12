@@ -230,8 +230,7 @@ def _check_masks_are_correct(partition):
                     field.mask, mask),
                 "{}:{}".format(field.mask, mask))
         for other_field in fixed_field.fields:
-            if (other_field != field and
-                    other_field.mask & field.mask != 0):
+            if other_field != field and other_field.mask & field.mask != 0:
                 raise PacmanInvalidParameterException(
                     "field.mask, mask",
                     "Field masks {} and {} overlap".format(

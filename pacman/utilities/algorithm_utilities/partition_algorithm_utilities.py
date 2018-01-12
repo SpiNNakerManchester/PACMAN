@@ -69,11 +69,8 @@ def get_remaining_constraints(vertex):
     """ Gets the rest of the constraints from a vertex after removing\
         partitioning constraints
     """
-    constraints = list()
-    for constraint in vertex.constraints:
-        if not isinstance(constraint, AbstractPartitionerConstraint):
-            constraints.append(constraint)
-    return constraints
+    return [constraint for constraint in vertex.constraints
+            if not isinstance(constraint, AbstractPartitionerConstraint)]
 
 
 def get_same_size_vertex_groups(vertices):
@@ -101,7 +98,7 @@ def get_same_size_vertex_groups(vertices):
                             constraint.vertex.n_atoms))
                 same_size_as_vertices.append(constraint.vertex)
 
-        if len(same_size_as_vertices) > 0:
+        if same_size_as_vertices:
 
             # Go through all the vertices that want to have the same size
             # as the top level vertex

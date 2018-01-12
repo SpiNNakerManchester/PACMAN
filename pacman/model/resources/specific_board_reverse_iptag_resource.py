@@ -28,14 +28,14 @@ class ReverseIPtagResource(AbstractResource):
         """
 
         :param board: A board IP address which is where this reverse IPTag is\
-                to be placed
+            to be placed
         :type board: str
         :param port: The target port of the tag or None to assign elsewhere
         :type port: int or None
         :param port: The UDP port to listen to on the board for this tag
         :type port: int
         :param sdp_port: The SDP port number to be used when constructing \
-                SDP packets from the received UDP packets for this tag.
+            SDP packets from the received UDP packets for this tag.
         :type sdp_port: int
         :param tag: A fixed tag id to assign, or None if any tag is OK
         :type tag: int or None

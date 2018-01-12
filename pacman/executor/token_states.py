@@ -42,7 +42,7 @@ class _TokenState(object):
             checks for completion of a specific part of the token
         """
         if part is None:
-            return len(self._incomplete_parts) == 0
+            return not self._incomplete_parts
         return part in self._complete_parts
 
 

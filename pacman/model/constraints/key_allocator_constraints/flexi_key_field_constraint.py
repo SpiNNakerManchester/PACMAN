@@ -21,10 +21,7 @@ class FlexiKeyFieldConstraint(AbstractKeyAllocatorConstraint):
     def __eq__(self, other):
         if not isinstance(other, FlexiKeyFieldConstraint):
             return False
-        for field in self._fields:
-            if field not in other.fields:
-                return False
-        return True
+        return all(field in other.fields for field in self._fields)
 
     def __ne__(self, other):
         return not self.__eq__(other)

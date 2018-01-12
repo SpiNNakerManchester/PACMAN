@@ -29,18 +29,18 @@ class MulticastRoutingTable(object):
     def __init__(self, x, y, multicast_routing_entries=None):
         """
 
-        :param x: The x-coordinate of the chip for which this is the routing\
-                    table
+        :param x: \
+            The x-coordinate of the chip for which this is the routing table
         :type x: int
-        :param y: The y-coordinate of the chip for which this is the routing\
-                    tables
+        :param y: \
+            The y-coordinate of the chip for which this is the routing tables
         :type y: int
-        :param multicast_routing_entries: An iterable of routing entries to\
-                    add to the table
+        :param multicast_routing_entries: \
+            The routing entries to add to the table
         :type multicast_routing_entries: iterable of\
-                    :py:class:`spinn_machine.MulticastRoutingEntry`
+            :py:class:`spinn_machine.MulticastRoutingEntry`
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
-                    routing entries contain the same key-mask combination
+            routing entries contain the same key-mask combination
         """
         self._x = x
         self._y = y
@@ -57,10 +57,10 @@ class MulticastRoutingTable(object):
 
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:\
-                    :py:class:`spinn_machine.MulticastRoutingEntry`
+            :py:class:`spinn_machine.MulticastRoutingEntry`
         :rtype: None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
-                    entry with the same key-mask combination already exists
+            entry with the same key-mask combination already exists
         """
         routing_entry_key = multicast_routing_entry.routing_entry_key
         mask = multicast_routing_entry.mask
@@ -134,9 +134,9 @@ class MulticastRoutingTable(object):
         :param mask: the routing mask to be searched
         :type mask: int
         :return: the routing entry associated with the routing key_combo or\
-                    None if no such entry exists
+            None if no such entry exists
         :rtype:\
-                    :py:class:`spinn_machine.MulticastRoutingEntry`
+            :py:class:`spinn_machine.MulticastRoutingEntry`
         """
         if (routing_entry_key & mask) != routing_entry_key:
             raise PacmanRoutingException(

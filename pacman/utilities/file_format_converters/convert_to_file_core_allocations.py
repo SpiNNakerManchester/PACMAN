@@ -24,19 +24,17 @@ class ConvertToFileCoreAllocations(object):
                                "Converting to json core allocations")
 
         # write basic stuff
-        json_core_allocations_dict = dict()
-        json_core_allocations_dict['type'] = "cores"
+        json_dict = dict()
+        json_dict['type'] = "cores"
         vertex_by_id = dict()
 
         # process placements
-        for placement in placements:
-            self._convert_placement(placement, vertex_by_id,
-                                    json_core_allocations_dict)
-            progress.update()
+        for placement in progress.over(placements, False):
+            self._convert_placement(placement, vertex_by_id, json_dict)
 
         # dump dict into json file
         with open(file_path, "w") as file_to_write:
-            json.dump(json_core_allocations_dict, file_to_write)
+            json.dump(json_dict, file_to_write)
         progress.update()
 
         # validate the schema
@@ -45,8 +43,7 @@ class ConvertToFileCoreAllocations(object):
             "core_allocations.json")
         with open(core_allocations_schema_file_path, "r") as file_to_read:
             core_allocations_schema = json.load(file_to_read)
-            jsonschema.validate(
-                json_core_allocations_dict, core_allocations_schema)
+        jsonschema.validate(json_dict, core_allocations_schema)
 
         # complete progress bar
         progress.end()

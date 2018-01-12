@@ -18,6 +18,7 @@ def supports_injection(injectable_class):
     orig_init = injectable_class.__init__
 
     def new_init(self, *args, **kwargs):
+        # pylint: disable=protected-access
         orig_init(self, *args, **kwargs)
         for method in injectable_class.__dict__.itervalues():
             if hasattr(method, "_type_to_inject"):
@@ -36,6 +37,7 @@ def inject(type_to_inject):
     :param type_to_inject: The type to be injected using this method
     """
     def wrap(method):
+        # pylint: disable=protected-access
 
         @wraps(method)
         def wrapper(obj, arg):
@@ -114,7 +116,7 @@ def inject_items(types):
                     raise InjectionException(
                         "Argument {} was already provided to"
                         " method {} of {}".format(
-                            arg, wrapped_method.__name, obj.__class__))
+                            arg, wrapped_method.__name__, obj.__class__))
                 new_args[arg] = _injectables[arg_type]
             return wrapped_method(obj, *args, **new_args)
         return wrapper
@@ -166,10 +168,7 @@ class _DictFacade(dict):
         raise KeyError(key)
 
     def __contains__(self, item):
-        for d in self._dicts:
-            if item in d:
-                return True
-        return False
+        return any(item in d for d in self._dicts)
 
 
 class injection_context(object):

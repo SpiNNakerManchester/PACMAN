@@ -4,9 +4,8 @@ from .sdram_resource import SDRAMResource
 
 
 class ResourceContainer(object):
-    """container object for the types of resources so that ordering is no
-        longer a risk
-
+    """Container object for the types of resources so that ordering is no\
+    longer a risk.
     """
 
     __slots__ = [
@@ -46,19 +45,19 @@ class ResourceContainer(object):
         :param iptags: the iptags required
         :param reverse_iptags: the reverse iptags required
         :type dtcm: None or \
-                    :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
+            :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
         :type sdram: None or \
-                    :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
+            :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
         :type cpu_cycles: None or \
-                    :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
+            :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
         :type iptags: None or list of \
-                    :py:class:`pacman.models.resources.iptag_resource.IPtagResource`
+            :py:class:`pacman.models.resources.iptag_resource.IPtagResource`
         :type reverse_iptags: None or list of \
-                    :py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`
+            :py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`
         :rtype: pacman.models.resources.resource_container.ResourceContainer
         :raise None: does not raise any known exception
-
         """
+        # pylint: disable=too-many-arguments
         self._dtcm_usage = dtcm
         self._sdram_usage = sdram
         self._cpu_cycles = cpu_cycles
