@@ -12,6 +12,7 @@ import logging
 import sys
 
 logger = logging.getLogger(__name__)
+infinity = float("inf")
 
 
 class _NodeInfo(object):
@@ -142,7 +143,7 @@ class BasicDijkstraRouting(object):
             for source_id in range(6):
                 n = chip.router.get_link(source_id)
                 node.neighbours.append(n)
-                node.weights.append(None)
+                node.weights.append(infinity)
                 node.bws.append(None if n is None else self._max_bw)
             nodes_info[chip.x, chip.y] = node
         return nodes_info
