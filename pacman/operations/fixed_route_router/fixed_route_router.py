@@ -5,11 +5,12 @@ from pacman.operations.router_algorithms import BasicDijkstraRouting
 from spinn_machine.fixed_route_entry import FixedRouteEntry
 from pacman import exceptions
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine.virtual_machine import VirtualMachine
 
 
 class FixedRouteRouter(object):
     """ fixed router that makes a mirror path on every board based off the\
-        below diagram. It assumed there's a core on the ethernet connected\
+        below diagram. It assumed there's a core on the Ethernet connected\
         chip that is of the destination class.
 
 
@@ -39,7 +40,7 @@ class FixedRouteRouter(object):
 
     """
 
-    # groups of chips which work to go down a specific link on the ethernet
+    # groups of chips which work to go down a specific link on the Ethernet
     # connected chip
     router_path_chips_48 = {
         0: [
@@ -56,10 +57,10 @@ class FixedRouteRouter(object):
 
     # dict of source and destination to create fixed route router when not
     # default 4 0 = E 1 = NE 2 = N 3 = W 4 = SW 5 = S
-    joins_48 = {(0, 1): [5], (0, 2): [5], (0, 3): [5], (2, 1): [3],
-                (1, 0): [3], (2, 0): [3], (3, 0): [3], (4, 0): [3],
-                (5, 6): [5], (6, 6): [5]}
-    joins_4 = {(0, 1): [5], (1, 0): [3]}
+    joins_48 = {(0, 1): 5, (0, 2): 5, (0, 3): 5, (2, 1): 3,
+                (1, 0): 3, (2, 0): 3, (3, 0): 3, (4, 0): 3,
+                (5, 6): 5, (6, 6): 5}
+    joins_4 = {(0, 1): 5, (1, 0): 3}
 
     FAKE_ROUTING_PARTITION = "FAKE_MC_ROUTE"
     DEFAULT_LINK_ID = 4
@@ -105,32 +106,55 @@ class FixedRouteRouter(object):
             else:  # use router for avoiding dead chips
                 self._do_dynamic_routing(
                     fixed_route_tables, placements, ethernet_connected_chip,
-                    destination_class, machine)
+                    destination_class, machine, board_version)
         return fixed_route_tables
 
     def _do_dynamic_routing(
             self, fixed_route_tables, placements, ethernet_connected_chip,
-            destination_class, machine):
+            destination_class, machine, board_version):
         """ uses a router to route fixed routes
 
         :param fixed_route_tables: fixed route tables entry holder
         :param placements: placements
         :param ethernet_connected_chip: the chip to consider for this routing
-        :param destination_class: the class at the ethernet connected chip\
+        :param destination_class: the class at the Ethernet connected chip\
             for receiving all these routes.
         :param machine: SpiNNMachine instance
+        :param board_version: The version of the machine
         :rtype: None
         """
         graph = MachineGraph(label="routing graph")
         fake_placements = Placements()
 
         # build fake setup for the routing
+        eth_x = ethernet_connected_chip.x
+        eth_y = ethernet_connected_chip.y
+        down_links = set()
         for (chip_x, chip_y) in machine.get_chips_on_board(
                 ethernet_connected_chip):
             vertex = RoutingMachineVertex()
             graph.add_vertex(vertex)
+            rel_x = chip_x - eth_x
+            rel_y = chip_y - eth_y
             fake_placements.add_placement(Placement(
-                x=chip_x, y=chip_y, p=self.RANDOM_CORE_ID, vertex=vertex))
+                x=rel_x, y=rel_y, p=self.RANDOM_CORE_ID, vertex=vertex))
+            down_links.update({
+                (rel_x, rel_y, link) for link in range(6)
+                if not machine.is_link_at(chip_x, chip_y, link)})
+
+        # Create a fake machine consisting of only the one board that
+        # the routes should go over
+        fake_machine = machine
+        if (board_version in machine.BOARD_VERSION_FOR_48_CHIPS and
+                (machine.max_chip_x > 7 or machine.max_chip_y > 7)):
+            down_chips = {
+                (x, y) for x, y in zip(range(8), range(8))
+                if not machine.is_chip_at(x + eth_x, y + eth_y)}
+
+            # build a fake machine which is just one board but with the missing
+            # bits of the real board
+            fake_machine = VirtualMachine(
+                8, 8, False, down_chips=down_chips, down_links=down_links)
 
         # build destination
         verts = graph.vertices
@@ -142,8 +166,7 @@ class FixedRouteRouter(object):
             destination_class=destination_class,
             placements=placements, machine=machine)
         fake_placements.add_placement(Placement(
-            x=ethernet_connected_chip.x, y=ethernet_connected_chip.y,
-            p=destination_processor, vertex=vertex_dest))
+            x=0, y=0, p=destination_processor, vertex=vertex_dest))
 
         # deal with edges
         for vertex in verts:
@@ -154,9 +177,9 @@ class FixedRouteRouter(object):
         # route as if using multicast
         router = BasicDijkstraRouting()
         routing_tables_by_partition = router(
-            fake_placements, machine, graph)
+            fake_placements, fake_machine, graph)
 
-        # convert to fr entries
+        # convert to fixed route entries
         for (chip_x, chip_y) in routing_tables_by_partition.get_routers():
             mc_entries = routing_tables_by_partition.get_entries_for_router(
                 chip_x, chip_y)
@@ -165,7 +188,7 @@ class FixedRouteRouter(object):
             fixed_route_entry = FixedRouteEntry(
                 link_ids=mc_entry.out_going_links,
                 processor_ids=mc_entry.out_going_processors)
-            key = (chip_x, chip_y)
+            key = (chip_x + eth_x, chip_y + eth_y)
             if key in fixed_route_tables:
                 raise exceptions.PacmanAlreadyExistsException(
                     "fixed route entry", str(key))
@@ -179,10 +202,10 @@ class FixedRouteRouter(object):
         :param fixed_route_tables: fixed routing tables
         :param board_version: the spinnaker machine version
         :param placements: the placements object
-        :param ethernet_chip_x: chip x of the ethernet connected chip
-        :param ethernet_chip_y: chip y of the ethernet connected chip
+        :param ethernet_chip_x: chip x of the Ethernet connected chip
+        :param ethernet_chip_y: chip y of the Ethernet connected chip
         :param destination_class: the class of the vertex to route to at \
-            the ethernet connected chip
+            the Ethernet connected chip
         :param machine: spinnMachine instance
         :rtype: None
         """
@@ -197,16 +220,18 @@ class FixedRouteRouter(object):
                 # figure link ids (default is [4])
                 link_ids = [self.DEFAULT_LINK_ID]
                 if (path_chip_x, path_chip_y) in joins:
-                    link_ids = joins[(path_chip_x, path_chip_y)]
+                    link_ids = [joins[(path_chip_x, path_chip_y)]]
 
                 # build entry and add to table and add to tables
                 fixed_route_entry = FixedRouteEntry(
                     link_ids=link_ids, processor_ids=[])
-                fixed_route_tables[
-                    (path_chip_x + ethernet_chip_x,
-                     path_chip_y + ethernet_chip_y)] = fixed_route_entry
+                chip_x = (
+                    path_chip_x + ethernet_chip_x) % (machine.max_chip_x + 1)
+                chip_y = (
+                    path_chip_y + ethernet_chip_y) % (machine.max_chip_y + 1)
+                fixed_route_tables[chip_x, chip_y] = fixed_route_entry
 
-        # locate where to plonk data
+        # locate where to put data
         processor_id = self._locate_destination(
             ethernet_chip_x, ethernet_chip_y, destination_class, placements,
             machine)
@@ -232,7 +257,7 @@ class FixedRouteRouter(object):
     def _locate_destination(
             ethernet_chip_x, ethernet_chip_y, destination_class, placements,
             machine):
-        """ locate destination vertex on ethernet connected chip to send\
+        """ locate destination vertex on Ethernet connected chip to send\
             fixed data to
 
         :param ethernet_chip_x: chip x to search
@@ -255,7 +280,7 @@ class FixedRouteRouter(object):
                             processor_id), destination_class):
                     return processor_id
         raise exceptions.PacmanConfigurationException(
-            "no destination vertex found on ethernet chip {}:{}".format(
+            "no destination vertex found on Ethernet chip {}:{}".format(
                 ethernet_chip_x, ethernet_chip_y))
 
     def _detect_failed_chips_on_board(
@@ -263,7 +288,7 @@ class FixedRouteRouter(object):
         """ detects if all chips on the board are alive
 
         :param machine: the spiNNMachine instance
-        :param ethernet_connected_chip: the chip which supports a ethernet\
+        :param ethernet_connected_chip: the chip which supports an Ethernet\
             connection
         :param board_version: what type of SpiNNaker board we're working with
         :return: bool
@@ -295,7 +320,7 @@ class FixedRouteRouter(object):
                     if not machine.is_link_at(
                             chip_x, chip_y, joins[(join_chip_x, join_chip_y)]):
                         return False
-                else:
+                elif join_chip_x != 0 or join_chip_y != 0:
                     if not machine.is_link_at(
                             chip_x, chip_y, self.DEFAULT_LINK_ID):
                         return False
