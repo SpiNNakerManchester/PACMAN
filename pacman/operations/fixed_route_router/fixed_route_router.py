@@ -6,6 +6,7 @@ from spinn_machine.fixed_route_entry import FixedRouteEntry
 from pacman import exceptions
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.virtual_machine import VirtualMachine
+from spinn_machine.machine import Machine
 
 
 class FixedRouteRouter(object):
@@ -210,7 +211,7 @@ class FixedRouteRouter(object):
         :rtype: None
         """
 
-        joins, paths = self._get_joins_paths(board_version, machine)
+        joins, paths = self._get_joins_paths(board_version)
 
         for path_id in paths.keys():
 
@@ -246,9 +247,9 @@ class FixedRouteRouter(object):
                 "fixed route entry", str(key))
         fixed_route_tables[key] = fixed_route_entry
 
-    def _get_joins_paths(self, board_version, machine):
+    def _get_joins_paths(self, board_version):
         # process each path separately
-        if board_version in machine.BOARD_VERSION_FOR_48_CHIPS:
+        if board_version in Machine.BOARD_VERSION_FOR_48_CHIPS:
             return self.joins_48, self.router_path_chips_48
         else:
             return self.joins_4, self.router_path_chips_4
@@ -308,7 +309,7 @@ class FixedRouteRouter(object):
             return False
 
         # figure correct links
-        joins, _ = self._get_joins_paths(board_version, machine)
+        joins, _ = self._get_joins_paths(board_version)
         for ethernet_connected_chip in machine.ethernet_connected_chips:
             ethernet_chip_x = ethernet_connected_chip.x
             ethernet_chip_y = ethernet_connected_chip.y
