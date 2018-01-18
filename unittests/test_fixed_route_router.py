@@ -37,51 +37,36 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
      (None, None, None, 5, 5),
      (12, 12, True, None, 5),
      (16, 16, False, None, 5)])
-def test_all_working(width, height, with_wrap_arounds, version, board_version):
-    machine = VirtualMachine(
+@pytest.mark.parametrize(
+    "with_down_links,with_down_chips",
+    [(False, False),
+     (True, False),
+     (False, True)])
+def test_all_working(
+        width, height, with_wrap_arounds, version, board_version,
+        with_down_links, with_down_chips):
+
+    router = FixedRouteRouter()
+
+    joins, _ = router._get_joins_paths(board_version)
+    temp_machine = VirtualMachine(
         width=width, height=height, with_wrap_arounds=with_wrap_arounds,
         version=version)
-    placements = Placements()
-
-    ethernet_chips = machine.ethernet_connected_chips
-    for ethernet_chip in ethernet_chips:
-        destination_vertex = DestinationVertex()
-        placements.add_placement(Placement(
-            destination_vertex, ethernet_chip.x, ethernet_chip.y, 1))
-
-    router = FixedRouteRouter()
-
-    for ethernet_chip in ethernet_chips:
-        assert(router._detect_failed_chips_on_board(
-            machine, ethernet_chip, board_version))
-
-    fixed_route_tables = router.__call__(
-        machine, placements, board_version, DestinationVertex)
-
-    for x, y in machine.chip_coordinates:
-        assert (x, y) in fixed_route_tables
-        chip = machine.get_chip_at(x, y)
-        destinations = _get_destinations(machine, fixed_route_tables, x, y)
-        assert len(destinations) == 1
-        assert (
-            (chip.nearest_ethernet_x, chip.nearest_ethernet_y, 1)
-            in destinations)
-
-
-@pytest.mark.parametrize(
-    "width,height,with_wrap_arounds,version,board_version,down_links",
-    [(2, 2, True, None, 3),
-     (2, 2, False, None, 3),
-     (None, None, None, 3, 3),
-     (8, 8, None, None, 5),
-     (None, None, None, 5, 5),
-     (12, 12, True, None, 5),
-     (16, 16, False, None, 5)])
-def test_missing_links(
-        width, height, with_wrap_arounds, version, board_version, down_links):
+    down_links = None
+    if with_down_links:
+        down_links = set()
+        for ethernet_chip in temp_machine.ethernet_connected_chips:
+            down_links.add((ethernet_chip.x + 1, ethernet_chip.y, joins[1, 0]))
+            down_links.add((ethernet_chip.x, ethernet_chip.y + 1, joins[0, 1]))
+    down_chips = None
+    if with_down_chips:
+        down_chips = set()
+        for ethernet_chip in temp_machine.ethernet_connected_chips:
+            down_chips.add((ethernet_chip.x + 1, ethernet_chip.y + 1))
     machine = VirtualMachine(
         width=width, height=height, with_wrap_arounds=with_wrap_arounds,
-        version=version, down_links=down_links)
+        version=version, down_links=down_links, down_chips=down_chips)
+
     placements = Placements()
 
     ethernet_chips = machine.ethernet_connected_chips
@@ -90,11 +75,10 @@ def test_missing_links(
         placements.add_placement(Placement(
             destination_vertex, ethernet_chip.x, ethernet_chip.y, 1))
 
-    router = FixedRouteRouter()
-
     for ethernet_chip in ethernet_chips:
-        assert(not router._detect_failed_chips_on_board(
-            machine, ethernet_chip, board_version))
+        uses_simple_routes = router._detect_failed_chips_on_board(
+            machine, ethernet_chip, board_version)
+        assert((with_down_chips or with_down_links) != uses_simple_routes)
 
     fixed_route_tables = router.__call__(
         machine, placements, board_version, DestinationVertex)

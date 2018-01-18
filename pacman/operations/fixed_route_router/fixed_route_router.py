@@ -136,7 +136,11 @@ class FixedRouteRouter(object):
             vertex = RoutingMachineVertex()
             graph.add_vertex(vertex)
             rel_x = chip_x - eth_x
+            if rel_x < 0:
+                rel_x += machine.max_chip_x + 1
             rel_y = chip_y - eth_y
+            if rel_y < 0:
+                rel_y += machine.max_chip_y + 1
             fake_placements.add_placement(Placement(
                 x=rel_x, y=rel_y, p=self.RANDOM_CORE_ID, vertex=vertex))
             down_links.update({
@@ -150,7 +154,9 @@ class FixedRouteRouter(object):
                 (machine.max_chip_x > 7 or machine.max_chip_y > 7)):
             down_chips = {
                 (x, y) for x, y in zip(range(8), range(8))
-                if not machine.is_chip_at(x + eth_x, y + eth_y)}
+                if not machine.is_chip_at(
+                    (x + eth_x) % (machine.max_chip_x + 1),
+                    (y + eth_y) % (machine.max_chip_y + 1))}
 
             # build a fake machine which is just one board but with the missing
             # bits of the real board
@@ -189,7 +195,9 @@ class FixedRouteRouter(object):
             fixed_route_entry = FixedRouteEntry(
                 link_ids=mc_entry.out_going_links,
                 processor_ids=mc_entry.out_going_processors)
-            key = (chip_x + eth_x, chip_y + eth_y)
+            x = (chip_x + eth_x) % (machine.max_chip_x + 1)
+            y = (chip_y + eth_y) % (machine.max_chip_y + 1)
+            key = (x, y)
             if key in fixed_route_tables:
                 raise exceptions.PacmanAlreadyExistsException(
                     "fixed route entry", str(key))
