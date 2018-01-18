@@ -7,7 +7,8 @@ class SimpleMachineVertex(MachineVertex):
     """
 
     def __init__(self, resources, label=None, constraints=None):
-        MachineVertex.__init__(self, label=label, constraints=constraints)
+        super(SimpleMachineVertex, self).__init__(
+            label=label, constraints=constraints)
         self._resources = resources
 
     @property

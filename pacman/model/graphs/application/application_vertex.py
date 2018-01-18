@@ -36,7 +36,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
             * If one of the constraints is not valid
         """
 
-        ConstrainedObject.__init__(self, constraints)
+        super(ApplicationVertex, self).__init__(constraints)
         self._label = label
 
         # add a constraint for max partitioning

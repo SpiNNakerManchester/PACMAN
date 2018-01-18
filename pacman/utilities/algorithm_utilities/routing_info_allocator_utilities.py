@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class ConstraintGroup(list):
 
     def __init__(self, values):
-        list.__init__(self, values)
+        super(ConstraintGroup, self).__init__(values)
         self._constraint = None
         self._n_keys = None
 

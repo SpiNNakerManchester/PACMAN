@@ -10,5 +10,5 @@ class ApplicationOutgoingEdgePartition(OutgoingEdgePartition):
     __slots__ = ()
 
     def __init__(self, identifier, constraints=None, label=None):
-        OutgoingEdgePartition.__init__(
-            self, identifier, ApplicationEdge, constraints, label)
+        super(ApplicationOutgoingEdgePartition, self).__init__(
+            identifier, ApplicationEdge, constraints, label)

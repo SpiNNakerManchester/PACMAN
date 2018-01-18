@@ -18,7 +18,6 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
         "_python_function"
     ]
 
-    @overrides(AbstractPythonAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
@@ -27,8 +26,8 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
         :param python_function: The name of the function to call
         """
         # pylint: disable=too-many-arguments
-        AbstractPythonAlgorithm.__init__(
-            self, algorithm_id, required_inputs, optional_inputs, outputs,
+        super(PythonFunctionAlgorithm, self).__init__(
+            algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, python_module)
         self._python_function = python_function
@@ -52,7 +51,7 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
     def __repr__(self):
         return (
             "PythonFunctionAlgorithm(algorithm_id={},"
-            " required_inputs={}, optional_inputs={}, outputs={}"
+            " required_inputs={}, optional_inputs={}, outputs={},"
             " python_module={},  python_function={})".format(
                 self._algorithm_id, self._required_inputs,
                 self._optional_inputs, self._outputs, self._python_module,

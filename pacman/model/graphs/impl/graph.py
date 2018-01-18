@@ -50,7 +50,7 @@ class Graph(ConstrainedObject, AbstractGraph):
             A single or tuple of types of partitions to be allowed in the graph
         :param label: The label on the graph, or None
         """
-        ConstrainedObject.__init__(self, None)
+        super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types

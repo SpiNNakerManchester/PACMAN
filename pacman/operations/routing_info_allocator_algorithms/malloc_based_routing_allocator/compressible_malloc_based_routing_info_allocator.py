@@ -37,15 +37,16 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
-    """ A Routing Info Allocation Allocator algorithm that keeps track of
-        free keys and attempts to allocate them as requested, but that also
+    """ A Routing Info Allocation Allocator algorithm that keeps track of\
+        free keys and attempts to allocate them as requested, but that also\
         looks at routing tables in an attempt to make things more compressible
     """
 
     __slots__ = []
 
     def __init__(self):
-        ElementAllocatorAlgorithm.__init__(self, 0, 2 ** 32)
+        super(CompressibleMallocBasedRoutingInfoAllocator, self).__init__(
+            0, 2 ** 32)
 
     def __call__(self, machine_graph, n_keys_map, routing_tables):
         # check that this algorithm supports the constraints
@@ -64,7 +65,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_keys, fixed_masks, fixed_fields, flexi_fields,
+        (fixed_keys, _shared_keys, fixed_masks, fixed_fields, flexi_fields,
          continuous, noncontinuous) = \
             get_edge_groups(machine_graph, EdgeTrafficType.MULTICAST)
         if flexi_fields:

@@ -25,7 +25,7 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
-        ConstrainedObject.__init__(self, constraints)
+        super(MachineVertex, self).__init__(constraints)
         self._label = label
 
     @property

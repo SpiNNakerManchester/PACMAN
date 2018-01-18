@@ -28,8 +28,8 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
     def __init__(
             self, n_atoms, fpga_id, fpga_link_id, board_address=None,
             label=None, constraints=None, max_atoms_per_core=sys.maxint):
-        ApplicationVertex.__init__(
-            self, label=label, constraints=constraints,
+        super(ApplicationFPGAVertex, self).__init__(
+            label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
 
         self._n_atoms = n_atoms

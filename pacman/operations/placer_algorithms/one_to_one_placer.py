@@ -29,9 +29,6 @@ class OneToOnePlacer(RadialPlacer):
 
     __slots__ = []
 
-    def __init__(self):
-        RadialPlacer.__init__(self)
-
     def __call__(self, machine_graph, machine):
 
         # check that the algorithm can handle the constraints

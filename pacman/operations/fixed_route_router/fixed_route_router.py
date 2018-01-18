@@ -3,7 +3,8 @@ from pacman.model.graphs.machine import MachineVertex, MachineGraph, \
 from pacman.model.placements import Placements, Placement
 from pacman.operations.router_algorithms import BasicDijkstraRouting
 from spinn_machine.fixed_route_entry import FixedRouteEntry
-from pacman import exceptions
+from pacman.exceptions import \
+    PacmanAlreadyExistsException, PacmanConfigurationException
 from spinn_utilities.progress_bar import ProgressBar
 
 
@@ -13,13 +14,13 @@ class FixedRouteRouter(object):
         chip that is of the destination class.
 
 
-            [] [] [] []
-            /  /  /  /
-          [] [] [] [] []
-          /  /   \  \ /
-        [] [] [] [] [] []
-        /  /  /  /  /  /
-      [] [] [] [] [] [] []
+                [] [] [] []
+               /  /  /  /
+             [] [] [] [] []
+            /  /   \  \ /
+          [] [] [] [] [] []
+         /  /  /  /  /  /
+       [] [] [] [] [] [] []
       /  /  /  /  /  /  /
     [] [] [] [] [] [] [] []
     | /  /  /  /  /  /  /
@@ -78,16 +79,15 @@ class FixedRouteRouter(object):
         # lazy cheat
         fixed_route_tables = dict()
 
-        progress_bar = ProgressBar(
+        if destination_class is None:
+            return fixed_route_tables
+
+        progress = ProgressBar(
             len(machine.ethernet_connected_chips),
             "generating fixed router routes.")
 
-        if destination_class is None:
-            progress_bar.end()
-            return fixed_route_tables
-
         # handle per board
-        for ethernet_connected_chip in progress_bar.over(
+        for ethernet_connected_chip in progress.over(
                 machine.ethernet_connected_chips):
             ethernet_chip_x = ethernet_connected_chip.x
             ethernet_chip_y = ethernet_connected_chip.y
@@ -167,7 +167,7 @@ class FixedRouteRouter(object):
                 processor_ids=mc_entry.out_going_processors)
             key = (chip_x, chip_y)
             if key in fixed_route_tables:
-                raise exceptions.PacmanAlreadyExistsException(
+                raise PacmanAlreadyExistsException(
                     "fixed route entry", str(key))
             fixed_route_tables[key] = fixed_route_entry
 
@@ -189,7 +189,7 @@ class FixedRouteRouter(object):
 
         joins, paths = self._get_joins_paths(board_version, machine)
 
-        for path_id in paths.keys():
+        for path_id in paths:
 
             # create entry for each chip along path
             for (path_chip_x, path_chip_y) in paths[path_id]:
@@ -197,7 +197,7 @@ class FixedRouteRouter(object):
                 # figure link ids (default is [4])
                 link_ids = [self.DEFAULT_LINK_ID]
                 if (path_chip_x, path_chip_y) in joins:
-                    link_ids = joins[(path_chip_x, path_chip_y)]
+                    link_ids = joins[path_chip_x, path_chip_y]
 
                 # build entry and add to table and add to tables
                 fixed_route_entry = FixedRouteEntry(
@@ -217,7 +217,7 @@ class FixedRouteRouter(object):
             link_ids=[], processor_ids=[processor_id])
         key = (ethernet_chip_x, ethernet_chip_y)
         if key in fixed_route_tables:
-            raise exceptions.PacmanAlreadyExistsException(
+            raise PacmanAlreadyExistsException(
                 "fixed route entry", str(key))
         fixed_route_tables[key] = fixed_route_entry
 
@@ -225,8 +225,7 @@ class FixedRouteRouter(object):
         # process each path separately
         if board_version in machine.BOARD_VERSION_FOR_48_CHIPS:
             return self.joins_48, self.router_path_chips_48
-        else:
-            return self.joins_4, self.router_path_chips_4
+        return self.joins_4, self.router_path_chips_4
 
     @staticmethod
     def _locate_destination(
@@ -243,18 +242,16 @@ class FixedRouteRouter(object):
         :return: processor id as a int or None if no valid processor found
         """
         for processor_id in range(0, machine.MAX_CORES_PER_CHIP):
-
             # only check occupied processors
             if placements.is_processor_occupied(
                     ethernet_chip_x, ethernet_chip_y, processor_id):
-
                 # verify if vertex correct one
                 if isinstance(
                         placements.get_vertex_on_processor(
                             ethernet_chip_x, ethernet_chip_y,
                             processor_id), destination_class):
                     return processor_id
-        raise exceptions.PacmanConfigurationException(
+        raise PacmanConfigurationException(
             "no destination vertex found on ethernet chip {}:{}".format(
                 ethernet_chip_x, ethernet_chip_y))
 
@@ -284,16 +281,15 @@ class FixedRouteRouter(object):
 
         # figure correct links
         joins, _ = self._get_joins_paths(board_version, machine)
-        for ethernet_connected_chip in machine.ethernet_connected_chips:
-            ethernet_chip_x = ethernet_connected_chip.x
-            ethernet_chip_y = ethernet_connected_chip.y
-            for (chip_x, chip_y) in machine.get_chips_on_board(
-                    ethernet_connected_chip):
+        for ethernet_chip in machine.ethernet_connected_chips:
+            ethernet_chip_x = ethernet_chip.x
+            ethernet_chip_y = ethernet_chip.y
+            for (chip_x, chip_y) in machine.get_chips_on_board(ethernet_chip):
                 join_chip_x = chip_x - ethernet_chip_x
                 join_chip_y = chip_y - ethernet_chip_y
                 if (join_chip_x, join_chip_y) in joins:
                     if not machine.is_link_at(
-                            chip_x, chip_y, joins[(join_chip_x, join_chip_y)]):
+                            chip_x, chip_y, joins[join_chip_x, join_chip_y]):
                         return False
                 else:
                     if not machine.is_link_at(
@@ -303,10 +299,6 @@ class FixedRouteRouter(object):
 
 
 class RoutingMachineVertex(MachineVertex):
-
     @property
     def resources_required(self):
         return None
-
-    def __init__(self):
-        MachineVertex.__init__(self)

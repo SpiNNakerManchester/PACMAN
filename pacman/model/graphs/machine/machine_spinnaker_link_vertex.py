@@ -21,7 +21,8 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
     def __init__(
             self, spinnaker_link_id, board_address=None, label=None,
             constraints=None):
-        MachineVertex.__init__(self, label=label, constraints=constraints)
+        super(MachineSpiNNakerLinkVertex, self).__init__(
+            label=label, constraints=constraints)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
         self._virtual_chip_x = None

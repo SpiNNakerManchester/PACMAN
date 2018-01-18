@@ -40,7 +40,7 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
-        ConstrainedObject.__init__(self, constraints)
+        super(OutgoingEdgePartition, self).__init__(constraints)
         self._label = label
         self._identifier = identifier
         self._edges = OrderedSet()

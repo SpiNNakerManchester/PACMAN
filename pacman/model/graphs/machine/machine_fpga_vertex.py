@@ -21,7 +21,8 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
     def __init__(
             self, fpga_id, fpga_link_id, board_address=None, label=None,
             constraints=None):
-        MachineVertex.__init__(self, label=label, constraints=constraints)
+        super(MachineFPGAVertex, self).__init__(
+            label=label, constraints=constraints)
 
         self._fpga_id = fpga_id
         self._fpga_link_id = fpga_link_id

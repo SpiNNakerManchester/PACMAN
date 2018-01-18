@@ -21,7 +21,6 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         "_python_method"
     ]
 
-    @overrides(AbstractPythonAlgorithm.__init__)
     def __init__(
             self, algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
@@ -33,8 +32,8 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             The method of the algorithm, or None if the class is callable
         """
         # pylint: disable=too-many-arguments
-        AbstractPythonAlgorithm.__init__(
-            self, algorithm_id, required_inputs, optional_inputs, outputs,
+        super(PythonClassAlgorithm, self).__init__(
+            algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, python_module)
         self._python_class = python_class
@@ -69,7 +68,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
     def __repr__(self):
         return (
             "PythonClassAlgorithm(algorithm_id={},"
-            " required_inputs={}, optional_inputs={}, outputs={}"
+            " required_inputs={}, optional_inputs={}, outputs={},"
             " python_module={}, python_class={}, python_method={})".format(
                 self._algorithm_id, self._required_inputs,
                 self._optional_inputs, self._outputs, self._python_module,
