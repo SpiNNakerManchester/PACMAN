@@ -92,6 +92,7 @@ def test_all_working(
             (chip.nearest_ethernet_x, chip.nearest_ethernet_y, 1)
             in destinations)
 
+
 if __name__ == '__main__':
     iterations = [
         (False, False),
