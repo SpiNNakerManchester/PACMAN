@@ -5,7 +5,7 @@ from pacman.operations.fixed_route_router.fixed_route_router \
     import FixedRouteRouter
 
 
-class DestinationVertex():
+class DestinationVertex(object):
     pass
 
 
@@ -91,3 +91,17 @@ def test_all_working(
         assert (
             (chip.nearest_ethernet_x, chip.nearest_ethernet_y, 1)
             in destinations)
+
+if __name__ == '__main__':
+    iterations = [
+        (False, False),
+        (True, False),
+        (False, True)]
+    for (x, y) in iterations:
+        test_all_working(2, 2, True, None, 3, x, y)
+        test_all_working(2, 2, False, None, 3, x, y)
+        test_all_working(None, None, None, 3, 3, x, y)
+        test_all_working(8, 8, None, None, 5, x, y)
+        test_all_working(None, None, None, 5, 5, x, y)
+        test_all_working(12, 12, True, None, 5, x, y)
+        test_all_working(16, 16, False, None, 5, x, y)

@@ -63,6 +63,12 @@ class FixedRouteRouter(object):
                 (5, 6): 5, (6, 6): 5}
     joins_4 = {(0, 1): 5, (1, 0): 3}
 
+    FAKE_ETHERNET_CHIP_X = 0
+    FAKE_ETHERNET_CHIP_Y = 0
+    SIZE_OF_ONE_BOARD = 8
+    MAX_CHIP_X_ID_ON_ONE_BOARD = 7
+    MAX_CHIP_Y_ID_ON_ONE_BOARD = 7
+    LINKS_PER_ROUTER = 6
     FAKE_ROUTING_PARTITION = "FAKE_MC_ROUTE"
     DEFAULT_LINK_ID = 4
     RANDOM_CORE_ID = 4
@@ -144,16 +150,19 @@ class FixedRouteRouter(object):
             fake_placements.add_placement(Placement(
                 x=rel_x, y=rel_y, p=self.RANDOM_CORE_ID, vertex=vertex))
             down_links.update({
-                (rel_x, rel_y, link) for link in range(6)
+                (rel_x, rel_y, link) for link in range(self.LINKS_PER_ROUTER)
                 if not machine.is_link_at(chip_x, chip_y, link)})
 
         # Create a fake machine consisting of only the one board that
         # the routes should go over
         fake_machine = machine
         if (board_version in machine.BOARD_VERSION_FOR_48_CHIPS and
-                (machine.max_chip_x > 7 or machine.max_chip_y > 7)):
+                (machine.max_chip_x > self.MAX_CHIP_X_ID_ON_ONE_BOARD or
+                 machine.max_chip_y > self.MAX_CHIP_Y_ID_ON_ONE_BOARD)):
             down_chips = {
-                (x, y) for x, y in zip(range(8), range(8))
+                (x, y) for x, y in zip(
+                    range(self.SIZE_OF_ONE_BOARD),
+                    range(self.SIZE_OF_ONE_BOARD))
                 if not machine.is_chip_at(
                     (x + eth_x) % (machine.max_chip_x + 1),
                     (y + eth_y) % (machine.max_chip_y + 1))}
@@ -161,7 +170,8 @@ class FixedRouteRouter(object):
             # build a fake machine which is just one board but with the missing
             # bits of the real board
             fake_machine = VirtualMachine(
-                8, 8, False, down_chips=down_chips, down_links=down_links)
+                self.SIZE_OF_ONE_BOARD, self.SIZE_OF_ONE_BOARD, False,
+                down_chips=down_chips, down_links=down_links)
 
         # build destination
         verts = graph.vertices
@@ -173,7 +183,8 @@ class FixedRouteRouter(object):
             destination_class=destination_class,
             placements=placements, machine=machine)
         fake_placements.add_placement(Placement(
-            x=0, y=0, p=destination_processor, vertex=vertex_dest))
+            x=self.FAKE_ETHERNET_CHIP_X, y=self.FAKE_ETHERNET_CHIP_Y,
+            p=destination_processor, vertex=vertex_dest))
 
         # deal with edges
         for vertex in verts:
@@ -329,7 +340,9 @@ class FixedRouteRouter(object):
                     if not machine.is_link_at(
                             chip_x, chip_y, joins[(join_chip_x, join_chip_y)]):
                         return False
-                elif join_chip_x != 0 or join_chip_y != 0:
+                elif (
+                        join_chip_x != self.FAKE_ETHERNET_CHIP_X or
+                        join_chip_y != self.FAKE_ETHERNET_CHIP_Y):
                     if not machine.is_link_at(
                             chip_x, chip_y, self.DEFAULT_LINK_ID):
                         return False
