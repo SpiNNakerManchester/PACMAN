@@ -7,12 +7,37 @@ from pacman.model.constraints.key_allocator_constraints\
     import FixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints\
     import FixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    share_key_constraint import ShareKeyConstraint
 from pacman.utilities import utility_calls
-from pacman.exceptions import (PacmanValueError, PacmanConfigurationException,
-                               PacmanInvalidParameterException)
+from pacman.exceptions import (
+    PacmanValueError, PacmanConfigurationException,
+    PacmanInvalidParameterException, PacmanRouteInfoAllocationException)
 
 import logging
+
 logger = logging.getLogger(__name__)
+
+
+class ConstraintGroup(list):
+
+    def __init__(self, values):
+        list.__init__(self, values)
+        self._constraint = None
+        self._n_keys = None
+
+    @property
+    def constraint(self):
+        return self._constraint
+
+    def _set_constraint(self, constraint):
+        self._constraint = constraint
+
+    def __hash__(self):
+        return id(self).__hash__()
+
+    def __eq__(self, other):
+        return id(other) == id(self)
 
 
 def get_edge_groups(machine_graph, traffic_type):
@@ -25,40 +50,99 @@ def get_edge_groups(machine_graph, traffic_type):
     :param traffic_type: the traffic type to group
     """
 
-    # Keep a dictionary of the group which contains an edge
-    fixed_key_groups = set()
-    fixed_mask_groups = set()
-    fixed_field_groups = set()
-    flexi_field_groups = set()
-    continuous_groups = set()
-    none_continuous_groups = list()
+    # mapping between partition and shared key group it is in
+    partition_groups = dict()
+
+    # process each partition one by one in a bubble sort kinda way
     for vertex in machine_graph.vertices:
-        for partition in \
-                machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
-                    vertex):
+        for partition in machine_graph.\
+                get_outgoing_edge_partitions_starting_at_vertex(vertex):
+
+            # only process partitions of the correct traffic type
             if partition.traffic_type == traffic_type:
-                # assume all edges have the same constraints in them. use \
-                # first one to deduce which group to place it into
-                constraints = partition.constraints
-                is_continuous = False
-                for constraint in constraints:
-                    if isinstance(constraint, FixedMaskConstraint):
-                        fixed_mask_groups.add(partition)
-                    elif isinstance(constraint,
-                                    FixedKeyAndMaskConstraint):
-                        fixed_key_groups.add(partition)
-                    elif isinstance(constraint, FlexiKeyFieldConstraint):
-                        flexi_field_groups.add(partition)
-                    elif isinstance(constraint, FixedKeyFieldConstraint):
-                        fixed_field_groups.add(partition)
-                    elif isinstance(constraint,
-                                    ContiguousKeyRangeContraint):
-                        is_continuous = True
-                        continuous_groups.add(partition)
-                if not is_continuous:
-                    none_continuous_groups.append(partition)
-    return (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-            flexi_field_groups, continuous_groups, none_continuous_groups)
+
+                # Get a set of partitions that should be grouped together
+                shared_key_constraints = \
+                    utility_calls.locate_constraints_of_type(
+                        partition.constraints, ShareKeyConstraint)
+                partitions_to_group = [partition]
+                map(lambda constraint: partitions_to_group.extend(
+                        constraint.other_partitions),
+                    shared_key_constraints)
+
+                # Get a set of groups that should be grouped
+                groups_to_group = [
+                    partition_groups.get(part_to_group, [part_to_group])
+                    for part_to_group in partitions_to_group]
+
+                # Group the groups
+                new_group = ConstraintGroup(
+                    part for group in groups_to_group for part in group)
+                partition_groups.update(
+                    {part: new_group for part in new_group})
+
+    # Keep track of groups
+    fixed_key_groups = list()
+    shared_key_groups = list()
+    fixed_mask_groups = list()
+    fixed_field_groups = list()
+    flexi_field_groups = list()
+    continuous_groups = list()
+    none_continuous_groups = list()
+    groups_by_type = {
+        FixedKeyAndMaskConstraint: fixed_key_groups,
+        FixedMaskConstraint: fixed_mask_groups,
+        FixedKeyFieldConstraint: fixed_field_groups,
+        FlexiKeyFieldConstraint: flexi_field_groups,
+    }
+    groups = set(partition_groups.itervalues())
+    for group in groups:
+
+        # Get all expected constraints in the group
+        constraints = [
+            constraint for partition in group
+            for constraint in utility_calls.locate_constraints_of_type(
+                partition.constraints,
+                (FixedKeyAndMaskConstraint, FixedMaskConstraint,
+                 FlexiKeyFieldConstraint, FixedKeyFieldConstraint))]
+
+        # Check that the possibly conflicting constraints are equal
+        if constraints and not all(
+                constraint_a == constraint_b for constraint_a in constraints
+                for constraint_b in constraints):
+            raise PacmanRouteInfoAllocationException(
+                "The group of partitions {} have conflicting constraints"
+                .format(constraints))
+
+        # If no constraints, must be one of the non-specific groups
+        if not constraints:
+            continuous_constraints = [
+                constraint for partition in group
+                for constraint in utility_calls.locate_constraints_of_type(
+                    constraints, ContiguousKeyRangeContraint)]
+
+            # If the group has only one item, it is not shared
+            if len(group) == 1:
+                if continuous_constraints:
+                    continuous_groups.append(group)
+                else:
+                    none_continuous_groups.append(group)
+
+            # If the group has more than one partition, it must be shared
+            else:
+                shared_key_groups.append(group)
+
+        # If constraints found, put the group in the appropriate constraint
+        # group
+        else:
+            group._set_constraint(constraints[0])
+            constraint_type = type(constraints[0])
+            groups_by_type[constraint_type].append(group)
+
+    # return the set of groups
+    return (fixed_key_groups, shared_key_groups,
+            fixed_mask_groups, fixed_field_groups, flexi_field_groups,
+            continuous_groups, none_continuous_groups)
 
 
 def check_types_of_edge_constraint(machine_graph):

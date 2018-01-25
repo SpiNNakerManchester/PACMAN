@@ -1,9 +1,11 @@
+from pacman.model.constraints.key_allocator_constraints.\
+    share_key_constraint import ShareKeyConstraint
 from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint
+    import AbstractKeyAllocatorConstraint
 from pacman.model.constraints.key_allocator_constraints\
     import FixedMaskConstraint
 from spinn_utilities.log import FormatAdapter
@@ -17,7 +19,7 @@ from pacman.operations.routing_info_allocator_algorithms\
 from pacman.model.routing_info \
     import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.utilities.utility_calls import \
-    check_algorithm_can_support_constraints, locate_first_constraint_of_type,\
+    check_algorithm_can_support_constraints, \
     compress_from_bit_array, expand_to_bit_array
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities import \
@@ -29,7 +31,6 @@ from pacman.exceptions \
 import math
 import numpy
 import logging
-from collections import defaultdict
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -51,23 +52,26 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             supported_constraints=[
                 FixedMaskConstraint,
                 FixedKeyAndMaskConstraint,
-                ContiguousKeyRangeContraint],
+                ContiguousKeyRangeContraint, ShareKeyConstraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # verify that no edge has more than 1 of a constraint ,and that
         # constraints are compatible
         utilities.check_types_of_edge_constraint(machine_graph)
 
+        # final keys allocations
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_key_groups, fixed_mask_groups, fixed_field_groups,
-         flexi_field_groups, continuous_groups, none_continuous_groups) = \
-            utilities.get_edge_groups(machine_graph, EdgeTrafficType.MULTICAST)
+        (fixed_key_groups, share_key_groups, fixed_mask_groups,
+         fixed_field_groups, flexi_field_groups,
+         continuous_groups, none_continuous_groups) = \
+            utilities.get_edge_groups(
+                machine_graph, EdgeTrafficType.MULTICAST)
 
         # Even non-continuous keys will be continuous
         for group in none_continuous_groups:
-            continuous_groups.add(group)
+            continuous_groups.append(group)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(
@@ -76,96 +80,88 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # allocate the groups that have fixed keys
         for group in progress.over(fixed_key_groups, False):
-            self._allocate_fixed_keys(group, routing_infos, continuous_groups)
+            self._allocate_fixed_keys(group, routing_infos)
 
         for group in progress.over(fixed_mask_groups, False):
-            self._allocate_fixed_masks(group, fixed_field_groups, n_keys_map,
-                                       routing_infos, continuous_groups)
+            self._allocate_fixed_masks(group, n_keys_map, routing_infos)
 
         for group in progress.over(fixed_field_groups, False):
-            self._allocate_fixed_fields(group, n_keys_map, routing_infos,
-                                        continuous_groups)
+            self._allocate_fixed_fields(group, n_keys_map, routing_infos)
 
         if flexi_field_groups:
             raise PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
-        # If there is a graph, group by source vertex and sort by vertex slice
-        # (lo_atom)
-        if graph_mapper is not None:
-            vertex_groups = defaultdict(list)
-            for partition in continuous_groups:
-                vertex = graph_mapper.get_application_vertex(
-                    partition.pre_vertex)
-                vertex_groups[vertex].append(partition)
-            vertex_partitions = list()
-            for vertex_group in vertex_groups.itervalues():
-                vertex_partitions.extend(sorted(
-                    vertex_group,
-                    key=lambda part: graph_mapper.get_slice(part.pre_vertex)))
-            continuous_groups = vertex_partitions
+        for group in progress.over(share_key_groups, False):
+            self._allocate_share_key(group, routing_infos, n_keys_map)
 
         for group in continuous_groups:
-            keys_and_masks = self._allocate_keys_and_masks(
-                None, None, n_keys_map.n_keys_for_partition(group))
-
-            # update the pacman data objects
-            self._update_routing_objects(keys_and_masks, routing_infos, group)
+            self._allocate_continuous_groups(group, routing_infos, n_keys_map)
 
         progress.end()
         return routing_infos
 
-    def _allocate_fixed_keys(self, group, routing_infos, continuous_groups):
+    def _get_n_keys(self, group, n_keys_map):
+        return max(
+            n_keys_map.n_keys_for_partition(partition) for partition in group)
+
+    def _allocate_continuous_groups(self, group, routing_infos, n_keys_map):
+        keys_and_masks = self._allocate_keys_and_masks(
+            None, None, self._get_n_keys(group, n_keys_map))
+        for partition in group:
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, partition)
+
+    def _allocate_share_key(
+            self, group, routing_infos, n_keys_map):
+        keys_and_masks = self._allocate_keys_and_masks(
+            None, None, self._get_n_keys(group, n_keys_map))
+
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(keys_and_masks, routing_infos,
+                                         partition)
+
+    def _allocate_fixed_keys(self, group, routing_infos):
         # Get any fixed keys and masks from the group and attempt to
         # allocate them
-        fixed_mask = None
-        fixed_key_and_mask_constraint = locate_first_constraint_of_type(
-            group.constraints, FixedKeyAndMaskConstraint)
+        fixed_key_and_mask_constraint = group.constraint
 
-        # attempt to allocate them
+        fixed_mask = None
         self._allocate_fixed_keys_and_masks(
             fixed_key_and_mask_constraint.keys_and_masks, fixed_mask)
 
-        # update the pacman data objects
-        self._update_routing_objects(
-            fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
-            group)
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(
+                fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
+                partition)
 
-        continuous_groups.remove(group)
+    def _allocate_fixed_masks(self, group, n_keys_map, routing_infos):
 
-    def _allocate_fixed_masks(self, group, fixed_field_groups, n_keys_map,
-                              routing_infos, continuous_groups):
         # get mask and fields if need be
-        fixed_mask = locate_first_constraint_of_type(
-            group.constraints, FixedMaskConstraint).mask
-
-        fields = None
-        if group in fixed_field_groups:
-            fields = locate_first_constraint_of_type(
-                group.constraints, FixedKeyFieldConstraint).fields
-            fixed_field_groups.remove(group)
+        fixed_mask = group.constraint.mask
 
         # try to allocate
         keys_and_masks = self._allocate_keys_and_masks(
-            fixed_mask, fields, n_keys_map.n_keys_for_partition(group))
+            fixed_mask, None, self._get_n_keys(group, n_keys_map))
 
-        # update the pacman data objects
-        self._update_routing_objects(keys_and_masks, routing_infos, group)
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, partition)
 
-        continuous_groups.remove(group)
-
-    def _allocate_fixed_fields(self, group, n_keys_map, routing_infos,
-                               continuous_groups):
-        fields = locate_first_constraint_of_type(
-            group.constraints, FixedKeyFieldConstraint).fields
+    def _allocate_fixed_fields(self, group, n_keys_map, routing_infos):
+        fields = group.constraint.fields
 
         # try to allocate
         keys_and_masks = self._allocate_keys_and_masks(
-            None, fields, n_keys_map.n_keys_for_partition(group))
+            None, fields, self._get_n_keys(group, n_keys_map))
 
-        # update the pacman data objects
-        self._update_routing_objects(keys_and_masks, routing_infos, group)
-        continuous_groups.remove(group)
+        for partition in group:
+            # update the pacman data objects
+            self._update_routing_objects(
+                keys_and_masks, routing_infos, partition)
 
     @staticmethod
     def _update_routing_objects(
@@ -226,6 +222,13 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return [(((1 << n_ones) - 1) << n_zeros)]
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
+        """ allocate fixed keys and masks
+
+        :param keys_and_masks: the fixed keys and masks combos
+        :param fixed_mask: fixed mask
+        :type fixed_mask: None or FixedMask object
+        :rtype: None
+        """
         # If there are fixed keys and masks, allocate them
         for key_and_mask in keys_and_masks:
             # If there is a fixed mask, check it doesn't clash
