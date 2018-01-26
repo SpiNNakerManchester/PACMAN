@@ -39,16 +39,11 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
         for application_partition in application_outgoing_partitions:
             for application_edge in application_partition.edges:
-
-                # and create and store a new edge for each post-vertex
-                application_post_vertex = application_edge.post_vertex
-                machine_post_vertices = \
-                    graph_mapper.get_machine_vertices(application_post_vertex)
-
                 # create new partitions
-                for machine_dest_vertex in machine_post_vertices:
+                for dest_vertex in graph_mapper.get_machine_vertices(
+                        application_edge.post_vertex):
                     machine_edge = application_edge.create_machine_edge(
-                        source_vertex, machine_dest_vertex,
+                        source_vertex, dest_vertex,
                         "machine_edge_for{}".format(application_edge.label))
                     machine_graph.add_edge(
                         machine_edge, application_partition.identifier)
