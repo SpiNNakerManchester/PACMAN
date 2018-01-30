@@ -37,9 +37,9 @@ class _DijkstraInfo(object):
 
 
 class BasicDijkstraRouting(object):
-    """ An routing algorithm that can find routes for edges between\
-        vertices in a machine graph that have been placed on a
-        machine by the use of a Dijkstra shortest path algorithm
+    """ An routing algorithm that can find routes for edges between vertices\
+        in a machine graph that have been placed on a machine by the use of a\
+        Dijkstra shortest path algorithm.
     """
 
     __slots__ = [
@@ -61,7 +61,7 @@ class BasicDijkstraRouting(object):
 
     def __call__(self, placements, machine, machine_graph,
                  bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
-        """ Find routes between the edges with the allocated information,
+        """ Find routes between the edges with the allocated information,\
             placed in the given places
 
         :param placements: The placements of the edges
@@ -75,8 +75,8 @@ class BasicDijkstraRouting(object):
         :return: The discovered routes
         :rtype:\
             :py:class:`pacman.model.routing_tables.MulticastRoutingTables`
-        :raise pacman.exceptions.PacmanRoutingException: If something\
-                   goes wrong with the routing
+        :raise pacman.exceptions.PacmanRoutingException: \
+            If something goes wrong with the routing
         """
 
         # set up basic data structures
@@ -90,40 +90,41 @@ class BasicDijkstraRouting(object):
         self._update_all_weights(nodes_info)
 
         # each vertex represents a core in the board
-        progress = ProgressBar(placements.n_placements,
-                               "Creating routing entries")
-
+        progress = ProgressBar(
+            placements.n_placements, "Creating routing entries")
         for placement in progress.over(placements.placements):
-            out_going_edges = filter(
-                lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
-                machine_graph.get_edges_starting_at_vertex(placement.vertex))
-
-            dest_chips = set()
-            edges_to_route = list()
-
-            for edge in out_going_edges:
-                destination = edge.post_vertex
-                dest_place = placements.get_placement_of_vertex(destination)
-                chip = machine.get_chip_at(dest_place.x, dest_place.y)
-                dest_chips.add((chip.x, chip.y))
-                edges_to_route.append(edge)
-
-            if dest_chips:
-                self._update_all_weights(nodes_info)
-                self._reset_tables(tables)
-                tables[placement.x, placement.y].activated = True
-                tables[placement.x, placement.y].cost = 0
-                self._propagate_costs_until_reached_destinations(
-                    tables, nodes_info, dest_chips, placement.x, placement.y)
-
-            for edge in edges_to_route:
-                dest = edge.post_vertex
-                dest_placement = placements.get_placement_of_vertex(dest)
-                self._retrace_back_to_source(
-                    dest_placement.x, dest_placement.y, tables,
-                    dest_placement.p, edge, nodes_info, placement.p,
-                    machine_graph)
+            self._route(placement, placements, machine, machine_graph, nodes_info, tables)
         return self._routing_paths
+
+    def _route(self, placement, placements, machine, graph, node_info, tables):
+        # pylint: disable=too-many-arguments
+        out_going_edges = filter(
+            lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
+            graph.get_edges_starting_at_vertex(placement.vertex))
+
+        dest_chips = set()
+        edges_to_route = list()
+
+        for edge in out_going_edges:
+            destination = edge.post_vertex
+            dest_place = placements.get_placement_of_vertex(destination)
+            chip = machine.get_chip_at(dest_place.x, dest_place.y)
+            dest_chips.add((chip.x, chip.y))
+            edges_to_route.append(edge)
+
+        if dest_chips:
+            self._update_all_weights(node_info)
+            self._reset_tables(tables)
+            tables[placement.x, placement.y].activated = True
+            tables[placement.x, placement.y].cost = 0
+            self._propagate_costs_until_reached_destinations(
+                tables, node_info, dest_chips, placement.x, placement.y)
+
+        for edge in edges_to_route:
+            dest = edge.post_vertex
+            dest_placement = placements.get_placement_of_vertex(dest)
+            self._retrace_back_to_source(
+                dest_placement, tables, edge, node_info, placement.p, graph)
 
     def _initiate_node_info(self, machine):
         """ Set up a dictionary which contains data for each chip in the\
@@ -150,7 +151,7 @@ class BasicDijkstraRouting(object):
 
     @staticmethod
     def _initiate_dijkstra_tables(machine):
-        """ Set up the Dijkstra's table which includes if you've reached a \
+        """ Set up the Dijkstra's table which includes if you've reached a\
             given node
 
         :param machine: the machine object
@@ -209,20 +210,20 @@ class BasicDijkstraRouting(object):
         """ Propagate the weights till the destination nodes of the source\
             nodes are retraced
 
-         :param tables: the dictionary object for the Dijkstra-tables
-         :param nodes_info: the dictionary object for the nodes inside a route\
-                    scope
-         :param dest_chips:
-         :param x_source:
-         :param y_source:
-         :type tables: dict
-         :type nodes_info: dict
-         :type dest_chips:
-         :type x_source: int
-         :type y_source: int
-         :rtype: None
-         :raise PacmanRoutingException: when the destination node could not be\
-                    reached from this source node.
+        :param tables: the dictionary object for the Dijkstra-tables
+        :param nodes_info: \
+            the dictionary object for the nodes inside a route scope
+        :param dest_chips:
+        :param x_source:
+        :param y_source:
+        :type tables: dict
+        :type nodes_info: dict
+        :type dest_chips:
+        :type x_source: int
+        :type y_source: int
+        :rtype: None
+        :raise PacmanRoutingException: when the destination node could not be\
+            reached from this source node.
         """
 
         dest_chips_to_find = set(dest_chips)
@@ -280,8 +281,7 @@ class BasicDijkstraRouting(object):
 
         :rtype: None
         :raise PacmanRoutingException: when the algorithm goes to a node that\
-                    doesn't exist in the machine or the node's cost was set\
-                    too low.
+            doesn't exist in the machine or the node's cost was set too low.
         """
         neighbour_xy = (neighbour.destination_x, neighbour.destination_y)
         if neighbour_xy not in tables:
@@ -308,40 +308,35 @@ class BasicDijkstraRouting(object):
                 .format(neighbour.destination_x, neighbour.destination_y))
 
     def _retrace_back_to_source(
-            self, x_dest, y_dest, tables, processor_dest, edge, nodes_info,
-            source_processor, graph):
+            self, dest, tables, edge, nodes_info, source_processor, graph):
         """
 
-        :param x_dest:
-        :param y_dest:
+        :param dest: Destination placement
         :param tables:
-        :param processor_dest:
         :param edge:
         :param nodes_info:
         :param source_processor:
         :param graph:
         :type nodes_info: dict( _NodeInfo )
         :type edge:
-        :type x_dest: int
-        :type y_dest: int
+        :type dest: Placement
         :type tables: dict( _DijkstraInfo )
-        :type processor_dest:
         :type graph:
         :return: the next coordinates to look into
-        :rtype: int int
-        :raise PacmanRoutingException: when the algorithm doesn't find a next\
-                    point to search from. AKA, the neighbours of a chip do not\
-                    have a cheaper cost than the node itself, but the node is\
-                    not the destination or when the algorithm goes to a node\
-                    that's not considered in the weighted search
+        :rtype: (int, int)
+        :raise PacmanRoutingException: \
+            when the algorithm doesn't find a next point to search from. AKA,\
+            the neighbours of a chip do not have a cheaper cost than the node\
+            itself, but the node is not the destination or when the algorithm\
+            goes to a node that's not considered in the weighted search.
         """
         # Set the tracking node to the destination to begin with
-        x, y = x_dest, y_dest
+        x, y = dest.x, dest.y
         routing_entry_route_processors = []
 
         # if the processor is None, don't add to router path entry
-        if processor_dest is not None:
-            routing_entry_route_processors.append(processor_dest)
+        if dest.p is not None:
+            routing_entry_route_processors.append(dest.p)
         routing_entry_route_links = None
 
         # build the multicast entry
@@ -355,7 +350,7 @@ class BasicDijkstraRouting(object):
                     out_going_links=routing_entry_route_links,
                     outgoing_processors=routing_entry_route_processors)
                 self._routing_paths.add_path_entry(
-                    entry, x_dest, y_dest, partition)
+                    entry, dest.x, dest.y, partition)
                 prev_entry = entry
 
         while tables[x, y].cost != 0:
@@ -392,8 +387,8 @@ class BasicDijkstraRouting(object):
 
         :return: x, y, previous_entry, made_an_entry
         :rtype: int, int, spinn_machine.MulticastRoutingEntry, bool
-        :raise PacmanRoutingException: when the bandwidth of a router is\
-                beyond expected parameters
+        :raise PacmanRoutingException: \
+            when the bandwidth of a router is beyond expected parameters
         """
 
         # Set the direction of the routing other_entry as that which is from

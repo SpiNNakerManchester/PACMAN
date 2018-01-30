@@ -9,7 +9,7 @@ from pacman.model.constraints.key_allocator_constraints\
     import FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     share_key_constraint import ShareKeyConstraint
-from pacman.utilities import utility_calls
+from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.exceptions import (
     PacmanValueError, PacmanConfigurationException,
     PacmanInvalidParameterException, PacmanRouteInfoAllocationException)
@@ -62,9 +62,8 @@ def get_edge_groups(machine_graph, traffic_type):
             if partition.traffic_type == traffic_type:
 
                 # Get a set of partitions that should be grouped together
-                shared_key_constraints = \
-                    utility_calls.locate_constraints_of_type(
-                        partition.constraints, ShareKeyConstraint)
+                shared_key_constraints = locate_constraints_of_type(
+                    partition.constraints, ShareKeyConstraint)
                 partitions_to_group = [partition]
                 map(lambda constraint: partitions_to_group.extend(
                         constraint.other_partitions),
@@ -88,7 +87,7 @@ def get_edge_groups(machine_graph, traffic_type):
     fixed_field_groups = list()
     flexi_field_groups = list()
     continuous_groups = list()
-    none_continuous_groups = list()
+    noncontinuous_groups = list()
     groups_by_type = {
         FixedKeyAndMaskConstraint: fixed_key_groups,
         FixedMaskConstraint: fixed_mask_groups,
@@ -101,7 +100,7 @@ def get_edge_groups(machine_graph, traffic_type):
         # Get all expected constraints in the group
         constraints = [
             constraint for partition in group
-            for constraint in utility_calls.locate_constraints_of_type(
+            for constraint in locate_constraints_of_type(
                 partition.constraints,
                 (FixedKeyAndMaskConstraint, FixedMaskConstraint,
                  FlexiKeyFieldConstraint, FixedKeyFieldConstraint))]
@@ -116,17 +115,16 @@ def get_edge_groups(machine_graph, traffic_type):
 
         # If no constraints, must be one of the non-specific groups
         if not constraints:
-            continuous_constraints = [
-                constraint for partition in group
-                for constraint in utility_calls.locate_constraints_of_type(
-                    constraints, ContiguousKeyRangeContraint)]
-
             # If the group has only one item, it is not shared
             if len(group) == 1:
+                continuous_constraints = [
+                    constraint for partition in group
+                    for constraint in locate_constraints_of_type(
+                        constraints, ContiguousKeyRangeContraint)]
                 if continuous_constraints:
                     continuous_groups.append(group)
                 else:
-                    none_continuous_groups.append(group)
+                    noncontinuous_groups.append(group)
 
             # If the group has more than one partition, it must be shared
             else:
@@ -142,7 +140,7 @@ def get_edge_groups(machine_graph, traffic_type):
     # return the set of groups
     return (fixed_key_groups, shared_key_groups,
             fixed_mask_groups, fixed_field_groups, flexi_field_groups,
-            continuous_groups, none_continuous_groups)
+            continuous_groups, noncontinuous_groups)
 
 
 def check_types_of_edge_constraint(machine_graph):
@@ -153,16 +151,16 @@ def check_types_of_edge_constraint(machine_graph):
     :rtype: None:
     """
     for partition in machine_graph.outgoing_edge_partitions:
-        fixed_key = utility_calls.locate_constraints_of_type(
+        fixed_key = locate_constraints_of_type(
             partition.constraints, FixedKeyAndMaskConstraint)
 
-        fixed_mask = utility_calls.locate_constraints_of_type(
+        fixed_mask = locate_constraints_of_type(
             partition.constraints, FixedMaskConstraint)
 
-        fixed_field = utility_calls.locate_constraints_of_type(
+        fixed_field = locate_constraints_of_type(
             partition.constraints, FixedKeyFieldConstraint)
 
-        flexi_field = utility_calls.locate_constraints_of_type(
+        flexi_field = locate_constraints_of_type(
             partition.constraints, FlexiKeyFieldConstraint)
 
         if (len(fixed_key) > 1 or len(fixed_field) > 1 or
@@ -213,13 +211,13 @@ def _check_masks_are_correct(partition):
         and a fixed_field constraint. completes if its correct, raises error\
         otherwise
 
-    :param partition: the outgoing_edge_partition to search for these\
-                constraints
+    :param partition: \
+        the outgoing_edge_partition to search for these constraints
     :rtype: None:
     """
-    fixed_mask = utility_calls.locate_constraints_of_type(
+    fixed_mask = locate_constraints_of_type(
         partition.constraints, FixedMaskConstraint)[0]
-    fixed_field = utility_calls.locate_constraints_of_type(
+    fixed_field = locate_constraints_of_type(
         partition.constraints, FixedKeyFieldConstraint)[0]
     mask = fixed_mask.mask
     for field in fixed_field.fields:
@@ -243,8 +241,8 @@ def get_fixed_mask(same_key_group):
         :py:class:`pacman.model.constraints.key_allocator_constraints.FixedMaskConstraint`\
         constraint exists in any of the edges in the group.
 
-    :param same_key_group: Set of edges that are to be\
-                assigned the same keys and masks
+    :param same_key_group: \
+        Set of edges that are to be assigned the same keys and masks
     :type same_key_group: iterable of\
         :py:class:`pacman.model.graph.machine.MachineEdge`
     :return: The fixed mask if found, or None
@@ -254,7 +252,7 @@ def get_fixed_mask(same_key_group):
     fields = None
     edge_with_mask = None
     for edge in same_key_group:
-        fixed_mask_constraints = utility_calls.locate_constraints_of_type(
+        fixed_mask_constraints = locate_constraints_of_type(
             edge.constraints, FixedMaskConstraint)
         for fixed_mask_constraint in fixed_mask_constraints:
             if mask is not None and mask != fixed_mask_constraint.mask:

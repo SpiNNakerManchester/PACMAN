@@ -642,7 +642,7 @@ class ResourceTracker(object):
         :type board_address: str or None
         :param ip_tags: The IP tag resource
         :type ip_tags: iterable of\
-                    :py:class:`pacman.model.resource.IptagResource`
+            :py:class:`pacman.model.resource.IptagResource`
         :return: True if the tags can be allocated, False otherwise
         :rtype: bool
         """

@@ -30,59 +30,64 @@ class ConnectiveBasedPlacer(RadialPlacer):
         # Sort the vertices into those with and those without
         # placement constraints
         placements = Placements()
-        constrained_vertices = list()
-        unconstrained_vertices = set()
+        constrained = list()
+        unconstrained = set()
         for vertex in machine_graph.vertices:
             if locate_constraints_of_type(
                     vertex.constraints, AbstractPlacerConstraint):
-                constrained_vertices.append(vertex)
+                constrained.append(vertex)
             else:
-                unconstrained_vertices.add(vertex)
+                unconstrained.add(vertex)
 
         # Iterate over constrained vertices and generate placements
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
-        constrained_vertices = sort_vertices_by_known_constraints(
-            constrained_vertices)
-        for vertex in progress.over(constrained_vertices, False):
+        constrained = sort_vertices_by_known_constraints(constrained)
+        for vertex in progress.over(constrained, False):
             self._place_vertex(vertex, resource_tracker, machine, placements)
 
-        while unconstrained_vertices:
-            # Keep track of all vertices connected to the currently placed ones
-            next_vertices = set()
-
-            # Initially, add the overall most connected vertex
+        while unconstrained:
+            # Place the subgraph with the overall most connected vertex
             max_connected_vertex = self._find_max_connected_vertex(
-                unconstrained_vertices, machine_graph)
-            next_vertices.add(max_connected_vertex)
-
-            while next_vertices:
-
-                # Find the vertex most connected to the currently placed
-                # vertices
-                vertex = self._find_max_connected_vertex(
-                    next_vertices, machine_graph)
-
-                # Place the vertex
-                self._place_vertex(
-                    vertex, resource_tracker, machine, placements)
-                progress.update()
-                unconstrained_vertices.remove(vertex)
-                next_vertices.remove(vertex)
-
-                # Add all vertices connected to this one to the set
-                for edge in machine_graph.get_edges_ending_at_vertex(vertex):
-                    if edge.pre_vertex in unconstrained_vertices:
-                        next_vertices.add(edge.pre_vertex)
-                for edge in machine_graph.get_edges_starting_at_vertex(vertex):
-                    if edge.post_vertex in unconstrained_vertices:
-                        next_vertices.add(edge.post_vertex)
+                unconstrained, machine_graph)
+            self._place_unconstrained_subgraph(
+                max_connected_vertex, machine_graph, unconstrained,
+                machine, placements, resource_tracker, progress)
 
         # finished, so stop progress bar and return placements
         progress.end()
         return placements
+
+    def _place_unconstrained_subgraph(
+            self, starting_vertex, machine_graph, unplaced_vertices,
+            machine, placements, resource_tracker, progress):
+        # pylint: disable=too-many-arguments
+        # Keep track of all unplaced_vertices connected to the currently
+        # placed ones
+        to_do = set()
+        to_do.add(starting_vertex)
+
+        while to_do:
+            # Find the vertex most connected of the currently-to-be-placed ones
+            vertex = self._find_max_connected_vertex(to_do, machine_graph)
+
+            # Place the vertex
+            self._place_vertex(vertex, resource_tracker, machine, placements)
+            progress.update()
+
+            # Remove from collections of unplaced_vertices to work on
+            unplaced_vertices.remove(vertex)
+            to_do.remove(vertex)
+
+            # Add all unplaced_vertices connected to this one to the set
+            for edge in machine_graph.get_edges_ending_at_vertex(vertex):
+                if edge.pre_vertex in unplaced_vertices:
+                    to_do.add(edge.pre_vertex)
+            for edge in machine_graph.get_edges_starting_at_vertex(vertex):
+                if edge.post_vertex in unplaced_vertices:
+                    to_do.add(edge.post_vertex)
 
     def _find_max_connected_vertex(self, vertices, graph):
         max_connected_vertex = None

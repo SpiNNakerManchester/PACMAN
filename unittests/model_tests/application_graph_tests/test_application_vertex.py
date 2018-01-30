@@ -5,7 +5,7 @@ from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 # unit tests imports
-from uinit_test_objects.simple_test_vertex import SimpleTestVertex
+from uinit_test_objects import SimpleTestVertex
 
 # general imports
 import unittest

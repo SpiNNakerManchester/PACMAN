@@ -20,8 +20,12 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
 class Vertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
         super(Vertex, self).__init__(label=label, max_atoms_per_core=256)
-        # What to do with n_atoms?
+        self._n_atoms = n_atoms
         self._model_based_max_atoms_per_core = 256
+
+    @property
+    def n_atoms(self):
+        return self._n_atoms
 
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 10 * (hi_atom - lo_atom)
@@ -29,8 +33,7 @@ class Vertex(ApplicationVertex):
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         return 200 * (hi_atom - lo_atom)
 
-    def get_sdram_usage_for_atoms(
-            self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         return 4000 + 50 * (vertex_slice.hi_atom - vertex_slice.lo_atom)
 
 
@@ -38,6 +41,7 @@ class MachineVertex(SimpleMachineVertex):
     def __init__(self, lo_atom, hi_atom, resources_required, label=None,
                  constraints=None):
         super(MachineVertex, self).__init__(
-            lo_atom, hi_atom, resources_required, label=label,
-            constraints=constraints)
+            resources_required, label=label, constraints=constraints)
+        self.lo_atom = lo_atom
+        self.hi_atom = hi_atom
         self._model_based_max_atoms_per_core = 256

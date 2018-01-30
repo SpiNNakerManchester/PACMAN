@@ -1,4 +1,3 @@
-
 """
 test vertex used in many unit tests
 """

@@ -13,9 +13,8 @@ _BOARD_PORTS = range(17896, 18000)
 
 
 class BasicTagAllocator(object):
-    """ Basic tag allocator that goes though the boards available and applies
+    """ Basic tag allocator that goes though the boards available and applies\
         the ip tags and reverse ip tags as needed.
-
     """
 
     __slots__ = []
@@ -34,19 +33,15 @@ class BasicTagAllocator(object):
         # Check that the algorithm can handle the constraints
         progress = ProgressBar(placements.n_placements + 1, "Allocating tags")
         placements_with_tags = list()
-        for placement in placements.placements:
+        for placement in progress.over(placements.placements, False):
             self._gather_placements_with_tags(placement, placements_with_tags)
-            progress.update()
 
         # Go through and allocate the tags
         tags = Tags()
-        for placement in placements_with_tags:
+        for placement in progress.over(placements_with_tags):
             self._allocate_tags_for_placement(
                 placement, resource_tracker, tags, ports_to_allocate,
                 tags_to_allocate_ports)
-        progress.update()
-
-        progress.end()
 
         # Finally allocate the ports to the reverse ip tags
         self._allocate_ports_for_reverse_ip_tags(
