@@ -1,5 +1,5 @@
 import logging
-import os
+import os.path
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_utilities.log import FormatAdapter
 
@@ -10,6 +10,8 @@ class NetworkSpecification(object):
     """ Generate report on the user's network specification.
     """
 
+    _FILENAME = "network_specification.rpt"
+
     def __call__(self, report_folder, graph):
         """
         :param report_folder: the directory to which reports are stored
@@ -18,7 +20,7 @@ class NetworkSpecification(object):
         :type graph: pacman.model.graph.application.application_graph.Graph
         :rtype: None
         """
-        filename = report_folder + os.sep + "network_specification.rpt"
+        filename = os.path.join(report_folder, self._FILENAME)
         try:
             with open(filename, "w") as f:
                 f.write("*** Vertices:\n")
