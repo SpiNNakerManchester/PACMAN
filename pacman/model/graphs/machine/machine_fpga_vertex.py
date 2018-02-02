@@ -1,5 +1,5 @@
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
-from pacman.model.decorators import overrides
 from pacman.model.resources import ResourceContainer
 from pacman.model.resources import DTCMResource
 from pacman.model.resources import SDRAMResource

@@ -2,7 +2,7 @@ import subprocess
 
 from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
 from .abstract_algorithm import AbstractAlgorithm
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 
 

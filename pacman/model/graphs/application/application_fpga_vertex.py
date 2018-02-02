@@ -1,8 +1,8 @@
+from spinn_utilities.overrides import overrides
 from pacman.model.constraints.placer_constraints\
     import ChipAndCoreConstraint
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
-from pacman.model.decorators import overrides
 from pacman.model.resources import ResourceContainer
 from pacman.model.resources import DTCMResource
 from pacman.model.resources import SDRAMResource

@@ -2,7 +2,7 @@ import importlib
 import logging
 
 from .abstract_python_algorithm import AbstractPythonAlgorithm
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))

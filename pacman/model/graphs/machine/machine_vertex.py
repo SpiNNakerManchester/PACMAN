@@ -2,7 +2,7 @@ from six import add_metaclass
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 

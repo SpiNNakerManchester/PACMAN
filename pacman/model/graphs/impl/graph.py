@@ -1,10 +1,10 @@
 from collections import defaultdict, OrderedDict
 
+from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 
 from pacman.exceptions import \
     PacmanAlreadyExistsException, PacmanInvalidParameterException
-from pacman.model.decorators import overrides
 from pacman.model.graphs import AbstractGraph
 from pacman.model.graphs.common import ConstrainedObject
 from .outgoing_edge_partition import OutgoingEdgePartition

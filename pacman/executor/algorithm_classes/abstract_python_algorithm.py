@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 from pacman.exceptions import PacmanAlgorithmFailedToGenerateOutputsException
 from .abstract_algorithm import AbstractAlgorithm
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 
 class AbstractPythonAlgorithm(AbstractAlgorithm):

@@ -1,12 +1,12 @@
 from six import add_metaclass
 import sys
 
-from pacman.model.decorators import overrides
 from pacman.model.constraints.partitioner_constraints import \
     MaxVertexAtomsConstraint
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
+from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import \
     abstractmethod, abstractproperty, AbstractBase
 
