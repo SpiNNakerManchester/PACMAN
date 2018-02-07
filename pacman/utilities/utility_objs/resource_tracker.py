@@ -1039,6 +1039,8 @@ class ResourceTracker(object):
             chip, the processor_id, and the IP tag and reverse IP tag\
             allocation tuples
         :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
+        :raises pacman.exceptions.PacmanValueError: \
+            If there aren't chips available that can take the allocation.
         """
 
         usable_chips = chips
@@ -1134,6 +1136,8 @@ class ResourceTracker(object):
         :return: The x and y coordinates of the used chip, the processor_id,\
             and the IP tag and reverse IP tag allocation tuples
         :rtype: (int, int, int, list((int, int, int, int)), list((int, int)))
+        :raises pacman.exceptions.PacmanValueError: \
+            If there isn't a chip available that can take the allocation.
         """
         # Find the first usable chip which fits the resources
         for (chip_x, chip_y) in self._get_usable_chips(

@@ -1,5 +1,4 @@
 import logging
-from math import floor
 
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints \
@@ -72,9 +71,12 @@ class BasicPartitioner(object):
         """
         # Compute how many atoms of this vertex we can put on one core
         atoms_per_core = self._compute_atoms_per_core(vertex, res_tracker)
+        if atoms_per_core < 1.0:
+            raise PacmanPartitionException(
+                "Not enough resources available to create vertex")
 
         # Partition into vertices
-        for first in range(0, vertex.n_atoms, atoms_per_core):
+        for first in range(0, vertex.n_atoms, int(atoms_per_core)):
             # Determine vertex size
             last = min(first + atoms_per_core, vertex.n_atoms) - 1
             if first < 0 or last < 0:
@@ -100,6 +102,8 @@ class BasicPartitioner(object):
         """ Work out how many atoms per core are required for the given\
             vertex. Assumes that the first atom of the vertex is fully\
             representative.
+
+        :rtype: float
         """
         # Get the usage of the first atom, then assume that this will be the
         # usage of all the atoms.
@@ -121,8 +125,5 @@ class BasicPartitioner(object):
         max_atom_values = [atoms_per_sdram, atoms_per_dtcm, atoms_per_cpu]
         for max_atom_constraint in utility_calls.locate_constraints_of_type(
                 vertex.constraints, MaxVertexAtomsConstraint):
-            max_atom_values.append(max_atom_constraint.size)
-        # Careful: use floor() to be conservative in estimation, yet ensure
-        # that the minimum value we return is 1; if one atom won't fit on a
-        # core, we're doomed anyway.
-        return max(int(floor(min(max_atom_values))), 1)
+            max_atom_values.append(float(max_atom_constraint.size))
+        return min(max_atom_values)
