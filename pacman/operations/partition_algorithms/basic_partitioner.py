@@ -122,5 +122,7 @@ class BasicPartitioner(object):
         for max_atom_constraint in utility_calls.locate_constraints_of_type(
                 vertex.constraints, MaxVertexAtomsConstraint):
             max_atom_values.append(max_atom_constraint.size)
-        # Careful: use floor() to be conservative in estimation
-        return int(floor(min(max_atom_values)))
+        # Careful: use floor() to be conservative in estimation, yet ensure
+        # that the minimum value we return is 1; if one atom won't fit on a
+        # core, we're doomed anyway.
+        return max(int(floor(min(max_atom_values))), 1)
