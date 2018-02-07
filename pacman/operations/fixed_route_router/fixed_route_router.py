@@ -13,7 +13,7 @@ from spinn_machine.machine import Machine
 class FixedRouteRouter(object):
     """ Fixed route router that makes a mirror path on every board based off\
     the diagram below. It assumed there's a core on the Ethernet-connected\
-    chip that is of the destination class.
+    chip that is of the destination class. ::
 
                     [] [] [] []
                    /  /  /  /
@@ -31,7 +31,7 @@ class FixedRouteRouter(object):
         | /     /  /  /
         []-[]-[]-[]-[]
 
-    or
+    or::
 
         [] []
         | /
