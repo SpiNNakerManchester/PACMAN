@@ -1,4 +1,5 @@
 import logging
+from math import floor
 
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints \
@@ -52,7 +53,7 @@ class BasicPartitioner(object):
 
         # start progress bar
         progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
-        machine_graph = MachineGraph("Machine graph for " +graph.label)
+        machine_graph = MachineGraph("Machine graph for " + graph.label)
         graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine)
 
@@ -121,4 +122,5 @@ class BasicPartitioner(object):
         for max_atom_constraint in utility_calls.locate_constraints_of_type(
                 vertex.constraints, MaxVertexAtomsConstraint):
             max_atom_values.append(max_atom_constraint.size)
-        return min(max_atom_values)
+        # Careful: use floor() to be conservative in estimation
+        return int(floor(min(max_atom_values)))

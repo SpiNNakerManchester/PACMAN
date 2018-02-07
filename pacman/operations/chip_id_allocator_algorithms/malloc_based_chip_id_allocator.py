@@ -67,7 +67,6 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
                     machine, self._get_link_data(machine, vertex))
                 vertex.set_virtual_chip_coordinates(x, y)
 
-
     @staticmethod
     def _get_link_data(machine, vertex):
         if isinstance(vertex, AbstractFPGAVertex):
