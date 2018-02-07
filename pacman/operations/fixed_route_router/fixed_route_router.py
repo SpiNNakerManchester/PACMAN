@@ -1,5 +1,5 @@
-from pacman.model.graphs.machine import MachineVertex, MachineGraph, \
-    MachineEdge
+from pacman.model.graphs.machine \
+    import MachineVertex, MachineGraph, MachineEdge
 from pacman.model.placements import Placements, Placement
 from pacman.operations.router_algorithms import BasicDijkstraRouting
 from spinn_machine.fixed_route_entry import FixedRouteEntry
@@ -11,35 +11,33 @@ from spinn_machine.machine import Machine
 
 
 class FixedRouteRouter(object):
-    """ fixed router that makes a mirror path on every board based off the\
-        below diagram. It assumed there's a core on the Ethernet connected\
-        chip that is of the destination class.
+    """ Fixed route router that makes a mirror path on every board based off\
+    the diagram below. It assumed there's a core on the Ethernet-connected\
+    chip that is of the destination class.
 
-
-                [] [] [] []
-               /  /  /  /
-             [] [] [] [] []
-            /  /   \  \ /
-          [] [] [] [] [] []
-         /  /  /  /  /  /
-       [] [] [] [] [] [] []
-      /  /  /  /  /  /  /
-    [] [] [] [] [] [] [] []
-    | /  /  /  /  /  /  /
-    [] [] [] [] [] [] []
-    | /  /  /  /  /  /
-    [] []-[] [] [] []
-    | /     /  /  /
-    []-[]-[]-[]-[]
+                    [] [] [] []
+                   /  /  /  /
+                 [] [] [] [] []
+                /  /   \  \ /
+              [] [] [] [] [] []
+             /  /  /  /  /  /
+           [] [] [] [] [] [] []
+          /  /  /  /  /  /  /
+        [] [] [] [] [] [] [] []
+        | /  /  /  /  /  /  /
+        [] [] [] [] [] [] []
+        | /  /  /  /  /  /
+        [] []-[] [] [] []
+        | /     /  /  /
+        []-[]-[]-[]-[]
 
     or
 
-    [] []
-    | /
-    []-[]
+        [] []
+        | /
+        []-[]
 
-    or router based to avoid dead chips
-
+    Falls back to classic algorithms when to avoid dead chips.
     """
 
     # groups of chips which work to go down a specific link on the Ethernet
@@ -75,11 +73,11 @@ class FixedRouteRouter(object):
     RANDOM_CORE_ID = 4
 
     def __call__(self, machine, placements, board_version, destination_class):
-        """ runs the fixed route generator for all boards on machine
+        """ Runs the fixed route generator for all boards on machine
 
-        :param machine: spinn machine object
+        :param machine: SpiNNMachine object
         :param placements: placements object
-        :param board_version: the version of spinnaker board using
+        :param board_version: the version of SpiNNaker board being used
         :param destination_class: the destination class to route packets to
         :return: router tables for fixed route paths
         """
@@ -119,7 +117,7 @@ class FixedRouteRouter(object):
     def _do_dynamic_routing(
             self, fixed_route_tables, placements, ethernet_connected_chip,
             destination_class, machine, board_version):
-        """ uses a router to route fixed routes
+        """ Uses a router to route fixed routes
 
         :param fixed_route_tables: fixed route tables entry holder
         :param placements: placements
@@ -217,26 +215,25 @@ class FixedRouteRouter(object):
     def _do_fixed_routing(
             self, fixed_route_tables, board_version, placements,
             ethernet_chip_x, ethernet_chip_y, destination_class, machine):
-        """ handles this board through the quick routing process
+        """ Handles this board through the quick routing process, based on a\
+            predefined routing table.
 
         :param fixed_route_tables: fixed routing tables
-        :param board_version: the spinnaker machine version
+        :param board_version: the SpiNNaker machine version
         :param placements: the placements object
         :param ethernet_chip_x: chip x of the Ethernet connected chip
         :param ethernet_chip_y: chip y of the Ethernet connected chip
         :param destination_class: \
             the class of the vertex to route to at the Ethernet connected chip
-        :param machine: spinnMachine instance
+        :param machine: SpiNNMachine instance
         :rtype: None
         """
 
         joins, paths = self._get_joins_paths(board_version)
 
         for path_id in paths:
-
             # create entry for each chip along path
             for (path_chip_x, path_chip_y) in paths[path_id]:
-
                 # figure link ids (default is [4])
                 link_ids = [self.DEFAULT_LINK_ID]
                 if (path_chip_x, path_chip_y) in joins:
@@ -281,7 +278,8 @@ class FixedRouteRouter(object):
         :param ethernet_chip_y: chip y to search
         :param destination_class: the class def to search for
         :param placements: the placements objects
-        :return: processor id as a int or None if no valid processor found
+        :return: processor id as a int, or None if no valid processor found
+        :rtype: int or None
         """
         for processor_id in range(0, Machine.MAX_CORES_PER_CHIP):
             # only check occupied processors
@@ -299,9 +297,9 @@ class FixedRouteRouter(object):
 
     def _detect_failed_chips_on_board(
             self, machine, ethernet_connected_chip, board_version):
-        """ detects if all chips on the board are alive
+        """ Detects if all chips on the board are alive.
 
-        :param machine: the spiNNMachine instance
+        :param machine: the SpiNNMachine instance
         :param ethernet_connected_chip: \
             the chip which supports an Ethernet connection
         :param board_version: what type of SpiNNaker board we're working with
