@@ -60,7 +60,8 @@ class BasicDijkstraRouting(object):
     MAX_BW = 250
 
     def __call__(self, placements, machine, machine_graph,
-                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
+                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW,
+                 use_progress_bar=True):
         """ Find routes between the edges with the allocated information,
             placed in the given places
 
@@ -72,6 +73,8 @@ class BasicDijkstraRouting(object):
         :param machine_graph: the machine_graph object
         :type machine_graph:\
             :py:class:`pacman.model.graph.machine.MachineGraph`
+        :param use_progress_bar: bool to either use a progress bar or not
+        :type use_progress_bar: bool
         :return: The discovered routes
         :rtype:\
             :py:class:`pacman.model.routing_tables.MulticastRoutingTables`
@@ -90,10 +93,12 @@ class BasicDijkstraRouting(object):
         self._update_all_weights(nodes_info)
 
         # each vertex represents a core in the board
-        progress = ProgressBar(placements.n_placements,
-                               "Creating routing entries")
+        progress = None
+        if use_progress_bar:
+            progress = ProgressBar(placements.n_placements,
+                                   "Creating routing entries")
 
-        for placement in progress.over(placements.placements):
+        for placement in placements.placements:
             out_going_edges = filter(
                 lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
                 machine_graph.get_edges_starting_at_vertex(placement.vertex))
@@ -123,6 +128,9 @@ class BasicDijkstraRouting(object):
                     dest_placement.x, dest_placement.y, tables,
                     dest_placement.p, edge, nodes_info, placement.p,
                     machine_graph)
+
+            if use_progress_bar:
+                progress.update()
         return self._routing_paths
 
     def _initiate_node_info(self, machine):
