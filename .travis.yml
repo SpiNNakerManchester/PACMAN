@@ -24,10 +24,11 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
+  - pip install python-coveralls
   - python ./setup.py install
 
 script:
-  - py.test unittests
+  - py.test unittests --cov=pacman
   # Currently no integration tests
   # - py.test integration_tests
   # Code quality check
@@ -38,3 +39,7 @@ script:
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
   - sphinx-build -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
+
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - coveralls

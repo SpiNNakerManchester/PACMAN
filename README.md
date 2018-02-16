@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/SpiNNakerManchester/PACMAN.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/PACMAN)
+[![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/PACMAN/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/PACMAN?branch=master)
 
 This package provides utilities for partitioning, placing a routing on a
 SpiNNaker machine
