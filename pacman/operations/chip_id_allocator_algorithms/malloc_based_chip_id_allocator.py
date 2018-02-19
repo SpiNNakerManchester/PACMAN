@@ -29,7 +29,7 @@ class NoSpiNNakerLink(PacmanConfigurationException):
 
 class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
     """ A Chip id Allocation Allocator algorithm that keeps track of\
-        chip ids and attempts to allocate them as requested
+        chip IDs and attempts to allocate them as requested
     """
 
     __slots__ = [
@@ -55,12 +55,12 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             graph.n_vertices + machine.n_chips,
             "Allocating virtual identifiers")
 
-        # allocate standard ids for real chips
+        # allocate standard IDs for real chips
         for x, y in progress.over(machine.chip_coordinates, False):
             expected_chip_id = (x << 8) + y
             self._allocate_elements(expected_chip_id, 1)
 
-        # allocate ids for virtual chips
+        # allocate IDs for virtual chips
         for vertex in progress.over(graph.vertices):
             if isinstance(vertex, AbstractVirtualVertex):
                 x, y = self._assign_virtual_chip_info(
@@ -99,7 +99,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         return chip_id_x, chip_id_y
 
     def _allocate_id(self):
-        """ Allocate a chip id from the free space
+        """ Allocate a chip ID from the free space
         """
 
         # can always assume there's at least one element in the free space,

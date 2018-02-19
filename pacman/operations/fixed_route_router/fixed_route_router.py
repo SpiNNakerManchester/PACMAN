@@ -234,7 +234,7 @@ class FixedRouteRouter(object):
         for path_id in paths:
             # create entry for each chip along path
             for (path_chip_x, path_chip_y) in paths[path_id]:
-                # figure link ids (default is [4])
+                # figure link IDs (default is [4])
                 link_ids = [self.DEFAULT_LINK_ID]
                 if (path_chip_x, path_chip_y) in joins:
                     link_ids = [joins[path_chip_x, path_chip_y]]
@@ -276,7 +276,7 @@ class FixedRouteRouter(object):
 
         :param ethernet_chip_x: chip x to search
         :param ethernet_chip_y: chip y to search
-        :param destination_class: the class def to search for
+        :param destination_class: the class of vertex to search for
         :param placements: the placements objects
         :return: processor id as a int, or None if no valid processor found
         :rtype: int or None

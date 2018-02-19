@@ -23,7 +23,7 @@ class ResourceTracker(object):
         # Note that entries are only added when the SDRAM is first used
         "_sdram_tracker",
 
-        # The set of processor ids available on each chip,
+        # The set of processor IDs available on each chip,
         # indexed by the (x, y) tuple of coordinates of the chip
         # Note that entries are only added when a core is first used
         "_core_tracker",
@@ -95,7 +95,7 @@ class ResourceTracker(object):
         # Note that entries are only added when the SDRAM is first used
         self._sdram_tracker = dict()
 
-        # The set of processor ids available on each chip,
+        # The set of processor IDs available on each chip,
         # indexed by the (x, y) tuple of coordinates of the chip
         # Note that entries are only added when a core is first used
         self._core_tracker = dict()
