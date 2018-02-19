@@ -24,18 +24,18 @@ class DestinationBasedRoutingInfoAllocator(object):
         """
         :param machine_graph: The graph to allocate the routing info for
         :type machine_graph:\
-            :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param placements: The placements of the vertices
         :type placements:\
-            :py:class:`pacman.model.placements.placements.Placements`
+            :py:class:`pacman.model.placements.Placements`
         :param n_keys_map: A map between the edges and the number of keys\
             required by the edges
         :type n_keys_map:\
-            :py:class:`pacman.model.routing_info.abstract_machine_partition_n_keys_map.AbstractMachinePartitionNKeysMap`
+            :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
         :return: The routing information
         :rtype: \
-            :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`, \
-            :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable
+            :py:class:`pacman.model.routing_info.RoutingInfo`, \
+            :py:class:`pacman.model.routing_tables.MulticastRoutingTable
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: \
             If something goes wrong with the allocation
         """
@@ -82,7 +82,7 @@ class DestinationBasedRoutingInfoAllocator(object):
 
         :param placement: the associated placement
         :type placement:\
-            :py:class:`pacman.model.placements.placement.Placement`
+            :py:class:`pacman.model.placements.Placement`
         :return: The key
         :rtype: int
         """

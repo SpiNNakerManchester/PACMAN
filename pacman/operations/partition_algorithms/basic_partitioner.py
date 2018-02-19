@@ -33,14 +33,14 @@ class BasicPartitioner(object):
         """
         :param graph: The application_graph to partition
         :type graph:\
-            :py:class:`pacman.model.graph.application.ApplicationGraph`
+            :py:class:`pacman.model.graphs.application.ApplicationGraph`
         :param machine:\
             The machine with respect to which to partition the application\
             graph
         :type machine: :py:class:`spinn_machine.Machine`
         :return: A machine graph
         :rtype:\
-            :py:class:`pacman.model.graph.machine.MachineGraph`
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :raise pacman.exceptions.PacmanPartitionException:\
             If something goes wrong with the partitioning
         """

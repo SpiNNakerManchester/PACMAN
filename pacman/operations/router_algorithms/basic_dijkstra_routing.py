@@ -71,7 +71,7 @@ class BasicDijkstraRouting(object):
         :type machine: :py:class:`spinn_machine.Machine`
         :param machine_graph: the machine_graph object
         :type machine_graph:\
-            :py:class:`pacman.model.graph.machine.MachineGraph`
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :return: The discovered routes
         :rtype:\
             :py:class:`pacman.model.routing_tables.MulticastRoutingTables`

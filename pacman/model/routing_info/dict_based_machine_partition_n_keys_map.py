@@ -4,7 +4,7 @@ from .abstract_machine_partition_n_keys_map \
 
 class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     """ A python dict-based implementation of the\
-        AbstractMachinePartitionNKeysMap
+        :py:class`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
     """
 
     __slots__ = [
@@ -21,7 +21,7 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-            :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.impl.OutgoingEdgePartition`
         :param n_keys: The number of keys required by the edge
         :type n_keys: int
         """
@@ -32,6 +32,6 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-            :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.impl.OutgoingEdgePartition`
         """
         return self._n_keys_map[partition]

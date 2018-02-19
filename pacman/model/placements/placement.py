@@ -26,7 +26,7 @@ class Placement(object):
 
         :param vertex: The vertex that has been placed
         :type vertex:\
-            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+            :py:class:`pacman.model.graphs.machine.MachineVertex`
         :param x: the x-coordinate of the chip on which the vertex is placed
         :type x: int
         :param y: the y-coordinate of the chip on which the vertex is placed
@@ -45,7 +45,7 @@ class Placement(object):
 
         :return: a vertex
         :rtype:\
-            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+            :py:class:`pacman.model.graph.machine.MachineVertex`
         :raise None: does not raise any known exceptions
         """
         return self._vertex

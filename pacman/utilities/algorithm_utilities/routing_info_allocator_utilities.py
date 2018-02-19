@@ -244,7 +244,7 @@ def get_fixed_mask(same_key_group):
     :param same_key_group: \
         Set of edges that are to be assigned the same keys and masks
     :type same_key_group: iterable of\
-        :py:class:`pacman.model.graph.machine.MachineEdge`
+        :py:class:`pacman.model.graphs.machine.MachineEdge`
     :return: The fixed mask if found, or None
     :raise PacmanValueError: If two edges conflict in their requirements
     """

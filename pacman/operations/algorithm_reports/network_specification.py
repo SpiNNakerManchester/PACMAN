@@ -17,7 +17,7 @@ class NetworkSpecification(object):
         :param report_folder: the directory to which reports are stored
         :type report_folder: str
         :param graph: the graph generated from the tools
-        :type graph: pacman.model.graph.application.application_graph.Graph
+        :type graph: pacman.model.graph.application.ApplicationGraph
         :rtype: None
         """
         filename = os.path.join(report_folder, self._FILENAME)

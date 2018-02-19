@@ -3,14 +3,10 @@ from pacman.model.constraints.key_allocator_constraints\
     import AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
     import FixedMaskConstraint
-from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.operations.routing_info_allocator_algorithms\
-    .malloc_based_routing_allocator.key_field_generator \
-    import KeyFieldGenerator
+    import FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint
+from .key_field_generator import KeyFieldGenerator
 from pacman.model.routing_info \
     import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.utilities.utility_calls import \

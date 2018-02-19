@@ -49,11 +49,11 @@ class IsomorphicChecker(object):
 
         :param placements: Placements of vertices on the machine
         :type placements: \
-            :py:class:`pacman.model.placements.placements.Placements`
+            :py:class:`pacman.model.placements.Placements`
         :param placements_copy: \
             memory copy of placements of vertices on the machine
         :type placements_copy: \
-            :py:class:`pacman.model.placements.placements.Placements`
+            :py:class:`pacman.model.placements.Placements`
         :return: True if the placements are the same
         :rtype: bool
         """

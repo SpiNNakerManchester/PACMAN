@@ -17,7 +17,7 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
 
         :param vertex: The vertex to which the constraint refers
         :type vertex: \
-            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graphs.application.ApplicationVertex`
         :raise None: does not raise any known exceptions
         """
         self._vertex = vertex
@@ -28,7 +28,7 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
 
         :return: the vertex
         :rtype:\
-                    :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graphs.application.ApplicationVertex`
         :raise None: does not raise any known exceptions
         """
         return self._vertex

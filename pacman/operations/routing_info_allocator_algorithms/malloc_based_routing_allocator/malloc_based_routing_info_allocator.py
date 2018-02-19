@@ -1,16 +1,12 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    share_key_constraint import ShareKeyConstraint
-from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 
 # pacman imports
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint
+    import AbstractKeyAllocatorConstraint, ShareKeyConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    import FixedMaskConstraint
-from spinn_utilities.log import FormatAdapter
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint
+    import FixedMaskConstraint, FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.operations.routing_info_allocator_algorithms\
