@@ -297,6 +297,29 @@ class Test(unittest.TestCase):
         with os.fdopen(fd) as f:
             self.assertEqual(f.read(), "foo\n")
 
+    def test_tokens(self):
+        t1 = Token("abc")
+        t2 = Token("abc", "def")
+        t3 = Token("abc")
+        t4 = Token("ghi")
+        t5 = Token("ghi", "def")
+        t6 = Token("abc", "def")
+        self.assertNotEqual(t1, t2)
+        self.assertEqual(t1, t3)
+        self.assertNotEqual(t1, t4)
+        self.assertNotEqual(t1, t5)
+        self.assertNotEqual(t2, t5)
+        self.assertEqual(t2, t6)
+        d = {}
+        d[t1] = 1
+        d[t2] = 2
+        d[t3] = 3
+        d[t4] = 4
+        d[t5] = 5
+        d[t6] = 6
+        self.assertEqual(len(d), 4)
+        self.assertEqual(repr(t2), "Token(name=abc, part=def)")
+
 
 if __name__ == "__main__":
     unittest.main()
