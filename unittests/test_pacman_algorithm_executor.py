@@ -1,3 +1,5 @@
+import os
+import tempfile
 import unittest
 from pacman.executor import PACMANAlgorithmExecutor
 from pacman.executor.algorithm_decorators import algorithm
@@ -88,6 +90,22 @@ class TestWholeTokenOptional(object):
 
     def __call__(self):
         TestWholeTokenOptional.called = True
+
+
+class SpecificException(Exception):
+    """ Just for test purposes.
+    """
+
+
+@algorithm({}, [], optional_input_tokens=[Token("Test")])
+class TestExceptionWhenCalled(object):
+    def __call__(self):
+        raise SpecificException("boom")
+
+
+@algorithm({}, [], optional_input_tokens=[Token("Test")])
+def exception_when_called():
+    raise SpecificException("boom")
 
 
 class Test(unittest.TestCase):
@@ -214,6 +232,39 @@ class Test(unittest.TestCase):
         self.assertEqual(
             [algorithm.algorithm_id for algorithm in executor._algorithms],
             ["TestRecursiveOptionalAlgorithm", "TestAlgorithm3"])
+
+    def test_failing_class_workflow(self):
+        inputs = {}
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["TestExceptionWhenCalled"],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        with self.assertRaises(SpecificException):
+            executor.execute_mapping()
+
+    def test_failing_function_workflow(self):
+        inputs = {}
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["exception_when_called"],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        with self.assertRaises(SpecificException):
+            executor.execute_mapping()
+
+    def test_external_algorithm(self):
+        if not os.access("/bin/sh", os.X_OK):
+            raise self.skipTest("need Bourne shell to run this test")
+        fd, name = tempfile.mkstemp()
+        inputs = {"ExampleFilePath": name}
+        xmlfile = os.path.join(os.path.dirname(__file__), "test_algos.xml")
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["SimpleExternal"], xml_paths=[xmlfile],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        executor.execute_mapping()
+        self.assertEqual(executor.get_item("Foo"), name)
+        with os.fdopen(fd) as f:
+            self.assertEqual(f.read(), "foo\n")
 
 
 if __name__ == "__main__":
