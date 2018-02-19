@@ -83,14 +83,17 @@ def _decode_inputs(input_defs, inputs):
 
     :param input_defs: A dict of algorithm parameter name SingleInput
     :param inputs: A list of inputs to decode
-    :type inputs: list of str, pacman.executor.algorithm_decorators.OneOf, \
-        pacman.executor.algorithm_decorators.AllOf
-    :return: a list of pacman.executor.algorithm_decorators.AbstractInput
+    :type inputs: list of str, \
+        :py:class:`pacman.executor.algorithm_decorators.OneOf`, \
+        :py:class:`pacman.executor.algorithm_decorators.AllOf`
+    :return: a list of inputs
+    :rtype: \
+        list(:py:class:`pacman.executor.algorithm_decorators.AbstractInput`)
     """
     final_inputs = list()
     for inp in inputs:
         if isinstance(inp, str):
-            if inp not in input_defs:
+            if inp not in input_defs:  # pragma: no cover
                 raise PacmanConfigurationException(
                     "Input {} not found in input_definitions".format(inp))
             final_inputs.append(input_defs[inp])
@@ -109,18 +112,16 @@ def _decode_algorithm_details(
     :param input_definitions: dict of algorithm parameter name to list of types
     :param required_inputs: List of required algorithm parameter names
     :type required_inputs: list of str, \
-        pacman.executor.algorithm_decorators.OneOf, \
-        pacman.executor.algorithm_decorators.AllOf
+        :py:class:`pacman.executor.algorithm_decorators.OneOf`, \
+        :py:class:`pacman.executor.algorithm_decorators.AllOf`
     :param optional_inputs: List of optional algorithm parameter names
     :type optional_inputs: list of str, \
-        pacman.executor.algorithm_decorators.OneOf, \
-        pacman.executor.algorithm_decorators.AllOf
+        :py:class:`pacman.executor.algorithm_decorators.OneOf`, \
+        :py:class:`pacman.executor.algorithm_decorators.AllOf`
     :param function: The function to be called by the algorithm
     :param has_self: True if the self parameter is expected
     """
     function_args = inspect.getargspec(function)
-    required_args = None
-    optional_args = None
     if function_args.defaults is not None:
         n_defaults = len(function_args.defaults)
         required_args = OrderedSet(
@@ -135,7 +136,7 @@ def _decode_algorithm_details(
     input_defs = dict()
     for (input_name, input_types) in input_definitions.iteritems():
         if (input_name not in required_args and
-                input_name not in optional_args):
+                input_name not in optional_args):  # pragma: no cover
             raise PacmanConfigurationException(
                 "No parameter named {} but found one"
                 " in the input_definitions".format(input_name))
@@ -175,8 +176,8 @@ def algorithm(
         input_definitions, outputs, algorithm_id=None, required_inputs=None,
         optional_inputs=None, method=None, required_input_tokens=None,
         optional_input_tokens=None, generated_output_tokens=None):
-    """ Define an object to be a PACMAN algorithm that can be executed by\
-        the PacmanAlgorithmExecutor.
+    """ Define an object to be a PACMAN algorithm that can be executed by the \
+        :py:class:`pacman.executor.pacman_algorithm_executor.PACMANAlgorithmExecutor`.
 
         Can be used to decorate either a class or a function (not a method).\
         If this decorates a class, the class must be callable (i.e., have a\
@@ -203,14 +204,14 @@ def algorithm(
         Optional list of required algorithm parameter names; if not specified\
         those parameters which have no default values are used.
     :type required_inputs: list of (str or \
-        pacman.executor.algorithm_decorators.OneOf or \
-        pacman.executor.algorithm_decorators.AllOf)
+        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
+        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
     :param optional_inputs:\
         Optional list of optional algorithm parameter names; if not specified\
         those parameters which have default values are used.
     :type optional_inputs: list of (str or \
-        pacman.executor.algorithm_decorators.OneOf or \
-        pacman.executor.algorithm_decorators.AllOf)
+        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
+        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
     :param method:\
         The optional name of the method to call if decorating a class; if not\
         specified, __call__ is used (i.e. it is assumed to be callable).  Must\
@@ -257,7 +258,7 @@ def algorithm(
             algorithm_class = algorithm.__name__
             module = algorithm.__module__
         elif inspect.isfunction(algorithm):
-            if method is not None:
+            if method is not None:  # pragma: no cover
                 raise PacmanConfigurationException(
                     "Cannot specify a method when decorating a function")
             function = algorithm
@@ -265,7 +266,7 @@ def algorithm(
             algorithm_class = None
             is_class_method = False
             module = algorithm.__module__
-        else:
+        else:  # pragma: no cover
             raise PacmanConfigurationException(
                 "Decorating an unknown object type")
 
@@ -353,9 +354,9 @@ def scan_packages(packages, recursive=True):
                 try:
                     __import__(package_name)
                     package = sys.modules[package_name]
-                except Exception as ex:
-                    msg = "Failed to import " + package_name + " : " + str(ex)
-                    logger.warning(msg)
+                except Exception as ex:  # pragma: no cover
+                    logger.warning("Failed to import {} : {}".format(
+                        package_name, str(ex)))
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -369,9 +370,9 @@ def scan_packages(packages, recursive=True):
                 else:
                     try:
                         __import__(module)
-                    except Exception as ex:
-                        msg = "Failed to import " + module + " : " + str(ex)
-                        logger.warning(msg)
+                    except Exception as ex:  # pragma: no cover
+                        logger.warning("Failed to import {} : {}".format(
+                            module, str(ex)))
                         continue
 
         new_algorithms = _algorithms

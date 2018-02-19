@@ -4,7 +4,8 @@ import unittest
 from pacman.executor import PACMANAlgorithmExecutor
 from pacman.executor.algorithm_decorators import algorithm
 from pacman.executor.algorithm_decorators.token import Token
-from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
+from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException,\
+    PacmanConfigurationException
 
 
 @algorithm({"param": "TestType1"}, ["TestType2"])
@@ -251,6 +252,14 @@ class Test(unittest.TestCase):
             tokens=[], required_output_tokens=[])
         with self.assertRaises(SpecificException):
             executor.execute_mapping()
+
+    def test_failing_incomplete_workflow(self):
+        inputs = {}
+        with self.assertRaises(PacmanConfigurationException):
+            PACMANAlgorithmExecutor(
+                algorithms=["NotThereAtAll"],
+                optional_algorithms=[], inputs=inputs, required_outputs=[],
+                tokens=[], required_output_tokens=[])
 
     def test_external_algorithm(self):
         if not os.access("/bin/sh", os.X_OK):
