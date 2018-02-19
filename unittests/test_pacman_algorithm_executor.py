@@ -4,6 +4,7 @@ import unittest
 from pacman.executor import PACMANAlgorithmExecutor
 from pacman.executor.algorithm_decorators import algorithm
 from pacman.executor.algorithm_decorators.token import Token
+from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
 
 
 @algorithm({"param": "TestType1"}, ["TestType2"])
@@ -263,6 +264,26 @@ class Test(unittest.TestCase):
             tokens=[], required_output_tokens=[])
         executor.execute_mapping()
         self.assertEqual(executor.get_item("Foo"), name)
+        with os.fdopen(fd) as f:
+            self.assertEqual(f.read(), "foo\n")
+
+    def test_failing_external_algorithm(self):
+        if not os.access("/bin/sh", os.X_OK):
+            raise self.skipTest("need Bourne shell to run this test")
+        fd, name = tempfile.mkstemp()
+        inputs = {"ExampleFilePath": name}
+        xmlfile = os.path.join(os.path.dirname(__file__), "test_algos.xml")
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["FailingExternal"], xml_paths=[xmlfile],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        with self.assertRaises(
+                PacmanExternalAlgorithmFailedToCompleteException) as e:
+            executor.execute_mapping()
+        self.assertIn(
+            "Algorithm FailingExternal returned a non-zero error code 1",
+            e.exception.message)
+        self.assertEqual(executor.get_item("Foo"), None)
         with os.fdopen(fd) as f:
             self.assertEqual(f.read(), "foo\n")
 
