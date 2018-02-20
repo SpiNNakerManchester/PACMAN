@@ -25,8 +25,8 @@ class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
         :type y: int
         :raise None: does not raise any known exceptions
         """
-        self._x = x
-        self._y = y
+        self._x = int(x)
+        self._y = int(y)
 
     @property
     def x(self):
@@ -39,3 +39,11 @@ class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     def __repr__(self):
         return "RadialPlacementFromChipConstraint(x={}, y={})".format(
             self._x, self._y)
+
+    def __eq__(self, other):
+        if not isinstance(other, RadialPlacementFromChipConstraint):
+            return False
+        return (self._x, self._y) == (other.x, other.y)  
+
+    def __hash__(self):
+        return hash((self._x, self._y))

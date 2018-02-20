@@ -16,7 +16,7 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
         "_y",
 
         # The processor id on chip (x,y) that this vertex is placed on within
-        # the SpiNNaker machine
+        # the SpiNNaker machine; may be None
         "_p",
     ]
 
@@ -31,9 +31,9 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
         :type p: int
         :raise None: does not raise any known exceptions
         """
-        self._x = x
-        self._y = y
-        self._p = p
+        self._x = int(x)
+        self._y = int(y)
+        self._p = None if p is None else int(p)
 
     @property
     def x(self):
@@ -59,8 +59,8 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
     def p(self):
         """ The processor on the chip
 
-        :return: the processor id or None
-        :rtype: int
+        :return: the processor id, or None if that is not constrained
+        :rtype: int or None
         :raise None: does not raise any known exceptions
         """
         return self._p
@@ -78,3 +78,11 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
     def __repr__(self):
         return "ChipAndCoreConstraint(x={}, y={}, p={})".format(
             self._x, self._y, self._p)
+
+    def __eq__(self, other):
+        if not isinstance(other, ChipAndCoreConstraint):
+            return False
+        return (self._x, self._y, self._p) == (other.x, other.y, other.p)  
+
+    def __hash__(self):
+        return hash((self._x, self._y, self._p))
