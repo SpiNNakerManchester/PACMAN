@@ -65,7 +65,7 @@ def validate_routes(machine_graph, placements, routing_infos,
                 partition)
             is_continuous = _check_if_partition_has_continuous_keys(partition)
             if not is_continuous:
-                logger.warn(
+                logger.warning(
                     "Due to the none continuous nature of the keys in this "
                     "partition {}, we cannot check all atoms will be routed "
                     "correctly, but will check the base key instead",
@@ -386,7 +386,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
             if found_entry is None:
                 found_entry = entry
             else:
-                logger.warn(
+                logger.warning(
                     "Found more than one entry for key {}. This could be "
                     "an error, as currently no router supports overloading"
                     " of entries.", hex(key))
