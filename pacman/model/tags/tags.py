@@ -1,3 +1,4 @@
+from spinn_machine.tags import IPTag, ReverseIPTag
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.utilities import utility_calls
 
@@ -52,6 +53,9 @@ class Tags(object):
             * If the combination of (board-address, tag) has already been\
               assigned to a reverse IP tag
         """
+        if not isinstance(ip_tag, IPTag):
+            raise PacmanInvalidParameterException(
+                "ip_tag", str(ip_tag), "Only add IP tags with this method.")
         existing_tag = None
         if (ip_tag.board_address, ip_tag.tag) in self._ip_tags:
             existing_tag = self._ip_tags[(ip_tag.board_address, ip_tag.tag)]
@@ -95,7 +99,10 @@ class Tags(object):
             * If the port of the tag has already been assigned on the given\
               board-address
         """
-
+        if not isinstance(reverse_ip_tag, ReverseIPTag):
+            raise PacmanInvalidParameterException(
+                "reverse_ip_tag", str(reverse_ip_tag),
+                "Only add reverse IP tags with this method.")
         if ((reverse_ip_tag.board_address, reverse_ip_tag.tag) in
                 self._ip_tags or
                 (reverse_ip_tag.board_address, reverse_ip_tag.tag) in
