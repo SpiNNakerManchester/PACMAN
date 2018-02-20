@@ -14,7 +14,6 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
 
     def __init__(self, vertex):
         """
-
         :param vertex: The vertex to which the constraint refers
         :type vertex: \
             :py:class:`pacman.model.graphs.application.ApplicationVertex`
@@ -36,3 +35,11 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
     def __repr__(self):
         return "SameAtomsAsVertexConstraint(vertex={})".format(
             self._vertex)
+
+    def __eq__(self, other):
+        if not isinstance(other, SameAtomsAsVertexConstraint):
+            return False
+        return self._vertex == other.vertex
+
+    def __hash__(self):
+        return hash((self._vertex,))

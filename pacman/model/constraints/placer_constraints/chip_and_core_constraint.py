@@ -82,7 +82,7 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
     def __eq__(self, other):
         if not isinstance(other, ChipAndCoreConstraint):
             return False
-        return (self._x, self._y, self._p) == (other.x, other.y, other.p)  
+        return (self._x, self._y, self._p) == (other.x, other.y, other.p)
 
     def __hash__(self):
         return hash((self._x, self._y, self._p))

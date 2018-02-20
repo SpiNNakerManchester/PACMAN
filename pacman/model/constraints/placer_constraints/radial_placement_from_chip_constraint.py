@@ -43,7 +43,7 @@ class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     def __eq__(self, other):
         if not isinstance(other, RadialPlacementFromChipConstraint):
             return False
-        return (self._x, self._y) == (other.x, other.y)  
+        return (self._x, self._y) == (other.x, other.y)
 
     def __hash__(self):
         return hash((self._x, self._y))
