@@ -1,6 +1,7 @@
 import unittest
 from pacman.model.resources import ResourceContainer
-from pacman.exceptions import PacmanAlreadyExistsException
+from pacman.exceptions import PacmanAlreadyExistsException,\
+    PacmanConfigurationException
 from pacman.model.routing_info \
     import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
 from pacman.model.graphs.machine \
@@ -51,6 +52,21 @@ class TestRoutingInfo(unittest.TestCase):
         assert routing_info.get_first_key_for_edge(None) is None
 
         assert next(iter(routing_info)) == partition_info
+
+    def test_base_key_and_mask(self):
+        with self.assertRaises(PacmanConfigurationException):
+            BaseKeyAndMask(0xF0, 0x40)
+        bkm1 = BaseKeyAndMask(0x40, 0xF0)
+        self.assertEqual(bkm1, bkm1)
+        self.assertNotEqual(bkm1, [])
+        self.assertEqual(str(bkm1), "KeyAndMask:0x40:0xf0")
+        self.assertEqual(bkm1.n_keys, 268435456)
+        bkm2 = BaseKeyAndMask(0x40000000, 0xFFFFFFFE)
+        self.assertNotEqual(bkm1, bkm2)
+        self.assertEqual(bkm2.n_keys, 2)
+        k, n = bkm2.get_keys()
+        self.assertEqual(k.tolist(), [1073741824, 1073741825])
+        self.assertEqual(n, 2)
 
 
 if __name__ == "__main__":
