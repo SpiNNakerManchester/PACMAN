@@ -1,11 +1,15 @@
 """
 TestRoutingInfo
 """
+from pacman.model.graphs.impl.outgoing_edge_partition import OutgoingEdgePartition
 
 # pacman imports
 from pacman.model.routing_tables \
     import MulticastRoutingTable, MulticastRoutingTables
-from pacman.exceptions import PacmanAlreadyExistsException
+from pacman.model.routing_table_by_partition import \
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
+from pacman.exceptions import PacmanAlreadyExistsException,\
+    PacmanInvalidParameterException
 
 # spinnmanchine imports
 from spinn_machine import MulticastRoutingEntry
@@ -18,6 +22,17 @@ class TestRoutingTable(unittest.TestCase):
     """
     tests for the routing table object
     """
+    def test_new_multicast_routing_table_entry(self):
+        """
+        test that creating a multicast routing entry works
+        """
+        # TODO: Move this test to SpiNNMachine's test suite
+        key_combo = 0xff00
+        mask = 0xff00
+        proc_ids = range(18)
+        link_ids = range(6)
+        MulticastRoutingEntry(key_combo, mask, proc_ids, link_ids, True)
+
     def test_new_multicast_routing_table(self):
         """
         test that creating a multicast routing entry and adding it to the table
@@ -131,24 +146,76 @@ class TestRoutingTable(unittest.TestCase):
         MulticastRoutingTables()
 
     def test_add_routing_table_for_duplicate_chip(self):
-        with self.assertRaises(PacmanAlreadyExistsException):
-            key_combo = 0xff35
-            mask = 0xffff
-            proc_ids = list()
-            link_ids = list()
-            for i in range(18):
-                proc_ids.append(i)
-            for i in range(6):
-                link_ids.append(i)
-            multicast_entries1 = MulticastRoutingEntry(
-                key_combo, mask, proc_ids, link_ids, True)
+        key_combo = 0xff35
+        mask = 0xffff
+        proc_ids = list()
+        link_ids = list()
+        for i in range(18):
+            proc_ids.append(i)
+        for i in range(6):
+            link_ids.append(i)
+        multicast_entries1 = MulticastRoutingEntry(
+            key_combo, mask, proc_ids, link_ids, True)
 
-            multicast_entries2 = MulticastRoutingEntry(
-                key_combo - 1, mask, proc_ids, link_ids, True)
-            mrt = list()
-            mrt.append(MulticastRoutingTable(3, 0, [multicast_entries1]))
-            mrt.append(MulticastRoutingTable(3, 0, [multicast_entries2]))
+        multicast_entries2 = MulticastRoutingEntry(
+            key_combo - 1, mask, proc_ids, link_ids, True)
+        mrt = list()
+        mrt.append(MulticastRoutingTable(3, 0, [multicast_entries1]))
+        mrt.append(MulticastRoutingTable(3, 0, [multicast_entries2]))
+        with self.assertRaises(PacmanAlreadyExistsException):
             MulticastRoutingTables(mrt)
+
+    def test_multicast_routing_table_by_partition(self):
+        mrt = MulticastRoutingTableByPartition()
+        partition = OutgoingEdgePartition("foo", None)
+        entry = MulticastRoutingTableByPartitionEntry(range(4), range(2))
+        mrt.add_path_entry(entry, 0, 0, partition)
+        entry = MulticastRoutingTableByPartitionEntry(
+            range(4, 8), range(2, 4))
+        mrt.add_path_entry(entry, 0, 0, partition)
+        entry = MulticastRoutingTableByPartitionEntry(
+            range(8, 12), range(4, 6))
+        mrt.add_path_entry(entry, 0, 0, partition)
+        assert list(mrt.get_routers()) == [(0, 0)]
+        assert len(mrt.get_entries_for_router(0, 0)) == 1
+        assert next(iter(mrt.get_entries_for_router(0, 0))) == partition
+        mre = mrt.get_entries_for_router(0, 0)[partition]
+        assert str(mre) == ("None:None:False"
+                            ":set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])"
+                            ":set([0, 1, 2, 3, 4, 5])")
+        assert mre == mrt.get_entry_on_coords_for_edge(partition, 0, 0)
+
+    def test_multicast_routing_table_by_partition_entry(self):
+        e1 = MulticastRoutingTableByPartitionEntry(range(18), range(6))
+        with self.assertRaises(PacmanInvalidParameterException):
+            MulticastRoutingTableByPartitionEntry(range(18), range(6), 4, 3)
+        e2 = MulticastRoutingTableByPartitionEntry(
+            range(4), range(2), incoming_processor=4)
+        e3 = MulticastRoutingTableByPartitionEntry(
+            range(12, 16), range(3, 5), incoming_link=3)
+        with self.assertRaises(PacmanInvalidParameterException):
+            MulticastRoutingTableByPartitionEntry(range(18), range(6),
+                                                  incoming_link=[])
+        e4 = MulticastRoutingTableByPartitionEntry(16, 2)
+        e5 = MulticastRoutingTableByPartitionEntry(None, None)
+        assert str(e2) == "None:4:False:set([0, 1, 2, 3]):set([0, 1])"
+        assert str(e3) == "3:None:False:set([12, 13, 14, 15]):set([3, 4])"
+        with self.assertRaises(PacmanInvalidParameterException):
+            e2.merge_entry(e3)
+        e6 = e2.merge_entry(MulticastRoutingTableByPartitionEntry(
+            range(12, 16), range(3, 5)))
+        assert str(e2) == "None:4:False:set([0, 1, 2, 3]):set([0, 1])"
+        assert str(e6) == ("None:4:False:set([0, 1, 2, 3, 12, 13, 14, 15])"
+                           ":set([0, 1, 3, 4])")
+        e6 = e3.merge_entry(MulticastRoutingTableByPartitionEntry(
+            range(4), range(2)))
+        assert str(e3) == "3:None:False:set([12, 13, 14, 15]):set([3, 4])"
+        assert str(e6) == ("3:None:False:set([0, 1, 2, 3, 12, 13, 14, 15])"
+                           ":set([0, 1, 3, 4])")
+        assert str(e4.merge_entry(e5)) == "None:None:False:set([16]):set([2])"
+        assert str(e1) == str(e5.merge_entry(e1))
+        # NB: Have true object identity; we have setters!
+        assert e5 != MulticastRoutingTableByPartitionEntry(None, None)
 
 
 if __name__ == '__main__':
