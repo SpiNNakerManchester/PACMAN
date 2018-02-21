@@ -2,8 +2,10 @@ import unittest
 from pacman.model.resources import ResourceContainer
 from pacman.exceptions import PacmanAlreadyExistsException,\
     PacmanConfigurationException
+from pacman.model.graphs.impl.outgoing_edge_partition import OutgoingEdgePartition
 from pacman.model.routing_info \
-    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
+    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo, \
+    DictBasedMachinePartitionNKeysMap
 from pacman.model.graphs.machine \
     import MachineOutgoingEdgePartition, MachineEdge, SimpleMachineVertex
 
@@ -53,20 +55,44 @@ class TestRoutingInfo(unittest.TestCase):
 
         assert next(iter(routing_info)) == partition_info
 
+        partition2 = MachineOutgoingEdgePartition("Test")
+        partition2.add_edge(MachineEdge(pre_vertex, post_vertex))
+        with self.assertRaises(PacmanAlreadyExistsException):
+            routing_info.add_partition_info(PartitionRoutingInfo(
+                [BaseKeyAndMask(key, 0xFFFFFFFF)], partition2))
+        assert partition != partition2
+        partition3 = MachineOutgoingEdgePartition("Test2")
+        partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
+        routing_info.add_partition_info(PartitionRoutingInfo(
+            [BaseKeyAndMask(key, 0xFFFFFFFF)], partition3))
+        assert routing_info.get_routing_info_from_partition(partition) != \
+            routing_info.get_routing_info_from_partition(partition3)
+        assert partition != partition3
+
+
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
             BaseKeyAndMask(0xF0, 0x40)
         bkm1 = BaseKeyAndMask(0x40, 0xF0)
-        self.assertEqual(bkm1, bkm1)
-        self.assertNotEqual(bkm1, [])
-        self.assertEqual(str(bkm1), "KeyAndMask:0x40:0xf0")
-        self.assertEqual(bkm1.n_keys, 268435456)
+        assert bkm1 == bkm1
+        assert bkm1 != []
+        assert str(bkm1) == "KeyAndMask:0x40:0xf0"
+        assert bkm1.n_keys == 268435456
         bkm2 = BaseKeyAndMask(0x40000000, 0xFFFFFFFE)
-        self.assertNotEqual(bkm1, bkm2)
-        self.assertEqual(bkm2.n_keys, 2)
+        assert bkm1 != bkm2
+        assert bkm2.n_keys == 2
         k, n = bkm2.get_keys()
-        self.assertEqual(k.tolist(), [1073741824, 1073741825])
-        self.assertEqual(n, 2)
+        assert k.tolist() == [1073741824, 1073741825]
+        assert n == 2
+
+    def test_dict_based_machine_partition_n_keys_map(self):
+        pmap = DictBasedMachinePartitionNKeysMap()
+        p1 = OutgoingEdgePartition("foo", None)
+        p2 = OutgoingEdgePartition("bar", None)
+        pmap.set_n_keys_for_partition(p1, 1)
+        pmap.set_n_keys_for_partition(p2, 2)
+        assert pmap.n_keys_for_partition(p1) == 1
+        assert pmap.n_keys_for_partition(p2) == 2
 
 
 if __name__ == "__main__":
