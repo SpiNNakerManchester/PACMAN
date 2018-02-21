@@ -1,9 +1,5 @@
-"""
-TestRoutingInfo
-"""
-from pacman.model.graphs.impl.outgoing_edge_partition import OutgoingEdgePartition
-
 # pacman imports
+from pacman.model.graphs.impl import OutgoingEdgePartition
 from pacman.model.routing_tables \
     import MulticastRoutingTable, MulticastRoutingTables
 from pacman.model.routing_table_by_partition import \
