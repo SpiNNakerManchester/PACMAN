@@ -6,6 +6,7 @@ from pacman.model.graphs import AbstractVirtualVertex
 
 from spinn_utilities.progress_bar import ProgressBar
 from collections import OrderedDict
+from pacman.utilities import file_format_schemas
 
 DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX = 1
 
@@ -44,6 +45,8 @@ class ConvertToFileMachineGraphPureMulticast(object):
             json.dump(json_graph, file_to_write)
         progress.update()
 
+        file_format_schemas.validate(json_graph, "machine_graph.json")
+
         progress.end()
 
         return file_path, vertex_by_id, partition_by_id
@@ -65,7 +68,7 @@ class ConvertToFileMachineGraphPureMulticast(object):
             tag_id = hashlib.md5(str(vertex_id) + "_tag").hexdigest()
             edges[tag_id] = {
                 "source": str(vertex_id),
-                "sinks": tag_id,
+                "sinks": [tag_id],
                 "weight": 1.0,
                 "type": "FAKE_TAG_EDGE"}
             # add the tag-able vertex

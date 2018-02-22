@@ -5,8 +5,6 @@ from spinn_utilities.progress_bar import ProgressBar
 from collections import defaultdict
 
 import json
-import jsonschema
-import os
 
 CHIP_HOMOGENEOUS_CORES = 18
 CHIP_HOMOGENEOUS_SDRAM = 119275520
@@ -60,10 +58,7 @@ class ConvertToFileMachine(object):
         progress.update()
 
         # validate the schema
-        schema_file = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "machine.json")
-        with open(schema_file, "r") as f:
-            jsonschema.validate(json_obj, json.load(f))
+        file_format_schemas.validate(json_obj, "machine.json")
 
         # update and complete progress bar
         progress.end()

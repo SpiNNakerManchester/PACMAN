@@ -8,8 +8,6 @@ from pacman.utilities.constants import EDGES
 from spinn_utilities.progress_bar import ProgressBar
 
 import json
-import os
-import jsonschema
 
 
 class CreateConstraintsToFile(object):
@@ -39,12 +37,7 @@ class CreateConstraintsToFile(object):
             json.dump(json_obj, f)
 
         # validate the schema
-        schema_file = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "constraints.json")
-
-        # for debug purposes, read schema and validate
-        with open(schema_file, "r") as f:
-            jsonschema.validate(json_obj, json.load(f))
+        file_format_schemas.validate(json_obj, "constraints.json")
 
         # complete progress bar
         progress.end()

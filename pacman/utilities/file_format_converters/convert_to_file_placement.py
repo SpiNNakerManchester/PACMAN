@@ -2,9 +2,7 @@ from pacman.utilities import file_format_schemas
 
 from spinn_utilities.progress_bar import ProgressBar
 
-import os
 import json
-import jsonschema
 
 
 class ConvertToFilePlacement(object):
@@ -36,14 +34,10 @@ class ConvertToFilePlacement(object):
         # dump dict into json file
         with open(file_path, "w") as file_to_write:
             json.dump(json_obj, file_to_write)
+        progress.update()
 
         # validate the schema
-        schema_file = os.path.join(
-            os.path.dirname(file_format_schemas.__file__), "placements.json")
-
-        progress.update()
-        with open(schema_file, "r") as file_to_read:
-            jsonschema.validate(json_obj, json.load(file_to_read))
+        file_format_schemas.validate(json_obj, "placements.json")
         progress.end()
 
         # return the file format

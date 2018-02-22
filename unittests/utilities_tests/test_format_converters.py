@@ -84,10 +84,10 @@ def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
                 "source": str(id(v0)), "sinks": [str(id(v2))],
                 "type": "multicast", "weight": 1},
             t1id: {
-                "source": str(id(v1)), "sinks": t1id,
+                "source": str(id(v1)), "sinks": [t1id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"},
             t2id: {
-                "source": str(id(v2)), "sinks": t2id,
+                "source": str(id(v2)), "sinks": [t2id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"}}}
     assert obj == baseline
 
@@ -133,10 +133,10 @@ def test_convert_to_file_machine_graph(tmpdir):
                 "source": str(id(v0)), "sinks": [str(id(v2))],
                 "type": "multicast", "weight": 1},
             t1id: {
-                "source": str(id(v1)), "sinks": t1id,
+                "source": str(id(v1)), "sinks": [t1id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"},
             t2id: {
-                "source": str(id(v2)), "sinks": t2id,
+                "source": str(id(v2)), "sinks": [t2id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"}}}
     assert obj == baseline
 
