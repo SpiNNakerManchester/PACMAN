@@ -45,11 +45,10 @@ class ConvertToFileMachine(object):
             "dead_links": []}
 
         # handle exceptions (dead chips)
-        exceptions = defaultdict()
+        exceptions = defaultdict(dict)
         for x in range(0, machine.max_chip_x + 1):
             for y in progress.over(range(0, machine.max_chip_y + 1), False):
-                self._add_possibly_dead_chip(
-                    json_obj, machine, x, y, exceptions)
+                self._add_exceptions(json_obj, machine, x, y, exceptions)
         json_obj["chip_resource_exceptions"] = [
             [x, y, exceptions[x, y]] for x, y in exceptions]
         progress.update()
@@ -71,41 +70,34 @@ class ConvertToFileMachine(object):
 
         return file_path
 
-    def _add_possibly_dead_chip(self, json_obj, machine, x, y, exceptions):
-        if not machine.is_chip_at(x, y) or machine.get_chip_at(x, y).virtual:
+    def _add_exceptions(self, json_obj, machine, x, y, exceptions):
+        # Handle non-existing/virtual chips by marking them as dead
+        chip = machine.get_chip_at(x, y)
+        if chip is None or chip.virtual:
             json_obj['dead_chips'].append([x, y])
             return
 
         # write dead links
         for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
-            router = machine.get_chip_at(x, y).router
-            if not router.is_link(link_id):
+            if not chip.router.is_link(link_id):
                 json_obj['dead_links'].append(
                     [x, y, "{}".format(constants.EDGES(link_id).name.lower())])
 
-        chip = machine.get_chip_at(x, y)
-        # locate number of monitor cores
+        # locate number of monitor cores and determine
         num_monitors = self._locate_no_monitors(chip)
-        if not chip.is_processor_with_id(CHIP_HOMOGENEOUS_CORES - 1):
-            # locate the highest core id
-            num_processors = self._locate_max_core_id(machine, x, y)
-            exceptions[x, y] = {
-                "cores": num_processors - num_monitors}
-        elif num_monitors:
-            # if monitors exist, remove them from top level
-            exceptions[x, y] = {
-                "cores": CHIP_HOMOGENEOUS_CORES - 1 - num_monitors}
+        max_working_core = self._locate_max_core_id(chip)
+        num_homogeneous_cores = max_working_core - num_monitors
+        if num_homogeneous_cores != CHIP_HOMOGENEOUS_CORES:
+            exceptions[x, y]["cores"] = num_homogeneous_cores
 
         # search for Ethernet connected chips
         for chip in machine.ethernet_connected_chips:
-            if (chip.x, chip.y) not in exceptions:
-                exceptions[chip.x, chip.y] = dict()
-            exceptions[chip.x, chip.y]['tags'] = len(chip.tag_ids)
+            exceptions[chip.x, chip.y]["tags"] = len(chip.tag_ids)
 
     @staticmethod
-    def _locate_max_core_id(machine, x, y):
+    def _locate_max_core_id(chip):
         for np in range(CHIP_HOMOGENEOUS_CORES, 0, -1):
-            if machine.get_chip_at(x, y).is_processor_with_id(np - 1):
+            if chip.is_processor_with_id(np - 1):
                 break
         return np - 1
 
@@ -113,5 +105,6 @@ class ConvertToFileMachine(object):
     def _locate_no_monitors(chip):
         # search for monitors in the list of processors
         return sum(
-            p in chip and chip[p].is_monitor
+            chip.is_processor_with_id(p)
+            and chip.get_processor_with_id(p).is_monitor
             for p in range(0, CHIP_HOMOGENEOUS_CORES - 1))
