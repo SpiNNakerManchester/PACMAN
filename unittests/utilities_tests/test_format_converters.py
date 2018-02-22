@@ -156,8 +156,8 @@ def test_convert_to_file_machine(tmpdir):
     obj = json.loads(fn.read())
     baseline = {
          "chip_resource_exceptions": [
-             [0, 1, {"cores": 16}], [1, 0, {"cores": 16}],
-             [0, 0, {"cores": 16, "tags": 7}], [1, 1, {"cores": 16}]],
+             [0, 1, {"cores": 17}], [1, 0, {"cores": 17}],
+             [0, 0, {"cores": 17, "tags": 7}], [1, 1, {"cores": 17}]],
          "chip_resources": {
              "cores": 18, "router_entries": 1024,
              "sdram": 119275520, "sram": 24320, "tags": 0},

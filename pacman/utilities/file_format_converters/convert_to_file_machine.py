@@ -81,7 +81,7 @@ class ConvertToFileMachine(object):
         # locate number of monitor cores and determine
         num_monitors = self._locate_no_monitors(chip)
         max_working_core = self._locate_max_core_id(chip)
-        num_homogeneous_cores = max_working_core - num_monitors
+        num_homogeneous_cores = max_working_core + 1 - num_monitors
         if num_homogeneous_cores != CHIP_HOMOGENEOUS_CORES:
             exceptions[x, y]["cores"] = num_homogeneous_cores
 
