@@ -47,10 +47,10 @@ class CreateConstraintsToFile(object):
     def _search_graph_for_placement_constraints(
             self, json_obj, machine_graph, machine, progress):
         vertex_by_id = dict()
-        for vertex in machine_graph.vertices:
+        for vertex in progress.over(machine_graph.vertices, False):
             vertex_id = str(id(vertex))
             vertex_by_id[vertex_id] = vertex
-            for constraint in progress.over(vertex.constraints, False):
+            for constraint in vertex.constraints:
                 self._handle_vertex_constraint(
                     constraint, json_obj, vertex, vertex_id)
             self._handle_vertex_resources(
@@ -61,12 +61,11 @@ class CreateConstraintsToFile(object):
         return vertex_by_id
 
     def _handle_virtual_vertex(self, vertex, vertex_id, json_obj, machine):
-        chip_id, direction_id = \
-            self._locate_connected_chip_data(vertex, machine)
+        chip_id, direction = self._locate_connected_chip_data(vertex, machine)
         json_obj.append({
             "type": "route_endpoint",
             "vertex": vertex_id,
-            "direction": EDGES(direction_id).name.lower()})
+            "direction": EDGES(direction).name.lower()})
         json_obj.append({
             "type": "location",
             "vertex": vertex_id,
@@ -82,14 +81,12 @@ class CreateConstraintsToFile(object):
         # locate the chip from the placement constraint
         placement_constraints = utility_calls.locate_constraints_of_type(
             vertex.constraints, ChipAndCoreConstraint)
-        if not isinstance(placement_constraints, list):
-            placement_constraints = [placement_constraints]
-        routers = [
+        routers = (
             machine.get_chip_at(constraint.x, constraint.y).router
-            for constraint in placement_constraints]
-        links = [
+            for constraint in placement_constraints)
+        links = (
             router.get_link(i)
-            for router in routers for i in range(6) if router.is_link(i)]
+            for router in routers for i in range(6) if router.is_link(i))
         link = next(iter(links), None)
         if link is None:
             raise PacmanConfigurationException(
@@ -104,8 +101,7 @@ class CreateConstraintsToFile(object):
             return
         if isinstance(constraint, AbstractPlacerConstraint):
             if not isinstance(constraint, ChipAndCoreConstraint):
-                # pragma: no cover
-                raise PacmanConfigurationException(
+                raise PacmanConfigurationException(  # pragma: no cover
                     "Converter does not recognise placer constraint {}".format(
                         constraint))
             json_obj.append({

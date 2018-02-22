@@ -40,7 +40,8 @@ def test_convert_to_file_core_allocations(tmpdir):
 
     v = SimpleMachineVertex(ResourceContainer())
     pl = Placement(v, 1, 2, 3)
-    algo([pl], str(fn))
+    filename, _ = algo([pl], str(fn))
+    assert filename == str(fn)
     assert fn.read() == '{"type": "cores", "%d": [3, 4]}' % id(v)
 
 
@@ -65,7 +66,8 @@ def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
     # Convert it to JSON
     algo = ConvertToFileMachineGraphPureMulticast()
     fn = tmpdir.join("foo.json")
-    algo(graph, str(fn))
+    filename, _vertex_by_id, _partition_by_id = algo(graph, str(fn))
+    assert filename == str(fn)
 
     # Rebuild and compare; simplest way of checking given that order is not
     # preserved in the underlying string and altering that is hard
@@ -114,7 +116,8 @@ def test_convert_to_file_machine_graph(tmpdir):
     # Convert it to JSON
     algo = ConvertToFileMachineGraph()
     fn = tmpdir.join("foo.json")
-    algo(graph, str(fn))
+    filename, _vertex_by_id, _partition_by_id = algo(graph, str(fn))
+    assert filename == str(fn)
 
     # Rebuild and compare; simplest way of checking given that order is not
     # preserved in the underlying string and altering that is hard
@@ -149,7 +152,8 @@ def test_convert_to_file_machine(tmpdir):
     # Convert it to JSON
     algo = ConvertToFileMachine()
     fn = tmpdir.join("foo.json")
-    algo(machine, str(fn))
+    filename = algo(machine, str(fn))
+    assert filename == str(fn)
 
     # Rebuild and compare; simplest way of checking given that order is not
     # preserved in the underlying string and altering that is hard
@@ -177,7 +181,8 @@ def test_convert_to_file_placement(tmpdir):
     placements = Placements([pl])
     algo = ConvertToFilePlacement()
     fn = tmpdir.join("foo.json")
-    algo(placements, str(fn))
+    filename, _vertex_by_id = algo(placements, str(fn))
+    assert filename == str(fn)
     obj = json.loads(fn.read())
     baseline = {
         str(id(v)): [1, 2]}
@@ -189,7 +194,10 @@ def test_create_constraints_to_file(tmpdir):
     machine = VirtualMachine(version=3, with_wrap_arounds=None)
     # TODO: define some extra monitor cores (how?)
     graph = MachineGraph("foo")
-    v0 = SimpleMachineVertex(ResourceContainer(), constraints=[
+    tag1 = IPtagResource("1.2.3.4", 5, False, tag="footag")
+    tag2 = ReverseIPtagResource(tag="bartag")
+    v0 = SimpleMachineVertex(ResourceContainer(
+        iptags=[tag1], reverse_iptags=[tag2]), constraints=[
         ChipAndCoreConstraint(1, 1, 3)])
     graph.add_vertex(v0)
     v0_id = str(id(v0))
@@ -201,7 +209,11 @@ def test_create_constraints_to_file(tmpdir):
 
     algo = CreateConstraintsToFile()
     fn = tmpdir.join("foo.json")
-    algo(graph, machine, str(fn))
+    filename, mapping = algo(graph, machine, str(fn))
+    assert filename == str(fn)
+    for vid in mapping:
+        assert vid in [v0_id, v1_id]
+        assert vid == str(id(mapping[vid]))
     obj = json.loads(fn.read())
     baseline = [
         {
@@ -213,6 +225,12 @@ def test_create_constraints_to_file(tmpdir):
         {
             "type": "resource",
             "resource": "cores", "range": [3, 4], "vertex": v0_id},
+        {
+            "type": "resource",
+            "resource": "iptag", "range": [0, 1], "vertex": v0_id},
+        {
+            "type": "resource",
+            "resource": "reverse_iptag", "range": [0, 1], "vertex": v0_id},
         {
             "type": "route_endpoint",
             "direction": "south", "vertex": v1_id},
