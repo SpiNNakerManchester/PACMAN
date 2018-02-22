@@ -16,22 +16,21 @@ class ConvertToFileMachineGraph(object):
 
     def __call__(self, machine_graph, file_path):
         """
-
         :param machine_graph:
         :param file_path:
         """
         progress = ProgressBar(
-            machine_graph.n_vertices + 1, "Converting to json graph")
+            machine_graph.n_vertices + 1, "Converting to JSON graph")
 
         # write basic stuff
-        json_graph_directory_rep = dict()
+        json_graph = dict()
 
         # write vertices data
         vertices_resources = dict()
-        json_graph_directory_rep["vertices_resources"] = vertices_resources
+        json_graph["vertices_resources"] = vertices_resources
 
         edges_resources = defaultdict()
-        json_graph_directory_rep["edges"] = edges_resources
+        json_graph["edges"] = edges_resources
 
         vertex_by_id = dict()
         partition_by_id = dict()
@@ -40,8 +39,8 @@ class ConvertToFileMachineGraph(object):
                                  edges_resources, machine_graph,
                                  partition_by_id)
 
-        with open(file_path, "w") as file_to_write:
-            json.dump(json_graph_directory_rep, file_to_write)
+        with open(file_path, "w") as f:
+            json.dump(json_graph, f)
         progress.update()
 
         progress.end()

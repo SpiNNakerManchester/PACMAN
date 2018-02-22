@@ -5,6 +5,7 @@ from spinn_utilities.progress_bar import ProgressBar
 import os
 import json
 import jsonschema
+from collections import OrderedDict
 
 
 class ConvertToFileCoreAllocations(object):
@@ -24,9 +25,9 @@ class ConvertToFileCoreAllocations(object):
                                "Converting to json core allocations")
 
         # write basic stuff
-        json_dict = dict()
+        json_dict = OrderedDict()
         json_dict['type'] = "cores"
-        vertex_by_id = dict()
+        vertex_by_id = OrderedDict()
 
         # process placements
         for placement in progress.over(placements, False):
