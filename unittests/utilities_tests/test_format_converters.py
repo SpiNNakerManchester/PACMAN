@@ -1,5 +1,6 @@
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.model.resources.iptag_resource import IPtagResource
@@ -186,11 +187,17 @@ def test_convert_to_file_placement(tmpdir):
 def test_create_constraints_to_file(tmpdir):
     # Construct the sample machine and graph
     machine = VirtualMachine(version=3, with_wrap_arounds=None)
+    # TODO: define some extra monitor cores (how?)
     graph = MachineGraph("foo")
     v0 = SimpleMachineVertex(ResourceContainer(), constraints=[
         ChipAndCoreConstraint(1, 1, 3)])
     graph.add_vertex(v0)
-    v_id = str(id(v0))
+    v0_id = str(id(v0))
+    v1 = MachineSpiNNakerLinkVertex(2, constraints=[
+        ChipAndCoreConstraint(1, 1)])
+    v1.set_virtual_chip_coordinates(0, 2)
+    graph.add_vertex(v1)
+    v1_id = str(id(v1))
 
     algo = CreateConstraintsToFile()
     fn = tmpdir.join("foo.json")
@@ -202,10 +209,16 @@ def test_create_constraints_to_file(tmpdir):
             "location": None, "reservation": [0, 1], "resource": "cores"},
         {
             "type": "location",
-            "location": [1, 1], "vertex": v_id},
+            "location": [1, 1], "vertex": v0_id},
         {
             "type": "resource",
-            "resource": "cores", "range": [3, 4], "vertex": v_id}]
+            "resource": "cores", "range": [3, 4], "vertex": v0_id},
+        {
+            "type": "route_endpoint",
+            "direction": "south", "vertex": v1_id},
+        {
+            "type": "location",
+            "location": [1, 0], "vertex": v1_id}]
     assert obj == baseline
 
 

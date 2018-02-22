@@ -66,7 +66,7 @@ class CreateConstraintsToFile(object):
         json_obj.append({
             "type": "route_endpoint",
             "vertex": vertex_id,
-            "direction": EDGES(direction_id)})
+            "direction": EDGES(direction_id).name.lower()})
         json_obj.append({
             "type": "location",
             "vertex": vertex_id,
@@ -80,38 +80,44 @@ class CreateConstraintsToFile(object):
         :param machine:
         """
         # locate the chip from the placement constraint
-        placement_constraint = utility_calls.locate_constraints_of_type(
+        placement_constraints = utility_calls.locate_constraints_of_type(
             vertex.constraints, ChipAndCoreConstraint)
-        router = machine.get_chip_at(
-            placement_constraint.x, placement_constraint.y).router
-        link = next(
-            (router.get_link(i) for i in range(6) if router.is_link(i)),
-            None)
+        if not isinstance(placement_constraints, list):
+            placement_constraints = [placement_constraints]
+        routers = [
+            machine.get_chip_at(constraint.x, constraint.y).router
+            for constraint in placement_constraints]
+        links = [
+            router.get_link(i)
+            for router in routers for i in range(6) if router.is_link(i)]
+        link = next(iter(links), None)
         if link is None:
             raise PacmanConfigurationException(
                 "Can't find the real chip this virtual chip is connected to."
                 "Please fix and try again.")
-        return (str([link.destination_x, link.destination_y]),
+        return ([link.destination_x, link.destination_y],
                 link.multicast_default_from)
 
     @staticmethod
     def _handle_vertex_constraint(constraint, json_obj, vertex, vertex_id):
-        if not isinstance(vertex, AbstractVirtualVertex):
-            if isinstance(constraint, AbstractPlacerConstraint):
-                if not isinstance(constraint, ChipAndCoreConstraint):
-                    raise PacmanConfigurationException(
-                        "Converter does not recognise placer constraint {}"
-                        .format(constraint))
+        if isinstance(vertex, AbstractVirtualVertex):
+            return
+        if isinstance(constraint, AbstractPlacerConstraint):
+            if not isinstance(constraint, ChipAndCoreConstraint):
+                # pragma: no cover
+                raise PacmanConfigurationException(
+                    "Converter does not recognise placer constraint {}".format(
+                        constraint))
+            json_obj.append({
+                "type": "location",
+                "vertex": vertex_id,
+                "location": [constraint.x, constraint.y]})
+            if constraint.p is not None:
                 json_obj.append({
-                    "type": "location",
+                    "type": "resource",
                     "vertex": vertex_id,
-                    "location": [constraint.x, constraint.y]})
-                if constraint.p is not None:
-                    json_obj.append({
-                        "type": "resource",
-                        "vertex": vertex_id,
-                        "resource": "cores",
-                        "range": [constraint.p, constraint.p + 1]})
+                    "resource": "cores",
+                    "range": [constraint.p, constraint.p + 1]})
 
     @staticmethod
     def _handle_vertex_resources(resources_required, json_obj, vertex_id):
