@@ -25,7 +25,7 @@ class CreateConstraintsToFile(object):
         """
 
         progress = ProgressBar(
-            machine_graph.n_vertices + 2, "creating json constraints")
+            machine_graph.n_vertices + 2, "creating JSON constraints")
 
         json_obj = list()
         self._add_monitor_core_reserve(json_obj)
@@ -35,16 +35,16 @@ class CreateConstraintsToFile(object):
         vertex_by_id = self._search_graph_for_placement_constraints(
             json_obj, machine_graph, machine, progress)
 
-        with open(file_path, "w") as file_to_write:
-            json.dump(json_obj, file_to_write)
+        with open(file_path, "w") as f:
+            json.dump(json_obj, f)
 
         # validate the schema
-        constraints_schema_file_path = os.path.join(
+        schema_file = os.path.join(
             os.path.dirname(file_format_schemas.__file__), "constraints.json")
 
         # for debug purposes, read schema and validate
-        with open(constraints_schema_file_path, "r") as file_to_read:
-            jsonschema.validate(json_obj, json.load(file_to_read))
+        with open(schema_file, "r") as f:
+            jsonschema.validate(json_obj, json.load(f))
 
         # complete progress bar
         progress.end()
@@ -118,7 +118,7 @@ class CreateConstraintsToFile(object):
                         "type": "resource",
                         "vertex": vertex_id,
                         "resource": "cores",
-                        "range": str([constraint.p, constraint.p + 1])})
+                        "range": [constraint.p, constraint.p + 1]})
 
     @staticmethod
     def _handle_vertex_resources(resources_required, json_obj, vertex_id):

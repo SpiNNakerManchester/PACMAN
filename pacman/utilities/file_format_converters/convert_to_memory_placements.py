@@ -21,7 +21,6 @@ class ConvertToMemoryPlacements(object):
     def __call__(self, extended_machine, placements, allocations,
                  constraints, vertex_by_id):
         """
-
         :param placements:
         :param allocations:
         :param extended_machine:
@@ -89,22 +88,20 @@ class ConvertToMemoryPlacements(object):
 
     @staticmethod
     def _load_json_files(placements, allocations, constraints):
-        """ Read in the 3 json files needed for the conversion
+        """ Read in the 3 JSON files needed for the conversion
 
         :param placements:
         :param allocations:
         :param constraints:
         """
+        with open(placements, "r") as f:
+            placements_obj = json.load(f)
+        with open(allocations, "r") as f:
+            allocations_obj = json.load(f)
+        with open(constraints, "r") as f:
+            constraints_obj = json.load(f)
 
-        placments_file = open(placements, "r")
-        allocations_file = open(allocations, "r")
-        constraints_file = open(constraints, "r")
-
-        file_placements = json.load(placments_file)
-        core_allocations = json.load(allocations_file)
-        constraints = json.load(constraints_file)
-
-        return file_placements, core_allocations, constraints
+        return placements_obj, allocations_obj, constraints_obj
 
     @staticmethod
     def _valid_constraints_for_external_device(constraints_for_vertex):

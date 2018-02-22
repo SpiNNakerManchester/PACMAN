@@ -15,7 +15,6 @@ class ConvertToFilePlacement(object):
 
     def __call__(self, placements, file_path):
         """
-
         :param placements: the memory placements object
         :param file_path: the file path for the placements.json
         :return: file path for the placements.json
@@ -26,7 +25,7 @@ class ConvertToFilePlacement(object):
         vertex_by_id = dict()
 
         progress = ProgressBar(placements.n_placements + 1,
-                               "converting to json placements")
+                               "converting to JSON placements")
 
         # process placements
         for placement in progress.over(placements, False):
@@ -39,11 +38,11 @@ class ConvertToFilePlacement(object):
             json.dump(json_obj, file_to_write)
 
         # validate the schema
-        placements_schema_file_path = os.path.join(
+        schema_file = os.path.join(
             os.path.dirname(file_format_schemas.__file__), "placements.json")
 
         progress.update()
-        with open(placements_schema_file_path, "r") as file_to_read:
+        with open(schema_file, "r") as file_to_read:
             jsonschema.validate(json_obj, json.load(file_to_read))
         progress.end()
 

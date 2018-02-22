@@ -1,24 +1,34 @@
-from pacman.model.placements import Placement
+from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.model.resources.iptag_resource import IPtagResource
 from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
 from pacman.model.graphs.machine.machine_edge import MachineEdge
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_machine.virtual_machine import VirtualMachine
 
 from pacman.utilities.file_format_converters.\
     convert_to_file_machine_graph_pure_multicast import \
     ConvertToFileMachineGraphPureMulticast
+from pacman.utilities.file_format_converters.convert_to_file_placement \
+    import ConvertToFilePlacement
 from pacman.utilities.file_format_converters.convert_to_file_machine \
     import ConvertToFileMachine
 from pacman.utilities.file_format_converters.convert_to_file_machine_graph \
     import ConvertToFileMachineGraph
 from pacman.utilities.file_format_converters.convert_to_file_core_allocations \
     import ConvertToFileCoreAllocations
+from pacman.utilities.file_format_converters.\
+    convert_to_memory_multi_cast_routes import ConvertToMemoryMultiCastRoutes
+from pacman.utilities.file_format_converters.\
+    convert_to_memory_placements import ConvertToMemoryPlacements
+from pacman.utilities.file_format_converters.create_file_constraints \
+    import CreateConstraintsToFile
 
 import hashlib
 import json
+import pytest
 
 
 def test_convert_to_file_core_allocations(tmpdir):
@@ -33,7 +43,7 @@ def test_convert_to_file_core_allocations(tmpdir):
     assert fn.read() == '{"type": "cores", "%d": [3, 4]}' % id(v)
 
 
-def test_ConvertToFileMachineGraphPureMulticast(tmpdir):
+def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
     # Construct the sample graph
     graph = MachineGraph("foo")
     v0 = SimpleMachineVertex(ResourceContainer())
@@ -71,7 +81,7 @@ def test_ConvertToFileMachineGraphPureMulticast(tmpdir):
                 "source": str(id(v1)), "sinks": [str(id(v0))],
                 "type": "multicast", "weight": 1},
             str(id(p2)): {
-                "source": str(id(v0)), "sinks": [str(id(v2))], 
+                "source": str(id(v0)), "sinks": [str(id(v2))],
                 "type": "multicast", "weight": 1},
             t1id: {
                 "source": str(id(v1)), "sinks": t1id,
@@ -120,7 +130,7 @@ def test_convert_to_file_machine_graph(tmpdir):
                 "source": str(id(v1)), "sinks": [str(id(v0))],
                 "type": "multicast", "weight": 1},
             str(id(p2)): {
-                "source": str(id(v0)), "sinks": [str(id(v2))], 
+                "source": str(id(v0)), "sinks": [str(id(v2))],
                 "type": "multicast", "weight": 1},
             t1id: {
                 "source": str(id(v1)), "sinks": t1id,
@@ -158,3 +168,85 @@ def test_convert_to_file_machine(tmpdir):
              [1, 1, "east"], [1, 1, "north_east"]],
          "height": 2, "width": 2}
     assert obj == baseline
+
+
+def test_convert_to_file_placement(tmpdir):
+    v = SimpleMachineVertex(ResourceContainer())
+    pl = Placement(v, 1, 2, 3)
+    placements = Placements([pl])
+    algo = ConvertToFilePlacement()
+    fn = tmpdir.join("foo.json")
+    algo(placements, str(fn))
+    obj = json.loads(fn.read())
+    baseline = {
+        str(id(v)): [1, 2]}
+    assert obj == baseline
+
+
+def test_create_constraints_to_file(tmpdir):
+    # Construct the sample machine and graph
+    machine = VirtualMachine(version=3, with_wrap_arounds=None)
+    graph = MachineGraph("foo")
+    v0 = SimpleMachineVertex(ResourceContainer(), constraints=[
+        ChipAndCoreConstraint(1, 1, 3)])
+    graph.add_vertex(v0)
+    v_id = str(id(v0))
+
+    algo = CreateConstraintsToFile()
+    fn = tmpdir.join("foo.json")
+    algo(graph, machine, str(fn))
+    obj = json.loads(fn.read())
+    baseline = [
+        {
+            "type": "reserve_resource",
+            "location": None, "reservation": [0, 1], "resource": "cores"},
+        {
+            "type": "location",
+            "location": [1, 1], "vertex": v_id},
+        {
+            "type": "resource",
+            "resource": "cores", "range": [3, 4], "vertex": v_id}]
+    assert obj == baseline
+
+
+def test_convert_to_memory_multi_cast_routes(tmpdir):
+    algo = ConvertToMemoryMultiCastRoutes()
+    fn = tmpdir.join("foo.json")
+    # TODO: A more useful input document
+    baseline = {
+        "a": None,
+        "b": {
+            "chip": [0, 0],
+            "children": [
+                {"route": "core_0", "next_hop": None}]}}
+    # TODO: Use some real partitions!
+    partitions = {
+        "a": None,
+        "b": 123}
+    fn.write(json.dumps(baseline))
+    mrtp = algo(str(fn), partitions)
+    assert list(mrtp.get_routers()) == [(0, 0)]
+    assert list(mrtp.get_entries_for_router(0, 0).iterkeys()) == [123]
+
+
+@pytest.mark.skip("not yet finished")
+def test_convert_to_memory_placements(tmpdir):
+    # FIXME: use better inputs
+    machine = None
+    placements = {}
+    allocations = {}
+    constraints = {}
+    vertex_by_id = None
+
+    p_f = tmpdir.join("placements.json")
+    p_f.write(json.dumps(placements))
+    a_f = tmpdir.join("allocations.json")
+    a_f.write(json.dumps(allocations))
+    c_f = tmpdir.join("constraints.json")
+    c_f.write(json.dumps(constraints))
+
+    algo = ConvertToMemoryPlacements()
+    placements = algo(
+        machine, str(p_f), str(a_f), str(c_f), vertex_by_id)
+    assert placements is not None
+    assert placements == []  # FIXME: compare to real result
