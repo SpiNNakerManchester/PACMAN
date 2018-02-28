@@ -12,25 +12,27 @@ class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
 
     def __init__(self, fields=None):
         """
-
-        :param fields: any fields that define regions in the mask with further\
-            limitations
-        :type fields: iterable of :py:class:`pacman.utilities.field.Field`
+        :param fields: \
+            any fields that define regions in the mask with further limitations
+        :type fields: iterable of \
+            :py:class:`pacman.utilities.utility_objs.Field`
         :raise PacmanInvalidParameterException: if any of the fields are\
-            outside of the mask i.e. mask & field.mask != field.mask or if any\
-            of the field masks overlap i.e. field.mask & other_field.mask != 0
+            outside of the mask i.e. mask & field.value != field.value or if\
+            any of the field masks overlap i.e.,\
+            field.value & other_field.value != 0
         """
-        self._fields = sorted(fields, key=lambda field: field.mask,
+        self._fields = sorted(fields, key=lambda field: field.value,
                               reverse=True)
+        # TODO: Enforce the documented restrictions
 
     @property
     def fields(self):
-        """ Any fields in the mask - i.e. ranges of the mask that have\
+        """ Any fields in the mask, i.e., ranges of the mask that have\
             further limitations
 
         :return: Iterable of fields, ordered by mask with the highest bit\
             range first
-        :rtype: iterable of :py:class:`pacman.utilities.field.Field`
+        :rtype: iterable of :py:class:`pacman.utilities.utility_objs.Field`
         """
         return self._fields
 

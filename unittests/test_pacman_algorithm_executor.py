@@ -1,7 +1,12 @@
+import os
+import tempfile
 import unittest
 from pacman.executor import PACMANAlgorithmExecutor
 from pacman.executor.algorithm_decorators import algorithm
 from pacman.executor.algorithm_decorators.token import Token
+from pacman.exceptions import \
+    PacmanExternalAlgorithmFailedToCompleteException,\
+    PacmanConfigurationException
 
 
 @algorithm({"param": "TestType1"}, ["TestType2"])
@@ -88,6 +93,22 @@ class TestWholeTokenOptional(object):
 
     def __call__(self):
         TestWholeTokenOptional.called = True
+
+
+class SpecificException(Exception):
+    """ Just for test purposes.
+    """
+
+
+@algorithm({}, [], optional_input_tokens=[Token("Test")])
+class TestExceptionWhenCalled(object):
+    def __call__(self):
+        raise SpecificException("boom")
+
+
+@algorithm({}, [], optional_input_tokens=[Token("Test")])
+def exception_when_called():
+    raise SpecificException("boom")
 
 
 class Test(unittest.TestCase):
@@ -214,6 +235,90 @@ class Test(unittest.TestCase):
         self.assertEqual(
             [algorithm.algorithm_id for algorithm in executor._algorithms],
             ["TestRecursiveOptionalAlgorithm", "TestAlgorithm3"])
+
+    def test_failing_class_workflow(self):
+        inputs = {}
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["TestExceptionWhenCalled"],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        with self.assertRaises(SpecificException):
+            executor.execute_mapping()
+
+    def test_failing_function_workflow(self):
+        inputs = {}
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["exception_when_called"],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        with self.assertRaises(SpecificException):
+            executor.execute_mapping()
+
+    def test_failing_incomplete_workflow(self):
+        inputs = {}
+        with self.assertRaises(PacmanConfigurationException):
+            PACMANAlgorithmExecutor(
+                algorithms=["NotThereAtAll"],
+                optional_algorithms=[], inputs=inputs, required_outputs=[],
+                tokens=[], required_output_tokens=[])
+
+    def test_external_algorithm(self):
+        if not os.access("/bin/sh", os.X_OK):
+            raise self.skipTest("need Bourne shell to run this test")
+        fd, name = tempfile.mkstemp()
+        inputs = {"ExampleFilePath": name}
+        xmlfile = os.path.join(os.path.dirname(__file__), "test_algos.xml")
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["SimpleExternal"], xml_paths=[xmlfile],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        executor.execute_mapping()
+        self.assertEqual(executor.get_item("Foo"), name)
+        with os.fdopen(fd) as f:
+            self.assertEqual(f.read(), "foo\n")
+
+    def test_failing_external_algorithm(self):
+        if not os.access("/bin/sh", os.X_OK):
+            raise self.skipTest("need Bourne shell to run this test")
+        fd, name = tempfile.mkstemp()
+        inputs = {"ExampleFilePath": name}
+        xmlfile = os.path.join(os.path.dirname(__file__), "test_algos.xml")
+        executor = PACMANAlgorithmExecutor(
+            algorithms=["FailingExternal"], xml_paths=[xmlfile],
+            optional_algorithms=[], inputs=inputs, required_outputs=[],
+            tokens=[], required_output_tokens=[])
+        with self.assertRaises(
+                PacmanExternalAlgorithmFailedToCompleteException) as e:
+            executor.execute_mapping()
+        self.assertIn(
+            "Algorithm FailingExternal returned a non-zero error code 1",
+            e.exception.message)
+        self.assertEqual(executor.get_item("Foo"), None)
+        with os.fdopen(fd) as f:
+            self.assertEqual(f.read(), "foo\n")
+
+    def test_tokens(self):
+        t1 = Token("abc")
+        t2 = Token("abc", "def")
+        t3 = Token("abc")
+        t4 = Token("ghi")
+        t5 = Token("ghi", "def")
+        t6 = Token("abc", "def")
+        self.assertNotEqual(t1, t2)
+        self.assertEqual(t1, t3)
+        self.assertNotEqual(t1, t4)
+        self.assertNotEqual(t1, t5)
+        self.assertNotEqual(t2, t5)
+        self.assertEqual(t2, t6)
+        d = {}
+        d[t1] = 1
+        d[t2] = 2
+        d[t3] = 3
+        d[t4] = 4
+        d[t5] = 5
+        d[t6] = 6
+        self.assertEqual(len(d), 4)
+        self.assertEqual(repr(t2), "Token(name=abc, part=def)")
 
 
 if __name__ == "__main__":

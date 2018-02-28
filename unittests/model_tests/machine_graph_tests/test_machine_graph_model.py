@@ -43,23 +43,19 @@ class TestMachineGraphModel(unittest.TestCase):
         graph.add_edges(edges, "bar")
         outgoing = set(graph.get_edges_starting_at_vertex(vertices[0]))
         for i in range(5):
-            if edges[i] not in outgoing:
-                raise AssertionError(
-                    "edges[" + str(i) + "] is not in outgoing and should be")
+            assert edges[i] in outgoing, \
+                "edges[" + str(i) + "] is not in outgoing and should be"
         for i in range(5, 10):
-            if edges[i] in outgoing:
-                raise AssertionError(
-                    "edges[" + str(i) + "] is in outgoing and shouldn't be")
+            assert edges[i] not in outgoing, \
+                "edges[" + str(i) + "] is in outgoing and shouldn't be"
 
         incoming = set(graph.get_edges_ending_at_vertex(vertices[0]))
 
-        if edges[9] not in incoming:
-            raise AssertionError(
-                "edges[9] is not in incoming and should be")
+        assert edges[9] in incoming, \
+            "edges[9] is not in incoming and should be"
         for i in range(9):
-            if edges[i] in incoming:
-                raise AssertionError(
-                    "edges[" + str(i) + "] is in incoming and shouldn't be")
+            assert edges[i] not in incoming, \
+                "edges[" + str(i) + "] is in incoming and shouldn't be"
 
         vertices_from_graph = list(graph.vertices)
         for vert in vertices_from_graph:

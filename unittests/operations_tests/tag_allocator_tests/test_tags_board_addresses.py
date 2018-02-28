@@ -20,13 +20,11 @@ class TestTagsBoardAddresses(unittest.TestCase):
                 ResourceContainer(iptags=[IPtagResource(
                     "127.0.0.1", port=None, strip_sdp=True)]),
                 label="Vertex {}".format(i))
-            for i in range(len(eth_chips))
-        ]
+            for i in range(len(eth_chips))]
         print "Created {} vertices".format(len(vertices))
-        placements = Placements([
+        placements = Placements(
             Placement(vertex, chip.x, chip.y, 1)
-            for vertex, chip in zip(vertices, eth_chips)
-        ])
+            for vertex, chip in zip(vertices, eth_chips))
         allocator = BasicTagAllocator()
         _, _, tags = allocator(machine, placements)
 
@@ -51,34 +49,28 @@ class TestTagsBoardAddresses(unittest.TestCase):
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
         eth_procs = [
             proc.processor_id for proc in eth_chip.processors
-            if not proc.is_monitor
-        ]
+            if not proc.is_monitor]
         eth2_procs = [
             proc.processor_id for proc in eth_chip_2.processors
-            if not proc.is_monitor
-        ]
+            if not proc.is_monitor]
         eth_vertices = [
             SimpleMachineVertex(
                 ResourceContainer(iptags=[IPtagResource(
                     "127.0.0.1", port=tag, strip_sdp=True)]),
                 label="Ethernet Vertex {}".format(proc))
-            for tag in eth_chip.tag_ids
-        ]
+            for tag in eth_chip.tag_ids]
         eth2_vertices = [
             SimpleMachineVertex(
                 ResourceContainer(iptags=[IPtagResource(
                     "127.0.0.1", port=10000 + tag, strip_sdp=True)]),
                 label="Ethernet 2 Vertex {}".format(proc))
-            for tag in range(n_extra_vertices)
-        ]
-        placements = Placements([
+            for tag in range(n_extra_vertices)]
+        placements = Placements(
             Placement(vertex, eth_chip.x, eth_chip.y, proc)
-            for proc, vertex in zip(eth_procs, eth_vertices)
-        ])
-        placements.add_placements([
+            for proc, vertex in zip(eth_procs, eth_vertices))
+        placements.add_placements(
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
-            for proc, vertex in zip(eth2_procs, eth2_vertices)
-        ])
+            for proc, vertex in zip(eth2_procs, eth2_vertices))
         allocator = BasicTagAllocator()
         _, _, tags = allocator(machine, placements)
 

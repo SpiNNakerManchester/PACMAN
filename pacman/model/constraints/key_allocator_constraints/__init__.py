@@ -4,10 +4,12 @@ from .fixed_key_field_constraint import FixedKeyFieldConstraint
 from .fixed_key_and_mask_constraint import FixedKeyAndMaskConstraint
 from .fixed_mask_constraint import FixedMaskConstraint
 from .flexi_key_field_constraint import FlexiKeyFieldConstraint
+from .share_key_constraint import ShareKeyConstraint
 
 __all__ = ["AbstractKeyAllocatorConstraint",
            "ContiguousKeyRangeContraint",
            "FixedKeyFieldConstraint",
            "FixedKeyAndMaskConstraint",
            "FixedMaskConstraint",
-           "FlexiKeyFieldConstraint"]
+           "FlexiKeyFieldConstraint",
+           "ShareKeyConstraint"]

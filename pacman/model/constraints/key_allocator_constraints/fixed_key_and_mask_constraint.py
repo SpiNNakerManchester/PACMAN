@@ -37,7 +37,7 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
             * Number of keys to generate (may be None)
         :type key_list_function: (iterable of\
             :py:class:`pacman.model.routing_info.BaseKeyAndMask`,\
-            :py:class:`pacman.model.graph.machine.MachineEdge`,
+            :py:class:`pacman.model.graphs.machine.MachineEdge`,\
             int) -> iterable of int
         """
         for keys_and_mask in keys_and_masks:
@@ -77,6 +77,8 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         if not isinstance(other, FixedKeyAndMaskConstraint):
             return False
         if other.key_list_function != self._key_list_function:
+            return False
+        if len(self._keys_and_masks) != len(other.keys_and_masks):
             return False
         return all(km in other.keys_and_masks for km in self._keys_and_masks)
 

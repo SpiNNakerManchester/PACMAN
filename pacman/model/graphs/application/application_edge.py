@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractEdge
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import MachineEdge
@@ -33,13 +33,13 @@ class ApplicationEdge(AbstractEdge):
 
         :param pre_vertex: the application vertex at the start of the edge
         :type pre_vertex: \
-            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graphs.application.ApplicationVertex`
         :param post_vertex: the application vertex at the end of the edge
         :type post_vertex: \
-            :py:class:`pacman.model.graph.application.application_vertex.ApplicationVertex`
+            :py:class:`pacman.model.graphs.application.ApplicationVertex`
         :param traffic_type: The type of the traffic on the edge
         :type traffic_type:\
-            :py:class:`pacman.model.graph.edge_traffic_type.EdgeTrafficType`
+            :py:class:`pacman.model.graphs.common.EdgeTrafficType`
         :param label: The name of the edge
         :type label: str
         """
@@ -59,15 +59,15 @@ class ApplicationEdge(AbstractEdge):
 
         :param pre_vertex: The machine vertex at the start of the edge
         :type pre_vertex:\
-            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+            :py:class:`pacman.model.graphs.machine.MachineVertex`
         :param post_vertex: The machine vertex at the end of the edge
         :type post_vertex:\
-            :py:class:`pacman.model.graph.machine.abstract_machine_vertex.impl.MachineVertex`
+            :py:class:`pacman.model.graphs.machine.MachineVertex`
         :param label: label of the edge
         :type label: str
         :return: The created machine edge
         :rtype:\
-            :py:class:`pacman.model.graph.machine.machine_edge.MachineEdge`
+            :py:class:`pacman.model.graphs.machine.MachineEdge`
         """
         return self._machine_edge_type(
             pre_vertex, post_vertex, self._traffic_type, label=label)

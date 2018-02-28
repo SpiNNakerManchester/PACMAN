@@ -4,19 +4,15 @@ import traceback
 class PacmanException(Exception):
     """ Indicates a general exception from Pacman
     """
-    def __init__(self, *args, **kwargs):
-
-        # Call the base class constructor with the parameters it needs
-        Exception.__init__(self, *args, **kwargs)
+    pass
 
 
 class PacmanInvalidParameterException(PacmanException):
-    """ An exception which indicates that a parameter has an invalid value
+    """ An exception which indicates that a parameter has an invalid value.
     """
 
     def __init__(self, parameter, value, problem):
         """
-
         :param parameter: The name of the parameter
         :type parameter: str
         :param value: The value of the parameter
@@ -24,23 +20,23 @@ class PacmanInvalidParameterException(PacmanException):
         :param problem: The problem with the value of the parameter
         :type problem: str
         """
-        PacmanException.__init__(self, parameter, value, problem)
+        super(PacmanInvalidParameterException, self).__init__(
+            parameter, value, problem)
 
 
 class PacmanAlreadyExistsException(PacmanException):
-    """ An exception that indicates that something already exists and that
-        adding another would be a conflict
+    """ An exception that indicates that something already exists and that\
+        adding another would be a conflict.
     """
 
     def __init__(self, item_type, item_id):
         """
-
         :param item_type: The type of the item that already exists
         :type item_type: str
         :param item_id: The id of the item which is in conflict
         :type item_id: str
         """
-        PacmanException.__init__(self, item_type, item_id)
+        super(PacmanAlreadyExistsException, self).__init__(item_type, item_id)
 
 
 class PacmanPartitionException(PacmanException):
@@ -49,11 +45,10 @@ class PacmanPartitionException(PacmanException):
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the partitioning
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanPartitionException, self).__init__(problem)
 
 
 class PacmanPlaceException(PacmanException):
@@ -62,11 +57,10 @@ class PacmanPlaceException(PacmanException):
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the placement
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanPlaceException, self).__init__(problem)
 
 
 class PacmanPruneException(PacmanException):
@@ -75,87 +69,79 @@ class PacmanPruneException(PacmanException):
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the pruning
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanPruneException, self).__init__(problem)
 
 
 class PacmanRouteInfoAllocationException(PacmanException):
     """ An exception that indicates that something went wrong with route info\
-        allocation
+        allocation.
     """
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the allocation
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanRouteInfoAllocationException, self).__init__(problem)
 
 
 class PacmanElementAllocationException(PacmanException):
     """ An exception that indicates that something went wrong with element\
-        allocation
+        allocation.
     """
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the allocation
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanElementAllocationException, self).__init__(problem)
 
 
 class PacmanRoutingException(PacmanException):
-    """ An exception that indicates that something went wrong with routing
+    """ An exception that indicates that something went wrong with routing.
     """
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the routing
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanRoutingException, self).__init__(problem)
 
 
 class PacmanConfigurationException(PacmanException):
     """ An exception that indicates that something went wrong with \
-        configuring some part of pacman
+        configuring some part of pacman.
     """
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the routing
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanConfigurationException, self).__init__(problem)
 
 
 class PacmanNotExistException(PacmanException):
     """ An exception that indicates that a routing table entry was attempted\
-        to be removed from a routing table which didn't have such an entry
-
+        to be removed from a routing table which didn't have such an entry.
     """
 
     def __init__(self, problem):
         """
-
         :param problem: The problem with the routing
         :type problem: str
         """
-        PacmanException.__init__(self, problem)
+        super(PacmanNotExistException, self).__init__(problem)
 
 
 class PacmanAlgorithmFailedToCompleteException(PacmanException):
     """ An exception that indicates that a pacman algorithm ran from inside\
         the software stack has failed to complete for some unknown reason.
-
     """
 
     def __init__(self, algorithm, exception, tb):
@@ -167,7 +153,7 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
                 algorithm.algorithm_id, algorithm.inputs, exception.message,
                 traceback.format_exc(tb)))
 
-        PacmanException.__init__(self, problem)
+        super(PacmanAlgorithmFailedToCompleteException, self).__init__(problem)
         self._exception = exception
         self._algorithm = algorithm
         self._traceback = tb
@@ -190,22 +176,17 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
         """
         return self._algorithm
 
-    def __repr__(self):
-        return PacmanException.__repr__(self)
-
 
 class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
     """ An exception that indicates that an algorithm ran from outside\
         the software stack has failed to complete for some unknown reason.
-
     """
     pass
 
 
 class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
     """ An exception that indicates that an algorithm has not generated the\
-        correct outputs for some unknown reason
-
+        correct outputs for some unknown reason.
     """
     pass
 
@@ -232,13 +213,12 @@ class PacmanProcessorNotOccupiedError(KeyError):
 
 class PacmanProcessorNotAvailableError(PacmanException):
     def __init__(self, x, y, p):
-
         msg = "The processor {} {} {} is not available. " \
               "This may be caused by a clash between a ChipAndCoreConstraint"\
-              " and the processor still being in use from a previous run" \
-              "".format(x, y, p)
+              " and the processor still being in use from a previous run." \
+              .format(x, y, p)
         # Call the base class constructor with the parameters it needs
-        PacmanException.__init__(self, msg)
+        super(PacmanProcessorNotAvailableError, self).__init__(msg)
 
 
 class PacmanValueError(ValueError, PacmanException):

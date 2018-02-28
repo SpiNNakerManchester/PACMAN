@@ -21,6 +21,19 @@ def _check_allowed_elements(path, element, allowed):
                 element.sourceline, path, allowed, element.tag))
 
 
+class _XmlConfigurationException(PacmanConfigurationException):
+    def __init__(self, element, path, problem, algorithm_name=None):
+        if algorithm_name is None:
+            msg = "Error in algorithm definition starting on " \
+                "line {} of {}: {}".format(
+                    element.sourceline, path, problem)
+        else:
+            msg = "Error in algorithm {} specification starting on " \
+                "line {} of {}: {}".format(
+                    algorithm_name, element.sourceline, path, problem)
+        super(_XmlConfigurationException, self).__init__(msg)
+
+
 class AlgorithmMetadataXmlReader(object):
     """ Converts an XML file into algorithm data
     """
@@ -124,21 +137,19 @@ class AlgorithmMetadataXmlReader(object):
         for input_name in input_definitions.iterkeys():
             if (input_name not in required_seen and
                     input_name not in optional_seen):
-                raise PacmanConfigurationException(
-                    "Error in algorithm definition starting on line {} of {}:"
-                    " input_definitions contains parameter {} but it is not"
-                    " required or optional".format(
-                        element.sourceline, path, input_name))
+                raise _XmlConfigurationException(
+                    element, path,
+                    "input_definitions contains parameter {} but it is not"
+                    " required or optional".format(input_name))
 
         if command_line_args is not None:
             if (python_module is not None or python_class is not None or
                     python_function is not None or python_method is not None):
-                raise PacmanConfigurationException(
-                    "Error in algorithm {} specification starting on line {}"
-                    " of {}: command_line_args can not be specified with"
-                    " python_module, python_class, python_function or"
-                    " python_method".format(
-                        algorithm_id, element.sourceline, path))
+                raise _XmlConfigurationException(
+                    element, path, algorithm_name=algorithm_id,
+                    problem="command_line_args can not be specified with "
+                    "python_module, python_class, python_function or "
+                    "python_method")
             return ExternalAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
                 required_tokens, optional_tokens, output_tokens,
@@ -146,11 +157,10 @@ class AlgorithmMetadataXmlReader(object):
 
         if python_module is not None and python_function is not None:
             if (python_class is not None or python_method is not None):
-                raise PacmanConfigurationException(
-                    "Error in algorithm {} specification starting on line {}"
-                    " of {}: python_function can not be specified with"
-                    " python_class or python_method".format(
-                        algorithm_id, element.sourceline, path))
+                raise _XmlConfigurationException(
+                    element, path, algorithm_name=algorithm_id,
+                    problem="python_function can not be specified with "
+                    "python_class or python_method")
             return PythonFunctionAlgorithm(
                 algorithm_id, required_inputs, optional_inputs, outputs,
                 required_tokens, optional_tokens, output_tokens,
@@ -162,12 +172,12 @@ class AlgorithmMetadataXmlReader(object):
                 required_tokens, optional_tokens, output_tokens,
                 python_module, python_class, python_method)
 
-        raise PacmanConfigurationException(
-            "Error in algorithm {} specification starting on line {}"
-            " of {}: One of command_line_args, [python_module,"
-            " python_function] or [python_module, python_class,"
-            " [python_method]] must be specified".format(
-                algorithm_id, element.sourceline, path))
+        raise _XmlConfigurationException(
+            element, path, algorithm_name=algorithm_id,
+            problem="One of command_line_args, "
+            "[python_module, python_function] or "
+            "[python_module, python_class, [python_method]] must be "
+            "specified")
 
     @staticmethod
     def _translate_args(path, args_element):
@@ -206,9 +216,8 @@ class AlgorithmMetadataXmlReader(object):
                 definitions[param_name] = SingleInput(param_name, param_types)
         return definitions
 
-    @staticmethod
     def _translate_inputs(
-            path, algorithm_id, inputs_element, definitions,
+            self, path, algorithm_id, inputs_element, definitions,
             allow_tokens=False):
         """ Convert an XML inputs section (required or optional) into a list\
             of AbstractInput
@@ -226,24 +235,21 @@ class AlgorithmMetadataXmlReader(object):
                 if tag == "param_name":
                     definition = definitions.get(alg_input.text.strip(), None)
                     if definition is None:
-                        raise PacmanConfigurationException(
-                            "Error in XML on line {} of {}: {} section"
-                            " references the parameter {} but this was not"
-                            " defined in input_definitions".format(
-                                alg_input.sourceline, path, inputs_element.tag,
-                                alg_input.text.strip()))
+                        raise _XmlConfigurationException(
+                            alg_input, path,
+                            "{} section references the parameter {} but this "
+                            "was not defined in input_definitions".format(
+                                inputs_element.tag, alg_input.text.strip()))
                     inputs.append(definition)
                     seen_inputs.add(definition.name)
                 elif tag == "one_of":
-                    children, seen, _ = \
-                        AlgorithmMetadataXmlReader._translate_inputs(
-                            path, algorithm_id, alg_input, definitions)
+                    children, seen, _ = self._translate_inputs(
+                        path, algorithm_id, alg_input, definitions)
                     seen_inputs.update(seen)
                     inputs.append(OneOfInput(children))
                 elif tag == "all_of":
-                    children, seen, _ = \
-                        AlgorithmMetadataXmlReader._translate_inputs(
-                            path, algorithm_id, alg_input, definitions)
+                    children, seen, _ = self._translate_inputs(
+                        path, algorithm_id, alg_input, definitions)
                     seen_inputs.update(seen)
                     inputs.append(AllOfInput(children))
                 elif tag == "token":
@@ -267,11 +273,11 @@ class AlgorithmMetadataXmlReader(object):
                     file_name_type = alg_output.get(
                         "file_name_type", default=None)
                     if is_external and file_name_type is None:
-                        raise PacmanConfigurationException(
-                            "Error in XML at line {} of {}: Outputs of "
-                            " external algorithms must specify the input type"
-                            " from which the file name will be obtained using"
-                            " the file_name_type attribute")
+                        raise _XmlConfigurationException(
+                            alg_output, path,
+                            "outputs of external algorithms must specify the "
+                            "input type from which the file name will be "
+                            "obtained using the file_name_type attribute")
                     outputs.append(
                         Output(alg_output.text.strip(), file_name_type))
                 elif tag == "token":

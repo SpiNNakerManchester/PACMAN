@@ -17,4 +17,3 @@ class AbstractResource(object):
         :return: The amount of the resource
         :rtype: int
         """
-        pass

@@ -11,6 +11,5 @@ class MachineGraph(Graph):
     __slots__ = []
 
     def __init__(self, label):
-        Graph.__init__(
-            self, MachineVertex, MachineEdge,
-            AbstractOutgoingEdgePartition, label)
+        super(MachineGraph, self).__init__(
+            MachineVertex, MachineEdge, AbstractOutgoingEdgePartition, label)

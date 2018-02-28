@@ -1,10 +1,10 @@
 from collections import defaultdict, OrderedDict
 
+from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 
 from pacman.exceptions import \
     PacmanAlreadyExistsException, PacmanInvalidParameterException
-from pacman.model.decorators import overrides
 from pacman.model.graphs import AbstractGraph
 from pacman.model.graphs.common import ConstrainedObject
 from .outgoing_edge_partition import OutgoingEdgePartition
@@ -50,7 +50,7 @@ class Graph(ConstrainedObject, AbstractGraph):
             A single or tuple of types of partitions to be allowed in the graph
         :param label: The label on the graph, or None
         """
-        ConstrainedObject.__init__(self, None)
+        super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types

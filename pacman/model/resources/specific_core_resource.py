@@ -16,10 +16,9 @@ class SpecificCoreResource(AbstractResource):
 
     def __init__(self, chip, cores):
         """
-
         :param cores:\
             The specific cores that need to be allocated\
-            (list of processor ids)
+            (list of processor IDs)
         :type cores: iterable of int
         :param chip: chip of where these cores are to be allocated
         :type chip: SpiNNMachine.chip.Chip

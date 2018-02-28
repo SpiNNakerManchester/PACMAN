@@ -26,3 +26,11 @@ class SameChipAsConstraint(AbstractPlacerConstraint):
 
     def __repr__(self):
         return "SameChipAsConstraint(vertex={})".format(self._vertex)
+
+    def __eq__(self, other):
+        if not isinstance(other, SameChipAsConstraint):
+            return False
+        return self._vertex == other.vertex
+
+    def __hash__(self):
+        return hash((self._vertex, ))

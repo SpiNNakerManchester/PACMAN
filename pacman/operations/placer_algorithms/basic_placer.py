@@ -23,9 +23,9 @@ class BasicPlacer(object):
 
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
-            :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :return: A set of placements
-        :rtype: :py:class:`pacman.model.placements.placements.Placements`
+        :rtype: :py:class:`pacman.model.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: \
             If something goes wrong with the placement
         """

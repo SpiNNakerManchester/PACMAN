@@ -99,7 +99,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(allocator._free_space_tracker[2].size,
                          0x100000000L - 0x1800, error)
 
-    def _intergration_setup(self):
+    def _integration_setup(self):
         machine_graph = MachineGraph(label="test me you git")
         n_keys_map = DictBasedMachinePartitionNKeysMap()
         v1 = SimpleMachineVertex(ResourceContainer())
@@ -127,8 +127,8 @@ class MyTestCase(unittest.TestCase):
         return machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4
 
     def test_share_key_with_2_nests(self):
-        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
-            self._intergration_setup()
+        machine_graph, n_keys_map, v1, v2, _v3, v4, e1, e2, e3, e4 = \
+            self._integration_setup()
         e5 = MachineEdge(v4, v2, label="e1")
         machine_graph.add_edge(e5, "part3")
         partition2 = machine_graph.\
@@ -166,8 +166,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(edge5_key, key)
 
     def test_share_key_with_conflicting_fixed_key_on_partitions(self):
-        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
-            self._intergration_setup()
+        machine_graph, n_keys_map, v1, v2, _v3, _v4, _e1, _e2, _e3, _e4 = \
+            self._integration_setup()
 
         partition = machine_graph.\
             get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
@@ -185,8 +185,8 @@ class MyTestCase(unittest.TestCase):
             allocator(machine_graph, n_keys_map)
 
     def test_share_key_with_fixed_key_on_new_partitions_other_order(self):
-        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
-            self._intergration_setup()
+        machine_graph, n_keys_map, v1, v2, _v3, _v4, e1, e2, e3, e4 = \
+            self._integration_setup()
 
         partition = machine_graph.\
             get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
@@ -214,8 +214,8 @@ class MyTestCase(unittest.TestCase):
         self.assertNotEqual(edge4_key, key)
 
     def test_share_key_with_fixed_key_on_new_partitions(self):
-        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
-            self._intergration_setup()
+        machine_graph, n_keys_map, v1, v2, _v3, _v4, e1, e2, e3, e4 = \
+            self._integration_setup()
 
         partition = machine_graph.\
             get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
@@ -243,8 +243,8 @@ class MyTestCase(unittest.TestCase):
         self.assertNotEqual(edge4_key, key)
 
     def test_share_key_on_own_partition(self):
-        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
-            self._intergration_setup()
+        machine_graph, n_keys_map, v1, _v2, _v3, _v4, e1, e2, e3, e4 = \
+            self._integration_setup()
 
         partition = machine_graph.\
             get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
@@ -269,8 +269,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(edge4_key, key)
 
     def test_share_key_on_new_partitions(self):
-        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
-            self._intergration_setup()
+        machine_graph, n_keys_map, v1, v2, _v3, _v4, e1, e2, e3, e4 = \
+            self._integration_setup()
 
         partition = machine_graph.\
             get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
@@ -295,8 +295,8 @@ class MyTestCase(unittest.TestCase):
         self.assertNotEqual(edge4_key, key)
 
     def test_no_share_key_on_partitions(self):
-        machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4 = \
-            self._intergration_setup()
+        machine_graph, n_keys_map, v1, _v2, _v3, _v4, e1, e2, e3, e4 = \
+            self._integration_setup()
 
         allocator = MallocBasedRoutingInfoAllocator()
         results = allocator(machine_graph, n_keys_map)

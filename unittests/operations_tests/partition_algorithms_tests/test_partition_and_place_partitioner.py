@@ -20,9 +20,7 @@ from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
 
 # general imports
 import unittest
-from uinit_test_objects.simple_test_partitioning_constraint import \
-    NewPartitionerConstraint
-from uinit_test_objects.simple_test_vertex import SimpleTestVertex
+from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
 from spinn_machine.virtual_machine import VirtualMachine
 
 

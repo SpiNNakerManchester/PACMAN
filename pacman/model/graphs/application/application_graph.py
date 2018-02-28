@@ -11,5 +11,6 @@ class ApplicationGraph(Graph):
     __slots__ = []
 
     def __init__(self, label):
-        Graph.__init__(self, ApplicationVertex, ApplicationEdge,
-                       AbstractOutgoingEdgePartition, label)
+        super(ApplicationGraph, self).__init__(
+            ApplicationVertex, ApplicationEdge, AbstractOutgoingEdgePartition,
+            label)

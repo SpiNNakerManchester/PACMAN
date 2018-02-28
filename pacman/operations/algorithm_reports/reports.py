@@ -11,6 +11,19 @@ from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+_LINK_LABELS = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
+
+_C_ROUTING_TABLE_DIR = "compressed_routing_tables_generated"
+_COMPARED_FILENAME = "comparison_of_compressed_uncompressed_routing_tables.rpt"
+_PARTITIONING_FILENAME = "partitioned_by_vertex.rpt"
+_PLACEMENT_VTX_FILENAME = "placement_by_vertex.rpt"
+_PLACEMENT_CORE_FILENAME = "placement_by_core.rpt"
+_ROUTING_FILENAME = "edge_routing_info.rpt"
+_ROUTING_TABLE_DIR = "routing_tables_generated"
+_SDRAM_FILENAME = "chip_sdram_usage_by_core.rpt"
+_TAGS_FILENAME = "tags.rpt"
+_VIRTKEY_FILENAME = "virtual_key_space_information_report.rpt"
+
 
 def tag_allocator_report(report_folder, tag_infos):
     """ Reports the tags that are being used by the tool chain for this\
@@ -21,7 +34,7 @@ def tag_allocator_report(report_folder, tag_infos):
     :rtype: None
     """
 
-    file_name = os.path.join(report_folder, "tags.rpt")
+    file_name = os.path.join(report_folder, _TAGS_FILENAME)
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(
@@ -45,8 +58,8 @@ def placer_reports_with_application_graph(
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param graph: the application graph to which placements were built
-    :param graph_mapper: the mapping between application and machine \
-                graphs
+    :param graph_mapper: \
+        the mapping between application and machine graphs
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
     :rtype: None
@@ -67,8 +80,8 @@ def placer_reports_without_application_graph(
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
-    :param machine_graph: the machine graph to which the reports are to\
-             operate on
+    :param machine_graph: \
+        the machine graph to which the reports are to operate on
     :rtype: None
     """
     placement_report_without_application_graph_by_vertex(
@@ -93,7 +106,8 @@ def router_report_from_paths(
     :param machine:
     :rtype: None
     """
-    file_name = os.path.join(report_folder, "edge_routing_info.rpt")
+    file_name = os.path.join(report_folder, _ROUTING_FILENAME)
+    time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(machine_graph.n_outgoing_edge_partitions,
@@ -101,39 +115,39 @@ def router_report_from_paths(
 
             f.write("        Edge Routing Report\n")
             f.write("        ===================\n\n")
-            time_date_string = time.strftime("%c")
-            f.write("Generated: {}".format(time_date_string))
-            f.write(" for target machine '{}'".format(hostname))
-            f.write("\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
 
             for partition in progress.over(
                     machine_graph.outgoing_edge_partitions):
                 if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                    source_placement = placements.get_placement_of_vertex(
-                        partition.pre_vertex)
-                    key_and_mask = \
-                        routing_infos.get_routing_info_from_partition(
-                            partition).first_key_and_mask
-                    for edge in partition.edges:
-                        destination_placement = \
-                            placements.get_placement_of_vertex(
-                                edge.post_vertex)
-                        path, number_of_entries = _search_route(
-                            source_placement, destination_placement,
-                            key_and_mask, routing_tables, machine)
-                        text = ("**** Edge '{}', from vertex: '{}'"
-                                " to vertex: '{}'".format(
-                                    edge.label, edge.pre_vertex.label,
-                                    edge.post_vertex.label))
-                        text += " Takes path \n {}\n".format(path)
-                        f.write(text)
-                        f.write("Route length: {}\n".format(number_of_entries))
-
-                        # End one entry:
-                        f.write("\n")
+                    _write_one_router_partition_report(
+                        f, partition, machine, placements, routing_infos,
+                        routing_tables)
     except IOError:
         logger.error("Generate_routing_reports: Can't open file {} for "
                      "writing.", file_name)
+
+
+def _write_one_router_partition_report(f, partition, machine, placements,
+                                       routing_infos, routing_tables):
+    source_placement = placements.get_placement_of_vertex(partition.pre_vertex)
+    key_and_mask = routing_infos.get_routing_info_from_partition(
+        partition).first_key_and_mask
+    for edge in partition.edges:
+        destination_placement = placements.get_placement_of_vertex(
+            edge.post_vertex)
+        path, number_of_entries = _search_route(
+            source_placement, destination_placement,
+            key_and_mask, routing_tables, machine)
+        text = ("**** Edge '{}', from vertex: '{}' to vertex: '{}'".format(
+            edge.label, edge.pre_vertex.label, edge.post_vertex.label))
+        text += " Takes path \n {}\n".format(path)
+        f.write(text)
+        f.write("Route length: {}\n".format(number_of_entries))
+
+        # End one entry:
+        f.write("\n")
 
 
 def partitioner_report(report_folder, hostname, graph, graph_mapper):
@@ -142,7 +156,8 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
 
     # Cycle through all vertices, and for each cycle through its vertices.
     # For each vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, "partitioned_by_vertex.rpt")
+    file_name = os.path.join(report_folder, _PARTITIONING_FILENAME)
+    time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(graph.n_vertices,
@@ -150,37 +165,35 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
 
             f.write("        Placement Information by Vertex\n")
             f.write("        ===============================\n\n")
-            time_date_string = time.strftime("%c")
-            f.write("Generated: {}".format(time_date_string))
-            f.write(" for target machine '{}'".format(hostname))
-            f.write("\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
 
-            for v in progress.over(graph.vertices):
-                vertex_name = v.label
-                vertex_model = v.__class__.__name__
-                num_atoms = v.n_atoms
-                f.write("**** Vertex: '{}'\n".format(vertex_name))
-                f.write("Model: {}\n".format(vertex_model))
-                f.write("Pop size: {}\n".format(num_atoms))
-                f.write("Machine Vertices: \n")
-
-                machine_vertices = \
-                    sorted(graph_mapper.get_machine_vertices(v),
-                           key=lambda x: x.label)
-                machine_vertices = \
-                    sorted(machine_vertices,
-                           key=lambda x: graph_mapper.get_slice(x).lo_atom)
-                for sv in machine_vertices:
-                    lo_atom = graph_mapper.get_slice(sv).lo_atom
-                    hi_atom = graph_mapper.get_slice(sv).hi_atom
-                    num_atoms = hi_atom - lo_atom + 1
-                    my_string = "  Slice {}:{} ({} atoms) \n"\
-                        .format(lo_atom, hi_atom, num_atoms)
-                    f.write(my_string)
-                f.write("\n")
+            for vertex in progress.over(graph.vertices):
+                _write_one_vertex_partition(f, vertex, graph_mapper)
     except IOError:
         logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.", file_name)
+
+
+def _write_one_vertex_partition(f, vertex, graph_mapper):
+    vertex_name = vertex.label
+    vertex_model = vertex.__class__.__name__
+    num_atoms = vertex.n_atoms
+    f.write("**** Vertex: '{}'\n".format(vertex_name))
+    f.write("Model: {}\n".format(vertex_model))
+    f.write("Pop size: {}\n".format(num_atoms))
+    f.write("Machine Vertices: \n")
+
+    machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
+                              key=lambda x: x.label)
+    machine_vertices = sorted(machine_vertices,
+                              key=lambda x: graph_mapper.get_slice(x).lo_atom)
+    for sv in machine_vertices:
+        lo_atom = graph_mapper.get_slice(sv).lo_atom
+        hi_atom = graph_mapper.get_slice(sv).hi_atom
+        f.write("  Slice {}:{} ({} atoms) \n".format(
+            lo_atom, hi_atom, hi_atom - lo_atom + 1))
+    f.write("\n")
 
 
 def placement_report_with_application_graph_by_vertex(
@@ -196,7 +209,8 @@ def placement_report_with_application_graph_by_vertex(
 
     # Cycle through all vertices, and for each cycle through its vertices.
     # For each vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
+    file_name = os.path.join(report_folder, _PLACEMENT_VTX_FILENAME)
+    time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(graph.n_vertices,
@@ -204,53 +218,58 @@ def placement_report_with_application_graph_by_vertex(
 
             f.write("        Placement Information by Vertex\n")
             f.write("        ===============================\n\n")
-            time_date_string = time.strftime("%c")
-            f.write("Generated: {}".format(time_date_string))
-            f.write(" for target machine '{}'".format(hostname))
-            f.write("\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
 
             used_processors_by_chip = dict()
             used_sdram_by_chip = dict()
             vertex_by_processor = dict()
 
-            for v in progress.over(graph.vertices):
-                vertex_name = v.label
-                vertex_model = v.__class__.__name__
-                num_atoms = v.n_atoms
-                f.write("**** Vertex: '{}'\n".format(vertex_name))
-                f.write("Model: {}\n".format(vertex_model))
-                f.write("Pop size: {}\n".format(num_atoms))
-                f.write("Machine Vertices: \n")
-
-                machine_vertices = \
-                    sorted(graph_mapper.get_machine_vertices(v),
-                           key=lambda vert: vert.label)
-                machine_vertices = \
-                    sorted(machine_vertices,
-                           key=lambda vert:
-                           graph_mapper.get_slice(vert).lo_atom)
-                for sv in machine_vertices:
-                    lo_atom = graph_mapper.get_slice(sv).lo_atom
-                    hi_atom = graph_mapper.get_slice(sv).hi_atom
-                    num_atoms = hi_atom - lo_atom + 1
-                    cur_placement = placements.get_placement_of_vertex(sv)
-                    x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
-                    key = "{},{}".format(x, y)
-                    if key in used_processors_by_chip:
-                        used_pros = used_processors_by_chip[key]
-                    else:
-                        used_pros = list()
-                        used_sdram_by_chip.update({key: 0})
-                    vertex_by_processor["{},{},{}".format(x, y, p)] = sv
-                    new_pro = [p, cur_placement]
-                    used_pros.append(new_pro)
-                    used_processors_by_chip.update({key: used_pros})
-                    f.write("  Slice {}:{} ({} atoms) on core ({}, {}, {}) \n"
-                            .format(lo_atom, hi_atom, num_atoms, x, y, p))
-                f.write("\n")
+            for vertex in progress.over(graph.vertices):
+                _write_one_vertex_application_placement(
+                    f, vertex, placements, graph_mapper,
+                    used_processors_by_chip, used_sdram_by_chip,
+                    vertex_by_processor)
     except IOError:
         logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.", file_name)
+
+
+def _write_one_vertex_application_placement(
+        f, vertex, placements, graph_mapper,
+        used_processors_by_chip, used_sdram_by_chip, vertex_by_processor):
+    vertex_name = vertex.label
+    vertex_model = vertex.__class__.__name__
+    num_atoms = vertex.n_atoms
+    f.write("**** Vertex: '{}'\n".format(vertex_name))
+    f.write("Model: {}\n".format(vertex_model))
+    f.write("Pop size: {}\n".format(num_atoms))
+    f.write("Machine Vertices: \n")
+
+    machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
+                              key=lambda vert: vert.label)
+    machine_vertices = sorted(machine_vertices,
+                              key=lambda vert:
+                              graph_mapper.get_slice(vert).lo_atom)
+    for sv in machine_vertices:
+        lo_atom = graph_mapper.get_slice(sv).lo_atom
+        hi_atom = graph_mapper.get_slice(sv).hi_atom
+        num_atoms = hi_atom - lo_atom + 1
+        cur_placement = placements.get_placement_of_vertex(sv)
+        x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
+        key = "{},{}".format(x, y)
+        if key in used_processors_by_chip:
+            used_pros = used_processors_by_chip[key]
+        else:
+            used_pros = list()
+            used_sdram_by_chip.update({key: 0})
+        vertex_by_processor["{},{},{}".format(x, y, p)] = sv
+        new_pro = [p, cur_placement]
+        used_pros.append(new_pro)
+        used_processors_by_chip.update({key: used_pros})
+        f.write("  Slice {}:{} ({} atoms) on core ({}, {}, {}) \n"
+                .format(lo_atom, hi_atom, num_atoms, x, y, p))
+    f.write("\n")
 
 
 def placement_report_without_application_graph_by_vertex(
@@ -265,7 +284,8 @@ def placement_report_without_application_graph_by_vertex(
 
     # Cycle through all vertices, and for each cycle through its vertices.
     # For each vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, "placement_by_vertex.rpt")
+    file_name = os.path.join(report_folder, _PLACEMENT_VTX_FILENAME)
+    time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(machine_graph.n_vertices,
@@ -273,37 +293,43 @@ def placement_report_without_application_graph_by_vertex(
 
             f.write("        Placement Information by Vertex\n")
             f.write("        ===============================\n\n")
-            time_date_string = time.strftime("%c")
-            f.write("Generated: {}".format(time_date_string))
-            f.write(" for target machine '{}'".format(hostname))
-            f.write("\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
 
             used_processors_by_chip = dict()
             used_sdram_by_chip = dict()
             vertex_by_processor = dict()
 
-            for v in progress.over(machine_graph.vertices):
-                vertex_name = v.label
-                vertex_model = v.__class__.__name__
-                f.write("**** Vertex: '{}'\n".format(vertex_name))
-                f.write("Model: {}\n".format(vertex_model))
-
-                cur_placement = placements.get_placement_of_vertex(v)
-                x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
-                key = "{},{}".format(x, y)
-                if key in used_processors_by_chip:
-                    used_pros = used_processors_by_chip[key]
-                else:
-                    used_pros = list()
-                    used_sdram_by_chip.update({key: 0})
-                vertex_by_processor["{},{},{}".format(x, y, p)] = v
-                new_pro = [p, cur_placement]
-                used_pros.append(new_pro)
-                used_processors_by_chip.update({key: used_pros})
-                f.write(" Placed on core ({}, {}, {})\n\n".format(x, y, p))
+            for vertex in progress.over(machine_graph.vertices):
+                _write_one_vertex_machine_placement(
+                    f, vertex, placements, used_processors_by_chip,
+                    used_sdram_by_chip, vertex_by_processor)
     except IOError:
         logger.error("Generate_placement_reports: Can't open file {} for"
                      " writing.", file_name)
+
+
+def _write_one_vertex_machine_placement(
+        f, vertex, placements, used_processors_by_chip, used_sdram_by_chip,
+        vertex_by_processor):
+    vertex_name = vertex.label
+    vertex_model = vertex.__class__.__name__
+    f.write("**** Vertex: '{}'\n".format(vertex_name))
+    f.write("Model: {}\n".format(vertex_model))
+
+    cur_placement = placements.get_placement_of_vertex(vertex)
+    x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
+    key = "{},{}".format(x, y)
+    if key in used_processors_by_chip:
+        used_pros = used_processors_by_chip[key]
+    else:
+        used_pros = list()
+        used_sdram_by_chip.update({key: 0})
+    vertex_by_processor["{},{},{}".format(x, y, p)] = vertex
+    new_pro = [p, cur_placement]
+    used_pros.append(new_pro)
+    used_processors_by_chip.update({key: used_pros})
+    f.write(" Placed on core ({}, {}, {})\n\n".format(x, y, p))
 
 
 def placement_report_with_application_graph_by_core(
@@ -312,8 +338,8 @@ def placement_report_with_application_graph_by_core(
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
-    :param graph_mapper: the mapping between application and machine\
-            graphs
+    :param graph_mapper: \
+        the mapping between application and machine graphs
     :param machine: the spinnaker machine object
     :param placements: the placements objects built by the placer.
     """
@@ -321,7 +347,8 @@ def placement_report_with_application_graph_by_core(
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
     # For each core, display what is held on it.
-    file_name = os.path.join(report_folder, "placement_by_core.rpt")
+    file_name = os.path.join(report_folder, _PLACEMENT_CORE_FILENAME)
+    time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(machine.n_chips,
@@ -329,43 +356,42 @@ def placement_report_with_application_graph_by_core(
 
             f.write("        Placement Information by Core\n")
             f.write("        =============================\n\n")
-            time_date_string = time.strftime("%c")
-            f.write("Generated: {}".format(time_date_string))
-            f.write(" for target machine '{}'".format(hostname))
-            f.write("\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
 
             for chip in progress.over(machine.chips):
-                written_header = False
-                for processor in chip.processors:
-                    if placements.is_processor_occupied(
-                            chip.x, chip.y, processor.processor_id):
-                        if not written_header:
-                            f.write("**** Chip: ({}, {})\n"
-                                    .format(chip.x, chip.y))
-                            f.write("Application cores: {}\n"
-                                    .format(len(list(chip.processors))))
-                            written_header = True
-                        pro_id = processor.processor_id
-                        vertex = placements.get_vertex_on_processor(
-                            chip.x, chip.y, processor.processor_id)
-                        app_vertex = graph_mapper.get_application_vertex(
-                            vertex)
-                        vertex_label = app_vertex.label
-                        vertex_model = app_vertex.__class__.__name__
-                        vertex_atoms = app_vertex.n_atoms
-                        lo_atom = graph_mapper.get_slice(vertex).lo_atom
-                        hi_atom = graph_mapper.get_slice(vertex).hi_atom
-                        num_atoms = hi_atom - lo_atom + 1
-                        f.write("  Processor {}: Vertex: '{}', pop size: {}\n"
-                                .format(pro_id, vertex_label, vertex_atoms))
-                        f.write("              "
-                                "Slice on this core: {}:{} ({} atoms)\n"
-                                .format(lo_atom, hi_atom, num_atoms))
-                        f.write("              Model: {}\n\n".format(
-                            vertex_model))
+                _write_one_chip_application_placement(
+                    f, chip, placements, graph_mapper)
     except IOError:
         logger.error("Generate_placement_reports: Can't open file {} for "
                      "writing.", file_name)
+
+
+def _write_one_chip_application_placement(f, chip, placements, graph_mapper):
+    written_header = False
+    for processor in chip.processors:
+        if placements.is_processor_occupied(
+                chip.x, chip.y, processor.processor_id):
+            if not written_header:
+                f.write("**** Chip: ({}, {})\n".format(chip.x, chip.y))
+                f.write("Application cores: {}\n".format(
+                    len(list(chip.processors))))
+                written_header = True
+            pro_id = processor.processor_id
+            vertex = placements.get_vertex_on_processor(
+                chip.x, chip.y, processor.processor_id)
+            app_vertex = graph_mapper.get_application_vertex(vertex)
+            vertex_label = app_vertex.label
+            vertex_model = app_vertex.__class__.__name__
+            vertex_atoms = app_vertex.n_atoms
+            lo_atom = graph_mapper.get_slice(vertex).lo_atom
+            hi_atom = graph_mapper.get_slice(vertex).hi_atom
+            num_atoms = hi_atom - lo_atom + 1
+            f.write("  Processor {}: Vertex: '{}', pop size: {}\n".format(
+                pro_id, vertex_label, vertex_atoms))
+            f.write("              Slice on this core: {}:{} ({} atoms)\n"
+                    .format(lo_atom, hi_atom, num_atoms))
+            f.write("              Model: {}\n\n".format(vertex_model))
 
 
 def placement_report_without_application_graph_by_core(
@@ -381,7 +407,8 @@ def placement_report_without_application_graph_by_core(
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
     # For each core, display what is held on it.
-    file_name = os.path.join(report_folder, "placement_by_core.rpt")
+    file_name = os.path.join(report_folder, _PLACEMENT_CORE_FILENAME)
+    time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(machine.chips,
@@ -389,33 +416,33 @@ def placement_report_without_application_graph_by_core(
 
             f.write("        Placement Information by Core\n")
             f.write("        =============================\n\n")
-            time_date_string = time.strftime("%c")
             f.write("Generated: {}".format(time_date_string))
             f.write(" for target machine '{}'".format(hostname))
             f.write("\n\n")
 
             for chip in progress.over(machine.chips):
-                written_header = False
-                for processor in chip.processors:
-                    if placements.is_processor_occupied(
-                            chip.x, chip.y, processor.processor_id):
-                        if not written_header:
-                            f.write("**** Chip: ({}, {})\n"
-                                    .format(chip.x, chip.y))
-                            f.write("Application cores: {}\n"
-                                    .format(len(list(chip.processors))))
-                            written_header = True
-                        pro_id = processor.processor_id
-                        vertex = placements.get_vertex_on_processor(
-                            chip.x, chip.y, processor.processor_id)
-                        f.write("  Processor {}: Vertex: '{}' \n"
-                                .format(pro_id, vertex.label))
-                        f.write("              Model: {}\n\n"
-                                .format(vertex.__class__.__name__))
-                        f.write("\n")
+                _write_one_chip_machine_placement(f, chip, placements)
     except IOError:
         logger.error("Generate_placement_reports: Can't open file {} for "
                      "writing.", file_name)
+
+
+def _write_one_chip_machine_placement(f, c, placements):
+    written_header = False
+    for pr in c.processors:
+        if placements.is_processor_occupied(c.x, c.y, pr.processor_id):
+            if not written_header:
+                f.write("**** Chip: ({}, {})\n".format(c.x, c.y))
+                f.write("Application cores: {}\n".format(
+                    len(list(c.processors))))
+                written_header = True
+            vertex = placements.get_vertex_on_processor(
+                c.x, c.y, pr.processor_id)
+            f.write("  Processor {}: Vertex: '{}' \n".format(
+                pr.processor_id, vertex.label))
+            f.write("              Model: {}\n\n".format(
+                vertex.__class__.__name__))
+            f.write("\n")
 
 
 def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
@@ -428,51 +455,57 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
     :rtype: None
     """
 
-    file_name = os.path.join(report_folder, "chip_sdram_usage_by_core.rpt")
+    file_name = os.path.join(report_folder, _SDRAM_FILENAME)
+    time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
             f.write("        Memory Usage by Core\n")
             f.write("        ====================\n\n")
-            time_date_string = time.strftime("%c")
-            f.write("Generated: %s" % time_date_string)
-            f.write(" for target machine '{}'".format(hostname))
-            f.write("\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
             used_sdram_by_chip = dict()
 
-            placements = sorted(placements.placements,
-                                key=lambda x: x.vertex.label)
             progress = ProgressBar(len(placements) + machine.n_chips,
                                    "Generating SDRAM usage report")
-
-            for placement in progress.over(placements, False):
-                reqs = placement.vertex.resources_required
-                x, y, p = placement.x, placement.y, placement.p
-                f.write("SDRAM reqs for core ({},{},{}) is {} KB\n".format(
-                    x, y, p, int(reqs.sdram.get_value() / 1024.0)))
-                if (x, y) not in used_sdram_by_chip:
-                    used_sdram_by_chip[(x, y)] = reqs.sdram.get_value()
-                else:
-                    used_sdram_by_chip[(x, y)] += reqs.sdram.get_value()
-
+            used_sdram_by_chip = _write_sdram_by_core(f, placements, progress)
             for chip in progress.over(machine.chips):
-                try:
-                    used_sdram = used_sdram_by_chip[(chip.x, chip.y)]
-                    if used_sdram != 0:
-                        f.write(
-                            "**** Chip: ({}, {}) has total memory usage of"
-                            " {} KB ({} bytes) out of a max of "
-                            "{} KB ({} bytes)\n\n".format(
-                                chip.x, chip.y,
-                                int(used_sdram / 1024.0),
-                                used_sdram,
-                                int(chip.sdram.size / 1024.0),
-                                chip.sdram.size))
-                except KeyError:
-                    # Do Nothing
-                    pass
+                _write_chip_sdram(f, chip, used_sdram_by_chip)
     except IOError:
         logger.error("Generate_placement_reports: Can't open file {} for "
                      "writing.", file_name)
+
+
+def _write_sdram_by_core(f, placements, progress):
+    used_sdram = dict()
+    placements = sorted(placements.placements,
+                        key=lambda x: x.vertex.label)
+    for placement in progress.over(placements, False):
+        sdram = placement.vertex.resources_required.sdram.get_value()
+        x, y, p = placement.x, placement.y, placement.p
+        f.write("SDRAM reqs for core ({},{},{}) is {} KB\n".format(
+            x, y, p, int(sdram / 1024.0)))
+        key = (x, y)
+        if key not in used_sdram:
+            used_sdram[key] = sdram
+        else:
+            used_sdram[key] += sdram
+    return used_sdram
+
+
+def _write_chip_sdram(f, chip, used_sdram_by_chip):
+    try:
+        used_sdram = used_sdram_by_chip[chip.x, chip.y]
+        if used_sdram:
+            f.write(
+                "**** Chip: ({}, {}) has total memory usage of"
+                " {} KB ({} bytes) out of a max of "
+                "{} KB ({} bytes)\n\n".format(
+                    chip.x, chip.y,
+                    int(used_sdram / 1024.0), used_sdram,
+                    int(chip.sdram.size / 1024.0), chip.sdram.size))
+    except KeyError:
+        # Do Nothing
+        pass
 
 
 def routing_info_report(report_folder, machine_graph, routing_infos):
@@ -483,58 +516,57 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
     :param machine_graph:
     :param routing_infos:
     """
-    file_name = os.path.join(
-        report_folder, "virtual_key_space_information_report.rpt")
+    file_name = os.path.join(report_folder, _VIRTKEY_FILENAME)
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(machine_graph.n_outgoing_edge_partitions,
                                    "Generating Routing info report")
-
             for vertex in machine_graph.vertices:
-                f.write("Vertex: {}\n".format(vertex))
-                for partition in progress.over(
-                        machine_graph.
-                        get_outgoing_edge_partitions_starting_at_vertex(
-                            vertex), False):
-                    if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        rinfo = routing_infos.get_routing_info_from_partition(
-                            partition)
-                        f.write("    Partition: {}, Routing Info: {}\n".format(
-                            partition.identifier, rinfo.keys_and_masks))
+                _write_vertex_virtual_keys(
+                    f, vertex, machine_graph, routing_infos, progress)
             progress.end()
     except IOError:
         logger.error("generate virtual key space information report: "
                      "Can't open file {} for writing.", file_name)
 
 
+def _write_vertex_virtual_keys(
+        f, vertex, graph, routing_infos, progress):
+    f.write("Vertex: {}\n".format(vertex))
+    for partition in progress.over(
+            graph.get_outgoing_edge_partitions_starting_at_vertex(vertex),
+            False):
+        if partition.traffic_type == EdgeTrafficType.MULTICAST:
+            rinfo = routing_infos.get_routing_info_from_partition(partition)
+            f.write("    Partition: {}, Routing Info: {}\n".format(
+                partition.identifier, rinfo.keys_and_masks))
+
+
 def router_report_from_router_tables(report_folder, routing_tables):
     """
-
     :param report_folder:
     :param routing_tables:
     :rtype: None
     """
 
-    top_level_folder = os.path.join(report_folder, "routing_tables_generated")
+    top_level_folder = os.path.join(report_folder, _ROUTING_TABLE_DIR)
     if not os.path.exists(top_level_folder):
         os.mkdir(top_level_folder)
     progress = ProgressBar(routing_tables.routing_tables,
                            "Generating Router table report")
     for routing_table in progress.over(routing_tables.routing_tables):
-        if routing_table.number_of_entries > 0:
+        if routing_table.number_of_entries:
             _generate_routing_table(routing_table, top_level_folder)
 
 
 def router_report_from_compressed_router_tables(report_folder, routing_tables):
     """
-
     :param report_folder:
     :param routing_tables:
     :rtype: None
     """
 
-    top_level_folder = os.path.join(report_folder,
-                                    "compressed_routing_tables_generated")
+    top_level_folder = os.path.join(report_folder, _C_ROUTING_TABLE_DIR)
     if not os.path.exists(top_level_folder):
         os.mkdir(top_level_folder)
     progress = ProgressBar(routing_tables.routing_tables,
@@ -596,35 +628,32 @@ def generate_comparison_router_report(
     :param compressed_routing_tables: the compressed routing tables
     :rtype: None
     """
-    file_name = os.path.join(
-        report_folder, "comparison_of_compressed_uncompressed_routing_tables")
-
+    file_name = os.path.join(report_folder, _COMPARED_FILENAME)
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(
                 routing_tables.routing_tables,
                 "Generating comparison of router table report")
-
             for table in progress.over(routing_tables.routing_tables):
-                x = table.x
-                y = table.y
-                compressed_table = compressed_routing_tables.\
-                    get_routing_table_for_chip(x, y)
-
-                n_entries_uncompressed = table.number_of_entries
-                n_entries_compressed = compressed_table.number_of_entries
-                ratio = ((n_entries_uncompressed - n_entries_compressed) /
-                         float(n_entries_uncompressed))
-
-                f.write(
-                    "Uncompressed table at {}:{} has {} entries whereas "
-                    "compressed table has {} entries. This is a decrease "
-                    "of {} %\n".format(
-                        x, y, n_entries_uncompressed, n_entries_compressed,
-                        ratio * 100))
+                _write_one_router_table_comparison(
+                    f, table, compressed_routing_tables)
     except IOError:
         logger.error("Generate_router_comparison_reports: Can't open file"
                      " {} for writing.", file_name)
+
+
+def _write_one_router_table_comparison(f, table, compressed_tables):
+    x = table.x
+    y = table.y
+    compressed_table = compressed_tables.get_routing_table_for_chip(x, y)
+    n_entries_uncompressed = table.number_of_entries
+    n_entries_compressed = compressed_table.number_of_entries
+    ratio = ((n_entries_uncompressed - n_entries_compressed) /
+             float(n_entries_uncompressed))
+    f.write(
+        "Uncompressed table at {}:{} has {} entries whereas compressed table "
+        "has {} entries. This is a decrease of {} %\n".format(
+            x, y, n_entries_uncompressed, n_entries_compressed, ratio * 100))
 
 
 def _reduce_route_value(processors_ids, link_ids):
@@ -669,9 +698,9 @@ def _search_route(
     source_vertex = source_placement.vertex
     text = ""
     if isinstance(source_vertex, AbstractSpiNNakerLinkVertex):
-        text += "Virtual SpiNNaker Link"
+        text += "Virtual SpiNNaker Link "
     if isinstance(source_vertex, AbstractFPGAVertex):
-        text += "Virtual FPGA Link"
+        text += "Virtual FPGA Link "
     text += "{}:{}:{} -> ".format(
         source_placement.x, source_placement.y, source_placement.p)
 
@@ -710,15 +739,15 @@ def _recursive_trace_to_destinations(
     result = None
     new_n_entries = None
     if chip.virtual:
-
         # If the current chip is virtual, use link out
         link_id, link = next(iter(chip.router))
         result, new_n_entries = _recursive_trace_to_destinations(
             link.destination_x, link.destination_y, key_and_mask,
             dest_chip_x, dest_chip_y, dest_p, machine,
             routing_tables, number_of_entries)
+        if result is None:
+            return None, None
     else:
-
         # If the current chip is real, find the link to the destination
         table = routing_tables.get_routing_table_for_chip(chip_x, chip_y)
         entry = _locate_routing_entry(table, key_and_mask.key)
@@ -730,30 +759,22 @@ def _recursive_trace_to_destinations(
                 routing_tables, number_of_entries)
             if result is not None:
                 break
+        else:
+            return None, None
 
-    if result is not None:
-        direction_text = _add_direction(link_id)
-        text = "{}:{}:{} -> {}".format(
-            chip_x, chip_y, direction_text, result)
-        return text, new_n_entries + 1
-
-    return None, None
-
-
-def _add_direction(link):
-    # Convert link targets to readable values:
-    link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
-    return link_labels[link]
+    text = "{}:{}:{} -> {}".format(
+        chip_x, chip_y, _LINK_LABELS[link_id], result)
+    return text, new_n_entries + 1
 
 
 def _locate_routing_entry(current_router, key):
-    """ locate the entry from the router based off the edge
+    """ Locate the entry from the router based off the edge
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement
     :return: the routing table entry
-    :raise PacmanRoutingException: when there is no entry located on this\
-            router.
+    :raise PacmanRoutingException: \
+        when there is no entry located on this router.
     """
     for entry in current_router.multicast_routing_entries:
         if entry.mask & key == entry.routing_entry_key:

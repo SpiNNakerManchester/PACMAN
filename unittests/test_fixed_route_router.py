@@ -1,8 +1,9 @@
 from spinn_machine import VirtualMachine
 from pacman.model.placements import Placements, Placement
-import pytest
 from pacman.operations.fixed_route_router.fixed_route_router \
     import FixedRouteRouter
+
+import pytest
 
 
 class DestinationVertex(object):
@@ -45,7 +46,6 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
 def test_all_working(
         width, height, with_wrap_arounds, version, board_version,
         with_down_links, with_down_chips):
-
     router = FixedRouteRouter()
 
     joins, _ = router._get_joins_paths(board_version)
@@ -60,27 +60,24 @@ def test_all_working(
             down_links.add((ethernet_chip.x, ethernet_chip.y + 1, joins[0, 1]))
     down_chips = None
     if with_down_chips:
-        down_chips = set()
-        for ethernet_chip in temp_machine.ethernet_connected_chips:
-            down_chips.add((ethernet_chip.x + 1, ethernet_chip.y + 1))
+        down_chips = set(
+            (ethernet_chip.x + 1, ethernet_chip.y + 1)
+            for ethernet_chip in temp_machine.ethernet_connected_chips)
     machine = VirtualMachine(
         width=width, height=height, with_wrap_arounds=with_wrap_arounds,
         version=version, down_links=down_links, down_chips=down_chips)
 
-    placements = Placements()
-
     ethernet_chips = machine.ethernet_connected_chips
-    for ethernet_chip in ethernet_chips:
-        destination_vertex = DestinationVertex()
-        placements.add_placement(Placement(
-            destination_vertex, ethernet_chip.x, ethernet_chip.y, 1))
+    placements = Placements(
+        Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
+        for ethernet_chip in ethernet_chips)
 
     for ethernet_chip in ethernet_chips:
         uses_simple_routes = router._detect_failed_chips_on_board(
             machine, ethernet_chip, board_version)
         assert((with_down_chips or with_down_links) != uses_simple_routes)
 
-    fixed_route_tables = router.__call__(
+    fixed_route_tables = router(
         machine, placements, board_version, DestinationVertex)
 
     for x, y in machine.chip_coordinates:

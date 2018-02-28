@@ -5,11 +5,12 @@ from pacman.exceptions import PacmanRoutingException
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 
+_MASK_MASK = 0xFFFF0000L  # upper 16 bits
+
 
 class BasicRouteMerger(object):
-    """ functionality to merge routing tables entries via different masks and
-    a exploration process
-
+    """ Merges routing tables entries via different masks and an\
+        exploration process
     """
 
     __slots__ = []
@@ -40,9 +41,8 @@ class BasicRouteMerger(object):
             n_entries = len([
                 entry for entry in new_table.multicast_routing_entries
                 if not entry.defaultable])
-            print "Reduced from {} to {}".format(
-                len(router_table.multicast_routing_entries),
-                n_entries)
+            # print "Reduced from {} to {}".format(
+            #     len(router_table.multicast_routing_entries), n_entries)
             if n_entries > 1023:
                 raise PacmanRoutingException(
                     "Cannot make table small enough: {} entries".format(
@@ -73,69 +73,20 @@ class BasicRouteMerger(object):
             if router_entry.routing_entry_key in keys_merged:
                 continue
 
-            # print "key =", hex(router_entry.routing_entry_key)
-
             mask = router_entry.mask
-            if mask & 0xFFFF0000L == 0xFFFF0000L:
-                merge_done = False
-
+            if mask & _MASK_MASK == _MASK_MASK:
                 for extra_bits in self._get_merge_masks(mask, previous_masks):
-
-                    new_mask = 0xFFFF0000L | extra_bits
-                    # print "trying mask =", hex(new_mask), hex(extra_bits)
-
+                    new_mask = _MASK_MASK | extra_bits
                     new_key = router_entry.routing_entry_key & new_mask
                     new_n_keys = ~new_mask & 0xFFFFFFFFL
-                    new_last_key = new_key + new_n_keys
 
-                    # Check that all the cores on this chip have the same route
-                    # as this is the only way we can merge here
-                    mergable = True
-                    potential_merges = set()
-                    for router_entry_2 in entries:
-                        key = router_entry_2.routing_entry_key
-                        n_keys = ~router_entry_2.mask & 0xFFFFFFFFL
-                        last_key = key + n_keys
-                        masked_key = (
-                            router_entry_2.routing_entry_key & new_mask)
-                        overlap = (
-                            min(new_last_key, last_key) -
-                            max(new_key, key)) > 0
-                        in_range = new_key <= key and new_last_key >= last_key
+                    # Get candidates for this particular possible merge
+                    potential_merges = self._mergeable_entries(
+                        router_entry, entries, new_key, new_mask,
+                        new_key + new_n_keys, keys_merged)
 
-                        if (new_key == masked_key and (
-                                not in_range or
-                                (router_entry_2.routing_entry_key in
-                                    keys_merged) or
-                                (router_entry.processor_ids !=
-                                    router_entry_2.processor_ids) or
-                                (router_entry.link_ids !=
-                                    router_entry_2.link_ids))):
-                            # print(
-                            #     "    ", hex(key), "and", hex(key2),
-                            #     "have mismatched routes")
-                            mergable = False
-                            break
-                        elif new_key == masked_key:
-                            # print(
-                            #     "    ", hex(key), "and", hex(key2),
-                            #     "can be merged")
-                            potential_merges.add(router_entry_2)
-                        elif overlap:
-                            mergable = False
-                            break
-
-                    if mergable and len(potential_merges) > 1:
-                        # print("Merging", [
-                        #     hex(route.routing_entry_key)
-                        #     for route in potential_merges], "using mask =",
-                        #     hex(new_mask), "and key =", hex(masked_key),
-                        #     "and route =", router_entry.processor_ids,
-                        #     router_entry.link_ids)
-
-                        # if masked_key in merged_routes:
-                        #     raise Exception(
-                        #         "Attempting to merge an existing key")
+                    # Only do a merge if there's real merging to do
+                    if len(potential_merges) > 1:
                         merged_routes.add_multicast_routing_entry(
                             MulticastRoutingEntry(
                                 new_key, new_mask,
@@ -144,10 +95,8 @@ class BasicRouteMerger(object):
                         keys_merged.update([
                             route.routing_entry_key
                             for route in potential_merges])
-                        merge_done = True
                         break
-
-                if not merge_done:
+                else:
                     # print "Was not able to merge", hex(key)
                     merged_routes.add_multicast_routing_entry(router_entry)
                     keys_merged.add(router_entry.routing_entry_key)
@@ -155,3 +104,31 @@ class BasicRouteMerger(object):
                 merged_routes.add_multicast_routing_entry(router_entry)
                 keys_merged.add(router_entry.routing_entry_key)
         return merged_routes
+
+    def _mergeable_entries(
+            self, entry, entries, new_key, new_mask, new_last_key, merged):
+        # Check that all the cores on this chip have the same route as this is
+        # the only way we can merge here
+        potential_merges = set()
+        for entry_2 in entries:
+            key = entry_2.routing_entry_key
+            n_keys = ~entry_2.mask & 0xFFFFFFFFL
+            last_key = key + n_keys
+            masked_key = entry_2.routing_entry_key & new_mask
+            overlap = (min(new_last_key, last_key) - max(new_key, key)) > 0
+            in_range = new_key <= key and new_last_key >= last_key
+
+            if (new_key == masked_key and (
+                    not in_range
+                    or entry_2.routing_entry_key in merged
+                    or entry.processor_ids != entry_2.processor_ids
+                    or entry.link_ids != entry_2.link_ids)):
+                # Mismatched routes; cannot merge
+                return []
+            elif new_key == masked_key:
+                # This one is mergeable
+                potential_merges.add(entry_2)
+            elif overlap:
+                # Overlapping routes; cannot merge
+                return []
+        return potential_merges

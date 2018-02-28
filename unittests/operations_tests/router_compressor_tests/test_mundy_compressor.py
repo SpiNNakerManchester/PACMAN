@@ -17,21 +17,22 @@ def calc_length(original, compressed):
         max_key = max(max_key, route.mask, route.routing_entry_key)
     for route in compressed.multicast_routing_entries:
         max_key = max(max_key, route.mask, route.routing_entry_key)
+    return max_key
 
 
 def codify(route, length=32):
     """
     This method discovers all the routing keys covered by this route
 
-    Starts of with the assumption thsat the key is always covered/
+    Starts of with the assumption that the key is always covered.
 
-    Whenever a mask bit is zero the list of covered keys is doubled to
+    Whenever a mask bit is zero the list of covered keys is doubled to\
         include both the key with a aero and a one at that place
 
     :param route: single routing Entry
     :type route: :py:class:`spinn_machine.MulticastRoutingEntry`
     :param length: length in bits of the key and mask
-    ;type length int
+    :type length: int
     :return: set of routing_keys covered by this route
     """
     mask = route.mask
@@ -40,26 +41,25 @@ def codify(route, length=32):
     # Check each bit in the mask
     for i in range(length):
         bit_value = 2**i
-        # If the mask bit is zero then both zero and one acceptable
-        if mask & bit_value == 0:
-            # Safety key 1 with mask 0 is an error
-            if routing_entry_key & bit_value == 1:
-                msg = "Bit {} on the mask:{} is 0 but 1 in the key:{}" \
-                      "".format(i, bin(mask), bin(routing_entry_key))
-                raise AssertionError(msg)
-            code = WILDCARD + code
-        else:
+        if mask & bit_value:
             if routing_entry_key & bit_value == 0:
                 code = "0" + code
             else:
                 code = "1" + code
+        else:
+            # If the mask bit is zero then both zero and one acceptable
+            # Safety key 1 with mask 0 is an error
+            assert routing_entry_key & bit_value != 1, \
+                "Bit {} on the mask:{} is 0 but 1 in the key:{}".format(
+                    i, bin(mask), bin(routing_entry_key))
+            code = WILDCARD + code
     return code
 
 
 def codify_table(table, length=32):
     code_dict = OrderedDict()
     for route in table.multicast_routing_entries:
-        code_dict[codify(route)] = route
+        code_dict[codify(route, length)] = route
     return code_dict
 
 
@@ -96,27 +96,24 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0):
     keys = compressed_dict.keys()
     for i in range(start, len(keys)):
         c_code = keys[i]
-        print o_code, c_code
+        print o_code, c_code  # TODO: Don't print this message!
         if covers(o_code, c_code):
-            print "covers"
+            print "covers"  # TODO: Don't print this message!
             c_route = compressed_dict[c_code]
             if o_route.defaultable != c_route.defaultable:
-                msg = "Compressed route {} covers orignal route {} but has " \
-                      "a different defaulatable value." \
-                      "".format(c_route, o_route)
-                PacmanRoutingException(msg)
+                PacmanRoutingException(  # TODO: Raise this exception!
+                    "Compressed route {} covers original route {} but has "
+                    "a different defaultable value.".format(c_route, o_route))
             if o_route.processor_ids != c_route.processor_ids:
-                msg = "Compressed route {} covers orignal route {} but has " \
-                      "a different processor_ids." \
-                      "".format(c_route, o_route)
-                PacmanRoutingException(msg)
+                PacmanRoutingException(  # TODO: Raise this exception!
+                    "Compressed route {} covers original route {} but has "
+                    "a different processor_ids.".format(c_route, o_route))
             if o_route.link_ids != c_route.link_ids:
-                msg = "Compressed route {} covers orignal route {} but has " \
-                      "a different link_ids." \
-                      "".format(c_route, o_route)
-                PacmanRoutingException(msg)
+                PacmanRoutingException(  # TODO: Raise this exception!
+                    "Compressed route {} covers original route {} but has "
+                    "a different link_ids.".format(c_route, o_route))
             remainders = calc_remainders(o_code, c_code)
-            print remainders
+            print remainders  # TODO: Don't print this message!
             for remainder in remainders:
                 compare_route(o_route, compressed_dict, o_code=remainder,
                               start=i + 1)
@@ -127,8 +124,8 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0):
 
 def compare_table(original, compressed):
     compressed_dict = codify_table(compressed)
-    print compressed_dict
-    print "-------------"
+    print compressed_dict  # TODO: Don't print this message!
+    print "-------------"  # TODO: Don't print this message!
     for o_route in original.multicast_routing_entries:
         compare_route(o_route, compressed_dict)
 

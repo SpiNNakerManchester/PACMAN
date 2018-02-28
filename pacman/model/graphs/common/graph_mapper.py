@@ -51,7 +51,7 @@ class GraphMapper(object):
         :param vertex_slice:\
             The range of atoms from the application vertex that is going to be\
             in the machine_vertex
-        :type vertex_slice: :py:class:`pacman.model.graphs.common.slice.Slice`
+        :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
         :param application_vertex: A vertex from an Application Graph
         :raise pacman.exceptions.PacmanValueError:\
             If atom selection is out of bounds.

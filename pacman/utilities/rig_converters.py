@@ -36,6 +36,9 @@ ROUTER_HOMOGENEOUS_ENTRIES = 1023
 
 N_CORES_PER_VERTEX = 1
 
+_SUPPORTED_VIRTUAL_VERTEX_TYPES = (
+    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex)
+
 
 def _is_dead(machine, chip, link_id):
     router = chip.router
@@ -179,15 +182,14 @@ def convert_to_rig_graph_pure_mc(machine_graph):
 
 
 def create_rig_graph_constraints(machine_graph, machine):
-
     constraints = []
     for vertex in machine_graph.vertices:
-        if isinstance(vertex, AbstractVirtualVertex):
-            link_data = None
+        # We only support FPGA and SpiNNakerLink virtual vertices
+        if isinstance(vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):
             if isinstance(vertex, AbstractFPGAVertex):
                 link_data = machine.get_fpga_link_with_id(
                     vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-            elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+            else:
                 link_data = machine.get_spinnaker_link_with_id(
                     vertex.spinnaker_link_id, vertex.board_address)
             constraints.append(LocationConstraint(
@@ -251,8 +253,7 @@ def convert_from_rig_placements(
     for vertex in rig_placements:
         if isinstance(vertex, AbstractVirtualVertex):
             placements.add_placement(Placement(
-                vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
-                None))
+                vertex, vertex.virtual_chip_x, vertex.virtual_chip_y, None))
         else:
             x, y = rig_placements[vertex]
             p = rig_allocations[vertex]["cores"].start

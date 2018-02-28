@@ -1,10 +1,9 @@
 class HilbertState(object):
-    """ A mutable self object for the hilbert placer algorithm.
+    """ A mutable self object for the Hilbert placer algorithm.
     """
 
     def __init__(self, xpos=0, ypos=0, xchange=1, ychange=0):
         """
-        Constructor
         :param xpos: the x coordinate on the generated curve
         :param ypos: the y coordinate on the generated curve
         :param xchange: the change in x coordinate on the generated curve
@@ -21,10 +20,11 @@ class HilbertState(object):
         self._change_y = ychange
 
     def turn_left(self, angle):
-        """ method to turn left in the generation of a hilbert curve
+        """ method to turn left in the generation of a Hilbert curve
+
         :param angle: determines the direction in which the curve turns
         :type angle: int
-        :return: the x and y coordinates on the generated curve
+        :return: the x,y coordinates on the generated curve
         """
 
         self._change_x, self._change_y = (
@@ -32,10 +32,11 @@ class HilbertState(object):
         return self._change_x, self._change_y
 
     def turn_right(self, angle):
-        """ method to turn right in the generation of a hilbert curve
+        """ method to turn right in the generation of a Hilbert curve
+
         :param angle: determines the direction in which the curve turns
         :type angle: int
-        :return: the x and y coordinates on the generated curve
+        :return: the x,y coordinates on the generated curve
         """
 
         self._change_x, self._change_y = (
@@ -43,8 +44,9 @@ class HilbertState(object):
         return self._change_x, self._change_y
 
     def move_forward(self):
-        """ method to move forward in the generation of a hilbert curve
-        :return: the x and y coordinates on the generated curve
+        """ method to move forward in the generation of a Hilbert curve
+
+        :return: the x,y coordinates on the generated curve
         """
 
         xp = self._x_pos

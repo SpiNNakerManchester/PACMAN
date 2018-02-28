@@ -167,12 +167,12 @@ class PACMANAlgorithmExecutor(object):
         :param inputs: list of input types
         :type inputs: iterable of str
         :param optional_algorithms: list of algorithms which are optional\
-                and don't necessarily need to be ran to complete the logic flow
+            and don't necessarily need to be ran to complete the logic flow
         :type optional_algorithms: list of strings
         :param xml_paths: the list of paths for XML configuration data
         :type xml_paths: iterable of strings
-        :param required_outputs: the set of outputs that this workflow is\
-                 meant to generate
+        :param required_outputs: \
+            the set of outputs that this workflow is meant to generate
         :type required_outputs: iterable of types as strings
         :param tokens:\
             A list of tokens that should be considered to have been generated\
@@ -258,8 +258,8 @@ class PACMANAlgorithmExecutor(object):
 
         :param inputs: list of input types
         :type inputs: iterable of str
-        :param required_outputs: the set of outputs that this workflow is\
-                meant to generate
+        :param required_outputs: \
+            the set of outputs that this workflow is meant to generate
         :param converter_algorithms_datas: the set of converter algorithms
         :param optional_algorithm_data: the set of optional algorithms
         :rtype: None
@@ -664,8 +664,8 @@ class PACMANAlgorithmExecutor(object):
     def get_item(self, item_type):
         """ Get an item from the outputs of the execution
 
-        :param item_type: the item from the internal type mapping to be\
-                    returned
+        :param item_type: \
+            the item from the internal type mapping to be returned
         :return: the returned item
         """
         if item_type not in self._internal_type_mapping:
