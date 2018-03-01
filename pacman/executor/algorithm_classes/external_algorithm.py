@@ -2,7 +2,7 @@ import subprocess
 
 from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
 from .abstract_algorithm import AbstractAlgorithm
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 
 
@@ -21,8 +21,8 @@ class ExternalAlgorithm(AbstractAlgorithm):
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, command_line_arguments):
         # pylint: disable=too-many-arguments
-        AbstractAlgorithm.__init__(
-            self, algorithm_id, required_inputs, optional_inputs, outputs,
+        super(ExternalAlgorithm, self).__init__(
+            algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens)
         self._command_line_arguments = command_line_arguments

@@ -23,7 +23,6 @@ class MulticastRoutingTableByPartitionEntry(object):
     def __init__(self, out_going_links, outgoing_processors,
                  incoming_processor=None, incoming_link=None):
         """
-
         :param out_going_links: the edges this path entry goes down
         :type out_going_links: iterable of ints between 0 and 5
         :param outgoing_processors: the processors this path entry goes to
@@ -37,7 +36,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             self._out_going_links = set()
             self._out_going_links.add(out_going_links)
         elif out_going_links is not None:
-            self._out_going_links = set(out_going_links)
+            self._out_going_links = set(int(link) for link in out_going_links)
         else:
             self._out_going_links = set()
 
@@ -45,30 +44,37 @@ class MulticastRoutingTableByPartitionEntry(object):
             self._out_going_processors = set()
             self._out_going_processors.add(outgoing_processors)
         elif outgoing_processors is not None:
-            self._out_going_processors = set(outgoing_processors)
+            self._out_going_processors = set(
+                int(p) for p in outgoing_processors)
         else:
             self._out_going_processors = set()
 
-        self._incoming_link = incoming_link
-        self._incoming_processor = incoming_processor
-
-        if (self._incoming_link is not None and
-                self._incoming_processor is not None):
+        if incoming_link is not None and incoming_processor is not None:
             raise PacmanInvalidParameterException(
                 "The incoming direction for a path can only be from either "
                 "one link or one processors, not both",
-                str(self._incoming_link), str(self._incoming_processor))
-        if (self._incoming_link is not None and
-                not isinstance(self._incoming_link, int)):
+                str(incoming_link), str(incoming_processor))
+        if (incoming_processor is not None
+                and not isinstance(incoming_processor, int)):
             raise PacmanInvalidParameterException(
                 "The incoming direction for a path can only be from either "
                 "one link or one processors, not both",
-                str(self._incoming_link), str(self._incoming_processor))
+                str(incoming_link), str(incoming_processor))
+        if incoming_link is not None and not isinstance(incoming_link, int):
+            raise PacmanInvalidParameterException(
+                "The incoming direction for a path can only be from either "
+                "one link or one processors, not both",
+                str(incoming_link), str(incoming_processor))
+        self._incoming_processor = (
+            None if incoming_processor is None else int(incoming_processor))
+        self._incoming_link = (
+            None if incoming_link is None else int(incoming_link))
 
     @property
     def out_going_processors(self):
         """ The destination processors of the entry
 
+        :rtype: set(int)
         """
         return self._out_going_processors
 
@@ -76,6 +82,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     def out_going_links(self):
         """ The destination links of the entry
 
+        :rtype: set(int)
         """
         return self._out_going_links
 
@@ -83,6 +90,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     def incoming_link(self):
         """ The source link for this path entry
 
+        :rtype: int or None
         """
         return self._incoming_link
 
@@ -97,11 +105,13 @@ class MulticastRoutingTableByPartitionEntry(object):
             raise Exception(
                 "Entry already has an incoming link {}".format(
                     self._incoming_link))
-        self._incoming_link = incoming_link
+        self._incoming_link = int(incoming_link)
 
     @property
     def incoming_processor(self):
         """ The source processor
+
+        :rtype: int or Non
         """
         return self._incoming_processor
 
@@ -116,7 +126,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             raise Exception(
                 "Entry already has an incoming link {}".format(
                     self._incoming_link))
-        self._incoming_processor = incoming_processor
+        self._incoming_processor = int(incoming_processor)
 
     @property
     def defaultable(self):
@@ -130,6 +140,17 @@ class MulticastRoutingTableByPartitionEntry(object):
         outgoing_link = next(iter(self._out_going_links))
         return (self._incoming_link + 3) % 6 == outgoing_link
 
+    @staticmethod
+    def __merge_noneables(p1, p2, name):
+        if p1 is None:
+            return p2
+        if p2 is None or p1 == p2:
+            return p1
+        raise PacmanInvalidParameterException(
+            name, "invalid merge",
+            "The two MulticastRoutingTableByPartitionEntry have different " +
+            name + "s, and so can't be merged")
+
     def merge_entry(self, other):
         """ Merges the another entry with this one and returns a new\
             MulticastRoutingTableByPartitionEntry
@@ -138,53 +159,23 @@ class MulticastRoutingTableByPartitionEntry(object):
             the MulticastRoutingTableByPartitionEntry to merge into this one
         :return: a merged MulticastRoutingTableByPartitionEntry
         """
-        # pylint: disable=protected-access
         if not isinstance(other, MulticastRoutingTableByPartitionEntry):
             raise PacmanInvalidParameterException(
                 "other", "type error",
-                "The other parameter is not a instance of "
+                "The other parameter is not an instance of "
                 "MulticastRoutingTableByPartitionEntry, and therefore cannot "
                 "be merged.")
-        # validate fixed things
-        if (self._incoming_processor is None and
-                other.incoming_processor is None):
-            valid_incoming_processor = None
-        elif (self._incoming_processor is not None and
-                other._incoming_processor is None):
-            valid_incoming_processor = self._incoming_processor
-        elif (self._incoming_processor is None and
-                other.incoming_processor is not None):
-            valid_incoming_processor = other.incoming_processor
-        elif self._incoming_processor == other._incoming_processor:
-            valid_incoming_processor = self._incoming_processor
-        else:
-            raise PacmanInvalidParameterException(
-                "incoming_processor", "invalid merge",
-                "The two MulticastRoutingTableByPartitionEntry have "
-                "different incoming_processors, and so can't be merged")
 
-        if (self._incoming_link is None and
-                other.incoming_link is None):
-            valid_incoming_link = None
-        elif (self._incoming_link is not None and
-                other._incoming_link is None):
-            valid_incoming_link = self._incoming_link
-        elif (self._incoming_link is None and
-                other.incoming_link is not None):
-            valid_incoming_link = other.incoming_link
-        elif self._incoming_link == other._incoming_link:
-            valid_incoming_link = self._incoming_link
-        else:
-            raise PacmanInvalidParameterException(
-                "incoming_link", "invalid merge",
-                "The two MulticastRoutingTableByPartitionEntry have "
-                "different incoming_links, and so can't be merged")
-
-        # merge merge-able things
+        # validate and merge
+        valid_incoming_processor = self.__merge_noneables(
+            self._incoming_processor, other.incoming_processor,
+            "incoming_processor")
+        valid_incoming_link = self.__merge_noneables(
+            self._incoming_link, other.incoming_link, "incoming_link")
         merged_outgoing_processors = self._out_going_processors.union(
-            other._out_going_processors)
+            other.out_going_processors)
         merged_outgoing_links = self._out_going_links.union(
-            other._out_going_links)
+            other.out_going_links)
 
         return MulticastRoutingTableByPartitionEntry(
             merged_outgoing_links, merged_outgoing_processors,

@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractEdge
 
@@ -29,16 +29,15 @@ class MachineEdge(AbstractEdge):
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
             traffic_weight=1):
         """
-
         :param pre_vertex: the vertex at the start of the edge
         :type pre_vertex:\
-            :py:class:`pacman.model.graphs.machine.abstract_machine_vertex.impl.MachineVertex`
+            :py:class:`pacman.model.graphs.machine.MachineVertex`
         :param post_vertex: the vertex at the end of the edge
         :type post_vertex:\
-            :py:class:`pacman.model.graphs.machine.abstract_machine_vertex.impl.MachineVertex`
+            :py:class:`pacman.model.graphs.machine.MachineVertex`
         :param traffic_type: The type of traffic that this edge will carry
         :type traffic_type:\
-            :py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
+            :py:class:`pacman.model.graphs.common.EdgeTrafficType`
         :param label: The name of the edge
         :type label: str
         :param traffic_weight:\

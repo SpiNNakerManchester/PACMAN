@@ -1,5 +1,5 @@
 from .abstract_resource import AbstractResource
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 
 class ReverseIPtagResource(AbstractResource):

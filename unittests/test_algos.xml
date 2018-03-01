@@ -1,0 +1,47 @@
+<algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+    <algorithm name="SimpleExternal">
+        <command_line_args>
+            <arg>/bin/sh</arg>
+            <arg>-c</arg>
+            <arg>echo foo &gt;{target_file}</arg>
+        </command_line_args>
+        <input_definitions>
+            <parameter>
+                <param_name>target_file</param_name>
+                <param_type>ExampleFilePath</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>target_file</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type file_name_type="ExampleFilePath">
+                Foo
+            </param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="FailingExternal">
+        <command_line_args>
+            <arg>/bin/sh</arg>
+            <arg>-c</arg>
+            <arg>echo foo &gt;{target_file}; echo bar >&amp;2; exit 1</arg>
+        </command_line_args>
+        <input_definitions>
+            <parameter>
+                <param_name>target_file</param_name>
+                <param_type>ExampleFilePath</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>target_file</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type file_name_type="ExampleFilePath">
+                Foo
+            </param_type>
+        </outputs>
+    </algorithm>
+</algorithms>

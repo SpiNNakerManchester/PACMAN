@@ -1,16 +1,12 @@
-from pacman.model.constraints.key_allocator_constraints.\
-    share_key_constraint import ShareKeyConstraint
-from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 
 # pacman imports
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint
+    import AbstractKeyAllocatorConstraint, ShareKeyConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    import FixedMaskConstraint
-from spinn_utilities.log import FormatAdapter
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint
+    import FixedMaskConstraint, FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.operations.routing_info_allocator_algorithms\
@@ -36,14 +32,14 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
-    """ A Routing Info Allocation Allocator algorithm that keeps track of
+    """ A Routing Info Allocation Allocator algorithm that keeps track of\
         free keys and attempts to allocate them as requested
     """
 
     __slots__ = []
 
     def __init__(self):
-        ElementAllocatorAlgorithm.__init__(self, 0, 2 ** 32)
+        super(MallocBasedRoutingInfoAllocator, self).__init__(0, 2 ** 32)
 
     def __call__(self, machine_graph, n_keys_map, graph_mapper=None):
         # check that this algorithm supports the constraints
@@ -63,15 +59,13 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_key_groups, share_key_groups, fixed_mask_groups,
-         fixed_field_groups, flexi_field_groups,
-         continuous_groups, none_continuous_groups) = \
-            utilities.get_edge_groups(
-                machine_graph, EdgeTrafficType.MULTICAST)
+        (fixed_keys, shared_keys, fixed_masks, fixed_fields, flexi_fields,
+         continuous, noncontinuous) = utilities.get_edge_groups(
+             machine_graph, EdgeTrafficType.MULTICAST)
 
         # Even non-continuous keys will be continuous
-        for group in none_continuous_groups:
-            continuous_groups.append(group)
+        for group in noncontinuous:
+            continuous.append(group)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(
@@ -79,23 +73,23 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             "Allocating routing keys")
 
         # allocate the groups that have fixed keys
-        for group in progress.over(fixed_key_groups, False):
+        for group in progress.over(fixed_keys, False):
             self._allocate_fixed_keys(group, routing_infos)
 
-        for group in progress.over(fixed_mask_groups, False):
+        for group in progress.over(fixed_masks, False):
             self._allocate_fixed_masks(group, n_keys_map, routing_infos)
 
-        for group in progress.over(fixed_field_groups, False):
+        for group in progress.over(fixed_fields, False):
             self._allocate_fixed_fields(group, n_keys_map, routing_infos)
 
-        if flexi_field_groups:
+        if flexi_fields:
             raise PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
-        for group in progress.over(share_key_groups, False):
+        for group in progress.over(shared_keys, False):
             self._allocate_share_key(group, routing_infos, n_keys_map)
 
-        for group in continuous_groups:
+        for group in continuous:
             self._allocate_continuous_groups(group, routing_infos, n_keys_map)
 
         progress.end()
@@ -112,8 +106,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._update_routing_objects(
                 keys_and_masks, routing_infos, partition)
 
-    def _allocate_share_key(
-            self, group, routing_infos, n_keys_map):
+    def _allocate_share_key(self, group, routing_infos, n_keys_map):
         keys_and_masks = self._allocate_keys_and_masks(
             None, None, self._get_n_keys(group, n_keys_map))
 

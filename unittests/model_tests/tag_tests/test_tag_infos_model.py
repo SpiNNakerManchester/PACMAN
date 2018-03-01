@@ -11,6 +11,7 @@ from spinn_machine.tags import IPTag, ReverseIPTag
 
 # general imports
 import unittest
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 class TestTagsModel(unittest.TestCase):
@@ -93,6 +94,46 @@ class TestTagsModel(unittest.TestCase):
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(
             machine_vertex)
         self.assertEqual(gotton_tag, None)
+
+    def test_add_conflicting_ip_tag(self):
+        tags = Tags()
+        tag1 = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
+        tag2 = IPTag("", 0, 7, 1, "122.2.2.3", 1, False)
+        tag3 = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
+        machine_vertex = SimpleMachineVertex(None, "")
+        tags.add_ip_tag(tag1, machine_vertex)
+        with self.assertRaises(PacmanInvalidParameterException) as e:
+            tags.add_ip_tag(tag2, machine_vertex)
+        self.assertIn("The tag specified has already been assigned with "
+                      "different properties", str(e.exception))
+        with self.assertRaises(PacmanInvalidParameterException) as e:
+            tags.add_reverse_ip_tag(tag3, machine_vertex)
+        self.assertIn("The tag has already been assigned on the given board",
+                      str(e.exception))
+        with self.assertRaises(PacmanInvalidParameterException) as e:
+            tags.add_ip_tag(tag3, machine_vertex)
+        self.assertIn("Only add IP tags with this method.",
+                      str(e.exception))
+
+    def test_add_conflicting_reverse_ip_tag(self):
+        tags = Tags()
+        tag1 = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
+        tag2 = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
+        tag3 = IPTag("", 0, 7, 1, "122.2.2.3", 1, False)
+        machine_vertex = SimpleMachineVertex(None, "")
+        tags.add_reverse_ip_tag(tag1, machine_vertex)
+        with self.assertRaises(PacmanInvalidParameterException) as e:
+            tags.add_reverse_ip_tag(tag2, machine_vertex)
+        self.assertIn("The tag has already been assigned on the given board",
+                      str(e.exception))
+        with self.assertRaises(PacmanInvalidParameterException) as e:
+            tags.add_ip_tag(tag3, machine_vertex)
+        self.assertIn("The tag has already been assigned to a reverse IP tag"
+                      " on the given board", str(e.exception))
+        with self.assertRaises(PacmanInvalidParameterException) as e:
+            tags.add_reverse_ip_tag(tag3, machine_vertex)
+        self.assertIn("Only add reverse IP tags with this method.",
+                      str(e.exception))
 
 
 if __name__ == '__main__':

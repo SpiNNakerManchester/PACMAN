@@ -2,7 +2,7 @@ from six import add_metaclass
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
@@ -25,7 +25,7 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
-        ConstrainedObject.__init__(self, constraints)
+        super(MachineVertex, self).__init__(constraints)
         self._label = label
 
     @property

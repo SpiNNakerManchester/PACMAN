@@ -21,40 +21,37 @@ def codify(route, length=32):
     Starts of with the assumption that the key is always covered.
 
     Whenever a mask bit is zero the list of covered keys is doubled to\
-        include both the key with a aero and a one at that place
+    include both the key with a zero and a one at that place.
 
     :param route: single routing Entry
     :type route: :py:class:`spinn_machine.MulticastRoutingEntry`
-    :param length: length in bits of the key and mask
-    ;type length int
+    :param length: length in bits of the key and mask (defaults to 32)
+    :type length: int
     :return: set of routing_keys covered by this route
+    :rtype: str
     """
     mask = route.mask
-    routing_entry_key = route.routing_entry_key
+    key = route.routing_entry_key
     code = ""
     # Check each bit in the mask
     for i in range(length):
         bit_value = 2**i
         # If the mask bit is zero then both zero and one acceptable
-        if mask & bit_value == 0:
-            # Safety key 1 with mask 0 is an error
-            if routing_entry_key & bit_value == 1:
-                msg = "Bit {} on the mask:{} is 0 but 1 in the key:{}" \
-                      "".format(i, bin(mask), bin(routing_entry_key))
-                raise AssertionError(msg)
-            code = WILDCARD + code
+        if mask & bit_value:
+            code = str(int(key & bit_value != 0)) + code
         else:
-            if routing_entry_key & bit_value == 0:
-                code = "0" + code
-            else:
-                code = "1" + code
+            # Safety key 1 with mask 0 is an error
+            assert key & bit_value == 0, \
+                "Bit {} on the mask:{} is 0 but 1 in the key:{}".format(
+                    i, bin(mask), bin(key))
+            code = WILDCARD + code
     return code
 
 
 def codify_table(table, length=32):
     code_dict = OrderedDict()
     for route in table.multicast_routing_entries:
-        code_dict[codify(route)] = route
+        code_dict[codify(route, length)] = route
     return code_dict
 
 
@@ -95,20 +92,17 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
             c_route = compressed_dict[c_code]
             f.write("\t\t{}\n".format(reports.format_route(c_route)))
             if o_route.defaultable != c_route.defaultable:
-                msg = "Compressed route {} covers orignal route {} but has " \
-                      "a different defaulatable value." \
-                      "".format(c_route, o_route)
-                PacmanRoutingException(msg)
+                PacmanRoutingException(  # TODO: Raise this exception!
+                    "Compressed route {} covers original route {} but has "
+                    "a different defaultable value.".format(c_route, o_route))
             if o_route.processor_ids != c_route.processor_ids:
-                msg = "Compressed route {} covers orignal route {} but has " \
-                      "a different processor_ids." \
-                      "".format(c_route, o_route)
-                PacmanRoutingException(msg)
+                PacmanRoutingException(  # TODO: Raise this exception!
+                    "Compressed route {} covers original route {} but has "
+                    "a different processor_ids.".format(c_route, o_route))
             if o_route.link_ids != c_route.link_ids:
-                msg = "Compressed route {} covers orignal route {} but has " \
-                      "a different link_ids." \
-                      "".format(c_route, o_route)
-                PacmanRoutingException(msg)
+                PacmanRoutingException(  # TODO: Raise this exception!
+                    "Compressed route {} covers original route {} but has "
+                    "a different link_ids.".format(c_route, o_route))
             remainders = calc_remainders(o_code, c_code)
             for remainder in remainders:
                 compare_route(f, o_route, compressed_dict, o_code=remainder,
@@ -120,7 +114,7 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
 
 def generate_routing_compression_checker_report(
         report_folder, routing_tables, compressed_routing_tables):
-    """ Make a full report of how the compressed covers all routes in the
+    """ Make a full report of how the compressed covers all routes in the\
         and uncompressed routing table
 
     :param report_folder: the folder to store the resulting report
@@ -139,7 +133,6 @@ def generate_routing_compression_checker_report(
 
             f.write("If this table did not raise an exception compression "
                     "was fully checked. \n\n")
-
             f.write("The format is:\n"
                     "Chip x, y\n"
                     "\t Uncompressed Route\n"

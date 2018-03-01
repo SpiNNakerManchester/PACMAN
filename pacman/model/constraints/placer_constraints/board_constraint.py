@@ -27,3 +27,11 @@ class BoardConstraint(AbstractPlacerConstraint):
     def __repr__(self):
         return "BoardConstraint(board_address=\"{}\")".format(
             self._board_address)
+
+    def __eq__(self, other):
+        if not isinstance(other, BoardConstraint):
+            return False
+        return self._board_address == other.board_address
+
+    def __hash__(self):
+        return hash((self._board_address,))

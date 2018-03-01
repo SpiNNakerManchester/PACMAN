@@ -5,6 +5,8 @@ from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractVirtualVertex
 
 from spinn_utilities.progress_bar import ProgressBar
+from collections import OrderedDict
+from pacman.utilities import file_format_schemas
 
 DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX = 1
 
@@ -17,25 +19,24 @@ class ConvertToFileMachineGraphPureMulticast(object):
 
     def __call__(self, machine_graph, file_path):
         """
-
-        :param machine_graph:
-        :param file_path:
+        :param machine_graph: The graph to convert
+        :param file_path: Where to write the JSON
         """
         progress = ProgressBar(
-            machine_graph.n_vertices + 1, "Converting to json graph")
+            machine_graph.n_vertices + 1, "Converting to JSON graph")
 
         # write basic stuff
-        json_graph = dict()
+        json_graph = OrderedDict()
 
         # write vertices data
-        vertices = dict()
+        vertices = OrderedDict()
         json_graph["vertices_resources"] = vertices
 
-        edges = dict()
+        edges = OrderedDict()
         json_graph["edges"] = edges
 
-        vertex_by_id = dict()
-        partition_by_id = dict()
+        vertex_by_id = OrderedDict()
+        partition_by_id = OrderedDict()
         for vertex in progress.over(machine_graph.vertices, False):
             self._convert_vertex(vertex, vertex_by_id, vertices,
                                  edges, machine_graph, partition_by_id)
@@ -43,6 +44,8 @@ class ConvertToFileMachineGraphPureMulticast(object):
         with open(file_path, "w") as file_to_write:
             json.dump(json_graph, file_to_write)
         progress.update()
+
+        file_format_schemas.validate(json_graph, "machine_graph.json")
 
         progress.end()
 
@@ -65,7 +68,7 @@ class ConvertToFileMachineGraphPureMulticast(object):
             tag_id = hashlib.md5(str(vertex_id) + "_tag").hexdigest()
             edges[tag_id] = {
                 "source": str(vertex_id),
-                "sinks": tag_id,
+                "sinks": [tag_id],
                 "weight": 1.0,
                 "type": "FAKE_TAG_EDGE"}
             # add the tag-able vertex

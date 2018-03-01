@@ -1,7 +1,7 @@
+from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import \
     PacmanInvalidParameterException, PacmanConfigurationException
-from pacman.model.decorators import overrides
 from pacman.model.graphs import AbstractOutgoingEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 
@@ -40,7 +40,7 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
-        ConstrainedObject.__init__(self, constraints)
+        super(OutgoingEdgePartition, self).__init__(constraints)
         self._label = label
         self._identifier = identifier
         self._edges = OrderedSet()

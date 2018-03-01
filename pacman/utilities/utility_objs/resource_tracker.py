@@ -23,7 +23,7 @@ class ResourceTracker(object):
         # Note that entries are only added when the SDRAM is first used
         "_sdram_tracker",
 
-        # The set of processor ids available on each chip,
+        # The set of processor IDs available on each chip,
         # indexed by the (x, y) tuple of coordinates of the chip
         # Note that entries are only added when a core is first used
         "_core_tracker",
@@ -95,7 +95,7 @@ class ResourceTracker(object):
         # Note that entries are only added when the SDRAM is first used
         self._sdram_tracker = dict()
 
-        # The set of processor ids available on each chip,
+        # The set of processor IDs available on each chip,
         # indexed by the (x, y) tuple of coordinates of the chip
         # Note that entries are only added when a core is first used
         self._core_tracker = dict()
@@ -642,7 +642,7 @@ class ResourceTracker(object):
         :type board_address: str or None
         :param ip_tags: The IP tag resource
         :type ip_tags: iterable of\
-                    :py:class:`pacman.model.resource.IptagResource`
+            :py:class:`pacman.model.resource.IptagResource`
         :return: True if the tags can be allocated, False otherwise
         :rtype: bool
         """
@@ -1039,6 +1039,8 @@ class ResourceTracker(object):
             chip, the processor_id, and the IP tag and reverse IP tag\
             allocation tuples
         :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
+        :raises pacman.exceptions.PacmanValueError: \
+            If there aren't chips available that can take the allocation.
         """
 
         usable_chips = chips
@@ -1134,6 +1136,8 @@ class ResourceTracker(object):
         :return: The x and y coordinates of the used chip, the processor_id,\
             and the IP tag and reverse IP tag allocation tuples
         :rtype: (int, int, int, list((int, int, int, int)), list((int, int)))
+        :raises pacman.exceptions.PacmanValueError: \
+            If there isn't a chip available that can take the allocation.
         """
         # Find the first usable chip which fits the resources
         for (chip_x, chip_y) in self._get_usable_chips(

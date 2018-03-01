@@ -14,7 +14,7 @@ from spinn_machine import VirtualMachine
 
 class Vertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
-        ApplicationVertex.__init__(self, label=label, max_atoms_per_core=256)
+        super(Vertex, self).__init__(label=label, max_atoms_per_core=256)
         # Ignoring n_atoms
 
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):

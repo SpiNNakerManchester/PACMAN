@@ -30,3 +30,11 @@ class MaxVertexAtomsConstraint(AbstractPartitionerConstraint):
 
     def __repr__(self):
         return "MaxVertexAtomsConstraint(size={})".format(self._size)
+
+    def __eq__(self, other):
+        if not isinstance(other, MaxVertexAtomsConstraint):
+            return False
+        return self._size == other.size
+
+    def __hash__(self):
+        return hash((self._size,))

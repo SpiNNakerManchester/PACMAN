@@ -4,10 +4,8 @@ class Token(object):
     """
 
     __slots__ = [
-
         # The name of the token
         "_name",
-
         # The part of the token, or None if no part
         "_part"
     ]
@@ -28,10 +26,9 @@ class Token(object):
         return "Token(name={}, part={})".format(self._name, self._part)
 
     def __hash__(self):
-        return str(self._name + ":" + str(self._part)).__hash__()
+        return ((self._name, self._part)).__hash__()
 
     def __eq__(self, other):
-        # pylint: disable=protected-access
         if not isinstance(other, Token):
             return False
-        return self._name == other._name and self._part == other._part
+        return self._name == other.name and self._part == other.part

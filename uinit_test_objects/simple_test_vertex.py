@@ -1,4 +1,3 @@
-
 """
 test vertex used in many unit tests
 """
@@ -9,7 +8,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import DTCMResource, ResourceContainer, \
     SDRAMResource, CPUCyclesPerTickResource
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 
 class SimpleTestVertex(ApplicationVertex):
@@ -20,8 +19,8 @@ class SimpleTestVertex(ApplicationVertex):
 
     def __init__(self, n_atoms, label="testVertex", max_atoms_per_core=256,
                  constraints=None, fixed_sdram_value=None):
-        ApplicationVertex.__init__(
-            self, label=label, max_atoms_per_core=max_atoms_per_core,
+        super(SimpleTestVertex, self).__init__(
+            label=label, max_atoms_per_core=max_atoms_per_core,
             constraints=constraints)
         self._model_based_max_atoms_per_core = max_atoms_per_core
         self._n_atoms = n_atoms

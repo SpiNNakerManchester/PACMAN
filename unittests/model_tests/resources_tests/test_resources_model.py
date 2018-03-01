@@ -5,6 +5,9 @@ test for the resources model
 import unittest
 from pacman.model.resources import SDRAMResource, CPUCyclesPerTickResource
 from pacman.model.resources import DTCMResource, ResourceContainer
+from pacman.model.resources import IPtagResource, ReverseIPtagResource
+from pacman.model.resources import \
+    SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource
 
 
 class TestResourceModels(unittest.TestCase):
@@ -78,6 +81,55 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(container.sdram.get_value(), 128 * (2**21))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**21) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**21) + 2)
+
+    def test_tags_resources(self):
+        IPtagResource("1", 2, 3)  # Minimal args
+        iptr = IPtagResource("1.2.3.4", 2, 3, 4, 5)
+        self.assertEqual(iptr.ip_address, "1.2.3.4")
+        self.assertEqual(iptr.port, 2)
+        self.assertEqual(iptr.strip_sdp, 3)
+        self.assertEqual(iptr.tag, 4)
+        self.assertEqual(iptr.traffic_identifier, 5)
+        self.assertEqual(iptr.get_value(), ['1.2.3.4', 2, 3, 4, 5])
+        self.assertEqual(str(iptr),
+                         "IPTagResource(ip_address=1.2.3.4, port=2, "
+                         "strip_sdp=3, tag=4, traffic_identifier=5)")
+
+        ReverseIPtagResource()  # Minimal args
+        riptr = ReverseIPtagResource(1, 2, 3)
+        self.assertEqual(riptr.port, 1)
+        self.assertEqual(riptr.sdp_port, 2)
+        self.assertEqual(riptr.tag, 3)
+        self.assertEqual(riptr.get_value(), [1, 2, 3])
+        self.assertEqual(str(riptr),
+                         "ReverseIPTagResource(port=1, sdp_port=2, tag=3)")
+
+        b = "4.3.2.1"
+
+        SpecificBoardIPtagResource(b, "1", 2, 3)  # Minimal args
+        iptr = SpecificBoardIPtagResource(b, "1.2.3.4", 2, 3, 4, 5)
+        self.assertEqual(iptr.board, b)
+        self.assertEqual(iptr.ip_address, "1.2.3.4")
+        self.assertEqual(iptr.port, 2)
+        self.assertEqual(iptr.strip_sdp, 3)
+        self.assertEqual(iptr.tag, 4)
+        self.assertEqual(iptr.traffic_identifier, 5)
+        self.assertEqual(iptr.get_value(), [b, '1.2.3.4', 2, 3, 4, 5])
+        self.assertEqual(str(iptr),
+                         "IPTagResource(board_address=" + b + ", "
+                         "ip_address=1.2.3.4, port=2, strip_sdp=3, tag=4, "
+                         "traffic_identifier=5)")
+
+        SpecificBoardReverseIPtagResource(b)  # Minimal args
+        riptr = SpecificBoardReverseIPtagResource(b, 1, 2, 3)
+        self.assertEqual(riptr.board, b)
+        self.assertEqual(riptr.port, 1)
+        self.assertEqual(riptr.sdp_port, 2)
+        self.assertEqual(riptr.tag, 3)
+        self.assertEqual(riptr.get_value(), [b, 1, 2, 3])
+        self.assertEqual(str(riptr),
+                         "ReverseIPTagResource(board=" + b + ", port=1, "
+                         "sdp_port=2, tag=3)")
 
 
 if __name__ == '__main__':

@@ -24,8 +24,8 @@ range_masks = {0xFFFFFFFFL - ((2 ** i) - 1) for i in range(33)}
 def validate_routes(machine_graph, placements, routing_infos,
                     routing_tables, machine, graph_mapper=None):
     """ Go though the placements given and check that the routing entries\
-    within the routing tables support reach the correction destinations as\
-    well as not producing any cycles.
+        within the routing tables support reach the correction destinations\
+        as well as not producing any cycles.
 
     :param machine_graph: the graph
     :param placements: the placements container
@@ -35,7 +35,7 @@ def validate_routes(machine_graph, placements, routing_infos,
     :param graph_mapper: \
         the mapping between graphs or none if only using a machine graph
     :param machine: the python machine object
-    :type machine: spinnMachine.machine.Machine object
+    :type machine: spinn_machine.Machine object
     :rtype: None
     :raises PacmanRoutingException: when either no routing table entry is\
         found by the search on a given router, or a cycle is detected
@@ -65,7 +65,7 @@ def validate_routes(machine_graph, placements, routing_infos,
                 partition)
             is_continuous = _check_if_partition_has_continuous_keys(partition)
             if not is_continuous:
-                logger.warn(
+                logger.warning(
                     "Due to the none continuous nature of the keys in this "
                     "partition {}, we cannot check all atoms will be routed "
                     "correctly, but will check the base key instead",
@@ -113,10 +113,10 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     :param is_continuous: \
         whether the keys and atoms mapping is continuous
     :type source_placement: instance of\
-        :py:class:`pacman.model.placements.placement.Placement`
+        :py:class:`pacman.model.placements.Placement`
     :type dest_placements: iterable of PlacementTuple
     :type key_and_mask: instance of\
-        :py:class:`pacman.model.routing_info.key_and_mask.BaseKeyAndMask`
+        :py:class:`pacman.model.routing_info.BaseKeyAndMask`
     :rtype: None
     :raise PacmanRoutingException: when the trace completes and there are\
         still destinations not visited
@@ -230,7 +230,6 @@ def _start_trace_via_routing_tables(
 
 def _check_all_keys_hit_entry(entry, n_atoms, base_key):
     """
-
     :param entry: routing entry discovered
     :param n_atoms: the number of atoms this partition covers
     :param base_key: the base key of the partition
@@ -249,8 +248,8 @@ def _recursive_trace_to_destinations(
         entry, current_router, chip_x, chip_y, key_and_mask, visited_routers,
         reached_placements, machine, routing_tables, is_continuous, n_atoms,
         failed_to_cover_all_keys_routers):
-    """ recursively search though routing tables till no more entries are\
-    registered with this key
+    """ Recursively search though routing tables until no more entries are\
+        registered with this key.
 
     :param entry: the original entry used by the first router which\
         resides on the source placement chip.
@@ -269,15 +268,15 @@ def _recursive_trace_to_destinations(
     :param failed_to_cover_all_keys_routers: \
         list of failed routers for all keys
     :type entry: \
-        :py:class:`spinnMachine.multicast_routing_entry.MulticastRoutingEntry`
+        :py:class:`spinn_machine.MulticastRoutingEntry`
     :type current_router:\
-        :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
+        :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
     :type chip_x: int
     :type chip_y: int
     :type key_and_mask:
-        :py:class:`pacman.model.routing_info.base_key_and_mask.BaseKeyAndMask`
+        :py:class:`pacman.model.routing_info.BaseKeyAndMask`
     :type visited_routers: iterable of\
-        :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
+        :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
     :type reached_placements: iterable of placement_tuple
     :rtype: None
     :raise None: this method does not raise any known exceptions
@@ -340,7 +339,7 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
     :type chip_x: int
     :type chip_y: int
     :type visited_routers: iterable of\
-        :py:class:`pacman.model.routing_tables.multicast_routing_table.MulticastRoutingTable`
+        :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
     :rtype: None
     :raise PacmanRoutingException: when a router has been visited twice.
     """
@@ -358,7 +357,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
     """ Check for processors to be removed
 
     :param reached_placements: the placements to which the trace visited
-    :param processor_ids: the processor ids which the last router entry\
+    :param processor_ids: the processor IDs which the last router entry\
         said the trace should visit
     :param current_router: the current router being used in the trace
     :rtype: None
@@ -387,7 +386,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
             if found_entry is None:
                 found_entry = entry
             else:
-                logger.warn(
+                logger.warning(
                     "Found more than one entry for key {}. This could be "
                     "an error, as currently no router supports overloading"
                     " of entries.", hex(key))

@@ -1,12 +1,12 @@
 from six import add_metaclass
 import sys
 
-from pacman.model.decorators import overrides
 from pacman.model.constraints.partitioner_constraints import \
     MaxVertexAtomsConstraint
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
+from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import \
     abstractmethod, abstractproperty, AbstractBase
 
@@ -26,9 +26,8 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :param label: The optional name of the vertex
         :type label: str
         :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable of\
-            :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+        :type constraints: iterable of\
+            :py:class:`pacman.model.constraints.AbstractConstraint`
         :param max_atoms_per_core: the max number of atoms that can be\
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
@@ -36,7 +35,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
             * If one of the constraints is not valid
         """
 
-        ConstrainedObject.__init__(self, constraints)
+        super(ApplicationVertex, self).__init__(constraints)
         self._label = label
 
         # add a constraint for max partitioning
@@ -60,7 +59,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
-        :type vertex_slice: :py:class:`pacman.model.graph.slice.Slice`
+        :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
         :return: a Resource container that contains a \
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
         :rtype: pacman.model.resources.ResourceContainer

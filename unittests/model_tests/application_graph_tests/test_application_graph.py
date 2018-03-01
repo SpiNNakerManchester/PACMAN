@@ -1,7 +1,7 @@
 # pacman imports
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 # uinit test object imports
-from uinit_test_objects.simple_test_vertex import SimpleTestVertex
+from uinit_test_objects import SimpleTestVertex
 
 # general imports
 import unittest
@@ -30,13 +30,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         assert frozenset(verts) == frozenset(graph.vertices)
         assert frozenset(edges) == frozenset(graph.edges)
 
-        oev = graph.get_edges_starting_at_vertex(vert1)
-        if edge2 in oev:
-            raise AssertionError("edge2 is in outgoing_edges_from vert1")
-        iev = graph.get_edges_ending_at_vertex(vert1)
-        if edge1 in iev or edge3 in iev:
-            raise AssertionError(
-                "edge1 or edge3 is in incoming_edges_to vert1")
+        assert edge1 not in graph.get_edges_ending_at_vertex(vert1)
+        assert edge2 not in graph.get_edges_starting_at_vertex(vert1)
+        assert edge3 not in graph.get_edges_ending_at_vertex(vert1)
 
 
 if __name__ == '__main__':

@@ -1,10 +1,11 @@
+from spinn_utilities.overrides import overrides
 from .abstract_machine_partition_n_keys_map \
     import AbstractMachinePartitionNKeysMap
 
 
 class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     """ A python dict-based implementation of the\
-        AbstractMachinePartitionNKeysMap
+        :py:class`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
     """
 
     __slots__ = [
@@ -21,17 +22,12 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-            :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.impl.OutgoingEdgePartition`
         :param n_keys: The number of keys required by the edge
         :type n_keys: int
         """
-        self._n_keys_map[partition] = n_keys
+        self._n_keys_map[partition] = int(n_keys)
 
+    @overrides(AbstractMachinePartitionNKeysMap.n_keys_for_partition)
     def n_keys_for_partition(self, partition):
-        """
-
-        :param partition: The partition to set the number of keys for
-        :type partition:\
-            :py:class:`pacman.model.graph.simple_outgoing_edge_partition.OutgoingEdgePartition`
-        """
         return self._n_keys_map[partition]

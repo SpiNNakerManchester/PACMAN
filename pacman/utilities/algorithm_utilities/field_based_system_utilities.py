@@ -1,11 +1,7 @@
 from pacman.model.constraints.key_allocator_constraints\
-    import ContiguousKeyRangeContraint
+    import ContiguousKeyRangeContraint, FixedKeyFieldConstraint
 from pacman.model.constraints.key_allocator_constraints\
-    import FixedKeyFieldConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedMaskConstraint
+    import FixedKeyAndMaskConstraint, FixedMaskConstraint
 from pacman.model.constraints.key_allocator_constraints\
     import FlexiKeyFieldConstraint
 from pacman import exceptions
@@ -29,8 +25,7 @@ START_OF_ROUTING_KEY_POSITION = 0
 
 
 def deduce_types(graph):
-    """
-    deducing the number of applications required for this key space
+    """ Deducing the number of applications required for this key space.
 
     :param graph:
     """
@@ -38,38 +33,35 @@ def deduce_types(graph):
     known_fields = list()
     for partition in graph.outgoing_edge_partitions:
         for constraint in partition.constraints:
-            if not isinstance(constraint,
-                              ContiguousKeyRangeContraint):
-                if isinstance(constraint, FlexiKeyFieldConstraint):
-                    handle_flexi_field(constraint, seen_fields, known_fields)
-                if isinstance(constraint,
-                              FixedKeyAndMaskConstraint):
-                    if TYPES_OF_FIELDS.FIXED_KEY.name not in seen_fields:
-                        seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name] = list()
-                    for key_mask in constraint.keys_and_masks:
-                        seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name].\
-                            append(key_mask)
-                if isinstance(constraint, FixedMaskConstraint):
-                    fields = convert_mask_into_fields(constraint.mask)
-                    if TYPES_OF_FIELDS.FIXED_MASK.name not in seen_fields:
-                        seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name] = dict()
-                    for field in fields:
-                        if field.value not in seen_fields[
-                                TYPES_OF_FIELDS.FIXED_MASK.name]:
-                            # add a new list for this mask type
-                            seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name][
-                                field.value] = list()
-                        if field not in seen_fields[
-                                TYPES_OF_FIELDS.FIXED_MASK.name][field.value]:
-                            seen_fields[
-                                TYPES_OF_FIELDS.FIXED_MASK.name][
-                                field.value].append(field)
+            if isinstance(constraint, ContiguousKeyRangeContraint):
+                continue
+            if isinstance(constraint, FlexiKeyFieldConstraint):
+                handle_flexi_field(constraint, seen_fields, known_fields)
+            if isinstance(constraint, FixedKeyAndMaskConstraint):
+                if TYPES_OF_FIELDS.FIXED_KEY.name not in seen_fields:
+                    seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name] = list()
+                seen_fields[TYPES_OF_FIELDS.FIXED_KEY.name].extend(
+                    constraint.keys_and_masks)
+            if isinstance(constraint, FixedMaskConstraint):
+                fields = convert_mask_into_fields(constraint.mask)
+                if TYPES_OF_FIELDS.FIXED_MASK.name not in seen_fields:
+                    seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name] = dict()
+                for field in fields:
+                    if field.value not in seen_fields[
+                            TYPES_OF_FIELDS.FIXED_MASK.name]:
+                        # add a new list for this mask type
+                        seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name][
+                            field.value] = list()
+                    if field not in seen_fields[
+                            TYPES_OF_FIELDS.FIXED_MASK.name][field.value]:
+                        seen_fields[TYPES_OF_FIELDS.FIXED_MASK.name][
+                            field.value].append(field)
 
-                if isinstance(constraint, FixedKeyFieldConstraint):
-                    if TYPES_OF_FIELDS.FIXED_FIELD not in seen_fields:
-                        seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name] = list()
-                    seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name].append(
-                        constraint.fields)
+            if isinstance(constraint, FixedKeyFieldConstraint):
+                if TYPES_OF_FIELDS.FIXED_FIELD not in seen_fields:
+                    seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name] = list()
+                seen_fields[TYPES_OF_FIELDS.FIXED_FIELD.name].append(
+                    constraint.fields)
     return seen_fields
 
 
@@ -144,15 +136,12 @@ def convert_mask_into_fields(entity):
 
                 # create field with correct routing tag
                 if detected_last_state == ROUTING_MASK_BIT:
-                    results.append(Field(
-                        NUM_BITS_IN_ROUTING - detected_change_position,
-                        NUM_BITS_IN_ROUTING, entity,
-                        SUPPORTED_TAGS.ROUTING.name))
+                    tag = SUPPORTED_TAGS.ROUTING
                 else:
-                    results.append(Field(
-                        NUM_BITS_IN_ROUTING - detected_change_position,
-                        NUM_BITS_IN_ROUTING, entity,
-                        SUPPORTED_TAGS.APPLICATION.name))
+                    tag = SUPPORTED_TAGS.APPLICATION
+                results.append(Field(
+                    NUM_BITS_IN_ROUTING - detected_change_position,
+                    NUM_BITS_IN_ROUTING, entity, tag.name))
         else:
 
             # check for bit iteration
@@ -161,15 +150,12 @@ def convert_mask_into_fields(entity):
                 # if changed state, a field needs to be created. check for
                 # which type of field to support
                 if detected_last_state == ROUTING_MASK_BIT:
-                    results.append(Field(
-                        NUM_BITS_IN_ROUTING - detected_change_position,
-                        NUM_BITS_IN_ROUTING - (position + 1),
-                        entity, SUPPORTED_TAGS.ROUTING.name))
+                    tag = SUPPORTED_TAGS.ROUTING
                 else:
-                    results.append(Field(
-                        NUM_BITS_IN_ROUTING - detected_change_position,
-                        NUM_BITS_IN_ROUTING - (position + 1),
-                        entity, SUPPORTED_TAGS.APPLICATION.name))
+                    tag = SUPPORTED_TAGS.APPLICATION
+                results.append(Field(
+                    NUM_BITS_IN_ROUTING - detected_change_position,
+                    NUM_BITS_IN_ROUTING - (position + 1), entity, tag.name))
 
                 # update positions
                 detected_last_state = expanded_mask[position]

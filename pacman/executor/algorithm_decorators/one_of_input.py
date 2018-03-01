@@ -1,5 +1,5 @@
 from .abstract_input import AbstractInput
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 
 class OneOfInput(AbstractInput):

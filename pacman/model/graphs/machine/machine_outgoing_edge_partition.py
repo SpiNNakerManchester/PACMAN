@@ -18,6 +18,5 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
         :param traffic_weight: the weight of this partition in relation\
             to other partitions
         """
-        OutgoingEdgePartition.__init__(
-            self, identifier, MachineEdge, constraints, label,
-            traffic_weight=traffic_weight)
+        super(MachineOutgoingEdgePartition, self).__init__(
+            identifier, MachineEdge, constraints, label, traffic_weight)
