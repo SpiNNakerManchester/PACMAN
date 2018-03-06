@@ -41,8 +41,8 @@ class BasicRouteMerger(object):
             n_entries = len([
                 entry for entry in new_table.multicast_routing_entries
                 if not entry.defaultable])
-            # print "Reduced from {} to {}".format(
-            #     len(router_table.multicast_routing_entries), n_entries)
+            # print("Reduced from {} to {}".format(
+            #     len(router_table.multicast_routing_entries), n_entries))
             if n_entries > 1023:
                 raise PacmanRoutingException(
                     "Cannot make table small enough: {} entries".format(
@@ -60,7 +60,7 @@ class BasicRouteMerger(object):
             [0xFFFF - ((2 ** n) - 1) for n in range(n_bits - 1, 17)],
             key=lambda x: bin(x).count("1"))
 
-        # print hex(mask), [hex(m) for m in merge_masks]
+        # print(hex(mask), [hex(m) for m in merge_masks])
         previous_masks[mask] = merge_masks
         return merge_masks
 
@@ -97,7 +97,7 @@ class BasicRouteMerger(object):
                             for route in potential_merges])
                         break
                 else:
-                    # print "Was not able to merge", hex(key)
+                    # print("Was not able to merge", hex(key))
                     merged_routes.add_multicast_routing_entry(router_entry)
                     keys_merged.add(router_entry.routing_entry_key)
             else:

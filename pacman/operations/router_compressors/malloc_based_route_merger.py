@@ -41,9 +41,9 @@ class MallocBasedRouteMerger(object):
             n_entries = len([
                 entry for entry in new_table.multicast_routing_entries
                 if not entry.defaultable])
-            print "Reduced from {} to {}".format(
+            print("Reduced from {} to {}".format(
                 len(router_table.multicast_routing_entries),
-                n_entries)
+                n_entries))
             if n_entries > 1023:
                 raise PacmanRoutingException(
                     "Cannot make table small enough: {} entries".format(
@@ -79,13 +79,13 @@ class MallocBasedRouteMerger(object):
                 next_pos += 1
             next_pos -= 1
 
-            # print "Pre decision", hex(base_key)
+            # print("Pre decision", hex(base_key))
 
             # If there is something to merge, merge it if possible
             merge_done = False
             if next_pos != pos:
 
-                # print "At merge, base_key =", hex(base_key)
+                # print("At merge, base_key =", hex(base_key))
 
                 # Find the next nearest power of 2 to the number of keys
                 # that will be covered

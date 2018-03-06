@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 import unittest
 from collections import defaultdict
 from spinn_machine import VirtualMachine
@@ -21,7 +21,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
                     "127.0.0.1", port=None, strip_sdp=True)]),
                 label="Vertex {}".format(i))
             for i in range(len(eth_chips))]
-        print "Created {} vertices".format(len(vertices))
+        print("Created {} vertices".format(len(vertices)))
         placements = Placements(
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
@@ -39,7 +39,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
                 iptags[0].destination_y, chip.y,
                 "Destination of tag incorrect")
             placement = placements.get_placement_of_vertex(vertex)
-            print placement, "has tag", iptags[0]
+            print(placement, "has tag", iptags[0])
 
     def test_too_many_ip_tags_for_1_board(self):
         n_extra_vertices = 3
@@ -81,7 +81,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
                 self.assertEqual(
                     len(iptags), 1, "Incorrect number of tags assigned")
                 placement = placements.get_placement_of_vertex(vertex)
-                print placement, "has tag", iptags[0]
+                print(placement, "has tag", iptags[0])
                 self.assertFalse(
                     iptags[0].tag in tags_by_board[iptags[0].board_address],
                     "Tag used more than once")

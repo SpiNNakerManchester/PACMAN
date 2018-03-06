@@ -38,12 +38,11 @@ class TestSameChipConstraint(unittest.TestCase):
 
         placements = placer(graph, machine)
         for same in same_vertices:
-            print "{0.vertex.label}, {0.x}, {0.y}, {0.p}: {1}".format(
+            print("{0.vertex.label}, {0.x}, {0.y}, {0.p}: {1}".format(
                 placements.get_placement_of_vertex(same),
                 ["{0.vertex.label}, {0.x}, {0.y}, {0.p}".format(
                     placements.get_placement_of_vertex(constraint.vertex))
-                 for constraint in same.constraints]
-            )
+                 for constraint in same.constraints]))
             placement = placements.get_placement_of_vertex(same)
             for constraint in same.constraints:
                 if isinstance(constraint, SameChipAsConstraint):
