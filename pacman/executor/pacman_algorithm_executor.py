@@ -14,6 +14,7 @@ from pacman.executor.algorithm_decorators.token import Token
 import logging
 from collections import defaultdict
 from spinn_utilities.log import FormatAdapter
+from six import iterkeys
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -266,7 +267,7 @@ class PACMANAlgorithmExecutor(object):
         """
 
         # Go through the algorithms and get all possible outputs
-        all_outputs = set(inputs.iterkeys())
+        all_outputs = set(iterkeys(inputs))
         for algorithms in (algorithm_data, optional_algorithm_data):
             for algorithm in algorithms:
 
@@ -316,7 +317,7 @@ class PACMANAlgorithmExecutor(object):
                         fake_tokens.track_token(token)
                         fake_tokens.process_output_token(token)
 
-        input_types = set(inputs.iterkeys())
+        input_types = set(iterkeys(inputs))
 
         allocated_algorithms = list()
         generated_outputs = set()

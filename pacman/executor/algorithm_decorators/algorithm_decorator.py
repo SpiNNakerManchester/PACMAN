@@ -2,6 +2,7 @@ import inspect
 import logging
 import os
 import pkgutil
+from six import iteritems
 import sys
 from threading import RLock
 
@@ -134,7 +135,7 @@ def _decode_algorithm_details(
 
     # Parse the input definitions
     input_defs = dict()
-    for (input_name, input_types) in input_definitions.iteritems():
+    for (input_name, input_types) in iteritems(input_definitions):
         if (input_name not in required_args and
                 input_name not in optional_args):  # pragma: no cover
             raise PacmanConfigurationException(

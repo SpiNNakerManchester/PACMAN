@@ -27,6 +27,7 @@ from pacman.exceptions \
 import math
 import numpy
 import logging
+from past.builtins import xrange
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

@@ -141,8 +141,7 @@ def convert_to_rig_graph(machine_graph):
 
     net_names = {
         Net(edge["source"], edge["sinks"], edge["weight"]): name
-        for name, edge in iteritems(edges_resources)
-    }
+        for name, edge in iteritems(edges_resources)}
 
     return vertices_resources, list(net_names), net_names
 

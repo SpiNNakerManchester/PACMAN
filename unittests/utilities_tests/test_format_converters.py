@@ -30,6 +30,7 @@ from pacman.utilities.file_format_converters.create_file_constraints \
 import hashlib
 import json
 import pytest
+from six import iterkeys
 
 
 def test_convert_to_file_core_allocations(tmpdir):
@@ -257,7 +258,7 @@ def test_convert_to_memory_multi_cast_routes(tmpdir):
     fn.write(json.dumps(baseline))
     mrtp = algo(str(fn), partitions)
     assert list(mrtp.get_routers()) == [(0, 0)]
-    assert list(mrtp.get_entries_for_router(0, 0).iterkeys()) == [123]
+    assert list(iterkeys(mrtp.get_entries_for_router(0, 0))) == [123]
 
 
 @pytest.mark.skip("not yet finished")

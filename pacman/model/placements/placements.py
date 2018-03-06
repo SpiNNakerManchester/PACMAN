@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from six import iterkeys, itervalues
 from pacman.exceptions import (PacmanAlreadyPlacedError,
                                PacmanNotPlacedError,
                                PacmanProcessorAlreadyOccupiedError,
@@ -117,7 +118,7 @@ class Placements(object):
         :return: Iterable of (x, y, p) tuples
         :rtype: iterable of (int, int, int)
         """
-        return self._placements.iterkeys()
+        return iterkeys(self._placements)
 
     def is_processor_occupied(self, x, y, p):
         """ Determine if a processor has a vertex on it
@@ -138,7 +139,7 @@ class Placements(object):
             :py:class:`pacman.model.placements.Placement`
         :raise None: does not raise any known exceptions
         """
-        return self._placements.itervalues()
+        return itervalues(self._placements)
 
     def __repr__(self):
         output = ""

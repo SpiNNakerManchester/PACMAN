@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from six import iterkeys
 
 
 class MulticastRoutingTableByPartition(object):
@@ -40,7 +41,7 @@ class MulticastRoutingTableByPartition(object):
     def get_routers(self):
         """ Get the coordinates of all stored routers
         """
-        return self._router_to_entries_map.iterkeys()
+        return iterkeys(self._router_to_entries_map)
 
     def get_entries_for_router(self, router_x, router_y):
         """ Get the set of multicast path entries assigned to this router

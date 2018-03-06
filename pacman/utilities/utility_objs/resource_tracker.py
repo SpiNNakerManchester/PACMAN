@@ -435,7 +435,7 @@ class ResourceTracker(object):
             for processor in chip.processors:
                 if not processor.is_monitor:
                     return processor.processor_id
-        return iter(self._core_tracker[key]).next()
+        return next(iter(self._core_tracker[key]))
 
     def _is_core_available(self, chip, key, processor_id):
         """ Check if there is a core available on a given chip given the\
@@ -785,7 +785,7 @@ class ResourceTracker(object):
                     board_address = b_address
                     break
         elif board_address is None and tag_id is None:
-            board_address = iter(self._boards_with_ip_tags).next()
+            board_address = next(iter(self._boards_with_ip_tags))
 
         self._setup_board_tags(board_address)
         tag_id = self._allocate_tag_id(tag_id, board_address)

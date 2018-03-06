@@ -25,6 +25,7 @@ from spinn_utilities.progress_bar import ProgressBar
 # general imports
 import math
 from rig.bitfield import BitField
+from past.builtins import range, xrange
 
 # hard coded values
 APPLICATION_MASK_BIT = 0
@@ -441,7 +442,7 @@ class VertexBasedRoutingInfoAllocator(object):
         :return: the application field that was created
         """
         # get next attempt
-        (bit_hi, bit_lo, original_mask) = bit_generator.next()
+        (bit_hi, bit_lo, original_mask) = next(bit_generator)
 
         # determine value of the application field
         if fixed_key is None:

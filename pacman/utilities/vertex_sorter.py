@@ -1,5 +1,6 @@
 from collections import defaultdict
 import sys
+from six import itervalues
 
 
 class ConstraintOrder(object):
@@ -85,7 +86,7 @@ class VertexSorter(object):
 
         # Sort each list of constraint by the number of optional properties,
         # largest first
-        for constraints in self._constraints.itervalues():
+        for constraints in itervalues(self._constraints):
             constraints.sort(key=len, reverse=True)
 
     def sort(self, vertices):
