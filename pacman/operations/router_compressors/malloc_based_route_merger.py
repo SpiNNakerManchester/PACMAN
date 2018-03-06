@@ -68,7 +68,7 @@ class MallocBasedRouteMerger(object):
 
             # Keep going until routes are not the same or too many keys are
             # generated
-            base_key = long(entries[pos].routing_entry_key)
+            base_key = int(entries[pos].routing_entry_key)
             while (next_pos < len(entries) and
                     entries[next_pos].link_ids == links and
                     entries[next_pos].processor_ids == processors and
