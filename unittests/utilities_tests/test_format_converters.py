@@ -156,6 +156,14 @@ def test_convert_to_file_machine(tmpdir):
     filename = algo(machine, str(fn))
     assert filename == str(fn)
 
+    def fix_cre(obj):
+        obj = dict(obj)
+        if "chip_resource_exceptions" in obj:
+            cre = list(obj["chip_resource_exceptions"])
+            cre.sort(key=lambda e: (e[0], e[1]))
+            obj["chip_resource_exceptions"] = cre
+        return obj
+
     # Rebuild and compare; simplest way of checking given that order is not
     # preserved in the underlying string and altering that is hard
     obj = json.loads(fn.read())
@@ -173,7 +181,7 @@ def test_convert_to_file_machine(tmpdir):
              [1, 0, "east"], [1, 0, "north_east"],
              [1, 1, "east"], [1, 1, "north_east"]],
          "height": 2, "width": 2}
-    assert obj == baseline
+    assert fix_cre(obj) == fix_cre(baseline)
 
 
 def test_convert_to_file_placement(tmpdir):

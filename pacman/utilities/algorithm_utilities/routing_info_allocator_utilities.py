@@ -66,9 +66,8 @@ def get_edge_groups(machine_graph, traffic_type):
                 shared_key_constraints = locate_constraints_of_type(
                     partition.constraints, ShareKeyConstraint)
                 partitions_to_group = [partition]
-                map(lambda constraint: partitions_to_group.extend(
-                        constraint.other_partitions),
-                    shared_key_constraints)
+                for constraint in shared_key_constraints:
+                    partitions_to_group.extend(constraint.other_partitions)
 
                 # Get a set of groups that should be grouped
                 groups_to_group = [
