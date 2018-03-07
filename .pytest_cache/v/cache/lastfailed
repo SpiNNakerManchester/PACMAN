@@ -1,9 +1,0 @@
-{
-  "unittests/operations_tests/routing_info_algorithms_tests/test_malloc_routing_info_allocator.py::MyTestCase::test_share_key_on_new_partitions": true,
-  "unittests/operations_tests/routing_info_algorithms_tests/test_malloc_routing_info_allocator.py::MyTestCase::test_share_key_on_own_partition": true,
-  "unittests/operations_tests/routing_info_algorithms_tests/test_malloc_routing_info_allocator.py::MyTestCase::test_share_key_with_2_nests": true,
-  "unittests/operations_tests/routing_info_algorithms_tests/test_malloc_routing_info_allocator.py::MyTestCase::test_share_key_with_conflicting_fixed_key_on_partitions": true,
-  "unittests/operations_tests/routing_info_algorithms_tests/test_malloc_routing_info_allocator.py::MyTestCase::test_share_key_with_fixed_key_on_new_partitions": true,
-  "unittests/operations_tests/routing_info_algorithms_tests/test_malloc_routing_info_allocator.py::MyTestCase::test_share_key_with_fixed_key_on_new_partitions_other_order": true,
-  "unittests/utilities_tests/test_format_converters.py::test_convert_to_file_machine": true
-}
