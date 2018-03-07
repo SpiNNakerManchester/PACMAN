@@ -145,7 +145,8 @@ class FixedRouteRouter(object):
             fake_placements.add_placement(Placement(
                 x=rel_x, y=rel_y, p=self.RANDOM_CORE_ID, vertex=vertex))
             down_links.update({
-                (rel_x, rel_y, link) for link in range(Router.LINKS_PER_ROUTER)
+                (rel_x, rel_y, link) for link in range(
+                    Router.MAX_LINKS_PER_ROUTER)
                 if not machine.is_link_at(chip_x, chip_y, link)})
 
         # Create a fake machine consisting of only the one board that
