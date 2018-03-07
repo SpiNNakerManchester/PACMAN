@@ -50,9 +50,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
         eth_procs = [
             proc.processor_id for proc in eth_chip.processors
             if not proc.is_monitor]
-        eth2_procs = [
-            proc.processor_id for proc in eth_chip_2.processors
-            if not proc.is_monitor]
+        procs = [proc for proc in eth_chip_2.processors if not proc.is_monitor]
+        eth2_procs = [proc.processor_id for proc in procs]
+        proc = procs[-1]
         eth_vertices = [
             SimpleMachineVertex(
                 ResourceContainer(iptags=[IPtagResource(

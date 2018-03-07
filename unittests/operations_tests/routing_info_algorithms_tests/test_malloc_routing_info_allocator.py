@@ -98,7 +98,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(allocator._free_space_tracker[2].start_address,
                          0x1800, error)
         self.assertEqual(allocator._free_space_tracker[2].size,
-                         0x100000000L - 0x1800, error)
+                         0x100000000 - 0x1800, error)
 
     def _integration_setup(self):
         machine_graph = MachineGraph(label="test me you git")

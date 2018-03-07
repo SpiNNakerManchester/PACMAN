@@ -24,6 +24,8 @@ _SDRAM_FILENAME = "chip_sdram_usage_by_core.rpt"
 _TAGS_FILENAME = "tags.rpt"
 _VIRTKEY_FILENAME = "virtual_key_space_information_report.rpt"
 
+_LOWER_16_BITS = 0xFFFF
+
 
 def tag_allocator_report(report_folder, tag_infos):
     """ Reports the tags that are being used by the tool chain for this\
@@ -606,7 +608,7 @@ def _generate_routing_table(routing_table, top_level_folder):
             entry_count = 0
             n_defaultable = 0
             for entry in routing_table.multicast_routing_entries:
-                index = entry_count & 0xFFFF
+                index = entry_count & _LOWER_16_BITS
                 entry_str = line_format.format(index, format_route(entry))
                 entry_count += 1
                 if entry.defaultable:

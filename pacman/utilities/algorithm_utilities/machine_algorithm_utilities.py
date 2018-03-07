@@ -37,7 +37,7 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
     router_object = Router(
         links=links, emergency_routing_enabled=False,
         clock_speed=Router.ROUTER_DEFAULT_CLOCK_SPEED,
-        n_available_multicast_entries=sys.maxint)
+        n_available_multicast_entries=sys.maxsize)
 
     # create the processors
     processors = list()

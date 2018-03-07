@@ -26,8 +26,8 @@ from pacman.utilities.file_format_converters.\
     convert_to_memory_placements import ConvertToMemoryPlacements
 from pacman.utilities.file_format_converters.create_file_constraints \
     import CreateConstraintsToFile
+from pacman.utilities.file_format_converters.utils import hash, ident
 
-import hashlib
 import json
 import pytest
 from six import iterkeys
@@ -43,7 +43,7 @@ def test_convert_to_file_core_allocations(tmpdir):
     pl = Placement(v, 1, 2, 3)
     filename, _ = algo([pl], str(fn))
     assert filename == str(fn)
-    assert fn.read() == '{"type": "cores", "%d": [3, 4]}' % id(v)
+    assert fn.read() == '{"type": "cores", "%s": [3, 4]}' % ident(v)
 
 
 def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
@@ -54,11 +54,11 @@ def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
     tag = IPtagResource("1.2.3.4", 5, False, tag="footag")
     v1 = SimpleMachineVertex(ResourceContainer(iptags=[tag]))
     graph.add_vertex(v1)
-    t1id = hashlib.md5("%d_tag" % id(v1)).hexdigest()
+    t1id = hash("%s_tag" % ident(v1))
     tag = ReverseIPtagResource(tag="bartag")
     v2 = SimpleMachineVertex(ResourceContainer(reverse_iptags=[tag]))
     graph.add_vertex(v2)
-    t2id = hashlib.md5("%d_tag" % id(v2)).hexdigest()
+    t2id = hash("%s_tag" % ident(v2))
     graph.add_edge(MachineEdge(v1, v0), "part1")
     p1 = graph.get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
     graph.add_edge(MachineEdge(v0, v2, label="foobar"), "part2")
@@ -75,23 +75,23 @@ def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
     obj = json.loads(fn.read())
     baseline = {
         "vertices_resources": {
-            str(id(v0)): {"cores": 1, "sdram": 0},
-            str(id(v1)): {"cores": 1, "sdram": 0},
-            t1id:        {"cores": 0, "sdram": 0},
-            str(id(v2)): {"cores": 1, "sdram": 0},
-            t2id:        {"cores": 0, "sdram": 0}},
+            ident(v0): {"cores": 1, "sdram": 0},
+            ident(v1): {"cores": 1, "sdram": 0},
+            t1id:      {"cores": 0, "sdram": 0},
+            ident(v2): {"cores": 1, "sdram": 0},
+            t2id:      {"cores": 0, "sdram": 0}},
         "edges": {
-            str(id(p1)): {
-                "source": str(id(v1)), "sinks": [str(id(v0))],
+            ident(p1): {
+                "source": ident(v1), "sinks": [ident(v0)],
                 "type": "multicast", "weight": 1},
-            str(id(p2)): {
-                "source": str(id(v0)), "sinks": [str(id(v2))],
+            ident(p2): {
+                "source": ident(v0), "sinks": [ident(v2)],
                 "type": "multicast", "weight": 1},
             t1id: {
-                "source": str(id(v1)), "sinks": [t1id],
+                "source": ident(v1), "sinks": [t1id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"},
             t2id: {
-                "source": str(id(v2)), "sinks": [t2id],
+                "source": ident(v2), "sinks": [t2id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"}}}
     assert obj == baseline
 
@@ -104,11 +104,11 @@ def test_convert_to_file_machine_graph(tmpdir):
     tag = IPtagResource("1.2.3.4", 5, False, tag="footag")
     v1 = SimpleMachineVertex(ResourceContainer(iptags=[tag]))
     graph.add_vertex(v1)
-    t1id = hashlib.md5("%d_tag" % id(v1)).hexdigest()
+    t1id = hash("%s_tag" % ident(v1))
     tag = ReverseIPtagResource(tag="bartag")
     v2 = SimpleMachineVertex(ResourceContainer(reverse_iptags=[tag]))
     graph.add_vertex(v2)
-    t2id = hashlib.md5("%d_tag" % id(v2)).hexdigest()
+    t2id = hash("%s_tag" % ident(v2))
     graph.add_edge(MachineEdge(v1, v0), "part1")
     p1 = graph.get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
     graph.add_edge(MachineEdge(v0, v2, label="foobar"), "part2")
@@ -125,23 +125,23 @@ def test_convert_to_file_machine_graph(tmpdir):
     obj = json.loads(fn.read())
     baseline = {
         "vertices_resources": {
-            str(id(v0)): {"cores": 1, "sdram": 0},
-            str(id(v1)): {"cores": 1, "sdram": 0},
-            t1id:        {"cores": 0, "sdram": 0},
-            str(id(v2)): {"cores": 1, "sdram": 0},
-            t2id:        {"cores": 0, "sdram": 0}},
+            ident(v0): {"cores": 1, "sdram": 0},
+            ident(v1): {"cores": 1, "sdram": 0},
+            t1id:      {"cores": 0, "sdram": 0},
+            ident(v2): {"cores": 1, "sdram": 0},
+            t2id:      {"cores": 0, "sdram": 0}},
         "edges": {
-            str(id(p1)): {
-                "source": str(id(v1)), "sinks": [str(id(v0))],
+            ident(p1): {
+                "source": ident(v1), "sinks": [ident(v0)],
                 "type": "multicast", "weight": 1},
-            str(id(p2)): {
-                "source": str(id(v0)), "sinks": [str(id(v2))],
+            ident(p2): {
+                "source": ident(v0), "sinks": [ident(v2)],
                 "type": "multicast", "weight": 1},
             t1id: {
-                "source": str(id(v1)), "sinks": [t1id],
+                "source": ident(v1), "sinks": [t1id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"},
             t2id: {
-                "source": str(id(v2)), "sinks": [t2id],
+                "source": ident(v2), "sinks": [t2id],
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"}}}
     assert obj == baseline
 
@@ -186,7 +186,7 @@ def test_convert_to_file_placement(tmpdir):
     assert filename == str(fn)
     obj = json.loads(fn.read())
     baseline = {
-        str(id(v)): [1, 2]}
+        ident(v): [1, 2]}
     assert obj == baseline
 
 
@@ -201,12 +201,12 @@ def test_create_constraints_to_file(tmpdir):
         iptags=[tag1], reverse_iptags=[tag2]), constraints=[
         ChipAndCoreConstraint(1, 1, 3)])
     graph.add_vertex(v0)
-    v0_id = str(id(v0))
+    v0_id = ident(v0)
     v1 = MachineSpiNNakerLinkVertex(2, constraints=[
         ChipAndCoreConstraint(1, 1)])
     v1.set_virtual_chip_coordinates(0, 2)
     graph.add_vertex(v1)
-    v1_id = str(id(v1))
+    v1_id = ident(v1)
 
     algo = CreateConstraintsToFile()
     fn = tmpdir.join("foo.json")
@@ -214,7 +214,7 @@ def test_create_constraints_to_file(tmpdir):
     assert filename == str(fn)
     for vid in mapping:
         assert vid in [v0_id, v1_id]
-        assert vid == str(id(mapping[vid]))
+        assert vid == ident(mapping[vid])
     obj = json.loads(fn.read())
     baseline = [
         {

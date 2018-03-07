@@ -1,8 +1,8 @@
-import hashlib
 import json
 
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractVirtualVertex
+from .utils import hash, ident
 
 from spinn_utilities.progress_bar import ProgressBar
 from collections import OrderedDict
@@ -54,7 +54,7 @@ class ConvertToFileMachineGraphPureMulticast(object):
     def _convert_vertex(self, vertex, vertex_by_id, vertices,
                         edges, machine_graph, partition_by_id):
         vertex_id = id(vertex)
-        vertex_by_id[str(vertex_id)] = vertex
+        vertex_by_id[ident(vertex)] = vertex
 
         # handle external devices
         if isinstance(vertex, AbstractVirtualVertex):
@@ -65,9 +65,9 @@ class ConvertToFileMachineGraphPureMulticast(object):
         elif vertex.resources_required.iptags or \
                 vertex.resources_required.reverse_iptags:
             # handle the edge between the tag-able vertex and the fake vertex
-            tag_id = hashlib.md5(str(vertex_id) + "_tag").hexdigest()
+            tag_id = hash(ident(vertex) + "_tag")
             edges[tag_id] = {
-                "source": str(vertex_id),
+                "source": ident(vertex),
                 "sinks": [tag_id],
                 "weight": 1.0,
                 "type": "FAKE_TAG_EDGE"}
@@ -90,12 +90,12 @@ class ConvertToFileMachineGraphPureMulticast(object):
         for partition in machine_graph\
                 .get_outgoing_edge_partitions_starting_at_vertex(vertex):
             if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                p_id = str(id(partition))
+                p_id = ident(partition)
                 partition_by_id[p_id] = partition
                 edges[p_id] = {
-                    "source": str(id(vertex)),
+                    "source": ident(vertex),
                     "sinks": [
-                        str(id(edge.post_vertex)) for edge in partition.edges],
+                        ident(edge.post_vertex) for edge in partition.edges],
                     "weight": sum(
                         edge.traffic_weight for edge in partition.edges),
                     "type": partition.traffic_type.name.lower()}

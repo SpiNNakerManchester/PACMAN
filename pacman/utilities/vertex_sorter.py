@@ -99,7 +99,7 @@ class VertexSorter(object):
         for vertex in vertices:
 
             # Get all the ranks of the constraints
-            ranks = [sys.maxint]
+            ranks = [sys.maxsize]
             for c in vertex.constraints:
 
                 # If the constraint is one to sort by

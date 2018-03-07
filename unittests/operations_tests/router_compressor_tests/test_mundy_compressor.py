@@ -94,7 +94,7 @@ def calc_remainders(o_code, c_code):
 def compare_route(o_route, compressed_dict, o_code=None, start=0):
     if o_code is None:
         o_code = codify(o_route)
-    keys = compressed_dict.keys()
+    keys = list(compressed_dict.keys())
     for i in range(start, len(keys)):
         c_code = keys[i]
         print(o_code, c_code)  # TODO: Don't print this message!

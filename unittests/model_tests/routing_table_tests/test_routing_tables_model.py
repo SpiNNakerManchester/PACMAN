@@ -176,9 +176,9 @@ class TestRoutingTable(unittest.TestCase):
         assert len(mrt.get_entries_for_router(0, 0)) == 1
         assert next(iter(mrt.get_entries_for_router(0, 0))) == partition
         mre = mrt.get_entries_for_router(0, 0)[partition]
-        assert str(mre) == ("None:None:False"
-                            ":set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])"
-                            ":set([0, 1, 2, 3, 4, 5])")
+        assert str(mre) == (
+            "None:None:False:{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}"
+            ":{0, 1, 2, 3, 4, 5}")
         assert mre == mrt.get_entry_on_coords_for_edge(partition, 0, 0)
 
     def test_multicast_routing_table_by_partition_entry(self):
@@ -194,21 +194,21 @@ class TestRoutingTable(unittest.TestCase):
                                                   incoming_link=[])
         e4 = MulticastRoutingTableByPartitionEntry(16, 2)
         e5 = MulticastRoutingTableByPartitionEntry(None, None)
-        assert str(e2) == "None:4:False:set([0, 1, 2, 3]):set([0, 1])"
-        assert str(e3) == "3:None:False:set([12, 13, 14, 15]):set([3, 4])"
+        assert str(e2) == "None:4:False:{0, 1, 2, 3}:{0, 1}"
+        assert str(e3) == "3:None:False:{12, 13, 14, 15}:{3, 4}"
         with self.assertRaises(PacmanInvalidParameterException):
             e2.merge_entry(e3)
         e6 = e2.merge_entry(MulticastRoutingTableByPartitionEntry(
             range(12, 16), range(3, 5)))
-        assert str(e2) == "None:4:False:set([0, 1, 2, 3]):set([0, 1])"
-        assert str(e6) == ("None:4:False:set([0, 1, 2, 3, 12, 13, 14, 15])"
-                           ":set([0, 1, 3, 4])")
+        assert str(e2) == "None:4:False:{0, 1, 2, 3}:{0, 1}"
+        assert str(e6) == (
+            "None:4:False:{0, 1, 2, 3, 12, 13, 14, 15}:{0, 1, 3, 4}")
         e6 = e3.merge_entry(MulticastRoutingTableByPartitionEntry(
             range(4), range(2)))
-        assert str(e3) == "3:None:False:set([12, 13, 14, 15]):set([3, 4])"
-        assert str(e6) == ("3:None:False:set([0, 1, 2, 3, 12, 13, 14, 15])"
-                           ":set([0, 1, 3, 4])")
-        assert str(e4.merge_entry(e5)) == "None:None:False:set([16]):set([2])"
+        assert str(e3) == "3:None:False:{12, 13, 14, 15}:{3, 4}"
+        assert str(e6) == (
+            "3:None:False:{0, 1, 2, 3, 12, 13, 14, 15}:{0, 1, 3, 4}")
+        assert str(e4.merge_entry(e5)) == "None:None:False:{16}:{2}"
         assert str(e1) == str(e5.merge_entry(e1))
         # NB: Have true object identity; we have setters!
         assert e5 != MulticastRoutingTableByPartitionEntry(None, None)
