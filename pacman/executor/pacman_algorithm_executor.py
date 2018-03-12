@@ -733,8 +733,7 @@ class PACMANAlgorithmExecutor(object):
 
                 provenance_file.write("\n")
         except Exception:
-            logger.error("Exception when attempting to write provenance",
-                         exc_info=True)
+            logger.exception("Exception when attempting to write provenance")
 
     def _report_inputs(self, provenance_file, inputs):
         for input_parameter in inputs:

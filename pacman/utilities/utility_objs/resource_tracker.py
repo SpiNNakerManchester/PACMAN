@@ -11,6 +11,7 @@ from pacman.exceptions import PacmanInvalidParameterException, \
 from spinn_utilities.ordered_set import OrderedSet
 
 from collections import defaultdict
+from six import raise_from
 
 
 class ResourceTracker(object):
@@ -1279,10 +1280,10 @@ class ResourceTracker(object):
                 try:
                     max_dtcm_available = processor.dtcm_available
                     max_cpu_available = processor.cpu_cycles_available
-                except AttributeError:
+                except AttributeError as e:
                     if processor is None:
-                        raise PacmanProcessorNotAvailableError(
-                            chip_x, chip_y, best_processor_id)
+                        raise_from(PacmanProcessorNotAvailableError(
+                            chip_x, chip_y, best_processor_id), e)
                     raise
 
             # If all the SDRAM on the chip is available,

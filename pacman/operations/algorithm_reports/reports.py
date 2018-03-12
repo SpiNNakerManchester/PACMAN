@@ -127,8 +127,8 @@ def router_report_from_paths(
                         f, partition, machine, placements, routing_infos,
                         routing_tables)
     except IOError:
-        logger.error("Generate_routing_reports: Can't open file {} for "
-                     "writing.", file_name)
+        logger.exception("Generate_routing_reports: Can't open file {} for "
+                         "writing.", file_name)
 
 
 def _write_one_router_partition_report(f, partition, machine, placements,
@@ -173,8 +173,8 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
             for vertex in progress.over(graph.vertices):
                 _write_one_vertex_partition(f, vertex, graph_mapper)
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file {} for"
-                     " writing.", file_name)
+        logger.exception("Generate_placement_reports: Can't open file {} for"
+                         " writing.", file_name)
 
 
 def _write_one_vertex_partition(f, vertex, graph_mapper):
@@ -233,8 +233,8 @@ def placement_report_with_application_graph_by_vertex(
                     used_processors_by_chip, used_sdram_by_chip,
                     vertex_by_processor)
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file {} for"
-                     " writing.", file_name)
+        logger.exception("Generate_placement_reports: Can't open file {} for"
+                         " writing.", file_name)
 
 
 def _write_one_vertex_application_placement(
@@ -307,8 +307,8 @@ def placement_report_without_application_graph_by_vertex(
                     f, vertex, placements, used_processors_by_chip,
                     used_sdram_by_chip, vertex_by_processor)
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file {} for"
-                     " writing.", file_name)
+        logger.exception("Generate_placement_reports: Can't open file {} for"
+                         " writing.", file_name)
 
 
 def _write_one_vertex_machine_placement(
@@ -365,8 +365,8 @@ def placement_report_with_application_graph_by_core(
                 _write_one_chip_application_placement(
                     f, chip, placements, graph_mapper)
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file {} for "
-                     "writing.", file_name)
+        logger.exception("Generate_placement_reports: Can't open file {} for "
+                         "writing.", file_name)
 
 
 def _write_one_chip_application_placement(f, chip, placements, graph_mapper):
@@ -425,8 +425,8 @@ def placement_report_without_application_graph_by_core(
             for chip in progress.over(machine.chips):
                 _write_one_chip_machine_placement(f, chip, placements)
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file {} for "
-                     "writing.", file_name)
+        logger.exception("Generate_placement_reports: Can't open file {} for "
+                         "writing.", file_name)
 
 
 def _write_one_chip_machine_placement(f, c, placements):
@@ -473,8 +473,8 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
             for chip in progress.over(machine.chips):
                 _write_chip_sdram(f, chip, used_sdram_by_chip)
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file {} for "
-                     "writing.", file_name)
+        logger.exception("Generate_placement_reports: Can't open file {} for "
+                         "writing.", file_name)
 
 
 def _write_sdram_by_core(f, placements, progress):
@@ -528,8 +528,8 @@ def routing_info_report(report_folder, machine_graph, routing_infos):
                     f, vertex, machine_graph, routing_infos, progress)
             progress.end()
     except IOError:
-        logger.error("generate virtual key space information report: "
-                     "Can't open file {} for writing.", file_name)
+        logger.exception("generate virtual key space information report: "
+                         "Can't open file {} for writing.", file_name)
 
 
 def _write_vertex_virtual_keys(
@@ -616,8 +616,8 @@ def _generate_routing_table(routing_table, top_level_folder):
                 f.write(entry_str)
             f.write("{} Defaultable entries\n".format(n_defaultable))
     except IOError:
-        logger.error("Generate_placement_reports: Can't open file"
-                     " {} for writing.", file_path)
+        logger.exception("Generate_placement_reports: Can't open file"
+                         " {} for writing.", file_path)
 
 
 def generate_comparison_router_report(
@@ -640,8 +640,8 @@ def generate_comparison_router_report(
                 _write_one_router_table_comparison(
                     f, table, compressed_routing_tables)
     except IOError:
-        logger.error("Generate_router_comparison_reports: Can't open file"
-                     " {} for writing.", file_name)
+        logger.exception("Generate_router_comparison_reports: Can't open file"
+                         " {} for writing.", file_name)
 
 
 def _write_one_router_table_comparison(f, table, compressed_tables):
