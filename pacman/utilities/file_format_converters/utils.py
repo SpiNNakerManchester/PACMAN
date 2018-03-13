@@ -7,7 +7,7 @@ def hash(string):  # @ReservedAssignment
     :type string: str
     :rtype: str
     """
-    return hashlib.md5(string.encode("ASCII")).hexdigest()
+    return hashlib.md5(string.encode()).hexdigest()
 
 
 def ident(object):  # @ReservedAssignment
