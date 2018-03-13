@@ -4,7 +4,7 @@ from pacman.model.constraints.placer_constraints\
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities import utility_calls, file_format_schemas
 from pacman.utilities.constants import EDGES
-from .utils import ident
+from pacman.utilities.utility_calls import ident
 from spinn_utilities.progress_bar import ProgressBar
 
 import json

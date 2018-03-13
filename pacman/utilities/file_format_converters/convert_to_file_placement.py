@@ -1,5 +1,5 @@
 from pacman.utilities import file_format_schemas
-from .utils import ident
+from pacman.utilities.utility_calls import ident
 from spinn_utilities.progress_bar import ProgressBar
 
 import json

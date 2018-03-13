@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
 from pacman.model.graphs import AbstractVirtualVertex
-from .utils import hash, ident
+from pacman.utilities.utility_calls import md5, ident
 
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
@@ -63,7 +63,7 @@ class ConvertToFileMachineGraph(object):
                 vertex.resources_required.reverse_iptags:
             # handle tagged vertices:
             # handle the edge between the tag-able vertex and the fake vertex
-            tag_id = hash(ident(vertex) + "_tag")
+            tag_id = md5(ident(vertex) + "_tag")
             edges[tag_id] = {
                 "source": ident(vertex),
                 "sinks": [tag_id],

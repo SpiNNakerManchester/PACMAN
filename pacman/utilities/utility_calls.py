@@ -1,6 +1,7 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.exceptions import PacmanValueError
 
+import hashlib
 import numpy
 
 
@@ -156,3 +157,21 @@ def is_single(iterable):
 
     # Otherwise return False
     return False
+
+
+def md5(string):
+    """ Get the MD5 hash of the given string, which is UTF-8 encoded.
+
+    :type string: str
+    :rtype: str
+    """
+    return hashlib.md5(string.encode()).hexdigest()
+
+
+def ident(object):  # @ReservedAssignment
+    """ Get the ID of the given object.
+
+    :type object: object
+    :rtype: str
+    """
+    return str(id(object))

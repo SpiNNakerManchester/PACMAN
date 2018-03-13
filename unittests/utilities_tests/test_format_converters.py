@@ -26,7 +26,7 @@ from pacman.utilities.file_format_converters.\
     convert_to_memory_placements import ConvertToMemoryPlacements
 from pacman.utilities.file_format_converters.create_file_constraints \
     import CreateConstraintsToFile
-from pacman.utilities.file_format_converters.utils import hash, ident
+from pacman.utilities.utility_calls import md5, ident
 
 import json
 import pytest
@@ -54,11 +54,11 @@ def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
     tag = IPtagResource("1.2.3.4", 5, False, tag="footag")
     v1 = SimpleMachineVertex(ResourceContainer(iptags=[tag]))
     graph.add_vertex(v1)
-    t1id = hash("%s_tag" % ident(v1))
+    t1id = md5("%s_tag" % ident(v1))
     tag = ReverseIPtagResource(tag="bartag")
     v2 = SimpleMachineVertex(ResourceContainer(reverse_iptags=[tag]))
     graph.add_vertex(v2)
-    t2id = hash("%s_tag" % ident(v2))
+    t2id = md5("%s_tag" % ident(v2))
     graph.add_edge(MachineEdge(v1, v0), "part1")
     p1 = graph.get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
     graph.add_edge(MachineEdge(v0, v2, label="foobar"), "part2")
@@ -104,11 +104,11 @@ def test_convert_to_file_machine_graph(tmpdir):
     tag = IPtagResource("1.2.3.4", 5, False, tag="footag")
     v1 = SimpleMachineVertex(ResourceContainer(iptags=[tag]))
     graph.add_vertex(v1)
-    t1id = hash("%s_tag" % ident(v1))
+    t1id = md5("%s_tag" % ident(v1))
     tag = ReverseIPtagResource(tag="bartag")
     v2 = SimpleMachineVertex(ResourceContainer(reverse_iptags=[tag]))
     graph.add_vertex(v2)
-    t2id = hash("%s_tag" % ident(v2))
+    t2id = md5("%s_tag" % ident(v2))
     graph.add_edge(MachineEdge(v1, v0), "part1")
     p1 = graph.get_outgoing_edge_partition_starting_at_vertex(v1, "part1")
     graph.add_edge(MachineEdge(v0, v2, label="foobar"), "part2")

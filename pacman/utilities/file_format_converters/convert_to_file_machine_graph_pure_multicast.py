@@ -2,7 +2,7 @@ import json
 
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractVirtualVertex
-from .utils import hash, ident
+from pacman.utilities.utility_calls import md5, ident
 
 from spinn_utilities.progress_bar import ProgressBar
 from collections import OrderedDict
@@ -65,7 +65,7 @@ class ConvertToFileMachineGraphPureMulticast(object):
         elif vertex.resources_required.iptags or \
                 vertex.resources_required.reverse_iptags:
             # handle the edge between the tag-able vertex and the fake vertex
-            tag_id = hash(ident(vertex) + "_tag")
+            tag_id = md5(ident(vertex) + "_tag")
             edges[tag_id] = {
                 "source": ident(vertex),
                 "sinks": [tag_id],
