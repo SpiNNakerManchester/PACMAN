@@ -9,6 +9,7 @@ from spinn_utilities.progress_bar import ProgressBar
 # general imports
 import logging
 logger = logging.getLogger(__name__)
+_LOWER_16_BITS = 0xFFFF
 
 
 class NoFPGALink(PacmanConfigurationException):
@@ -107,4 +108,4 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         free_space_chunk = self._free_space_tracker[0]
         chip_id = free_space_chunk.start_address
         self._allocate_elements(chip_id, 1)
-        return (chip_id >> 8), (chip_id & 0xFFFF)
+        return (chip_id >> 8), (chip_id & _LOWER_16_BITS)

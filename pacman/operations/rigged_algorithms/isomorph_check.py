@@ -39,7 +39,7 @@ class IsomorphicChecker(object):
                     f.write("\nVertices present only in second placements:\n")
                     f.write("\t" + (",".join(second)) + "\n")
         except IOError:
-            logger.error(
+            logger.exception(
                 "Generate_isomorph_report: Can't open file {} for writing.",
                 file_name)
 

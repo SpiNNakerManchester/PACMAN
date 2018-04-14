@@ -1,4 +1,5 @@
 from pacman.utilities import file_format_schemas
+from pacman.utilities.utility_calls import ident
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -45,6 +46,6 @@ class ConvertToFileCoreAllocations(object):
         return file_path, vertex_by_id
 
     def _convert_placement(self, placement, vertex_map, allocations_dict):
-        vertex_id = str(id(placement.vertex))
+        vertex_id = ident(placement.vertex)
         vertex_map[vertex_id] = placement.vertex
         allocations_dict[vertex_id] = [placement.p, placement.p + 1]

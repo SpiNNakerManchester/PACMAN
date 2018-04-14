@@ -3,6 +3,7 @@ from pacman.exceptions import PacmanInvalidParameterException
 from pacman.utilities import utility_calls
 
 from collections import defaultdict
+from six import itervalues
 
 
 class Tags(object):
@@ -134,7 +135,7 @@ class Tags(object):
         :rtype: iterable of \
             :py:class:`spinn_machine.tags.IPTag`
         """
-        return self._ip_tags.itervalues()
+        return itervalues(self._ip_tags)
 
     @property
     def reverse_ip_tags(self):
@@ -144,7 +145,7 @@ class Tags(object):
         :rtype: iterable of \
             :py:class:`spinn_machine.tags.ReverseIPTag`
         """
-        return self._reverse_ip_tags.itervalues()
+        return itervalues(self._reverse_ip_tags)
 
     def get_ip_tags_for_vertex(self, vertex):
         """ Get the IP Tags assigned to a given machine vertex

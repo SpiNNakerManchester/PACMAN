@@ -4,7 +4,7 @@ from pacman.model.constraints.placer_constraints\
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities import utility_calls, file_format_schemas
 from pacman.utilities.constants import EDGES
-
+from pacman.utilities.utility_calls import ident
 from spinn_utilities.progress_bar import ProgressBar
 
 import json
@@ -48,7 +48,7 @@ class CreateConstraintsToFile(object):
             self, json_obj, machine_graph, machine, progress):
         vertex_by_id = dict()
         for vertex in progress.over(machine_graph.vertices, False):
-            vertex_id = str(id(vertex))
+            vertex_id = ident(vertex)
             vertex_by_id[vertex_id] = vertex
             for constraint in vertex.constraints:
                 self._handle_vertex_constraint(

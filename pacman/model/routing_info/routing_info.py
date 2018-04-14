@@ -1,5 +1,6 @@
 # pacman imports
 from pacman.exceptions import PacmanAlreadyExistsException
+from six import itervalues
 
 
 class RoutingInfo(object):
@@ -144,4 +145,4 @@ class RoutingInfo(object):
 
         :return: a iterator of partition routing information
         """
-        return self._info_by_partition.itervalues()
+        return itervalues(self._info_by_partition)

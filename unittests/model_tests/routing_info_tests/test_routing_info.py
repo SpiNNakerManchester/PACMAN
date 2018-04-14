@@ -9,6 +9,8 @@ from pacman.model.routing_info \
 from pacman.model.graphs.machine \
     import MachineOutgoingEdgePartition, MachineEdge, SimpleMachineVertex
 
+_32_BITS = 0xFFFFFFFF
+
 
 class TestRoutingInfo(unittest.TestCase):
 
@@ -19,7 +21,7 @@ class TestRoutingInfo(unittest.TestCase):
         edge = MachineEdge(pre_vertex, post_vertex)
         key = 12345
         partition_info = PartitionRoutingInfo(
-            [BaseKeyAndMask(key, 0xFFFFFFFF)], partition)
+            [BaseKeyAndMask(key, _32_BITS)], partition)
         partition.add_edge(edge)
         routing_info = RoutingInfo([partition_info])
 
@@ -60,13 +62,13 @@ class TestRoutingInfo(unittest.TestCase):
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_partition_info(PartitionRoutingInfo(
-                [BaseKeyAndMask(key, 0xFFFFFFFF)], partition2))
+                [BaseKeyAndMask(key, _32_BITS)], partition2))
         assert partition != partition2
 
         partition3 = MachineOutgoingEdgePartition("Test2")
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
-            [BaseKeyAndMask(key, 0xFFFFFFFF)], partition3))
+            [BaseKeyAndMask(key, _32_BITS)], partition3))
 
         assert routing_info.get_routing_info_from_partition(partition) != \
             routing_info.get_routing_info_from_partition(partition3)
@@ -77,8 +79,8 @@ class TestRoutingInfo(unittest.TestCase):
         partition3 = MachineOutgoingEdgePartition("Test3")
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
-            [BaseKeyAndMask(key, 0xFFFFFFFF),
-             BaseKeyAndMask(key*2, 0xFFFFFFFF)], partition3))
+            [BaseKeyAndMask(key, _32_BITS),
+             BaseKeyAndMask(key*2, _32_BITS)], partition3))
 
         assert routing_info.get_routing_info_from_partition(
             partition3).get_keys().tolist() == [key, key*2]
@@ -91,7 +93,7 @@ class TestRoutingInfo(unittest.TestCase):
         assert bkm1 != []
         assert str(bkm1) == "KeyAndMask:0x40:0xf0"
         assert bkm1.n_keys == 268435456
-        bkm2 = BaseKeyAndMask(0x40000000, 0xFFFFFFFE)
+        bkm2 = BaseKeyAndMask(0x40000000, _32_BITS & ~1)
         assert bkm1 != bkm2
         assert bkm2.n_keys == 2
         k, n = bkm2.get_keys()

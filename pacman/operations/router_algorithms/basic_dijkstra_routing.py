@@ -7,7 +7,10 @@ from pacman.model.routing_table_by_partition import \
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
 
 # general imports
-import itertools
+try:
+    import itertools.izip as zip  # @ReservedAssignment
+except ImportError:
+    pass
 import logging
 import sys
 
@@ -25,7 +28,7 @@ class _NodeInfo(object):
 
     @property
     def neighweights(self):
-        return itertools.izip(self.neighbours, self.weights)
+        return zip(self.neighbours, self.weights)
 
 
 class _DijkstraInfo(object):
@@ -257,7 +260,7 @@ class BasicDijkstraRouting(object):
     @staticmethod
     def _minimum(tables):
         # This is the lowest cost across ALL deactivated nodes in the graph.
-        lowest_cost = sys.maxint
+        lowest_cost = sys.maxsize
         lowest = None
 
         # Find the next node to be activated

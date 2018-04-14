@@ -1,3 +1,6 @@
+from six import iteritems
+
+
 class _TokenState(object):
     """ Determines whether a token has been fulfilled or not
     """
@@ -99,6 +102,6 @@ class TokenStates(object):
         """ Get a list of tokens that have been completed
         """
         return [
-            name for name, token in self._tokens.iteritems()
+            name for name, token in iteritems(self._tokens)
             if token.is_complete()
         ]

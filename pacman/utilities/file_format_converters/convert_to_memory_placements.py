@@ -1,14 +1,12 @@
-
 # pacman imports
 from pacman.model.placements import Placement, Placements
 from pacman.exceptions import PacmanConfigurationException
-from pacman.utilities import file_format_schemas
 from pacman.utilities.constants import EDGES
+from pacman.utilities.file_format_schemas import validate
 
 # general imports
-import os
 import json
-import jsonschema
+from six import text_type
 
 
 class ConvertToMemoryPlacements(object):
@@ -40,7 +38,7 @@ class ConvertToMemoryPlacements(object):
         # process placements
         for vertex_id in file_placements:
             if str(vertex_id) not in vertex_by_id:
-                if unicode(vertex_id) not in core_allocations:
+                if text_type(vertex_id) not in core_allocations:
                     raise PacmanConfigurationException(
                         "I don't recognise this pattern of constraints for"
                         " a vertex which does not have a placement")
@@ -49,7 +47,7 @@ class ConvertToMemoryPlacements(object):
                         "Failed to locate the vertex in the "
                         "graph with id {}".format(vertex_id))
 
-            if unicode(vertex_id) in core_allocations:
+            if text_type(vertex_id) in core_allocations:
                 memory_placements.add_placement(Placement(
                     x=file_placements[vertex_id][0],
                     y=file_placements[vertex_id][1],
@@ -125,31 +123,11 @@ class ConvertToMemoryPlacements(object):
 
     @staticmethod
     def _validate_file_read_data(
-            file_placements, file_allocations, constraints):
-
-        # verify that the files meet the schema.
-        # locate schemas
-        schemas = os.path.dirname(file_format_schemas.__file__)
-        file_placements_schema_file_path = os.path.join(
-            schemas, "placements.json")
-        file_allocations_schema_file_path = os.path.join(
-            schemas, "core_allocations.json")
-        file_constraints_schema_file_path = os.path.join(
-            schemas, "constraints.json")
-
-        # open readers for schemas and read in schema
-        with open(file_placements_schema_file_path, "r") as file_to_read:
-            placements_schema = json.load(file_to_read)
-
-        with open(file_allocations_schema_file_path, "r") as file_to_read:
-            core_allocations_schema = json.load(file_to_read)
-
-        with open(file_constraints_schema_file_path, "r") as file_to_read:
-            constraints_schema = json.load(file_to_read)
-
-        jsonschema.validate(file_placements, placements_schema)
-        jsonschema.validate(file_allocations, core_allocations_schema)
-        jsonschema.validate(constraints, constraints_schema)
+            placements_obj, allocations_obj, constraints_obj):
+        # verify that the files meet the schemas.
+        validate(placements_obj, "placements.json")
+        validate(allocations_obj, "core_allocations.json")
+        validate(constraints_obj, "constraints.json")
 
     @staticmethod
     def _locate_constraints(vertex_label, constraints):

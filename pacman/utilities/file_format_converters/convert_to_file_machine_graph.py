@@ -1,7 +1,7 @@
-import hashlib
 import json
 from collections import defaultdict
 from pacman.model.graphs import AbstractVirtualVertex
+from pacman.utilities.utility_calls import md5, ident
 
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
@@ -53,7 +53,7 @@ class ConvertToFileMachineGraph(object):
     def _convert_vertex(self, vertex, vertex_by_id, vertices,
                         edges, machine_graph, partition_by_id):
         vertex_id = id(vertex)
-        vertex_by_id[str(vertex_id)] = vertex
+        vertex_by_id[ident(vertex)] = vertex
 
         # handle external devices
         if isinstance(vertex, AbstractVirtualVertex):
@@ -63,9 +63,9 @@ class ConvertToFileMachineGraph(object):
                 vertex.resources_required.reverse_iptags:
             # handle tagged vertices:
             # handle the edge between the tag-able vertex and the fake vertex
-            tag_id = hashlib.md5(str(vertex_id) + "_tag").hexdigest()
+            tag_id = md5(ident(vertex) + "_tag")
             edges[tag_id] = {
-                "source": str(vertex_id),
+                "source": ident(vertex),
                 "sinks": [tag_id],
                 "weight": 1.0,
                 "type": "FAKE_TAG_EDGE"}
@@ -89,8 +89,8 @@ class ConvertToFileMachineGraph(object):
             p_id = str(id(partition))
             partition_by_id[p_id] = partition
             edges[p_id] = {
-                "source": str(id(vertex)),
+                "source": ident(vertex),
                 "sinks": [
-                    str(id(edge.post_vertex)) for edge in partition.edges],
+                    ident(edge.post_vertex) for edge in partition.edges],
                 "weight": sum(edge.traffic_weight for edge in partition.edges),
                 "type": partition.traffic_type.name.lower()}

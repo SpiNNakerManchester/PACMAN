@@ -28,7 +28,6 @@ class MulticastRoutingTable(object):
 
     def __init__(self, x, y, multicast_routing_entries=None):
         """
-
         :param x: \
             The x-coordinate of the chip for which this is the routing table
         :type x: int
@@ -166,3 +165,6 @@ class MulticastRoutingTable(object):
         for entry in self._multicast_routing_entries:
             entry_string += "{}\n".format(entry)
         return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
+
+    def __hash__(self):
+        return id(self)

@@ -1,6 +1,6 @@
-"""
-test basic placer
-"""
+# general imports
+from __future__ import print_function
+import unittest
 
 # pacman imports
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
@@ -13,9 +13,6 @@ from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 
 # spinn machine imports
 from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
-
-# general imports
-import unittest
 
 # support imports
 from uinit_test_objects import SimpleTestVertex, get_resources_used_by_atoms
@@ -103,8 +100,8 @@ class TestBasicPlacer(unittest.TestCase):
         self.bp = BasicPlacer(self.machine, self.graph)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_place_where_vertices_have_vertices(self):
@@ -113,8 +110,8 @@ class TestBasicPlacer(unittest.TestCase):
         self.graph_mapper.add_vertices(self.vertices, self.vert1)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_place_vertex_too_big_with_vertex(self):
@@ -155,8 +152,8 @@ class TestBasicPlacer(unittest.TestCase):
         self.graph_mapper.add_vertices(self.vertices)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_have_vertices(self):
@@ -178,8 +175,8 @@ class TestBasicPlacer(unittest.TestCase):
         self.graph_mapper.add_vertices(self.vertices, self.vert1)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_unsupported_non_placer_constraint(self):
@@ -208,8 +205,8 @@ class TestBasicPlacer(unittest.TestCase):
         self.graph = MachineGraph(vertices=vertices)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_too_many_vertices(self):

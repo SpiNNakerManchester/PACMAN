@@ -1,11 +1,11 @@
 from lxml import etree
+from six import iterkeys
 
+from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.algorithm_decorators import OneOfInput
 from pacman.executor.algorithm_decorators import Output
 from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
 from pacman.executor.algorithm_decorators import SingleInput
-
-from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.algorithm_classes import ExternalAlgorithm
 from pacman.executor.algorithm_classes import PythonClassAlgorithm
 from pacman.executor.algorithm_decorators import AllOfInput
@@ -134,7 +134,7 @@ class AlgorithmMetadataXmlReader(object):
             path, element.find("{*}outputs"), is_external)
 
         # Check that all input definitions have been used
-        for input_name in input_definitions.iterkeys():
+        for input_name in iterkeys(input_definitions):
             if (input_name not in required_seen and
                     input_name not in optional_seen):
                 raise _XmlConfigurationException(

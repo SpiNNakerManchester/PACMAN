@@ -15,6 +15,7 @@ from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanRouteInfoAllocationException)
 
 import logging
+from six import itervalues
 
 logger = logging.getLogger(__name__)
 
@@ -65,9 +66,8 @@ def get_edge_groups(machine_graph, traffic_type):
                 shared_key_constraints = locate_constraints_of_type(
                     partition.constraints, ShareKeyConstraint)
                 partitions_to_group = [partition]
-                map(lambda constraint: partitions_to_group.extend(
-                        constraint.other_partitions),
-                    shared_key_constraints)
+                for constraint in shared_key_constraints:
+                    partitions_to_group.extend(constraint.other_partitions)
 
                 # Get a set of groups that should be grouped
                 groups_to_group = [
@@ -94,7 +94,7 @@ def get_edge_groups(machine_graph, traffic_type):
         FixedKeyFieldConstraint: fixed_field_groups,
         FlexiKeyFieldConstraint: flexi_field_groups,
     }
-    groups = set(partition_groups.itervalues())
+    groups = set(itervalues(partition_groups))
     for group in groups:
 
         # Get all expected constraints in the group

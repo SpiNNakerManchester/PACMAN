@@ -1,6 +1,7 @@
 from pacman.utilities import rig_converters
 from rig.place_and_route.route.ner import route
 from spinn_utilities.progress_bar import ProgressBar
+from six import iteritems
 
 
 class RigMCRoute(object):
@@ -36,7 +37,7 @@ class RigMCRoute(object):
             vertices_resources, nets, rig_machine, rig_constraints,
             rig_placements, rig_allocations, "cores")
         rig_routes = {
-            name: rig_routes[net] for net, name in net_names.iteritems()}
+            name: rig_routes[net] for net, name in iteritems(net_names)}
         progress_bar.update()
 
         routes = rig_converters.convert_from_rig_routes(rig_routes)

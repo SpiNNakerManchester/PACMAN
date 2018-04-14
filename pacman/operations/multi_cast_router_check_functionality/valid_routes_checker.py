@@ -18,7 +18,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 # Define an internal class for placements
 PlacementTuple = namedtuple('PlacementTuple', 'x y p')
 
-range_masks = {0xFFFFFFFFL - ((2 ** i) - 1) for i in range(33)}
+_32_BITS = 0xFFFFFFFF
+range_masks = {_32_BITS - ((2 ** i) - 1) for i in range(33)}
 
 
 def validate_routes(machine_graph, placements, routing_infos,
@@ -392,7 +393,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
                     " of entries.", hex(key))
             if entry.mask in range_masks:
                 last_atom = key + n_atoms - 1
-                last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
+                last_key = e_key + (~entry.mask & _32_BITS)
                 if last_key < last_atom:
                     raise PacmanRoutingException(
                         "Full key range not covered: key:{} key_combo:{} "
@@ -401,7 +402,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
                             hex(last_key), hex(e_key)))
         elif entry.mask in range_masks:
             last_atom = key + n_atoms
-            last_key = e_key + (~entry.mask & 0xFFFFFFFFL)
+            last_key = e_key + (~entry.mask & _32_BITS)
             if min(last_key, last_atom) - max(e_key, key) + 1 > 0:
                 raise Exception(
                     "Key range partially covered:  key:{} key_combo:{} "

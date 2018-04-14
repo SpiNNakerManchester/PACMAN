@@ -182,7 +182,8 @@ class MulticastRoutingTableByPartitionEntry(object):
             valid_incoming_processor, valid_incoming_link)
 
     def __repr__(self):
-        return "{}:{}:{}:{}:{}".format(
+        return "{}:{}:{}:{{{}}}:{{{}}}".format(
             self._incoming_link, self._incoming_processor,
-            self.defaultable, self._out_going_links,
-            self._out_going_processors)
+            self.defaultable,
+            ", ".join(map(str, self._out_going_links)),
+            ", ".join(map(str, self._out_going_processors)))
