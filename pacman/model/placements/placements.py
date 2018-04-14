@@ -109,7 +109,7 @@ class Placements(object):
         """
         try:
             return self._machine_vertices[vertex]
-        except KeyError:
+        except KeyError as e:
             raise_from(PacmanNotPlacedError(vertex), e)
 
     def get_placed_processors(self):
