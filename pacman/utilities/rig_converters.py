@@ -205,7 +205,7 @@ def create_rig_graph_constraints(machine_graph, machine):
                     constraints.append(LocationConstraint(
                         vertex, (constraint.x, constraint.y)))
 
-    for group in get_same_chip_vertex_groups(machine_graph.vertices).values():
+    for group in get_same_chip_vertex_groups(machine_graph).itervalues():
         if len(group) > 1:
             constraints.append(SameChipConstraint(group))
     return constraints

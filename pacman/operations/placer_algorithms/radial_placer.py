@@ -1,8 +1,8 @@
 # pacman imports
 from pacman.model.constraints.placer_constraints \
     import RadialPlacementFromChipConstraint, SameChipAsConstraint
-from pacman.utilities.algorithm_utilities \
-    import placer_algorithm_utilities as placer_utils
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
+    import sort_vertices_by_known_constraints, get_same_chip_vertex_groups
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
@@ -28,16 +28,14 @@ class RadialPlacer(object):
         self._check_constraints(machine_graph.vertices)
 
         placements = Placements()
-        vertices = placer_utils.sort_vertices_by_known_constraints(
-            machine_graph.vertices)
+        vertices = sort_vertices_by_known_constraints(machine_graph.vertices)
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
-        vertices_on_same_chip = placer_utils.get_same_chip_vertex_groups(
-            machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:

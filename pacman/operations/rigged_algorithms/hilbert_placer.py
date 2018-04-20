@@ -48,8 +48,7 @@ class HilbertPlacer(object):
             machine, self._generate_hilbert_chips(machine))
 
         # get vertices which must be placed on the same chip
-        vertices_on_same_chip = \
-            get_same_chip_vertex_groups(machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
 
         # iterate over vertices and generate placements
         all_vertices_placed = set()
