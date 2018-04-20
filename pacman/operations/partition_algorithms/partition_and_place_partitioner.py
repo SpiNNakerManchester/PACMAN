@@ -4,7 +4,8 @@ from six import raise_from
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
+    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint, \
+    MinVertexAtomsConstraint
 from pacman.model.constraints.partitioner_constraints \
     import SameAtomsAsVertexConstraint
 from pacman.model.graphs.common import GraphMapper, Slice
@@ -50,8 +51,9 @@ class PartitionAndPlacePartitioner(object):
         utils.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
             abstract_constraint_type=AbstractPartitionerConstraint,
-            supported_constraints=[MaxVertexAtomsConstraint,
-                                   SameAtomsAsVertexConstraint])
+            supported_constraints=[
+                MaxVertexAtomsConstraint, MinVertexAtomsConstraint,
+                SameAtomsAsVertexConstraint])
 
         # Load the vertices and create the machine_graph to fill
         machine_graph = MachineGraph(
@@ -122,6 +124,7 @@ class PartitionAndPlacePartitioner(object):
 
         # locate max atoms per core
         possible_max_atoms = list()
+        possible_min_atoms = list([1])
         if isinstance(vertex, AbstractHasGlobalMaxAtoms):
             possible_max_atoms.append(vertex.get_max_atoms_per_core())
 
@@ -131,17 +134,23 @@ class PartitionAndPlacePartitioner(object):
                 MaxVertexAtomsConstraint)
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
+            min_atom_constraints = utils.locate_constraints_of_type(
+                MinVertexAtomsConstraint)
+            for constraint in min_atom_constraints:
+                possible_min_atoms.append(constraint.size)
 
         max_atoms_per_core = int(min(possible_max_atoms))
+        min_atoms_per_core = int(min(possible_min_atoms))
 
         # partition by atoms
         self._partition_by_atoms(
             partition_together_vertices, vertex.n_atoms, max_atoms_per_core,
-            machine_graph, graph, graph_mapper, resource_tracker, progress)
+            min_atoms_per_core, machine_graph, graph, graph_mapper,
+            resource_tracker, progress)
 
     def _partition_by_atoms(
-            self, vertices, n_atoms, max_atoms_per_core, machine_graph, graph,
-            graph_mapper, resource_tracker, progress):
+            self, vertices, n_atoms, max_atoms_per_core, min_atoms_per_core,
+            machine_graph, graph, graph_mapper, resource_tracker, progress):
         """ Try to partition vertices on how many atoms it can fit on\
             each vertex
 
@@ -156,6 +165,10 @@ class PartitionAndPlacePartitioner(object):
             the max atoms from all the vertexes considered that have max_atom\
             constraints
         :type max_atoms_per_core: int
+        :param min_atoms_per_core:\
+            the min atoms from all the vertexes considered that have min_atom\
+            constraints
+        :type min_atoms_per_core: int
         :param machine_graph: the machine graph
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
@@ -179,7 +192,7 @@ class PartitionAndPlacePartitioner(object):
             # Scale down the number of atoms to fit the available resources
             used_placements, hi_atom = self._scale_down_resources(
                 lo_atom, hi_atom, vertices, resource_tracker,
-                max_atoms_per_core, graph)
+                max_atoms_per_core, min_atoms_per_core, graph)
 
             # Update where we are
             n_atoms_placed = hi_atom + 1
@@ -245,7 +258,7 @@ class PartitionAndPlacePartitioner(object):
     # noinspection PyUnusedLocal
     def _scale_down_resources(
             self, lo_atom, hi_atom, vertices, resource_tracker,
-            max_atoms_per_core, graph):
+            max_atoms_per_core, min_atoms_per_core, graph):
         """ Reduce the number of atoms on a core so that it fits within the
             resources available.
 
@@ -262,6 +275,10 @@ class PartitionAndPlacePartitioner(object):
             the max atoms from all the vertexes considered that have max_atom\
             constraints
         :type max_atoms_per_core: int
+        :param min_atoms_per_core:\
+            the min atoms from all the vertexes considered that have min_atom\
+            constraints
+        :type min_atoms_per_core: int
         :param graph: the application graph object
         :type graph:\
             :py:class:`pacman.model.graphs.application.ApplicationGraph`
@@ -290,7 +307,8 @@ class PartitionAndPlacePartitioner(object):
             # Work out the ratio of used to available resources
             ratio = self._find_max_ratio(used_resources, resources)
 
-            while ratio > 1.0 and hi_atom >= lo_atom:
+            while ratio > 1.0 and (
+                    (hi_atom - lo_atom) + 1 >= min_atoms_per_core):
                 # Scale the resources by the ratio
                 old_n_atoms = (hi_atom - lo_atom) + 1
                 new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))
@@ -301,14 +319,14 @@ class PartitionAndPlacePartitioner(object):
 
                 # Find the new resource usage
                 hi_atom = lo_atom + new_n_atoms - 1
-                if hi_atom >= lo_atom:
+                if (hi_atom - lo_atom) + 1 >= min_atoms_per_core:
                     vertex_slice = Slice(lo_atom, hi_atom)
                     used_resources = \
                         vertex.get_resources_used_by_atoms(vertex_slice)
                     ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
-            if hi_atom < lo_atom:
+            if (hi_atom - lo_atom) + 1 < min_atoms_per_core:
                 raise PacmanPartitionException(
                     "No more of vertex '{}' would fit on the board:\n"
                     "    Allocated so far: {} atoms\n"

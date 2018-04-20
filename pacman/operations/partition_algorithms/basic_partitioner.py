@@ -2,7 +2,8 @@ import logging
 
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
+    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint, \
+    MinVertexAtomsConstraint
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
@@ -47,7 +48,8 @@ class BasicPartitioner(object):
         ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
-            supported_constraints=[MaxVertexAtomsConstraint],
+            supported_constraints=[
+                MaxVertexAtomsConstraint, MinVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
@@ -71,7 +73,11 @@ class BasicPartitioner(object):
         """
         # Compute how many atoms of this vertex we can put on one core
         atoms_per_core = self._compute_atoms_per_core(vertex, res_tracker)
-        if atoms_per_core < 1.0:
+        min_atom_values = [1.0]
+        for min_atom_constraint in utility_calls.locate_constraints_of_type(
+                vertex.constraints, MinVertexAtomsConstraint):
+            min_atom_values.append(float(min_atom_constraint.size))
+        if atoms_per_core < max(min_atom_values):
             raise PacmanPartitionException(
                 "Not enough resources available to create vertex")
 
