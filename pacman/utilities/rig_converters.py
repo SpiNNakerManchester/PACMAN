@@ -6,7 +6,7 @@ from rig.place_and_route.constraints import \
     LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint
 from rig.place_and_route.routing_tree import RoutingTree
 from rig.routing_table import Routes
-from six import iteritems
+from six import iteritems, itervalues
 
 from pacman.model.constraints.placer_constraints\
     import ChipAndCoreConstraint, RadialPlacementFromChipConstraint
@@ -205,7 +205,7 @@ def create_rig_graph_constraints(machine_graph, machine):
                     constraints.append(LocationConstraint(
                         vertex, (constraint.x, constraint.y)))
 
-    for group in get_same_chip_vertex_groups(machine_graph).itervalues():
+    for group in itervalues(get_same_chip_vertex_groups(machine_graph)):
         if len(group) > 1:
             constraints.append(SameChipConstraint(group))
     return constraints
