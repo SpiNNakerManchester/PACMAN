@@ -3,6 +3,7 @@ from six import raise_from
 
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
+import math
 from pacman.model.constraints.partitioner_constraints \
     import AbstractPartitionerConstraint, MaxVertexAtomsConstraint, \
     MinVertexAtomsConstraint
@@ -135,12 +136,13 @@ class PartitionAndPlacePartitioner(object):
             for constraint in max_atom_constraints:
                 possible_max_atoms.append(constraint.size)
             min_atom_constraints = utils.locate_constraints_of_type(
+                other_vertex.constraints,
                 MinVertexAtomsConstraint)
             for constraint in min_atom_constraints:
                 possible_min_atoms.append(constraint.size)
 
         max_atoms_per_core = int(min(possible_max_atoms))
-        min_atoms_per_core = int(min(possible_min_atoms))
+        min_atoms_per_core = int(max(possible_min_atoms))
 
         # partition by atoms
         self._partition_by_atoms(
@@ -308,10 +310,11 @@ class PartitionAndPlacePartitioner(object):
             ratio = self._find_max_ratio(used_resources, resources)
 
             while ratio > 1.0 and (
-                    (hi_atom - lo_atom) + 1 >= min_atoms_per_core):
+                    ((hi_atom - lo_atom) + 1) >= min_atoms_per_core):
                 # Scale the resources by the ratio
                 old_n_atoms = (hi_atom - lo_atom) + 1
-                new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))
+                new_n_atoms = int(
+                    math.ceil(float(old_n_atoms) / (ratio * 1.1)))
 
                 # Avoid infinite looping
                 if old_n_atoms == new_n_atoms:
@@ -326,7 +329,7 @@ class PartitionAndPlacePartitioner(object):
                     ratio = self._find_max_ratio(used_resources, resources)
 
             # If we couldn't partition, raise an exception
-            if (hi_atom - lo_atom) + 1 < min_atoms_per_core:
+            if ((hi_atom - lo_atom) + 1) < min_atoms_per_core:
                 raise PacmanPartitionException(
                     "No more of vertex '{}' would fit on the board:\n"
                     "    Allocated so far: {} atoms\n"
