@@ -476,6 +476,34 @@ class TestBasicPartitioner(unittest.TestCase):
             partitioner = PartitionAndPlacePartitioner()
             partitioner(app_graph, machine)
 
+    def test_partition_with_min_atom_constraints_close_to_limit(self):
+        """
+        test a partitioning with a graph with min atom constraint which\
+        should fit but is close to the limit
+        """
+
+        # Create a 2x2 machine with 1 core per chip (so 4 cores),
+        # and 5MB SDRAM per chip
+        n_cores_per_chip = 1
+        sdram_per_chip = 5
+        machine = VirtualMachine(
+            width=2, height=2, with_monitors=False,
+            n_cpus_per_chip=n_cores_per_chip,
+            sdram_per_chip=sdram_per_chip)
+
+        # Create a vertex which will need to be split perfectly into 4 cores
+        # to work
+        vertex = SimpleTestVertex(
+            machine.n_chips * sdram_per_chip,
+            max_atoms_per_core=((machine.n_chips * sdram_per_chip) / 2),
+            constraints=[MinVertexAtomsConstraint(sdram_per_chip)])
+        app_graph = ApplicationGraph("Test")
+        app_graph.add_vertex(vertex)
+
+        # Do the partitioning - this should just work
+        partitioner = PartitionAndPlacePartitioner()
+        partitioner(app_graph, machine)
+
 
 if __name__ == '__main__':
     unittest.main()
