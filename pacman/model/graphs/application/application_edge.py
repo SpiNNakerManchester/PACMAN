@@ -2,6 +2,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractEdge
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import MachineEdge
+from pacman.model.resources import ResourceContainer
 
 
 class ApplicationEdge(AbstractEdge):
@@ -86,3 +87,21 @@ class ApplicationEdge(AbstractEdge):
     @overrides(AbstractEdge.traffic_type)
     def traffic_type(self):
         return self._traffic_type
+
+    def get_resources_used_by_atoms(self, pre_vertex_slice, post_vertex_slice):
+        """ Get the resources used by the edge from a range of atoms in the\
+            pre-vertex to a range of atoms in the post-vertex.  This\
+            represents shared resources between source and target vertices,\
+            which has implications in placement.
+
+            This is designed to be overridden by an edge that has such\
+            requirements that are not accounted for elsewhere.  The default\
+            implementation assumes no resources are consumed by edges.
+
+        :param pre_vertex_slice: The slice of the pre-vertex being considered
+        :type pre_vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
+        :param post_vertex_slice: The slice of the post-vertex being considered
+        :type post_vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
+        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
+        """
+        return ResourceContainer()
