@@ -483,9 +483,9 @@ class TestBasicPartitioner(unittest.TestCase):
         """
 
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
-        # and 5MB SDRAM per chip
+        # and 6MB SDRAM per chip
         n_cores_per_chip = 1
-        sdram_per_chip = 5
+        sdram_per_chip = 6
         machine = VirtualMachine(
             width=2, height=2, with_monitors=False,
             n_cpus_per_chip=n_cores_per_chip,
@@ -494,8 +494,8 @@ class TestBasicPartitioner(unittest.TestCase):
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work
         vertex = SimpleTestVertex(
-            machine.n_chips * sdram_per_chip,
-            max_atoms_per_core=((machine.n_chips * sdram_per_chip) / 2),
+            10,
+            max_atoms_per_core=8,
             constraints=[MinVertexAtomsConstraint(sdram_per_chip)])
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
