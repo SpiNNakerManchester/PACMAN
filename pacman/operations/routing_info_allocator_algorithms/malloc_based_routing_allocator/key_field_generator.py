@@ -187,3 +187,5 @@ class KeyFieldGenerator(object):
         if not self.is_next_key:
             raise StopIteration
         return self.next_key
+
+    __next__ = next

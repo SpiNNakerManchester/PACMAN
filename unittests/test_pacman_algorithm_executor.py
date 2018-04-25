@@ -292,7 +292,7 @@ class Test(unittest.TestCase):
             executor.execute_mapping()
         self.assertIn(
             "Algorithm FailingExternal returned a non-zero error code 1",
-            e.exception.message)
+            str(e.exception))
         self.assertEqual(executor.get_item("Foo"), None)
         with os.fdopen(fd) as f:
             self.assertEqual(f.read(), "foo\n")

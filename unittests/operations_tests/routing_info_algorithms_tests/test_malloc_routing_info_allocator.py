@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 
 from pacman.exceptions import PacmanRouteInfoAllocationException
@@ -23,7 +24,7 @@ class MyTestCase(unittest.TestCase):
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
-        print allocator._free_space_tracker
+        print(allocator._free_space_tracker)
         self.assertEqual(len(allocator._free_space_tracker), 2, error)
         self.assertEqual(allocator._free_space_tracker[0].start_address, 0,
                          error)
@@ -45,7 +46,7 @@ class MyTestCase(unittest.TestCase):
             0xFFFFFF00, None, 20))
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
-        print allocator._free_space_tracker
+        print(allocator._free_space_tracker)
         self.assertEqual(len(allocator._free_space_tracker), 1, error)
         self.assertEqual(allocator._free_space_tracker[0].start_address, 0x100,
                          error)
@@ -58,7 +59,7 @@ class MyTestCase(unittest.TestCase):
             None, None, 20))
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
-        print allocator._free_space_tracker
+        print(allocator._free_space_tracker)
         self.assertEqual(len(allocator._free_space_tracker), 1, error)
         self.assertEqual(allocator._free_space_tracker[0].start_address, 32,
                          error)
@@ -74,14 +75,14 @@ class MyTestCase(unittest.TestCase):
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
 
-        print allocator._free_space_tracker
+        print(allocator._free_space_tracker)
 
         for mask, keys in zip(fixed_masks, n_keys):
             self._print_keys_and_masks(
                 allocator._allocate_keys_and_masks(mask, None, keys))
-            print allocator._free_space_tracker
+            print(allocator._free_space_tracker)
 
-        print allocator._free_space_tracker
+        print(allocator._free_space_tracker)
 
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
@@ -97,7 +98,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(allocator._free_space_tracker[2].start_address,
                          0x1800, error)
         self.assertEqual(allocator._free_space_tracker[2].size,
-                         0x100000000L - 0x1800, error)
+                         0x100000000 - 0x1800, error)
 
     def _integration_setup(self):
         machine_graph = MachineGraph(label="test me you git")

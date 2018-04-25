@@ -9,6 +9,7 @@ from pacman.exceptions import \
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.virtual_machine import VirtualMachine
 from spinn_machine.machine import Machine
+from six import itervalues
 
 
 class FixedRouteRouter(object):
@@ -199,7 +200,7 @@ class FixedRouteRouter(object):
             mc_entries = routing_tables_by_partition.get_entries_for_router(
                 chip_x, chip_y)
             # only want the first entry, as that will all be the same.
-            mc_entry = mc_entries[mc_entries.keys()[0]]
+            mc_entry = next(itervalues(mc_entries))
             fixed_route_entry = FixedRouteEntry(
                 link_ids=mc_entry.out_going_links,
                 processor_ids=mc_entry.out_going_processors)

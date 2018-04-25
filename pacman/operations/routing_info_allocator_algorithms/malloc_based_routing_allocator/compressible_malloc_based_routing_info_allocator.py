@@ -18,16 +18,17 @@ from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
 from pacman.exceptions import \
     PacmanConfigurationException, PacmanRouteInfoAllocationException
 
-from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
 
 # general imports
 import math
 import numpy
 import logging
-from collections import defaultdict
-from collections import OrderedDict
-from spinn_utilities.log import FormatAdapter
+from collections import defaultdict, OrderedDict
+from past.builtins import xrange
+from six import iteritems, itervalues
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -138,7 +139,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # Find all partitions that share a route in this table
             partitions_by_route = defaultdict(OrderedSet)
             routing_table = routing_tables.get_entries_for_router(x, y)
-            for partition, entry in routing_table.iteritems():
+            for partition, entry in iteritems(routing_table):
                 if partition in continuous:
                     entry_hash = sum(
                         1 << i
@@ -148,7 +149,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                         for i in entry.out_going_processors)
                     partitions_by_route[entry_hash].add(partition)
 
-            for entry_hash, partitions in partitions_by_route.iteritems():
+            for entry_hash, partitions in iteritems(partitions_by_route):
                 found_groups = list()
                 for partition in partitions:
                     if partition in partition_groups:
@@ -176,7 +177,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Sort partitions by largest group
         continuous = list(OrderedSet(
-            tuple(group) for group in partition_groups.itervalues()))
+            tuple(group) for group in itervalues(partition_groups)))
 
         for group in reversed(sorted(continuous, key=len)):
             for partition in progress.over(group, False):

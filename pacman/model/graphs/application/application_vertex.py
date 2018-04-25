@@ -20,7 +20,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
     __slots__ = ["_label"]
 
     def __init__(self, label=None, constraints=None,
-                 max_atoms_per_core=sys.maxint):
+                 max_atoms_per_core=sys.maxsize):
         """
 
         :param label: The optional name of the vertex

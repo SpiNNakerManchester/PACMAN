@@ -1,4 +1,5 @@
 import logging
+from six import raise_from
 
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
@@ -337,9 +338,9 @@ class PartitionAndPlacePartitioner(object):
                 used_placements.append((vertex, x, y, p, used_resources,
                                         ip_tags, reverse_ip_tags))
             except PacmanValueError as e:
-                raise PacmanValueError(
+                raise_from(PacmanValueError(
                     "Unable to allocate requested resources to"
-                    " vertex '{}':\n{}".format(vertex, e))
+                    " vertex '{}':\n{}".format(vertex, e)), e)
 
         # reduce data to what the parent requires
         final_placements = list()

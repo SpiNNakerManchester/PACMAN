@@ -1,12 +1,13 @@
+from __future__ import print_function
+from collections import OrderedDict
+import unittest
+
 from pacman.model.routing_tables \
     import MulticastRoutingTable, MulticastRoutingTables
 from pacman.operations.router_compressors.mundys_router_compressor.\
     routing_table_condenser import MundyRouterCompressor
 from pacman.exceptions import PacmanRoutingException
 from spinn_machine import MulticastRoutingEntry
-
-from collections import OrderedDict
-import unittest
 
 WILDCARD = "*"
 
@@ -93,12 +94,12 @@ def calc_remainders(o_code, c_code):
 def compare_route(o_route, compressed_dict, o_code=None, start=0):
     if o_code is None:
         o_code = codify(o_route)
-    keys = compressed_dict.keys()
+    keys = list(compressed_dict.keys())
     for i in range(start, len(keys)):
         c_code = keys[i]
-        print o_code, c_code  # TODO: Don't print this message!
+        print(o_code, c_code)  # TODO: Don't print this message!
         if covers(o_code, c_code):
-            print "covers"  # TODO: Don't print this message!
+            print("covers")  # TODO: Don't print this message!
             c_route = compressed_dict[c_code]
             if o_route.defaultable != c_route.defaultable:
                 PacmanRoutingException(  # TODO: Raise this exception!
@@ -113,7 +114,7 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0):
                     "Compressed route {} covers original route {} but has "
                     "a different link_ids.".format(c_route, o_route))
             remainders = calc_remainders(o_code, c_code)
-            print remainders  # TODO: Don't print this message!
+            print(remainders)  # TODO: Don't print this message!
             for remainder in remainders:
                 compare_route(o_route, compressed_dict, o_code=remainder,
                               start=i + 1)
@@ -124,8 +125,8 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0):
 
 def compare_table(original, compressed):
     compressed_dict = codify_table(compressed)
-    print compressed_dict  # TODO: Don't print this message!
-    print "-------------"  # TODO: Don't print this message!
+    print(compressed_dict)  # TODO: Don't print this message!
+    print("-------------")  # TODO: Don't print this message!
     for o_route in original.multicast_routing_entries:
         compare_route(o_route, compressed_dict)
 

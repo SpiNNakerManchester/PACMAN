@@ -1,6 +1,7 @@
 from collections import defaultdict
 from functools import wraps
 import inspect
+from six import iteritems, itervalues
 
 _instances = list()
 _methods = defaultdict(dict)
@@ -20,7 +21,7 @@ def supports_injection(injectable_class):
     def new_init(self, *args, **kwargs):
         # pylint: disable=protected-access
         orig_init(self, *args, **kwargs)
-        for method in injectable_class.__dict__.itervalues():
+        for method in itervalues(injectable_class.__dict__):
             if hasattr(method, "_type_to_inject"):
                 _methods[injectable_class][method._type_to_inject] = method
         _instances.append(self)
@@ -106,7 +107,7 @@ def inject_items(types):
                 raise InjectionException(
                     "No injectable objects have been provided")
             new_args = dict(kwargs)
-            for arg, arg_type in types.iteritems():
+            for arg, arg_type in iteritems(types):
                 if arg_type not in _injectables:
                     raise InjectionException(
                         "Cannot find object of type {} to inject into"
@@ -220,7 +221,7 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
             cls_methods = _methods.get(cls, {})
             methods.update(cls_methods)
         if methods is not None:
-            for object_type, object_to_inject in objects_to_inject.iteritems():
+            for object_type, object_to_inject in iteritems(objects_to_inject):
                 method = methods.get(object_type, None)
                 if method is not None:
                     method(obj, object_to_inject)

@@ -27,7 +27,7 @@ class ApplicationSpiNNakerLinkVertex(
 
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,
-            constraints=None, max_atoms_per_core=sys.maxint):
+            constraints=None, max_atoms_per_core=sys.maxsize):
         super(ApplicationSpiNNakerLinkVertex, self).__init__(
             label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)

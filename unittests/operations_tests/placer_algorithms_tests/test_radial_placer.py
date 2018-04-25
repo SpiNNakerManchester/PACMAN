@@ -1,3 +1,6 @@
+from __future__ import print_function
+from operator import itemgetter
+from pprint import pprint as pp
 import unittest
 
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
@@ -11,9 +14,6 @@ from pacman.model.graphs.common import GraphMapper
 from pacman.operations.placer_algorithms import RadialPlacer
 
 from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
-
-from operator import itemgetter
-from pprint import pprint as pp
 
 
 class TestRadialPlacer(unittest.TestCase):
@@ -93,8 +93,8 @@ class TestRadialPlacer(unittest.TestCase):
         self.bp = RadialPlacer(self.machine, self.graph)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_place_where_vertices_have_vertices(self):
@@ -103,8 +103,8 @@ class TestRadialPlacer(unittest.TestCase):
         self.graph_mapper.add_vertices(self.vertices, self.vert1)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_place_vertex_too_big_with_vertex(self):
@@ -144,8 +144,8 @@ class TestRadialPlacer(unittest.TestCase):
         self.graph_mapper.add_vertices(self.vertices)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_have_vertices(self):
@@ -167,8 +167,8 @@ class TestRadialPlacer(unittest.TestCase):
         self.graph_mapper.add_vertices(self.vertices, self.vert1)
         placements = self.bp.place(self.graph, self.graph_mapper)
         for placement in placements.placements:
-            print placement.vertex.label, placement.vertex.n_atoms, \
-                'x:', placement.x, 'y:', placement.y, 'p:', placement.p
+            print(placement.vertex.label, placement.vertex.n_atoms,
+                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
     @unittest.skip("demonstrating skipping")
     def test_unsupported_non_placer_constraint(self):
