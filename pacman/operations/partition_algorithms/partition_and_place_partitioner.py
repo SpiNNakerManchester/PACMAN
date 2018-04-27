@@ -3,6 +3,7 @@ from six import raise_from
 
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.model.constraints.partitioner_constraints \
     import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
 from pacman.model.constraints.partitioner_constraints \
@@ -224,19 +225,21 @@ class PartitionAndPlacePartitioner(object):
         for (placed_vertex, x, y, p, placed_resources,
                 ip_tags, reverse_ip_tags) in used_placements:
 
-            # Deallocate the existing resources
-            resource_tracker.unallocate_resources(
-                x, y, p, placed_resources, ip_tags, reverse_ip_tags)
+            if not isinstance(placed_vertex, AbstractVirtualVertex):
+                # Deallocate the existing resources
+                resource_tracker.unallocate_resources(
+                    x, y, p, placed_resources, ip_tags, reverse_ip_tags)
 
             # Get the new resource usage
             vertex_slice = Slice(lo_atom, hi_atom)
             new_resources = \
                 placed_vertex.get_resources_used_by_atoms(vertex_slice)
 
-            # Re-allocate the existing resources
-            (x, y, p, ip_tags, reverse_ip_tags) = \
-                resource_tracker.allocate_constrained_resources(
-                    new_resources, placed_vertex.constraints)
+            if not isinstance(placed_vertex, AbstractVirtualVertex):
+                # Re-allocate the existing resources
+                (x, y, p, ip_tags, reverse_ip_tags) = \
+                    resource_tracker.allocate_constrained_resources(
+                        new_resources, placed_vertex.constraints)
             new_used_placements.append(
                 (placed_vertex, x, y, p, new_resources, ip_tags,
                  reverse_ip_tags))
@@ -278,69 +281,79 @@ class PartitionAndPlacePartitioner(object):
         # resources available
         min_hi_atom = hi_atom
         for vertex in vertices:
+
             # get resources used by vertex
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
 
-            # get max resources available on machine
-            resources = \
-                resource_tracker.get_maximum_constrained_resources_available(
-                    used_resources, vertex.constraints)
+            x = None
+            y = None
+            p = None
+            ip_tags = None
+            reverse_ip_tags = None
+            if not isinstance(vertex, AbstractVirtualVertex):
 
-            # Work out the ratio of used to available resources
-            ratio = self._find_max_ratio(used_resources, resources)
-
-            while ratio > 1.0 and hi_atom >= lo_atom:
-                # Scale the resources by the ratio
-                old_n_atoms = (hi_atom - lo_atom) + 1
-                new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))
-
-                # Avoid infinite looping
-                if old_n_atoms == new_n_atoms:
-                    new_n_atoms -= 1
-
-                # Find the new resource usage
-                hi_atom = lo_atom + new_n_atoms - 1
-                if hi_atom >= lo_atom:
-                    vertex_slice = Slice(lo_atom, hi_atom)
-                    used_resources = \
-                        vertex.get_resources_used_by_atoms(vertex_slice)
-                    ratio = self._find_max_ratio(used_resources, resources)
-
-            # If we couldn't partition, raise an exception
-            if hi_atom < lo_atom:
-                raise PacmanPartitionException(
-                    "No more of vertex '{}' would fit on the board:\n"
-                    "    Allocated so far: {} atoms\n"
-                    "    Request for SDRAM: {}\n"
-                    "    Largest SDRAM space: {}".format(
-                        vertex, lo_atom - 1,
-                        used_resources.sdram.get_value(),
-                        resources.sdram.get_value()))
-
-            # Try to scale up until just below the resource usage
-            used_resources, hi_atom = self._scale_up_resource_usage(
-                used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
-                resources, ratio, graph)
-
-            # If this hi_atom is smaller than the current minimum, update the
-            # other placements to use (hopefully) less resources
-            if hi_atom < min_hi_atom:
-                min_hi_atom = hi_atom
-                used_placements = self._reallocate_resources(
-                    used_placements, resource_tracker, lo_atom, hi_atom)
-
-            # Attempt to allocate the resources for this vertex on the machine
-            try:
-                (x, y, p, ip_tags, reverse_ip_tags) = \
-                    resource_tracker.allocate_constrained_resources(
+                # get max resources available on machine
+                resources = resource_tracker\
+                    .get_maximum_constrained_resources_available(
                         used_resources, vertex.constraints)
-                used_placements.append((vertex, x, y, p, used_resources,
-                                        ip_tags, reverse_ip_tags))
-            except PacmanValueError as e:
-                raise_from(PacmanValueError(
-                    "Unable to allocate requested resources to"
-                    " vertex '{}':\n{}".format(vertex, e)), e)
+
+                # Work out the ratio of used to available resources
+                ratio = self._find_max_ratio(used_resources, resources)
+
+                while ratio > 1.0 and hi_atom >= lo_atom:
+                    # Scale the resources by the ratio
+                    old_n_atoms = (hi_atom - lo_atom) + 1
+                    new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))
+
+                    # Avoid infinite looping
+                    if old_n_atoms == new_n_atoms:
+                        new_n_atoms -= 1
+
+                    # Find the new resource usage
+                    hi_atom = lo_atom + new_n_atoms - 1
+                    if hi_atom >= lo_atom:
+                        vertex_slice = Slice(lo_atom, hi_atom)
+                        used_resources = \
+                            vertex.get_resources_used_by_atoms(vertex_slice)
+                        ratio = self._find_max_ratio(used_resources, resources)
+
+                # If we couldn't partition, raise an exception
+                if hi_atom < lo_atom:
+                    raise PacmanPartitionException(
+                        "No more of vertex '{}' would fit on the board:\n"
+                        "    Allocated so far: {} atoms\n"
+                        "    Request for SDRAM: {}\n"
+                        "    Largest SDRAM space: {}".format(
+                            vertex, lo_atom - 1,
+                            used_resources.sdram.get_value(),
+                            resources.sdram.get_value()))
+
+                # Try to scale up until just below the resource usage
+                used_resources, hi_atom = self._scale_up_resource_usage(
+                    used_resources, hi_atom, lo_atom, max_atoms_per_core,
+                    vertex, resources, ratio, graph)
+
+                # If this hi_atom is smaller than the current minimum, update
+                # the other placements to use (hopefully) less resources
+                if hi_atom < min_hi_atom:
+                    min_hi_atom = hi_atom
+                    used_placements = self._reallocate_resources(
+                        used_placements, resource_tracker, lo_atom, hi_atom)
+
+                # Attempt to allocate the resources for this vertex on the
+                # machine
+                try:
+                    (x, y, p, ip_tags, reverse_ip_tags) = \
+                        resource_tracker.allocate_constrained_resources(
+                            used_resources, vertex.constraints)
+                except PacmanValueError as e:
+                    raise_from(PacmanValueError(
+                        "Unable to allocate requested resources to"
+                        " vertex '{}':\n{}".format(vertex, e)), e)
+
+            used_placements.append((vertex, x, y, p, used_resources,
+                                    ip_tags, reverse_ip_tags))
 
         # reduce data to what the parent requires
         final_placements = list()
