@@ -1,4 +1,4 @@
-from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar, DummyProgressBar
 
 # pacman imports
 from pacman.exceptions import PacmanRoutingException
@@ -76,7 +76,7 @@ class BasicDijkstraRouting(object):
         :param machine_graph: the machine_graph object
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param use_progress_bar: bool to either use a progress bar or not
+        :param use_progress_bar: whether to show a progress bar
         :type use_progress_bar: bool
         :return: The discovered routes
         :rtype:\
@@ -96,18 +96,17 @@ class BasicDijkstraRouting(object):
         self._update_all_weights(nodes_info)
 
         # each vertex represents a core in the board
-        progress = None
-        if use_progress_bar:
-            progress = ProgressBar(placements.n_placements,
-                                   "Creating routing entries")
+        pb_factory = ProgressBar if use_progress_bar else DummyProgressBar
+        progress = pb_factory(placements.n_placements,
+                              "Creating routing entries")
 
-        for placement in placements.placements:
+        for placement in progress.over(placements.placements):
             self._route(placement, placements, machine, machine_graph,
-                        nodes_info, tables, use_progress_bar, progress)
+                        nodes_info, tables)
         return self._routing_paths
 
     def _route(self, placement, placements, machine, graph, node_info,
-               tables, use_progress_bar, progress):
+               tables):
         # pylint: disable=too-many-arguments
         out_going_edges = filter(
             lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
@@ -136,9 +135,6 @@ class BasicDijkstraRouting(object):
             dest_placement = placements.get_placement_of_vertex(dest)
             self._retrace_back_to_source(
                 dest_placement, tables, edge, node_info, placement.p, graph)
-
-        if use_progress_bar:
-            progress.update()
 
     def _initiate_node_info(self, machine):
         """ Set up a dictionary which contains data for each chip in the\
