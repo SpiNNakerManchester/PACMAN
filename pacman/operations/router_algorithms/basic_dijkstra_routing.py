@@ -65,7 +65,7 @@ class BasicDijkstraRouting(object):
     def __call__(self, placements, machine, machine_graph,
                  bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW,
                  use_progress_bar=True):
-        """ Find routes between the edges with the allocated information,
+        """ Find routes between the edges with the allocated information,\
             placed in the given places
 
         :param placements: The placements of the edges
@@ -105,8 +105,7 @@ class BasicDijkstraRouting(object):
                         nodes_info, tables)
         return self._routing_paths
 
-    def _route(self, placement, placements, machine, graph, node_info,
-               tables):
+    def _route(self, placement, placements, machine, graph, node_info, tables):
         # pylint: disable=too-many-arguments
         out_going_edges = filter(
             lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
