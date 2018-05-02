@@ -168,7 +168,7 @@ def check_types_of_edge_constraint(machine_graph):
             raise PacmanConfigurationException(
                 "There are more than one of the same constraint type on "
                 "the partition {} starting at {}. Please fix and try again."
-                .format(partition.identifer, partition.pre_vertex))
+                .format(partition.identifier, partition.pre_vertex))
 
         fixed_key = len(fixed_key) == 1
         fixed_mask = len(fixed_mask) == 1
