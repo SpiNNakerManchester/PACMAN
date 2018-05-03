@@ -1,12 +1,9 @@
-from six import add_metaclass
 import math
 
 from pacman.model.resources import ElementFreeSpace
 from pacman.exceptions import PacmanElementAllocationException
-from spinn_utilities.abstract_base import AbstractBase
 
 
-@add_metaclass(AbstractBase)
 class ElementAllocatorAlgorithm(object):
     """ Abstract element allocator algorithm which allocates elements from\
         a pool of a given size
@@ -29,7 +26,7 @@ class ElementAllocatorAlgorithm(object):
             self._free_space_tracker.append(
                 ElementFreeSpace(size_begin, size_end))
 
-    def _allocate_elements(self, base_element_id, n_elements):
+    def allocate_elements(self, base_element_id, n_elements):
         """ Handle the allocating of space for a given set of elements
 
         :param base_element_id: the first element id to allocate

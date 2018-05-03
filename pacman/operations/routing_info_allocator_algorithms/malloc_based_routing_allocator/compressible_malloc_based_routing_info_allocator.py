@@ -221,7 +221,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # Go through the mask sets and allocate
             for key, n_keys in generate_key_ranges_from_mask(
                     key_and_mask.key, key_and_mask.mask):
-                self._allocate_elements(key, n_keys)
+                self.allocate_elements(key, n_keys)
 
     def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys):
         # If there isn't a fixed mask, generate a fixed mask based on the
@@ -281,6 +281,6 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         for (base_key, n_keys) in generate_key_ranges_from_mask(
                 key_found, mask):
-            self._allocate_elements(base_key, n_keys)
+            self.allocate_elements(base_key, n_keys)
         # If we get here, we can assign the keys to the edges
         return [BaseKeyAndMask(base_key=key_found, mask=mask)]

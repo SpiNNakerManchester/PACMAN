@@ -59,7 +59,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         # allocate standard IDs for real chips
         for x, y in progress.over(machine.chip_coordinates, False):
             expected_chip_id = (x << 8) + y
-            self._allocate_elements(expected_chip_id, 1)
+            self.allocate_elements(expected_chip_id, 1)
 
         # allocate IDs for virtual chips
         for vertex in progress.over(graph.vertices):
@@ -107,5 +107,5 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         # otherwise it will have already been deleted already.
         free_space_chunk = self._free_space_tracker[0]
         chip_id = free_space_chunk.start_address
-        self._allocate_elements(chip_id, 1)
+        self.allocate_elements(chip_id, 1)
         return (chip_id >> 8), (chip_id & _LOWER_16_BITS)
