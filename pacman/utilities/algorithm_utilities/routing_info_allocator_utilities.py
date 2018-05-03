@@ -9,13 +9,15 @@ from pacman.model.constraints.key_allocator_constraints\
     import FixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     share_key_constraint import ShareKeyConstraint
-from pacman.utilities.utility_calls import locate_constraints_of_type
+from pacman.utilities.utility_calls import \
+    locate_constraints_of_type, expand_to_bit_array, compress_from_bit_array
 from pacman.exceptions import (
     PacmanValueError, PacmanConfigurationException,
     PacmanInvalidParameterException, PacmanRouteInfoAllocationException)
 
 import logging
 from six import itervalues
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -274,3 +276,39 @@ def get_fixed_mask(same_key_group):
                 fields = fixed_mask_constraint.fields
 
     return mask, fields
+
+
+def generate_key_ranges_from_mask(key, mask):
+    """ Get a generator of base_key, n_keys pairs that represent ranges
+        allowed by the mask
+
+    :param key: The base key
+    :param mask: The mask
+    """
+    unwrapped_mask = expand_to_bit_array(mask)
+    first_zeros = list()
+    remaining_zeros = list()
+    pos = len(unwrapped_mask) - 1
+
+    # Keep the indices of the first set of zeros
+    while pos >= 0 and unwrapped_mask[pos] == 0:
+        first_zeros.append(pos)
+        pos -= 1
+
+    # Find all the remaining zeros
+    while pos >= 0:
+        if unwrapped_mask[pos] == 0:
+            remaining_zeros.append(pos)
+        pos -= 1
+
+    # Loop over 2^len(remaining_zeros) to produce the base key,
+    # with n_keys being 2^len(first_zeros)
+    n_sets = 2 ** len(remaining_zeros)
+    n_keys = 2 ** len(first_zeros)
+    unwrapped_key = expand_to_bit_array(key)
+    for value in xrange(n_sets):
+        generated_key = numpy.copy(unwrapped_key)
+        unwrapped_value = expand_to_bit_array(value)[
+            -len(remaining_zeros):]
+        generated_key[remaining_zeros] = unwrapped_value
+        yield compress_from_bit_array(generated_key), n_keys
