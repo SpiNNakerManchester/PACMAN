@@ -284,6 +284,9 @@ def generate_key_ranges_from_mask(key, mask):
 
     :param key: The base key
     :param mask: The mask
+    :return: generator of two ints representing the key field, and the n keys /
+    for that field
+    :rtype: generator of (int, int)
     """
     unwrapped_mask = expand_to_bit_array(mask)
     first_zeros = list()

@@ -40,7 +40,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     __slots__ = []
 
     def __init__(self):
-        super(MallocBasedRoutingInfoAllocator, self).__init__(0, 2 ** 32)
+        super(MallocBasedRoutingInfoAllocator, self).__init__(
+            [(0, 2 ** 32)])
 
     def __call__(self, machine_graph, n_keys_map, graph_mapper=None):
         # check that this algorithm supports the constraints

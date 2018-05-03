@@ -39,7 +39,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
     ]
 
     def __init__(self):
-        super(MallocBasedChipIdAllocator, self).__init__(0, 2 ** 32)
+        super(MallocBasedChipIdAllocator, self).__init__([(0, 2 ** 32)])
 
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()

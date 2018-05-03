@@ -17,9 +17,17 @@ class ElementAllocatorAlgorithm(object):
         "_free_space_tracker"
     ]
 
-    def __init__(self, size_begin, size_end):
+    def __init__(self, ranges):
+        """ element allocator algorithm
+        
+        :param ranges: iterable of tuples of (size being, size_end)
+        :type ranges: iterable of (int, int)
+        """
+
         self._free_space_tracker = list()
-        self._free_space_tracker.append(ElementFreeSpace(size_begin, size_end))
+        for size_begin, size_end in ranges:
+            self._free_space_tracker.append(
+                ElementFreeSpace(size_begin, size_end))
 
     def _allocate_elements(self, base_element_id, n_elements):
         """ Handle the allocating of space for a given set of elements
