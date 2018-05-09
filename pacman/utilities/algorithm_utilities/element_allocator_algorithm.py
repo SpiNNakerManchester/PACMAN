@@ -15,10 +15,9 @@ class ElementAllocatorAlgorithm(object):
     ]
 
     def __init__(self, ranges):
-        """ element allocator algorithm
-        
+        """
         :param ranges: iterable of tuples of (size being, size_end)
-        :type ranges: iterable of (int, int)
+        :type ranges: iterable(int, int)
         """
 
         self._free_space_tracker = list()

@@ -211,7 +211,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks):
         """ allocate fixed keys and masks
-        
+
         :param keys_and_masks: set of keys and masks
         :rtype: None
         """
