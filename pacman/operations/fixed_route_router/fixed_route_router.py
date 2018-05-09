@@ -2,6 +2,7 @@ from pacman.model.graphs.machine \
     import MachineVertex, MachineGraph, MachineEdge
 from pacman.model.placements import Placements, Placement
 from pacman.operations.router_algorithms import BasicDijkstraRouting
+from spinn_machine import Router
 from spinn_machine.fixed_route_entry import FixedRouteEntry
 from pacman.exceptions import \
     PacmanAlreadyExistsException, PacmanConfigurationException
@@ -65,10 +66,6 @@ class FixedRouteRouter(object):
 
     FAKE_ETHERNET_CHIP_X = 0
     FAKE_ETHERNET_CHIP_Y = 0
-    SIZE_OF_ONE_BOARD = 8
-    MAX_CHIP_X_ID_ON_ONE_BOARD = 7
-    MAX_CHIP_Y_ID_ON_ONE_BOARD = 7
-    LINKS_PER_ROUTER = 6
     FAKE_ROUTING_PARTITION = "FAKE_MC_ROUTE"
     DEFAULT_LINK_ID = 4
     RANDOM_CORE_ID = 4
@@ -149,19 +146,20 @@ class FixedRouteRouter(object):
             fake_placements.add_placement(Placement(
                 x=rel_x, y=rel_y, p=self.RANDOM_CORE_ID, vertex=vertex))
             down_links.update({
-                (rel_x, rel_y, link) for link in range(self.LINKS_PER_ROUTER)
+                (rel_x, rel_y, link) for link in range(
+                    Router.MAX_LINKS_PER_ROUTER)
                 if not machine.is_link_at(chip_x, chip_y, link)})
 
         # Create a fake machine consisting of only the one board that
         # the routes should go over
         fake_machine = machine
         if (board_version in machine.BOARD_VERSION_FOR_48_CHIPS and
-                (machine.max_chip_x > self.MAX_CHIP_X_ID_ON_ONE_BOARD or
-                 machine.max_chip_y > self.MAX_CHIP_Y_ID_ON_ONE_BOARD)):
+                (machine.max_chip_x > machine.MAX_CHIP_X_ID_ON_ONE_BOARD or
+                 machine.max_chip_y > machine.MAX_CHIP_Y_ID_ON_ONE_BOARD)):
             down_chips = {
                 (x, y) for x, y in zip(
-                    range(self.SIZE_OF_ONE_BOARD),
-                    range(self.SIZE_OF_ONE_BOARD))
+                    range(machine.SIZE_X_OF_ONE_BOARD),
+                    range(machine.SIZE_Y_OF_ONE_BOARD))
                 if not machine.is_chip_at(
                     (x + eth_x) % (machine.max_chip_x + 1),
                     (y + eth_y) % (machine.max_chip_y + 1))}
@@ -169,8 +167,8 @@ class FixedRouteRouter(object):
             # build a fake machine which is just one board but with the missing
             # bits of the real board
             fake_machine = VirtualMachine(
-                self.SIZE_OF_ONE_BOARD, self.SIZE_OF_ONE_BOARD, False,
-                down_chips=down_chips, down_links=down_links)
+                machine.SIZE_X_OF_ONE_BOARD, machine.SIZE_Y_OF_ONE_BOARD,
+                False, down_chips=down_chips, down_links=down_links)
 
         # build destination
         verts = graph.vertices
@@ -194,7 +192,8 @@ class FixedRouteRouter(object):
         # route as if using multicast
         router = BasicDijkstraRouting()
         routing_tables_by_partition = router(
-            fake_placements, fake_machine, graph)
+            placements=fake_placements, machine=fake_machine,
+            machine_graph=graph, use_progress_bar=False)
 
         # convert to fixed route entries
         for (chip_x, chip_y) in routing_tables_by_partition.get_routers():
