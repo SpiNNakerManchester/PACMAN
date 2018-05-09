@@ -402,7 +402,7 @@ class PACMANAlgorithmExecutor(object):
                     algorithms_used.append(algorithm.algorithm_id)
                 algorithm_input_requirement_breakdown = ""
                 for algorithm in algorithms_to_find:
-                     algorithm_input_requirement_breakdown += \
+                    algorithm_input_requirement_breakdown += \
                         self._deduce_inputs_required_to_run(
                             algorithm, input_types, token_states,
                             fake_inputs, fake_tokens)
