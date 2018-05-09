@@ -17,6 +17,7 @@ from pacman.exceptions import (
 
 import logging
 from six import itervalues
+from six.moves import xrange
 import numpy
 
 logger = logging.getLogger(__name__)
