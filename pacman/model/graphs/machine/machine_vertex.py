@@ -1,10 +1,8 @@
 from six import add_metaclass
-
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
-from spinn_utilities.overrides import overrides
-
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
 @add_metaclass(AbstractBase)

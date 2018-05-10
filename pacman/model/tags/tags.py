@@ -1,9 +1,8 @@
+from collections import defaultdict
+from six import itervalues
 from spinn_machine.tags import IPTag, ReverseIPTag
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.utilities import utility_calls
-
-from collections import defaultdict
-from six import itervalues
 
 
 class Tags(object):

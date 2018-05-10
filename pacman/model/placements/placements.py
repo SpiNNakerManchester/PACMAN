@@ -1,9 +1,8 @@
 from collections import OrderedDict
 from six import iterkeys, itervalues, raise_from
-from pacman.exceptions import (PacmanAlreadyPlacedError,
-                               PacmanNotPlacedError,
-                               PacmanProcessorAlreadyOccupiedError,
-                               PacmanProcessorNotOccupiedError)
+from pacman.exceptions import (
+    PacmanAlreadyPlacedError, PacmanNotPlacedError,
+    PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
 
 
 class Placements(object):
@@ -11,7 +10,6 @@ class Placements(object):
     """
 
     __slots__ = [
-
         # dict of [(x,y,p)] -> placement object. used for fast lookup of a
         # vertex given a set of coordinates
         "_placements",

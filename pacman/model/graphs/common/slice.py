@@ -1,5 +1,5 @@
-from pacman.exceptions import PacmanValueError
 import collections
+from pacman.exceptions import PacmanValueError
 
 
 class Slice(collections.namedtuple('Slice',

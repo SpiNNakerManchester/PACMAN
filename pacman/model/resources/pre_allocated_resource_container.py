@@ -1,9 +1,8 @@
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 
 
 class PreAllocatedResourceContainer(object):
-    """ container object for pre-allocated resources
-
+    """ container object for preallocated resources
     """
 
     __slots__ = [
@@ -93,9 +92,9 @@ class PreAllocatedResourceContainer(object):
 
     def extend(self, other):
         if not isinstance(other, PreAllocatedResourceContainer):
-            raise exceptions.PacmanConfigurationException(
-                "Only another pre allocated resource container can extend a "
-                "pre allocated resource container")
+            raise PacmanConfigurationException(
+                "Only another preallocated resource container can extend a "
+                "preallocated resource container")
 
         # add specific sdram usage
         self._specific_sdram_usage.extend(other.specific_sdram_usage)

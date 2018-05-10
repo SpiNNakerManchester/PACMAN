@@ -1,14 +1,9 @@
-# pacman imports
-from pacman.model.constraints.partitioner_constraints\
-    import MaxVertexAtomsConstraint
+import unittest
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint)
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
-
-# unit tests imports
 from uinit_test_objects import SimpleTestVertex
-
-# general imports
-import unittest
 
 
 class TestApplicationGraphModel(unittest.TestCase):
@@ -17,7 +12,7 @@ class TestApplicationGraphModel(unittest.TestCase):
     """
     def test_create_new_vertex(self):
         """
-        test initisation of a vertex
+        test initialisation of a vertex
         """
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         self.assertEqual(vert.n_atoms, 10)
@@ -25,7 +20,7 @@ class TestApplicationGraphModel(unittest.TestCase):
 
     def test_create_new_vertex_without_label(self):
         """
-        test initisation of a vertex without a label
+        test initialisation of a vertex without a label
         """
         vert = SimpleTestVertex(10, "Population", 256)
         self.assertEqual(vert.n_atoms, 10)
@@ -34,7 +29,7 @@ class TestApplicationGraphModel(unittest.TestCase):
 
     def test_create_new_vertex_with_constraint_list(self):
         """
-        test initisation of a vertex with a max size constraint
+        test initialisation of a vertex with a max size constraint
         """
         constraint = MaxVertexAtomsConstraint(2)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
@@ -45,7 +40,7 @@ class TestApplicationGraphModel(unittest.TestCase):
 
     def test_create_new_vertex_add_constraint(self):
         """
-        test creating a vertex and then adding constraints indivusally
+        test creating a vertex and then adding constraints individually
         """
         constraint1 = MaxVertexAtomsConstraint(2)
         constraint2 = MaxVertexAtomsConstraint(3)
@@ -64,7 +59,7 @@ class TestApplicationGraphModel(unittest.TestCase):
 
     def test_create_new_vertex_add_constraints(self):
         """
-        test that  creating a vertex and then adding constraints in a list
+        test that creating a vertex and then adding constraints in a list
         """
         constraint1 = MaxVertexAtomsConstraint(2)
         constraint2 = MaxVertexAtomsConstraint(3)
@@ -105,8 +100,8 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertIsInstance(vertex, SimpleMachineVertex)
 
     def test_new_create_vertex_from_vertex_check_resources(self):
-        """ check that the creation of a vertex means that the reosurces
-        calcualted by the vertex is the same as what the
+        """ check that the creation of a vertex means that the resources
+        calculated by the vertex is the same as what the
         vertex says (given same sizes)
 
         """

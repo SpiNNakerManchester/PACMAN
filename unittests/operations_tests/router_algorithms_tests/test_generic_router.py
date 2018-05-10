@@ -1,15 +1,13 @@
 import unittest
-
-from pacman.model.graphs.application \
-    import ApplicationVertex, ApplicationGraph, ApplicationEdge
-from pacman.model.graphs.machine \
-    import MachineEdge, MachineGraph, SimpleMachineVertex
-
+from spinn_machine import VirtualMachine
+from pacman.model.graphs.application import (
+    ApplicationVertex, ApplicationGraph, ApplicationEdge)
+from pacman.model.graphs.machine import (
+    MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.model.placements import Placement, Placements
 from pacman.model.routing_info import PartitionRoutingInfo, RoutingInfo
 from pacman.operations.router_algorithms import BasicDijkstraRouting
 from pacman.utilities.constants import DEFAULT_MASK
-from spinn_machine import VirtualMachine
 
 
 class Vertex(ApplicationVertex):

@@ -1,12 +1,11 @@
 import logging
 from spinn_utilities.progress_bar import ProgressBar
-
-from pacman.model.constraints.placer_constraints \
-    import AbstractPlacerConstraint
+from pacman.model.constraints.placer_constraints import (
+    AbstractPlacerConstraint)
 from pacman.model.placements import Placements
 from pacman.operations.placer_algorithms import RadialPlacer
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
-    import sort_vertices_by_known_constraints
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    sort_vertices_by_known_constraints)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 

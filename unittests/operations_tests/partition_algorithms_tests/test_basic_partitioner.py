@@ -1,22 +1,14 @@
 """
 test for partitioning
 """
-
-# pacman imports
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-
-from pacman.exceptions import PacmanInvalidParameterException,\
-    PacmanPartitionException
-from pacman.model.constraints.partitioner_constraints\
-    import MaxVertexAtomsConstraint
-from pacman.operations.partition_algorithms.basic_partitioner \
-    import BasicPartitioner
-
-# spinnMachine imports
-from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
-
-# general imports
 import unittest
+from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from pacman.exceptions import (
+    PacmanInvalidParameterException, PacmanPartitionException)
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint)
+from pacman.operations.partition_algorithms import BasicPartitioner
 from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
@@ -223,7 +215,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_less_sdram_than_default(self):
         """
         test that the partitioner works when its machine is slightly malformed
-        in that it has less sdram available
+        in that it has less SDRAM available
         """
         self.setup()
         flops = 20000000
@@ -258,7 +250,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_more_sdram_than_default(self):
         """
         test that the partitioner works when its machine is slightly malformed
-        in that it has more sdram avilable
+        in that it has more SDRAM available
         """
         self.setup()
         flops = 20000000

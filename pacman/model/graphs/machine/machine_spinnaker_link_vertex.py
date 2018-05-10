@@ -1,11 +1,9 @@
 from spinn_utilities.overrides import overrides
-from pacman.model.resources import ResourceContainer
-from pacman.model.resources import DTCMResource
-from pacman.model.resources import SDRAMResource
-from pacman.model.resources import CPUCyclesPerTickResource
+from pacman.model.resources import (
+    ResourceContainer, DTCMResource, SDRAMResource, CPUCyclesPerTickResource)
 from .machine_vertex import MachineVertex
-from pacman.model.graphs \
-    import AbstractVirtualVertex, AbstractSpiNNakerLinkVertex
+from pacman.model.graphs import (
+    AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 
 
 class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):

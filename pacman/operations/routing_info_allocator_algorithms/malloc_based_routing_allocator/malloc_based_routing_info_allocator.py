@@ -1,33 +1,24 @@
+import math
+import logging
+import numpy
+from past.builtins import xrange
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-
-# pacman imports
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint, ShareKeyConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedMaskConstraint, FixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.operations.routing_info_allocator_algorithms\
-    .malloc_based_routing_allocator.key_field_generator \
-    import KeyFieldGenerator
-from pacman.model.routing_info \
-    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
-from pacman.utilities.utility_calls import \
-    check_algorithm_can_support_constraints, \
-    compress_from_bit_array, expand_to_bit_array
+from pacman.model.constraints.key_allocator_constraints import (
+    AbstractKeyAllocatorConstraint, ShareKeyConstraint, FixedMaskConstraint,
+    FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint)
+from .key_field_generator import KeyFieldGenerator
+from pacman.model.routing_info import (
+    RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)
+from pacman.utilities.utility_calls import (
+    check_algorithm_can_support_constraints,
+    compress_from_bit_array, expand_to_bit_array)
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
-from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities as utilities
-from pacman.exceptions \
-    import PacmanConfigurationException, PacmanRouteInfoAllocationException
-
-# general imports
-import math
-import numpy
-import logging
-from past.builtins import xrange
+from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
+    import (check_types_of_edge_constraint, get_edge_groups)
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanRouteInfoAllocationException)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -54,14 +45,14 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # verify that no edge has more than 1 of a constraint ,and that
         # constraints are compatible
-        utilities.check_types_of_edge_constraint(machine_graph)
+        check_types_of_edge_constraint(machine_graph)
 
         # final keys allocations
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
         (fixed_keys, shared_keys, fixed_masks, fixed_fields, flexi_fields,
-         continuous, noncontinuous) = utilities.get_edge_groups(
+         continuous, noncontinuous) = get_edge_groups(
              machine_graph, EdgeTrafficType.MULTICAST)
 
         # Even non-continuous keys will be continuous

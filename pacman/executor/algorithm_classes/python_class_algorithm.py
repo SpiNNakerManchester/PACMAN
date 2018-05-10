@@ -1,9 +1,8 @@
 import importlib
 import logging
-
-from .abstract_python_algorithm import AbstractPythonAlgorithm
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from .abstract_python_algorithm import AbstractPythonAlgorithm
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -13,7 +12,6 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
     """
 
     __slots__ = [
-
         # Python Class to create
         "_python_class",
 

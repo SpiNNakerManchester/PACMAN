@@ -1,4 +1,3 @@
-# pacman imports
 from pacman.exceptions import PacmanInvalidParameterException
 
 

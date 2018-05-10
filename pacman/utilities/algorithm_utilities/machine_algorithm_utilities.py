@@ -1,5 +1,5 @@
-from spinn_machine import SDRAM, Chip, Link, Processor, Router
 import sys
+from spinn_machine import SDRAM, Chip, Link, Processor, Router
 
 
 def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):

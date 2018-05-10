@@ -1,8 +1,7 @@
-from pacman.exceptions import PacmanInvalidParameterException
-from pacman.exceptions import PacmanValueError
-
 import hashlib
 import numpy
+from pacman.exceptions import (
+    PacmanInvalidParameterException, PacmanValueError)
 
 
 def locate_constraints_of_type(constraints, constraint_type):
@@ -16,8 +15,8 @@ def locate_constraints_of_type(constraints, constraint_type):
         :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
     :return: The constraints of constraint_type that are found in the \
         constraints given
-    :rtype: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :rtype: iterable(\
+        :py:class:`pacman.model.constraints.AbstractConstraint`)
     :raises None: no known exceptions
     """
     return [c for c in constraints if isinstance(c, constraint_type)]
@@ -27,8 +26,8 @@ def locate_first_constraint_of_type(constraints, constraint_type):
     """ Locates the first constraint of a given type out of a list
 
     :param constraints: The constraints to select from
-    :type constraints: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :type constraints: iterable(\
+        :py:class:`pacman.model.constraints.AbstractConstraint`)
     :param constraint_type: The type of constraints to return
     :type constraint_type:\
         :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
@@ -59,11 +58,11 @@ def check_algorithm_can_support_constraints(
 
     :param constrained_vertices: a list of constrained vertices which each has\
         constraints given to the algorithm
-    :type constrained_vertices: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :type constrained_vertices: iterable(\
+        :py:class:`pacman.model.constraints.AbstractConstraint`)
     :param supported_constraints: The constraints supported
-    :type supported_constraints: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :type supported_constraints: iterable(\
+        :py:class:`pacman.model.constraints.AbstractConstraint`)
     :param abstract_constraint_type: The overall abstract c type supported
     :type abstract_constraint_type:\
         :py:class:`pacman.model.constraints.AbstractConstraint`
@@ -102,7 +101,7 @@ def expand_to_bit_array(value):
 
     :param value: The value to expand
     :type value: int
-    :rtype: [uint8]
+    :rtype: numpy.array(uint8)
     """
     return numpy.unpackbits(
         numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
@@ -113,7 +112,7 @@ def compress_from_bit_array(bit_array):
         into a 32-bit value
 
     :param bit_array: The array to compress
-    :type bit_array: [uint8]
+    :type bit_array: numpy.array(uint8)
     :rtype: int
     """
     return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
@@ -124,10 +123,10 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
         where is a 1 or 0, into a 32-bit value.
 
     :param bit_array: The array to extract the value from
-    :type bit_array: [uint8]
+    :type bit_array: numpy.array(uint8)
     :param bit_positions: The positions of the bits to extract, each value\
         being between 0 and 31
-    :type bit_positions: [int]
+    :type bit_positions: numpy.array(int)
     :rtype: int
     """
     expanded_value = numpy.zeros(32, dtype="uint8")

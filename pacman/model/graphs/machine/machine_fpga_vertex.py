@@ -1,10 +1,8 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
-from pacman.model.resources import ResourceContainer
-from pacman.model.resources import DTCMResource
-from pacman.model.resources import SDRAMResource
+from pacman.model.resources import (
+    ResourceContainer, DTCMResource, SDRAMResource, CPUCyclesPerTickResource)
 from .machine_vertex import MachineVertex
-from pacman.model.resources import CPUCyclesPerTickResource
 
 
 class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):

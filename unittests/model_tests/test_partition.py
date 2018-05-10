@@ -1,7 +1,7 @@
 import unittest
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.constraints.partitioner_constraints import \
-    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint)
 
 
 class TestPartitionConstraints(unittest.TestCase):

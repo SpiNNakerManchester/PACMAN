@@ -1,6 +1,6 @@
 import numpy
-
-from pacman.utilities import utility_calls
+from pacman.utilities.utility_calls import (
+    compress_bits_from_bit_array, compress_from_bit_array, expand_to_bit_array)
 from pacman.utilities.utility_objs import Field
 from pacman.exceptions import PacmanRouteInfoAllocationException
 
@@ -49,7 +49,7 @@ class KeyFieldGenerator(object):
         self._field_ones = dict()
         self._field_value = dict()
 
-        expanded_mask = utility_calls.expand_to_bit_array(fixed_mask)
+        expanded_mask = expand_to_bit_array(fixed_mask)
         zeros = numpy.where(expanded_mask == 0)[0]
         self._n_mask_keys = 2 ** len(zeros)
 
@@ -96,12 +96,12 @@ class KeyFieldGenerator(object):
         # the current value of each field given the minimum key (even if the
         # value might be out of range for the key - see later for fix for this)
         for field in self._fields:
-            expanded_mask = utility_calls.expand_to_bit_array(field.value)
+            expanded_mask = expand_to_bit_array(field.value)
             field_ones = numpy.where(expanded_mask == 1)[0]
             self._field_ones[field] = field_ones
             field_min_key = min_key & field.value
-            field_min_value = utility_calls.compress_bits_from_bit_array(
-                utility_calls.expand_to_bit_array(field_min_key), field_ones)
+            field_min_value = compress_bits_from_bit_array(
+                expand_to_bit_array(field_min_key), field_ones)
             self._field_value[field] = field_min_value
 
         # Update the values (other than the top value) to be valid
@@ -156,10 +156,9 @@ class KeyFieldGenerator(object):
         expanded_key = numpy.zeros(32, dtype="uint8")
         for field in self._fields:
             field_ones = self._field_ones[field]
-            expanded_value = utility_calls.expand_to_bit_array(
-                self._field_value[field])
+            expanded_value = expand_to_bit_array(self._field_value[field])
             expanded_key[field_ones] = expanded_value[-len(field_ones):]
-        key = utility_calls.compress_from_bit_array(expanded_key)
+        key = compress_from_bit_array(expanded_key)
 
         # Return the generated key
         return key

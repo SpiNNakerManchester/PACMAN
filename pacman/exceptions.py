@@ -4,7 +4,6 @@ import traceback
 class PacmanException(Exception):
     """ Indicates a general exception from Pacman
     """
-    pass
 
 
 class PacmanInvalidParameterException(PacmanException):
@@ -181,34 +180,28 @@ class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
     """ An exception that indicates that an algorithm ran from outside\
         the software stack has failed to complete for some unknown reason.
     """
-    pass
 
 
 class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
     """ An exception that indicates that an algorithm has not generated the\
         correct outputs for some unknown reason.
     """
-    pass
 
 
 class PacmanAlreadyPlacedError(ValueError):
     """Indicates multiple placements are being made for a vertex."""
-    pass
 
 
 class PacmanNotPlacedError(KeyError):
     """Indicates no placements are made for a vertex."""
-    pass
 
 
 class PacmanProcessorAlreadyOccupiedError(ValueError):
     """Indicates multiple placements are being made to a processor."""
-    pass
 
 
 class PacmanProcessorNotOccupiedError(KeyError):
     """Indicates that no placement has been made to a processor."""
-    pass
 
 
 class PacmanProcessorNotAvailableError(PacmanException):
@@ -223,19 +216,15 @@ class PacmanProcessorNotAvailableError(PacmanException):
 
 class PacmanValueError(ValueError, PacmanException):
     """Indicates that a value is invalid for some reason."""
-    pass
 
 
 class PacmanNotFoundError(KeyError, PacmanException):
     """Indicates that some object has not been found when requested."""
-    pass
 
 
 class PacmanTypeError(TypeError, PacmanException):
     """Indicates that an object is of incorrect type."""
-    pass
 
 
 class PacmanNoMergeException(PacmanException):
     """Exception to indicate that there are no merges worth performing."""
-    pass

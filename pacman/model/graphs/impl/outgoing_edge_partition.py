@@ -1,7 +1,7 @@
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
-from pacman.exceptions import \
-    PacmanInvalidParameterException, PacmanConfigurationException
+from pacman.exceptions import (
+    PacmanInvalidParameterException, PacmanConfigurationException)
 from pacman.model.graphs import AbstractOutgoingEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 

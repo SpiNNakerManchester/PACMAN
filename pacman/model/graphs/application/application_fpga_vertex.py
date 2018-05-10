@@ -1,16 +1,12 @@
+import sys
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
-from pacman.model.resources import ResourceContainer
-from pacman.model.resources import DTCMResource
-from pacman.model.resources import SDRAMResource
-from pacman.model.graphs.machine.machine_fpga_vertex \
-    import MachineFPGAVertex
-from pacman.model.resources import CPUCyclesPerTickResource
-
-import sys
+from pacman.model.resources import (
+    ResourceContainer, DTCMResource, SDRAMResource, CPUCyclesPerTickResource)
+from pacman.model.graphs.machine import MachineFPGAVertex
 
 
 class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):

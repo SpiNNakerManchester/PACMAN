@@ -1,12 +1,9 @@
-# pacman imports
+import json
+from six import text_type
 from pacman.model.placements import Placement, Placements
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities.constants import EDGES
 from pacman.utilities.file_format_schemas import validate
-
-# general imports
-import json
-from six import text_type
 
 
 class ConvertToMemoryPlacements(object):

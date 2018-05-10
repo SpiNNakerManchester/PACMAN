@@ -1,7 +1,6 @@
 from six import add_metaclass
-
-from pacman.exceptions import PacmanConfigurationException
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.exceptions import PacmanConfigurationException
 
 
 @add_metaclass(AbstractBase)

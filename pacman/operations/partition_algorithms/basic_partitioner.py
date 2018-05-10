@@ -1,16 +1,14 @@
 import logging
-
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPartitionException
-from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
+from pacman.model.constraints.partitioner_constraints import (
+    AbstractPartitionerConstraint, MaxVertexAtomsConstraint)
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
-from pacman.utilities.algorithm_utilities \
-    import partition_algorithm_utilities as utils
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
+    import (generate_machine_edges, get_remaining_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
-
-from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +59,7 @@ class BasicPartitioner(object):
             self._partition_one_application_vertex(
                 vertex, resource_tracker, machine_graph, graph_mapper)
 
-        utils.generate_machine_edges(machine_graph, graph_mapper, graph)
+        generate_machine_edges(machine_graph, graph_mapper, graph)
 
         return machine_graph, graph_mapper, len(resource_tracker.keys)
 
@@ -90,7 +88,7 @@ class BasicPartitioner(object):
             m_vertex = vertex.create_machine_vertex(
                 vertex_slice, resources,
                 "{}:{}:{}".format(vertex.label, first, last),
-                utils.get_remaining_constraints(vertex))
+                get_remaining_constraints(vertex))
             m_graph.add_vertex(m_vertex)
             mapper.add_vertex_mapping(m_vertex, vertex_slice, vertex)
 

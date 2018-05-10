@@ -1,6 +1,6 @@
 from collections import OrderedDict
-from pacman.exceptions import \
-    PacmanAlreadyExistsException, PacmanRoutingException
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanRoutingException)
 
 
 class MulticastRoutingTable(object):

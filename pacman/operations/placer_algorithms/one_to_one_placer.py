@@ -1,16 +1,13 @@
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
-
-# pacman imports
-from pacman.exceptions import \
-    PacmanException, PacmanInvalidParameterException, PacmanValueError
+from pacman.exceptions import (
+    PacmanException, PacmanInvalidParameterException, PacmanValueError)
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
-from pacman.utilities.algorithm_utilities \
-    import placer_algorithm_utilities as placer_utils
-from pacman.model.constraints.placer_constraints\
-    import SameChipAsConstraint
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
+from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.utilities.utility_calls import is_single
 
 
@@ -37,7 +34,7 @@ class OneToOnePlacer(RadialPlacer):
             additional_placement_constraints={SameChipAsConstraint})
 
         # Get which vertices must be placed on the same chip as another vertex
-        same_chip_vertex_groups = placer_utils.get_same_chip_vertex_groups(
+        same_chip_vertex_groups = get_same_chip_vertex_groups(
             machine_graph.vertices)
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
             machine_graph, same_chip_vertex_groups)
@@ -120,8 +117,7 @@ class OneToOnePlacer(RadialPlacer):
         found_list = set()
 
         # order vertices based on constraint priority
-        vertices = placer_utils.sort_vertices_by_known_constraints(
-            machine_graph.vertices)
+        vertices = sort_vertices_by_known_constraints(machine_graph.vertices)
 
         for vertex in vertices:
             if vertex not in found_list:

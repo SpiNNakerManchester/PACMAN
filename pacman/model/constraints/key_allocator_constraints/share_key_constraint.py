@@ -1,5 +1,4 @@
-from pacman.model.constraints.key_allocator_constraints import \
-    AbstractKeyAllocatorConstraint
+from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class ShareKeyConstraint(AbstractKeyAllocatorConstraint):

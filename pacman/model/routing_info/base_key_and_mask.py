@@ -1,5 +1,5 @@
-from pacman.exceptions import PacmanConfigurationException
 import numpy
+from pacman.exceptions import PacmanConfigurationException
 
 
 class BaseKeyAndMask(object):

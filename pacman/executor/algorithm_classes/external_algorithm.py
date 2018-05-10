@@ -1,9 +1,8 @@
 import subprocess
-
-from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
-from .abstract_algorithm import AbstractAlgorithm
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
+from .abstract_algorithm import AbstractAlgorithm
 
 
 class ExternalAlgorithm(AbstractAlgorithm):

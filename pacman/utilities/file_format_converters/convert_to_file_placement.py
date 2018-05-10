@@ -1,8 +1,7 @@
+import json
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
 from pacman.utilities.utility_calls import ident
-from spinn_utilities.progress_bar import ProgressBar
-
-import json
 
 
 class ConvertToFilePlacement(object):

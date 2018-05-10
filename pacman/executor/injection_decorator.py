@@ -1,6 +1,6 @@
 from collections import defaultdict
-from functools import wraps
 import inspect
+from functools import wraps
 from six import iteritems, itervalues
 
 _instances = list()

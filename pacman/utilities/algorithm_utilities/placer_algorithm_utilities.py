@@ -1,7 +1,6 @@
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint, SameChipAsConstraint
-from pacman.model.constraints.placer_constraints \
-    import BoardConstraint, RadialPlacementFromChipConstraint
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
+    RadialPlacementFromChipConstraint)
 from pacman.utilities import VertexSorter, ConstraintOrder
 
 

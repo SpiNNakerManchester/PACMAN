@@ -1,13 +1,9 @@
 """
 tests for slice
 """
-
-# pacman imports
+import unittest
 from pacman.exceptions import PacmanValueError
 from pacman.model.graphs.common import Slice
-
-# general imports
-import unittest
 
 
 class TestSliceFunctions(unittest.TestCase):

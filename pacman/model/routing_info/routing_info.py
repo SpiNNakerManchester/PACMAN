@@ -1,6 +1,5 @@
-# pacman imports
-from pacman.exceptions import PacmanAlreadyExistsException
 from six import itervalues
+from pacman.exceptions import PacmanAlreadyExistsException
 
 
 class RoutingInfo(object):
@@ -23,8 +22,8 @@ class RoutingInfo(object):
     def __init__(self, partition_info_items=None):
         """
         :param partition_info_items: The partition information items to add
-        :type partition_info_items: iterable of\
-            :py:class:`pacman.model.routing_info.PartitionRoutingInfo` \
+        :type partition_info_items: iterable(\
+            :py:class:`pacman.model.routing_info.PartitionRoutingInfo`) \
             or None
         :raise pacman.exceptions.PacmanAlreadyExistsException: If there are \
             two partition information objects with the same partition

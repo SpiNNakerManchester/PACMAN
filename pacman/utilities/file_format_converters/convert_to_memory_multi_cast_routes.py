@@ -1,8 +1,7 @@
 import json
-
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.routing_table_by_partition import \
-    MulticastRoutingTableByPartitionEntry, MulticastRoutingTableByPartition
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartitionEntry, MulticastRoutingTableByPartition)
 
 _route_translation = {
     "CORE_0": (True, 0),
@@ -94,7 +93,6 @@ class ConvertToMemoryMultiCastRoutes(object):
     @staticmethod
     def _handle_json_files(file_routing_paths):
         """
-
         :param file_routing_paths:
         """
         with open(file_routing_paths, "r") as f:

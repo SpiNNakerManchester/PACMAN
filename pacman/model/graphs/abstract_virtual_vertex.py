@@ -1,9 +1,8 @@
-from abc import abstractproperty, abstractmethod
-
+from spinn_utilities.abstract_base import (
+    abstractmethod, abstractproperty)
 from .abstract_vertex import AbstractVertex
 
 
-# interface
 class AbstractVirtualVertex(AbstractVertex):
     """ A vertex which exists outside of the machine
     """

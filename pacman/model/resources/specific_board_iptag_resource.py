@@ -1,5 +1,5 @@
-from pacman.model.resources import AbstractResource
 from spinn_utilities.overrides import overrides
+from .abstract_resource import AbstractResource
 
 
 class SpecificBoardTagResource(AbstractResource):
