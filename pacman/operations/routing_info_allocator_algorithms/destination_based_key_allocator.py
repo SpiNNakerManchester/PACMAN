@@ -9,7 +9,6 @@ from pacman.utilities.utility_calls import (
 from pacman.exceptions import PacmanConfigurationException
 
 
-
 class DestinationBasedRoutingInfoAllocator(object):
     """ A routing key allocator that operates for people who wish to have a\
         separate key for each destination (making a mc into a point-to-point\

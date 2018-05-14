@@ -14,7 +14,7 @@ from pacman import exceptions
 from pacman.utilities.utility_objs import FlexiField
 from pacman.utilities.utility_objs.flexi_field import SUPPORTED_TAGS
 from pacman.utilities.algorithm_utilities.field_based_system_utilities import (
-    convert_mask_into_fields, deduce_types)
+    convert_mask_into_fields, deduce_types, TYPES_OF_FIELDS)
 from rig.bitfield import BitField
 
 # hard coded values
@@ -23,12 +23,9 @@ APPLICATION_MASK_BIT = 0
 # flag for usage for detecting the application field
 APPLICATION_DIVIDER_FIELD_NAME = "APPLICATION_DIVIDER"
 
-FIXED_MASK_NAME = \
-    field_utilities.TYPES_OF_FIELDS.FIXED_MASK.name  # @UndefinedVariable
-FIXED_KEY_NAME = \
-    field_utilities.TYPES_OF_FIELDS.FIXED_KEY.name  # @UndefinedVariable
-FIXED_FIELD_NAME = \
-    field_utilities.TYPES_OF_FIELDS.FIXED_FIELD.name  # @UndefinedVariable
+FIXED_MASK_NAME = TYPES_OF_FIELDS.FIXED_MASK.name  # @UndefinedVariable
+FIXED_KEY_NAME = TYPES_OF_FIELDS.FIXED_KEY.name  # @UndefinedVariable
+FIXED_FIELD_NAME = TYPES_OF_FIELDS.FIXED_FIELD.name  # @UndefinedVariable
 FIXED_NAMES = frozenset([FIXED_MASK_NAME, FIXED_KEY_NAME, FIXED_FIELD_NAME])
 
 
