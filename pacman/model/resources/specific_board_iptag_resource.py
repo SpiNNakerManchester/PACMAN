@@ -1,8 +1,7 @@
-from pacman.model.resources import AbstractResource
 from spinn_utilities.overrides import overrides
 
 
-class SpecificBoardTagResource(AbstractResource):
+class SpecificBoardTagResource(object):
     """
     A resource that allocates a tag on a specific board before the class\
     needing it has been built.
@@ -110,7 +109,6 @@ class SpecificBoardTagResource(AbstractResource):
         """
         return self._board
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
         return [
             self._board, self._ip_address, self._port, self._strip_sdp,

@@ -1,7 +1,4 @@
-from .abstract_resource import AbstractResource
-
-
-class SpecificChipSDRAMResource(AbstractResource):
+class SpecificChipSDRAMResource(object):
     """ Represents the number of cores that need to be allocated
     """
 

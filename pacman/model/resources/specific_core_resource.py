@@ -1,7 +1,4 @@
-from .abstract_resource import AbstractResource
-
-
-class SpecificCoreResource(AbstractResource):
+class SpecificCoreResource(object):
     """ Represents specific cores that need to be allocated
     """
 
