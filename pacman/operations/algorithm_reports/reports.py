@@ -482,7 +482,7 @@ def _write_sdram_by_core(f, placements, progress):
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.get_value()
+        sdram = placement.vertex.resources_required.sdram.get_total_sdram()
         x, y, p = placement.x, placement.y, placement.p
         f.write("SDRAM reqs for core ({},{},{}) is {} KB\n".format(
             x, y, p, int(sdram / 1024.0)))

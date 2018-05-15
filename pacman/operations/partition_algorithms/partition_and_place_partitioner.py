@@ -326,8 +326,8 @@ class PartitionAndPlacePartitioner(object):
                         "    Request for SDRAM: {}\n"
                         "    Largest SDRAM space: {}".format(
                             vertex, lo_atom - 1,
-                            used_resources.sdram.get_value(),
-                            resources.sdram.get_value()))
+                            used_resources.sdram.get_total_sdram(),
+                            resources.sdram.get_total_sdram()))
 
                 # Try to scale up until just below the resource usage
                 used_resources, hi_atom = self._scale_up_resource_usage(
@@ -460,6 +460,17 @@ class PartitionAndPlacePartitioner(object):
         return float(aval) / float(bval)
 
     @staticmethod
+    def _sdram_ratio(a, b):
+        """Get the ratio between two resource descriptors, with special\
+        handling for when either descriptor is zero.
+        """
+        aval = a.get_total_sdram()
+        bval = b.get_total_sdram()
+        if aval == 0 or bval == 0:
+            return 0
+        return float(aval) / float(bval)
+
+    @staticmethod
     def _find_max_ratio(resources, max_resources):
         """ Find the max ratio between the resources
 
@@ -478,6 +489,6 @@ class PartitionAndPlacePartitioner(object):
             resources.cpu_cycles, max_resources.cpu_cycles)
         dtcm_ratio = PartitionAndPlacePartitioner._ratio(
             resources.dtcm, max_resources.dtcm)
-        sdram_ratio = PartitionAndPlacePartitioner._ratio(
+        sdram_ratio = PartitionAndPlacePartitioner._sdram_ratio(
             resources.sdram, max_resources.sdram)
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))

@@ -21,11 +21,11 @@ class TestResourceModels(unittest.TestCase):
         correctly
         """
         sdram = SDRAMResource(128 * (2**20))
-        self.assertEqual(sdram.get_value(), 128 * (2**20))
+        self.assertEqual(sdram.get_total_sdram(), 128 * (2**20))
         sdram = SDRAMResource(128 * (2**19))
-        self.assertEqual(sdram.get_value(), 128 * (2**19))
+        self.assertEqual(sdram.get_total_sdram(), 128 * (2**19))
         sdram = SDRAMResource(128 * (2**21))
-        self.assertEqual(sdram.get_value(), 128 * (2**21))
+        self.assertEqual(sdram.get_total_sdram(), 128 * (2**21))
 
     def test_dtcm(self):
         """
@@ -60,7 +60,7 @@ class TestResourceModels(unittest.TestCase):
         cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_value(), 128 * (2**20))
+        self.assertEqual(container.sdram.get_total_sdram(), 128 * (2**20))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**20) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**20) + 2)
 
@@ -69,7 +69,7 @@ class TestResourceModels(unittest.TestCase):
         cpu = CPUCyclesPerTickResource(128 * (2**19) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_value(), 128 * (2**19))
+        self.assertEqual(container.sdram.get_total_sdram(), 128 * (2**19))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**19) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**19) + 2)
 
@@ -78,7 +78,7 @@ class TestResourceModels(unittest.TestCase):
         cpu = CPUCyclesPerTickResource(128 * (2**21) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_value(), 128 * (2**21))
+        self.assertEqual(container.sdram.get_total_sdram(), 128 * (2**21))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**21) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**21) + 2)
 

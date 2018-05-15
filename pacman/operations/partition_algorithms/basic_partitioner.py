@@ -116,7 +116,8 @@ class BasicPartitioner(object):
         # Find the ratio of each of the resources - if 0 is required,
         # assume the ratio is the max available
         atoms_per_sdram = self._get_ratio(
-            limits.sdram.get_value(), requirements.sdram.get_value())
+            limits.sdram.get_total_sdram(),
+            requirements.sdram.get_total_sdram())
         atoms_per_dtcm = self._get_ratio(
             limits.dtcm.get_value(), requirements.dtcm.get_value())
         atoms_per_cpu = self._get_ratio(

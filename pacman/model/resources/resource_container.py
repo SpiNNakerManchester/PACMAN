@@ -112,7 +112,7 @@ class ResourceContainer(object):
 
         # add sdram usage
         self._sdram_usage = SDRAMResource(
-            self._sdram_usage.get_value() + other.sdram.get_value())
+            self._sdram_usage.get_total_sdram() + other.sdram.get_total_sdram())
 
         # add iptags
         self._iptags.extend(other.iptags)

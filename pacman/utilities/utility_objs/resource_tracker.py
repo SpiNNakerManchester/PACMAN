@@ -389,8 +389,8 @@ class ResourceTracker(object):
         """
         if key in self._sdram_tracker:
             return ((chip.sdram.size - self._sdram_tracker[key]) >=
-                    resources.sdram.get_value())
-        return chip.sdram.size >= resources.sdram.get_value()
+                    resources.sdram.get_total_sdram())
+        return chip.sdram.size >= resources.sdram.get_total_sdram()
 
     def _sdram_available(self, chip, key):
         """ Return the amount of SDRAM available on a chip
@@ -720,9 +720,9 @@ class ResourceTracker(object):
             :py:class:`pacman.model.resources.ResourceContainer`
         """
         if key not in self._sdram_tracker:
-            self._sdram_tracker[key] = resources.sdram.get_value()
+            self._sdram_tracker[key] = resources.sdram.get_total_sdram()
         else:
-            self._sdram_tracker[key] += resources.sdram.get_value()
+            self._sdram_tracker[key] += resources.sdram.get_total_sdram()
 
     def _allocate_core(self, chip, key, processor_id):
         """ Allocates a core on the given chip
@@ -1052,7 +1052,7 @@ class ResourceTracker(object):
 
         total_sdram = 0
         for resources in group_resources:
-            total_sdram += resources.sdram.get_value()
+            total_sdram += resources.sdram.get_total_sdram()
 
         # Find the first usable chip which fits all the group resources
         tried_chips = list()
@@ -1178,7 +1178,7 @@ class ResourceTracker(object):
             "      {} Cores and {} tags on {} chips, largest SDRAM space: {}\n"
             .format(
                 resources.cpu_cycles.get_value(), resources.dtcm.get_value(),
-                resources.sdram.get_value(), resources.iptags,
+                resources.sdram.get_total_sdram(), resources.iptags,
                 resources.reverse_iptags, n_cores, n_tags, n_chips, max_sdram,
                 all_n_cores, all_n_tags, all_n_chips, all_max_sdram))
 
@@ -1319,7 +1319,7 @@ class ResourceTracker(object):
         """
 
         self._chips_available.add((chip_x, chip_y))
-        self._sdram_tracker[chip_x, chip_y] -= resources.sdram.get_value()
+        self._sdram_tracker[chip_x, chip_y] -= resources.sdram.get_total_sdram()
         self._core_tracker[chip_x, chip_y].add(processor_id)
 
         # check if chip used needs updating

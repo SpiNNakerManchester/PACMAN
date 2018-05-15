@@ -127,7 +127,7 @@ def convert_to_rig_graph(machine_graph):
             # handle standard vertices
             vertices_resources[vertex] = {
                 "cores": N_CORES_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
+                "sdram": int(vertex.resources_required.sdram.get_total_sdram())}
 
         # handle the vertex edges
         for partition in \
@@ -159,7 +159,7 @@ def convert_to_rig_graph_pure_mc(machine_graph):
             # handle standard vertices
             vertices_resources[vertex] = {
                 "cores": N_CORES_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
+                "sdram": int(vertex.resources_required.sdram.get_total_sdram())}
 
         # handle the vertex edges
         for partition in \

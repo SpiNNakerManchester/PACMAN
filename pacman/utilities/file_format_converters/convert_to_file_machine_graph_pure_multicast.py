@@ -74,7 +74,7 @@ class ConvertToFileMachineGraphPureMulticast(object):
             # add the tag-able vertex
             vertices[vertex_id] = {
                 "cores": DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
+                "sdram": int(vertex.resources_required.sdram.get_total_sdram())}
             # add fake vertex
             vertices[tag_id] = {
                 "cores": 0,
@@ -84,7 +84,7 @@ class ConvertToFileMachineGraphPureMulticast(object):
         else:
             vertices[vertex_id] = {
                 "cores": DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
+                "sdram": int(vertex.resources_required.sdram.get_total_sdram())}
 
         # handle the vertex edges
         for partition in machine_graph\
