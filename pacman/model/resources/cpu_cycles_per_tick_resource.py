@@ -1,6 +1,3 @@
-from spinn_utilities.overrides import overrides
-
-
 class CPUCyclesPerTickResource(object):
     """ Represents the number of CPU clock cycles per tick used or available\
         on a core of a chip in the machine

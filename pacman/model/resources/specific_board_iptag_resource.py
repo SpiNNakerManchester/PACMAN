@@ -1,6 +1,3 @@
-from spinn_utilities.overrides import overrides
-
-
 class SpecificBoardTagResource(object):
     """
     A resource that allocates a tag on a specific board before the class\

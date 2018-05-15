@@ -1,6 +1,3 @@
-from spinn_utilities.overrides import overrides
-
-
 class IPtagResource(object):
     """ Represents the amount of local core memory available or used on a core\
         on a chip of the machine
