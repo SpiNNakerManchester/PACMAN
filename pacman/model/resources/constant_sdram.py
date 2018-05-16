@@ -1,8 +1,10 @@
 from .abstract_sdram import AbstractSDRAM
 
 
-class SDRAMResource(AbstractSDRAM):
-    """ DEPRICATED: Please use SDRAMAvaiable, ConstantSDRAM or VariableSDRAM
+class ConstantSDRAM(AbstractSDRAM):
+    """ Represents an amount of SDRAM used  on a chip in the machine.
+
+    This is used when the amount of SDRAM needed is not effected by runtime
     """
 
     __slots__ = [

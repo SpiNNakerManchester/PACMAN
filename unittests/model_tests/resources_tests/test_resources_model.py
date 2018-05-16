@@ -3,7 +3,7 @@ test for the resources model
 """
 
 import unittest
-from pacman.model.resources import SDRAMResource, CPUCyclesPerTickResource
+from pacman.model.resources import ConstantSDRAM, CPUCyclesPerTickResource
 from pacman.model.resources import DTCMResource, ResourceContainer
 from pacman.model.resources import IPtagResource, ReverseIPtagResource
 from pacman.model.resources import \
@@ -20,11 +20,11 @@ class TestResourceModels(unittest.TestCase):
         test that adding a sdram resource to a resoruce container works
         correctly
         """
-        sdram = SDRAMResource(128 * (2**20))
+        sdram = ConstantSDRAM(128 * (2**20))
         self.assertEqual(sdram.get_total_sdram(), 128 * (2**20))
-        sdram = SDRAMResource(128 * (2**19))
+        sdram = ConstantSDRAM(128 * (2**19))
         self.assertEqual(sdram.get_total_sdram(), 128 * (2**19))
-        sdram = SDRAMResource(128 * (2**21))
+        sdram = ConstantSDRAM(128 * (2**21))
         self.assertEqual(sdram.get_total_sdram(), 128 * (2**21))
 
     def test_dtcm(self):
@@ -55,7 +55,7 @@ class TestResourceModels(unittest.TestCase):
         """
         tests that creating multiple resoruce containers doesnt cause issues.
         """
-        sdram = SDRAMResource(128 * (2**20))
+        sdram = ConstantSDRAM(128 * (2**20))
         dtcm = DTCMResource(128 * (2**20) + 1)
         cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
 
@@ -64,7 +64,7 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(container.dtcm.get_value(), 128 * (2**20) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**20) + 2)
 
-        sdram = SDRAMResource(128 * (2**19))
+        sdram = ConstantSDRAM(128 * (2**19))
         dtcm = DTCMResource(128 * (2**19) + 1)
         cpu = CPUCyclesPerTickResource(128 * (2**19) + 2)
 
@@ -73,7 +73,7 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(container.dtcm.get_value(), 128 * (2**19) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**19) + 2)
 
-        sdram = SDRAMResource(128 * (2**21))
+        sdram = ConstantSDRAM(128 * (2**21))
         dtcm = DTCMResource(128 * (2**21) + 1)
         cpu = CPUCyclesPerTickResource(128 * (2**21) + 2)
 

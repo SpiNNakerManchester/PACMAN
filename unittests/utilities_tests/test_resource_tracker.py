@@ -1,7 +1,7 @@
 import unittest
 
 from spinn_machine import VirtualMachine
-from pacman.model.resources import ResourceContainer, SDRAMResource
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.resources import PreAllocatedResourceContainer
@@ -51,7 +51,7 @@ class TestResourceTracker(unittest.TestCase):
             width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
         tracker = ResourceTracker(machine, preallocated_resources=None)
 
-        sdram_res = SDRAMResource(12345)
+        sdram_res = ConstantSDRAM(12345)
         resources = ResourceContainer(sdram=sdram_res)
         chip_0 = machine.get_chip_at(0, 0)
 
@@ -93,7 +93,7 @@ class TestResourceTracker(unittest.TestCase):
         resource_tracker = ResourceTracker(machine)
         with self.assertRaises(PacmanValueError):
             resource_tracker.allocate_resources(
-                ResourceContainer(sdram=SDRAMResource(1024)))
+                ResourceContainer(sdram=ConstantSDRAM(1024)))
 
 
 if __name__ == '__main__':

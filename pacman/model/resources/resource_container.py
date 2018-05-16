@@ -1,6 +1,6 @@
 from .cpu_cycles_per_tick_resource import CPUCyclesPerTickResource
 from .dtcm_resource import DTCMResource
-from .sdram_resource import SDRAMResource
+from .constant_sdram import ConstantSDRAM
 
 
 class ResourceContainer(object):
@@ -68,7 +68,7 @@ class ResourceContainer(object):
         if self._dtcm_usage is None:
             self._dtcm_usage = DTCMResource(0)
         if self._sdram_usage is None:
-            self._sdram_usage = SDRAMResource(0)
+            self._sdram_usage = ConstantSDRAM(0)
         if self._cpu_cycles is None:
             self._cpu_cycles = CPUCyclesPerTickResource(0)
         if self._reverse_iptags is None:
