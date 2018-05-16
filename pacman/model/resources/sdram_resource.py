@@ -1,6 +1,3 @@
-from spinn_utilities.overrides import overrides
-
-
 class SDRAMResource(object):
     """ Represents an amount of SDRAM used or available on a chip in the\
         machine.
