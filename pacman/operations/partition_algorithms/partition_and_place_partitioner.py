@@ -1,3 +1,4 @@
+from __future__ import division
 import logging
 from six import raise_from
 
@@ -250,7 +251,7 @@ class PartitionAndPlacePartitioner(object):
             self, lo_atom, hi_atom, vertices, resource_tracker,
             max_atoms_per_core, graph):
         """ Reduce the number of atoms on a core so that it fits within the
-            resources available.
+            resources_available available.
 
         :param lo_atom: the number of atoms already partitioned
         :type lo_atom: int
@@ -268,7 +269,7 @@ class PartitionAndPlacePartitioner(object):
         :param graph: the application graph object
         :type graph:\
             :py:class:`pacman.model.graphs.application.ApplicationGraph`
-        :param resource_tracker: Tracker of used resources
+        :param resource_tracker: Tracker of used resources_available
         :type resource_tracker: spinn_machine.Machine object
         :return: the list of placements made by this method and the new amount\
             of atoms partitioned
@@ -278,11 +279,11 @@ class PartitionAndPlacePartitioner(object):
         used_placements = list()
 
         # Find the number of atoms that will fit in each vertex given the
-        # resources available
+        # resources_available available
         min_hi_atom = hi_atom
         for vertex in vertices:
 
-            # get resources used by vertex
+            # get resources_available used by vertex
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
 
@@ -293,18 +294,18 @@ class PartitionAndPlacePartitioner(object):
             reverse_ip_tags = None
             if not isinstance(vertex, AbstractVirtualVertex):
 
-                # get max resources available on machine
-                resources = resource_tracker\
+                # get max resources_available available on machine
+                resources_available = resource_tracker\
                     .get_maximum_constrained_resources_available(
                         used_resources, vertex.constraints)
 
-                # Work out the ratio of used to available resources
-                ratio = self._find_max_ratio(used_resources, resources)
+                # Work out the ratio of used to available resources_available
+                ratio = self._find_max_ratio(used_resources, resources_available)
 
                 while ratio > 1.0 and hi_atom >= lo_atom:
-                    # Scale the resources by the ratio
+                    # Scale the resources_available by the ratio
                     old_n_atoms = (hi_atom - lo_atom) + 1
-                    new_n_atoms = int(float(old_n_atoms) / (ratio * 1.1))
+                    new_n_atoms = int(old_n_atoms / (ratio * 1.1))
 
                     # Avoid infinite looping
                     if old_n_atoms == new_n_atoms:
@@ -316,7 +317,8 @@ class PartitionAndPlacePartitioner(object):
                         vertex_slice = Slice(lo_atom, hi_atom)
                         used_resources = \
                             vertex.get_resources_used_by_atoms(vertex_slice)
-                        ratio = self._find_max_ratio(used_resources, resources)
+                        ratio = self._find_max_ratio(
+                            used_resources, resources_available)
 
                 # If we couldn't partition, raise an exception
                 if hi_atom < lo_atom:
@@ -327,21 +329,21 @@ class PartitionAndPlacePartitioner(object):
                         "    Largest SDRAM space: {}".format(
                             vertex, lo_atom - 1,
                             used_resources.sdram.get_total_sdram(),
-                            resources.sdram.get_total_sdram()))
+                            resources_available.sdram.get_sdram_available()))
 
                 # Try to scale up until just below the resource usage
                 used_resources, hi_atom = self._scale_up_resource_usage(
                     used_resources, hi_atom, lo_atom, max_atoms_per_core,
-                    vertex, resources, ratio, graph)
+                    vertex, resources_available, ratio, graph)
 
                 # If this hi_atom is smaller than the current minimum, update
-                # the other placements to use (hopefully) less resources
+                # the other placements to use (hopefully) less resources_available
                 if hi_atom < min_hi_atom:
                     min_hi_atom = hi_atom
                     used_placements = self._reallocate_resources(
                         used_placements, resource_tracker, lo_atom, hi_atom)
 
-                # Attempt to allocate the resources for this vertex on the
+                # Attempt to allocate the resources_available for this vertex on the
                 # machine
                 try:
                     (x, y, p, ip_tags, reverse_ip_tags) = \
@@ -349,7 +351,7 @@ class PartitionAndPlacePartitioner(object):
                             used_resources, vertex.constraints)
                 except PacmanValueError as e:
                     raise_from(PacmanValueError(
-                        "Unable to allocate requested resources to"
+                        "Unable to allocate requested resources_available to"
                         " vertex '{}':\n{}".format(vertex, e)), e)
 
             used_placements.append((vertex, x, y, p, used_resources,
@@ -449,36 +451,23 @@ class PartitionAndPlacePartitioner(object):
         return max_atoms_per_core
 
     @staticmethod
-    def _ratio(a, b):
-        """Get the ratio between two resource descriptors, with special\
-        handling for when either descriptor is zero.
+    def _ratio(numerator, denominator):
+        """Get the ratio between two values, with special\
+        handling for when the denominator is zero.
         """
-        aval = a.get_value()
-        bval = b.get_value()
-        if aval == 0 or bval == 0:
+        if denominator == 0:
             return 0
-        return float(aval) / float(bval)
+        return numerator / denominator
 
     @staticmethod
-    def _sdram_ratio(a, b):
-        """Get the ratio between two resource descriptors, with special\
-        handling for when either descriptor is zero.
-        """
-        aval = a.get_total_sdram()
-        bval = b.get_total_sdram()
-        if aval == 0 or bval == 0:
-            return 0
-        return float(aval) / float(bval)
-
-    @staticmethod
-    def _find_max_ratio(resources, max_resources):
+    def _find_max_ratio(required, available):
         """ Find the max ratio between the resources
 
-        :param resources: the resources used by the vertex
-        :type resources:\
+        :param required: the resources used by the vertex
+        :type required:\
             :py:class:`pacman.model.resources.ResourceContainer`
-        :param max_resources: the max resources available from the machine
-        :type max_resources: \
+        :param available: the max resources available from the machine
+        :type available: \
             :py:class:`pacman.model.resources.ResourceContainer`
         :return: the largest ratio of resources
         :rtype: int
@@ -486,9 +475,10 @@ class PartitionAndPlacePartitioner(object):
 
         """
         cpu_ratio = PartitionAndPlacePartitioner._ratio(
-            resources.cpu_cycles, max_resources.cpu_cycles)
+            required.cpu_cycles.get_value(), available.cpu_cycles.get_value())
         dtcm_ratio = PartitionAndPlacePartitioner._ratio(
-            resources.dtcm, max_resources.dtcm)
-        sdram_ratio = PartitionAndPlacePartitioner._sdram_ratio(
-            resources.sdram, max_resources.sdram)
+            required.dtcm.get_value(), available.dtcm.get_value())
+        sdram_ratio = PartitionAndPlacePartitioner._ratio(
+            required.sdram.get_total_sdram(),
+            available.sdram.get_sdram_available())
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))

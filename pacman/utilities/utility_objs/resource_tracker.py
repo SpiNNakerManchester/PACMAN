@@ -3,7 +3,7 @@ from pacman.model.constraints.placer_constraints\
 from pacman.model.constraints.placer_constraints\
     import ChipAndCoreConstraint, AbstractPlacerConstraint
 from pacman.model.resources import ResourceContainer, DTCMResource, \
-    SDRAMResource, CPUCyclesPerTickResource
+    SDRAMAvaiable, CPUCyclesPerTickResource
 from pacman.utilities import utility_calls
 from pacman.exceptions import PacmanInvalidParameterException, \
     PacmanProcessorNotAvailableError, PacmanValueError, PacmanException
@@ -1294,7 +1294,7 @@ class ResourceTracker(object):
         # Send the maximums
         return ResourceContainer(
             DTCMResource(max_dtcm_available),
-            SDRAMResource(max_sdram_available),
+            SDRAMAvaiable(max_sdram_available),
             CPUCyclesPerTickResource(max_cpu_available))
 
     def unallocate_resources(self, chip_x, chip_y, processor_id, resources,
