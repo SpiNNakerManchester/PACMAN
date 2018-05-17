@@ -37,10 +37,18 @@ class VariableSDRAM(AbstractSDRAM):
                 self._fixed_sdram + other.get_total_sdram(),
                 self._per_timestep_sdram, self._assumed_timesteps)
         else:
+            if self._assumed_timesteps:
+                if other._assumed_timesteps:
+                    assumed_timesteps = max(
+                        self._assumed_timesteps, other._assumed_timesteps)
+                else:
+                    assumed_timesteps = self._assumed_timesteps
+            else:
+                assumed_timesteps = other._assumed_timesteps
             return VariableSDRAM(
                 self._fixed_sdram + other._fixed_sdram,
                 self._per_timestep_sdram + other._per_timestep_sdram,
-                max(self._assumed_timesteps, other._assumed_timesteps))
+                assumed_timesteps)
 
     def set_assumed_timesteps(self, assumed_timesteps):
         self._assumed_timesteps = assumed_timesteps
