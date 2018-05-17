@@ -9,7 +9,6 @@ from .pre_allocated_resource_container import PreAllocatedResourceContainer
 from .resource_container import ResourceContainer
 from .reverse_iptag_resource import ReverseIPtagResource
 from .sdram_available import SDRAMAvaiable
-from .sdram_resource import SDRAMResource
 from .specific_board_iptag_resource import \
     SpecificBoardTagResource as SpecificBoardIPtagResource
 from .specific_board_reverse_iptag_resource import \
@@ -21,7 +20,7 @@ from .variable_sdram import VariableSDRAM
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
            "CPUCyclesPerTickResource", "DTCMResource",
            "ElementFreeSpace", "IPtagResource", "ResourceContainer",
-           "ReverseIPtagResource", "SDRAMAvaiable", "SDRAMResource",
+           "ReverseIPtagResource", "SDRAMAvaiable",
            "PreAllocatedResourceContainer", "SpecificChipSDRAMResource",
            "SpecificCoreResource", "SpecificBoardIPtagResource",
            "SpecificBoardReverseIPtagResource", "VariableSDRAM"]
