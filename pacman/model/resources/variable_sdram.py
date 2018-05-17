@@ -17,7 +17,7 @@ class VariableSDRAM(AbstractSDRAM):
         "_assumed_timesteps"
     ]
 
-    def __init__(self, fixed_sdram, per_timestep_sdram, assumed_timesteps):
+    def __init__(self, fixed_sdram, per_timestep_sdram, assumed_timesteps=None):
         """
         :param sdram: The amount of SDRAM in bytes
         :type sdram: int
@@ -41,3 +41,6 @@ class VariableSDRAM(AbstractSDRAM):
                 self._fixed_sdram + other._fixed_sdram,
                 self._per_timestep_sdram + other._per_timestep_sdram,
                 max(self._assumed_timesteps, other._assumed_timesteps))
+
+    def set_assumed_timesteps(self, assumed_timesteps):
+        self._assumed_timesteps = assumed_timesteps
