@@ -22,3 +22,11 @@ class ConstantSDRAM(AbstractSDRAM):
 
     def get_total_sdram(self):
         return self._sdram
+
+    def extend(self, other):
+        if isinstance(other, ConstantSDRAM):
+            return ConstantSDRAM(
+                self.get_total_sdram() + other.get_total_sdram())
+        else:
+            # The other is more complex so delegate to it
+            return other.extend(self)

@@ -1,4 +1,5 @@
 from .abstract_sdram import AbstractSDRAM
+from .constant_sdram import ConstantSDRAM
 
 
 class VariableSDRAM(AbstractSDRAM):
@@ -29,3 +30,14 @@ class VariableSDRAM(AbstractSDRAM):
     def get_total_sdram(self):
         return self._fixed_sdram + \
                (self._per_timestep_sdram * self._assumed_timesteps)
+
+    def extend(self, other):
+        if isinstance(other, ConstantSDRAM):
+            return VariableSDRAM(
+                self._fixed_sdram + other.get_total_sdram(),
+                self._per_timestep_sdram, self._assumed_timesteps)
+        else:
+            return VariableSDRAM(
+                self._fixed_sdram + other._fixed_sdram,
+                self._per_timestep_sdram + other._per_timestep_sdram,
+                max(self._assumed_timesteps, other._assumed_timesteps))

@@ -3,11 +3,10 @@ test for the resources model
 """
 
 import unittest
-from pacman.model.resources import ConstantSDRAM, CPUCyclesPerTickResource
-from pacman.model.resources import DTCMResource, ResourceContainer
-from pacman.model.resources import IPtagResource, ReverseIPtagResource
-from pacman.model.resources import \
-    SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource
+from pacman.model.resources import (
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
+    IPtagResource, ReverseIPtagResource, SpecificBoardIPtagResource,
+    SpecificBoardReverseIPtagResource, VariableSDRAM)
 
 
 class TestResourceModels(unittest.TestCase):
@@ -20,12 +19,22 @@ class TestResourceModels(unittest.TestCase):
         test that adding a sdram resource to a resoruce container works
         correctly
         """
-        sdram = ConstantSDRAM(128 * (2**20))
-        self.assertEqual(sdram.get_total_sdram(), 128 * (2**20))
-        sdram = ConstantSDRAM(128 * (2**19))
-        self.assertEqual(sdram.get_total_sdram(), 128 * (2**19))
-        sdram = ConstantSDRAM(128 * (2**21))
-        self.assertEqual(sdram.get_total_sdram(), 128 * (2**21))
+        const1 = ConstantSDRAM(128)
+        self.assertEqual(const1.get_total_sdram(), 128)
+        const2 = ConstantSDRAM(256)
+        combo = const1.extend(const2)
+        self.assertEqual(combo.get_total_sdram(), 128+256)
+        combo = const2.extend(const1)
+        self.assertEqual(combo.get_total_sdram(), 128+256)
+        var1 = VariableSDRAM(124, 8, 100)
+        self.assertEqual(var1.get_total_sdram(), 124 + 8 * 100)
+        combo = var1.extend(const1)
+        self.assertEqual(combo.get_total_sdram(), 128 + 124 + 8 * 100)
+        combo = const1.extend(var1)
+        self.assertEqual(combo.get_total_sdram(), 128 + 124 + 8 * 100)
+        var2 = VariableSDRAM(234, 6, 150)
+        combo = var2.extend(var1)
+        self.assertEqual(combo.get_total_sdram(), 234 + 124 + (8 + 6) * 150)
 
     def test_dtcm(self):
         """

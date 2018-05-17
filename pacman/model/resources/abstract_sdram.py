@@ -13,3 +13,14 @@ class AbstractSDRAM(object):
     def get_total_sdram(self):
         """ The total sdram. Or the best quess based on the assume runtime"""
         return self._sdram
+
+    @abstractmethod
+    def extend(self, other):
+        """
+        Combines this SDRAM resource with the other one and creates a new one
+
+        :param other: another  SDRAM resource
+        :type other: AbstractSDRAM
+        :return: a New AbstractSDRAM
+        :rtype AbstractSDRAM
+        """

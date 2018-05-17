@@ -1,6 +1,6 @@
+from .constant_sdram import ConstantSDRAM
 from .cpu_cycles_per_tick_resource import CPUCyclesPerTickResource
 from .dtcm_resource import DTCMResource
-from .constant_sdram import ConstantSDRAM
 
 
 class ResourceContainer(object):
@@ -111,8 +111,7 @@ class ResourceContainer(object):
             self._dtcm_usage.get_value() + other.dtcm.get_value())
 
         # add sdram usage
-        self._sdram_usage = SDRAMResource(
-            self._sdram_usage.get_total_sdram() + other.sdram.get_total_sdram())
+        self._sdram_usage = self._sdram_usage.extend(other._sdram_usage)
 
         # add iptags
         self._iptags.extend(other.iptags)
