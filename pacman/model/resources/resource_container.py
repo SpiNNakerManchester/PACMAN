@@ -111,7 +111,7 @@ class ResourceContainer(object):
             self._dtcm_usage.get_value() + other.dtcm.get_value())
 
         # add sdram usage
-        self._sdram_usage = self._sdram_usage.extend(other._sdram_usage)
+        self._sdram_usage = self._sdram_usage + other._sdram_usage
 
         # add iptags
         self._iptags.extend(other.iptags)
