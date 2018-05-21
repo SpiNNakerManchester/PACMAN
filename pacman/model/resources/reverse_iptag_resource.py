@@ -1,8 +1,4 @@
-from .abstract_resource import AbstractResource
-from spinn_utilities.overrides import overrides
-
-
-class ReverseIPtagResource(AbstractResource):
+class ReverseIPtagResource(object):
     """ Represents the amount of local core memory available or used on a core\
         on a chip of the machine
     """
@@ -64,7 +60,6 @@ class ReverseIPtagResource(AbstractResource):
         """
         return self._tag
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
         return [self._port, self._sdp_port, self._tag]
 
