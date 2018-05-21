@@ -69,7 +69,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Even non-continuous keys will be continuous
         for group in noncontinuous:
-            continuous.add(group)
+            continuous.append(group)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(
@@ -211,7 +211,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks):
         """ allocate fixed keys and masks
-        
+
         :param keys_and_masks: set of keys and masks
         :rtype: None
         """

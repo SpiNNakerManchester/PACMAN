@@ -17,6 +17,7 @@ from pacman.exceptions import (
 
 import logging
 from six import itervalues
+from six.moves import xrange
 import numpy
 
 logger = logging.getLogger(__name__)
@@ -279,14 +280,14 @@ def get_fixed_mask(same_key_group):
 
 
 def generate_key_ranges_from_mask(key, mask):
-    """ Get a generator of base_key, n_keys pairs that represent ranges
+    """ Get a generator of base_key, n_keys pairs that represent ranges\
         allowed by the mask
 
     :param key: The base key
     :param mask: The mask
-    :return: generator of two ints representing the key field, and the n keys /
-    for that field
-    :rtype: generator of (int, int)
+    :return: generator of two ints representing the key field, and the n keys\
+        for that field
+    :rtype: iterator(tuple(int, int))
     """
     unwrapped_mask = expand_to_bit_array(mask)
     first_zeros = list()
