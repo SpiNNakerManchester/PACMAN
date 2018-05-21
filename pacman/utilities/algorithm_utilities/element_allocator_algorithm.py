@@ -143,3 +143,9 @@ class ElementAllocatorAlgorithm(object):
         if space < n_elements:
             return None
         return space
+
+    def space_remaining(self):
+        remaining = 0
+        for free_space in self._free_space_tracker:
+            remaining += free_space.size
+        return remaining
