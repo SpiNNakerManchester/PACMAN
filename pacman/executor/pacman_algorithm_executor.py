@@ -431,7 +431,7 @@ class PACMANAlgorithmExecutor(object):
                     "    Tokens complete: {}\n"
                     "    Fake tokens complete: {}\n"
                     "    Tokens to find: {}\n"
-                    "    Algorithms Left: {}\n"
+                    "    Required algorithms remaining to be used: {}\n"
                     "    Optional Algorithms unused: {}\n"
                     "    Functions used: {}\n"
                     "    Algorithm by outputs: {}\n"
