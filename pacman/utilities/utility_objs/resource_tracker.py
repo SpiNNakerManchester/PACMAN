@@ -180,7 +180,7 @@ class ResourceTracker(object):
         for sdram_pre_allocated in preallocated_resources.specific_sdram_usage:
             chip = sdram_pre_allocated.chip
             sdram = sdram_pre_allocated.sdram_usage
-            if [chip.x, chip.y] in self._sdram_tracker:
+            if (chip.x, chip.y) in self._sdram_tracker:
                 self._sdram_tracker[chip.x, chip.y] += sdram
             else:
                 self._sdram_tracker[chip.x, chip.y] = sdram
@@ -189,7 +189,7 @@ class ResourceTracker(object):
         for specific_core in preallocated_resources.specific_core_resources:
             chip = specific_core.chip
             processor_ids = specific_core.cores
-            if not [chip.x, chip.y] in self._core_tracker:
+            if not (chip.x, chip.y) in self._core_tracker:
                 self._fill_in_core_tracker_for_chip((chip.x, chip.y), chip)
             for processor_id in processor_ids:
                 self._core_tracker[chip.x, chip.y].remove(processor_id)
@@ -199,7 +199,7 @@ class ResourceTracker(object):
         for arbitrary_core in preallocated_resources.core_resources:
             chip = arbitrary_core.chip
             n_cores = arbitrary_core.n_cores
-            if [chip.x, chip.y] in chip_to_arbitrary_core_requirement:
+            if (chip.x, chip.y) in chip_to_arbitrary_core_requirement:
                 chip_to_arbitrary_core_requirement[chip.x, chip.y] += n_cores
             else:
                 chip_to_arbitrary_core_requirement[chip.x, chip.y] = n_cores
