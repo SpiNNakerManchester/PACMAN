@@ -1,8 +1,4 @@
-from spinn_utilities.overrides import overrides
-from .abstract_resource import AbstractResource
-
-
-class DTCMResource(AbstractResource):
+class DTCMResource(object):
     """ Represents the amount of local core memory available or used on a core\
         on a chip of the machine
     """
@@ -22,6 +18,8 @@ class DTCMResource(AbstractResource):
         """
         self._dtcm = dtcm
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
+        """
+        :return: The required amount of DTCM, in bytes.
+        """
         return self._dtcm

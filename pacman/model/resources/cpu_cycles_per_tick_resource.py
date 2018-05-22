@@ -1,8 +1,4 @@
-from spinn_utilities.overrides import overrides
-from .abstract_resource import AbstractResource
-
-
-class CPUCyclesPerTickResource(AbstractResource):
+class CPUCyclesPerTickResource(object):
     """ Represents the number of CPU clock cycles per tick used or available\
         on a core of a chip in the machine
     """
@@ -22,6 +18,8 @@ class CPUCyclesPerTickResource(AbstractResource):
         """
         self._cycles = cycles
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
+        """
+        :return: The number of CPU clock cycles needed per simulation tick.
+        """
         return self._cycles

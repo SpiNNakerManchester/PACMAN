@@ -3,8 +3,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
-from pacman.model.resources import (
-    ResourceContainer, DTCMResource, SDRAMResource, CPUCyclesPerTickResource)
+from pacman.model.resources import ResourceContainer
 from pacman.model.graphs import (
     AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
@@ -68,10 +67,7 @@ class ApplicationSpiNNakerLinkVertex(
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer(
-            dtcm=DTCMResource(0), sdram=SDRAMResource(0),
-            cpu_cycles=CPUCyclesPerTickResource(0)
-        )
+        return ResourceContainer()
 
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(

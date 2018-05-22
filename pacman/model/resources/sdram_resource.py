@@ -1,8 +1,4 @@
-from spinn_utilities.overrides import overrides
-from .abstract_resource import AbstractResource
-
-
-class SDRAMResource(AbstractResource):
+class SDRAMResource(object):
     """ Represents an amount of SDRAM used or available on a chip in the\
         machine.
     """
@@ -20,9 +16,8 @@ class SDRAMResource(AbstractResource):
         """
         self._sdram = sdram
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
-        """ See \
-            :py:meth:`pacman.model.resources.AbstractResource.get_value`
+        """
+        :return: The amount of SDRAM required, in bytes.
         """
         return self._sdram

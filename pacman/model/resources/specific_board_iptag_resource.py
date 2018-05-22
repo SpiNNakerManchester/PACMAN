@@ -1,8 +1,4 @@
-from spinn_utilities.overrides import overrides
-from .abstract_resource import AbstractResource
-
-
-class SpecificBoardTagResource(AbstractResource):
+class SpecificBoardTagResource(object):
     """
     A resource that allocates a tag on a specific board before the class\
     needing it has been built.
@@ -110,8 +106,10 @@ class SpecificBoardTagResource(AbstractResource):
         """
         return self._board
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
+        """
+        :return: A description of the specific board's IP tag required.
+        """
         return [
             self._board, self._ip_address, self._port, self._strip_sdp,
             self._tag, self._traffic_identifier]

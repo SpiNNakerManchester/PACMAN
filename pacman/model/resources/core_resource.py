@@ -1,7 +1,4 @@
-from .abstract_resource import AbstractResource
-
-
-class CoreResource(AbstractResource):
+class CoreResource(object):
     """ Represents the number of cores that need to be allocated
     """
 
@@ -35,4 +32,7 @@ class CoreResource(AbstractResource):
         return self._chip
 
     def get_value(self):
+        """
+        :return: The number of chips and cores required.
+        """
         return self._chip, self._n_cores

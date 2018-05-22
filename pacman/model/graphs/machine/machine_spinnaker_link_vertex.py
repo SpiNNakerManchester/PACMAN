@@ -1,6 +1,5 @@
 from spinn_utilities.overrides import overrides
-from pacman.model.resources import (
-    ResourceContainer, DTCMResource, SDRAMResource, CPUCyclesPerTickResource)
+from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
 from pacman.model.graphs import (
     AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
@@ -29,9 +28,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
     @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
-        return ResourceContainer(
-            dtcm=DTCMResource(0), sdram=SDRAMResource(0),
-            cpu_cycles=CPUCyclesPerTickResource(0))
+        return ResourceContainer()
 
     @property
     @overrides(AbstractSpiNNakerLinkVertex.spinnaker_link_id)

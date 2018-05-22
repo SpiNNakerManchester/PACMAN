@@ -1,8 +1,4 @@
-from spinn_utilities.overrides import overrides
-from .abstract_resource import AbstractResource
-
-
-class IPtagResource(AbstractResource):
+class IPtagResource(object):
     """ Represents the amount of local core memory available or used on a core\
         on a chip of the machine
     """
@@ -99,8 +95,10 @@ class IPtagResource(AbstractResource):
         """
         return self._tag
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
+        """
+        :return: The description of the IP tag.
+        """
         return [
             self._ip_address, self._port, self._strip_sdp, self._tag,
             self._traffic_identifier
