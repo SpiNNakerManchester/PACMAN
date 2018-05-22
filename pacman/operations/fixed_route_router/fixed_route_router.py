@@ -68,7 +68,6 @@ class FixedRouteRouter(object):
     FAKE_ETHERNET_CHIP_Y = 0
     FAKE_ROUTING_PARTITION = "FAKE_MC_ROUTE"
     DEFAULT_LINK_ID = 4
-    RANDOM_CORE_ID = 4
 
     def __call__(self, machine, placements, board_version, destination_class):
         """ Runs the fixed route generator for all boards on machine
@@ -143,8 +142,17 @@ class FixedRouteRouter(object):
             rel_y = chip_y - eth_y
             if rel_y < 0:
                 rel_y += machine.max_chip_y + 1
+
+            free_processor = 0
+            while ((free_processor < machine.MAX_CORES_PER_CHIP) and
+                   fake_placements.is_processor_occupied(
+                       self.FAKE_ETHERNET_CHIP_X,
+                       y=self.FAKE_ETHERNET_CHIP_Y,
+                       p=free_processor)):
+                free_processor += 1
+
             fake_placements.add_placement(Placement(
-                x=rel_x, y=rel_y, p=self.RANDOM_CORE_ID, vertex=vertex))
+                x=rel_x, y=rel_y, p=free_processor, vertex=vertex))
             down_links.update({
                 (rel_x, rel_y, link) for link in range(
                     Router.MAX_LINKS_PER_ROUTER)
