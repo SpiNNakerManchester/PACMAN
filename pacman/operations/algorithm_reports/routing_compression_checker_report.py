@@ -85,22 +85,22 @@ def calc_remainders(o_code, c_code):
 def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
     if o_code is None:
         o_code = codify(o_route)
-    keys = compressed_dict.keys()
+    keys = list(compressed_dict.keys())
     for i in range(start, len(keys)):
         c_code = keys[i]
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
             f.write("\t\t{}\n".format(reports.format_route(c_route)))
             if o_route.defaultable != c_route.defaultable:
-                PacmanRoutingException(  # TODO: Raise this exception!
+                raise PacmanRoutingException(
                     "Compressed route {} covers original route {} but has "
                     "a different defaultable value.".format(c_route, o_route))
             if o_route.processor_ids != c_route.processor_ids:
-                PacmanRoutingException(  # TODO: Raise this exception!
+                raise PacmanRoutingException(
                     "Compressed route {} covers original route {} but has "
                     "a different processor_ids.".format(c_route, o_route))
             if o_route.link_ids != c_route.link_ids:
-                PacmanRoutingException(  # TODO: Raise this exception!
+                raise PacmanRoutingException(
                     "Compressed route {} covers original route {} but has "
                     "a different link_ids.".format(c_route, o_route))
             remainders = calc_remainders(o_code, c_code)
