@@ -1,7 +1,4 @@
-from .abstract_resource import AbstractResource
-
-
-class CoreResource(AbstractResource):
+class CoreResource(object):
     """ Represents the number of cores that need to be allocated
     """
 

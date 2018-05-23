@@ -26,7 +26,10 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
             * If one of the constraints is not valid
         """
         super(MachineVertex, self).__init__(constraints)
-        self._label = label
+        if label:
+            self._label = label
+        else:
+            self._label = str(type(self))
 
     @property
     @overrides(AbstractVertex.label)
