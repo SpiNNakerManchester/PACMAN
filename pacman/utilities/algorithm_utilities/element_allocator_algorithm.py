@@ -148,3 +148,6 @@ class ElementAllocatorAlgorithm(object):
         for free_space in self._free_space_tracker:
             remaining += free_space.size
         return remaining
+
+    def spaces_left(self):
+        return self._free_space_tracker
