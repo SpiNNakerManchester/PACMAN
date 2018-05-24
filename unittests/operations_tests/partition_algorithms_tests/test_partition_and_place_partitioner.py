@@ -1,6 +1,7 @@
 """
 test for partitioning
 """
+from __future__ import division
 import unittest
 from spinn_machine import (
     Machine, Processor, SDRAM, Link, Router, Chip, VirtualMachine)
@@ -9,7 +10,8 @@ from pacman.exceptions import (
     PacmanPartitionException, PacmanInvalidParameterException,
     PacmanValueError)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint)
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
+    SameAtomsAsVertexConstraint)
 from pacman.model.resources import PreAllocatedResourceContainer
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
@@ -437,6 +439,63 @@ class TestBasicPartitioner(unittest.TestCase):
     @unittest.skip("Test not implemented yet")
     def test_partition_with_supported_constraints_not_enough_space(self):
         self.assertEqual(True, False, "Test not implemented yet")
+
+    def test_partition_with_fixed_atom_constraints(self):
+        """
+        test a partitioning with a graph with fixed atom constraint
+        """
+
+        # Create a 2x2 machine with 10 cores per chip (so 40 cores),
+        # but 1MB off 2MB per chip (so 19MB per chip)
+        n_cores_per_chip = 10
+        sdram_per_chip = (n_cores_per_chip * 2) - 1
+        machine = VirtualMachine(
+            width=2, height=2, with_monitors=False,
+            n_cpus_per_chip=n_cores_per_chip,
+            sdram_per_chip=sdram_per_chip)
+
+        # Create a vertex where each atom requires 1MB (default) of SDRAM
+        # but which can't be subdivided lower than 2 atoms per core.
+        # The vertex has 1 atom per MB of SDRAM, and so would fit but will
+        # be disallowed by the fixed atoms per core constraint
+        vertex = SimpleTestVertex(
+            sdram_per_chip * machine.n_chips,
+            max_atoms_per_core=2, constraints=[FixedVertexAtomsConstraint(2)])
+        app_graph = ApplicationGraph("Test")
+        app_graph.add_vertex(vertex)
+
+        # Do the partitioning - this should result in an error
+        with self.assertRaises(PacmanPartitionException):
+            partitioner = PartitionAndPlacePartitioner()
+            partitioner(app_graph, machine)
+
+    def test_partition_with_fixed_atom_constraints_at_limit(self):
+        """
+        test a partitioning with a graph with fixed atom constraint which\
+        should fit but is close to the limit
+        """
+
+        # Create a 2x2 machine with 1 core per chip (so 4 cores),
+        # and 8MB SDRAM per chip
+        n_cores_per_chip = 1
+        sdram_per_chip = 8
+        machine = VirtualMachine(
+            width=2, height=2, with_monitors=False,
+            n_cpus_per_chip=n_cores_per_chip,
+            sdram_per_chip=sdram_per_chip)
+
+        # Create a vertex which will need to be split perfectly into 4 cores
+        # to work and which max atoms per core must be ignored
+        vertex = SimpleTestVertex(
+            sdram_per_chip * 2, max_atoms_per_core=sdram_per_chip,
+            constraints=[FixedVertexAtomsConstraint(sdram_per_chip // 2)])
+        app_graph = ApplicationGraph("Test")
+        app_graph.add_vertex(vertex)
+
+        # Do the partitioning - this should just work
+        partitioner = PartitionAndPlacePartitioner()
+        machine_graph, _, _ = partitioner(app_graph, machine)
+        self.assert_(len(machine_graph.vertices) == 4)
 
 
 if __name__ == '__main__':
