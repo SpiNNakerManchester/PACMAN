@@ -22,9 +22,9 @@ from pacman.utilities.algorithm_utilities import \
     routing_info_allocator_utilities as utilities
 from pacman.exceptions \
     import PacmanConfigurationException, PacmanRouteInfoAllocationException
+from .utils import get_possible_masks
 
 # general imports
-import math
 import numpy
 import logging
 from past.builtins import xrange
@@ -202,19 +202,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 expand_to_bit_array(value)[-len(remaining_zeros):]
             yield compress_from_bit_array(generated_key), n_keys
 
-    @staticmethod
-    def _get_possible_masks(n_keys):
-        """ Get the possible masks given the number of keys
-
-        :param n_keys: The number of keys to generate a mask for
-        """
-        # TODO: Generate all the masks. Currently only the obvious mask with
-        # the zeros at the bottom is generated but the zeros could actually be
-        # anywhere
-        n_zeros = int(math.ceil(math.log(n_keys, 2)))
-        n_ones = 32 - n_zeros
-        return [(((1 << n_ones) - 1) << n_zeros)]
-
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
         """ allocate fixed keys and masks
 
@@ -240,7 +227,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = self._get_possible_masks(partition_n_keys)
+            masks_available = get_possible_masks(partition_n_keys)
 
         # For each usable mask, try all of the possible keys and
         # see if a match is possible
