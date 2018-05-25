@@ -22,18 +22,18 @@ class TestResourceModels(unittest.TestCase):
         const1 = ConstantSDRAM(128)
         self.assertEqual(const1.get_total_sdram(), 128)
         const2 = ConstantSDRAM(256)
-        combo = const1.extend(const2)
+        combo = const1 + const2
         self.assertEqual(combo.get_total_sdram(), 128+256)
-        combo = const2.extend(const1)
+        combo = const2 + const1
         self.assertEqual(combo.get_total_sdram(), 128+256)
         var1 = VariableSDRAM(124, 8, 100)
         self.assertEqual(var1.get_total_sdram(), 124 + 8 * 100)
-        combo = var1.extend(const1)
+        combo = var1 + const1
         self.assertEqual(combo.get_total_sdram(), 128 + 124 + 8 * 100)
-        combo = const1.extend(var1)
+        combo = const1 + var1
         self.assertEqual(combo.get_total_sdram(), 128 + 124 + 8 * 100)
         var2 = VariableSDRAM(234, 6, 150)
-        combo = var2.extend(var1)
+        combo = var2 + var1
         self.assertEqual(combo.get_total_sdram(), 234 + 124 + (8 + 6) * 150)
 
     def test_dtcm(self):
