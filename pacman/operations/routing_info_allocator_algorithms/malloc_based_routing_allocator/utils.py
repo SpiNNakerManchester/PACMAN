@@ -3,24 +3,26 @@ import itertools
 from six.moves import reduce, xrange
 
 
-def get_possible_masks(n_keys):
+def get_possible_masks(n_keys, mask_width=32):
     """ Get the possible masks given the number of keys.
 
     :param n_keys: The number of keys to generate a mask for
     :type n_keys: int
+    :param mask_width: \
+        Number of bits that are meaningful in the mask. 32 by default.
+    :param mask_width: int
     :return: A generator of all possible masks
     :rtype: iterable(int)
     """
     # Starting values
-    n_bits = 32
     n_zeros = int(math.ceil(math.log(n_keys, 2)))
-    assert n_zeros <= n_bits
-    all_ones_mask = (1 << n_bits) - 1
+    assert n_zeros <= mask_width
+    all_ones_mask = (1 << mask_width) - 1
 
     # Get all possible places where the zero bits could be put; this is an
     # ideal way to do it too, as it gives us the one with the bits at the
     # bottom (the old generation algorithm) first.
-    places_for_zeroes = itertools.combinations(xrange(n_bits), n_zeros)
+    places_for_zeroes = itertools.combinations(xrange(mask_width), n_zeros)
 
     # Convert the selected places for zero bits into an iterable of masks
     return (
