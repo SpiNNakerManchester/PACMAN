@@ -333,8 +333,8 @@ class PartitionAndPlacePartitioner(object):
                         "    Request for SDRAM: {}\n"
                         "    Largest SDRAM space: {}".format(
                             vertex, lo_atom - 1,
-                            used_resources.sdram.get_value(),
-                            resources_available.sdram.get_value()))
+                            used_resources.sdram.get_total_sdram(),
+                            resources_available.sdram.get_sdram_available()))
 
                 while ratio > 1.0 and hi_atom >= lo_atom:
                     # Scale the resources_available by the ratio
