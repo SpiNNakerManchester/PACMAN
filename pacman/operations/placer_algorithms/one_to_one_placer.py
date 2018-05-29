@@ -29,7 +29,23 @@ class OneToOnePlacer(RadialPlacer):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine):
+    def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+
+        :param machine_graph: The machine_graph to place
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
+        :param machine:\
+            The machine with respect to which to partition the application\
+            graph
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :return: A set of placements
+        :rtype: :py:class:`pacman.model.placements.Placements`
+        :raise pacman.exceptions.PacmanPlaceException: \
+            If something goes wrong with the placement
+        """
 
         # check that the algorithm can handle the constraints
         self._check_constraints(
@@ -43,17 +59,19 @@ class OneToOnePlacer(RadialPlacer):
             machine_graph, same_chip_vertex_groups)
 
         return self._do_allocation(
-            sorted_vertices, machine, same_chip_vertex_groups, machine_graph)
+            sorted_vertices, machine, plan_n_timesteps,
+            same_chip_vertex_groups, machine_graph)
 
     def _do_allocation(
-            self, vertices, machine, same_chip_vertex_groups, machine_graph):
+            self, vertices, machine, plan_n_timesteps,
+            same_chip_vertex_groups, machine_graph):
         placements = Placements()
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_radial_chips(machine))
+            machine, self._generate_radial_chips(machine), plan_n_timesteps)
         all_vertices_placed = set()
 
         # iterate over vertices

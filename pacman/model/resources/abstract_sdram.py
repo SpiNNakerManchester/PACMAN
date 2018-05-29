@@ -11,10 +11,15 @@ class AbstractSDRAM(object):
     """
 
     @abstractmethod
-    def get_total_sdram(self):
-        """ The total sdram. Or the best quess based on the assume runtime"""
-        return self._sdram
-
+    def get_total_sdram(self, n_timesteps):
+        """
+        The total sdram. 
+        
+        :param n_timesteps: number of timesteps to cost for
+        :type n_timesteps: int
+        :return: 
+        """
+ 
     @abstractmethod
     def __add__(self, other):
         """ Combines this SDRAM resource with the other one and creates a new one

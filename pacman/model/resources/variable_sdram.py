@@ -27,9 +27,9 @@ class VariableSDRAM(AbstractSDRAM):
         self._per_timestep_sdram = per_timestep_sdram
         self._assumed_timesteps = assumed_timesteps
 
-    def get_total_sdram(self):
+    def get_total_sdram(self, n_timesteps):
         return self._fixed_sdram + \
-               (self._per_timestep_sdram * self._assumed_timesteps)
+               (self._per_timestep_sdram * n_timesteps)
 
     @property
     def fixed(self):
@@ -42,7 +42,7 @@ class VariableSDRAM(AbstractSDRAM):
     def __add__(self, other):
         if isinstance(other, ConstantSDRAM):
             return VariableSDRAM(
-                self._fixed_sdram + other.get_total_sdram(),
+                self._fixed_sdram + other.fixed,
                 self._per_timestep_sdram, self._assumed_timesteps)
         else:
             if self._assumed_timesteps:

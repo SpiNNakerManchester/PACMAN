@@ -36,7 +36,7 @@ class TestSameChipConstraint(unittest.TestCase):
                     SameChipAsConstraint(
                         vertices[random.randint(0, 99)]))
 
-        placements = placer(graph, machine)
+        placements = placer(graph, machine, plan_n_timesteps=None)
         for same in same_vertices:
             print("{0.vertex.label}, {0.x}, {0.y}, {0.p}: {1}".format(
                 placements.get_placement_of_vertex(same),

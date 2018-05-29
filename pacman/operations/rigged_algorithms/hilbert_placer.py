@@ -20,7 +20,7 @@ class HilbertPlacer(object):
     """ A simple placing algorithm using the Hilbert space-filling curve,\
         translated from RIG."""
 
-    def __call__(self, machine_graph, machine):
+    def __call__(self, machine_graph, machine, plan_n_timesteps):
         """ Place each vertex in a machine graph on a core in the machine.
 
         :param machine_graph: The machine_graph to place
@@ -28,6 +28,8 @@ class HilbertPlacer(object):
             :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param machine: A SpiNNaker machine object.
         :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
         :return placements: Placements of vertices on the machine
         :rtype :py:class:`pacman.model.placements.Placements`
         """
@@ -45,7 +47,7 @@ class HilbertPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_hilbert_chips(machine))
+            machine, self._generate_hilbert_chips(machine), plan_n_timesteps)
 
         # get vertices which must be placed on the same chip
         vertices_on_same_chip = \

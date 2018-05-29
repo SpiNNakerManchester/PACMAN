@@ -26,7 +26,8 @@ class TestResourceTracker(unittest.TestCase):
             core_resources=[
                 CoreResource(chip=chip, n_cores=2)])
         tracker = ResourceTracker(
-            machine, preallocated_resources=preallocated_resources)
+            machine, plan_n_timesteps=None,
+            preallocated_resources=preallocated_resources)
 
         # Should be 14 cores = 18 - 1 monitor - 1 specific core - 2 other cores
         self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 14)
@@ -49,7 +50,8 @@ class TestResourceTracker(unittest.TestCase):
     def test_deallocation_of_resources(self):
         machine = VirtualMachine(
             width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
-        tracker = ResourceTracker(machine, preallocated_resources=None)
+        tracker = ResourceTracker(machine, plan_n_timesteps=None,
+                                  preallocated_resources=None)
 
         sdram_res = ConstantSDRAM(12345)
         resources = ResourceContainer(sdram=sdram_res)
@@ -90,7 +92,7 @@ class TestResourceTracker(unittest.TestCase):
             0, 0, [], router, sdram, 0, 0, "127.0.0.1",
             virtual=False, tag_ids=[1])
         machine = Machine([empty_chip], 0, 0)
-        resource_tracker = ResourceTracker(machine)
+        resource_tracker = ResourceTracker(machine, plan_n_timesteps=None)
         with self.assertRaises(PacmanValueError):
             resource_tracker.allocate_resources(
                 ResourceContainer(sdram=ConstantSDRAM(1024)))

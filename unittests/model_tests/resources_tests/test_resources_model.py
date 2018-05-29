@@ -20,21 +20,21 @@ class TestResourceModels(unittest.TestCase):
         correctly
         """
         const1 = ConstantSDRAM(128)
-        self.assertEqual(const1.get_total_sdram(), 128)
+        self.assertEqual(const1.get_total_sdram(None), 128)
         const2 = ConstantSDRAM(256)
         combo = const1 + const2
-        self.assertEqual(combo.get_total_sdram(), 128+256)
+        self.assertEqual(combo.get_total_sdram(None), 128+256)
         combo = const2 + const1
-        self.assertEqual(combo.get_total_sdram(), 128+256)
+        self.assertEqual(combo.get_total_sdram(None), 128+256)
         var1 = VariableSDRAM(124, 8, 100)
-        self.assertEqual(var1.get_total_sdram(), 124 + 8 * 100)
+        self.assertEqual(var1.get_total_sdram(100), 124 + 8 * 100)
         combo = var1 + const1
-        self.assertEqual(combo.get_total_sdram(), 128 + 124 + 8 * 100)
+        self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
         combo = const1 + var1
-        self.assertEqual(combo.get_total_sdram(), 128 + 124 + 8 * 100)
+        self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
         var2 = VariableSDRAM(234, 6, 150)
         combo = var2 + var1
-        self.assertEqual(combo.get_total_sdram(), 234 + 124 + (8 + 6) * 150)
+        self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (8 + 6) * 150)
 
     def test_dtcm(self):
         """
@@ -69,7 +69,7 @@ class TestResourceModels(unittest.TestCase):
         cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_total_sdram(), 128 * (2**20))
+        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**20))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**20) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**20) + 2)
 
@@ -78,7 +78,7 @@ class TestResourceModels(unittest.TestCase):
         cpu = CPUCyclesPerTickResource(128 * (2**19) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_total_sdram(), 128 * (2**19))
+        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**19))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**19) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**19) + 2)
 
@@ -87,7 +87,7 @@ class TestResourceModels(unittest.TestCase):
         cpu = CPUCyclesPerTickResource(128 * (2**21) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_total_sdram(), 128 * (2**21))
+        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**21))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**21) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**21) + 2)
 

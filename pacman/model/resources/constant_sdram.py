@@ -20,7 +20,7 @@ class ConstantSDRAM(AbstractSDRAM):
         """
         self._sdram = sdram
 
-    def get_total_sdram(self):
+    def get_total_sdram(self, n_timesteps):
         return self._sdram
 
     @property
@@ -34,7 +34,7 @@ class ConstantSDRAM(AbstractSDRAM):
     def __add__(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
-                self.get_total_sdram() + other.get_total_sdram())
+                self._sdram + other._sdram)
         else:
             # The other is more complex so delegate to it
             return other.__add__(self)
