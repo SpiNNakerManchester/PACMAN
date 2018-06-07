@@ -51,7 +51,7 @@ class RadialPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_radial_chips(machine), plan_n_timesteps)
+            machine, plan_n_timesteps, self._generate_radial_chips(machine))
         vertices_on_same_chip = placer_utils.get_same_chip_vertex_groups(
             machine_graph.vertices)
         all_vertices_placed = set()

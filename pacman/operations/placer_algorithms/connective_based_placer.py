@@ -58,7 +58,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_radial_chips(machine), plan_n_timesteps)
+            machine, plan_n_timesteps, self._generate_radial_chips(machine))
         constrained = sort_vertices_by_known_constraints(constrained)
         for vertex in progress.over(constrained, False):
             self._place_vertex(vertex, resource_tracker, machine, placements)

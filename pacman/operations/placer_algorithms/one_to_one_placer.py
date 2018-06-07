@@ -71,7 +71,7 @@ class OneToOnePlacer(RadialPlacer):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_radial_chips(machine), plan_n_timesteps)
+            machine, plan_n_timesteps, self._generate_radial_chips(machine))
         all_vertices_placed = set()
 
         # iterate over vertices

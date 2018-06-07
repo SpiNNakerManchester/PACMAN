@@ -47,7 +47,7 @@ class HilbertPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_hilbert_chips(machine), plan_n_timesteps)
+            machine, plan_n_timesteps, self._generate_hilbert_chips(machine))
 
         # get vertices which must be placed on the same chip
         vertices_on_same_chip = \
