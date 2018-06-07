@@ -404,7 +404,9 @@ class ResourceTracker(object):
         :rtype: bool
         """
         if key in self._sdram_tracker:
-            return ((chip.sdram.size - self._sdram_tracker[key]) >=
+            return ((chip.sdram.size -
+                     self._sdram_tracker[key].get_total_sdram(
+                         self._plan_n_timesteps)) >=
                     resources.sdram.get_total_sdram(self._plan_n_timesteps))
         return chip.sdram.size >= resources.sdram.get_total_sdram(
             self._plan_n_timesteps)
