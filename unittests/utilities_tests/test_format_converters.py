@@ -67,7 +67,8 @@ def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
     # Convert it to JSON
     algo = ConvertToFileMachineGraphPureMulticast()
     fn = tmpdir.join("foo.json")
-    filename, _vertex_by_id, _partition_by_id = algo(graph, str(fn))
+    filename, _vertex_by_id, _partition_by_id = algo(
+        graph, plan_n_timesteps=None, file_path=str(fn))
     assert filename == str(fn)
 
     # Rebuild and compare; simplest way of checking given that order is not
@@ -117,7 +118,8 @@ def test_convert_to_file_machine_graph(tmpdir):
     # Convert it to JSON
     algo = ConvertToFileMachineGraph()
     fn = tmpdir.join("foo.json")
-    filename, _vertex_by_id, _partition_by_id = algo(graph, str(fn))
+    filename, _vertex_by_id, _partition_by_id = algo(
+        graph, plan_n_timesteps=None, file_path=str(fn))
     assert filename == str(fn)
 
     # Rebuild and compare; simplest way of checking given that order is not
