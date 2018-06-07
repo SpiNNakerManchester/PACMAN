@@ -53,7 +53,8 @@ def tag_allocator_report(report_folder, tag_infos):
 
 
 def placer_reports_with_application_graph(
-        report_folder, hostname, graph, graph_mapper, placements, machine):
+        report_folder, hostname, graph, graph_mapper, placements, machine,
+        data_n_timesteps):
     """ Reports that can be produced from placement given a application\
         graph's existence
 
@@ -64,6 +65,8 @@ def placer_reports_with_application_graph(
         the mapping between application and machine graphs
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
+    :param data_n_timesteps: The number of timesteps for which data space\
+        has been reserved
     :rtype: None
     """
     placement_report_with_application_graph_by_vertex(
@@ -71,11 +74,12 @@ def placer_reports_with_application_graph(
     placement_report_with_application_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper)
     sdram_usage_report_per_chip(
-        report_folder, hostname, placements, machine)
+        report_folder, hostname, placements, machine, data_n_timesteps)
 
 
 def placer_reports_without_application_graph(
-        report_folder, hostname, machine_graph, placements, machine):
+        report_folder, hostname, machine_graph, placements, machine,
+        data_n_timesteps):
     """
 
     :param report_folder: the folder to which the reports are being written
@@ -84,6 +88,8 @@ def placer_reports_without_application_graph(
     :param machine: the python machine object
     :param machine_graph: \
         the machine graph to which the reports are to operate on
+    :param data_n_timesteps: The number of timesteps for which data space\
+        has been reserved
     :rtype: None
     """
     placement_report_without_application_graph_by_vertex(
@@ -91,7 +97,7 @@ def placer_reports_without_application_graph(
     placement_report_without_application_graph_by_core(
         report_folder, hostname, placements, machine)
     sdram_usage_report_per_chip(
-        report_folder, hostname, placements, machine)
+        report_folder, hostname, placements, machine, data_n_timesteps)
 
 
 def router_report_from_paths(
@@ -447,13 +453,16 @@ def _write_one_chip_machine_placement(f, c, placements):
             f.write("\n")
 
 
-def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
+def sdram_usage_report_per_chip(
+        report_folder, hostname, placements, machine, data_n_timesteps):
     """ Reports the SDRAM used per chip
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
+    :param data_n_timesteps: The number of timesteps for which data space\
+        has been reserved
     :rtype: None
     """
 
@@ -469,7 +478,8 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
 
             progress = ProgressBar(len(placements) + machine.n_chips,
                                    "Generating SDRAM usage report")
-            used_sdram_by_chip = _write_sdram_by_core(f, placements, progress)
+            used_sdram_by_chip = _write_sdram_by_core(
+                f, placements, data_n_timesteps, progress)
             for chip in progress.over(machine.chips):
                 _write_chip_sdram(f, chip, used_sdram_by_chip)
     except IOError:
@@ -477,12 +487,13 @@ def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
                          "writing.", file_name)
 
 
-def _write_sdram_by_core(f, placements, progress):
+def _write_sdram_by_core(f, placements, data_n_timesteps, progress):
     used_sdram = dict()
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.get_total_sdram()
+        sdram = placement.vertex.resources_required.sdram.get_total_sdram(
+            data_n_timesteps)
         x, y, p = placement.x, placement.y, placement.p
         f.write("SDRAM reqs for core ({},{},{}) is {} KB\n".format(
             x, y, p, int(sdram / 1024.0)))
