@@ -655,10 +655,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -677,10 +682,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -698,6 +708,10 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
@@ -706,6 +720,7 @@
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
             <param_name>placements</param_name>
         </required_inputs>
         <outputs>
@@ -724,6 +739,10 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
@@ -732,6 +751,7 @@
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
             <param_name>placements</param_name>
         </required_inputs>
         <outputs>
