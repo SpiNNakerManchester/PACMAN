@@ -423,7 +423,8 @@ class ResourceTracker(object):
         """
         if key not in self._sdram_tracker:
             return chip.sdram.size
-        return chip.sdram.size - self._sdram_tracker[key]
+        return chip.sdram.size - self._sdram_tracker[key].get_total_sdram(
+                self._plan_n_timesteps)
 
     def sdram_avilable_on_chip(self, chip_x, chip_y):
         """ Get the available SDRAM on the chip at coordinates chip_x, chip_y
@@ -739,12 +740,9 @@ class ResourceTracker(object):
             :py:class:`pacman.model.resources.ResourceContainer`
         """
         if key not in self._sdram_tracker:
-            self._sdram_tracker[key] = resources.sdram.get_total_sdram(
-                self._plan_n_timesteps)
+            self._sdram_tracker[key] = resources.sdram
         else:
-            self._sdram_tracker[key] += resources.sdram.get_total_sdram(
-                self._plan_n_timesteps
-            )
+            self._sdram_tracker[key] += resources.sdram
 
     def _allocate_core(self, chip, key, processor_id):
         """ Allocates a core on the given chip
@@ -1346,7 +1344,7 @@ class ResourceTracker(object):
 
         self._chips_available.add((chip_x, chip_y))
         self._sdram_tracker[chip_x, chip_y] -= \
-            resources.sdram.get_total_sdram(self._plan_n_timesteps)
+            resources.sdram
         self._core_tracker[chip_x, chip_y].add(processor_id)
 
         # check if chip used needs updating
