@@ -387,14 +387,15 @@ class PartitionAndPlacePartitioner(object):
                     vertex, plan_n_timesteps, resources_available, ratio)
 
                 # If this hi_atom is smaller than the current minimum, update
-                # the other placements to use (hopefully) less resources_available
+                # the other placements to use (hopefully) less
+                # resources_available
                 if hi_atom < min_hi_atom:
                     min_hi_atom = hi_atom
                     used_placements = self._reallocate_resources(
                         used_placements, resource_tracker, lo_atom, hi_atom)
 
-                # Attempt to allocate the resources_available for this vertex on the
-                # machine
+                # Attempt to allocate the resources_available for this vertex
+                # on the machine
                 try:
                     (x, y, p, ip_tags, reverse_ip_tags) = \
                         resource_tracker.allocate_constrained_resources(

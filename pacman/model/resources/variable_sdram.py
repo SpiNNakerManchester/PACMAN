@@ -17,7 +17,8 @@ class VariableSDRAM(AbstractSDRAM):
         "_assumed_timesteps"
     ]
 
-    def __init__(self, fixed_sdram, per_timestep_sdram, assumed_timesteps=None):
+    def __init__(
+            self, fixed_sdram, per_timestep_sdram, assumed_timesteps=None):
         """
         :param sdram: The amount of SDRAM in bytes
         :type sdram: int

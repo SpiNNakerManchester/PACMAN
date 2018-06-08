@@ -38,4 +38,3 @@ class ConstantSDRAM(AbstractSDRAM):
         else:
             # The other is more complex so delegate to it
             return other.__add__(self)
-

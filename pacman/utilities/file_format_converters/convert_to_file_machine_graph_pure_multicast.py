@@ -54,8 +54,8 @@ class ConvertToFileMachineGraphPureMulticast(object):
 
         return file_path, vertex_by_id, partition_by_id
 
-    def _convert_vertex(self, vertex, vertex_by_id, vertices,
-                        edges, machine_graph, plan_n_timesteps, partition_by_id):
+    def _convert_vertex(self, vertex, vertex_by_id, vertices, edges,
+                        machine_graph, plan_n_timesteps, partition_by_id):
         vertex_id = id(vertex)
         vertex_by_id[ident(vertex)] = vertex
 
