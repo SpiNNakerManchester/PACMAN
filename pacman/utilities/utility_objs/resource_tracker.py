@@ -93,7 +93,7 @@ class ResourceTracker(object):
 
         # The amount of SDRAM used by each chip,
         # indexed by the (x, y) tuple of coordinates of the chip
-        # Note that entries are only added when the SDRAM is first used
+        # Note that the values are negative to allow reverse-order sorting
         self._sdram_tracker = ValueSortedDict()
         for chip in machine.chips:
             self._sdram_tracker[chip.x, chip.y] = -chip.sdram.size
