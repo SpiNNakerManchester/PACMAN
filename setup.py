@@ -47,5 +47,6 @@ setup(
         'numpy',
         'lxml',
         'jsonschema',
+        'sortedcollections',
         'rig >= 2.0.0, < 3.0.0']
 )
