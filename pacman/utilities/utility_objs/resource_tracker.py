@@ -1148,7 +1148,7 @@ class ResourceTracker(object):
         tried_chips = self._get_usable_chips(chips, board_address)
         n_cores, n_chips, max_sdram, n_tags = \
             self._available_resources(tried_chips)
-        all_chips = self._get_usable_chips(None, None, None, None)
+        all_chips = self._get_usable_chips(None, None)
         all_n_cores, all_n_chips, all_max_sdram, all_n_tags = \
             self._available_resources(all_chips)
         raise PacmanValueError(
