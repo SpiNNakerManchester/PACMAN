@@ -1247,7 +1247,7 @@ class ResourceTracker(object):
             max_cpu_available = processor.cpu_cycles_available
             return ResourceContainer(
                 DTCMResource(max_dtcm_available),
-                SDRAMResource(-sdram_available),
+                SDRAMResource(sdram_available),
                 CPUCyclesPerTickResource(max_cpu_available))
 
         return self.get_maximum_resources_available(area_code)
