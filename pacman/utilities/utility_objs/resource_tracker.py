@@ -392,8 +392,6 @@ class ResourceTracker(object):
 
         :param chip: The chip to check the resources of
         :type chip: :py:class:`spinn_machine.Chip`
-        :param key: The (x, y) coordinates of the chip
-        :type key: tuple of (int, int)
         :return: the SDRAM available
         :rtype: int
         """
@@ -414,8 +412,6 @@ class ResourceTracker(object):
 
         :param chip: The chip to check the resources of
         :type chip: :py:class:`spinn_machine.Chip`
-        :param key: The (x, y) coordinates of the chip
-        :type key: tuple of (int, int)
         :return: The processor id selected as the best on this chip
         """
 
