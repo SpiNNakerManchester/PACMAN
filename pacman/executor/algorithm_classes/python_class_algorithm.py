@@ -62,7 +62,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
                 method = self._python_method
             logger.error("Error when calling {}.{}.{} with inputs {}",
                          self._python_module, self._python_class, method,
-                         inputs)
+                         inputs.keys())
             raise
 
     def __repr__(self):

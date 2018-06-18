@@ -59,7 +59,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
                     "    Output: {}\n"
                     "    Error: {}\n".format(
                         self._algorithm_id, child.returncode,
-                        inputs, stdout, stderr))
+                        inputs.keys(), stdout, stderr))
 
         # Return the results processed into a dict
         # Use None here as the results don't actually exist, and are expected
