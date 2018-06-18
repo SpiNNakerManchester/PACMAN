@@ -3,8 +3,7 @@ from pacman.model.graphs.impl import OutgoingEdgePartition
 
 
 class ApplicationOutgoingEdgePartition(OutgoingEdgePartition):
-    """ edge partition for the application graph.
-
+    """ Edge partition for the application graph.
     """
 
     __slots__ = ()

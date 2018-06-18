@@ -80,7 +80,7 @@ class MulticastRoutingTables(object):
         return self._routing_tables_by_chip.get((x, y), None)
 
     def __iter__(self):
-        """ returns a iterator for the multicast routing tables stored within
+        """ Iterator for the multicast routing tables stored within
 
         :return: iterator of multicast_routing_table
         """

@@ -43,7 +43,7 @@ FIXED_NAMES = frozenset([FIXED_MASK_NAME, FIXED_KEY_NAME, FIXED_FIELD_NAME])
 
 
 class VertexBasedRoutingInfoAllocator(object):
-    """ allocator of routing keys based off the vertex requirements
+    """ Allocator of routing keys based off the vertex requirements
     """
 
     __slots__ = [

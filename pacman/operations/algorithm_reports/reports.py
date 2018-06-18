@@ -723,7 +723,7 @@ def _recursive_trace_to_destinations(
         chip_x, chip_y, key_and_mask,
         dest_chip_x, dest_chip_y, dest_p, machine, routing_tables,
         number_of_entries):
-    """ recursively search though routing tables till no more entries are\
+    """ Recursively search though routing tables till no more entries are\
         registered with this key
     """
 

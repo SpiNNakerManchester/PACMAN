@@ -20,7 +20,7 @@ class BasicTagAllocator(object):
     __slots__ = []
 
     def __call__(self, machine, placements):
-        """ see AbstractTagAllocatorAlgorithm.allocate_tags
+        """ See :py:meth:`AbstractTagAllocatorAlgorithm.allocate_tags`
         """
 
         resource_tracker = ResourceTracker(machine)

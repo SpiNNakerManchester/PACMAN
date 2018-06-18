@@ -227,7 +227,7 @@ class PartitionAndPlacePartitioner(object):
     @staticmethod
     def _reallocate_resources(
             used_placements, resource_tracker, lo_atom, hi_atom):
-        """ readjusts resource allocation and updates the placement list to\
+        """ Readjusts resource allocation and updates the placement list to\
             take into account the new layout of the atoms
 
         :param used_placements: \

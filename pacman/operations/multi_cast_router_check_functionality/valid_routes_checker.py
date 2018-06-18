@@ -371,7 +371,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
 
 
 def _locate_routing_entry(current_router, key, n_atoms):
-    """ locate the entry from the router based off the edge
+    """ Locate the entry from the router based off the edge
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement

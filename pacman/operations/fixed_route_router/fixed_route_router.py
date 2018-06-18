@@ -279,7 +279,7 @@ class FixedRouteRouter(object):
     @staticmethod
     def _locate_destination(
             ethernet_chip_x, ethernet_chip_y, destination_class, placements):
-        """ locate destination vertex on Ethernet connected chip to send\
+        """ Locate destination vertex on Ethernet connected chip to send\
             fixed data to
 
         :param ethernet_chip_x: chip x to search

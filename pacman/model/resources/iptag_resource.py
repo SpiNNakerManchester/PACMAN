@@ -5,7 +5,7 @@ class IPtagResource(object):
 
     __slots__ = [
 
-        # The host ip address that will receive the data from this tag
+        # The host IP address that will receive the data from this tag
         "_ip_address",
 
         # the port number that data from this tag will be sent to, or None
@@ -29,9 +29,8 @@ class IPtagResource(object):
             self, ip_address, port, strip_sdp, tag=None,
             traffic_identifier="DEFAULT"):
         """
-
-        :param ip_address: The ip address of the host that will receive data\
-            from this tag
+        :param ip_address: \
+            The IP address of the host that will receive data from this tag
         :type ip_address: str
         :param port: The port that will
         :type port: int or None
@@ -54,9 +53,9 @@ class IPtagResource(object):
 
     @property
     def ip_address(self):
-        """ The ip address to assign to the tag
+        """ The IP address to assign to the tag
 
-        :return: An ip address
+        :return: An IP address
         :rtype: str
         """
         return self._ip_address
@@ -72,7 +71,7 @@ class IPtagResource(object):
 
     @property
     def traffic_identifier(self):
-        """ the traffic identifier for this iptag
+        """ The traffic identifier for this IPtag
 
         """
         return self._traffic_identifier
