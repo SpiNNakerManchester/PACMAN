@@ -12,7 +12,7 @@ class ReverseIPtagResource(object):
         # the received UDP packets for this tag
         "_sdp_port",
 
-        # A fixed tag id to assign, or None if any tag is OK
+        # A fixed tag ID to assign, or None if any tag is OK
         "_tag"
     ]
 
@@ -28,7 +28,7 @@ class ReverseIPtagResource(object):
             The SDP port number to be used when constructing SDP packets from\
             the received UDP packets for this tag
         :type sdp_port: int
-        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int or None
         """
         self._port = port

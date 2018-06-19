@@ -16,7 +16,7 @@ class Placement(object):
         # vertex is placed
         "_y",
 
-        # The processor id on chip (x,y) that this vertex is placed on within
+        # The processor ID on chip (x,y) that this vertex is placed on within
         # the SpiNNaker machine
         "_p",
     ]
@@ -31,7 +31,7 @@ class Placement(object):
         :type x: int
         :param y: the y-coordinate of the chip on which the vertex is placed
         :type y: int
-        :param p: the id of the processor on which the vertex is placed
+        :param p: the ID of the processor on which the vertex is placed
         :type p: int or None
         """
         self._vertex = vertex
@@ -70,9 +70,9 @@ class Placement(object):
 
     @property
     def p(self):
-        """ The id of the processor of the chip where the vertex is placed
+        """ The ID of the processor of the chip where the vertex is placed
 
-        :return: The processor id
+        :return: The processor ID
         :rtype: int
         """
         return self._p

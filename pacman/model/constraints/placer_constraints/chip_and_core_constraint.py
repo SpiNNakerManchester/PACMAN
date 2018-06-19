@@ -15,7 +15,7 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
         # vertex is placed
         "_y",
 
-        # The processor id on chip (x,y) that this vertex is placed on within
+        # The processor ID on chip (x,y) that this vertex is placed on within
         # the SpiNNaker machine; may be None
         "_p",
     ]
@@ -59,7 +59,7 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
     def p(self):
         """ The processor on the chip
 
-        :return: the processor id, or None if that is not constrained
+        :return: the processor ID, or None if that is not constrained
         :rtype: int or None
         :raise None: does not raise any known exceptions
         """

@@ -5,7 +5,7 @@ class CPUCyclesPerTickResource(object):
 
     __slots__ = [
 
-        # The number of cpu cycles needed for a given object
+        # The number of CPU cycles needed for a given object
         "_cycles"
     ]
 

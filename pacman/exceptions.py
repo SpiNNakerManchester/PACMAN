@@ -32,7 +32,7 @@ class PacmanAlreadyExistsException(PacmanException):
         """
         :param item_type: The type of the item that already exists
         :type item_type: str
-        :param item_id: The id of the item which is in conflict
+        :param item_id: The ID of the item which is in conflict
         :type item_id: str
         """
         super(PacmanAlreadyExistsException, self).__init__(item_type, item_id)

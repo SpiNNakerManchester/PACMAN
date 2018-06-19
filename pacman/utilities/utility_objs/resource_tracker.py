@@ -176,7 +176,7 @@ class ResourceTracker(object):
         if preallocated_resources is None:
             return defaultdict(lambda: 0)
 
-        # remove sdram by adding the cost into the sdram tracker already
+        # remove SDRAM by adding the cost into the SDRAM tracker already
         for sdram_pre_allocated in preallocated_resources.specific_sdram_usage:
             chip = sdram_pre_allocated.chip
             sdram = sdram_pre_allocated.sdram_usage
@@ -286,7 +286,7 @@ class ResourceTracker(object):
         :param chips: Optional list of tuples of (x, y) coordinates of chips,\
             restricting the allowed chips
         :type chips: iterable(int, int)
-        :return: tuple of a chip x and y coordinates, and processor id, any of\
+        :return: tuple of a chip x and y coordinates, and processor ID, any of\
              which might be None
         :rtype: tuple(int or None, int or None, int or None)
         """
@@ -430,7 +430,7 @@ class ResourceTracker(object):
         :type key: tuple(int, int)
         :param processor_id: A fixed processor ID
         :type processor_id: int
-        :return: The processor id selected as the best on this chip
+        :return: The processor ID selected as the best on this chip
         """
         if processor_id is not None:
             return processor_id
@@ -513,7 +513,7 @@ class ResourceTracker(object):
         :type chip: :py:class:`spinn_machine.Chip` or None
         :param board_address: the board address to locate the chip on
         :type board_address: str or None
-        :param tag_id: the tag id to locate
+        :param tag_id: the tag ID to locate
         :type tag_id: int or None
         :param ip_address: The IP address of the tag
         :type ip_address: str
@@ -524,7 +524,7 @@ class ResourceTracker(object):
         :param traffic_identifier: \
             The identifier of the traffic to pass over this tag
         :type traffic_identifier: str
-        :return: A board address, tag id, and port or None, None, None if none
+        :return: A board address, tag ID, and port or None, None, None if none
         :rtype: tuple of (str, int, (int or None)) or (None, None, None)
         """
 
@@ -581,7 +581,7 @@ class ResourceTracker(object):
 
         :param board_address: the board address to locate the chip on
         :type board_address: str or None
-        :param tag: the tag id to locate
+        :param tag: the tag ID to locate
         :type tag: int or None
         :return: True if the tag is available, False otherwise
         :rtype: bool
@@ -615,7 +615,7 @@ class ResourceTracker(object):
 
         :param board_address: the board address to locate the chip on
         :type board_address: str or None
-        :param tag: the tag id to locate
+        :param tag: the tag ID to locate
         :type tag: int or None
         :param ip_address: the IP address of the tag to be assigned
         :type ip_address: str
@@ -752,7 +752,7 @@ class ResourceTracker(object):
         # update chip tracker
         self._chips_used.add(key)
 
-        # return processor id
+        # return processor ID
         return processor_id
 
     def _fill_in_core_tracker_for_chip(self, key, chip):
@@ -768,7 +768,7 @@ class ResourceTracker(object):
         :type chip: :py:class:`spinn_machine.Chip`
         :param board_address: the board address to allocate to
         :type board_address: str or None
-        :param tag_id: the tag id to allocate on this board address
+        :param tag_id: the tag ID to allocate on this board address
         :type tag_id: int or None
         :return: a tuple of (board_address and tag)
         :rtype: tuple(str, int)
@@ -779,7 +779,7 @@ class ResourceTracker(object):
             eth_chip = self._machine.get_chip_at(
                 chip.nearest_ethernet_x, chip.nearest_ethernet_y)
 
-            # verify if the Ethernet chip has the available tag id
+            # verify if the Ethernet chip has the available tag ID
             if self._is_tag_available_on_ethernet_chip(eth_chip, tag_id):
                 board_address = eth_chip.ip_address
 
@@ -812,11 +812,11 @@ class ResourceTracker(object):
             self._tags_by_board[board_address] = set(e_chip.tag_ids)
 
     def _allocate_tag_id(self, tag_id, board_address):
-        """ Locates a tag id for the iptag
+        """ Locates a tag ID for the iptag
 
-        :param tag_id: tag id to get, or None
+        :param tag_id: tag ID to get, or None
         :param board_address: board address
-        :return: tag id allocated
+        :return: tag ID allocated
         """
         if tag_id is None:
             return self._tags_by_board[board_address].pop()
@@ -921,7 +921,7 @@ class ResourceTracker(object):
         """ Updates the structures for reverse IP tags
 
         :param board_address: the board its going to be placed on
-        :param tag: the tag id
+        :param tag: the tag ID
         :param port: the port number
         :rtype: None
         """
@@ -1244,7 +1244,7 @@ class ResourceTracker(object):
 
         :param chips: An iterable of (x, y) tuples of chips that are to be used
         :type chips: iterable(tuple(int, int))
-        :param processor_id: the processor id
+        :param processor_id: the processor ID
         :type processor_id: int
         :param board_address: the board address for locating max resources from
         :type board_address: str
@@ -1307,7 +1307,7 @@ class ResourceTracker(object):
         :param chip_y: the y coord of the chip allocated
         :type chip_x: int
         :type chip_y: int
-        :param processor_id: the processor id
+        :param processor_id: the processor ID
         :type processor_id: int
         :param resources: The resources to be unallocated
         :type resources:\

@@ -12,7 +12,7 @@ class RoutingInfo(object):
         # Partition information indexed by partition
         "_info_by_partition",
 
-        # Partition information indexed by edge pre vertex and partition id
+        # Partition information indexed by edge pre vertex and partition ID
         # name
         "_info_by_prevertex",
 
@@ -33,7 +33,7 @@ class RoutingInfo(object):
         # Partition information indexed by partition
         self._info_by_partition = dict()
 
-        # Partition information indexed by edge pre vertex and partition id
+        # Partition information indexed by edge pre vertex and partition ID
         # name
         self._info_by_prevertex = dict()
 
@@ -103,7 +103,7 @@ class RoutingInfo(object):
             a prevertex
 
         :param vertex: The prevertex to search for
-        :param partition_id: The id of the partition for which to get\
+        :param partition_id: The ID of the partition for which to get\
             the routing information
         """
         if (vertex, partition_id) in self._info_by_prevertex:
@@ -115,7 +115,7 @@ class RoutingInfo(object):
 
         :param vertex: The vertex which the partition starts at
         :param partition_id: \
-            The id of the partition for which to get the routing information
+            The ID of the partition for which to get the routing information
         :return: The routing key of the partition
         :rtype: int
         """

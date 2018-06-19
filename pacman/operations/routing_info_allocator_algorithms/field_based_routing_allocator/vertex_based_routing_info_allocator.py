@@ -47,16 +47,16 @@ class VertexBasedRoutingInfoAllocator(object):
     """
 
     __slots__ = [
-        # the field id used for a fixed key field.
+        # the field ID used for a fixed key field.
         "_fixed_key_application_field_value",
 
-        # the field id used for a fixed mask
+        # the field ID used for a fixed mask
         "_fixed_mask_application_field_value",
 
-        # the id used for a flexible field
+        # the ID used for a flexible field
         "_flexi_field_application_field_values",
 
-        # the id used for a fixed field
+        # the ID used for a fixed field
         "_fixed_field_application_field_value",
 
         # dictionary containing all fields that have been mapped during the
@@ -1114,7 +1114,7 @@ class VertexBasedRoutingInfoAllocator(object):
                 first = field_instance
             elif field_instance.tag != first.tag:
                 raise exceptions.PacmanConfigurationException(
-                    "Two fields with the same id, but with different tags. "
+                    "Two fields with the same ID, but with different tags. "
                     "This is deemed an error and therefore please fix before"
                     "trying again. thanks you")
         return first

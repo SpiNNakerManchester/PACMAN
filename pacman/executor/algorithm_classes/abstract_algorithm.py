@@ -11,7 +11,7 @@ class AbstractAlgorithm(object):
 
     __slots__ = [
 
-        # The id of the algorithm; must be unique over all algorithms
+        # The ID of the algorithm; must be unique over all algorithms
         "_algorithm_id",
 
         # A list of inputs that must be provided
@@ -39,7 +39,7 @@ class AbstractAlgorithm(object):
             generated_output_tokens):
         """
 
-        :param algorithm_id: The unique id of the algorithm
+        :param algorithm_id: The unique ID of the algorithm
         :type algorithm_id: str
         :param required_inputs: The inputs required by the algorithm
         :type required_inputs: list of AbstractInput
@@ -70,7 +70,7 @@ class AbstractAlgorithm(object):
 
     @property
     def algorithm_id(self):
-        """ The id for this algorithm
+        """ The ID for this algorithm
         """
         return self._algorithm_id
 

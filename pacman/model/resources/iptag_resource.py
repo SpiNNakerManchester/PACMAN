@@ -16,7 +16,7 @@ class IPtagResource(object):
         # stripped before transmission of data
         "_strip_sdp",
 
-        #  A fixed tag id to assign, or None if any tag is OK
+        #  A fixed tag ID to assign, or None if any tag is OK
         "_tag",
 
         # the identifier that states what type of data is being transmitted
@@ -37,7 +37,7 @@ class IPtagResource(object):
         :param strip_sdp: Whether the tag requires that SDP headers are\
             stripped before transmission of data
         :type strip_sdp: bool
-        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int
         :param traffic_identifier: The traffic to be sent using this tag; \
             traffic with the same traffic_identifier can be sent using\

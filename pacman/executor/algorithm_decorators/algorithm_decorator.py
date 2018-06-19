@@ -198,7 +198,7 @@ def algorithm(
         which they are returned.
     :type outputs: list of str
     :param algorithm_id:\
-        Optional unique id of the algorithm; if not specified, the name of the\
+        Optional unique ID of the algorithm; if not specified, the name of the\
         class or function is used.
     :type algorithm_id: str
     :param required_inputs:\
@@ -228,11 +228,11 @@ def algorithm(
     """
 
     def wrap(algorithm):
-        # Get the algorithm id
+        # Get the algorithm ID
         algo_id = algorithm_id or algorithm.__name__
         if algo_id in _algorithms:
             raise PacmanConfigurationException(
-                "Multiple algorithms with id {} found: {} and {}".format(
+                "Multiple algorithms with ID {} found: {} and {}".format(
                     algo_id, algorithm, _algorithms[algo_id]))
 
         # Get the details of the method or function
@@ -326,7 +326,7 @@ def reset_algorithms():
 
 
 def get_algorithms():
-    """ Get the dict of known algorithm id -> algorithm data
+    """ Get the dict of known algorithm ID -> algorithm data
     """
     return _algorithms
 

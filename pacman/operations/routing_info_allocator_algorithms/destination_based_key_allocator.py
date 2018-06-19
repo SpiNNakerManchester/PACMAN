@@ -11,8 +11,8 @@ from spinn_utilities.progress_bar import ProgressBar
 
 class DestinationBasedRoutingInfoAllocator(object):
     """ A routing key allocator that operates for people who wish to have a\
-        separate key for each destination (making a mc into a point-to-point\
-        cast.
+        separate key for each destination (making a multicast into a\
+        point-to-point cast).
     """
 
     __slots__ = []

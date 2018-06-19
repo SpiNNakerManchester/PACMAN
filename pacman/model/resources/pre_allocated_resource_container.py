@@ -96,18 +96,18 @@ class PreAllocatedResourceContainer(object):
                 "Only another preallocated resource container can extend a "
                 "preallocated resource container")
 
-        # add specific sdram usage
+        # add specific SDRAM usage
         self._specific_sdram_usage.extend(other.specific_sdram_usage)
 
         # add specific cores
         self._specific_core_resources.extend(other.specific_core_resources)
 
-        # add none specific cores
+        # add non-specific cores
         self._core_resources.extend(other.core_resources)
 
-        # add iptag resources
+        # add IPtag resources
         self._specific_iptag_resources.extend(other.specific_iptag_resources)
 
-        # add reverse iptags
+        # add reverse IPtag resources
         self._specific_reverse_iptag_resources.extend(
             other.specific_reverse_iptag_resources)
