@@ -287,7 +287,7 @@ class ResourceTracker(object):
             restricting the allowed chips
         :type chips: iterable(int, int)
         :return: tuple of a chip x and y coordinates, and processor ID, any of\
-             which might be None
+            which might be None
         :rtype: tuple(int or None, int or None, int or None)
         """
         x = None

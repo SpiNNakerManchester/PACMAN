@@ -24,9 +24,8 @@ logger = logging.getLogger(__name__)
 
 
 class PartitionAndPlacePartitioner(object):
-    """  A partitioner that tries to ensure that SDRAM is not overloaded by\
-         keeping track of the SDRAM usage on the various chips
-
+    """ A partitioner that tries to ensure that SDRAM is not overloaded by\
+        keeping track of the SDRAM usage on the various chips
     """
 
     __slots__ = []
@@ -34,7 +33,6 @@ class PartitionAndPlacePartitioner(object):
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine, preallocated_resources=None):
         """
-
         :param graph: The application_graph to partition
         :type graph:\
             :py:class:`pacman.model.graph.application.ApplicationGraph`
