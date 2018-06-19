@@ -1222,7 +1222,7 @@ class ResourceTracker(object):
         """ Get the maximum resources available given the constraints
 
         :param resources: The resources of the item to check
-        :type resources: ResourceContainer
+        :type resources: :py:class:`pacman.model.resources.ResourceContainer`
         :type constraints: \
             iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
         :param chips: the chips to locate the max available resources of
