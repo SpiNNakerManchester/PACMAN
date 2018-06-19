@@ -4,8 +4,8 @@ from .sdram_resource import SDRAMResource
 
 
 class ResourceContainer(object):
-    """Container object for the types of resources so that ordering is no\
-    longer a risk.
+    """ Container for the types of resources so that ordering is no\
+        longer a problem.
     """
 
     __slots__ = [
