@@ -16,7 +16,6 @@ class BaseKeyAndMask(object):
 
     def __init__(self, base_key, mask):
         """
-
         :param base_key: The routing key
         :type base_key: int
         :param mask: The routing mask
@@ -31,7 +30,7 @@ class BaseKeyAndMask(object):
             raise PacmanConfigurationException(
                 "This routing info is invalid as the mask and key together "
                 "alters the key. This is deemed to be a error from "
-                "spynnaker's point of view and therefore please rectify and"
+                "SpiNNaker's point of view and therefore please rectify and "
                 "try again")
 
     @property
@@ -108,7 +107,7 @@ class BaseKeyAndMask(object):
         :type n_keys: int
         :return: A tuple of an array of keys and the number of keys added to\
             the array
-        :rtype: (array-like of int, int)
+        :rtype: tuple(array-like of int, int)
         """
         # Get the position of the zeros in the mask - assume 32-bits
         unwrapped_mask = numpy.unpackbits(

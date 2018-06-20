@@ -204,7 +204,7 @@ class ResourceTracker(object):
             else:
                 chip_to_arbitrary_core_requirement[chip.x, chip.y] = n_cores
 
-        # handle specific iptags
+        # handle specific IP tags
         for ip_tag in preallocated_resources.specific_iptag_resources:
             self._setup_board_tags(ip_tag.board)
             tag = self._allocate_tag_id(ip_tag.tag, ip_tag.board)
@@ -212,7 +212,7 @@ class ResourceTracker(object):
                 ip_tag.board, tag, ip_tag.ip_address,
                 ip_tag.traffic_identifier, ip_tag.strip_sdp, ip_tag.port)
 
-        # handle specific reverse iptags
+        # handle specific reverse IP tags
         for rip_tag in preallocated_resources.specific_reverse_iptag_resources:
             self._setup_board_tags(rip_tag.board)
             tag = self._allocate_tag_id(rip_tag.tag, rip_tag.board)
@@ -812,7 +812,7 @@ class ResourceTracker(object):
             self._tags_by_board[board_address] = set(e_chip.tag_ids)
 
     def _allocate_tag_id(self, tag_id, board_address):
-        """ Locates a tag ID for the iptag
+        """ Locates a tag ID for the IP tag
 
         :param tag_id: tag ID to get, or None
         :param board_address: board address

@@ -15,15 +15,14 @@ class ReverseIPtagResource(object):
         # A fixed tag ID to assign, or None if any tag is OK
         "_tag",
 
-        # A board IP address which is where this reverse IPTag is to be \
+        # A board IP address which is where this reverse IP tag is to be \
         # placed
         "_board"
     ]
 
     def __init__(self, board, port=None, sdp_port=1, tag=None):
         """
-
-        :param board: A board IP address which is where this reverse IPTag is\
+        :param board: A board IP address which is where this reverse IP tag is\
             to be placed
         :type board: str
         :param port: The target port of the tag or None to assign elsewhere
@@ -68,8 +67,8 @@ class ReverseIPtagResource(object):
 
     @property
     def board(self):
-        """
-        A board IP address which is where this reverse IPTag is to be placed
+        """ A board IP address which is where this reverse IP tag is to be\
+            placed.
 
         :return: str
         """

@@ -23,14 +23,14 @@ class ResourceContainer(object):
         # machine
         "_cpu_cycles",
 
-        # A iterable of IPtagResource objects that reflect the number of IPTags
-        # a machine vertex is going to use on a SpiNNaker machine, as well as
-        # the configuration data of said IPTags.
+        # An iterable of IPtagResource objects that reflect the number of IP
+        # tags a machine vertex is going to use on a SpiNNaker machine, as well
+        # as the configuration data of said IP tags.
         "_iptags",
 
         # A iterable of ReverseIPtagResource objects that reflect the number of
-        #  ReverseIPtags a machine vertex is going to use on a SpiNNaker
-        # machine, as well as the configuration data of said reverse IPTags.
+        # Reverse IP tags a machine vertex is going to use on a SpiNNaker
+        # machine, as well as the configuration data of said reverse IP tags.
         "_reverse_iptags"
     ]
 
@@ -42,8 +42,8 @@ class ResourceContainer(object):
         :param dtcm: the amount of dtcm used
         :param sdram: the amount of SDRAM used
         :param cpu_cycles: the amount of CPU used
-        :param iptags: the IPtags required
-        :param reverse_iptags: the reverse IPtags required
+        :param iptags: the IP tags required
+        :param reverse_iptags: the reverse IP tags required
         :type dtcm: None or \
             :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
         :type sdram: None or \

@@ -20,12 +20,12 @@ class PreAllocatedResourceContainer(object):
         # which core it uses.
         "_core_resources",
 
-        # An iterable of SpecificIPTagResource objects that reflect the iptag
+        # An iterable of SpecificIPTagResource objects that reflect the IP tag
         # details that have been preallocated on a board.
         "_specific_iptag_resources",
 
         # An iterable of SpecificReverseIPTagResource objects that reflect the
-        # reverse iptag details that have been preallocated on a board.
+        # reverse IP tag details that have been preallocated on a board.
         "_specific_reverse_iptag_resources",
     ]
 
@@ -105,9 +105,9 @@ class PreAllocatedResourceContainer(object):
         # add non-specific cores
         self._core_resources.extend(other.core_resources)
 
-        # add IPtag resources
+        # add IP tag resources
         self._specific_iptag_resources.extend(other.specific_iptag_resources)
 
-        # add reverse IPtag resources
+        # add reverse IP tag resources
         self._specific_reverse_iptag_resources.extend(
             other.specific_reverse_iptag_resources)

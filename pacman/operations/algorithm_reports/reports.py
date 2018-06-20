@@ -342,7 +342,7 @@ def placement_report_with_application_graph_by_core(
     :param hostname: the machine's hostname to which the placer worked on
     :param graph_mapper: \
         the mapping between application and machine graphs
-    :param machine: the spinnaker machine object
+    :param machine: the SpiNNaker machine object
     :param placements: the placements objects built by the placer.
     """
 
@@ -402,7 +402,7 @@ def placement_report_without_application_graph_by_core(
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
-    :param machine: the spinnaker machine object
+    :param machine: the SpiNNaker machine object
     :param placements: the placements objects built by the placer.
     """
 

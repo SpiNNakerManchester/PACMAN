@@ -110,7 +110,7 @@ class RadialPlacer(object):
         """ Generates the list of chips from a given starting point in a radial\
             format.
 
-        :param machine: the spinnaker machine object
+        :param machine: the SpiNNaker machine object
         :param resource_tracker:\
             the resource tracker object which contains what resources of the\
             machine have currently been used

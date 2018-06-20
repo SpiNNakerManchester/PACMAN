@@ -20,7 +20,7 @@ class SpecificBoardTagResource(object):
         "_tag",
 
         # The identifier that states what type of data is being transmitted
-        # through this IPTag
+        # through this IP tag
         "_traffic_identifier",
 
         # The board IP address that this tag is going to be placed upon
@@ -76,7 +76,7 @@ class SpecificBoardTagResource(object):
 
     @property
     def traffic_identifier(self):
-        """ The traffic identifier for this IPTag
+        """ The traffic identifier for this IP tag
         """
         return self._traffic_identifier
 

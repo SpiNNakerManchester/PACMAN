@@ -1,6 +1,6 @@
 class ReverseIPtagResource(object):
-    """ Represents the amount of local core memory available or used on a core\
-        on a chip of the machine
+    """ Represents the ability to have a SpiNNaker machine send messages to\
+        you.
     """
 
     __slots__ = [
@@ -19,7 +19,6 @@ class ReverseIPtagResource(object):
     def __init__(
             self, port=None, sdp_port=1, tag=None):
         """
-
         :param port: The target port of the tag or None to assign elsewhere
         :type port: int or None
         :param port: The UDP port to listen to on the board for this tag

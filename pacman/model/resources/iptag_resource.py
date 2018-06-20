@@ -1,6 +1,6 @@
 class IPtagResource(object):
-    """ Represents the amount of local core memory available or used on a core\
-        on a chip of the machine
+    """ Represents the ability to talk to a SpiNNaker machine by sending UDP\
+        packets to it.
     """
 
     __slots__ = [
@@ -20,7 +20,7 @@ class IPtagResource(object):
         "_tag",
 
         # the identifier that states what type of data is being transmitted
-        # through this iptag
+        # through this IP tag
         "_traffic_identifier"
 
     ]
@@ -71,7 +71,7 @@ class IPtagResource(object):
 
     @property
     def traffic_identifier(self):
-        """ The traffic identifier for this IPtag
+        """ The traffic identifier for this IP tag
 
         """
         return self._traffic_identifier
