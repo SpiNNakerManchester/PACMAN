@@ -100,8 +100,7 @@ class MulticastRoutingTable(object):
         """ The multicast routing entries in the table
 
         :return: an iterable of multicast routing entries
-        :rtype: iterable of\
-                    :py:class:`spinn_machine.MulticastRoutingEntry`
+        :rtype: iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
         :raise None: does not raise any known exceptions
         """
         return self._multicast_routing_entries
@@ -115,8 +114,8 @@ class MulticastRoutingTable(object):
 
     @property
     def number_of_defaultable_entries(self):
-        """ The number of  multi-cast routing entries that are set to be\
-        defaultable within this multicast routing table
+        """ The number of multi-cast routing entries that are set to be\
+            defaultable within this multicast routing table
 
         :return: int
         """

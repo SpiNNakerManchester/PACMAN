@@ -527,8 +527,8 @@ class PACMANAlgorithmExecutor(object):
         :param algorithm_list: the list of algorithms to remove algorithm from
         :param algorithm: the algorithm to remove
         :param inputs: the inputs list to update output from algorithm
-        :param generated_outputs: the outputs list to update output from\
-                    algorithm
+        :param generated_outputs: \
+            the outputs list to update output from algorithm
         :rtype: None
         """
         algorithm_list.remove(algorithm)
