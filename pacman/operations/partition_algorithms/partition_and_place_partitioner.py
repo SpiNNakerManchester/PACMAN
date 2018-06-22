@@ -106,7 +106,7 @@ class PartitionAndPlacePartitioner(object):
             :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param graph_mapper: the mappings between graphs
         :type graph_mapper:\
-            :py:class:'pacman.model.graphs.common.GraphMapper'
+            :py:class:`pacman.model.graphs.common.GraphMapper'
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
             :py:class:`pacman.utilities.ResourceTracker`
@@ -181,7 +181,7 @@ class PartitionAndPlacePartitioner(object):
             :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param graph_mapper: the mapper between graphs
         :type graph_mapper:\
-            :py:class:'pacman.model.graphs.common.GraphMapper'
+            :py:class:`pacman.model.graphs.common.GraphMapper'
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
             :py:class:`pacman.utilities.ResourceTracker`
