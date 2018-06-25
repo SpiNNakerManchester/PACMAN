@@ -1,5 +1,6 @@
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
+from pacman.exceptions import PacmanConfigurationException
 
 
 class VariableSDRAM(AbstractSDRAM):
@@ -26,8 +27,15 @@ class VariableSDRAM(AbstractSDRAM):
         self._per_timestep_sdram = per_timestep_sdram
 
     def get_total_sdram(self, n_timesteps):
-        return self._fixed_sdram + \
-               (self._per_timestep_sdram * n_timesteps)
+        if n_timesteps:
+            return self._fixed_sdram + \
+                   (self._per_timestep_sdram * n_timesteps)
+        else:
+            if self._per_timestep_sdram == 0:
+                return self._fixed_sdram
+            else:
+                raise PacmanConfigurationException(
+                    "Unable to run forever with a variable SDRAM cost")
 
     @property
     def fixed(self):
