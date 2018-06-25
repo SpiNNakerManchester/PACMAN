@@ -47,7 +47,7 @@ class VariableSDRAM(AbstractSDRAM):
                 self._fixed_sdram + other._fixed_sdram,
                 self._per_timestep_sdram + other._per_timestep_sdram)
 
-    def __suba__(self, other):
+    def __sub__(self, other):
         if isinstance(other, ConstantSDRAM):
             return VariableSDRAM(
                 self._fixed_sdram - other.fixed,

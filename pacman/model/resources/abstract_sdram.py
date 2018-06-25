@@ -31,7 +31,7 @@ class AbstractSDRAM(object):
         """
 
     @abstractmethod
-    def __suba__(self, other):
+    def __sub__(self, other):
         """ Creates a new SDRAM which is this one less the other
 
         :param other: another  SDRAM resource

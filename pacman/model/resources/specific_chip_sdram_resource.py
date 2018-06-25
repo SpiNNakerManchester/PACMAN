@@ -1,3 +1,6 @@
+from pacman.model.resources import AbstractSDRAM
+
+
 class SpecificChipSDRAMResource(object):
     """ Represents the SDRAm required for this Chip
     """
@@ -21,6 +24,7 @@ class SpecificChipSDRAMResource(object):
         :type chip: SpiNNMachine.chip.Chip
         :raise None: No known exceptions are raised
         """
+        assert isinstance(sdram_usage, AbstractSDRAM)
         self._sdram_usage = sdram_usage
         self._chip = chip
 

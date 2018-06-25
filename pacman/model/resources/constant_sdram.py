@@ -39,7 +39,7 @@ class ConstantSDRAM(AbstractSDRAM):
             # The other is more complex so delegate to it
             return other.__add__(self)
 
-    def __suba__(self, other):
+    def __sub__(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
                 self._sdram - other._sdram)

@@ -24,17 +24,28 @@ class TestResourceModels(unittest.TestCase):
         const2 = ConstantSDRAM(256)
         combo = const1 + const2
         self.assertEqual(combo.get_total_sdram(None), 128+256)
+        combo = const1 - const2
+        self.assertEqual(combo.get_total_sdram(None), 128-256)
         combo = const2 + const1
-        self.assertEqual(combo.get_total_sdram(None), 128+256)
+        self.assertEqual(combo.get_total_sdram(None), 256+128)
+        combo = const2 - const1
+        self.assertEqual(combo.get_total_sdram(None), 256-128)
+
         var1 = VariableSDRAM(124, 8)
         self.assertEqual(var1.get_total_sdram(100), 124 + 8 * 100)
         combo = var1 + const1
-        self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
+        self.assertEqual(combo.get_total_sdram(100), 124 + 8 * 100 + 128)
+        combo = var1 - const1
+        self.assertEqual(combo.get_total_sdram(100), 124 + 8 * 100 - 128)
         combo = const1 + var1
         self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
+        combo = const1 - var1
+        self.assertEqual(combo.get_total_sdram(100), 128 - (124 + 8 * 100))
         var2 = VariableSDRAM(234, 6)
         combo = var2 + var1
-        self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (8 + 6) * 150)
+        self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (6 + 8) * 150)
+        combo = var2 - var1
+        self.assertEqual(combo.get_total_sdram(150), 234 - 124 + (6 - 8) * 150)
 
     def test_dtcm(self):
         """
