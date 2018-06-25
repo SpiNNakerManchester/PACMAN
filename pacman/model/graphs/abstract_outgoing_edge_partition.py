@@ -25,7 +25,7 @@ class AbstractOutgoingEdgePartition(object):
     def constraints(self):
         """ The constraints of the vertex
 
-        :rtype: iterable of :py:class:`AbstractConstraint`
+        :rtype: iterable(:py:class:`AbstractConstraint`)
         """
 
     @abstractmethod
@@ -40,7 +40,7 @@ class AbstractOutgoingEdgePartition(object):
         """ Add a list of constraints
 
         :param constraints: The list of constraints to add
-        :type constraints: list of :py:class:`AbstractConstraint`
+        :type constraints: iterable(:py:class:`AbstractConstraint`)
         """
         for constraint in constraints:
             self.add_constraint(constraint)
@@ -67,9 +67,7 @@ class AbstractOutgoingEdgePartition(object):
     def edges(self):
         """ The edges in this outgoing edge partition
 
-        :rtype:\
-            iterable of\
-            :py:class:`pacman.model.graphs.AbstractEdge`
+        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
         """
 
     @abstractproperty
@@ -98,8 +96,7 @@ class AbstractOutgoingEdgePartition(object):
     def traffic_type(self):
         """ The traffic type of all the edges in this partition
 
-        :rtype:\
-            :py:class:`pacman.model.graphs.common.EdgeTrafficType`
+        :rtype: :py:class:`pacman.model.graphs.common.EdgeTrafficType`
         """
 
     @abstractmethod

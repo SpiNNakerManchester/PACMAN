@@ -7,8 +7,8 @@ from spinn_utilities.progress_bar import ProgressBar
 
 
 class ExternalAlgorithm(AbstractAlgorithm):
-    """
-    the container for a algorithm which is external to the SpiNNaker software
+    """ An algorithm which is external to the SpiNNaker software, or rather\
+        its wrapper into PACMAN.
     """
 
     __slots__ = [

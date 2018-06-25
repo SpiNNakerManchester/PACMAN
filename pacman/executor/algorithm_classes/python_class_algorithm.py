@@ -9,7 +9,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PythonClassAlgorithm(AbstractPythonAlgorithm):
-    """ An algorithm that is a class
+    """ An algorithm that is a class.
     """
 
     __slots__ = [

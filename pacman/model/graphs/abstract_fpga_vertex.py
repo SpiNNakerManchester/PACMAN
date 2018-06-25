@@ -19,7 +19,7 @@ class AbstractFPGAVertex(AbstractVirtualVertex):
 
     @abstractproperty
     def fpga_id(self):
-        """ The id of the FPGA to which the vertex is connected
+        """ The ID of the FPGA to which the vertex is connected
 
         :rtype: int
         """

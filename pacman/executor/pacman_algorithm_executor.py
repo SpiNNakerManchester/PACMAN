@@ -22,7 +22,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class PACMANAlgorithmExecutor(object):
     """ An executor of PACMAN algorithms where the order is deduced from the\
         input and outputs of the algorithm using an XML description of the\
-        algorithm
+        algorithm.
     """
 
     __slots__ = [
@@ -75,7 +75,6 @@ class PACMANAlgorithmExecutor(object):
             do_direct_injection=True, use_unscanned_annotated_algorithms=True,
             provenance_path=None, provenance_name=None):
         """
-
         :param algorithms: A list of algorithms that must all be run
         :param optional_algorithms:\
             A list of algorithms that must be run if their inputs are available
@@ -166,15 +165,15 @@ class PACMANAlgorithmExecutor(object):
 
         :param algorithms: the string representation of the set of algorithms
         :param inputs: list of input types
-        :type inputs: iterable of str
+        :type inputs: iterable(str)
         :param optional_algorithms: list of algorithms which are optional\
             and don't necessarily need to be ran to complete the logic flow
-        :type optional_algorithms: list of strings
+        :type optional_algorithms: iterable(str)
         :param xml_paths: the list of paths for XML configuration data
-        :type xml_paths: iterable of strings
+        :type xml_paths: iterable(str)
         :param required_outputs: \
             the set of outputs that this workflow is meant to generate
-        :type required_outputs: iterable of types as strings
+        :type required_outputs: iterable(str)
         :param tokens:\
             A list of tokens that should be considered to have been generated\
             as a list of strings
@@ -258,7 +257,7 @@ class PACMANAlgorithmExecutor(object):
             executed to generate the correct data objects
 
         :param inputs: list of input types
-        :type inputs: iterable of str
+        :type inputs: iterable(str)
         :param required_outputs: \
             the set of outputs that this workflow is meant to generate
         :param converter_algorithms_datas: the set of converter algorithms
@@ -473,7 +472,7 @@ class PACMANAlgorithmExecutor(object):
         :param required_outputs: the original output listings
         :param inputs: the inputs given to the executor
         :return: new list of outputs
-        :rtype: iterable of str
+        :rtype: iterable(str)
         """
         copy_required_outputs = set(required_outputs)
         for input_type in inputs:
@@ -527,8 +526,8 @@ class PACMANAlgorithmExecutor(object):
         :param algorithm_list: the list of algorithms to remove algorithm from
         :param algorithm: the algorithm to remove
         :param inputs: the inputs list to update output from algorithm
-        :param generated_outputs: the outputs list to update output from\
-                    algorithm
+        :param generated_outputs: \
+            the outputs list to update output from algorithm
         :rtype: None
         """
         algorithm_list.remove(algorithm)

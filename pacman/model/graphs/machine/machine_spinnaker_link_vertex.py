@@ -6,7 +6,7 @@ from pacman.model.graphs \
 
 
 class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
-    """ A virtual vertex on a SpiNNaker Link
+    """ A virtual vertex on a SpiNNaker Link.
     """
 
     __slots__ = [

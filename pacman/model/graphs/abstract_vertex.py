@@ -23,7 +23,7 @@ class AbstractVertex(object):
     def constraints(self):
         """ The constraints of the vertex
 
-        :rtype: iterable of :py:class:`AbstractConstraint`
+        :rtype: iterable(:py:class:`AbstractConstraint`)
         """
 
     @abstractmethod
@@ -38,7 +38,7 @@ class AbstractVertex(object):
         """ Add a list of constraints
 
         :param constraints: The list of constraints to add
-        :type constraints: list of :py:class:`AbstractConstraint`
+        :type constraints: list(:py:class:`AbstractConstraint`)
         """
         for constraint in constraints:
             self.add_constraint(constraint)

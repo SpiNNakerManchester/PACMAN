@@ -56,8 +56,8 @@ class RandomPlacer(object):
 
     def _generate_random_chips(self, machine, np=numpy,
                                random_generator=random):
-        """Generates the list of chips in a random order, with the option \
-         to provide a starting point.
+        """ Generates the list of chips in a random order, with the option \
+            to provide a starting point.
 
         :param machine: A SpiNNaker machine object.
         :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
