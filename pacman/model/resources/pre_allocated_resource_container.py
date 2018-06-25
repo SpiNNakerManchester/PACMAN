@@ -38,17 +38,17 @@ class PreAllocatedResourceContainer(object):
         :param specific_sdram_usage:\
             iterable of SpecificSDRAMResource which states that specific chips\
             have missing SDRAM
-        :type specific_sdram_usage: iterable of \
-            :py:class:`pacman.model.resources.SpecificSDRAMResource`
+        :type specific_sdram_usage: \
+            iterable(:py:class:`pacman.model.resources.SpecificSDRAMResource`)
         :param  specific_core_resources:\
             states which cores have been preallocated
-        :type specific_core_resources: iterable of \
-            :py:class:`pacman.model.resources.SpecificCoreResource`
+        :type specific_core_resources: \
+            iterable(:py:class:`pacman.model.resources.SpecificCoreResource`)
         :param core_resources:\
-            states a number of cores have been pre allocated but don't care
+            states a number of cores have been preallocated but don't care
             which ones they are
-        :type core_resources: iterable of \
-            :py:class:`pacman.model.resources.CoreResource`
+        :type core_resources: \
+            iterable(:py:class:`pacman.model.resources.CoreResource`)
         """
         # pylint: disable=too-many-arguments
         self._specific_sdram_usage = specific_sdram_usage

@@ -113,10 +113,10 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     :param n_atoms: the number of atoms going through this path
     :param is_continuous: \
         whether the keys and atoms mapping is continuous
-    :type source_placement: instance of\
+    :type source_placement: \
         :py:class:`pacman.model.placements.Placement`
-    :type dest_placements: iterable of PlacementTuple
-    :type key_and_mask: instance of\
+    :type dest_placements: iterable(PlacementTuple)
+    :type key_and_mask: \
         :py:class:`pacman.model.routing_info.BaseKeyAndMask`
     :rtype: None
     :raise PacmanRoutingException: when the trace completes and there are\
@@ -276,9 +276,9 @@ def _recursive_trace_to_destinations(
     :type chip_y: int
     :type key_and_mask:
         :py:class:`pacman.model.routing_info.BaseKeyAndMask`
-    :type visited_routers: iterable of\
-        :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
-    :type reached_placements: iterable of placement_tuple
+    :type visited_routers: \
+        iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
+    :type reached_placements: iterable(PlacementTuple)
     :rtype: None
     :raise None: this method does not raise any known exceptions
     """

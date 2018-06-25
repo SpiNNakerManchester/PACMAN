@@ -16,8 +16,8 @@ class MulticastRoutingTables(object):
         """
 
         :param routing_tables: The routing tables to add
-        :type routing_tables: iterable of\
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+        :type routing_tables: \
+            iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
         :raise pacman.exceptions.PacmanAlreadyExistsException: \
             If any two routing tables are for the same chip
         """
@@ -58,8 +58,8 @@ class MulticastRoutingTables(object):
         """ The routing tables stored within
 
         :return: an iterable of routing tables
-        :rtype: iterable of\
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+        :rtype: \
+            iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
         :raise None: does not raise any known exceptions
         """
         return self._routing_tables

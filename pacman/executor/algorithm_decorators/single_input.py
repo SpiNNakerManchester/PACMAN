@@ -16,11 +16,10 @@ class SingleInput(AbstractInput):
 
     def __init__(self, name, param_types):
         """
-
         :param name: The name of the input parameter
         :type name: str
         :param param_types: The ordered possible types of the input parameter
-        :type param_types: list of str
+        :type param_types: list(str)
         """
         self._name = name
         self._param_types = param_types

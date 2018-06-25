@@ -903,7 +903,7 @@ class ResourceTracker(object):
         :type reverse_ip_tags: \
             iterable(:py:class:`pacman.model.resources.ReverseIptagResource`)
         :return: iterable of tuples of (board address, tag) assigned
-        :rtype: iterable of (str, int)
+        :rtype: iterable(tuple(str, int))
         """
         if reverse_ip_tags is None or not reverse_ip_tags:
             return None
@@ -972,7 +972,8 @@ class ResourceTracker(object):
         :param chips: a list of chips that can be used
         :return: list of The x and y coordinates of the used chip, the\
             processor_id, and the IP tag and reverse IP tag allocation tuples
-        :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
+        :rtype: iterable(tuple(int, int, int, list(tuple(int, int)),\
+            list(tuple(int, int))))
         """
 
         x = None
@@ -1042,7 +1043,8 @@ class ResourceTracker(object):
         :return: An iterable of tuples of the x and y coordinates of the used\
             chip, the processor_id, and the IP tag and reverse IP tag\
             allocation tuples
-        :rtype: iterable of (int, int, int, list((int, int)), list((int, int)))
+        :rtype: iterable(tuple(int, int, int, list(tuple(int, int)),\
+            list(tuple(int, int))))
         :raises pacman.exceptions.PacmanValueError: \
             If there aren't chips available that can take the allocation.
         """
@@ -1313,9 +1315,9 @@ class ResourceTracker(object):
         :type resources:\
             :py:class:`pacman.model.resources.ResourceContainer`
         :param ip_tags: the details of the IP tags allocated
-        :type ip_tags: iterable of (str, int) or None
+        :type ip_tags: iterable(tuple(str, int)) or None
         :param reverse_ip_tags: the details of the reverse IP tags allocated
-        :type reverse_ip_tags: iterable of (str, int) or None
+        :type reverse_ip_tags: iterable(tuple(str, int)) or None
         :rtype: None
         """
 

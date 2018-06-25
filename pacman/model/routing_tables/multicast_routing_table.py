@@ -36,8 +36,8 @@ class MulticastRoutingTable(object):
         :type y: int
         :param multicast_routing_entries: \
             The routing entries to add to the table
-        :type multicast_routing_entries: iterable of\
-            :py:class:`spinn_machine.MulticastRoutingEntry`
+        :type multicast_routing_entries: \
+            iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
         :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
             routing entries contain the same key-mask combination
         """

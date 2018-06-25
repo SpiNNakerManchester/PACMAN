@@ -58,9 +58,9 @@ class ConstrainedObject(object):
     def add_constraints(self, constraints):
         """ Add an iterable of constraints to the collection of constraints
 
-        :param constraints: iterable of constraints to add
-        :type constraints: iterable of\
-            :py:class:`pacman.model.constraints.AbstractConstraint`
+        :param constraints: the constraints to add
+        :type constraints: \
+            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
         :rtype: None
         :raise pacman.exceptions.PacmanInvalidParameterException: \
             If one of the constraints is not valid
@@ -73,9 +73,9 @@ class ConstrainedObject(object):
     def constraints(self):
         """ An iterable of constraints
 
-        :return: iterable of constraints
-        :rtype: iterable of\
-            :py:class:`pacman.model.constraints.AbstractConstraint`
+        :return: the constraints
+        :rtype: \
+            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
         :raise None: Raises no known exceptions
         """
         try:

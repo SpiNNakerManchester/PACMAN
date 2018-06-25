@@ -20,8 +20,7 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         :type label: str
         :param constraints: The optional initial constraints of the vertex
         :type constraints: \
-            iterable of\
-            :py:class:`pacman.model.constraints.AbstractConstraint`
+            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
@@ -48,6 +47,5 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
     def resources_required(self):
         """ The resources required by the vertex
 
-        :rtype:\
-            :py:class:`pacman.model.resources.ResourceContainer`
+        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
         """

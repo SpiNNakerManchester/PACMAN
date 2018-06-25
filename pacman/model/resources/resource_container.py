@@ -50,10 +50,10 @@ class ResourceContainer(object):
             :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
         :type cpu_cycles: None or \
             :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
-        :type iptags: None or list of \
-            :py:class:`pacman.models.resources.iptag_resource.IPtagResource`
-        :type reverse_iptags: None or list of \
-            :py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`
+        :type iptags: None or \
+            list(:py:class:`pacman.models.resources.iptag_resource.IPtagResource`)
+        :type reverse_iptags: None or \
+            list(:py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`)
         :rtype: pacman.models.resources.resource_container.ResourceContainer
         :raise None: does not raise any known exception
         """

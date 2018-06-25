@@ -26,8 +26,8 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :param label: The optional name of the vertex
         :type label: str
         :param constraints: The optional initial constraints of the vertex
-        :type constraints: iterable of\
-            :py:class:`pacman.model.constraints.AbstractConstraint`
+        :type constraints: \
+            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
         :param max_atoms_per_core: the max number of atoms that can be\
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
@@ -62,7 +62,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
         :return: a Resource container that contains a \
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: pacman.model.resources.ResourceContainer
+        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
         :raise None: this method does not raise any known exception
         """
 

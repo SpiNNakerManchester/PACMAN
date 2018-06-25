@@ -58,7 +58,7 @@ def requires_injection(types_required):
         injected
 
     :param types_required: A list of types that must have been injected
-    :type types_required: list of str
+    :type types_required: list(str)
     """
     def wrap(wrapped_method):
 
