@@ -6,7 +6,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractAlgorithm(object):
-    """ Represents the metadata for an algorithm
+    """ Represents the metadata for an algorithm.
     """
 
     __slots__ = [
@@ -38,7 +38,6 @@ class AbstractAlgorithm(object):
             required_input_tokens, optional_input_tokens,
             generated_output_tokens):
         """
-
         :param algorithm_id: The unique ID of the algorithm
         :type algorithm_id: str
         :param required_inputs: The inputs required by the algorithm

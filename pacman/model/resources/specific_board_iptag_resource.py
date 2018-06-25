@@ -1,7 +1,6 @@
 class SpecificBoardTagResource(object):
-    """
-    A resource that allocates a tag on a specific board before the class\
-    needing it has been built.
+    """ A resource that allocates a tag on a specific board before the class\
+        needing it has been built.
     """
 
     __slots__ = [

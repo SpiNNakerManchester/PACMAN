@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class AllOf(object):
-    """ Indicates that all of the items specified are required
+    """ Indicates that all of the items specified are required.
     """
 
     __slots__ = ["_items"]
@@ -53,7 +53,7 @@ class AllOf(object):
 
 
 class OneOf(object):
-    """ Indicates that one of the items specified is required
+    """ Indicates that one of the items specified is required.
     """
 
     __slots__ = ["_items"]

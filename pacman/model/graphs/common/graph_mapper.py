@@ -4,7 +4,7 @@ from spinn_utilities.ordered_set import OrderedSet
 
 
 class GraphMapper(object):
-    """ A mapping between an Application Graph and a Machine Graph
+    """ A mapping between an Application Graph and a Machine Graph.
     """
 
     __slots__ = [

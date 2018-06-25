@@ -3,7 +3,7 @@ from spinn_utilities.overrides import overrides
 
 
 class OneOfInput(AbstractInput):
-    """ An input for which one of the input parameters must be matched
+    """ An input for which one of the input parameters must be matched.
     """
 
     __slots__ = [
@@ -13,7 +13,6 @@ class OneOfInput(AbstractInput):
 
     def __init__(self, inputs):
         """
-
         :param inputs: The inputs that make up this input
         """
         self._inputs = inputs

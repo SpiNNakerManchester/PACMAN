@@ -1,6 +1,6 @@
 class ReverseIPtagResource(object):
-    """ Represents the ability to have a SpiNNaker machine send messages to\
-        you.
+    """ Represents the ability to talk to a SpiNNaker machine by sending UDP\
+        packets to it during execution.
     """
 
     __slots__ = [

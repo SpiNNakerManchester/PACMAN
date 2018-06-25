@@ -37,8 +37,7 @@ class ResourceContainer(object):
     def __init__(
             self, dtcm=None, sdram=None, cpu_cycles=None, iptags=None,
             reverse_iptags=None):
-        """ Container object for the types of resources
-
+        """
         :param dtcm: the amount of dtcm used
         :param sdram: the amount of SDRAM used
         :param cpu_cycles: the amount of CPU used

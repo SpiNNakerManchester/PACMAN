@@ -4,7 +4,7 @@ from pacman.exceptions import \
 
 
 class MulticastRoutingTable(object):
-    """ Represents a routing table for a chip
+    """ Represents a routing table for a chip.
     """
 
     __slots__ = [

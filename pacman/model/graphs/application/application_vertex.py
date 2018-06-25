@@ -14,7 +14,7 @@ from spinn_utilities.abstract_base import \
 @add_metaclass(AbstractBase)
 class ApplicationVertex(ConstrainedObject, AbstractVertex):
     """ A vertex that can be broken down into a number of smaller vertices
-        based on the resources that the vertex requires
+        based on the resources that the vertex requires.
     """
 
     __slots__ = ["_label"]
@@ -22,7 +22,6 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
         """
-
         :param label: The optional name of the vertex
         :type label: str
         :param constraints: The optional initial constraints of the vertex

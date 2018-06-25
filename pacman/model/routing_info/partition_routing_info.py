@@ -3,7 +3,7 @@ from pacman.exceptions import PacmanConfigurationException
 
 
 class PartitionRoutingInfo(object):
-    """ Associates a partition to its routing information (keys and masks)
+    """ Associates a partition to its routing information (keys and masks).
     """
 
     __slots__ = [

@@ -1,6 +1,6 @@
 
 class Placement(object):
-    """ The placement of a vertex on to a machine chip and core
+    """ The placement of a vertex on to a machine chip and core.
     """
 
     __slots__ = [
@@ -23,7 +23,6 @@ class Placement(object):
 
     def __init__(self, vertex, x, y, p):
         """
-
         :param vertex: The vertex that has been placed
         :type vertex:\
             :py:class:`pacman.model.graphs.machine.MachineVertex`

@@ -10,7 +10,7 @@ def _get_class_name(cls):
 
 @add_metaclass(AbstractBase)
 class ConstrainedObject(object):
-    """ An implementation of an object which holds constraints
+    """ An implementation of an object which holds constraints.
     """
 
     __slots__ = [

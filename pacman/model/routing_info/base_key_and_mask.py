@@ -3,7 +3,7 @@ import numpy
 
 
 class BaseKeyAndMask(object):
-    """ A Key and Mask to be used for routing
+    """ A Key and Mask to be used for routing.
     """
 
     __slots__ = [

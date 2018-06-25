@@ -7,7 +7,7 @@ from pacman.exceptions import (PacmanAlreadyPlacedError,
 
 
 class Placements(object):
-    """ The placements of vertices on the chips of the machine
+    """ The placements of vertices on the chips of the machine.
     """
 
     __slots__ = [
@@ -23,7 +23,6 @@ class Placements(object):
 
     def __init__(self, placements=None):
         """
-
         :param placements: Any initial placements
         :type placements:\
             iterable(:py:class:`pacman.model.placements.Placement`)

@@ -78,7 +78,6 @@ class VertexBasedRoutingInfoAllocator(object):
     def __call__(self, application_graph, graph_mapper, machine_graph,
                  n_keys_map):
         """
-
         :param application_graph: The application graph
         :param graph_mapper: the mapping between graphs
         :param machine_graph: the machine graph

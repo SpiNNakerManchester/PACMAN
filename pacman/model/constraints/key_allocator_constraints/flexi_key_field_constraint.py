@@ -3,7 +3,7 @@ from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 class FlexiKeyFieldConstraint(AbstractKeyAllocatorConstraint):
     """ Constraint that indicates fields in the mask without a specific size\
-        or position
+        or position.
     """
 
     __slots__ = [

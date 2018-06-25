@@ -2,8 +2,8 @@ from .abstract_placer_constraint import AbstractPlacerConstraint
 
 
 class SameChipAsConstraint(AbstractPlacerConstraint):
-    """ Indicates that a vertex should be placed on the same chip as another
-        vertex
+    """ Indicates that a vertex should be placed on the same chip as another\
+        vertex.
     """
 
     __slots__ = [
@@ -13,7 +13,6 @@ class SameChipAsConstraint(AbstractPlacerConstraint):
 
     def __init__(self, vertex):
         """
-
         :param vertex: The vertex to place on the same chip
         """
         self._vertex = vertex

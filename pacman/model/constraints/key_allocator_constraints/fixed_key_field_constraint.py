@@ -2,7 +2,7 @@ from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
-    """ Constraint that indicates fields in the mask of a key
+    """ Constraint that indicates fields in the mask of a key.
     """
 
     __slots__ = [

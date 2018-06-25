@@ -9,12 +9,12 @@ _injectables = None
 
 
 class InjectionException(Exception):
-    """ Raised when there is an error with injection
+    """ Raised when there is an error with injection.
     """
 
 
 def supports_injection(injectable_class):
-    """ Indicate that the class has methods on which objects can be injected
+    """ Indicate that the class has methods on which objects can be injected.
     """
     orig_init = injectable_class.__init__
 
@@ -33,7 +33,7 @@ def supports_injection(injectable_class):
 def inject(type_to_inject):
     """ Marks a method as something to be called to inject an object of the\
         given type.  The type is just a name for the type, and should match up\
-        at some point with some generated data
+        at some point with some generated data.
 
     :param type_to_inject: The type to be injected using this method
     """
@@ -55,7 +55,7 @@ def inject(type_to_inject):
 def requires_injection(types_required):
     """ Indicates that injection of the given types is required before this\
         method is called; an Exception is raised if the types have not been\
-        injected
+        injected.
 
     :param types_required: A list of types that must have been injected
     :type types_required: list(str)
@@ -145,11 +145,10 @@ def clear_injectables():
 class _DictFacade(dict):
     """ Provides a dict of dict overlay so that container-ship is True if any\
         one of the dict objects contains the items and the item is returned\
-        from the first dict
+        from the first dict.
     """
     def __init__(self, dicts):
         """
-
         :param dicts: An iterable of dict objects to be used
         """
         self._dicts = dicts
@@ -173,12 +172,11 @@ class _DictFacade(dict):
 
 
 class injection_context(object):
-    """ Provides a context for injection to use with "with"
+    """ Provides a context for injection to use with `with`.
     """
 
     def __init__(self, injection_dictionary):
         """
-
         :param injection_dictionary:\
             The dictionary of items to inject whilst in the context
         """
@@ -200,7 +198,7 @@ class injection_context(object):
 
 
 def do_injection(objects_to_inject, objects_to_inject_into=None):
-    """ Perform the actual injection of objects
+    """ Perform the actual injection of objects.
 
     :param objects_to_inject:\
         The objects to be injected as a dict of type name -> object of type

@@ -1,5 +1,5 @@
 class SpecificCoreResource(object):
-    """ Represents specific cores that need to be allocated
+    """ Represents specific cores that need to be allocated.
     """
 
     __slots__ = [

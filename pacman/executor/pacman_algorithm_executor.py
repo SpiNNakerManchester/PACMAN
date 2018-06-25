@@ -22,7 +22,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class PACMANAlgorithmExecutor(object):
     """ An executor of PACMAN algorithms where the order is deduced from the\
         input and outputs of the algorithm using an XML description of the\
-        algorithm
+        algorithm.
     """
 
     __slots__ = [
@@ -75,7 +75,6 @@ class PACMANAlgorithmExecutor(object):
             do_direct_injection=True, use_unscanned_annotated_algorithms=True,
             provenance_path=None, provenance_name=None):
         """
-
         :param algorithms: A list of algorithms that must all be run
         :param optional_algorithms:\
             A list of algorithms that must be run if their inputs are available

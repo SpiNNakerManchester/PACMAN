@@ -5,7 +5,7 @@ from six import itervalues
 
 class RoutingInfo(object):
     """ An association of a set of edges to a non-overlapping set of keys\
-        and masks
+        and masks.
     """
 
     __slots__ = [

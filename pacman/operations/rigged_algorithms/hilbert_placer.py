@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 class HilbertPlacer(object):
     """ A simple placing algorithm using the Hilbert space-filling curve,\
-        translated from RIG."""
+        translated from RIG.
+    """
 
     def __call__(self, machine_graph, machine):
         """ Place each vertex in a machine graph on a core in the machine.

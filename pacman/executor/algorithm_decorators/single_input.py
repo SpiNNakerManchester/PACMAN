@@ -3,7 +3,7 @@ from spinn_utilities.overrides import overrides
 
 
 class SingleInput(AbstractInput):
-    """ An input that is just one item
+    """ An input that is just one item.
     """
 
     __slots__ = [

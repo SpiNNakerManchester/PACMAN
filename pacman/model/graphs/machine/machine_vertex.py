@@ -9,7 +9,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 @add_metaclass(AbstractBase)
 class MachineVertex(ConstrainedObject, AbstractVertex):
-    """ A machine graph vertex
+    """ A machine graph vertex.
     """
 
     __slots__ = ["_label"]

@@ -33,8 +33,7 @@ class PreAllocatedResourceContainer(object):
             self, specific_sdram_usage=None, specific_core_resources=None,
             core_resources=None, specific_iptag_resources=None,
             specific_reverse_iptag_resources=None):
-        """ Container object for the types of resources
-
+        """
         :param specific_sdram_usage:\
             iterable of SpecificSDRAMResource which states that specific chips\
             have missing SDRAM

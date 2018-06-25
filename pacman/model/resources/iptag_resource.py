@@ -1,10 +1,9 @@
 class IPtagResource(object):
-    """ Represents the ability to talk to a SpiNNaker machine by sending UDP\
-        packets to it.
+    """ Represents the ability to have a SpiNNaker machine send messages to\
+        you during execution.
     """
 
     __slots__ = [
-
         # The host IP address that will receive the data from this tag
         "_ip_address",
 
@@ -22,7 +21,6 @@ class IPtagResource(object):
         # the identifier that states what type of data is being transmitted
         # through this IP tag
         "_traffic_identifier"
-
     ]
 
     def __init__(

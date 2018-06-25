@@ -2,7 +2,7 @@ from pacman.exceptions import PacmanAlreadyExistsException
 
 
 class MulticastRoutingTables(object):
-    """ Represents the multicast routing tables for a number of chips
+    """ Represents the multicast routing tables for a number of chips.
     """
 
     __slots__ = [
@@ -14,7 +14,6 @@ class MulticastRoutingTables(object):
 
     def __init__(self, routing_tables=None):
         """
-
         :param routing_tables: The routing tables to add
         :type routing_tables: \
             iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)

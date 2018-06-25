@@ -3,7 +3,7 @@ from spinn_utilities.overrides import overrides
 
 
 class SimpleMachineVertex(MachineVertex):
-    """ A MachineVertex that stores its own resources
+    """ A MachineVertex that stores its own resources.
     """
 
     def __init__(self, resources, label=None, constraints=None):

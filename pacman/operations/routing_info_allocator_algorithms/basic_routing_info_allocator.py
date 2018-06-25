@@ -16,7 +16,9 @@ class BasicRoutingInfoAllocator(object):
     """ An basic algorithm that can produce routing keys and masks for\
         edges in a graph based on the x,y,p of the placement\
         of the preceding vertex.
-        Note that no constraints are supported, and that the number of keys\
+
+    .. note::
+        No constraints are supported, and that the number of keys\
         required by each edge must be 2048 or less, and that all edges coming\
         out of a vertex will be given the same key/mask assignment.
     """
@@ -25,7 +27,6 @@ class BasicRoutingInfoAllocator(object):
 
     def __call__(self, machine_graph, placements, n_keys_map):
         """
-
         :param machine_graph:\
             The machine graph to allocate the routing info for
         :type machine_graph:\

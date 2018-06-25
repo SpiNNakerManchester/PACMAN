@@ -1,6 +1,6 @@
 class ReverseIPtagResource(object):
-    """ Represents the amount of local core memory available or used on a core\
-        on a chip of the machine
+    """ Represents the ability to talk to a specific board of a SpiNNaker\
+        machine by sending UDP packets to it during execution.
     """
 
     __slots__ = [

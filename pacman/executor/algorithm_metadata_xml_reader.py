@@ -35,7 +35,7 @@ class _XmlConfigurationException(PacmanConfigurationException):
 
 
 class AlgorithmMetadataXmlReader(object):
-    """ Converts an XML file into algorithm data
+    """ Converts an XML file into algorithm data.
     """
 
     __slots__ = [

@@ -15,7 +15,7 @@ from six import raise_from
 
 
 class ResourceTracker(object):
-    """ Tracks the usage of resources of a machine
+    """ Tracks the usage of resources of a machine.
     """
 
     __slots__ = [

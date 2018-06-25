@@ -2,7 +2,7 @@ from .abstract_placer_constraint import AbstractPlacerConstraint
 
 
 class BoardConstraint(AbstractPlacerConstraint):
-    """ A constraint on the board on which a placement is made
+    """ A constraint on the board on which a placement is made.
     """
 
     __slots__ = [
@@ -12,7 +12,6 @@ class BoardConstraint(AbstractPlacerConstraint):
 
     def __init__(self, board_address):
         """
-
         :param board_address:\
             The IP address of the Ethernet of the board to be used
         """
