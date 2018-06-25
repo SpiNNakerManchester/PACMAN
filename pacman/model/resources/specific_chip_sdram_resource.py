@@ -1,5 +1,5 @@
 class SpecificChipSDRAMResource(object):
-    """ Represents the number of cores that need to be allocated
+    """ Represents the number of cores that need to be allocated.
     """
 
     __slots__ = [
@@ -13,12 +13,11 @@ class SpecificChipSDRAMResource(object):
 
     def __init__(self, chip, sdram_usage):
         """
-
         :param sdram_usage:\
-            The amount of SDRAM in bytes needed to be pre-allocated
+            The amount of SDRAM in bytes needed to be preallocated
         :type sdram_usage: int
         :param chip: chip of where the SDRAM is to be allocated
-        :type chip: SpiNNMachine.chip.Chip
+        :type chip: :py:class:`spinn_machine.Chip`
         :raise None: No known exceptions are raised
         """
         self._sdram_usage = sdram_usage

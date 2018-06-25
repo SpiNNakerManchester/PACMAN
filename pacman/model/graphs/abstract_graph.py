@@ -24,7 +24,7 @@ class AbstractGraph(object):
     def constraints(self):
         """ The constraints of the vertex
 
-        :rtype: iterable of :py:class:`AbstractConstraint`
+        :rtype: iterable(:py:class:`AbstractConstraint`)
         """
 
     @abstractmethod
@@ -39,7 +39,7 @@ class AbstractGraph(object):
         """ Add a list of constraints
 
         :param constraints: The list of constraints to add
-        :type constraints: list of :py:class:`AbstractConstraint`
+        :type constraints: list(:py:class:`AbstractConstraint`)
         """
         for constraint in constraints:
             self.add_constraint(constraint)
@@ -59,8 +59,8 @@ class AbstractGraph(object):
         """ Add a collection of vertices to the graph.
 
         :param vertices: The vertices to add
-        :type vertices: iterable of \
-            :py:class:`pacman.model.graphs.AbstractVertex`
+        :type vertices: \
+            iterable(:py:class:`pacman.model.graphs.AbstractVertex`)
         :raises PacmanInvalidParameterException:\
             If any vertex is not of a valid type
         """
@@ -87,8 +87,7 @@ class AbstractGraph(object):
         """ Add a collection of edges to the graph
 
         :param edges: The edges to add
-        :type edges: iterable of \
-            :py:class:`pacman.model.graphs.AbstractEdge`
+        :type edges: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
         :param outgoing_edge_partition_name: \
             The name of the edge partition to add the edges to; each edge\
             partition is the partition of edges that start at the same vertex
@@ -117,8 +116,7 @@ class AbstractGraph(object):
     def vertices(self):
         """ The vertices in the graph
 
-        :rtype: iterable of\
-            :py:class:`pacman.model.graphs.AbstractVertex`
+        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractVertex`)
         """
 
     @abstractproperty
@@ -132,16 +130,15 @@ class AbstractGraph(object):
     def edges(self):
         """ The edges in the graph
 
-        :rtype: iterable of\
-            :py:class:`pacman.model.graphs.AbstractEdge`
+        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
         """
 
     @abstractproperty
     def outgoing_edge_partitions(self):
         """ The outgoing edge partitions in the graph
 
-        :rtype: iterable of\
-            :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
+        :rtype: \
+            iterable(:py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`)
         """
 
     @abstractproperty
@@ -158,8 +155,7 @@ class AbstractGraph(object):
         :param vertex: The vertex at which the edges to get start
         :type vertex:\
             :py:class:`pacman.model.graphs.AbstractVertex`
-        :rtype: iterable of\
-            :py:class:`pacman.model.graphs.AbstractEdge`
+        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
         """
 
     @abstractmethod
@@ -169,23 +165,21 @@ class AbstractGraph(object):
         :param vertex: The vertex at which the edges to get end
         :type vertex:\
             :py:class:`pacman.model.graphs.AbstractVertex`
-        :rtype: iterable of\
-            :py:class:`pacman.model.graphs.AbstractEdge`
+        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
         """
 
     @abstractmethod
     def get_edges_ending_at_vertex_with_partition_name(
             self, vertex, partition_name):
-        """ Get all the edges that end at the given vertex, and reside in the
-         correct partition id
+        """ Get all the edges that end at the given vertex, and reside in the\
+            correct partition ID
 
         :param vertex:  The vertex at which the edges to get end
         :type vertex:\
             :py:class:`pacman.model.graphs.AbstractVertex`
         :param partition_name: the label for the partition
         :type partition_name: str
-        :return: iterable of\
-            :py:class:`pacman.model.graphs.AbstractEdge`
+        :return: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
         """
 
     @abstractmethod
@@ -196,8 +190,7 @@ class AbstractGraph(object):
         :type vertex:\
             :py:class:`pacman.model.graphs.AbstractVertex`
         :rtype: \
-            iterable of\
-            :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
+            iterable(:py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`)
         """
 
     @abstractmethod

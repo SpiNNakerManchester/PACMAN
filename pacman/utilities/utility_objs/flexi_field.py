@@ -7,8 +7,7 @@ SUPPORTED_TAGS = Enum(
 
 
 class FlexiField(object):
-    """ field who's location is not fixed in key allocation
-
+    """ Field who's location is not fixed in key allocation
     """
 
     __slots__ = [

@@ -5,7 +5,7 @@ from .machine_vertex import MachineVertex
 
 
 class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
-    """ A virtual vertex on an FPGA link
+    """ A virtual vertex on an FPGA link.
     """
 
     __slots__ = [

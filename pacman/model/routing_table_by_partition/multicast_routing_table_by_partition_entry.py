@@ -3,7 +3,7 @@ from pacman.exceptions import PacmanInvalidParameterException
 
 
 class MulticastRoutingTableByPartitionEntry(object):
-    """ An entry in a path of a multicast route
+    """ An entry in a path of a multicast route.
     """
 
     __slots__ = [
@@ -23,14 +23,18 @@ class MulticastRoutingTableByPartitionEntry(object):
     def __init__(self, out_going_links, outgoing_processors,
                  incoming_processor=None, incoming_link=None):
         """
-        :param out_going_links: the edges this path entry goes down
-        :type out_going_links: iterable of ints between 0 and 5
-        :param outgoing_processors: the processors this path entry goes to
-        :type outgoing_processors: iterable of ints between 0 and 17
-        :param incoming_processor:  the direction this entry came from
-        :type incoming_processor: int between 0 and 17
-        :param incoming_link: the direction this entry came from in link
-        :type incoming_link: int between 0 and 5
+        :param out_going_links: the edges this path entry goes down, each of\
+            which is between 0 and 5
+        :type out_going_links: iterable(int)
+        :param outgoing_processors: the processors this path entry goes to,\
+            each of which is between 0 and 17
+        :type outgoing_processors: iterable(int)
+        :param incoming_processor: \
+            the direction this entry came from (between 0 and 17)
+        :type incoming_processor: int
+        :param incoming_link: \
+            the direction this entry came from in link (between 0 and 5)
+        :type incoming_link: int
         """
         if isinstance(out_going_links, int):
             self._out_going_links = set()
