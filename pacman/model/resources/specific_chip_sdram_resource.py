@@ -2,8 +2,7 @@ from pacman.model.resources import AbstractSDRAM
 
 
 class SpecificChipSDRAMResource(object):
-    """ Represents the SDRAm required for this Chip
-    """ Represents the number of cores that need to be allocated.
+    """ Represents the SDRAM required for this Chip
     """
 
     __slots__ = [
@@ -21,7 +20,6 @@ class SpecificChipSDRAMResource(object):
             The amount of SDRAM in bytes needed to be pre-allocated
         :type sdram_usage: AbstractSDRAM
             The amount of SDRAM in bytes needed to be preallocated
-        :type sdram_usage: int
         :param chip: chip of where the SDRAM is to be allocated
         :type chip: :py:class:`spinn_machine.Chip`
         :raise None: No known exceptions are raised
