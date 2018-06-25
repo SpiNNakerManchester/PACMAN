@@ -40,7 +40,7 @@ class PreAllocatedResourceContainer(object):
             iterable of SpecificSDRAMResource which states that specific chips\
             have missing SDRAM
         :type specific_sdram_usage: iterable of \
-            :py:class:`pacman.model.resources.SpecificSDRAMResource`
+            :py:class:`pacman.model.resources.SpecificChipSDRAMResource`
         :param  specific_core_resources:\
             states which cores have been preallocated
         :type specific_core_resources: iterable of \

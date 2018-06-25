@@ -26,13 +26,13 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(combo.get_total_sdram(None), 128+256)
         combo = const2 + const1
         self.assertEqual(combo.get_total_sdram(None), 128+256)
-        var1 = VariableSDRAM(124, 8, 100)
+        var1 = VariableSDRAM(124, 8)
         self.assertEqual(var1.get_total_sdram(100), 124 + 8 * 100)
         combo = var1 + const1
         self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
         combo = const1 + var1
         self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
-        var2 = VariableSDRAM(234, 6, 150)
+        var2 = VariableSDRAM(234, 6)
         combo = var2 + var1
         self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (8 + 6) * 150)
 

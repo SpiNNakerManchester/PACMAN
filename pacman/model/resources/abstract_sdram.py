@@ -30,6 +30,26 @@ class AbstractSDRAM(object):
         :rtype AbstractSDRAM
         """
 
+    @abstractmethod
+    def __suba__(self, other):
+        """ Creates a new SDRAM which is this one less the other
+
+        :param other: another  SDRAM resource
+        :type other: AbstractSDRAM
+        :return: a New AbstractSDRAM
+        :rtype AbstractSDRAM
+        """
+
+    @abstractmethod
+    def sub_from(self, other):
+        """ Creates a new SDRAM which is the other less this one
+
+        :param other: another  SDRAM resource
+        :type other: AbstractSDRAM
+        :return: a New AbstractSDRAM
+        :rtype AbstractSDRAM
+        """
+
     @abstractproperty
     def fixed(self):
         """ Returns the fixed sdram cost

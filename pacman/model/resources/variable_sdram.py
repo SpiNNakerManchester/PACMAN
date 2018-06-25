@@ -13,12 +13,10 @@ class VariableSDRAM(AbstractSDRAM):
         "_fixed_sdram"
         # The amount of extra SDRAm used for each timestep
         "_per_timestep_sdram"
-        # The assumed runtime. Used when no specific runtime is supplied
-        "_assumed_timesteps"
     ]
 
     def __init__(
-            self, fixed_sdram, per_timestep_sdram, assumed_timesteps=None):
+            self, fixed_sdram, per_timestep_sdram):
         """
         :param sdram: The amount of SDRAM in bytes
         :type sdram: int
@@ -26,7 +24,6 @@ class VariableSDRAM(AbstractSDRAM):
         """
         self._fixed_sdram = fixed_sdram
         self._per_timestep_sdram = per_timestep_sdram
-        self._assumed_timesteps = assumed_timesteps
 
     def get_total_sdram(self, n_timesteps):
         return self._fixed_sdram + \
@@ -44,20 +41,28 @@ class VariableSDRAM(AbstractSDRAM):
         if isinstance(other, ConstantSDRAM):
             return VariableSDRAM(
                 self._fixed_sdram + other.fixed,
-                self._per_timestep_sdram, self._assumed_timesteps)
+                self._per_timestep_sdram)
         else:
-            if self._assumed_timesteps:
-                if other._assumed_timesteps:
-                    assumed_timesteps = max(
-                        self._assumed_timesteps, other._assumed_timesteps)
-                else:
-                    assumed_timesteps = self._assumed_timesteps
-            else:
-                assumed_timesteps = other._assumed_timesteps
             return VariableSDRAM(
                 self._fixed_sdram + other._fixed_sdram,
-                self._per_timestep_sdram + other._per_timestep_sdram,
-                assumed_timesteps)
+                self._per_timestep_sdram + other._per_timestep_sdram)
 
-    def set_assumed_timesteps(self, assumed_timesteps):
-        self._assumed_timesteps = assumed_timesteps
+    def __suba__(self, other):
+        if isinstance(other, ConstantSDRAM):
+            return VariableSDRAM(
+                self._fixed_sdram - other.fixed,
+                self._per_timestep_sdram)
+        else:
+            return VariableSDRAM(
+                self._fixed_sdram - other._fixed_sdram,
+                self._per_timestep_sdram - other._per_timestep_sdram)
+
+    def sub_from(self, other):
+        if isinstance(other, ConstantSDRAM):
+            return VariableSDRAM(
+                other.fixed - self._fixed_sdram,
+                0 - self._per_timestep_sdram)
+        else:
+            return VariableSDRAM(
+                other._fixed_sdram - self._fixed_sdram,
+                other._per_timestep_sdram - self._per_timestep_sdram)
