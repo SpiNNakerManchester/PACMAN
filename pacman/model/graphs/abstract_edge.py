@@ -5,7 +5,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 @add_metaclass(AbstractBase)
 class AbstractEdge(object):
-    """ A directed edge in a graph between two vertices
+    """ A directed edge in a graph between two vertices.
     """
 
     __slots__ = ()
@@ -38,5 +38,5 @@ class AbstractEdge(object):
         """ The traffic type of the edge
 
         :rtype:\
-            py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
+            :py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
         """
