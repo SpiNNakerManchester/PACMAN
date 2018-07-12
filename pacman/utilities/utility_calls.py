@@ -9,15 +9,14 @@ def locate_constraints_of_type(constraints, constraint_type):
     """ Locates all constraints of a given type out of a list
 
     :param constraints: The constraints to filter
-    :type constraints: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :type constraints: \
+        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
     :param constraint_type: The type of constraints to return
     :type constraint_type:\
         :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
     :return: The constraints of constraint_type that are found in the \
         constraints given
-    :rtype: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :rtype: iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
     :raises None: no known exceptions
     """
     return [c for c in constraints if isinstance(c, constraint_type)]
@@ -27,15 +26,14 @@ def locate_first_constraint_of_type(constraints, constraint_type):
     """ Locates the first constraint of a given type out of a list
 
     :param constraints: The constraints to select from
-    :type constraints: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :type constraints: \
+        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
     :param constraint_type: The type of constraints to return
     :type constraint_type:\
         :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
     :return: The first constraint of constraint_type that was found in the\
         constraints given
-    :rtype:\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :rtype: :py:class:`pacman.model.constraints.AbstractConstraint`
     :raises pacman.exceptions.PacmanInvalidParameterException: \
         If no such constraint is present
     """
@@ -59,11 +57,11 @@ def check_algorithm_can_support_constraints(
 
     :param constrained_vertices: a list of constrained vertices which each has\
         constraints given to the algorithm
-    :type constrained_vertices: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :type constrained_vertices: \
+        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
     :param supported_constraints: The constraints supported
-    :type supported_constraints: iterable of\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :type supported_constraints: \
+        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
     :param abstract_constraint_type: The overall abstract c type supported
     :type abstract_constraint_type:\
         :py:class:`pacman.model.constraints.AbstractConstraint`

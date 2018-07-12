@@ -4,7 +4,7 @@ from six import itervalues
 
 
 class ConstraintOrder(object):
-    """ A constraint order definition for sorting
+    """ A constraint order definition for sorting.
     """
 
     __slots__ = [
@@ -24,7 +24,6 @@ class ConstraintOrder(object):
             self, constraint_class, relative_order,
             required_optional_properties=None):
         """
-
         :param constraint_class: The class of the constraint
         :param relative_order:\
             The order of the constraint relative to other constraints to be\
@@ -62,7 +61,7 @@ class ConstraintOrder(object):
 
 
 class VertexSorter(object):
-    """ Sorts vertices based on constraints with given criteria
+    """ Sorts vertices based on constraints with given criteria.
     """
 
     __slots__ = [
@@ -72,10 +71,9 @@ class VertexSorter(object):
 
     def __init__(self, constraint_order):
         """
-
         :param constraint_order:\
             The order in which the constraints are to be sorted
-        :type constraint_order: list of ConstraintOrder
+        :type constraint_order: list(:py:class:`ConstraintOrder`)
         """
 
         # Group constraints based on the class

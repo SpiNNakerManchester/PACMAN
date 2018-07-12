@@ -11,13 +11,7 @@ _REPR_TEMPLATE = \
 
 class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     """ A collection of edges which start at a single vertex which have the
-        same semantics and so can share a single key
-
-    :param identifier: The identifier of the partition
-    :param allowed_edge_types: The types of edges allowed
-    :param constraints: Any initial constraints
-    :param label: An optional label of the partition
-    :param traffic_weight: The weight of traffic going down this partition
+        same semantics and so can share a single key.
     """
 
     __slots__ = [
@@ -40,6 +34,13 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
+        """
+        :param identifier: The identifier of the partition
+        :param allowed_edge_types: The types of edges allowed
+        :param constraints: Any initial constraints
+        :param label: An optional label of the partition
+        :param traffic_weight: The weight of traffic going down this partition
+        """
         super(OutgoingEdgePartition, self).__init__(constraints)
         self._label = label
         self._identifier = identifier

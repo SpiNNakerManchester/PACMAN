@@ -2,8 +2,7 @@ from pacman import exceptions
 
 
 class PreAllocatedResourceContainer(object):
-    """ container object for pre-allocated resources
-
+    """ Container object for preallocated resources
     """
 
     __slots__ = [
@@ -21,12 +20,12 @@ class PreAllocatedResourceContainer(object):
         # which core it uses.
         "_core_resources",
 
-        # An iterable of SpecificIPTagResource objects that reflect the iptag
+        # An iterable of SpecificIPTagResource objects that reflect the IP tag
         # details that have been preallocated on a board.
         "_specific_iptag_resources",
 
         # An iterable of SpecificReverseIPTagResource objects that reflect the
-        # reverse iptag details that have been preallocated on a board.
+        # reverse IP tag details that have been preallocated on a board.
         "_specific_reverse_iptag_resources",
     ]
 
@@ -34,22 +33,21 @@ class PreAllocatedResourceContainer(object):
             self, specific_sdram_usage=None, specific_core_resources=None,
             core_resources=None, specific_iptag_resources=None,
             specific_reverse_iptag_resources=None):
-        """ Container object for the types of resources
-
+        """
         :param specific_sdram_usage:\
             iterable of SpecificSDRAMResource which states that specific chips\
             have missing SDRAM
-        :type specific_sdram_usage: iterable of \
-            :py:class:`pacman.model.resources.SpecificSDRAMResource`
+        :type specific_sdram_usage: \
+            iterable(:py:class:`pacman.model.resources.SpecificSDRAMResource`)
         :param  specific_core_resources:\
             states which cores have been preallocated
-        :type specific_core_resources: iterable of \
-            :py:class:`pacman.model.resources.SpecificCoreResource`
+        :type specific_core_resources: \
+            iterable(:py:class:`pacman.model.resources.SpecificCoreResource`)
         :param core_resources:\
-            states a number of cores have been pre allocated but don't care
+            states a number of cores have been preallocated but don't care
             which ones they are
-        :type core_resources: iterable of \
-            :py:class:`pacman.model.resources.CoreResource`
+        :type core_resources: \
+            iterable(:py:class:`pacman.model.resources.CoreResource`)
         """
         # pylint: disable=too-many-arguments
         self._specific_sdram_usage = specific_sdram_usage
@@ -94,21 +92,21 @@ class PreAllocatedResourceContainer(object):
     def extend(self, other):
         if not isinstance(other, PreAllocatedResourceContainer):
             raise exceptions.PacmanConfigurationException(
-                "Only another pre allocated resource container can extend a "
-                "pre allocated resource container")
+                "Only another preallocated resource container can extend a "
+                "preallocated resource container")
 
-        # add specific sdram usage
+        # add specific SDRAM usage
         self._specific_sdram_usage.extend(other.specific_sdram_usage)
 
         # add specific cores
         self._specific_core_resources.extend(other.specific_core_resources)
 
-        # add none specific cores
+        # add non-specific cores
         self._core_resources.extend(other.core_resources)
 
-        # add iptag resources
+        # add IP tag resources
         self._specific_iptag_resources.extend(other.specific_iptag_resources)
 
-        # add reverse iptags
+        # add reverse IP tag resources
         self._specific_reverse_iptag_resources.extend(
             other.specific_reverse_iptag_resources)

@@ -7,7 +7,7 @@ from six import itervalues
 
 
 class Tags(object):
-    """ Represents assigned IP Tag and Reverse IP Tags
+    """ Represents assigned IP Tag and Reverse IP Tags.
     """
 
     __slots__ = [
@@ -86,7 +86,7 @@ class Tags(object):
                 existing_tag.port = ip_tag.port
 
     def add_reverse_ip_tag(self, reverse_ip_tag, vertex):
-        """ Add a reverse iptag
+        """ Add a reverse IP tag
 
         :param reverse_ip_tag: The tag to add
         :type reverse_ip_tag:\
@@ -129,21 +129,19 @@ class Tags(object):
 
     @property
     def ip_tags(self):
-        """ The IPTags assigned
+        """ The IP tags assigned
 
         :return: iterable of IPTag
-        :rtype: iterable of \
-            :py:class:`spinn_machine.tags.IPTag`
+        :rtype: iterable(:py:class:`spinn_machine.tags.IPTag`)
         """
         return itervalues(self._ip_tags)
 
     @property
     def reverse_ip_tags(self):
-        """ The ReverseIPTags assigned
+        """ The reverse IP tags assigned
 
         :return: iterable of ReverseIPTag
-        :rtype: iterable of \
-            :py:class:`spinn_machine.tags.ReverseIPTag`
+        :rtype: iterable(:py:class:`spinn_machine.tags.ReverseIPTag`)
         """
         return itervalues(self._reverse_ip_tags)
 
@@ -153,8 +151,8 @@ class Tags(object):
         :param vertex: The vertex to get the tags for
         :type vertex:\
             :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :return: An iterable of IPTag or None if the vertex has no tags
-        :rtype: iterable of :py:class:`spinn_machine.tags.IPTag` or None
+        :return: An iterable of IPTag, or None if the vertex has no tags
+        :rtype: iterable(:py:class:`spinn_machine.tags.IPTag`) or None
         """
         return self._ip_tags_by_vertex.get(vertex, None)
 
@@ -164,8 +162,7 @@ class Tags(object):
         :param vertex: The vertex to get the tags for
         :type vertex:\
             :py:class:`pacman.model.graphs.AbstractVertex`
-        :return: An iterable of ReverseIPTag or None if the vertex has no tags
-        :rtype: iterable of \
-            :py:class:`spinn_machine.tags.ReverseIPTag` or None
+        :return: An iterable of ReverseIPTag, or None if the vertex has no tags
+        :rtype: iterable(:py:class:`spinn_machine.tags.ReverseIPTag`) or None
         """
         return self._reverse_ip_tags_by_vertex.get(vertex, None)
