@@ -140,6 +140,18 @@ class Graph(ConstrainedObject, AbstractGraph):
             outgoing_edge_partition.identifier] = outgoing_edge_partition
 
     @property
+    def allowed_vertex_types(self):
+        return self._allowed_vertex_types
+
+    @property
+    def allowed_edge_types(self):
+        return self._allowed_edge_types
+
+    @property
+    def allowed_partition_types(self):
+        return self._allowed_partition_types
+
+    @property
     @overrides(AbstractGraph.vertices)
     def vertices(self):
         return self._vertices
