@@ -29,7 +29,7 @@ class NoSpiNNakerLink(PacmanConfigurationException):
 
 
 class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
-    """ A Chip id Allocation Allocator algorithm that keeps track of\
+    """ A Chip ID Allocation Allocator algorithm that keeps track of\
         chip IDs and attempts to allocate them as requested
     """
 

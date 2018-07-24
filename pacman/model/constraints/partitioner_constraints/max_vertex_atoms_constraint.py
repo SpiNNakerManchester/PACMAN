@@ -4,7 +4,7 @@ from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 class MaxVertexAtomsConstraint(AbstractPartitionerConstraint):
     """ A constraint which limits the number of atoms on each division of a\
-        vertex
+        vertex.
     """
 
     __slots__ = [
@@ -14,7 +14,6 @@ class MaxVertexAtomsConstraint(AbstractPartitionerConstraint):
 
     def __init__(self, size):
         """
-
         :param size: The maximum number of atoms to split the vertex into
         :type size: int
         """

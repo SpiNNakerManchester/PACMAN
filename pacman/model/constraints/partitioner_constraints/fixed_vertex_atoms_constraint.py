@@ -4,7 +4,7 @@ from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 class FixedVertexAtomsConstraint(AbstractPartitionerConstraint):
     """ A constraint which specifies the exact number of atoms on each\
-        division of a vertex
+        division of a vertex.
     """
 
     __slots__ = [
@@ -14,7 +14,6 @@ class FixedVertexAtomsConstraint(AbstractPartitionerConstraint):
 
     def __init__(self, size):
         """
-
         :param size: The exact number of atoms to split the vertex into
         :type size: int
         """

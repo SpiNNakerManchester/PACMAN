@@ -7,7 +7,7 @@ from pacman.exceptions import (PacmanAlreadyPlacedError,
 
 
 class Placements(object):
-    """ The placements of vertices on the chips of the machine
+    """ The placements of vertices on the chips of the machine.
     """
 
     __slots__ = [
@@ -23,10 +23,9 @@ class Placements(object):
 
     def __init__(self, placements=None):
         """
-
         :param placements: Any initial placements
         :type placements:\
-            iterable of :py:class:`pacman.model.placements.Placement`
+            iterable(:py:class:`pacman.model.placements.Placement`)
         :raise PacmanAlreadyPlacedError:\
             If there is any vertex with more than one placement.
         :raise PacmanProcessorAlreadyOccupiedError:\
@@ -50,7 +49,7 @@ class Placements(object):
 
         :param placements: The placements to add
         :type placements:\
-            iterable of :py:class:`pacman.model.placements.Placement`
+            iterable(:py:class:`pacman.model.placements.Placement`)
         """
         for placement in placements:
             self.add_placement(placement)
@@ -86,8 +85,7 @@ class Placements(object):
         :param p: the processor on the chip
         :type p: int
         :return: the vertex placed on the given processor
-        :rtype:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
+        :rtype: :py:class:`pacman.model.graphs.machine.MachineVertex`
         :raise PacmanProcessorNotOccupiedError:\
             If the processor is not occupied
         """
@@ -101,8 +99,7 @@ class Placements(object):
         """ Return the placement information for a vertex
 
         :param vertex: The vertex to find the placement of
-        :type vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
+        :type vertex: :py:class:`pacman.model.graphs.machine.MachineVertex`
         :return: The placement
         :rtype: :py:class:`pacman.model.placements.Placement`
         :raise PacmanNotPlacedError: If the vertex has not been placed.
@@ -116,7 +113,7 @@ class Placements(object):
         """ Return an iterable of processors with assigned vertices.
 
         :return: Iterable of (x, y, p) tuples
-        :rtype: iterable of (int, int, int)
+        :rtype: iterable(tuple(int, int, int))
         """
         return iterkeys(self._placements)
 
@@ -135,8 +132,7 @@ class Placements(object):
         """ All of the placements
 
         :return: iterable of placements
-        :rtype: iterable of\
-            :py:class:`pacman.model.placements.Placement`
+        :rtype: iterable(:py:class:`pacman.model.placements.Placement`)
         :raise None: does not raise any known exceptions
         """
         return itervalues(self._placements)

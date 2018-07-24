@@ -12,7 +12,7 @@ import sys
 
 class ApplicationSpiNNakerLinkVertex(
         ApplicationVertex, AbstractSpiNNakerLinkVertex):
-    """ A virtual vertex on a SpiNNaker Link
+    """ A virtual vertex on a SpiNNaker Link.
     """
 
     __slots__ = [

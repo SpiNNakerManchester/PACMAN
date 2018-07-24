@@ -35,7 +35,7 @@ class _XmlConfigurationException(PacmanConfigurationException):
 
 
 class AlgorithmMetadataXmlReader(object):
-    """ Converts an XML file into algorithm data
+    """ Converts an XML file into algorithm data.
     """
 
     __slots__ = [
@@ -45,7 +45,6 @@ class AlgorithmMetadataXmlReader(object):
 
     def __init__(self, xml_paths):
         """
-
         :param xml_paths: paths to extra metadata files
         :rtype: None
         """
@@ -53,9 +52,8 @@ class AlgorithmMetadataXmlReader(object):
 
     def decode_algorithm_data_objects(self):
         """
-
         :return: the algorithm data objects which represent all the\
-                    algorithm's inputs and outputs
+            algorithm's inputs and outputs
         """
         # parse xmls
         algorithm_data_objects = dict()
