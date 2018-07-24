@@ -75,7 +75,10 @@ class ResourceTracker(object):
         "_n_cores_preallocated",
 
         # counter of chips that have had processors allocated to them
-        "_chips_used"
+        "_chips_used",
+
+        # The number of chips with the n cores currently available
+        "_chips_with_n_cores_available"
     ]
 
     def __init__(self, machine, chips=None, preallocated_resources=None):
@@ -152,6 +155,15 @@ class ResourceTracker(object):
         self._n_cores_preallocated = self._convert_preallocated_resources(
             preallocated_resources)
 
+        # update tracker for n cores available per chip
+        self._chips_with_n_cores_available = [0] * machine.MAX_CORES_PER_CHIP
+        for chip in machine.chips:
+            pre_allocated = 0
+            if (chip.x, chip.y) in self._n_cores_preallocated:
+                pre_allocated = self._n_cores_preallocated[(chip.x, chip.y)]
+            self._chips_with_n_cores_available[
+                chip.n_user_processors - pre_allocated] += 1
+
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors
         self._chips_available = OrderedSet()
@@ -191,6 +203,10 @@ class ResourceTracker(object):
             if not (chip.x, chip.y) in self._core_tracker:
                 self._fill_in_core_tracker_for_chip((chip.x, chip.y), chip)
             for processor_id in processor_ids:
+                self._chips_with_n_cores_available[
+                    len(self._core_tracker[chip.x, chip.y])] -= 1
+                self._chips_with_n_cores_available[
+                    len(self._core_tracker[chip.x, chip.y]) - 1] += 1
                 self._core_tracker[chip.x, chip.y].remove(processor_id)
 
         # create random_core_map
@@ -722,6 +738,11 @@ class ResourceTracker(object):
             # TODO: Find a core that meets the resource requirements
             processor_id = self._core_tracker[key].pop()
 
+        # update number tracker
+        self._chips_with_n_cores_available[len(self._core_tracker[key])] -= 1
+        self._chips_with_n_cores_available[
+            len(self._core_tracker[key]) - 1] += 1
+
         if len(self._core_tracker[key]) == self._n_cores_preallocated[key]:
             self._chips_available.remove(key)
 
@@ -1192,6 +1213,18 @@ class ResourceTracker(object):
                 n_tags += len(self._machine.get_chip_at(eth_x, eth_y).tag_ids)
         return n_cores, n_chips, max_sdram, n_tags
 
+    def get_maximum_cores_available_on_a_chip(self):
+        """ returns the number of available cores of the chip with the maximum 
+        number of available cores 
+        
+        :return: the max cores available on the best chip
+        :rtype: int
+        """
+        for n_cores_available, n_chips_with_n_cores in reversed(list(
+                enumerate(self._chips_with_n_cores_available))):
+            if n_chips_with_n_cores != 0:
+                return n_cores_available
+
     def get_maximum_constrained_resources_available(
             self, resources, constraints):
         """ Get the maximum resources available given the constraints
@@ -1293,6 +1326,13 @@ class ResourceTracker(object):
 
         self._chips_available.add((chip_x, chip_y))
         self._sdram_tracker[chip_x, chip_y] += resources.sdram.get_value()
+
+        # update number tracker
+        self._chips_with_n_cores_available[
+            len(self._core_tracker[chip_x, chip_y])] -= 1
+        self._chips_with_n_cores_available[
+            len(self._core_tracker[chip_x, chip_y]) + 1] += 1
+
         self._core_tracker[chip_x, chip_y].add(processor_id)
 
         # check if chip used needs updating
