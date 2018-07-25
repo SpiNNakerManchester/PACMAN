@@ -1325,7 +1325,7 @@ class ResourceTracker(object):
         """
 
         self._chips_available.add((chip_x, chip_y))
-        self._sdram_tracker[chip_x, chip_y] += resources.sdram.get_value()
+        self._sdram_tracker[chip_x, chip_y] -= resources.sdram.get_value()
 
         # update number tracker
         self._chips_with_n_cores_available[
