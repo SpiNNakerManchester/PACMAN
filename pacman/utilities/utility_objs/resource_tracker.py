@@ -1292,7 +1292,7 @@ class ResourceTracker(object):
         """
 
         self._chips_available.add((chip_x, chip_y))
-        self._sdram_tracker[chip_x, chip_y] += resources.sdram.get_value()
+        self._sdram_tracker[chip_x, chip_y] -= resources.sdram.get_value()
         self._core_tracker[chip_x, chip_y].add(processor_id)
 
         # check if chip used needs updating
