@@ -1214,9 +1214,9 @@ class ResourceTracker(object):
         return n_cores, n_chips, max_sdram, n_tags
 
     def get_maximum_cores_available_on_a_chip(self):
-        """ returns the number of available cores of the chip with the maximum 
-        number of available cores 
-        
+        """ returns the number of available cores of the chip with the maximum\
+        number of available cores
+
         :return: the max cores available on the best chip
         :rtype: int
         """
