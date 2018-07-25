@@ -156,7 +156,8 @@ class ResourceTracker(object):
             preallocated_resources)
 
         # update tracker for n cores available per chip
-        self._chips_with_n_cores_available = [0] * machine.MAX_CORES_PER_CHIP
+        self._chips_with_n_cores_available = \
+            [0] * (machine.MAX_CORES_PER_CHIP + 1)
         for chip in machine.chips:
             pre_allocated = 0
             if (chip.x, chip.y) in self._n_cores_preallocated:
