@@ -204,10 +204,6 @@ class ResourceTracker(object):
             if not (chip.x, chip.y) in self._core_tracker:
                 self._fill_in_core_tracker_for_chip((chip.x, chip.y), chip)
             for processor_id in processor_ids:
-                self._chips_with_n_cores_available[
-                    len(self._core_tracker[chip.x, chip.y])] -= 1
-                self._chips_with_n_cores_available[
-                    len(self._core_tracker[chip.x, chip.y]) - 1] += 1
                 self._core_tracker[chip.x, chip.y].remove(processor_id)
 
         # create random_core_map
