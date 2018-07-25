@@ -65,7 +65,7 @@ class BasicPartitioner(object):
 
         utils.generate_machine_edges(machine_graph, graph_mapper, graph)
 
-        return machine_graph, graph_mapper, len(resource_tracker.keys)
+        return machine_graph, graph_mapper, resource_tracker.chips_used
 
     def _partition_one_application_vertex(
             self, vertex, res_tracker, m_graph, mapper):
