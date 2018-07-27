@@ -56,7 +56,8 @@ class BasicNAtomsPartitioner(object):
         # start progress bar
         progress = ProgressBar(
             graph.n_vertices,
-            "Partitioning graph vertices with real basic assumption of n atoms")
+            "Partitioning graph vertices with real basic assumption of n "
+            "atoms")
         machine_graph = MachineGraph("Machine graph for " + graph.label)
         graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine)
