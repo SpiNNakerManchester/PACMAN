@@ -258,7 +258,8 @@ class FixedRouteRouter(object):
 
         # locate where to put data
         processor_id = self._locate_destination(
-            ethernet_chip_x, ethernet_chip_y, destination_class, placements)
+            ethernet_chip_x, ethernet_chip_y, destination_class, placements,
+            machine)
 
         # create final fixed route entry
         # build entry and add to table and add to tables
@@ -278,7 +279,8 @@ class FixedRouteRouter(object):
 
     @staticmethod
     def _locate_destination(
-            ethernet_chip_x, ethernet_chip_y, destination_class, placements):
+            ethernet_chip_x, ethernet_chip_y, destination_class, placements,
+            machine):
         """ Locate destination vertex on Ethernet connected chip to send\
             fixed data to
 
@@ -286,10 +288,12 @@ class FixedRouteRouter(object):
         :param ethernet_chip_y: chip y to search
         :param destination_class: the class of vertex to search for
         :param placements: the placements objects
+        :param machine: the SpiNNaker machine object
         :return: processor ID as a int, or None if no valid processor found
         :rtype: int or None
         """
-        for processor_id in range(0, Machine.MAX_CORES_PER_CHIP):
+        for processor_id in range(0, machine.get_chip_at(
+                ethernet_chip_x, ethernet_chip_y).n_processors):
             # only check occupied processors
             if placements.is_processor_occupied(
                     ethernet_chip_x, ethernet_chip_y, processor_id):
