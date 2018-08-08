@@ -1,4 +1,3 @@
-from .abstract_resource import AbstractResource
 from .core_resource import CoreResource
 from .cpu_cycles_per_tick_resource import CPUCyclesPerTickResource
 from .dtcm_resource import DTCMResource
@@ -15,7 +14,7 @@ from .specific_board_reverse_iptag_resource import \
 from .specific_chip_sdram_resource import SpecificChipSDRAMResource
 from .specific_core_resource import SpecificCoreResource
 
-__all__ = ["AbstractResource", "CPUCyclesPerTickResource", "DTCMResource",
+__all__ = ["CPUCyclesPerTickResource", "DTCMResource",
            "ElementFreeSpace", "IPtagResource", "ResourceContainer",
            "ReverseIPtagResource", "SDRAMResource", "CoreResource",
            "PreAllocatedResourceContainer", "SpecificChipSDRAMResource",

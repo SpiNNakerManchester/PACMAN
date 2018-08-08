@@ -3,7 +3,7 @@ from .abstract_placer_constraint import AbstractPlacerConstraint
 
 class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
     """ A constraint that attempts to place a vertex as close to a chip\
-        as possible (including on it)
+        as possible (including on it).
     """
 
     __slots__ = [
@@ -18,7 +18,6 @@ class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
 
     def __init__(self, x, y):
         """
-
         :param x: the x-coordinate of the chip
         :type x: int
         :param y: the y-coordinate of the chip

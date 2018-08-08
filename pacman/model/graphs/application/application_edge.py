@@ -6,7 +6,7 @@ from pacman.model.resources import ResourceContainer
 
 
 class ApplicationEdge(AbstractEdge):
-    """ A simple implementation of an application edge
+    """ A simple implementation of an application edge.
     """
 
     __slots__ = [
@@ -31,7 +31,6 @@ class ApplicationEdge(AbstractEdge):
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
             machine_edge_type=MachineEdge):
         """
-
         :param pre_vertex: the application vertex at the start of the edge
         :type pre_vertex: \
             :py:class:`pacman.model.graphs.application.ApplicationVertex`

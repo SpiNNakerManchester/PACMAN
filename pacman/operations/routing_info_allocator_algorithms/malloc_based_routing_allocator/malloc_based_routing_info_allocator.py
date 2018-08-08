@@ -216,7 +216,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return [(((1 << n_ones) - 1) << n_zeros)]
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
-        """ allocate fixed keys and masks
+        """ Allocate fixed keys and masks
 
         :param keys_and_masks: the fixed keys and masks combos
         :param fixed_mask: fixed mask

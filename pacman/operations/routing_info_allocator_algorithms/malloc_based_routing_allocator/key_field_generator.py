@@ -6,8 +6,7 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 
 
 class KeyFieldGenerator(object):
-    """ functionality to handle fields in a routing key.
-
+    """ Handle fields in a routing key.
     """
 
     __slots__ = [

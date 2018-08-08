@@ -1,15 +1,10 @@
-from .abstract_resource import AbstractResource
-from spinn_utilities.overrides import overrides
-
-
-class IPtagResource(AbstractResource):
-    """ Represents the amount of local core memory available or used on a core\
-        on a chip of the machine
+class IPtagResource(object):
+    """ Represents the ability to have a SpiNNaker machine send messages to\
+        you during execution.
     """
 
     __slots__ = [
-
-        # The host ip address that will receive the data from this tag
+        # The host IP address that will receive the data from this tag
         "_ip_address",
 
         # the port number that data from this tag will be sent to, or None
@@ -20,29 +15,27 @@ class IPtagResource(AbstractResource):
         # stripped before transmission of data
         "_strip_sdp",
 
-        #  A fixed tag id to assign, or None if any tag is OK
+        #  A fixed tag ID to assign, or None if any tag is OK
         "_tag",
 
         # the identifier that states what type of data is being transmitted
-        # through this iptag
+        # through this IP tag
         "_traffic_identifier"
-
     ]
 
     def __init__(
             self, ip_address, port, strip_sdp, tag=None,
             traffic_identifier="DEFAULT"):
         """
-
-        :param ip_address: The ip address of the host that will receive data\
-            from this tag
+        :param ip_address: \
+            The IP address of the host that will receive data from this tag
         :type ip_address: str
         :param port: The port that will
         :type port: int or None
         :param strip_sdp: Whether the tag requires that SDP headers are\
             stripped before transmission of data
         :type strip_sdp: bool
-        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int
         :param traffic_identifier: The traffic to be sent using this tag; \
             traffic with the same traffic_identifier can be sent using\
@@ -58,9 +51,9 @@ class IPtagResource(AbstractResource):
 
     @property
     def ip_address(self):
-        """ The ip address to assign to the tag
+        """ The IP address to assign to the tag
 
-        :return: An ip address
+        :return: An IP address
         :rtype: str
         """
         return self._ip_address
@@ -76,7 +69,7 @@ class IPtagResource(AbstractResource):
 
     @property
     def traffic_identifier(self):
-        """ the traffic identifier for this iptag
+        """ The traffic identifier for this IP tag
 
         """
         return self._traffic_identifier
@@ -99,7 +92,6 @@ class IPtagResource(AbstractResource):
         """
         return self._tag
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
         return [
             self._ip_address, self._port, self._strip_sdp, self._tag,

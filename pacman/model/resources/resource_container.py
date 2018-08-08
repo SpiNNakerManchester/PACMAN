@@ -4,8 +4,8 @@ from .sdram_resource import SDRAMResource
 
 
 class ResourceContainer(object):
-    """Container object for the types of resources so that ordering is no\
-    longer a risk.
+    """ Container for the types of resources so that ordering is no\
+        longer a problem.
     """
 
     __slots__ = [
@@ -19,41 +19,40 @@ class ResourceContainer(object):
         "_sdram_usage",
 
         # a CPUCyclesPerTickResource object that reflects the number of
-        # cpu cycles the machine vertex is expected to use on a SpiNNaker
+        # CPU cycles the machine vertex is expected to use on a SpiNNaker
         # machine
         "_cpu_cycles",
 
-        # A iterable of IPtagResource objects that reflect the number of IPTags
-        # a machine vertex is going to use on a SpiNNaker machine, as well as
-        # the configuration data of said IPTags.
+        # An iterable of IPtagResource objects that reflect the number of IP
+        # tags a machine vertex is going to use on a SpiNNaker machine, as well
+        # as the configuration data of said IP tags.
         "_iptags",
 
         # A iterable of ReverseIPtagResource objects that reflect the number of
-        #  ReverseIPtags a machine vertex is going to use on a SpiNNaker
-        # machine, as well as the configuration data of said reverse IPTags.
+        # Reverse IP tags a machine vertex is going to use on a SpiNNaker
+        # machine, as well as the configuration data of said reverse IP tags.
         "_reverse_iptags"
     ]
 
     def __init__(
             self, dtcm=None, sdram=None, cpu_cycles=None, iptags=None,
             reverse_iptags=None):
-        """ Container object for the types of resources
-
+        """
         :param dtcm: the amount of dtcm used
-        :param sdram: the amount of sdram used
-        :param cpu_cycles: the amount of cpu used
-        :param iptags: the iptags required
-        :param reverse_iptags: the reverse iptags required
+        :param sdram: the amount of SDRAM used
+        :param cpu_cycles: the amount of CPU used
+        :param iptags: the IP tags required
+        :param reverse_iptags: the reverse IP tags required
         :type dtcm: None or \
             :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
         :type sdram: None or \
             :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
         :type cpu_cycles: None or \
             :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
-        :type iptags: None or list of \
-            :py:class:`pacman.models.resources.iptag_resource.IPtagResource`
-        :type reverse_iptags: None or list of \
-            :py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`
+        :type iptags: None or \
+            list(:py:class:`pacman.models.resources.iptag_resource.IPtagResource`)
+        :type reverse_iptags: None or \
+            list(:py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`)
         :rtype: pacman.models.resources.resource_container.ResourceContainer
         :raise None: does not raise any known exception
         """
@@ -102,7 +101,7 @@ class ResourceContainer(object):
 
     def extend(self, other):
 
-        # added cpu stuff
+        # added CPU stuff
         self._cpu_cycles = CPUCyclesPerTickResource(
             self._cpu_cycles.get_value() + other.cpu_cycles.get_value())
 
@@ -110,12 +109,12 @@ class ResourceContainer(object):
         self._dtcm_usage = DTCMResource(
             self._dtcm_usage.get_value() + other.dtcm.get_value())
 
-        # add sdram usage
+        # add SDRAM usage
         self._sdram_usage = SDRAMResource(
             self._sdram_usage.get_value() + other.sdram.get_value())
 
-        # add iptags
+        # add IPtags
         self._iptags.extend(other.iptags)
 
-        # add reverse iptags
+        # add reverse IPtags
         self._reverse_iptags.extend(other.reverse_iptags)

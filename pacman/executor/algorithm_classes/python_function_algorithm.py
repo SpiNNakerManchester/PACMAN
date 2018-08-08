@@ -9,7 +9,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
-    """ An algorithm that is a function
+    """ An algorithm that is a function.
     """
 
     __slots__ = [
@@ -45,7 +45,8 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
             return function(**inputs)
         except Exception:
             logger.error("Error when calling {}.{} with inputs {}",
-                         self._python_module, self._python_function, inputs)
+                         self._python_module, self._python_function,
+                         inputs.keys())
             raise
 
     def __repr__(self):

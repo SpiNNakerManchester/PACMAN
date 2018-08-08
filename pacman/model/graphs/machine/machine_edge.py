@@ -5,7 +5,7 @@ from pacman.model.resources import ResourceContainer
 
 
 class MachineEdge(AbstractEdge):
-    """ A simple implementation of a machine edge
+    """ A simple implementation of a machine edge.
     """
 
     __slots__ = [

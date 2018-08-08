@@ -168,7 +168,7 @@ def check_types_of_edge_constraint(machine_graph):
             raise PacmanConfigurationException(
                 "There are more than one of the same constraint type on "
                 "the partition {} starting at {}. Please fix and try again."
-                .format(partition.identifer, partition.pre_vertex))
+                .format(partition.identifier, partition.pre_vertex))
 
         fixed_key = len(fixed_key) == 1
         fixed_mask = len(fixed_mask) == 1
@@ -243,8 +243,8 @@ def get_fixed_mask(same_key_group):
 
     :param same_key_group: \
         Set of edges that are to be assigned the same keys and masks
-    :type same_key_group: iterable of\
-        :py:class:`pacman.model.graphs.machine.MachineEdge`
+    :type same_key_group: \
+        iterable(:py:class:`pacman.model.graphs.machine.MachineEdge`)
     :return: The fixed mask if found, or None
     :raise PacmanValueError: If two edges conflict in their requirements
     """

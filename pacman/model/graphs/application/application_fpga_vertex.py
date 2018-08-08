@@ -4,17 +4,14 @@ from pacman.model.constraints.placer_constraints\
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
 from pacman.model.resources import ResourceContainer
-from pacman.model.resources import DTCMResource
-from pacman.model.resources import SDRAMResource
 from pacman.model.graphs.machine.machine_fpga_vertex \
     import MachineFPGAVertex
-from pacman.model.resources import CPUCyclesPerTickResource
 
 import sys
 
 
 class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
-    """ A virtual vertex on an FPGA link
+    """ A virtual vertex on an FPGA link.
     """
 
     __slots__ = [
@@ -78,10 +75,7 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer(
-            dtcm=DTCMResource(0), sdram=SDRAMResource(0),
-            cpu_cycles=CPUCyclesPerTickResource(0)
-        )
+        return ResourceContainer()
 
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(

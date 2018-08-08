@@ -3,9 +3,6 @@ from pacman.model.constraints.placer_constraints \
     import ChipAndCoreConstraint
 from .application_vertex import ApplicationVertex
 from pacman.model.resources import ResourceContainer
-from pacman.model.resources import DTCMResource
-from pacman.model.resources import SDRAMResource
-from pacman.model.resources import CPUCyclesPerTickResource
 from pacman.model.graphs \
     import AbstractVirtualVertex, AbstractSpiNNakerLinkVertex
 from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
@@ -15,7 +12,7 @@ import sys
 
 class ApplicationSpiNNakerLinkVertex(
         ApplicationVertex, AbstractSpiNNakerLinkVertex):
-    """ A virtual vertex on a SpiNNaker Link
+    """ A virtual vertex on a SpiNNaker Link.
     """
 
     __slots__ = [
@@ -71,10 +68,7 @@ class ApplicationSpiNNakerLinkVertex(
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer(
-            dtcm=DTCMResource(0), sdram=SDRAMResource(0),
-            cpu_cycles=CPUCyclesPerTickResource(0)
-        )
+        return ResourceContainer()
 
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(

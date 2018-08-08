@@ -1,8 +1,5 @@
-from .abstract_resource import AbstractResource
-
-
-class CoreResource(AbstractResource):
-    """ Represents the number of cores that need to be allocated
+class CoreResource(object):
+    """ Represents the number of cores that need to be allocated.
     """
 
     __slots__ = [
@@ -16,11 +13,10 @@ class CoreResource(AbstractResource):
 
     def __init__(self, chip, n_cores):
         """
-
         :param n_cores: The number of cores to allocate
         :type n_cores: int
         :param chip: chip of where these cores are to be allocated
-        :type chip: SpiNNMachine.chip.Chip
+        :type chip: :py:class:`spinn_machine.Chip`
         :raise None: No known exceptions are raised
         """
         self._n_cores = n_cores

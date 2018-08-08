@@ -1,10 +1,6 @@
-from .abstract_resource import AbstractResource
-from spinn_utilities.overrides import overrides
-
-
-class ReverseIPtagResource(AbstractResource):
-    """ Represents the amount of local core memory available or used on a core\
-        on a chip of the machine
+class ReverseIPtagResource(object):
+    """ Represents the ability to talk to a specific board of a SpiNNaker\
+        machine by sending UDP packets to it during execution.
     """
 
     __slots__ = [
@@ -16,18 +12,17 @@ class ReverseIPtagResource(AbstractResource):
         # the received UDP packets for this tag
         "_sdp_port",
 
-        # A fixed tag id to assign, or None if any tag is OK
+        # A fixed tag ID to assign, or None if any tag is OK
         "_tag",
 
-        # A board IP address which is where this reverse IPTag is to be \
+        # A board IP address which is where this reverse IP tag is to be \
         # placed
         "_board"
     ]
 
     def __init__(self, board, port=None, sdp_port=1, tag=None):
         """
-
-        :param board: A board IP address which is where this reverse IPTag is\
+        :param board: A board IP address which is where this reverse IP tag is\
             to be placed
         :type board: str
         :param port: The target port of the tag or None to assign elsewhere
@@ -37,7 +32,7 @@ class ReverseIPtagResource(AbstractResource):
         :param sdp_port: The SDP port number to be used when constructing \
             SDP packets from the received UDP packets for this tag.
         :type sdp_port: int
-        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int or None
         """
         self._port = port
@@ -72,14 +67,13 @@ class ReverseIPtagResource(AbstractResource):
 
     @property
     def board(self):
-        """
-        A board IP address which is where this reverse IPTag is to be placed
+        """ A board IP address which is where this reverse IP tag is to be\
+            placed.
 
         :return: str
         """
         return self._board
 
-    @overrides(AbstractResource.get_value)
     def get_value(self):
         return [self._board, self._port, self._sdp_port, self._tag]
 

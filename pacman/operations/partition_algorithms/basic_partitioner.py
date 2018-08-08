@@ -2,7 +2,8 @@ import logging
 
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint
+    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint, \
+    FixedVertexAtomsConstraint
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
@@ -47,7 +48,8 @@ class BasicPartitioner(object):
         ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
-            supported_constraints=[MaxVertexAtomsConstraint],
+            supported_constraints=[
+                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
         # start progress bar
@@ -63,7 +65,7 @@ class BasicPartitioner(object):
 
         utils.generate_machine_edges(machine_graph, graph_mapper, graph)
 
-        return machine_graph, graph_mapper, len(resource_tracker.keys)
+        return machine_graph, graph_mapper, resource_tracker.chips_used
 
     def _partition_one_application_vertex(
             self, vertex, res_tracker, m_graph, mapper):
@@ -122,8 +124,25 @@ class BasicPartitioner(object):
         atoms_per_cpu = self._get_ratio(
             limits.cpu_cycles.get_value(), requirements.cpu_cycles.get_value())
 
+        n_atoms = None
+        for fa_constraint in utility_calls.locate_constraints_of_type(
+                vertex.constraints, FixedVertexAtomsConstraint):
+            if n_atoms is not None and n_atoms != fa_constraint.size:
+                raise PacmanPartitionException(
+                    "Vertex has multiple contradictory fixed atom constraints"
+                    " - cannot be both {} and {}".format(
+                        n_atoms, fa_constraint.size))
+            n_atoms = fa_constraint.size
+
         max_atom_values = [atoms_per_sdram, atoms_per_dtcm, atoms_per_cpu]
         for max_atom_constraint in utility_calls.locate_constraints_of_type(
                 vertex.constraints, MaxVertexAtomsConstraint):
             max_atom_values.append(float(max_atom_constraint.size))
-        return min(max_atom_values)
+        max_atoms = min(max_atom_values)
+
+        if n_atoms is not None and max_atoms < n_atoms:
+            raise PacmanPartitionException(
+                "Max size of {} is incompatible with fixed size of {}".format(
+                    max_atoms, n_atoms))
+
+        return n_atoms if n_atoms is not None else max_atoms

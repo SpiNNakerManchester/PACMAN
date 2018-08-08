@@ -2,6 +2,7 @@ from pacman.model.graphs.machine \
     import MachineVertex, MachineGraph, MachineEdge
 from pacman.model.placements import Placements, Placement
 from pacman.operations.router_algorithms import BasicDijkstraRouting
+from spinn_machine import Router
 from spinn_machine.fixed_route_entry import FixedRouteEntry
 from pacman.exceptions import \
     PacmanAlreadyExistsException, PacmanConfigurationException
@@ -65,13 +66,8 @@ class FixedRouteRouter(object):
 
     FAKE_ETHERNET_CHIP_X = 0
     FAKE_ETHERNET_CHIP_Y = 0
-    SIZE_OF_ONE_BOARD = 8
-    MAX_CHIP_X_ID_ON_ONE_BOARD = 7
-    MAX_CHIP_Y_ID_ON_ONE_BOARD = 7
-    LINKS_PER_ROUTER = 6
     FAKE_ROUTING_PARTITION = "FAKE_MC_ROUTE"
     DEFAULT_LINK_ID = 4
-    RANDOM_CORE_ID = 4
 
     def __call__(self, machine, placements, board_version, destination_class):
         """ Runs the fixed route generator for all boards on machine
@@ -146,22 +142,32 @@ class FixedRouteRouter(object):
             rel_y = chip_y - eth_y
             if rel_y < 0:
                 rel_y += machine.max_chip_y + 1
+
+            free_processor = 0
+            while ((free_processor < machine.MAX_CORES_PER_CHIP) and
+                   fake_placements.is_processor_occupied(
+                       self.FAKE_ETHERNET_CHIP_X,
+                       y=self.FAKE_ETHERNET_CHIP_Y,
+                       p=free_processor)):
+                free_processor += 1
+
             fake_placements.add_placement(Placement(
-                x=rel_x, y=rel_y, p=self.RANDOM_CORE_ID, vertex=vertex))
+                x=rel_x, y=rel_y, p=free_processor, vertex=vertex))
             down_links.update({
-                (rel_x, rel_y, link) for link in range(self.LINKS_PER_ROUTER)
+                (rel_x, rel_y, link) for link in range(
+                    Router.MAX_LINKS_PER_ROUTER)
                 if not machine.is_link_at(chip_x, chip_y, link)})
 
         # Create a fake machine consisting of only the one board that
         # the routes should go over
         fake_machine = machine
         if (board_version in machine.BOARD_VERSION_FOR_48_CHIPS and
-                (machine.max_chip_x > self.MAX_CHIP_X_ID_ON_ONE_BOARD or
-                 machine.max_chip_y > self.MAX_CHIP_Y_ID_ON_ONE_BOARD)):
+                (machine.max_chip_x > machine.MAX_CHIP_X_ID_ON_ONE_BOARD or
+                 machine.max_chip_y > machine.MAX_CHIP_Y_ID_ON_ONE_BOARD)):
             down_chips = {
                 (x, y) for x, y in zip(
-                    range(self.SIZE_OF_ONE_BOARD),
-                    range(self.SIZE_OF_ONE_BOARD))
+                    range(machine.SIZE_X_OF_ONE_BOARD),
+                    range(machine.SIZE_Y_OF_ONE_BOARD))
                 if not machine.is_chip_at(
                     (x + eth_x) % (machine.max_chip_x + 1),
                     (y + eth_y) % (machine.max_chip_y + 1))}
@@ -169,8 +175,8 @@ class FixedRouteRouter(object):
             # build a fake machine which is just one board but with the missing
             # bits of the real board
             fake_machine = VirtualMachine(
-                self.SIZE_OF_ONE_BOARD, self.SIZE_OF_ONE_BOARD, False,
-                down_chips=down_chips, down_links=down_links)
+                machine.SIZE_X_OF_ONE_BOARD, machine.SIZE_Y_OF_ONE_BOARD,
+                False, down_chips=down_chips, down_links=down_links)
 
         # build destination
         verts = graph.vertices
@@ -194,7 +200,8 @@ class FixedRouteRouter(object):
         # route as if using multicast
         router = BasicDijkstraRouting()
         routing_tables_by_partition = router(
-            fake_placements, fake_machine, graph)
+            placements=fake_placements, machine=fake_machine,
+            machine_graph=graph, use_progress_bar=False)
 
         # convert to fixed route entries
         for (chip_x, chip_y) in routing_tables_by_partition.get_routers():
@@ -272,14 +279,14 @@ class FixedRouteRouter(object):
     @staticmethod
     def _locate_destination(
             ethernet_chip_x, ethernet_chip_y, destination_class, placements):
-        """ locate destination vertex on Ethernet connected chip to send\
+        """ Locate destination vertex on Ethernet connected chip to send\
             fixed data to
 
         :param ethernet_chip_x: chip x to search
         :param ethernet_chip_y: chip y to search
         :param destination_class: the class of vertex to search for
         :param placements: the placements objects
-        :return: processor id as a int, or None if no valid processor found
+        :return: processor ID as a int, or None if no valid processor found
         :rtype: int or None
         """
         for processor_id in range(0, Machine.MAX_CORES_PER_CHIP):
