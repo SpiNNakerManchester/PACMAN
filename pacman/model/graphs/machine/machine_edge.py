@@ -1,7 +1,6 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractEdge
-from pacman.model.resources import ResourceContainer
 
 
 class MachineEdge(AbstractEdge):
@@ -78,20 +77,6 @@ class MachineEdge(AbstractEdge):
             other edges
         """
         return self._traffic_weight
-
-    @property
-    def resources_required(self):
-        """ The resources required by this edge. This represents shared\
-            resources between source and target vertices, which has\
-            implications in placement.
-
-            This is designed to be overridden by an edge that has such\
-            requirements that are not accounted for elsewhere.  The default\
-            implementation assumes no resources are consumed by edges.
-
-        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
-        """
-        return ResourceContainer()
 
     def __repr__(self):
         return (
