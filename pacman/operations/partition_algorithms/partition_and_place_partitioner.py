@@ -74,9 +74,6 @@ class PartitionAndPlacePartitioner(object):
 
         # Group vertices that are supposed to be the same size
         vertex_groups = partition_utils.get_same_size_vertex_groups(vertices)
-        
-        # Get a map of vertex group to SDRAM edge list
-        
 
         # Partition one vertex at a time
         for vertex in vertices:

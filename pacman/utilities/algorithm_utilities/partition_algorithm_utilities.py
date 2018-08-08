@@ -8,8 +8,6 @@ from pacman.model.constraints.partitioner_constraints\
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanPartitionException
-from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-import itertools
 
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):
@@ -68,96 +66,73 @@ def get_remaining_constraints(vertex):
             if not isinstance(constraint, AbstractPartitionerConstraint)]
 
 
-def _same_size_func(_graph, vertex):
-    # Find all vertices that have a same size constraint associated with
-    #  this vertex
-    same_size_as_vertices = list()
-    for constraint in vertex.constraints:
-        if isinstance(constraint, SameAtomsAsVertexConstraint):
-            if vertex.n_atoms != constraint.vertex.n_atoms:
-                raise PacmanPartitionException(
-                    "Vertices {} ({} atoms) and {} ({} atoms) must be of"
-                    " the same size to partition them together".format(
-                        vertex.label, vertex.n_atoms,
-                        constraint.vertex.label,
-                        constraint.vertex.n_atoms))
-            same_size_as_vertices.append(constraint.vertex)
-    return same_size_as_vertices, None
-
-
-def _shared_sdram_func(graph, vertex):
-    # Find all vertices connected to this vertex through an SDRAM edge
-    shared_sdram_vertices = list()
-    shared_sdram_edges = list()
-    for edge in filter(
-            graph.get_edges_ending_at_vertex(vertex),
-            lambda e: e.traffic_type == EdgeTrafficType.SDRAM):
-        shared_sdram_vertices.append(edge.pre_vertex)
-        shared_sdram_edges.append(edge)
-    for edge in filter(
-            graph.get_edges_starting_at_vertex(vertex),
-            lambda e: e.traffic_type == EdgeTrafficType.SDRAM):
-        shared_sdram_vertices.append(edge.post_vertex)
-        shared_sdram_edges.append(edge)
-    return shared_sdram_vertices, shared_sdram_edges
-
-
-def _group_vertices(graph, same_as_func):
-    """ Get a dictionary of vertex to list of vertices that want to be the
+def get_same_size_vertex_groups(vertices):
+    """ Get a dictionary of vertex to vertex that must be partitioned the same\
+        size
     """
 
     # Dict of vertex to list of vertices with same size
     # (repeated lists expected)
-    grouped_vertices = dict()
-    extra_data = dict()
+    same_size_vertices = dict()
 
-    for vertex in graph.vertices:
+    for vertex in vertices:
 
-        same_as_vertices, extra = same_as_func(graph, vertex)
+        # Find all vertices that have a same size constraint associated with
+        #  this vertex
+        same_size_as_vertices = list()
+        for constraint in vertex.constraints:
+            if isinstance(constraint, SameAtomsAsVertexConstraint):
+                if vertex.n_atoms != constraint.vertex.n_atoms:
+                    raise PacmanPartitionException(
+                        "Vertices {} ({} atoms) and {} ({} atoms) must be of"
+                        " the same size to partition them together".format(
+                            vertex.label, vertex.n_atoms,
+                            constraint.vertex.label,
+                            constraint.vertex.n_atoms))
+                same_size_as_vertices.append(constraint.vertex)
 
-        if not same_as_vertices:
-            grouped_vertices[vertex] = OrderedSet([vertex])
-            extra_data[vertex] = [extra]
+        if not same_size_as_vertices:
+            same_size_vertices[vertex] = {vertex}
             continue
 
-        # Go through all the vertices that want to be the same
+        # Go through all the vertices that want to have the same size
         # as the top level vertex
-        for same_size_vertex in same_as_vertices:
+        for same_size_vertex in same_size_as_vertices:
 
             # Neither vertex has been seen
-            if (same_size_vertex not in grouped_vertices and
-                    vertex not in grouped_vertices):
+            if (same_size_vertex not in same_size_vertices and
+                    vertex not in same_size_vertices):
 
                 # add both to a new group
                 group = OrderedSet([vertex, same_size_vertex])
-                grouped_vertices[vertex] = group
-                grouped_vertices[same_size_vertex] = group
+                same_size_vertices[vertex] = group
+                same_size_vertices[same_size_vertex] = group
 
             # Both vertices have been seen elsewhere
-            elif (same_size_vertex in grouped_vertices and
-                    vertex in grouped_vertices):
+            elif (same_size_vertex in same_size_vertices and
+                    vertex in same_size_vertices):
 
                 # merge their groups
-                group_1 = grouped_vertices[vertex]
-                group_2 = grouped_vertices[same_size_vertex]
+                group_1 = same_size_vertices[vertex]
+                group_2 = same_size_vertices[same_size_vertex]
                 group_1.update(group_2)
                 for vert in group_1:
-                    grouped_vertices[vert] = group_1
+                    same_size_vertices[vert] = group_1
 
             # The current vertex has been seen elsewhere
-            elif vertex in grouped_vertices:
+            elif vertex in same_size_vertices:
 
                 # add the new vertex to the existing group
-                group = grouped_vertices[vertex]
+                group = same_size_vertices[vertex]
                 group.add(same_size_vertex)
-                grouped_vertices[same_size_vertex] = group
+                same_size_vertices[same_size_vertex] = group
 
             # The other vertex has been seen elsewhere
-            elif same_size_vertex in grouped_vertices:
+            elif same_size_vertex in same_size_vertices:
 
                 #  so add this vertex to the existing group
-                group = grouped_vertices[same_size_vertex]
+                group = same_size_vertices[same_size_vertex]
                 group.add(vertex)
-                grouped_vertices[vertex] = group
+                same_size_vertices[vertex] = group
 
-    return grouped_vertices
+    return same_size_vertices
