@@ -35,8 +35,6 @@ class Graph(ConstrainedObject, AbstractGraph):
         "_incoming_edges_by_partition_name",
         # The outgoing edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
-        # the outgoing partitions by edge
-        "_outgoing_edge_partition_by_edge",
         # The label of the graph
         "_label"]
 
@@ -62,7 +60,6 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._incoming_edges = defaultdict(OrderedSet)
         self._incoming_edges_by_partition_name = defaultdict(list)
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
-        self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
 
     @property
@@ -115,12 +112,6 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._incoming_edges_by_partition_name[
             (edge.post_vertex, outgoing_edge_partition_name)].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
-        self._outgoing_edge_partition_by_edge[edge] = partition
-
-    def get_outgoing_partition_for_edge(self, edge):
-        if edge in self._outgoing_edge_partition_by_edge:
-            return self._outgoing_edge_partition_by_edge[edge]
-        return None
 
     @overrides(AbstractGraph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, outgoing_edge_partition):
