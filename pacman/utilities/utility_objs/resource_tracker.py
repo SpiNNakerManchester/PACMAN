@@ -79,7 +79,7 @@ class ResourceTracker(object):
 
         # The number of chips with the n cores currently available
         "_real_chips_with_n_cores_available",
-        
+
         # the number of virtual chips with the n cores currently available
         "_virtual_chips_with_n_cores_available"
 
@@ -1250,7 +1250,6 @@ class ResourceTracker(object):
                 enumerate(self._virtual_chips_with_n_cores_available))):
             if n_chips_with_n_cores != 0:
                 return n_cores_available
-
 
     def get_maximum_constrained_resources_available(
             self, resources, constraints):
