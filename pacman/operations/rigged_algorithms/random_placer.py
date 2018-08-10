@@ -32,8 +32,7 @@ class RandomPlacer(object):
                                "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_random_chips(machine))
-        vertices_on_same_chip = get_same_chip_vertex_groups(
-            machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in vertices_placed:
