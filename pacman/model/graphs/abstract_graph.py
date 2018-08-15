@@ -157,6 +157,16 @@ class AbstractGraph(object):
         """
 
     @abstractmethod
+    def get_outgoing_partition_for_edge(self, edge):
+        """ gets the outgoing partition this edge is associated with.
+        
+        :param edge: the edge to find associated partition
+        :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
+        :return: the outgoing partition
+        :rtype: :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
+        """
+
+    @abstractmethod
     def get_edges_ending_at_vertex(self, vertex):
         """ Get all the edges that end at the given vertex.
 
