@@ -1,3 +1,5 @@
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.resources import IPtagResource, ReverseIPtagResource
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 
@@ -46,19 +48,21 @@ class BasicTagAllocator(object):
 
         # Finally allocate ports to the unconstrained reverse IP tags
         self._allocate_ports_for_reverse_ip_tags(
-            tags_to_allocate_ports, ports_to_allocate, tags)
+            tags_to_allocate_ports, ports_to_allocate, tags, machine)
 
         return list(tags.ip_tags), list(tags.reverse_ip_tags), tags
 
-    def _gather_placements_with_tags(self, placement, collector):
+    @staticmethod
+    def _gather_placements_with_tags(placement, collector):
         if (placement.vertex.resources_required.iptags or
                 placement.vertex.resources_required.reverse_iptags):
             ResourceTracker.check_constraints([placement.vertex])
             collector.append(placement)
 
-    def _allocate_tags_for_placement(self, placement, resource_tracker,
-                                     tag_collector, ports_collector,
-                                     tag_port_tasks):
+    @staticmethod
+    def _allocate_tags_for_placement(
+            placement, resource_tracker, tag_collector, ports_collector,
+            tag_port_tasks):
         vertex = placement.vertex
         resources = vertex.resources_required
 
@@ -78,14 +82,18 @@ class BasicTagAllocator(object):
         if returned_ip_tags is not None:
             for (tag_constraint, (board_address, tag, dest_x, dest_y)) in \
                     zip(ip_tags, returned_ip_tags):
-                ip_tag = IPTag(
-                    board_address=board_address, destination_x=dest_x,
-                    destination_y=dest_y, tag=tag,
-                    ip_address=tag_constraint.ip_address,
-                    port=tag_constraint.port,
-                    strip_sdp=tag_constraint.strip_sdp,
-                    traffic_identifier=tag_constraint.traffic_identifier)
-                tag_collector.add_ip_tag(ip_tag, vertex)
+                if tag_constraint is not None:
+                    ip_tag = IPTag(
+                        board_address=board_address, destination_x=dest_x,
+                        destination_y=dest_y, tag=tag,
+                        ip_address=tag_constraint.ip_address,
+                        port=tag_constraint.port,
+                        strip_sdp=tag_constraint.strip_sdp,
+                        traffic_identifier=tag_constraint.traffic_identifier)
+                    tag_collector.add_ip_tag(ip_tag, vertex)
+                else:
+                    tag_port_tasks.append(
+                        (tag_constraint, board_address, tag, vertex, placement))
 
         if returned_reverse_ip_tags is None:
             return
@@ -107,13 +115,33 @@ class BasicTagAllocator(object):
                 tag_port_tasks.append(
                     (tag_constraint, board_address, tag, vertex, placement))
 
-    def _allocate_ports_for_reverse_ip_tags(self, tasks, ports, tags):
+    @staticmethod
+    def _allocate_ports_for_reverse_ip_tags(tasks, ports, tags, machine):
         for tag_constraint, board_address, tag, vertex, placement in tasks:
             if board_address not in ports:
                 ports[board_address] = OrderedSet(_BOARD_PORTS)
+
             port = ports[board_address].pop(last=False)
-            reverse_ip_tag = ReverseIPTag(
-                board_address, tag, port,
-                placement.x, placement.y, placement.p,
-                tag_constraint.sdp_port)
-            tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+
+            if isinstance(tag_constraint, IPtagResource):
+                this_chip = machine.get_chip_at(placement.x, placement.y)
+                ip_tag = IPTag(
+                    board_address=board_address,
+                    destination_x=this_chip.nearest_ethernet_x,
+                    destination_y=this_chip.nearest_ethernet_y, tag=tag,
+                    ip_address=tag_constraint.ip_address,
+                    port=tag_constraint.port,
+                    strip_sdp=tag_constraint.strip_sdp,
+                    traffic_identifier=tag_constraint.traffic_identifier)
+                tags.add_ip_tag(ip_tag)
+
+            elif isinstance(tag_constraint, ReverseIPtagResource):
+                reverse_ip_tag = ReverseIPTag(
+                    board_address, tag, port,
+                    placement.x, placement.y, placement.p,
+                    tag_constraint.sdp_port)
+                tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+            else:
+                raise PacmanConfigurationException(
+                    "Tried to process a tag whom's type the basic tag "
+                    "allocator does not recognise")
