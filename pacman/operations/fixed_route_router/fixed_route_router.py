@@ -210,8 +210,8 @@ class FixedRouteRouter(object):
             # only want the first entry, as that will all be the same.
             mc_entry = next(itervalues(mc_entries))
             fixed_route_entry = FixedRouteEntry(
-                link_ids=mc_entry.out_going_links,
-                processor_ids=mc_entry.out_going_processors)
+                link_ids=mc_entry.link_ids,
+                processor_ids=mc_entry.processor_ids)
             x = (chip_x + eth_x) % (machine.max_chip_x + 1)
             y = (chip_y + eth_y) % (machine.max_chip_y + 1)
             key = (x, y)

@@ -143,10 +143,10 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 if partition in continuous:
                     entry_hash = sum(
                         1 << i
-                        for i in entry.out_going_links)
+                        for i in entry.link_ids)
                     entry_hash += sum(
                         1 << (i + 6)
-                        for i in entry.out_going_processors)
+                        for i in entry.processor_ids)
                     partitions_by_route[entry_hash].add(partition)
 
             for entry_hash, partitions in iteritems(partitions_by_route):
