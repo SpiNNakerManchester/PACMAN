@@ -159,7 +159,7 @@ class AbstractGraph(object):
     @abstractmethod
     def get_outgoing_partition_for_edge(self, edge):
         """ gets the outgoing partition this edge is associated with.
-        
+
         :param edge: the edge to find associated partition
         :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
         :return: the outgoing partition
