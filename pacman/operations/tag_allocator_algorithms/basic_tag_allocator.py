@@ -93,7 +93,8 @@ class BasicTagAllocator(object):
                     tag_collector.add_ip_tag(ip_tag, vertex)
                 else:
                     tag_port_tasks.append(
-                        (tag_constraint, board_address, tag, vertex, placement))
+                        (tag_constraint, board_address, tag, vertex,
+                         placement))
 
         if returned_reverse_ip_tags is None:
             return
