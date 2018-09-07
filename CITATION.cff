@@ -1,0 +1,65 @@
+cff-version: 1.0.3
+message: If you use this software, please cite it as below.
+authors:
+- family-names: Stokes
+  given-names: Alan
+  orcid: https://orcid.org/0000-0002-6110-1484
+  affiliation: "University Of Manchester"
+  email: alan.stokes-2@manchester.ac.uk
+  website: http://www.cs.man.ac.uk/~stokesa6/
+- family-names: Rowley
+  given-names: Andrew
+  orcid: https://orcid.org/0000-0002-2646-8520
+  affiliation: "University Of Manchester"
+  email: Andrew.Rowley@manchester.ac.uk
+  website: https://www.researchgate.net/profile/Andrew_Rowley2
+- family-names: Brenninkmeijer
+  given-names: Christian Y.
+  orcid: https://orcid.org/0000-0002-2937-7819
+  affiliation: "University Of Manchester"
+  email: christian.brenninkmeijer@manchester.ac.uk
+  website: https://www.researchgate.net/profile/Christian_Brenninkmeijer
+- family-names: Fellows
+  given-names: Donal
+  orcid: https://orcid.org/0000-0002-9091-5938
+  affiliation: "University Of Manchester"
+  email: donal.k.fellows@manchester.ac.uk
+  website: http://www.cs.manchester.ac.uk/about-us/staff/profile/?ea=donal.k.fellows
+- family-names: Ceccotti
+  given-names: Arthur
+  affiliation: "University Of Manchester"
+  email: arthur.ceccotti@student.manchester.ac.uk
+  website: https://www.linkedin.com/in/arthur-ceccotti-07359483
+- family-names: Mundy
+  given-names: Andrew
+  affiliation: "University Of Manchester"
+  email: andrew.mundy@ieee.org
+  website: https://www.linkedin.com/in/andrew-mundy-56422627/
+- family-names: Bogdan
+  given-names: Petrut
+  affiliation: "University Of Manchester"
+  email: petrut.bogdan@manchester.ac.uk
+  website: https://personalpages.manchester.ac.uk/staff/petrut.bogdan/
+  orcid: https://orcid.org/0000-0001-5535-7865
+- family-names: Summerton
+  given-names: Sara
+  affiliation: "University Of Manchester"
+  email: sara.summerton@student.manchester.ac.uk
+  website: https://www.linkedin.com/in/sara-summerton-67723637/
+- family-names: Davies
+  given-names: Sergio
+  affiliation: "University Of Manchester"
+  email: sergio.davies@gmail.com
+  website: http://apt.cs.manchester.ac.uk/people/daviess/
+  orcid: https://orcid.org/0000-0001-5330-5527
+
+title: The Mapping algorthims from a graph to SpiNNaker machine data structures and work flow manager for executing said algorithms
+version:
+date-released: 2017-09-17
+url: http://spinnakermanchester.github.io/
+repository: https://github.com/SpiNNakerManchester/PACMAN
+contact:
+- name: SpiNNaker Software team
+address: IT 302, It building, Oxford road, University of Manchester, Manchester, M13 9PL
+email: spinnakerusers@googlegroups.com
+
