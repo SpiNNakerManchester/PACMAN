@@ -1,142 +1,148 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    
-    "title": "A description of the resources available to a SpiNNaker machine.",
-    "type": "object",
-    "properties": {
-        "width":  {
-            "description": "The width of the system in chips",
-            "type": "integer",
-            "minimum": 1
-        },
-        "height":  {
-            "description": "The height of the system in chips",
-            "type": "integer",
-            "minimum": 1
-        },
-        "chip_resources": {
-            "description": "The resources available on chips not listed in chip_resource_exceptions. All resource types available on any chip must be enumerated, even if zero in the common case.",
-            "allOf": [
-                {"$ref": "#/resources/resourceSet"},
-                {"minProperties": 1}
-            ]
-        },
-        "chip_resource_exceptions": {
-            "description": "Exceptions to the resources listed in chip_resources.",
-            "type": "array",
-            "items": {
-                "type": "array",
-                "items": [
-                    {
-                        "description": "Exceptional chip X coordinate, 0-based.",
-                        "type": "integer",
-                        "minimum": 0
-                    },
-                    {
-                        "description": "Exceptional chip Y coordinate, 0-based.",
-                        "type": "integer",
-                        "minimum": 0
-                    },
-                    {
-                        "description": "The resources available to the exceptional chip. Must list a subset of the resources in chip_resources.",
-                        "allOf": [
-                            {"$ref": "#/resources/resourceSet"},
-                            {"minProperties": 1}
-                        ]
-                    }
-                ],
-                "additionalItems": false
-            },
-            "uniqueItems": true
-        },
-        "dead_chips": {
-            "description": "An enumeration of all dead/unavilable chips in the system.",
-            "type": "array",
-            "items": {
-                "description": "The position of a dead chip.",
-                "type": "array",
-                "items": [
-                    {"description": "X-coordinate of dead chip", "type": "integer", "minimum": 0},
-                    {"description": "Y-coordinate of dead chip", "type": "integer", "minimum": 0}
-                ],
-                "additionalItems": false
-            },
-            "uniqueItems": true
-        },
-        "dead_links": {
-            "description": "An enumeration of all dead/unavilable links in the system.",
-            "type": "array",
-            "items": {
-                "description": "The location of a dead link.",
-                "type": "array",
-                "items": [
-                    {
-                        "description": "X-coordinate of the sending-end of the dead link",
-                        "type": "integer",
-                        "minimum": 0
-                    },
-                    {
-                        "description": "Y-coordinate of the sending-end of the dead link",
-                        "type": "integer",
-                        "minimum": 0
-                    },
-                    {
-                        "description": "The dead link direction, from sender's perspective",
-                        "allOf": [{"$ref": "#/resources/link"}]
-                    }
-                ],
-                "additionalItems": false
-            },
-            "uniqueItems": true
-        },
-        "ip_addresses": {
-            "description": "An enumeration of all ip_addresses in the system.",
-            "type": "array",
-            "items": {
-                "description": "The location of an ip address",
-                "type": "array",
-                "items": [
-                    {
-                        "description": "X-coordinate of the sending-end of theip address",
-                        "type": "integer",
-                        "minimum": 0
-                    },
-                    {
-                        "description": "Y-coordinate of the sending-end of the ip address",
-                        "type": "integer",
-                        "minimum": 0
-                    },
-                    {
-                        "ip_address": "The ip address, from sender's perspective",
-                        "type": "string",
-                        "minimum": 0
-                    }
-                ],
-                "additionalItems": false
-            },
-            "uniqueItems": true
-        }
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "A Java Readable description of the resources available to a SpiNNaker machine.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "width":  {
+      "description": "The width of the system in chips",
+      "type": "integer",
+      "minimum": 1
     },
-    "additionalProperties": false,
-    "required": ["width", "height", "chip_resources"],
-    
-    "resources": {
-        "resourceSet": {
-            "description": "Enumerates a set of on-chip resources available/required.",
+    "height":  {
+      "description": "The height of the system in chips",
+      "type": "integer",
+      "minimum": 1
+    },
+    "root": {
+      "description": "The x and y coordinates of the chip used to boot the machine",
+      "type": "array",
+      "additionalItems": false,
+      "minItems": 2,
+      "items": [
+          {
+            "description": "The x coordinates of the chip used to boot the machine",
+            "type": "integer"
+          },
+          {
+            "description": "The y coordinates of the chip used to boot the machine",
+            "type": "integer"
+          }
+      ]
+    },
+    "ethernetResources": {
+       "description": "Expected Resources on each Ethernet connected chip",
+       "$ref": "#/definitions/resources"
+    },
+    "standardResources": {
+       "description": "Expected Resources on each none Ethernet connected chip",
+       "$ref": "#/definitions/resources"
+    },
+    "chips": {
+      "description": "Desriptions of each chip",
+      "type" : "array",
+      "items": {
+        "type" : "array",
+        "additionalItems": false,
+        "minItems": 3,
+        "items": [
+          {
+            "description": "The x coordinates of the chip",
+            "type": "integer"
+          },
+          {
+            "description": "The y coordinates of the chip",
+            "type": "integer"
+          },
+          {
+            "description": "The specific details of this chip",
             "type": "object",
-            "additionalProperties": {
-                "description": "The quantity of a resource available.",
-                "type": "integer",
-                "minimum": 0
-            }
-        },
-        "link": {
-            "description": "A chip-to-chip link.",
-            "type": "string",
-            "enum": [
-                "east", "north_east", "north",
-                "west", "south_west", "south"
-            ]
-        }
+            "$ref": "#/definitions/details"
+          },
+          {
+           "description": "Exception to the normal resource. ",
+           "type": "object",
+           "$ref": "#/definitions/resources"
+          }
+        ]
+      }
     }
+
+  },
+  "definitions": {
+       "details": {
+          "description": "Details that differ for each Chip",
+          "type": "object",
+          "properties": {
+              "cores": {
+                  "description": "Total number of cores on the chip incluing monitors.",
+                  "type": "integer"
+              },
+              "deadLinks": {
+                  "description": "List of any missing/ dead links on the chip. Including ones missing because the Chip is on an edge. If missing there are no dead links.",
+                  "type": "array",
+                  "items": {
+                      "type": "integer"
+                  }
+              },
+              "ethernet": {
+                  "description": "X and Y coordinates of the nearest Ethernet Chip to this Chip",
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": [
+                      {
+                          "description": "X coordinate of the nearest Ethernet Chip to this Chip",
+                          "type": "integer"
+                      },
+                      {
+                          "description": "Y coordinate of the nearest Ethernet Chip to this Chip",
+                          "type": "integer"}
+                  ]
+            },
+              "ipAddress": {
+                  "description": "Ip Address of this Chip or missing if this is a standard therefor none Ethernet Chip",
+                  "type": "string"
+              }
+          },
+          "required": [
+              "cores", "ethernet"
+          ],
+          "additionalProperties": false
+      },
+      "resources": {
+          "description": "Details that are expected to be the same on each Chip. ",
+          "type": "object",
+          "properties": {
+              "monitors": {
+                  "description": "Number of monitor cores",
+                  "type": "integer"
+              },
+              "routerClockSpeed": {
+                  "description": "Clock spped of the router.",
+                  "type": "integer"
+              },
+              "routerEntries": {
+                  "description": "Number of entries in the routing table.",
+                  "type": "integer"
+              },
+              "sdram": {
+                  "description": "total sdram on the chip.",
+                  "type": "integer"
+              },
+              "tags": {
+                  "description": "Ids of the tags available and usable.",
+                  "type": "array",
+                  "items": {
+                      "type": "integer"
+                  }
+              },
+              "virtual": {
+                  "description": "Is this an actual chip or a connected thing.",
+                  "type": "boolean"
+              }
+          },
+          "additionalProperties": false
+      }
+  }
+
 }
