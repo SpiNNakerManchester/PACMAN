@@ -4,8 +4,6 @@ from spinn_machine.router import Router
 
 import json
 
-CHIP_HOMOGENEOUS_CORES = 18
-
 
 class ConvertToJavaMachine(object):
     """ Converter from memory machine to java machine
@@ -15,8 +13,10 @@ class ConvertToJavaMachine(object):
 
     def __call__(self, machine, file_path):
         """
-        :param machine:
-        :param file_path:
+        Runs the code to write the machine in Java readable json.
+
+        :param machine: Machine to convert
+        :param file_path: Location to write file to. Warning will overwrite!
         """
         progress = ProgressBar(
             (machine.max_chip_x + 1) * (machine.max_chip_y + 1) + 2,
