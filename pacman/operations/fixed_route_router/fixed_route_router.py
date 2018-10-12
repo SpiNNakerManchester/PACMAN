@@ -186,7 +186,8 @@ class FixedRouteRouter(object):
             ethernet_chip_x=ethernet_connected_chip.x,
             ethernet_chip_y=ethernet_connected_chip.y,
             destination_class=destination_class,
-            placements=placements)
+            placements=placements,
+            machine=machine)
         fake_placements.add_placement(Placement(
             x=self.FAKE_ETHERNET_CHIP_X, y=self.FAKE_ETHERNET_CHIP_Y,
             p=destination_processor, vertex=vertex_dest))
@@ -292,6 +293,9 @@ class FixedRouteRouter(object):
         :return: processor ID as a int, or None if no valid processor found
         :rtype: int or None
         """
+        chip = machine.get_chip_at(ethernet_chip_x, ethernet_chip_y)
+        if chip is None:
+            print("HERE")
         for processor_id in range(0, machine.get_chip_at(
                 ethernet_chip_x, ethernet_chip_y).n_processors):
             # only check occupied processors
