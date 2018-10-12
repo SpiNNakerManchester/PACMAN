@@ -228,7 +228,10 @@ class ResourceTracker(object):
                 chip_to_arbitrary_core_requirement[chip.x, chip.y] = n_cores
 
         # handle specific IP tags
-        for ip_tag in preallocated_resources.specific_iptag_resources:
+        ordered_ip_tags = sorted(
+            preallocated_resources.specific_iptag_resources,
+            key=lambda iptag: iptag.tag == None)
+        for ip_tag in ordered_ip_tags:
             self._setup_board_tags(ip_tag.board)
             tag = self._allocate_tag_id(ip_tag.tag, ip_tag.board)
             self._update_data_structures_for_iptag(
