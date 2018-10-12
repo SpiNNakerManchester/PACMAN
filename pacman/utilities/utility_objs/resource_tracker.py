@@ -230,7 +230,7 @@ class ResourceTracker(object):
         # handle specific IP tags
         ordered_ip_tags = sorted(
             preallocated_resources.specific_iptag_resources,
-            key=lambda iptag: iptag.tag == None)
+            key=lambda iptag: iptag.tag is None)
         for ip_tag in ordered_ip_tags:
             self._setup_board_tags(ip_tag.board)
             tag = self._allocate_tag_id(ip_tag.tag, ip_tag.board)
