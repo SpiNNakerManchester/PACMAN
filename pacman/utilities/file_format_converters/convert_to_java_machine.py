@@ -1,8 +1,9 @@
+from collections import OrderedDict
+import json
+
 from pacman.utilities import file_format_schemas
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.router import Router
-
-import json
 
 
 class ConvertToJavaMachine(object):
@@ -40,31 +41,34 @@ class ConvertToJavaMachine(object):
         e_virtual = chip.virtual
         e_tags = chip._tag_ids
 
+        standardResources = OrderedDict()
+        standardResources["monitors"] = s_monitors
+        standardResources["routerEntries"] = s_router_entries
+        standardResources["routerClockSpeed"] = s_router_clock_speed
+        standardResources["sdram"] = s_sdram
+        standardResources["virtual"] = s_virtual
+        standardResources["tags"] = list(s_tags)
+
+        ethernetResources = OrderedDict()
+        ethernetResources["monitors"] = e_monitors
+        ethernetResources["routerEntries"] = e_router_entries
+        ethernetResources["routerClockSpeed"] = e_router_clock_speed
+        ethernetResources["sdram"] = e_sdram
+        ethernetResources["virtual"] = e_virtual
+        ethernetResources["tags"] = list(e_tags)
+
         # write basic stuff
-        json_obj = {
-            "width": machine.max_chip_x + 1,
-            "height": machine.max_chip_y + 1,
-            "ethernetResources": {
-                "monitors": e_monitors,
-                "routerEntries": e_router_entries,
-                "routerClockSpeed": e_router_clock_speed,
-                "tags": list(e_tags),
-                "sdram": e_sdram,
-                "virtual": e_virtual},
-            "standardResources": {
-                "monitors": s_monitors,
-                "routerEntries": s_router_entries,
-                "routerClockSpeed": s_router_clock_speed,
-                "tags": list(s_tags),
-                "sdram": s_sdram,
-                "virtual": s_virtual},
-            "chips": [],
-            "root": list((machine.boot_x, machine.boot_y))
-        }
+        json_obj = OrderedDict()
+        json_obj["height"] = machine.max_chip_y + 1
+        json_obj["width"] = machine.max_chip_x + 1
+        json_obj["root"] = list((machine.boot_x, machine.boot_y))
+        json_obj["standardResources"] = standardResources
+        json_obj["ethernetResources"] = ethernetResources
+        json_obj["chips"] = []
 
         # handle chips
         for chip in machine.chips:
-            details = dict()
+            details = OrderedDict()
             details["cores"] = chip.n_processors
             details["ethernet"] =\
                 [chip.nearest_ethernet_x, chip.nearest_ethernet_x]
@@ -75,7 +79,7 @@ class ConvertToJavaMachine(object):
             if len(dead_links) > 0:
                 details["deadLinks"] = dead_links
 
-            exceptions = dict()
+            exceptions = OrderedDict()
             if chip.ip_address is not None:
                 details['ipAddress'] = chip.ip_address
                 if (chip.n_processors - chip.n_user_processors) != e_monitors:
