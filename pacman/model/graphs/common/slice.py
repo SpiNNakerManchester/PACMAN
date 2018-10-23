@@ -35,3 +35,6 @@ class Slice(collections.namedtuple('Slice',
         # values filled in.
         return super(cls, Slice).__new__(cls, lo_atom, hi_atom, n_atoms,
                                          as_slice)
+
+    def __hash__(self):
+        return hash((self.lo_atom, self.hi_atom, self.n_atoms))
