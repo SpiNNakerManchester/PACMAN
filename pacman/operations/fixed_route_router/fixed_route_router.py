@@ -40,7 +40,7 @@ class FixedRouteRouter(object):
         []-[]
 
     Falls back to classic algorithms when to avoid dead chips.
-    """
+    """  # noqa: W605
 
     # groups of chips which work to go down a specific link on the Ethernet
     # connected chip
