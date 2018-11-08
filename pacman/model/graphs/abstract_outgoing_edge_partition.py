@@ -6,14 +6,14 @@ from spinn_utilities.abstract_base import (
 @add_metaclass(AbstractBase)
 class AbstractOutgoingEdgePartition(object):
     """ A group of edges that start at the same vertex and share the same\
-        semantics; used to group edges that can use the same multicast key
+        semantics; used to group edges that can use the same multicast key.
     """
 
     __slots__ = ()
 
     @abstractproperty
     def label(self):
-        """ The label of the item
+        """ The label of the outgoing edge partition.
 
         :return: The label
         :rtype: str
@@ -22,31 +22,31 @@ class AbstractOutgoingEdgePartition(object):
 
     @abstractproperty
     def constraints(self):
-        """ The constraints of the vertex
+        """ The constraints of the outgoing edge partition.
 
-        :rtype: iterable of :py:class:`AbstractConstraint`
+        :rtype: iterable(:py:class:`AbstractConstraint`)
         """
 
     @abstractmethod
     def add_constraint(self, constraint):
-        """ Add a constraint
+        """ Add a constraint to the outgoing edge partition.
 
         :param constraint: The constraint to add
         :type constraint: :py:class:`AbstractConstraint`
         """
 
     def add_constraints(self, constraints):
-        """ Add a list of constraints
+        """ Add a list of constraints to the outgoing edge partition.
 
         :param constraints: The list of constraints to add
-        :type constraints: list of :py:class:`AbstractConstraint`
+        :type constraints: iterable(:py:class:`AbstractConstraint`)
         """
         for constraint in constraints:
             self.add_constraint(constraint)
 
     @abstractmethod
     def add_edge(self, edge):
-        """ Add an edge to the partition
+        """ Add an edge to the outgoing edge partition.
 
         :param edge: the edge to add
         :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
@@ -57,53 +57,51 @@ class AbstractOutgoingEdgePartition(object):
 
     @abstractproperty
     def identifier(self):
-        """ The identifier of this outgoing edge partition
+        """ The identifier of this outgoing edge partition.
 
         :rtype: str
         """
 
     @abstractproperty
     def edges(self):
-        """ The edges in this outgoing edge partition
+        """ The edges in this outgoing edge partition.
 
-        :rtype:\
-            iterable of\
-            :py:class:`pacman.model.graphs.AbstractEdge`
+        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
         """
 
     @abstractproperty
     def n_edges(self):
-        """ The number of edges in the partition
+        """ The number of edges in the outgoing edge partition.
 
         :rtype: int
         """
 
     @abstractproperty
     def pre_vertex(self):
-        """ The vertex at which all edges in this partition start
+        """ The vertex at which all edges in this outgoing edge partition\
+            start.
 
         :rtype: :py:class:`pacman.model.graphs.AbstractVertex`
         """
 
     @abstractproperty
     def traffic_weight(self):
-        """ The weight of the traffic in this partition compared to other\
-            partitions
+        """ The weight of the traffic in this outgoing edge partition compared\
+            to other partitions.
 
         :rtype: int
         """
 
     @abstractproperty
     def traffic_type(self):
-        """ The traffic type of all the edges in this partition
+        """ The traffic type of all the edges in this outgoing edge partition.
 
-        :rtype:\
-            :py:class:`pacman.model.graphs.common.EdgeTrafficType`
+        :rtype: :py:class:`pacman.model.graphs.common.EdgeTrafficType`
         """
 
     @abstractmethod
     def __contains__(self, edge):
-        """ Determine if an edge is in the partition
+        """ Determine if an edge is in the outgoing edge partition.
 
         :param edge: The edge to check for the existence of
         :type edge: :py:class:`pacman.model.graphs.AbstractEdge`

@@ -3,7 +3,7 @@ from .abstract_input import AbstractInput
 
 
 class AllOfInput(AbstractInput):
-    """ A composite input for which all input parameters must be matched
+    """ A composite input for which all input parameters must be matched.
     """
 
     __slots__ = [
@@ -13,7 +13,6 @@ class AllOfInput(AbstractInput):
 
     def __init__(self, inputs):
         """
-
         :param inputs: The inputs that make up this input
         """
         self._inputs = inputs

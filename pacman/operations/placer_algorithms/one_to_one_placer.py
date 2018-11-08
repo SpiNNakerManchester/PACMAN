@@ -34,8 +34,7 @@ class OneToOnePlacer(RadialPlacer):
             additional_placement_constraints={SameChipAsConstraint})
 
         # Get which vertices must be placed on the same chip as another vertex
-        same_chip_vertex_groups = get_same_chip_vertex_groups(
-            machine_graph.vertices)
+        same_chip_vertex_groups = get_same_chip_vertex_groups(machine_graph)
         sorted_vertices = self._sort_vertices_for_one_to_one_connection(
             machine_graph, same_chip_vertex_groups)
 

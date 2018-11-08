@@ -7,7 +7,7 @@ class PacmanException(Exception):
 
 
 class PacmanInvalidParameterException(PacmanException):
-    """ An exception which indicates that a parameter has an invalid value.
+    """ An exception that indicates that a parameter has an invalid value.
     """
 
     def __init__(self, parameter, value, problem):
@@ -32,7 +32,7 @@ class PacmanAlreadyExistsException(PacmanException):
         """
         :param item_type: The type of the item that already exists
         :type item_type: str
-        :param item_id: The id of the item which is in conflict
+        :param item_id: The ID of the item which is in conflict
         :type item_id: str
         """
         super(PacmanAlreadyExistsException, self).__init__(item_type, item_id)
@@ -189,22 +189,33 @@ class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
 
 
 class PacmanAlreadyPlacedError(ValueError):
-    """Indicates multiple placements are being made for a vertex."""
+    """ An exception that indicates multiple placements are being made for a\
+        vertex.
+    """
 
 
 class PacmanNotPlacedError(KeyError):
-    """Indicates no placements are made for a vertex."""
+    """ An exception that indicates no placements are made for a vertex.
+    """
 
 
 class PacmanProcessorAlreadyOccupiedError(ValueError):
-    """Indicates multiple placements are being made to a processor."""
+    """ An exception that indicates multiple placements are being made to a\
+        processor.
+    """
 
 
 class PacmanProcessorNotOccupiedError(KeyError):
-    """Indicates that no placement has been made to a processor."""
+    """ An exception that indicates that no placement has been made to a\
+        processor.
+    """
 
 
 class PacmanProcessorNotAvailableError(PacmanException):
+    """ An exception that indicates that a processor is unavailable for some\
+        reason.
+    """
+
     def __init__(self, x, y, p):
         msg = "The processor {} {} {} is not available. " \
               "This may be caused by a clash between a ChipAndCoreConstraint"\
@@ -215,16 +226,22 @@ class PacmanProcessorNotAvailableError(PacmanException):
 
 
 class PacmanValueError(ValueError, PacmanException):
-    """Indicates that a value is invalid for some reason."""
+    """ An exception that indicates that a value is invalid for some reason.
+    """
 
 
 class PacmanNotFoundError(KeyError, PacmanException):
-    """Indicates that some object has not been found when requested."""
+    """ An exception that indicates that some object has not been found when\
+        requested.
+    """
 
 
 class PacmanTypeError(TypeError, PacmanException):
-    """Indicates that an object is of incorrect type."""
+    """ An exception that indicates that an object is of incorrect type.
+    """
 
 
 class PacmanNoMergeException(PacmanException):
-    """Exception to indicate that there are no merges worth performing."""
+    """ An exception that indicates to indicate that there are no merges worth\
+        performing.
+    """

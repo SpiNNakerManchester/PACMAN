@@ -5,7 +5,7 @@ from .abstract_algorithm import AbstractAlgorithm
 
 
 class AbstractPythonAlgorithm(AbstractAlgorithm):
-    """ An algorithm written in Python
+    """ An algorithm written in Python.
     """
 
     __slots__ = [
@@ -18,7 +18,6 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, python_module):
         """
-
         :param python_module: The module containing the python code to execute
         """
         # pylint: disable=too-many-arguments

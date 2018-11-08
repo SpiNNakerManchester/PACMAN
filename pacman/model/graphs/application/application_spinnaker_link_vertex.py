@@ -11,7 +11,7 @@ from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
 
 class ApplicationSpiNNakerLinkVertex(
         ApplicationVertex, AbstractSpiNNakerLinkVertex):
-    """ A virtual vertex on a SpiNNaker Link
+    """ A virtual vertex on a SpiNNaker Link.
     """
 
     __slots__ = [

@@ -1,6 +1,6 @@
 # These two warnings are disabled; because Enum Python hackery.
 # pylint: disable=not-an-iterable, not-callable
-from six import iteritems
+from six import iteritems, itervalues
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
 from pacman.model.graphs import (
@@ -203,7 +203,7 @@ def create_rig_graph_constraints(machine_graph, machine):
                     constraints.append(LocationConstraint(
                         vertex, (constraint.x, constraint.y)))
 
-    for group in get_same_chip_vertex_groups(machine_graph.vertices).values():
+    for group in itervalues(get_same_chip_vertex_groups(machine_graph)):
         if len(group) > 1:
             constraints.append(SameChipConstraint(group))
     return constraints

@@ -16,7 +16,7 @@ class BasicTagAllocator(object):
     __slots__ = []
 
     def __call__(self, machine, placements):
-        """ see AbstractTagAllocatorAlgorithm.allocate_tags
+        """ See :py:meth:`AbstractTagAllocatorAlgorithm.allocate_tags`
         """
 
         resource_tracker = ResourceTracker(machine)
@@ -70,7 +70,7 @@ class BasicTagAllocator(object):
                 resources, chips, placement.p, board_address, ip_tags,
                 reverse_ip_tags)
 
-        # Put the allocated ip tag information into the tag object
+        # Put the allocated IP tag information into the tag object
         if returned_ip_tags is not None:
             for (tag_constraint, (board_address, tag, dest_x, dest_y)) in \
                     zip(ip_tags, returned_ip_tags):
@@ -86,7 +86,7 @@ class BasicTagAllocator(object):
         if returned_reverse_ip_tags is None:
             return
 
-        # Put the allocated reverse ip tag information into the tag object
+        # Put the allocated reverse IP tag information into the tag object
         for tag_constraint, (board_address, tag) in zip(
                 reverse_ip_tags, returned_reverse_ip_tags):
             if board_address not in ports_collector:

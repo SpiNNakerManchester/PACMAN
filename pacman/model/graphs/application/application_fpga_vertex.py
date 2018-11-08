@@ -9,7 +9,7 @@ from pacman.model.resources import ResourceContainer
 
 
 class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
-    """ A virtual vertex on an FPGA link
+    """ A virtual vertex on an FPGA link.
     """
 
     __slots__ = [

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class AllOf(object):
-    """ Indicates that all of the items specified are required
+    """ Indicates that all of the items specified are required.
     """
 
     __slots__ = ["_items"]
@@ -51,7 +51,7 @@ class AllOf(object):
 
 
 class OneOf(object):
-    """ Indicates that one of the items specified is required
+    """ Indicates that one of the items specified is required.
     """
 
     __slots__ = ["_items"]
@@ -110,13 +110,13 @@ def _decode_algorithm_details(
 
     :param input_definitions: dict of algorithm parameter name to list of types
     :param required_inputs: List of required algorithm parameter names
-    :type required_inputs: list of str, \
-        :py:class:`pacman.executor.algorithm_decorators.OneOf`, \
-        :py:class:`pacman.executor.algorithm_decorators.AllOf`
+    :type required_inputs: list(str or \
+        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
+        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
     :param optional_inputs: List of optional algorithm parameter names
-    :type optional_inputs: list of str, \
-        :py:class:`pacman.executor.algorithm_decorators.OneOf`, \
-        :py:class:`pacman.executor.algorithm_decorators.AllOf`
+    :type optional_inputs: list(str or \
+        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
+        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
     :param function: The function to be called by the algorithm
     :param has_self: True if the self parameter is expected
     """
@@ -190,25 +190,25 @@ def algorithm(
         dict of algorithm parameter name to list of types, one for each\
         required algorithm parameter, and one for each optional parameter\
         that is used in this algorithm call
-    :type input_definitions: dict of str -> (str or list of str)
+    :type input_definitions: dict(str, str or list(str))
     :param outputs:\
         A list of types output from the algorithm that must match the order in\
         which they are returned.
-    :type outputs: list of str
+    :type outputs: list(str)
     :param algorithm_id:\
-        Optional unique id of the algorithm; if not specified, the name of the\
+        Optional unique ID of the algorithm; if not specified, the name of the\
         class or function is used.
     :type algorithm_id: str
     :param required_inputs:\
         Optional list of required algorithm parameter names; if not specified\
         those parameters which have no default values are used.
-    :type required_inputs: list of (str or \
+    :type required_inputs: list(str or \
         :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
         :py:class:`pacman.executor.algorithm_decorators.AllOf`)
     :param optional_inputs:\
         Optional list of optional algorithm parameter names; if not specified\
         those parameters which have default values are used.
-    :type optional_inputs: list of (str or \
+    :type optional_inputs: list(str or \
         :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
         :py:class:`pacman.executor.algorithm_decorators.AllOf`)
     :param method:\
@@ -226,11 +226,11 @@ def algorithm(
     """
 
     def wrap(algorithm):
-        # Get the algorithm id
+        # Get the algorithm ID
         algo_id = algorithm_id or algorithm.__name__
         if algo_id in _algorithms:
             raise PacmanConfigurationException(
-                "Multiple algorithms with id {} found: {} and {}".format(
+                "Multiple algorithms with ID {} found: {} and {}".format(
                     algo_id, algorithm, _algorithms[algo_id]))
 
         # Get the details of the method or function
@@ -324,7 +324,7 @@ def reset_algorithms():
 
 
 def get_algorithms():
-    """ Get the dict of known algorithm id -> algorithm data
+    """ Get the dict of known algorithm ID -> algorithm data
     """
     return _algorithms
 

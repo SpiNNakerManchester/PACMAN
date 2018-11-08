@@ -10,7 +10,7 @@ from .outgoing_edge_partition import OutgoingEdgePartition
 
 class Graph(ConstrainedObject, AbstractGraph):
     """ A graph implementation that specifies the allowed types of the\
-        vertices and edges
+        vertices and edges.
     """
 
     __slots__ = [
@@ -39,7 +39,6 @@ class Graph(ConstrainedObject, AbstractGraph):
     def __init__(self, allowed_vertex_types, allowed_edge_types,
                  allowed_partition_types, label):
         """
-
         :param allowed_vertex_types:\
             A single or tuple of types of vertex to be allowed in the graph
         :param allowed_edge_types:\

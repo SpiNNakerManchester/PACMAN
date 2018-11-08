@@ -5,7 +5,7 @@ from pacman.model.graphs.impl import Graph
 
 
 class MachineGraph(Graph):
-    """ A graph whose vertices can fit on the chips of a machine
+    """ A graph whose vertices can fit on the chips of a machine.
     """
 
     __slots__ = []

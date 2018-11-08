@@ -3,6 +3,8 @@ from enum import Enum
 DEFAULT_MASK = 0xfffff800  # DEFAULT LOCATION FOR THE APP MASK
 BITS_IN_KEY = 32
 
+CORES_PER_VIRTUAL_CHIP = 128
+
 EDGES = Enum(
     value="EDGES",
     names=[("EAST", 0),

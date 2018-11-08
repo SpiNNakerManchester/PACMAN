@@ -30,8 +30,7 @@ class RadialPlacer(object):
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
-        vertices_on_same_chip = get_same_chip_vertex_groups(
-            machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
@@ -104,12 +103,12 @@ class RadialPlacer(object):
         """ Generates the list of chips from a given starting point in a radial\
             format.
 
-        :param machine: the spinnaker machine object
+        :param machine: the SpiNNaker machine object
         :param resource_tracker:\
             the resource tracker object which contains what resources of the\
             machine have currently been used
         :type resource_tracker: None or \
-                :py:class:`ResourceTracker`
+            :py:class:`ResourceTracker`
         :param start_chip_x:\
             The chip x coordinate to start with for radial iteration
         :param start_chip_y:\

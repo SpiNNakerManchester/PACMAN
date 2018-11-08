@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 class HilbertPlacer(object):
     """ A simple placing algorithm using the Hilbert space-filling curve,\
-        translated from RIG."""
+        translated from RIG.
+    """
 
     def __call__(self, machine_graph, machine):
         """ Place each vertex in a machine graph on a core in the machine.
@@ -43,8 +44,7 @@ class HilbertPlacer(object):
             machine, self._generate_hilbert_chips(machine))
 
         # get vertices which must be placed on the same chip
-        vertices_on_same_chip = \
-            get_same_chip_vertex_groups(machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
 
         # iterate over vertices and generate placements
         all_vertices_placed = set()
@@ -115,9 +115,9 @@ class HilbertPlacer(object):
             :py:class:`pacman.model.placements.Placements`
         :param vertices_on_same_chip: a dictionary where keys are a vertex \
             and values are a list of vertices
-        :type vertices_on_same_chip: dict
+        :type vertices_on_same_chip: dict(vertex,list(vertex))
         :return vertices: an iterable of vertices to be placed
-        :rtype vertices: list
+        :rtype vertices: list(vertex)
         """
 
         vertices = vertices_on_same_chip[vertex]
@@ -158,8 +158,7 @@ class HilbertPlacer(object):
         :type state: \
             :py:class:`pacman.operations.rigged_algorithms.hilbert_state.HilbertState`
         :return the x and y positions in a Hilbert curve as a state object.
-        :rtype HilbertState object \
-            :py:class:`pacman.operations.rigged_algorithms.hilbert_state.HilbertState`
+        :rtype: iterable(tuple(int,int))
         """
 
         # Create state object first time we're called while also yielding

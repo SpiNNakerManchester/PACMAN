@@ -9,9 +9,8 @@ _32_BITS = 0xFFFFFFFF
 
 
 class MallocBasedRouteMerger(object):
-    """ a routing table entry merging function, that merges based off a
-    malloc memory style.
-
+    """ Routing table entry merging function, that merges based off a\
+        malloc memory style.
     """
 
     __slots__ = []
