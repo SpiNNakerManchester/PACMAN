@@ -1,16 +1,10 @@
 """
 tests for graph mapper
 """
-
-# unit test objects
-from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
-
-# pacman imports
+import unittest
 from pacman.model.graphs.common import Slice, GraphMapper
 from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
-
-# general imports
-import unittest
+from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
 class TestGraphMapper(unittest.TestCase):

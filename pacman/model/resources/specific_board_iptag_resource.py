@@ -106,6 +106,9 @@ class SpecificBoardTagResource(object):
         return self._board
 
     def get_value(self):
+        """
+        :return: A description of the specific board's IP tag required.
+        """
         return [
             self._board, self._ip_address, self._port, self._strip_sdp,
             self._tag, self._traffic_identifier]

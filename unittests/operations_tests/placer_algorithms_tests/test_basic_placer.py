@@ -1,26 +1,18 @@
-# general imports
 from __future__ import print_function
 import unittest
-
-# pacman imports
+from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.graphs.common import Slice, GraphMapper
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
-
-# spinn machine imports
-from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
-
-# support imports
 from uinit_test_objects import SimpleTestVertex, get_resources_used_by_atoms
 
 
 class TestBasicPlacer(unittest.TestCase):
     """
-    test for basic placement algorithum
+    test for basic placement algorithm
     """
     def setUp(self):
         #######################################################################

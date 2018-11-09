@@ -75,6 +75,9 @@ class ReverseIPtagResource(object):
         return self._board
 
     def get_value(self):
+        """
+        :return: A description of the specific board's reverse IP tag required.
+        """
         return [self._board, self._port, self._sdp_port, self._tag]
 
     def __repr__(self):

@@ -1,5 +1,4 @@
 import unittest
-
 from pacman.model.graphs.common import Slice
 
 

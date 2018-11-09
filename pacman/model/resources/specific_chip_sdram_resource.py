@@ -1,9 +1,8 @@
 class SpecificChipSDRAMResource(object):
-    """ Represents the number of cores that need to be allocated.
+    """ Represents the the allocation of memory on a specific chip.
     """
 
     __slots__ = [
-
         # The number of cores that need to be allocated on a give chip
         "_sdram_usage",
 
@@ -32,4 +31,8 @@ class SpecificChipSDRAMResource(object):
         return self._chip
 
     def get_value(self):
+        """
+        :return: The chip for which it is required, and the amount of SDRAM\
+            required thereon, in bytes.
+        """
         return self._chip, self._sdram_usage
