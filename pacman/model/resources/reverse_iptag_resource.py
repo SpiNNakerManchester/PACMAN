@@ -60,6 +60,9 @@ class ReverseIPtagResource(object):
         return self._tag
 
     def get_value(self):
+        """
+        :return: The description of the reverse IP tag.
+        """
         return [self._port, self._sdp_port, self._tag]
 
     def __repr__(self):
