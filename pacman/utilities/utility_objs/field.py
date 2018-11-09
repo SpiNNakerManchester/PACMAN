@@ -1,5 +1,5 @@
-from .flexi_field import SUPPORTED_TAGS
 import uuid
+from .flexi_field import SUPPORTED_TAGS
 
 
 class Field(object):

@@ -1,16 +1,13 @@
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
-
-# pacman imports
-from pacman.exceptions import \
-    PacmanException, PacmanInvalidParameterException, PacmanValueError
+from pacman.exceptions import (
+    PacmanException, PacmanInvalidParameterException, PacmanValueError)
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
-    import get_same_chip_vertex_groups, sort_vertices_by_known_constraints
-from pacman.model.constraints.placer_constraints\
-    import SameChipAsConstraint
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
+from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.utilities.utility_calls import is_single
 
 

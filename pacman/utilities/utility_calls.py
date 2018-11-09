@@ -1,8 +1,7 @@
-from pacman.exceptions import PacmanInvalidParameterException
-from pacman.exceptions import PacmanValueError
-
 import hashlib
 import numpy
+from pacman.exceptions import (
+    PacmanInvalidParameterException, PacmanValueError)
 
 
 def locate_constraints_of_type(constraints, constraint_type):
@@ -100,7 +99,7 @@ def expand_to_bit_array(value):
 
     :param value: The value to expand
     :type value: int
-    :rtype: [uint8]
+    :rtype: numpy.array(uint8)
     """
     return numpy.unpackbits(
         numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
@@ -111,7 +110,7 @@ def compress_from_bit_array(bit_array):
         into a 32-bit value
 
     :param bit_array: The array to compress
-    :type bit_array: [uint8]
+    :type bit_array: numpy.array(uint8)
     :rtype: int
     """
     return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
@@ -122,10 +121,10 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
         where is a 1 or 0, into a 32-bit value.
 
     :param bit_array: The array to extract the value from
-    :type bit_array: [uint8]
+    :type bit_array: numpy.array(uint8)
     :param bit_positions: The positions of the bits to extract, each value\
         being between 0 and 31
-    :type bit_positions: [int]
+    :type bit_positions: numpy.array(int)
     :rtype: int
     """
     expanded_value = numpy.zeros(32, dtype="uint8")

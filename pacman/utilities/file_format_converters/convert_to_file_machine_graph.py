@@ -1,9 +1,8 @@
 import json
 from collections import defaultdict
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs import AbstractVirtualVertex
 from pacman.utilities.utility_calls import md5, ident
-
-from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
 
 DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX = 1

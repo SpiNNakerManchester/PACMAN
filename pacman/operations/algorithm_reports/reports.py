@@ -1,13 +1,11 @@
 import logging
 import os
 import time
-
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 from pacman.model.graphs.common import EdgeTrafficType
-
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

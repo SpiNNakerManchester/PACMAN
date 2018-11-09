@@ -2,18 +2,15 @@ from __future__ import print_function
 from operator import itemgetter
 from pprint import pprint as pp
 import unittest
-
+from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-from uinit_test_objects \
-    import get_resources_used_by_atoms, T_MachineVertex, T_AppVertex
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.model.graphs.common import GraphMapper
 from pacman.operations.placer_algorithms import RadialPlacer
-
-from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
+from uinit_test_objects import (
+    get_resources_used_by_atoms, T_MachineVertex, T_AppVertex)
 
 
 class TestRadialPlacer(unittest.TestCase):
