@@ -1,12 +1,10 @@
-from pacman.utilities.utility_objs import ResourceTracker
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import \
-    get_same_chip_vertex_groups, sort_vertices_by_known_constraints
-from pacman.model.placements import Placement, Placements
-
-from spinn_utilities.progress_bar import ProgressBar
-
 import random
 import numpy
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs import ResourceTracker
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
+from pacman.model.placements import Placement, Placements
 
 
 class RandomPlacer(object):

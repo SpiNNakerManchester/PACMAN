@@ -1,10 +1,7 @@
-# pacman imports
-from pacman.model.graphs.machine \
-    import MachineEdge, MachineGraph, SimpleMachineVertex
-from pacman.exceptions import PacmanInvalidParameterException
-
-# general imports
 import unittest
+from pacman.model.graphs.machine import (
+    MachineEdge, MachineGraph, SimpleMachineVertex)
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 class TestMachineGraphModel(unittest.TestCase):

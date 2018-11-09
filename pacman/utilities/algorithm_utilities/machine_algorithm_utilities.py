@@ -1,6 +1,6 @@
+import sys
 from pacman.utilities import constants
 from spinn_machine import SDRAM, Chip, Link, Processor, Router
-import sys
 
 
 def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):

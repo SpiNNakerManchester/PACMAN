@@ -1,36 +1,19 @@
-from pacman.model.placements import Placement, Placements
-from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
-from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.machine.machine_graph import MachineGraph
-from pacman.model.resources.iptag_resource import IPtagResource
-from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
-from pacman.model.graphs.machine.machine_edge import MachineEdge
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from spinn_machine.virtual_machine import VirtualMachine
-
-from pacman.utilities.file_format_converters.\
-    convert_to_file_machine_graph_pure_multicast import \
-    ConvertToFileMachineGraphPureMulticast
-from pacman.utilities.file_format_converters.convert_to_file_placement \
-    import ConvertToFilePlacement
-from pacman.utilities.file_format_converters.convert_to_file_machine \
-    import ConvertToFileMachine
-from pacman.utilities.file_format_converters.convert_to_file_machine_graph \
-    import ConvertToFileMachineGraph
-from pacman.utilities.file_format_converters.convert_to_file_core_allocations \
-    import ConvertToFileCoreAllocations
-from pacman.utilities.file_format_converters.\
-    convert_to_memory_multi_cast_routes import ConvertToMemoryMultiCastRoutes
-from pacman.utilities.file_format_converters.\
-    convert_to_memory_placements import ConvertToMemoryPlacements
-from pacman.utilities.file_format_converters.create_file_constraints \
-    import CreateConstraintsToFile
-from pacman.utilities.utility_calls import md5, ident
-
 import json
 import pytest
 from six import iterkeys
+from spinn_machine import VirtualMachine
+from pacman.model.placements import Placement, Placements
+from pacman.model.graphs.machine import (
+    MachineGraph, MachineEdge, SimpleMachineVertex, MachineSpiNNakerLinkVertex)
+from pacman.model.resources import (
+    ResourceContainer, IPtagResource, ReverseIPtagResource)
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.utilities.file_format_converters import (
+    ConvertToFileMachineGraphPureMulticast, ConvertToFilePlacement,
+    ConvertToFileMachine, ConvertToFileMachineGraph,
+    ConvertToFileCoreAllocations, ConvertToMemoryMultiCastRoutes,
+    ConvertToMemoryPlacements, CreateConstraintsToFile)
+from pacman.utilities.utility_calls import md5, ident
 
 
 def test_convert_to_file_core_allocations(tmpdir):

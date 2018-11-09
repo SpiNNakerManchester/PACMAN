@@ -1,9 +1,7 @@
-from abc import abstractproperty
-
+from spinn_utilities.abstract_base import abstractproperty
 from .abstract_virtual_vertex import AbstractVirtualVertex
 
 
-# interface
 class AbstractFPGAVertex(AbstractVirtualVertex):
     """ A vertex connected to an FPGA.
     """

@@ -1,13 +1,12 @@
+import sys
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.placer_constraints \
-    import ChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs \
-    import AbstractVirtualVertex, AbstractSpiNNakerLinkVertex
+from pacman.model.graphs import (
+    AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
-
-import sys
 
 
 class ApplicationSpiNNakerLinkVertex(
