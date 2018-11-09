@@ -32,6 +32,6 @@ class CoreResource(object):
 
     def get_value(self):
         """
-        :return: The number of chips and cores required.
+        :return: The chip and the cores required on it.
         """
         return self._chip, self._n_cores
