@@ -2,6 +2,9 @@ import hashlib
 import numpy
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError)
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
+from pacman.model.constraints.partitioner_constraints \
+    import MaxVertexAtomsConstraint
 
 
 def locate_constraints_of_type(constraints, constraint_type):
@@ -172,3 +175,20 @@ def ident(object):  # @ReservedAssignment
     :rtype: str
     """
     return str(id(object))
+
+
+def get_max_atoms_per_core(vertex):
+    """ Get the maximum number of atoms per core for a vertex using the\
+        constraints of the vertex and the size of the vertex
+
+    :param vertex: The vertex to determine the max atoms per core of
+    :rtype: int
+    """
+    possible_max_atoms = [vertex.n_atoms]
+    if isinstance(vertex, AbstractHasGlobalMaxAtoms):
+        possible_max_atoms.append(vertex.get_max_atoms_per_core())
+    max_atom_constraints = locate_constraints_of_type(
+        vertex.constraints, MaxVertexAtomsConstraint)
+    for constraint in max_atom_constraints:
+        possible_max_atoms.append(constraint.size)
+    return int(min(possible_max_atoms))
