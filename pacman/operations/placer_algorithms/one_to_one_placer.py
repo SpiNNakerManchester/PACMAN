@@ -55,7 +55,9 @@ class OneToOnePlacer(RadialPlacer):
         # iterate over vertices
         for vertex_list in vertices:
             # if too many one to ones to fit on a chip, allocate individually
-            if len(vertex_list) > machine.maximum_user_cores_on_chip:
+
+            if len(vertex_list) > \
+                    machine.get_maximum_cores_available_on_a_chip():
                 for vertex in progress.over(vertex_list, False):
                     self._allocate_individual(
                         vertex, placements, resource_tracker,
