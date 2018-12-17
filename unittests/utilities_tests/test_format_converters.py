@@ -14,7 +14,8 @@ from pacman.utilities.file_format_converters import (
     ConvertToFileCoreAllocations, ConvertToMemoryMultiCastRoutes,
     ConvertToMemoryPlacements, CreateConstraintsToFile)
 from pacman.utilities.utility_calls import md5, ident
-from pacman.operations.chip_id_allocator_algorithms.malloc_based_chip_id_allocator import MallocBasedChipIdAllocator
+from pacman.operations.chip_id_allocator_algorithms \
+    import MallocBasedChipIdAllocator
 
 
 def test_convert_to_file_core_allocations(tmpdir):
