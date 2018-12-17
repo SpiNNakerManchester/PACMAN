@@ -34,7 +34,7 @@ def _find_one_to_one_vertices(vertex, graph):
     # Virtual vertices can't be forced on other chips
     if isinstance(vertex, AbstractVirtualVertex):
         return []
-    found_vertices = []
+    found_vertices = set()
     vertices_seen = {vertex}
 
     # look for one to ones leaving this vertex
@@ -48,7 +48,7 @@ def _find_one_to_one_vertices(vertex, graph):
             vertices_seen.add(next_vertex)
             edges = graph.get_edges_ending_at_vertex(next_vertex)
             if is_single(edges):
-                found_vertices.append(next_vertex)
+                found_vertices.add(next_vertex)
                 outgoing = graph.get_edges_starting_at_vertex(next_vertex)
                 vertices_to_try.extend([
                     edge.post_vertex for edge in outgoing
@@ -65,7 +65,7 @@ def _find_one_to_one_vertices(vertex, graph):
             vertices_seen.add(next_vertex)
             edges = graph.get_edges_starting_at_vertex(next_vertex)
             if is_single(edges):
-                found_vertices.append(next_vertex)
+                found_vertices.add(next_vertex)
                 incoming = graph.get_edges_ending_at_vertex(next_vertex)
                 vertices_to_try.extend([
                     edge.pre_vertex for edge in incoming
@@ -73,8 +73,7 @@ def _find_one_to_one_vertices(vertex, graph):
 
     extra_vertices = get_vertices_on_same_chip(vertex, graph)
     for vertex in extra_vertices:
-        if vertex not in vertices_seen:
-            found_vertices.append(extra_vertices)
+        found_vertices.add(vertex)
     return found_vertices
 
 
