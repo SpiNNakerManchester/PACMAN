@@ -156,20 +156,19 @@ class OneToOnePlacer(RadialPlacer):
             # if too many one to ones to fit on a chip, allocate individually
             if len(unallocated) > \
                     resource_tracker.get_maximum_cores_available_on_a_chip():
-                for vert in one_to_one_vertices:
-                    if vert not in all_vertices_placed:
-                        self._allocate_individual(
-                            vert, placements, resource_tracker,
-                            same_chip_vertex_groups, all_vertices_placed,
-                            progress)
+                for vert in unallocated:
+                    self._allocate_individual(
+                        vert, placements, resource_tracker,
+                        same_chip_vertex_groups, all_vertices_placed,
+                        progress)
                 continue
 
             # Try to allocate all vertices to the same chip
-            allocations = self._get_allocations(
+            success = self._get_allocations(
                 resource_tracker, unallocated, progress, placements, chips,
                 all_vertices_placed)
 
-            if allocations is None:
+            if not success:
 
                 # Something went wrong, try to allocate each individually
                 for vertex in progress.over(unallocated, False):
@@ -194,10 +193,10 @@ class OneToOnePlacer(RadialPlacer):
                     zip(vertices, allocs), False):
                 placements.add_placement(Placement(vertex, x, y, p))
                 all_vertices_placed.add(vertex)
-            return allocs
+            return True
         except (PacmanValueError, PacmanException,
                 PacmanInvalidParameterException):
-            return None
+            return False
 
     @staticmethod
     def _allocate_individual(
