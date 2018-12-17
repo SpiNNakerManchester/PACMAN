@@ -14,6 +14,7 @@ from pacman.utilities.file_format_converters import (
     ConvertToFileCoreAllocations, ConvertToMemoryMultiCastRoutes,
     ConvertToMemoryPlacements, CreateConstraintsToFile)
 from pacman.utilities.utility_calls import md5, ident
+from pacman.operations.chip_id_allocator_algorithms.malloc_based_chip_id_allocator import MallocBasedChipIdAllocator
 
 
 def test_convert_to_file_core_allocations(tmpdir):
@@ -193,12 +194,12 @@ def test_create_constraints_to_file(tmpdir):
         ChipAndCoreConstraint(1, 1, 3)])
     graph.add_vertex(v0)
     v0_id = ident(v0)
-    v1 = MachineSpiNNakerLinkVertex(2, constraints=[
-        ChipAndCoreConstraint(1, 1)])
+    v1 = MachineSpiNNakerLinkVertex(0)
     v1.set_virtual_chip_coordinates(0, 2)
     graph.add_vertex(v1)
     v1_id = ident(v1)
 
+    machine = MallocBasedChipIdAllocator()(machine, graph)
     algo = CreateConstraintsToFile()
     fn = tmpdir.join("foo.json")
     filename, mapping = algo(graph, machine, str(fn))
@@ -225,10 +226,10 @@ def test_create_constraints_to_file(tmpdir):
             "resource": "reverse_iptag", "range": [0, 1], "vertex": v0_id},
         {
             "type": "route_endpoint",
-            "direction": "south", "vertex": v1_id},
+            "direction": "west", "vertex": v1_id},
         {
             "type": "location",
-            "location": [1, 0], "vertex": v1_id}]
+            "location": [0, 0], "vertex": v1_id}]
     assert obj == baseline
 
 
