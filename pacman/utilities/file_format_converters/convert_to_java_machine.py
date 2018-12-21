@@ -17,12 +17,15 @@ class ConvertToJavaMachine(object):
         Runs the code to write the machine in Java readable json.
 
         :param machine: Machine to convert
+        :type machine: :py:class:`spinn_machine.machine.Machine`
         :param file_path: Location to write file to. Warning will overwrite!
+        :type file_path: str
         """
         progress = ProgressBar(
             (machine.max_chip_x + 1) * (machine.max_chip_y + 1) + 2,
             "Converting to JSON machine")
 
+        # Find the s_ values for one non ethernet chip to use as standard
         for chip in machine.chips:
             if (chip.ip_address is None):
                 s_monitors = chip.n_processors - chip.n_user_processors
@@ -30,17 +33,19 @@ class ConvertToJavaMachine(object):
                 s_router_clock_speed = chip.router.clock_speed
                 s_sdram = chip.sdram.size
                 s_virtual = chip.virtual
-                s_tags = chip._tag_ids
+                s_tags = chip.tag_ids
                 break
 
+        # find the e_ values to use for ethernet chips
         chip = machine.boot_chip
         e_monitors = chip.n_processors - chip.n_user_processors
         e_router_entries = chip.router.n_available_multicast_entries
         e_router_clock_speed = chip.router.clock_speed
         e_sdram = chip.sdram.size
         e_virtual = chip.virtual
-        e_tags = chip._tag_ids
+        e_tags = chip.tag_ids
 
+        # Save the standard data to be used as defaults to none ethernet chips
         standardResources = OrderedDict()
         standardResources["monitors"] = s_monitors
         standardResources["routerEntries"] = s_router_entries
@@ -49,6 +54,7 @@ class ConvertToJavaMachine(object):
         standardResources["virtual"] = s_virtual
         standardResources["tags"] = list(s_tags)
 
+        # Save the standard data to be used as defaults to none ethernet chips
         ethernetResources = OrderedDict()
         ethernetResources["monitors"] = e_monitors
         ethernetResources["routerEntries"] = e_router_entries
@@ -82,6 +88,7 @@ class ConvertToJavaMachine(object):
             exceptions = OrderedDict()
             if chip.ip_address is not None:
                 details['ipAddress'] = chip.ip_address
+                # Write the Resources ONLY if different from the e_values
                 if (chip.n_processors - chip.n_user_processors) != e_monitors:
                     exceptions["monitors"] = \
                         chip.n_processors - chip.n_user_processors
@@ -99,6 +106,7 @@ class ConvertToJavaMachine(object):
                 if chip.tag_ids != e_tags:
                     details["tags"] = list(chip.tag_ids)
             else:
+                # Write the Resources ONLY if different from the s_values
                 if (chip.n_processors - chip.n_user_processors) != s_monitors:
                     exceptions["monitors"] = \
                         chip.n_processors - chip.n_user_processors
