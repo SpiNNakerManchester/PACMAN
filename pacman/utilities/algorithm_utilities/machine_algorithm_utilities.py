@@ -1,5 +1,6 @@
-from spinn_machine import SDRAM, Chip, Link, Processor, Router
 import sys
+from pacman.utilities import constants
+from spinn_machine import SDRAM, Chip, Link, Processor, Router
 
 
 def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
@@ -41,8 +42,8 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
 
     # create the processors
     processors = list()
-    for virtual_core_id in range(0, 128):
-        processors.append(Processor(virtual_core_id))
+    for virtual_core_id in range(0, constants.CORES_PER_VIRTUAL_CHIP):
+        processors.append(Processor.factory(virtual_core_id))
 
     # connect the real chip with the virtual one
     connected_chip = machine.get_chip_at(

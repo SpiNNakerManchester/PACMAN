@@ -1,10 +1,8 @@
-from pacman.utilities import file_format_schemas
-from pacman.utilities.utility_calls import ident
-
-from spinn_utilities.progress_bar import ProgressBar
-
 import json
 from collections import OrderedDict
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities import file_format_schemas
+from pacman.utilities.utility_calls import ident
 
 
 class ConvertToFileCoreAllocations(object):

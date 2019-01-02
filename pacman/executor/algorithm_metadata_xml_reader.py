@@ -1,15 +1,10 @@
 from lxml import etree
 from six import iterkeys
-
 from pacman.exceptions import PacmanConfigurationException
-from pacman.executor.algorithm_decorators import OneOfInput
-from pacman.executor.algorithm_decorators import Output
-from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
-from pacman.executor.algorithm_decorators import SingleInput
-from pacman.executor.algorithm_classes import ExternalAlgorithm
-from pacman.executor.algorithm_classes import PythonClassAlgorithm
-from pacman.executor.algorithm_decorators import AllOfInput
-from pacman.executor.algorithm_decorators.token import Token
+from pacman.executor.algorithm_decorators import (
+    AllOfInput, OneOfInput, Output, SingleInput, Token)
+from pacman.executor.algorithm_classes import (
+    ExternalAlgorithm, PythonClassAlgorithm, PythonFunctionAlgorithm)
 
 
 def _check_allowed_elements(path, element, allowed):

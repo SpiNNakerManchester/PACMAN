@@ -1,17 +1,12 @@
-# pacman imports
+import logging
+from math import log, ceil
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import \
-    get_same_chip_vertex_groups, sort_vertices_by_known_constraints
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
-
-# spinn_utils imports
-from spinn_utilities.progress_bar import ProgressBar
-
-# general imports
-from math import log, ceil
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +46,7 @@ class HilbertPlacer(object):
             machine, plan_n_timesteps, self._generate_hilbert_chips(machine))
 
         # get vertices which must be placed on the same chip
-        vertices_on_same_chip = \
-            get_same_chip_vertex_groups(machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
 
         # iterate over vertices and generate placements
         all_vertices_placed = set()

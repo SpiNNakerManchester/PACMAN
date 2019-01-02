@@ -1,14 +1,13 @@
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
-from spinn_machine import VirtualMachine
-from pacman.model.resources import ResourceContainer
-from pacman.model.constraints.placer_constraints \
-    import SameChipAsConstraint
-from pacman.operations.rig_algorithms.rig_place import RigPlace
-from pacman.operations.placer_algorithms.one_to_one_placer \
-    import OneToOnePlacer
-from pacman.operations.placer_algorithms import RadialPlacer
 import random
 import unittest
+from spinn_machine import VirtualMachine
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.resources import ResourceContainer
+from pacman.model.constraints.placer_constraints import SameChipAsConstraint
+from pacman.operations.rig_algorithms.rig_place import RigPlace
+from pacman.operations.placer_algorithms.one_to_one_placer import (
+    OneToOnePlacer)
+from pacman.operations.placer_algorithms import RadialPlacer
 
 
 class TestSameChipConstraint(unittest.TestCase):

@@ -1,8 +1,7 @@
 import json
-
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.routing_table_by_partition import \
-    MulticastRoutingTableByPartitionEntry, MulticastRoutingTableByPartition
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartitionEntry, MulticastRoutingTableByPartition)
 
 _route_translation = {
     "CORE_0": (True, 0),

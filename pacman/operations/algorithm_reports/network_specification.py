@@ -1,7 +1,7 @@
 import logging
 import os.path
-from pacman.model.graphs.application import ApplicationVertex
 from spinn_utilities.log import FormatAdapter
+from pacman.model.graphs.application import ApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

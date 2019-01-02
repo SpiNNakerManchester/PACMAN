@@ -7,3 +7,4 @@ class EdgeTrafficType(Enum):
 
     MULTICAST = 1
     FIXED_ROUTE = 2
+    SDRAM = 3

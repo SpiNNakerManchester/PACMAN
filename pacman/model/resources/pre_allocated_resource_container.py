@@ -1,4 +1,4 @@
-from pacman import exceptions
+from pacman.exceptions import PacmanConfigurationException
 
 
 class PreAllocatedResourceContainer(object):
@@ -92,7 +92,7 @@ class PreAllocatedResourceContainer(object):
 
     def extend(self, other):
         if not isinstance(other, PreAllocatedResourceContainer):
-            raise exceptions.PacmanConfigurationException(
+            raise PacmanConfigurationException(
                 "Only another preallocated resource container can extend a "
                 "preallocated resource container")
 

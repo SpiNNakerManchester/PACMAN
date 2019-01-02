@@ -1,12 +1,8 @@
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
-
-# pacman imports
+from spinn_machine.tags import IPTag, ReverseIPTag
 from pacman.model.tags import Tags
 from pacman.utilities.utility_objs import ResourceTracker
-
-# spinn_machine imports
-from spinn_machine.tags import IPTag, ReverseIPTag
 
 # An arbitrary range of ports from which to allocate ports to Reverse IP Tags
 _BOARD_PORTS = range(17896, 18000)

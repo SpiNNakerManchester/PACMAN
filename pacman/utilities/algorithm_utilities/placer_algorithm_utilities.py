@@ -1,7 +1,7 @@
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint, SameChipAsConstraint
-from pacman.model.constraints.placer_constraints \
-    import BoardConstraint, RadialPlacementFromChipConstraint
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
+    RadialPlacementFromChipConstraint)
+from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
 
 
@@ -18,15 +18,15 @@ def sort_vertices_by_known_constraints(vertices):
     return sorter.sort(vertices)
 
 
-def get_same_chip_vertex_groups(vertices):
-    """ Get a dictionary of vertex to vertex that must be placed on the same\
-        chip
+def get_same_chip_vertex_groups(graph):
+    """ Get a dictionary of vertex to list of vertices that must be placed on\
+       the same chip
     """
 
     # Dict of vertex to list of vertices on same chip (repeated lists expected)
     same_chip_vertices = dict()
 
-    for vertex in vertices:
+    for vertex in graph.vertices:
         # Find all vertices that have a same chip constraint associated with
         #  this vertex
         same_chip_as_vertices = list()
@@ -34,9 +34,14 @@ def get_same_chip_vertex_groups(vertices):
             if isinstance(constraint, SameChipAsConstraint):
                 same_chip_as_vertices.append(constraint.vertex)
 
+        for edge in filter(
+                lambda edge: edge.traffic_type == EdgeTrafficType.SDRAM,
+                graph.get_edges_starting_at_vertex(vertex)):
+            same_chip_as_vertices.append(edge.post_vertex)
+
         if same_chip_as_vertices:
-            # Go through all the verts that want to be on the same chip as
-            # the top level vert
+            # Go through all the vertices that want to be on the same chip as
+            # the top level vertex
             for same_as_chip_vertex in same_chip_as_vertices:
                 # Neither vertex has been seen
                 if (same_as_chip_vertex not in same_chip_vertices and

@@ -2,19 +2,17 @@ import inspect
 import logging
 import os
 import pkgutil
-from six import iteritems
 import sys
 from threading import RLock
-
+from six import iteritems
+from spinn_utilities.ordered_set import OrderedSet
+from pacman.exceptions import PacmanConfigurationException
+from pacman.executor.algorithm_classes import (
+    PythonClassAlgorithm, PythonFunctionAlgorithm)
 from .one_of_input import OneOfInput
 from .output import Output
 from .single_input import SingleInput
 from .all_of_input import AllOfInput
-
-from pacman.exceptions import PacmanConfigurationException
-from pacman.executor.algorithm_classes \
-    import PythonClassAlgorithm, PythonFunctionAlgorithm
-from spinn_utilities.ordered_set import OrderedSet
 
 # The dict of algorithm name to algorithm description
 _algorithms = dict()
