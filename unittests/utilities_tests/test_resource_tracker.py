@@ -1,17 +1,11 @@
 import unittest
-
-from spinn_machine import VirtualMachine
-from pacman.model.resources import ResourceContainer, ConstantSDRAM
-
-from pacman.utilities.utility_objs import ResourceTracker
-from pacman.model.resources import PreAllocatedResourceContainer
-from pacman.model.resources import CoreResource
-from pacman.model.resources import SpecificCoreResource
-from spinn_machine.machine import Machine
-from spinn_machine.chip import Chip
-from spinn_machine.router import Router
-from spinn_machine.sdram import SDRAM
+from spinn_machine import (
+    VirtualMachine, Machine, Chip, Router, SDRAM)
+from pacman.model.resources import (
+    ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer,
+    CoreResource, SpecificCoreResource)
 from pacman.exceptions import PacmanValueError
+from pacman.utilities.utility_objs import ResourceTracker
 
 
 class TestResourceTracker(unittest.TestCase):
@@ -61,6 +55,11 @@ class TestResourceTracker(unittest.TestCase):
         if (0, 0) in tracker._core_tracker:
             raise Exception("shouldnt exist")
 
+        # verify sdram tracker
+        if tracker._sdram_tracker[0, 0] != -12346:
+            raise Exception("incorrect sdram of {}".format(
+                tracker._sdram_tracker[0, 0]))
+
         # allocate some res
         chip_x, chip_y, processor_id, ip_tags, reverse_ip_tags = \
             tracker.allocate_resources(resources, [(0, 0)])
@@ -68,6 +67,10 @@ class TestResourceTracker(unittest.TestCase):
         # verify chips used is updated
         cores = list(tracker._core_tracker[(0, 0)])
         self.assertEqual(len(cores), chip_0.n_user_processors - 1)
+
+        # verify sdram used is updated
+        sdram = tracker._sdram_tracker[(0, 0)]
+        self.assertEqual(sdram, -1)
 
         if (0, 0) not in tracker._chips_used:
             raise Exception("should exist")
@@ -84,6 +87,11 @@ class TestResourceTracker(unittest.TestCase):
 
         if (0, 0) in tracker._chips_used:
             raise Exception("shouldnt exist")
+
+        # verify sdram tracker
+        if tracker._sdram_tracker[0, 0] != -12346:
+            raise Exception("incorrect sdram of {}".format(
+                tracker._sdram_tracker[0, 0]))
 
     def test_allocate_resources_when_chip_used(self):
         router = Router([])

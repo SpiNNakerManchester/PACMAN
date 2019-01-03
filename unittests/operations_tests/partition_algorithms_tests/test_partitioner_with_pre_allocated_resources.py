@@ -1,15 +1,14 @@
-from pacman.exceptions import PacmanInvalidParameterException, \
-    PacmanValueError, PacmanPartitionException
-from pacman.model.constraints.placer_constraints import \
-    ChipAndCoreConstraint
-from pacman.model.graphs.application import ApplicationGraph
-from pacman.model.resources import CoreResource
-from pacman.model.resources import ConstantSDRAM
-from pacman.model.resources import SpecificCoreResource
-from pacman.model.resources import SpecificChipSDRAMResource
-from pacman.model.resources import PreAllocatedResourceContainer
-from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from spinn_machine import VirtualMachine
+from pacman.exceptions import (
+    PacmanInvalidParameterException, PacmanValueError,
+    PacmanPartitionException)
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint)
+from pacman.model.graphs.application import ApplicationGraph
+from pacman.model.resources import (
+    CoreResource, ConstantSDRAM, SpecificCoreResource,
+    SpecificChipSDRAMResource, PreAllocatedResourceContainer)
+from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from uinit_test_objects import SimpleTestVertex
 
 import six

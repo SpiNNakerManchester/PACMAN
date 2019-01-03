@@ -16,4 +16,7 @@ class SDRAMAvaiable(object):
         self._sdram = sdram
 
     def get_sdram_available(self):
+        """
+        :return: The amount of SDRAM required, in bytes.
+        """
         return self._sdram
