@@ -8,7 +8,6 @@ from .iptag_resource import IPtagResource
 from .pre_allocated_resource_container import PreAllocatedResourceContainer
 from .resource_container import ResourceContainer
 from .reverse_iptag_resource import ReverseIPtagResource
-from .sdram_available import SDRAMAvaiable
 from .specific_board_iptag_resource import (
     SpecificBoardTagResource as
     SpecificBoardIPtagResource)

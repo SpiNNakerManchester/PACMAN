@@ -4,7 +4,7 @@ from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
     AbstractPlacerConstraint)
 from pacman.model.resources import (
-    SDRAMAvaiable, ResourceContainer, DTCMResource, CPUCyclesPerTickResource)
+    ConstantSDRAM, ResourceContainer, DTCMResource, CPUCyclesPerTickResource)
 from pacman.utilities.utility_calls import (
     check_algorithm_can_support_constraints, check_constrained_value,
     is_equal_or_None)
@@ -1286,10 +1286,10 @@ class ResourceTracker(object):
             resources, constraints)
 
         if not self._are_ip_tags_available(board_address, ip_tags):
-            return ResourceContainer(sdram=SDRAMAvaiable(0))
+            return ResourceContainer()
         if not self._are_reverse_ip_tags_available(
                 board_address, reverse_ip_tags):
-            return ResourceContainer(sdram=SDRAMAvaiable(0))
+            return ResourceContainer()
 
         area_code = None
         if board_address is not None:
@@ -1304,15 +1304,15 @@ class ResourceTracker(object):
         (x, y, p) = self.get_chip_and_core(constraints)
         if x is not None and y is not None:
             if not self._chip_available(x, y):
-                return ResourceContainer(sdram=SDRAMAvaiable(0))
+                return ResourceContainer()
             if area_code is not None and (x, y) not in area_code:
-                return ResourceContainer(sdram=SDRAMAvaiable(0))
+                return ResourceContainer()
             best_processor_id = p
             chip = self._machine.get_chip_at(x, y)
             key = (x, y)
             sdram_available = self._sdram_available(chip)
             if p is not None and not self._is_core_available(chip, key, p):
-                return ResourceContainer(sdram=SDRAMAvaiable(0))
+                return ResourceContainer()
             if p is None:
                 best_processor_id = self._best_core_available(chip)
             processor = chip.get_processor_with_id(best_processor_id)
@@ -1320,7 +1320,7 @@ class ResourceTracker(object):
             max_cpu_available = processor.cpu_cycles_available
             return ResourceContainer(
                 DTCMResource(max_dtcm_available),
-                SDRAMAvaiable(sdram_available),
+                ConstantSDRAM(sdram_available),
                 CPUCyclesPerTickResource(max_cpu_available))
 
         return self.get_maximum_resources_available(area_code)
@@ -1344,12 +1344,12 @@ class ResourceTracker(object):
                 max_cpu_available = processor.cpu_cycles_available
                 return ResourceContainer(
                     DTCMResource(max_dtcm_available),
-                    SDRAMAvaiable(sdram_available),
+                    ConstantSDRAM(sdram_available),
                     CPUCyclesPerTickResource(max_cpu_available))
 
         # Send the maximums
         # If nothing is available, return nothing
-        return ResourceContainer(sdram=SDRAMAvaiable(0))
+        return ResourceContainer()
 
     def unallocate_resources(self, chip_x, chip_y, processor_id, resources,
                              ip_tags, reverse_ip_tags):

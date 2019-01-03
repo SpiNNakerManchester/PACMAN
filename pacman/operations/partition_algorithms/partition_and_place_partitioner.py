@@ -343,7 +343,8 @@ class PartitionAndPlacePartitioner(object):
                             vertex, lo_atom - 1,
                             used_resources.sdram.get_total_sdram(
                                 plan_n_timesteps),
-                            resources_available.sdram.get_sdram_available()))
+                            resources_available.sdram.get_total_sdram(
+                                plan_n_timesteps)))
 
                 while ratio > 1.0 and hi_atom >= lo_atom:
                     # Scale the resources_available by the ratio
@@ -374,7 +375,8 @@ class PartitionAndPlacePartitioner(object):
                             vertex, lo_atom - 1,
                             used_resources.sdram.get_total_sdram(
                                 plan_n_timesteps),
-                            resources_available.sdram.get_sdram_available()))
+                            resources_available.sdram.get_total_sdram(
+                                plan_n_timesteps)))
 
                 # Try to scale up until just below the resource usage
                 used_resources, hi_atom = self._scale_up_resource_usage(
@@ -530,5 +532,5 @@ class PartitionAndPlacePartitioner(object):
             required.dtcm.get_value(), available.dtcm.get_value())
         sdram_ratio = PartitionAndPlacePartitioner._ratio(
             required.sdram.get_total_sdram(plan_n_timesteps),
-            available.sdram.get_sdram_available())
+            available.sdram.get_total_sdram(plan_n_timesteps))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
