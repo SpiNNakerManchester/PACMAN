@@ -44,7 +44,7 @@ class TestResourceTracker(unittest.TestCase):
     def test_deallocation_of_resources(self):
         machine = VirtualMachine(
             width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
-        chip_sdram = machine.get_chip_at(1,1).sdram.size
+        chip_sdram = machine.get_chip_at(1, 1).sdram.size
         res_sdram = 12345
 
         tracker = ResourceTracker(machine, plan_n_timesteps=None,

@@ -420,7 +420,7 @@ class ResourceTracker(object):
         :rtype: bool
         """
         return (self._sdram_tracker[chip.x, chip.y] >=
-            resources.sdram.get_total_sdram(self._plan_n_timesteps))
+                resources.sdram.get_total_sdram(self._plan_n_timesteps))
 
     def _sdram_available(self, chip):
         """ Return the amount of SDRAM available on a chip
