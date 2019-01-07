@@ -1,3 +1,5 @@
+from pacman.exceptions import PacmanException
+from pacman.model.graphs.common import EdgeTrafficType
 from spinn_machine.virtual_machine import VirtualMachine
 
 from pacman.model.graphs.machine import (
@@ -117,3 +119,33 @@ def test_one_to_one():
         placement = placements.get_placement_of_vertex(vertex)
         too_many_chips.add((placement.x, placement.y))
     assert len(too_many_chips) > 1
+
+def test_sdram_links():
+    """ Test sdram edges which should explode
+        """
+
+    # Create a graph
+    machine_graph = MachineGraph("Test")
+
+    # Connect a set of vertices in a chain of length 3
+    last_vertex = None
+    for x in range(20):
+        vertex = SimpleMachineVertex(
+            resources=ResourceContainer(),
+            label="Vertex_{}".format(x))
+        machine_graph.add_vertex(vertex)
+        last_vertex = vertex
+
+    for vertex in machine_graph.vertices:
+        edge = MachineEdge(vertex, last_vertex,
+                           traffic_type=EdgeTrafficType.SDRAM)
+
+    # Do placements
+    machine = VirtualMachine(version=5)
+    try:
+        OneToOnePlacer()(machine_graph, machine)
+        raise Exception("should blow up here")
+    except PacmanException:
+        pass
+
+
