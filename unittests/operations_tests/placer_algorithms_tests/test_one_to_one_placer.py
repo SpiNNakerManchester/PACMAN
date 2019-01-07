@@ -120,6 +120,7 @@ def test_one_to_one():
         too_many_chips.add((placement.x, placement.y))
     assert len(too_many_chips) > 1
 
+
 def test_sdram_links():
     """ Test sdram edges which should explode
         """
