@@ -139,13 +139,14 @@ def test_sdram_links():
     for vertex in machine_graph.vertices:
         edge = MachineEdge(vertex, last_vertex,
                            traffic_type=EdgeTrafficType.SDRAM)
+        machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements
     machine = VirtualMachine(version=5)
     try:
         OneToOnePlacer()(machine_graph, machine)
         raise Exception("should blow up here")
-    except PacmanException:
+    except PacmanException as e:
         pass
 
 
