@@ -147,5 +147,5 @@ def test_sdram_links():
     try:
         OneToOnePlacer()(machine_graph, machine)
         raise Exception("should blow up here")
-    except PacmanException as e:
+    except PacmanException:
         pass
