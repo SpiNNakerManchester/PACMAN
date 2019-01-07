@@ -149,5 +149,3 @@ def test_sdram_links():
         raise Exception("should blow up here")
     except PacmanException as e:
         pass
-
-
