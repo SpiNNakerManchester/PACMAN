@@ -1,24 +1,22 @@
 import logging
 from six import raise_from
-
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
-from pacman.model.constraints.partitioner_constraints \
-    import AbstractPartitionerConstraint, MaxVertexAtomsConstraint, \
-    FixedVertexAtomsConstraint
-from pacman.model.constraints.partitioner_constraints \
-    import SameAtomsAsVertexConstraint
+from pacman.model.constraints.partitioner_constraints import (
+    AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
+    FixedVertexAtomsConstraint, SameAtomsAsVertexConstraint)
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls as utils
-from pacman.utilities.algorithm_utilities \
-    import partition_algorithm_utilities as partition_utils
-from pacman.utilities.algorithm_utilities \
-    import placer_algorithm_utilities as placer_utils
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
+    import (
+        generate_machine_edges, get_same_size_vertex_groups,
+        get_remaining_constraints)
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
-
-from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +58,7 @@ class PartitionAndPlacePartitioner(object):
         graph_mapper = GraphMapper()
 
         # sort out vertex's by placement constraints
-        vertices = placer_utils.sort_vertices_by_known_constraints(
-            graph.vertices)
+        vertices = sort_vertices_by_known_constraints(graph.vertices)
 
         # Set up the progress
         n_atoms = 0
@@ -73,7 +70,7 @@ class PartitionAndPlacePartitioner(object):
             machine, preallocated_resources=preallocated_resources)
 
         # Group vertices that are supposed to be the same size
-        vertex_groups = partition_utils.get_same_size_vertex_groups(vertices)
+        vertex_groups = get_same_size_vertex_groups(vertices)
 
         # Partition one vertex at a time
         for vertex in vertices:
@@ -88,8 +85,7 @@ class PartitionAndPlacePartitioner(object):
                     progress, vertex_groups)
         progress.end()
 
-        partition_utils.generate_machine_edges(
-            machine_graph, graph_mapper, graph)
+        generate_machine_edges(machine_graph, graph_mapper, graph)
 
         return machine_graph, graph_mapper, resource_tracker.chips_used
 
@@ -211,8 +207,7 @@ class PartitionAndPlacePartitioner(object):
                 machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, used_resources,
                     label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
-                    constraints=partition_utils.get_remaining_constraints(
-                        vertex))
+                    constraints=get_remaining_constraints(vertex))
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)

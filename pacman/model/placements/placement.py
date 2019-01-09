@@ -1,4 +1,3 @@
-
 class Placement(object):
     """ The placement of a vertex on to a machine chip and core.
     """

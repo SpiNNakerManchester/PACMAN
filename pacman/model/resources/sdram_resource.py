@@ -17,4 +17,7 @@ class SDRAMResource(object):
         self._sdram = sdram
 
     def get_value(self):
+        """
+        :return: The amount of SDRAM required, in bytes.
+        """
         return self._sdram

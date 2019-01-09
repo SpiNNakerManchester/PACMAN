@@ -1,13 +1,13 @@
 from __future__ import print_function
 from collections import OrderedDict
 import unittest
-
-from pacman.model.routing_tables \
-    import MulticastRoutingTable, MulticastRoutingTables
-from pacman.operations.router_compressors.mundys_router_compressor.\
-    routing_table_condenser import MundyRouterCompressor
-from pacman.exceptions import PacmanRoutingException
 from spinn_machine import MulticastRoutingEntry
+from pacman.model.routing_tables import (
+    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.operations.router_compressors.mundys_router_compressor.\
+    routing_table_condenser import (
+        MundyRouterCompressor)
+from pacman.exceptions import PacmanRoutingException
 
 WILDCARD = "*"
 

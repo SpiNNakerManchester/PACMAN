@@ -1,31 +1,21 @@
-# pacman imports
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyFieldConstraint
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedMaskConstraint
-from pacman.model.constraints.key_allocator_constraints \
-    import FlexiKeyFieldConstraint
-from pacman.model.routing_info \
-    import RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask
+import math
+from past.builtins import range, xrange
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint, FixedKeyFieldConstraint,
+    FixedKeyAndMaskConstraint, FixedMaskConstraint, FlexiKeyFieldConstraint)
+from pacman.model.routing_info import (
+    RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.utilities.utility_calls import locate_constraints_of_type
-from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities
+from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
+    import (
+        check_types_of_edge_constraint)
 from pacman import exceptions
 from pacman.utilities.utility_objs import FlexiField
 from pacman.utilities.utility_objs.flexi_field import SUPPORTED_TAGS
-from pacman.utilities.algorithm_utilities import \
-    field_based_system_utilities as field_utilities
-
-from spinn_utilities.progress_bar import ProgressBar
-
-# general imports
-import math
+from pacman.utilities.algorithm_utilities.field_based_system_utilities import (
+    convert_mask_into_fields, deduce_types, TYPES_OF_FIELDS)
 from rig.bitfield import BitField
-from past.builtins import range, xrange
 
 # hard coded values
 APPLICATION_MASK_BIT = 0
@@ -33,12 +23,9 @@ APPLICATION_MASK_BIT = 0
 # flag for usage for detecting the application field
 APPLICATION_DIVIDER_FIELD_NAME = "APPLICATION_DIVIDER"
 
-FIXED_MASK_NAME = \
-    field_utilities.TYPES_OF_FIELDS.FIXED_MASK.name  # @UndefinedVariable
-FIXED_KEY_NAME = \
-    field_utilities.TYPES_OF_FIELDS.FIXED_KEY.name  # @UndefinedVariable
-FIXED_FIELD_NAME = \
-    field_utilities.TYPES_OF_FIELDS.FIXED_FIELD.name  # @UndefinedVariable
+FIXED_MASK_NAME = TYPES_OF_FIELDS.FIXED_MASK.name  # @UndefinedVariable
+FIXED_KEY_NAME = TYPES_OF_FIELDS.FIXED_KEY.name  # @UndefinedVariable
+FIXED_FIELD_NAME = TYPES_OF_FIELDS.FIXED_FIELD.name  # @UndefinedVariable
 FIXED_NAMES = frozenset([FIXED_MASK_NAME, FIXED_KEY_NAME, FIXED_FIELD_NAME])
 
 
@@ -98,7 +85,7 @@ class VertexBasedRoutingInfoAllocator(object):
         field_positions = set()
 
         # locate however many types of constraints there are
-        seen_fields = field_utilities.deduce_types(machine_graph)
+        seen_fields = deduce_types(machine_graph)
         progress_bar.update(machine_graph.n_outgoing_edge_partitions)
 
         if len(seen_fields) > 1:
@@ -223,7 +210,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
             # generate the bit generator for the fixed key
             fixed_key = fixed_keys[0]
-            fields = field_utilities.convert_mask_into_fields(fixed_key.mask)
+            fields = convert_mask_into_fields(fixed_key.mask)
             bit_generator = self._generate_bits_that_satisfy_constraints(
                 fields, required_bits)
 
@@ -258,7 +245,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
             # generate the bit generator for the fixed key
             fixed_key = fixed_keys[0]
-            fields = field_utilities.convert_mask_into_fields(fixed_key.mask)
+            fields = convert_mask_into_fields(fixed_key.mask)
             bit_generator = self._generate_bits_that_satisfy_constraints(
                 fields, required_bits)
 
@@ -273,8 +260,7 @@ class VertexBasedRoutingInfoAllocator(object):
                 valid = True
                 for fixed_key_index in range(1, len(fixed_keys)):
                     fixed_key = fixed_keys[fixed_key_index]
-                    fields = field_utilities.convert_mask_into_fields(
-                        fixed_key.mask)
+                    fields = convert_mask_into_fields(fixed_key.mask)
                     application_field_value = \
                         self._determine_fixed_mask_application_field_value(
                             fields[0].value, application_field.hi,
@@ -290,8 +276,7 @@ class VertexBasedRoutingInfoAllocator(object):
                     # set the rest of the fields which need computing
                     for fixed_key_index in range(1, len(fixed_keys)):
                         fixed_key = fixed_keys[fixed_key_index]
-                        fields = field_utilities.convert_mask_into_fields(
-                            fixed_key.mask)
+                        fields = convert_mask_into_fields(fixed_key.mask)
                         # create new fields
                         new_fields = self.\
                             _adjust_fixed_mask_fields_for_application_field(
@@ -503,7 +488,7 @@ class VertexBasedRoutingInfoAllocator(object):
         new_mask = original_mask & inverted_value
 
         # convert new mask into fields
-        fields = field_utilities.convert_mask_into_fields(new_mask)
+        fields = convert_mask_into_fields(new_mask)
 
         # adjust the fields to link to the original mask (needed for mapping
         # later on)
@@ -1009,8 +994,7 @@ class VertexBasedRoutingInfoAllocator(object):
 
     def _determine_groups(self, machine_graph, graph_mapper, graph,
                           n_keys_map, progress):
-        routing_info_allocator_utilities.check_types_of_edge_constraint(
-            machine_graph)
+        check_types_of_edge_constraint(machine_graph)
 
         for partition in progress.over(
                 machine_graph.outgoing_edge_partitions, False):

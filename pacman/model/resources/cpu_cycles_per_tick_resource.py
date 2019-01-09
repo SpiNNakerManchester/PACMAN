@@ -18,4 +18,7 @@ class CPUCyclesPerTickResource(object):
         self._cycles = cycles
 
     def get_value(self):
+        """
+        :return: The number of CPU clock cycles needed per simulation tick.
+        """
         return self._cycles

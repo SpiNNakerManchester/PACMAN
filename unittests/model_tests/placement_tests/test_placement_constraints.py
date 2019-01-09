@@ -1,7 +1,7 @@
 import unittest
-from pacman.model.constraints.placer_constraints import \
-    BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,\
-    SameChipAsConstraint
+from pacman.model.constraints.placer_constraints import (
+    BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
+    SameChipAsConstraint)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 

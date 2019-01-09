@@ -1,9 +1,8 @@
-from pacman.model.routing_tables \
-    import MulticastRoutingTable, MulticastRoutingTables
-from pacman.exceptions import PacmanRoutingException
-
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
+from pacman.model.routing_tables import (
+    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.exceptions import PacmanRoutingException
 
 _32_BITS = 0xFFFFFFFF
 _UPPER_16_BITS = 0xFFFF << 16  # upper 16 bits of 32

@@ -1,7 +1,7 @@
-from pacman.exceptions import PacmanInvalidParameterException
 from six import add_metaclass
-from pacman.model.constraints import AbstractConstraint
 from spinn_utilities.abstract_base import AbstractBase
+from pacman.exceptions import PacmanInvalidParameterException
+from pacman.model.constraints import AbstractConstraint
 
 
 def _get_class_name(cls):
