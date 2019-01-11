@@ -127,7 +127,7 @@ class OneToOnePlacer(RadialPlacer):
 
         # Place vertices with hard constraints
         for vertex in constrained:
-            self._allocate_individual(
+            self._allocate_same_chip_as_group(
                 vertex, placements, resource_tracker, same_chip_vertex_groups,
                 all_vertices_placed, progress)
 
@@ -156,14 +156,14 @@ class OneToOnePlacer(RadialPlacer):
             if len(unallocated) > \
                     resource_tracker.get_maximum_cores_available_on_a_chip():
                 for vert in unallocated:
-                    self._allocate_individual(
+                    self._allocate_same_chip_as_group(
                         vert, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed,
                         progress)
                 continue
 
             # Try to allocate all vertices to the same chip
-            success = self._get_allocations(
+            success = self._allocate_one_to_one_group(
                 resource_tracker, unallocated, progress, placements, chips,
                 all_vertices_placed)
 
@@ -171,7 +171,7 @@ class OneToOnePlacer(RadialPlacer):
 
                 # Something went wrong, try to allocate each individually
                 for vertex in progress.over(unallocated, False):
-                    self._allocate_individual(
+                    self._allocate_same_chip_as_group(
                         vertex, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed,
                         progress)
@@ -179,7 +179,7 @@ class OneToOnePlacer(RadialPlacer):
         return placements
 
     @staticmethod
-    def _get_allocations(
+    def _allocate_one_to_one_group(
             resource_tracker, vertices, progress, placements, chips,
             all_vertices_placed):
         try:
@@ -198,7 +198,7 @@ class OneToOnePlacer(RadialPlacer):
             return False
 
     @staticmethod
-    def _allocate_individual(
+    def _allocate_same_chip_as_group(
             vertex, placements, tracker, same_chip_vertex_groups,
             all_vertices_placed, progress):
         if vertex not in all_vertices_placed:
