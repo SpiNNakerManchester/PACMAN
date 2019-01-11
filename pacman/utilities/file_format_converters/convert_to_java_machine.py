@@ -25,6 +25,20 @@ class ConvertToJavaMachine(object):
             (machine.max_chip_x + 1) * (machine.max_chip_y + 1) + 2,
             "Converting to JSON machine")
 
+        return ConvertToJavaMachine.do_convert(machine, file_path, progress)
+
+
+    @staticmethod
+    def do_convert(machine, file_path, progress=None):
+        """
+        Runs the code to write the machine in Java readable json.
+
+        :param machine: Machine to convert
+        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param file_path: Location to write file to. Warning will overwrite!
+        :type file_path: str
+        """
+
         # Find the s_ values for one non ethernet chip to use as standard
         for chip in machine.chips:
             if (chip.ip_address is None):
@@ -77,7 +91,7 @@ class ConvertToJavaMachine(object):
             details = OrderedDict()
             details["cores"] = chip.n_processors
             details["ethernet"] =\
-                [chip.nearest_ethernet_x, chip.nearest_ethernet_x]
+                [chip.nearest_ethernet_x, chip.nearest_ethernet_y]
             dead_links = []
             for link_id in range(0, Router.MAX_LINKS_PER_ROUTER):
                 if not chip.router.is_link(link_id):
@@ -128,18 +142,21 @@ class ConvertToJavaMachine(object):
                 json_obj["chips"].append([chip.x, chip.y, details, exceptions])
             else:
                 json_obj["chips"].append([chip.x, chip.y, details])
-        progress.update()
+        if progress:
+            progress.update()
 
         # dump to json file
         with open(file_path, "w") as f:
             json.dump(json_obj, f)
 
-        progress.update()
+        if progress:
+            progress.update()
 
         # validate the schema
         file_format_schemas.validate(json_obj, "jmachine.json")
 
         # update and complete progress bar
-        progress.end()
+        if progress:
+            progress.end()
 
         return file_path
