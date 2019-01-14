@@ -27,7 +27,6 @@ class ConvertToJavaMachine(object):
 
         return ConvertToJavaMachine.do_convert(machine, file_path, progress)
 
-
     @staticmethod
     def do_convert(machine, file_path, progress=None):
         """
