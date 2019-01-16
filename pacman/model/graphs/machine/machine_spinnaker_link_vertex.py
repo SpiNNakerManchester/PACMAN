@@ -3,6 +3,7 @@ from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
 from pacman.model.graphs import (
     AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 
 class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
@@ -54,3 +55,5 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y
+        self.add_constraint(ChipAndCoreConstraint(
+            self._virtual_chip_x, self._virtual_chip_y))
