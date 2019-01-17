@@ -44,8 +44,8 @@ class TestSameChipConstraint(unittest.TestCase):
         for edge in sdram_edges:
             pre_place = placements.get_placement_of_vertex(edge.pre_vertex)
             post_place = placements.get_placement_of_vertex(edge.post_vertex)
-            self.assert_(pre_place.x == post_place.x)
-            self.assert_(pre_place.y == post_place.y)
+            assert pre_place.x == post_place.x
+            assert pre_place.y == post_place.y
 
     def test_one_to_one(self):
         self._do_test(OneToOnePlacer())
