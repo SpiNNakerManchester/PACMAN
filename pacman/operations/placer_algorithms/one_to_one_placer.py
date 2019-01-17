@@ -142,14 +142,14 @@ class OneToOnePlacer(RadialPlacer):
             if vertex in all_vertices_placed:
                 continue
 
-            # Find vertices that are one-to-one connected to this one
-            one_to_one_vertices = one_to_one_groups[vertex]
-            if not one_to_one_vertices:
-                one_to_one_vertices = same_chip_vertex_groups[vertex]
+            # Find vertices that are connected to this one
+            grouped_vertices = one_to_one_groups[vertex]\
+                | same_chip_vertex_groups[vertex]
+
             # Get unallocated vertices and placements of allocated vertices
             unallocated = list()
             chips = list()
-            for vert in one_to_one_vertices:
+            for vert in grouped_vertices:
                 if vert in all_vertices_placed:
                     placement = placements.get_placement_of_vertex(vert)
                     chips.append((placement.x, placement.y))

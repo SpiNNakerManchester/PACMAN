@@ -64,12 +64,12 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
         A dictionary of vertex to list of vertices that are grouped with it
     """
 
-    # Dict of vertex to list of vertices on same chip (repeated lists expected)
-    # A None value indicates a set that is too big.
+    # Dict of vertex to setof vertices on same chip (repeated lists expected)
+    # A empty set value indicates a set that is too big.
     same_chip_vertices = dict()
     for vertex in vertices:
         if vertex in same_chip_vertices:
-            check = same_chip_vertices[vertex] is not None
+            check = same_chip_vertices[vertex]
         else:
             check = True
         if check:
@@ -93,11 +93,6 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
             else:
                 same_chip_vertices[vertex] = {vertex}
 
-    # Change the too big groups to just a group with self
-    for vertex in vertices:
-        if same_chip_vertices[vertex] is None:
-            same_chip_vertices[vertex] = {vertex}
-
     return same_chip_vertices
 
 
@@ -107,7 +102,7 @@ def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
     with all the vertices in sets already saved for each of the orignal
     vertices.
 
-    If the resulting set is bigger than the cutoff None is returned.
+    If the resulting set is bigger than the cutoff empty is returned.
 
     :param same_chip_as_vertices:
     :param same_chip_vertices:
@@ -115,14 +110,15 @@ def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
     :return:
     """
     if len(same_chip_as_vertices) >= cutoff:
-        return None
+        return set()
     # clone so we can iterate over it and change result
     result = same_chip_as_vertices
     for vertex in same_chip_as_vertices:
         if vertex in same_chip_vertices:
-            if same_chip_vertices[vertex] is None:
-                return None
-            result = result | same_chip_vertices[vertex]
-            if len(result) >= cutoff:
-                return None
+            if same_chip_vertices[vertex]:
+                result = result | same_chip_vertices[vertex]
+                if len(result) >= cutoff:
+                    return set()
+            else:
+                return set()
     return result
