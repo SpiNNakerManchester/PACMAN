@@ -144,8 +144,8 @@ def test_sdram_links():
 
     # Do placements
     machine = VirtualMachine(version=5)
-    #try:
-    OneToOnePlacer()(machine_graph, machine)
-    #    raise Exception("should blow up here")
-    #except PacmanException:
-    #    pass
+    try:
+        OneToOnePlacer()(machine_graph, machine)
+        raise Exception("should blow up here")
+    except PacmanException:
+        pass
