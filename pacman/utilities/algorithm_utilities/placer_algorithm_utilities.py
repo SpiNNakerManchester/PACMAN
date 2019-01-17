@@ -84,6 +84,9 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
                 group = concat_all_groups(
                     same_chip_as_vertices, same_chip_vertices, cutoff)
 
+                if group:
+                    assert len(group) >= len(same_chip_as_vertices)
+                    same_chip_as_vertices = group
                 # Set all to this concat group
                 for same_as_chip_vertex in same_chip_as_vertices:
                     same_chip_vertices[same_as_chip_vertex] = group
