@@ -1,9 +1,10 @@
+import functools
+import sys
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
     RadialPlacementFromChipConstraint)
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
-import functools
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 
 
@@ -51,7 +52,7 @@ def get_same_chip_vertex_groups(graph):
         get_vertices_on_same_chip, graph=graph))
 
 
-def group_vertices(vertices, same_group_as_function):
+def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
     """ Group vertices according to some function that can indicate the groups\
         that any vertex can be contained within
 
@@ -64,49 +65,61 @@ def group_vertices(vertices, same_group_as_function):
     """
 
     # Dict of vertex to list of vertices on same chip (repeated lists expected)
+    # A None value indicates a set that is too big.
     same_chip_vertices = dict()
-
     for vertex in vertices:
-        # Find all vertices that should be grouped with this vertex
-        same_chip_as_vertices = same_group_as_function(vertex)
-
-        if same_chip_as_vertices:
-            # Go through all the vertices that want to be on the same chip as
-            # the top level vertex
-            for same_as_chip_vertex in same_chip_as_vertices:
-                # Neither vertex has been seen
-                if (same_as_chip_vertex not in same_chip_vertices and
-                        vertex not in same_chip_vertices):
-                    # add both to a new group
-                    group = {vertex, same_as_chip_vertex}
-                    same_chip_vertices[vertex] = group
-                    same_chip_vertices[same_as_chip_vertex] = group
-
-                # Both vertices have been seen elsewhere
-                elif (same_as_chip_vertex in same_chip_vertices and
-                        vertex in same_chip_vertices):
-                    # merge their groups
-                    group_1 = same_chip_vertices[vertex]
-                    group_2 = same_chip_vertices[same_as_chip_vertex]
-                    group_1.update(group_2)
-                    for vert in group_1:
-                        same_chip_vertices[vert] = group_1
-
-                # The current vertex has been seen elsewhere
-                elif vertex in same_chip_vertices:
-                    # add the new vertex to the existing group
-                    group = same_chip_vertices[vertex]
-                    group.add(same_as_chip_vertex)
-                    same_chip_vertices[same_as_chip_vertex] = group
-
-                # The other vertex has been seen elsewhere
-                elif same_as_chip_vertex in same_chip_vertices:
-                    #  so add this vertex to the existing group
-                    group = same_chip_vertices[same_as_chip_vertex]
-                    group.add(vertex)
-                    same_chip_vertices[vertex] = group
-
+        if vertex in same_chip_vertices:
+            check = same_chip_vertices[vertex] is not None
         else:
+            check = True
+        if check:
+            # Find all vertices that should be grouped with this vertex
+            same_chip_as_vertices = same_group_as_function(vertex)
+            if same_chip_as_vertices:
+                # Make 100% sure we have a set
+                same_chip_as_vertices = set(same_chip_as_vertices)
+                # Make sure set includes original vertex
+                same_chip_as_vertices.add(vertex)
+                # Concat all the same chip groups known
+                group = concat_all_groups(
+                    same_chip_as_vertices, same_chip_vertices, cutoff)
+
+                # Set all to this concat group
+                for same_as_chip_vertex in same_chip_as_vertices:
+                    same_chip_vertices[same_as_chip_vertex] = group
+            else:
+                same_chip_vertices[vertex] = {vertex}
+
+    # Change the too big groups to just a group with self
+    for vertex in vertices:
+        if same_chip_vertices[vertex] is None:
             same_chip_vertices[vertex] = {vertex}
 
     return same_chip_vertices
+
+
+def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
+    """
+    Will create a set which concatenate the vertixes in same_chip_as_vertices
+    with all the vertices in sets already saved for each of the orignal
+    vertices.
+
+    If the resulting set is bigger than the cutoff None is returned.
+
+    :param same_chip_as_vertices:
+    :param same_chip_vertices:
+    :param cutoff:
+    :return:
+    """
+    if len(same_chip_as_vertices) >= cutoff:
+        return None
+    # clone so we can iterate over it and change result
+    result = same_chip_as_vertices
+    for vertex in same_chip_as_vertices:
+        if vertex in same_chip_vertices:
+            if same_chip_vertices[vertex] is None:
+                return None
+            result = result | same_chip_vertices[vertex]
+            if len(result) >= cutoff:
+                return None
+    return result

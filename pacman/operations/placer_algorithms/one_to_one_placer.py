@@ -86,31 +86,34 @@ class OneToOnePlacer(RadialPlacer):
 
     def __call__(self, machine_graph, machine):
 
+        # Iterate over vertices and generate placements
+        progress = ProgressBar(
+            machine_graph.n_vertices + 3, "Placing graph vertices")
         # check that the algorithm can handle the constraints
         self._check_constraints(
             machine_graph.vertices,
             additional_placement_constraints={SameChipAsConstraint})
-
+        progress.update()
         # Get which vertices must be placed on the same chip as another vertex
         same_chip_vertex_groups = get_same_chip_vertex_groups(machine_graph)
 
+        progress.update()
         # Work out the vertices that should be on the same chip by one-to-one
         # connectivity
         one_to_one_groups = group_vertices(
             machine_graph.vertices, functools.partial(
-                _find_one_to_one_vertices, graph=machine_graph))
+                _find_one_to_one_vertices, graph=machine_graph), 18)
 
+        progress.update()
         return self._do_allocation(
-            one_to_one_groups, same_chip_vertex_groups, machine, machine_graph)
+            one_to_one_groups, same_chip_vertex_groups, machine,
+            machine_graph, progress)
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
-            machine, machine_graph):
+            machine, machine_graph, progress):
         placements = Placements()
 
-        # Iterate over vertices and generate placements
-        progress = ProgressBar(
-            machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         all_vertices_placed = set()
