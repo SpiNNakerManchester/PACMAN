@@ -104,7 +104,8 @@ def test_one_to_one():
 
     # Do placements
     machine = VirtualMachine(version=5)
-    placements = OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
+    placements = OneToOnePlacer()(
+        machine_graph, machine, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
