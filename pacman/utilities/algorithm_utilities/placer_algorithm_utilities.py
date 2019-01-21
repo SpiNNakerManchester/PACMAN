@@ -52,49 +52,6 @@ def get_same_chip_vertex_groups(graph):
         get_vertices_on_same_chip, graph=graph))
 
 
-def group_verticesX(vertices, same_group_as_function, cutoff=sys.maxsize):
-    """ Group vertices according to some function that can indicate the groups\
-        that any vertex can be contained within
-
-    :param vertices: The vertices to group
-    :param same_group_as_function:\
-        A function which takes a vertex and returns vertices that should be in\
-        the same group (excluding the original vertex)
-    :return:\
-        A dictionary of vertex to list of vertices that are grouped with it
-    """
-
-    # Dict of vertex to setof vertices on same chip (repeated lists expected)
-    # A empty set value indicates a set that is too big.
-    same_chip_vertices = dict()
-    for vertex in vertices:
-        if vertex in same_chip_vertices:
-            check = same_chip_vertices[vertex]
-        else:
-            check = True
-        if check:
-            # Find all vertices that should be grouped with this vertex
-            same_chip_as_vertices = same_group_as_function(vertex)
-            if same_chip_as_vertices:
-                # Make 100% sure we have a set
-                same_chip_as_vertices = set(same_chip_as_vertices)
-                # Make sure set includes original vertex
-                same_chip_as_vertices.add(vertex)
-                # Concat all the same chip groups known
-                group = concat_all_groups(
-                    same_chip_as_vertices, same_chip_vertices, cutoff)
-
-                if group:
-                    assert len(group) >= len(same_chip_as_vertices)
-                    same_chip_as_vertices = group
-                # Set all to this concat group
-                for same_as_chip_vertex in same_chip_as_vertices:
-                    same_chip_vertices[same_as_chip_vertex] = group
-            else:
-                same_chip_vertices[vertex] = {vertex}
-
-    return same_chip_vertices
-
 def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
     """ Group vertices according to some function that can indicate the groups\
         that any vertex can be contained within
@@ -119,6 +76,7 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
             same_chip_vertices[vertex] = {vertex}
     return same_chip_vertices
 
+
 def add_set(all_sets, new_set):
     for a_set in all_sets:
         intersection =  new_set & a_set
@@ -129,6 +87,7 @@ def add_set(all_sets, new_set):
             return
     all_sets.append(new_set)
     return
+
 
 def create_vertices_groups(vertices, same_group_as_function):
     groups = list()
@@ -141,6 +100,7 @@ def create_vertices_groups(vertices, same_group_as_function):
             if len(same_chip_as_vertices) > 1:
                 add_set(groups, same_chip_as_vertices)
     return groups
+
 
 def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
     """

@@ -96,7 +96,7 @@ class OneToOnePlacer(RadialPlacer):
             additional_placement_constraints={SameChipAsConstraint})
         progress.update()
         # Get which vertices must be placed on the same chip as another vertex
-        same_chip_vertex_groups =  get_same_chip_vertex_groups(machine_graph)
+        same_chip_vertex_groups = get_same_chip_vertex_groups(machine_graph)
 
         progress.update()
         # Work out the vertices that should be on the same chip by one-to-one
