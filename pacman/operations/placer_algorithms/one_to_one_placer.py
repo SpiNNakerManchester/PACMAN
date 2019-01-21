@@ -5,7 +5,8 @@ from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
-    get_same_chip_vertex_groups, get_vertices_on_same_chip, group_vertices)
+    create_vertices_groups, get_same_chip_vertex_groups,
+    get_vertices_on_same_chip)
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 from pacman.utilities.utility_calls import (
@@ -95,14 +96,14 @@ class OneToOnePlacer(RadialPlacer):
             additional_placement_constraints={SameChipAsConstraint})
         progress.update()
         # Get which vertices must be placed on the same chip as another vertex
-        same_chip_vertex_groups = get_same_chip_vertex_groups(machine_graph)
+        same_chip_vertex_groups =  get_same_chip_vertex_groups(machine_graph)
 
         progress.update()
         # Work out the vertices that should be on the same chip by one-to-one
         # connectivity
-        one_to_one_groups = group_vertices(
-            machine_graph.vertices, functools.partial(
-                _find_one_to_one_vertices, graph=machine_graph), 18)
+        one_to_one_groups = create_vertices_groups(
+            machine_graph.vertices,
+            functools.partial(_find_one_to_one_vertices, graph=machine_graph))
 
         progress.update()
         return self._do_allocation(
@@ -112,6 +113,21 @@ class OneToOnePlacer(RadialPlacer):
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
             machine, machine_graph, progress):
+        """
+
+        :param one_to_one_groups:
+            Groups of vertexes that would be nice on same chip
+        :type one_to_one_groups:
+            list(set(vertex))
+        :param same_chip_vertex_groups:
+            Mapping of Vertex to the Vertex that must be on the same Chip
+        :type same_chip_vertex_groups:
+            dict(vertex, collection(vertex))
+        :param machine:
+        :param machine_graph:
+        :param progress:
+        :return:
+        """
         placements = Placements()
 
         resource_tracker = ResourceTracker(
@@ -134,18 +150,7 @@ class OneToOnePlacer(RadialPlacer):
                 vertex, placements, resource_tracker, same_chip_vertex_groups,
                 all_vertices_placed, progress)
 
-        # iterate over the remaining unconstrained (or less constrained)
-        # vertices
-        for vertex in unconstrained:
-
-            # If the vertex has been placed, skip it
-            if vertex in all_vertices_placed:
-                continue
-
-            # Find vertices that are connected to this one
-            grouped_vertices = one_to_one_groups[vertex]\
-                | same_chip_vertex_groups[vertex]
-
+        for grouped_vertices in one_to_one_groups:
             # Get unallocated vertices and placements of allocated vertices
             unallocated = list()
             chips = list()
@@ -156,29 +161,22 @@ class OneToOnePlacer(RadialPlacer):
                 else:
                     unallocated.append(vert)
 
-            # if too many one to ones to fit on a chip, allocate individually
-            if len(unallocated) > \
+            if len(unallocated) <=\
                     resource_tracker.get_maximum_cores_available_on_a_chip():
-                for vert in unallocated:
-                    self._allocate_same_chip_as_group(
-                        vert, placements, resource_tracker,
-                        same_chip_vertex_groups, all_vertices_placed,
-                        progress)
-                continue
+                # Try to allocate all vertices to the same chip
+                self._allocate_one_to_one_group(
+                    resource_tracker, unallocated, progress, placements, chips,
+                    all_vertices_placed)
+            # if too big or failed go on to other groups first
 
-            # Try to allocate all vertices to the same chip
-            success = self._allocate_one_to_one_group(
-                resource_tracker, unallocated, progress, placements, chips,
-                all_vertices_placed)
+        # check all have been allocated if not do so now.
+        for vertex in machine_graph.vertices:
+            if vertex not in all_vertices_placed:
+                self._allocate_same_chip_as_group(
+                    vertex, placements, resource_tracker,
+                    same_chip_vertex_groups, all_vertices_placed,
+                    progress)
 
-            if not success:
-
-                # Something went wrong, try to allocate each individually
-                for vertex in progress.over(unallocated, False):
-                    self._allocate_same_chip_as_group(
-                        vertex, placements, resource_tracker,
-                        same_chip_vertex_groups, all_vertices_placed,
-                        progress)
         progress.end()
         return placements
 

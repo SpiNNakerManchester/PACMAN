@@ -137,7 +137,9 @@ def create_vertices_groups(vertices, same_group_as_function):
         if same_chip_as_vertices:
             same_chip_as_vertices = set(same_chip_as_vertices)
             same_chip_as_vertices.add(vertex)
-            add_set(groups, same_chip_as_vertices)
+            # Singletons on interesting and added later if needed
+            if len(same_chip_as_vertices) > 1:
+                add_set(groups, same_chip_as_vertices)
     return groups
 
 def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
