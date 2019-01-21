@@ -52,7 +52,7 @@ def get_same_chip_vertex_groups(graph):
         get_vertices_on_same_chip, graph=graph))
 
 
-def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
+def group_verticesX(vertices, same_group_as_function, cutoff=sys.maxsize):
     """ Group vertices according to some function that can indicate the groups\
         that any vertex can be contained within
 
@@ -95,6 +95,50 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
 
     return same_chip_vertices
 
+def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
+    """ Group vertices according to some function that can indicate the groups\
+        that any vertex can be contained within
+
+    :param vertices: The vertices to group
+    :param same_group_as_function:\
+        A function which takes a vertex and returns vertices that should be in\
+        the same group (excluding the original vertex)
+    :return:\
+        A dictionary of vertex to list of vertices that are grouped with it
+    """
+
+    groups = create_vertices_groups(vertices, same_group_as_function)
+    # Dict of vertex to setof vertices on same chip (repeated lists expected)
+    # A empty set value indicates a set that is too big.
+    same_chip_vertices = dict()
+    for group in groups:
+        for vertex in group:
+            same_chip_vertices[vertex] = group
+    for vertex in vertices:
+        if vertex not in same_chip_vertices:
+            same_chip_vertices[vertex] = {vertex}
+    return same_chip_vertices
+
+def add_set(all_sets, new_set):
+    for a_set in all_sets:
+        intersection =  new_set & a_set
+        if intersection:
+            all_sets.remove(a_set)
+            union = a_set | new_set
+            add_set(all_sets, union)
+            return
+    all_sets.append(new_set)
+    return
+
+def create_vertices_groups(vertices, same_group_as_function):
+    groups = list()
+    for vertex in vertices:
+        same_chip_as_vertices = same_group_as_function(vertex)
+        if same_chip_as_vertices:
+            same_chip_as_vertices = set(same_chip_as_vertices)
+            same_chip_as_vertices.add(vertex)
+            add_set(groups, same_chip_as_vertices)
+    return groups
 
 def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
     """
