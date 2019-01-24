@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 import json
 
 from pacman.utilities import file_format_schemas
@@ -11,6 +11,8 @@ class ConvertToJavaMachine(object):
     """
 
     __slots__ = []
+
+    JAVA_MAX_INT = 2147483647
 
     def __call__(self, machine, file_path):
         """
@@ -27,6 +29,32 @@ class ConvertToJavaMachine(object):
 
         return ConvertToJavaMachine.do_convert(machine, file_path, progress)
 
+
+    @staticmethod
+    def int_value(value):
+        if value < ConvertToJavaMachine.JAVA_MAX_INT:
+            return value
+        else:
+            return ConvertToJavaMachine.JAVA_MAX_INT
+
+
+    @staticmethod
+    def _find_virtual_links(machine):
+        virtual_links_dict = defaultdict(list)
+        for chip in machine._virtual_chips:
+            # assume all links need special treatment
+            for link in chip.router.links:
+                destination = machine.get_chip_at(
+                    link.destination_x, link.destination_y)
+                inverse_id = (link.source_link_id + 6) % 6
+                inverse_link = destination.router.get_link(inverse_id)
+                assert(inverse_link.destination_x == chip.x)
+                assert(inverse_link.destination_y == chip.y)
+                virtual_links_dict[chip].append(link)
+                virtual_links_dict[destination].append(inverse_link)
+
+
+
     @staticmethod
     def do_convert(machine, file_path, progress=None):
         """
@@ -42,7 +70,8 @@ class ConvertToJavaMachine(object):
         for chip in machine.chips:
             if (chip.ip_address is None):
                 s_monitors = chip.n_processors - chip.n_user_processors
-                s_router_entries = chip.router.n_available_multicast_entries
+                s_router_entries = ConvertToJavaMachine.int_value(
+                    chip.router.n_available_multicast_entries)
                 s_router_clock_speed = chip.router.clock_speed
                 s_sdram = chip.sdram.size
                 s_virtual = chip.virtual
@@ -52,7 +81,8 @@ class ConvertToJavaMachine(object):
         # find the e_ values to use for ethernet chips
         chip = machine.boot_chip
         e_monitors = chip.n_processors - chip.n_user_processors
-        e_router_entries = chip.router.n_available_multicast_entries
+        e_router_entries = ConvertToJavaMachine.int_value(
+            chip.router.n_available_multicast_entries)
         e_router_clock_speed = chip.router.clock_speed
         e_sdram = chip.sdram.size
         e_virtual = chip.virtual
@@ -85,30 +115,42 @@ class ConvertToJavaMachine(object):
         json_obj["ethernetResources"] = ethernetResources
         json_obj["chips"] = []
 
+        virtual_links_dict = ConvertToJavaMachine._find_virtual_links(machine)
+
         # handle chips
         for chip in machine.chips:
             details = OrderedDict()
             details["cores"] = chip.n_processors
-            details["ethernet"] =\
-                [chip.nearest_ethernet_x, chip.nearest_ethernet_y]
+            if chip.nearest_ethernet_x is not None:
+                details["ethernet"] =\
+                    [chip.nearest_ethernet_x, chip.nearest_ethernet_y]
             dead_links = []
             for link_id in range(0, Router.MAX_LINKS_PER_ROUTER):
                 if not chip.router.is_link(link_id):
                     dead_links.append(link_id)
             if len(dead_links) > 0:
                 details["deadLinks"] = dead_links
+            if chip in virtual_links_dict:
+                links = []
+                for link in virtual_links_dict[chip]:
+                    link_details = OrderedDict()
+                    link_details["source_link_id"] = link.source_link_id
+                    link_details["destination_x"] = link.destination_x
+                    link_details["destination_y"] = link.destination_y
+                    links.append(link_details)
+                details["links"] = links
 
             exceptions = OrderedDict()
+            router_entries = ConvertToJavaMachine.int_value(
+                chip.router.n_available_multicast_entries)
             if chip.ip_address is not None:
                 details['ipAddress'] = chip.ip_address
                 # Write the Resources ONLY if different from the e_values
                 if (chip.n_processors - chip.n_user_processors) != e_monitors:
                     exceptions["monitors"] = \
                         chip.n_processors - chip.n_user_processors
-                if (chip.router.n_available_multicast_entries !=
-                        e_router_entries):
-                    exceptions["routerEntries"] = \
-                        chip.router.n_available_multicast_entries
+                if (router_entries != e_router_entries):
+                    exceptions["routerEntries"] = router_entries
                 if (chip.router.clock_speed != e_router_clock_speed):
                     exceptions["routerClockSpeed"] = \
                         chip.router.n_available_multicast_entries
@@ -123,10 +165,8 @@ class ConvertToJavaMachine(object):
                 if (chip.n_processors - chip.n_user_processors) != s_monitors:
                     exceptions["monitors"] = \
                         chip.n_processors - chip.n_user_processors
-                if (chip.router.n_available_multicast_entries !=
-                        s_router_entries):
-                    exceptions["routerEntries"] = \
-                        chip.router.n_available_multicast_entries
+                if (router_entries != s_router_entries):
+                    exceptions["routerEntries"] = router_entries
                 if (chip.router.clock_speed != s_router_clock_speed):
                     exceptions["routerClockSpeed"] = \
                         chip.router.n_available_multicast_entries
