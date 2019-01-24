@@ -3,7 +3,7 @@ from collections import OrderedDict
 import unittest
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.operations.router_compressors.mundys_router_compressor.\
     routing_table_condenser import (
         MundyRouterCompressor)
@@ -155,7 +155,7 @@ class MyTestCase(unittest.TestCase):
         """
 
         original_tables = MulticastRoutingTables()
-        original_table = MulticastRoutingTable(x=0, y=0)
+        original_table = UnCompressedMulticastRoutingTable(x=0, y=0)
         original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0000, 0b1111, [1, 2], [], False))
         original_table.add_multicast_routing_entry(
