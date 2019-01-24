@@ -40,19 +40,29 @@ class ConvertToJavaMachine(object):
 
     @staticmethod
     def _find_virtual_links(machine):
+        """
+        Find all the virtual links and there inverse.
+
+        As these may well go to an unexpected source
+
+        :param machine:
+        :return:
+        """
         virtual_links_dict = defaultdict(list)
         for chip in machine._virtual_chips:
             # assume all links need special treatment
             for link in chip.router.links:
+                virtual_links_dict[chip].append(link)
+                # Find and save inverse link as well
+                inverse_id = (link.source_link_id
+                              + Router.MAX_LINKS_PER_ROUTER//2) \
+                             % Router.MAX_LINKS_PER_ROUTER
                 destination = machine.get_chip_at(
                     link.destination_x, link.destination_y)
-                inverse_id = (link.source_link_id + 6) % 6
                 inverse_link = destination.router.get_link(inverse_id)
                 assert(inverse_link.destination_x == chip.x)
                 assert(inverse_link.destination_y == chip.y)
-                virtual_links_dict[chip].append(link)
                 virtual_links_dict[destination].append(inverse_link)
-
 
 
     @staticmethod
