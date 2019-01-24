@@ -110,15 +110,15 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "source_link_id": {
+                  "sourceLinkId": {
                     "description": "Link id on the source Chip's router",
                     "type": "integer"
                   },
-                  "destination_x": {
+                  "destinationX": {
                     "description": "X coordinate of the destination chip.",
                     "type": "integer"
                   },
-                  "destination_y": {
+                  "destinationY": {
                     "description": "Y coordinate of the destination chip.",
                     "type": "integer"
                   }

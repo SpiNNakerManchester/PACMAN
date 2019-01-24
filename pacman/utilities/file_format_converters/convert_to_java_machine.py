@@ -37,16 +37,15 @@ class ConvertToJavaMachine(object):
         else:
             return ConvertToJavaMachine.JAVA_MAX_INT
 
-
     @staticmethod
     def _find_virtual_links(machine):
         """
-        Find all the virtual links and there inverse.
+        Find all the virtual links and their inverse.
 
         As these may well go to an unexpected source
 
-        :param machine:
-        :return:
+        :param machine: Machine to convert
+        :return: Map of Chip to list of virtual links
         """
         virtual_links_dict = defaultdict(list)
         for chip in machine._virtual_chips:
@@ -63,7 +62,7 @@ class ConvertToJavaMachine(object):
                 assert(inverse_link.destination_x == chip.x)
                 assert(inverse_link.destination_y == chip.y)
                 virtual_links_dict[destination].append(inverse_link)
-
+        return virtual_links_dict
 
     @staticmethod
     def do_convert(machine, file_path, progress=None):
@@ -144,9 +143,9 @@ class ConvertToJavaMachine(object):
                 links = []
                 for link in virtual_links_dict[chip]:
                     link_details = OrderedDict()
-                    link_details["source_link_id"] = link.source_link_id
-                    link_details["destination_x"] = link.destination_x
-                    link_details["destination_y"] = link.destination_y
+                    link_details["sourceLinkId"] = link.source_link_id
+                    link_details["destinationX"] = link.destination_x
+                    link_details["destinationY"] = link.destination_y
                     links.append(link_details)
                 details["links"] = links
 
