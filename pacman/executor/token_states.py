@@ -119,6 +119,11 @@ class TokenStates(object):
         return tokens_to_return
 
     def is_tracking_token_part(self, token):
+        """ checks if a token part is actually being tracked
+        
+        :param token: the token whom's part is to be checked.
+        :return: bool
+        """
         if token.name not in self._tokens:
             return False
 
