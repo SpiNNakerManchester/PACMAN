@@ -1,5 +1,7 @@
 from six import iteritems
 
+from pacman.executor.algorithm_decorators import Token
+
 
 class _TokenState(object):
     """ Determines whether a token has been fulfilled or not
@@ -47,6 +49,14 @@ class _TokenState(object):
         if part is None:
             return not self._incomplete_parts
         return part in self._complete_parts
+
+    @property
+    def complete_parts(self):
+        """ returns the complete parts
+        
+        :return: the complete parts of this token
+        """
+        return self._complete_parts
 
 
 class TokenStates(object):
@@ -101,7 +111,15 @@ class TokenStates(object):
     def get_completed_tokens(self):
         """ Get a list of tokens that have been completed
         """
-        return [
-            name for name, token in iteritems(self._tokens)
-            if token.is_complete()
-        ]
+        tokens_to_return = list()
+        for token_name in self._tokens:
+            for completed_part in self._tokens[token_name].complete_parts:
+                tokens_to_return.append(
+                    Token(name=token_name, part=completed_part))
+        return tokens_to_return
+
+    def is_tracking_token_part(self, token):
+        if token.name not in self._tokens:
+            return False
+
+        return self._tokens[token.name].is_tracking_token_part(token.part)

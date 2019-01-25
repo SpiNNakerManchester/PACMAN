@@ -429,6 +429,7 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingTables</param_type>
+            <token part="UnCompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
     <algorithm name="MundyRouterCompressor">
@@ -452,6 +453,7 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
+            <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
     <algorithm name="BasicRouteMerger">
