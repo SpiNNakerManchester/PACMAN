@@ -379,7 +379,7 @@ class ResourceTracker(object):
                     chip_found = True
                     yield (x, y)
             if not chip_found:
-                self._check_chip_not_used(chips);
+                self._check_chip_not_used(chips)
                 raise PacmanInvalidParameterException(
                     "chips and board_address",
                     "{} and {}".format(chips, board_address),
