@@ -246,6 +246,7 @@ class PacmanNoMergeException(PacmanException):
         performing.
     """
 
+
 class PacmanCanNotFindChipException(PacmanException):
     """ An exception that indicates the chip was not in the list of chips.
     """
