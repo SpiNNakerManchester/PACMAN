@@ -30,8 +30,8 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
         :type p: int
         :raise None: does not raise any known exceptions
         """
-        self._x = int(x)
-        self._y = int(y)
+        self._x = None if x is None else int(x)
+        self._y = None if y is None else int(y)
         self._p = None if p is None else int(p)
 
     @property
