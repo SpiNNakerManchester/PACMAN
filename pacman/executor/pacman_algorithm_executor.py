@@ -430,7 +430,6 @@ class PACMANAlgorithmExecutor(object):
                 for token in fake_tokens.get_completed_tokens():
                     fake_token_string += "{}, ".format(token.name)
 
-
                 raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
                     "    Inputs: {}\n"
@@ -474,7 +473,8 @@ class PACMANAlgorithmExecutor(object):
         self._algorithms = allocated_algorithms
         self._completed_tokens = token_states.get_completed_tokens()
 
-    def _remove_outputs_which_are_inputs(self, required_outputs, inputs):
+    @staticmethod
+    def _remove_outputs_which_are_inputs(required_outputs, inputs):
         """ Generates the output list which has pruned outputs which are\
             already in the input list
 
@@ -489,14 +489,16 @@ class PACMANAlgorithmExecutor(object):
                 copy_required_outputs.remove(input_type)
         return copy_required_outputs
 
-    def _remove_complete_tokens(self, tokens, output_tokens):
+    @staticmethod
+    def _remove_complete_tokens(tokens, output_tokens):
         return {
             token for token in output_tokens
             if not tokens.is_token_complete(Token(token))
         }
 
+    @staticmethod
     def _deduce_inputs_required_to_run(
-            self, algorithm, inputs, tokens, fake_inputs, fake_tokens):
+            algorithm, inputs, tokens, fake_inputs, fake_tokens):
         left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
         separator = ""
         for algorithm_inputs, extra in (
