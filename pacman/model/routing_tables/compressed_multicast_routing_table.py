@@ -1,6 +1,3 @@
-from collections import OrderedDict
-from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanRoutingException)
 from pacman.model.routing_tables.abstract_multicast_routing_table import \
     AbsractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
