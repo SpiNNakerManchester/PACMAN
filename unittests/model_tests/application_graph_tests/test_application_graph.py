@@ -1,10 +1,6 @@
-# pacman imports
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-# uinit test object imports
-from uinit_test_objects import SimpleTestVertex
-
-# general imports
 import unittest
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from uinit_test_objects import SimpleTestVertex
 
 
 class TestApplicationGraphModel(unittest.TestCase):

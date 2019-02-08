@@ -1,15 +1,10 @@
 from lxml import etree
 from six import iterkeys
-
 from pacman.exceptions import PacmanConfigurationException
-from pacman.executor.algorithm_decorators import OneOfInput
-from pacman.executor.algorithm_decorators import Output
-from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
-from pacman.executor.algorithm_decorators import SingleInput
-from pacman.executor.algorithm_classes import ExternalAlgorithm
-from pacman.executor.algorithm_classes import PythonClassAlgorithm
-from pacman.executor.algorithm_decorators import AllOfInput
-from pacman.executor.algorithm_decorators.token import Token
+from pacman.executor.algorithm_decorators import (
+    AllOfInput, OneOfInput, Output, SingleInput, Token)
+from pacman.executor.algorithm_classes import (
+    ExternalAlgorithm, PythonClassAlgorithm, PythonFunctionAlgorithm)
 
 
 def _check_allowed_elements(path, element, allowed):
@@ -35,7 +30,7 @@ class _XmlConfigurationException(PacmanConfigurationException):
 
 
 class AlgorithmMetadataXmlReader(object):
-    """ Converts an XML file into algorithm data
+    """ Converts an XML file into algorithm data.
     """
 
     __slots__ = [
@@ -45,7 +40,6 @@ class AlgorithmMetadataXmlReader(object):
 
     def __init__(self, xml_paths):
         """
-
         :param xml_paths: paths to extra metadata files
         :rtype: None
         """
@@ -53,9 +47,8 @@ class AlgorithmMetadataXmlReader(object):
 
     def decode_algorithm_data_objects(self):
         """
-
         :return: the algorithm data objects which represent all the\
-                    algorithm's inputs and outputs
+            algorithm's inputs and outputs
         """
         # parse xmls
         algorithm_data_objects = dict()

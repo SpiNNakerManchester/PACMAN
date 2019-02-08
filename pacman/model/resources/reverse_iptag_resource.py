@@ -1,6 +1,6 @@
 class ReverseIPtagResource(object):
-    """ Represents the amount of local core memory available or used on a core\
-        on a chip of the machine
+    """ Represents the ability to talk to a SpiNNaker machine by sending UDP\
+        packets to it during execution.
     """
 
     __slots__ = [
@@ -12,14 +12,13 @@ class ReverseIPtagResource(object):
         # the received UDP packets for this tag
         "_sdp_port",
 
-        # A fixed tag id to assign, or None if any tag is OK
+        # A fixed tag ID to assign, or None if any tag is OK
         "_tag"
     ]
 
     def __init__(
             self, port=None, sdp_port=1, tag=None):
         """
-
         :param port: The target port of the tag or None to assign elsewhere
         :type port: int or None
         :param port: The UDP port to listen to on the board for this tag
@@ -28,7 +27,7 @@ class ReverseIPtagResource(object):
             The SDP port number to be used when constructing SDP packets from\
             the received UDP packets for this tag
         :type sdp_port: int
-        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int or None
         """
         self._port = port
@@ -61,6 +60,9 @@ class ReverseIPtagResource(object):
         return self._tag
 
     def get_value(self):
+        """
+        :return: The description of the reverse IP tag.
+        """
         return [self._port, self._sdp_port, self._tag]
 
     def __repr__(self):

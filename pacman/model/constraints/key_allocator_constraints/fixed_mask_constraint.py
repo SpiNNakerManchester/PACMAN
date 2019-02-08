@@ -2,7 +2,7 @@ from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class FixedMaskConstraint(AbstractKeyAllocatorConstraint):
-    """ A key allocator that fixes the mask to be assigned to an edge
+    """ A key allocator that fixes the mask to be assigned to an edge.
     """
 
     __slots__ = [
@@ -12,7 +12,6 @@ class FixedMaskConstraint(AbstractKeyAllocatorConstraint):
 
     def __init__(self, mask):
         """
-
         :param mask: the mask to be used during key allocation
         :type mask: int
         """

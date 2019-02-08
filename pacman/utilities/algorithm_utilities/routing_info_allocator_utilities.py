@@ -1,24 +1,16 @@
-# pacman imports
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedKeyFieldConstraint, FlexiKeyFieldConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    import ContiguousKeyRangeContraint
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedMaskConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    share_key_constraint import ShareKeyConstraint
+import logging
+from six import itervalues
+from six.moves import xrange
+import numpy
+from pacman.model.constraints.key_allocator_constraints import (
+    FixedKeyFieldConstraint, FlexiKeyFieldConstraint,
+    ContiguousKeyRangeContraint, FixedMaskConstraint,
+    FixedKeyAndMaskConstraint, ShareKeyConstraint)
 from pacman.utilities.utility_calls import \
     locate_constraints_of_type, expand_to_bit_array, compress_from_bit_array
 from pacman.exceptions import (
     PacmanValueError, PacmanConfigurationException,
     PacmanInvalidParameterException, PacmanRouteInfoAllocationException)
-
-import logging
-from six import itervalues
-from six.moves import xrange
-import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +38,7 @@ class ConstraintGroup(list):
 
 def get_edge_groups(machine_graph, traffic_type):
     """ Utility method to get groups of edges using any\
-        :py:class:`pacman.model.constraints.key_allocator_constraints.KeyAllocatorSameKeyConstraint`\
+        :py:class:`~pacman.model.constraints.key_allocator_constraints.KeyAllocatorSameKeyConstraint`\
         constraints.  Note that no checking is done here about conflicts\
         related to other constraints.
 
@@ -241,13 +233,13 @@ def _check_masks_are_correct(partition):
 
 def get_fixed_mask(same_key_group):
     """ Get a fixed mask from a group of edges if a\
-        :py:class:`pacman.model.constraints.key_allocator_constraints.FixedMaskConstraint`\
+        :py:class:`~pacman.model.constraints.key_allocator_constraints.FixedMaskConstraint`\
         constraint exists in any of the edges in the group.
 
     :param same_key_group: \
         Set of edges that are to be assigned the same keys and masks
-    :type same_key_group: iterable of\
-        :py:class:`pacman.model.graphs.machine.MachineEdge`
+    :type same_key_group: \
+        iterable(:py:class:`pacman.model.graphs.machine.MachineEdge`)
     :return: The fixed mask if found, or None
     :raise PacmanValueError: If two edges conflict in their requirements
     """

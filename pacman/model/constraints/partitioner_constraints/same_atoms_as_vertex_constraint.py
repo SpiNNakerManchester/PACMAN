@@ -1,10 +1,9 @@
-# pacman imports
 from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
 class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
     """ A constraint which indicates that a vertex must be split in the\
-        same way as another vertex
+        same way as another vertex.
     """
 
     __slots__ = [

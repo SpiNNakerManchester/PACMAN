@@ -1,18 +1,18 @@
-from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint
-from pacman.model.routing_info \
-    import BaseKeyAndMask, RoutingInfo, PartitionRoutingInfo
-from pacman.model.routing_tables import MulticastRoutingTables
-from pacman.utilities import utility_calls
-from pacman.exceptions import PacmanConfigurationException
-
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.constraints.key_allocator_constraints import (
+    AbstractKeyAllocatorConstraint)
+from pacman.model.routing_info import (
+    BaseKeyAndMask, RoutingInfo, PartitionRoutingInfo)
+from pacman.model.routing_tables import MulticastRoutingTables
+from pacman.utilities.utility_calls import (
+    check_algorithm_can_support_constraints)
+from pacman.exceptions import PacmanConfigurationException
 
 
 class DestinationBasedRoutingInfoAllocator(object):
     """ A routing key allocator that operates for people who wish to have a\
-        separate key for each destination (making a mc into a point-to-point\
-        cast.
+        separate key for each destination (making a multicast into a\
+        point-to-point cast).
     """
 
     __slots__ = []
@@ -42,10 +42,9 @@ class DestinationBasedRoutingInfoAllocator(object):
 
         # check that this algorithm supports the constraints put onto the
         # partitions
-        supported_constraints = []
-        utility_calls.check_algorithm_can_support_constraints(
+        check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.partitions,
-            supported_constraints=supported_constraints,
+            supported_constraints=[],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each edge and create keys from its placement

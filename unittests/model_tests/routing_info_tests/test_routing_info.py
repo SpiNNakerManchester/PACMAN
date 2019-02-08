@@ -1,13 +1,13 @@
 import unittest
 from pacman.model.resources import ResourceContainer
-from pacman.exceptions import PacmanAlreadyExistsException,\
-    PacmanConfigurationException
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanConfigurationException)
 from pacman.model.graphs.impl import OutgoingEdgePartition
-from pacman.model.routing_info \
-    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo, \
-    DictBasedMachinePartitionNKeysMap
-from pacman.model.graphs.machine \
-    import MachineOutgoingEdgePartition, MachineEdge, SimpleMachineVertex
+from pacman.model.routing_info import (
+    RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo,
+    DictBasedMachinePartitionNKeysMap)
+from pacman.model.graphs.machine import (
+    MachineOutgoingEdgePartition, MachineEdge, SimpleMachineVertex)
 
 _32_BITS = 0xFFFFFFFF
 

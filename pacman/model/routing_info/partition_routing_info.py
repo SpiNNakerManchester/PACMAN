@@ -3,7 +3,7 @@ from pacman.exceptions import PacmanConfigurationException
 
 
 class PartitionRoutingInfo(object):
-    """ Associates a partition to its routing information (keys and masks)
+    """ Associates a partition to its routing information (keys and masks).
     """
 
     __slots__ = [
@@ -17,8 +17,8 @@ class PartitionRoutingInfo(object):
     def __init__(self, keys_and_masks, partition):
         """
         :param keys_and_masks: The keys allocated to the machine partition
-        :type keys_and_masks: iterable of\
-            :py:class:`pacman.model.routing_info.BaseKeyAndMask`
+        :type keys_and_masks: \
+            iterable(:py:class:`pacman.model.routing_info.BaseKeyAndMask`)
         :param partition: The partition to set the number of keys for
         :type partition:\
             :py:class:`pacman.model.graphs.impl.OutgoingEdgePartition`

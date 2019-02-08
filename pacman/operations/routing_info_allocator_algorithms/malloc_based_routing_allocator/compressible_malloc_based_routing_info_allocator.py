@@ -1,32 +1,28 @@
-# pacman imports
-from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedMaskConstraint
-from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint
-from .key_field_generator import KeyFieldGenerator
-from pacman.model.routing_info \
-    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
-from pacman.utilities.utility_calls import \
-    check_algorithm_can_support_constraints, locate_constraints_of_type
-from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
-from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
-    import check_types_of_edge_constraint, get_edge_groups, \
-    generate_key_ranges_from_mask
-from pacman.exceptions import \
-    PacmanConfigurationException, PacmanRouteInfoAllocationException
-
+from collections import defaultdict, OrderedDict
+import math
+import logging
+from past.builtins import xrange
+from six import iteritems, itervalues
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
-
-# general imports
-import math
-import logging
-from collections import defaultdict, OrderedDict
-from six import iteritems, itervalues
+from pacman.model.constraints.key_allocator_constraints import (
+    AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint,
+    FixedMaskConstraint, FixedKeyAndMaskConstraint,
+    ContiguousKeyRangeContraint)
+from pacman.model.graphs.common import EdgeTrafficType
+from .key_field_generator import KeyFieldGenerator
+from pacman.model.routing_info import (
+    RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)
+from pacman.utilities.utility_calls import (
+    check_algorithm_can_support_constraints, locate_constraints_of_type)
+from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
+from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
+    import (
+        check_types_of_edge_constraint, get_edge_groups,
+        generate_key_ranges_from_mask)
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanRouteInfoAllocationException)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

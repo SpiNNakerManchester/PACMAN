@@ -3,23 +3,21 @@
 
 from collections import namedtuple
 import logging
-
-from pacman.exceptions import PacmanRoutingException
-from spinn_utilities.log import FormatAdapter
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
+from pacman.exceptions import PacmanRoutingException
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.utilities import utility_calls
 
 logger = FormatAdapter(logging.getLogger(__name__))
+_32_BITS = 0xFFFFFFFF
+range_masks = {_32_BITS - ((2 ** i) - 1) for i in range(33)}
 
 # Define an internal class for placements
 PlacementTuple = namedtuple('PlacementTuple', 'x y p')
-
-_32_BITS = 0xFFFFFFFF
-range_masks = {_32_BITS - ((2 ** i) - 1) for i in range(33)}
 
 
 def validate_routes(machine_graph, placements, routing_infos,
@@ -113,10 +111,10 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     :param n_atoms: the number of atoms going through this path
     :param is_continuous: \
         whether the keys and atoms mapping is continuous
-    :type source_placement: instance of\
+    :type source_placement: \
         :py:class:`pacman.model.placements.Placement`
-    :type dest_placements: iterable of PlacementTuple
-    :type key_and_mask: instance of\
+    :type dest_placements: iterable(PlacementTuple)
+    :type key_and_mask: \
         :py:class:`pacman.model.routing_info.BaseKeyAndMask`
     :rtype: None
     :raise PacmanRoutingException: when the trace completes and there are\
@@ -276,9 +274,9 @@ def _recursive_trace_to_destinations(
     :type chip_y: int
     :type key_and_mask:
         :py:class:`pacman.model.routing_info.BaseKeyAndMask`
-    :type visited_routers: iterable of\
-        :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
-    :type reached_placements: iterable of placement_tuple
+    :type visited_routers: \
+        iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
+    :type reached_placements: iterable(PlacementTuple)
     :rtype: None
     :raise None: this method does not raise any known exceptions
     """
@@ -371,7 +369,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
 
 
 def _locate_routing_entry(current_router, key, n_atoms):
-    """ locate the entry from the router based off the edge
+    """ Locate the entry from the router based off the edge
 
     :param current_router: the current router being used in the trace
     :param key: the key being used by the source placement

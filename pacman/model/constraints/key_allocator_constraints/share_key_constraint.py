@@ -1,10 +1,9 @@
-from pacman.model.constraints.key_allocator_constraints import \
-    AbstractKeyAllocatorConstraint
+from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
-    """constraint to allow the same keys to be allocated to multiple edges\
-     via partitions
+    """ Constraint to allow the same keys to be allocated to multiple edges\
+        via partitions.
     """
 
     __slots__ = [
@@ -14,9 +13,8 @@ class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
     ]
 
     def __init__(self, other_partitions):
-        """ constructor for the same key edges constraint
-
-        :param other_partitions: the other edges which
+        """
+        :param other_partitions: the other edges which keys are shared with.
         """
         self._other_partitions = other_partitions
 

@@ -3,7 +3,7 @@ from .machine_edge import MachineEdge
 
 
 class MachineOutgoingEdgePartition(OutgoingEdgePartition):
-    """ An outgoing edge partition for a Machine Graph
+    """ An outgoing edge partition for a Machine Graph.
     """
 
     __slots__ = []
@@ -11,7 +11,6 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
     def __init__(self, identifier, constraints=None, label=None,
                  traffic_weight=1):
         """
-
         :param identifier: The identifier of the partition
         :param constraints: Any initial constraints
         :param label: An optional label of the partition

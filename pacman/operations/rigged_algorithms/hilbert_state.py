@@ -20,7 +20,7 @@ class HilbertState(object):
         self._change_y = ychange
 
     def turn_left(self, angle):
-        """ method to turn left in the generation of a Hilbert curve
+        """ Turn left in the generation of a Hilbert curve
 
         :param angle: determines the direction in which the curve turns
         :type angle: int
@@ -32,7 +32,7 @@ class HilbertState(object):
         return self._change_x, self._change_y
 
     def turn_right(self, angle):
-        """ method to turn right in the generation of a Hilbert curve
+        """ Turn right in the generation of a Hilbert curve
 
         :param angle: determines the direction in which the curve turns
         :type angle: int
@@ -44,7 +44,7 @@ class HilbertState(object):
         return self._change_x, self._change_y
 
     def move_forward(self):
-        """ method to move forward in the generation of a Hilbert curve
+        """ Move forward in the generation of a Hilbert curve
 
         :return: the x,y coordinates on the generated curve
         """

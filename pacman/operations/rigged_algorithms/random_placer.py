@@ -1,12 +1,10 @@
-from pacman.utilities.utility_objs import ResourceTracker
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import \
-    get_same_chip_vertex_groups, sort_vertices_by_known_constraints
-from pacman.model.placements import Placement, Placements
-
-from spinn_utilities.progress_bar import ProgressBar
-
 import random
 import numpy
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs import ResourceTracker
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
+from pacman.model.placements import Placement, Placements
 
 
 class RandomPlacer(object):
@@ -32,8 +30,7 @@ class RandomPlacer(object):
                                "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_random_chips(machine))
-        vertices_on_same_chip = get_same_chip_vertex_groups(
-            machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in vertices_placed:
@@ -44,8 +41,8 @@ class RandomPlacer(object):
 
     def _generate_random_chips(self, machine, np=numpy,
                                random_generator=random):
-        """Generates the list of chips in a random order, with the option \
-         to provide a starting point.
+        """ Generates the list of chips in a random order, with the option \
+            to provide a starting point.
 
         :param machine: A SpiNNaker machine object.
         :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`

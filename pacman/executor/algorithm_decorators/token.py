@@ -1,6 +1,6 @@
 class Token(object):
     """ A token in the algorithm flow that indicates a process or part of a\
-        process
+        process.
     """
 
     __slots__ = [

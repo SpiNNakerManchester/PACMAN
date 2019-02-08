@@ -1,13 +1,10 @@
+""" A collection of methods which support partitioning algorithms.
 """
-A collection of methods which support partitioning algorithms.
-"""
-
-from pacman.model.constraints.partitioner_constraints\
-    import AbstractPartitionerConstraint, SameAtomsAsVertexConstraint
-
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanPartitionException
+from pacman.model.constraints.partitioner_constraints import (
+    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint)
 
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):

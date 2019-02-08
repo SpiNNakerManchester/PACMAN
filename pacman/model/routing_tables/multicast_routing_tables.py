@@ -2,7 +2,7 @@ from pacman.exceptions import PacmanAlreadyExistsException
 
 
 class MulticastRoutingTables(object):
-    """ Represents the multicast routing tables for a number of chips
+    """ Represents the multicast routing tables for a number of chips.
     """
 
     __slots__ = [
@@ -14,10 +14,9 @@ class MulticastRoutingTables(object):
 
     def __init__(self, routing_tables=None):
         """
-
         :param routing_tables: The routing tables to add
-        :type routing_tables: iterable of\
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+        :type routing_tables: \
+            iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
         :raise pacman.exceptions.PacmanAlreadyExistsException: \
             If any two routing tables are for the same chip
         """
@@ -58,8 +57,8 @@ class MulticastRoutingTables(object):
         """ The routing tables stored within
 
         :return: an iterable of routing tables
-        :rtype: iterable of\
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+        :rtype: \
+            iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
         :raise None: does not raise any known exceptions
         """
         return self._routing_tables
@@ -80,7 +79,7 @@ class MulticastRoutingTables(object):
         return self._routing_tables_by_chip.get((x, y), None)
 
     def __iter__(self):
-        """ returns a iterator for the multicast routing tables stored within
+        """ Iterator for the multicast routing tables stored within
 
         :return: iterator of multicast_routing_table
         """

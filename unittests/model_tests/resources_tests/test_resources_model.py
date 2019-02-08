@@ -1,13 +1,11 @@
 """
 test for the resources model
 """
-
 import unittest
-from pacman.model.resources import SDRAMResource, CPUCyclesPerTickResource
-from pacman.model.resources import DTCMResource, ResourceContainer
-from pacman.model.resources import IPtagResource, ReverseIPtagResource
-from pacman.model.resources import \
-    SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource
+from pacman.model.resources import (
+    SDRAMResource, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
+    IPtagResource, ReverseIPtagResource, SpecificBoardIPtagResource,
+    SpecificBoardReverseIPtagResource)
 
 
 class TestResourceModels(unittest.TestCase):
@@ -17,7 +15,7 @@ class TestResourceModels(unittest.TestCase):
 
     def test_sdram(self):
         """
-        test that adding a sdram resource to a resoruce container works
+        test that adding a SDRAM resource to a resource container works
         correctly
         """
         sdram = SDRAMResource(128 * (2**20))
@@ -29,7 +27,7 @@ class TestResourceModels(unittest.TestCase):
 
     def test_dtcm(self):
         """
-        test that adding a dtcm resource to a resoruce container works
+        test that adding a DTCM resource to a resource container works
         correctly
         """
         dtcm = DTCMResource(128 * (2**20))
@@ -41,7 +39,7 @@ class TestResourceModels(unittest.TestCase):
 
     def test_cpu(self):
         """
-        test that adding a cpu resource to a resoruce container works
+        test that adding a CPU resource to a resource container works
         correctly
         """
         cpu = CPUCyclesPerTickResource(128 * (2**20))
@@ -53,7 +51,7 @@ class TestResourceModels(unittest.TestCase):
 
     def test_resource_container(self):
         """
-        tests that creating multiple resoruce containers doesnt cause issues.
+        tests that creating multiple resource containers doesn't cause issues.
         """
         sdram = SDRAMResource(128 * (2**20))
         dtcm = DTCMResource(128 * (2**20) + 1)

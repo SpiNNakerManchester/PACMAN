@@ -1,13 +1,12 @@
-from pacman.model.graphs import AbstractVirtualVertex
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint, AbstractPlacerConstraint
-from pacman.exceptions import PacmanConfigurationException
-from pacman.utilities import utility_calls, file_format_schemas
-from pacman.utilities.constants import EDGES
-from pacman.utilities.utility_calls import ident
-from spinn_utilities.progress_bar import ProgressBar
-
 import json
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.graphs import AbstractVirtualVertex
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint, AbstractPlacerConstraint)
+from pacman.exceptions import PacmanConfigurationException
+from pacman.utilities import file_format_schemas
+from pacman.utilities.constants import EDGES
+from pacman.utilities.utility_calls import ident, locate_constraints_of_type
 
 
 class CreateConstraintsToFile(object):
@@ -79,7 +78,7 @@ class CreateConstraintsToFile(object):
         :param machine:
         """
         # locate the chip from the placement constraint
-        placement_constraints = utility_calls.locate_constraints_of_type(
+        placement_constraints = locate_constraints_of_type(
             vertex.constraints, ChipAndCoreConstraint)
         routers = (
             machine.get_chip_at(constraint.x, constraint.y).router

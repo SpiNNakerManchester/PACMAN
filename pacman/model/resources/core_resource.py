@@ -1,5 +1,5 @@
 class CoreResource(object):
-    """ Represents the number of cores that need to be allocated
+    """ Represents the number of cores that need to be allocated.
     """
 
     __slots__ = [
@@ -13,11 +13,10 @@ class CoreResource(object):
 
     def __init__(self, chip, n_cores):
         """
-
         :param n_cores: The number of cores to allocate
         :type n_cores: int
         :param chip: chip of where these cores are to be allocated
-        :type chip: SpiNNMachine.chip.Chip
+        :type chip: :py:class:`spinn_machine.Chip`
         :raise None: No known exceptions are raised
         """
         self._n_cores = n_cores
@@ -32,4 +31,7 @@ class CoreResource(object):
         return self._chip
 
     def get_value(self):
+        """
+        :return: The chip and the cores required on it.
+        """
         return self._chip, self._n_cores

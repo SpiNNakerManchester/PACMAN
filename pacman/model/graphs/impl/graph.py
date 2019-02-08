@@ -1,10 +1,8 @@
 from collections import defaultdict, OrderedDict
-
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
-
-from pacman.exceptions import \
-    PacmanAlreadyExistsException, PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractGraph
 from pacman.model.graphs.common import ConstrainedObject
 from .outgoing_edge_partition import OutgoingEdgePartition
@@ -12,7 +10,7 @@ from .outgoing_edge_partition import OutgoingEdgePartition
 
 class Graph(ConstrainedObject, AbstractGraph):
     """ A graph implementation that specifies the allowed types of the\
-        vertices and edges
+        vertices and edges.
     """
 
     __slots__ = [
@@ -35,13 +33,14 @@ class Graph(ConstrainedObject, AbstractGraph):
         "_incoming_edges_by_partition_name",
         # The outgoing edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
+        # the outgoing partitions by edge
+        "_outgoing_edge_partition_by_edge",
         # The label of the graph
         "_label"]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types,
                  allowed_partition_types, label):
         """
-
         :param allowed_vertex_types:\
             A single or tuple of types of vertex to be allowed in the graph
         :param allowed_edge_types:\
@@ -61,6 +60,7 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._incoming_edges = defaultdict(OrderedSet)
         self._incoming_edges_by_partition_name = defaultdict(list)
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
+        self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
 
     @property
@@ -113,6 +113,7 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._incoming_edges_by_partition_name[
             (edge.post_vertex, outgoing_edge_partition_name)].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
+        self._outgoing_edge_partition_by_edge[edge] = partition
 
     @overrides(AbstractGraph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, outgoing_edge_partition):
@@ -167,6 +168,10 @@ class Graph(ConstrainedObject, AbstractGraph):
     @overrides(AbstractGraph.n_outgoing_edge_partitions)
     def n_outgoing_edge_partitions(self):
         return len(self._outgoing_edge_partitions_by_name)
+
+    @overrides(AbstractGraph.get_outgoing_partition_for_edge)
+    def get_outgoing_partition_for_edge(self, edge):
+        return self._outgoing_edge_partition_by_edge[edge]
 
     @overrides(AbstractGraph.get_edges_starting_at_vertex)
     def get_edges_starting_at_vertex(self, vertex):

@@ -1,28 +1,19 @@
-from spinn_utilities.progress_bar import ProgressBar
-
-# pacman imports
-from pacman.model.routing_tables \
-    import MulticastRoutingTable, MulticastRoutingTables
-from pacman.exceptions import PacmanElementAllocationException
-
-# spinnMachine imports
-from spinn_machine import MulticastRoutingEntry
-
-# rig imports
-from rig import routing_table as rig_routing_table
-from rig.routing_table import ordered_covering as rigs_compressor
-
-# general imports
 import collections
 import logging
 import itertools
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import MulticastRoutingEntry
+from pacman.model.routing_tables import (
+    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.exceptions import PacmanElementAllocationException
+from rig import routing_table as rig_routing_table
+from rig.routing_table import ordered_covering as rigs_compressor
 
 logger = logging.getLogger(__name__)
 
 
 class MundyRouterCompressor(object):
-    """
-    compressor from rig which has been tied into the main tool chain stack.
+    """ Compressor from rig that has been tied into the main tool chain stack.
     """
 
     __slots__ = []
@@ -64,7 +55,6 @@ class MundyRouterCompressor(object):
     @staticmethod
     def _convert_to_mundy_format(pacman_router_table):
         """
-
         :param pacman_router_table: pacman version of the routing table
         :return: rig version of the router table
         """
@@ -98,7 +88,6 @@ class MundyRouterCompressor(object):
             self, mundy_compressed_router_table_entries, router_x_coord,
             router_y_coord):
         """
-
         :param mundy_compressed_router_table_entries: rig version of the table
         :param router_x_coord: the x coord of this routing table
         :param router_y_coord: the y coord of this routing table

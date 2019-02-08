@@ -1,30 +1,23 @@
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
-
-# pacman imports
-from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint, ShareKeyConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    import FixedMaskConstraint, FixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.operations.routing_info_allocator_algorithms\
-    .malloc_based_routing_allocator.key_field_generator \
-    import KeyFieldGenerator
-from pacman.model.routing_info \
-    import RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo
-from pacman.utilities.utility_calls import \
-    check_algorithm_can_support_constraints
-from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
-from pacman.utilities.algorithm_utilities import \
-    routing_info_allocator_utilities as utilities
-from pacman.exceptions \
-    import PacmanConfigurationException, PacmanRouteInfoAllocationException
-
-# general imports
 import math
 import logging
+from past.builtins import xrange
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.constraints.key_allocator_constraints import (
+    AbstractKeyAllocatorConstraint, ShareKeyConstraint, FixedMaskConstraint,
+    FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint)
+from .key_field_generator import KeyFieldGenerator
+from pacman.model.routing_info import (
+    RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)
+from pacman.utilities.utility_calls import (
+    check_algorithm_can_support_constraints)
+from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
+from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
+    import (check_types_of_edge_constraint, get_edge_groups,
+            generate_key_ranges_from_mask)
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanRouteInfoAllocationException)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -52,14 +45,14 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # verify that no edge has more than 1 of a constraint ,and that
         # constraints are compatible
-        utilities.check_types_of_edge_constraint(machine_graph)
+        check_types_of_edge_constraint(machine_graph)
 
         # final keys allocations
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
         (fixed_keys, shared_keys, fixed_masks, fixed_fields, flexi_fields,
-         continuous, noncontinuous) = utilities.get_edge_groups(
+         continuous, noncontinuous) = get_edge_groups(
              machine_graph, EdgeTrafficType.MULTICAST)
 
         # Even non-continuous keys will be continuous
@@ -176,7 +169,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return [(((1 << n_ones) - 1) << n_zeros)]
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
-        """ allocate fixed keys and masks
+        """ Allocate fixed keys and masks
 
         :param keys_and_masks: the fixed keys and masks combos
         :param fixed_mask: fixed mask
@@ -191,7 +184,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     "Cannot meet conflicting constraints")
 
             # Go through the mask sets and allocate
-            for key, n_keys in utilities.generate_key_ranges_from_mask(
+            for key, n_keys in generate_key_ranges_from_mask(
                     key_and_mask.key, key_and_mask.mask):
                 self.allocate_elements(key, n_keys)
 
@@ -220,8 +213,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 # Check if all the key ranges can be allocated
                 matched_all = True
                 index = 0
-                for (base_key, n_keys) in \
-                        utilities.generate_key_ranges_from_mask(key, mask):
+                for (base_key, n_keys) in generate_key_ranges_from_mask(
+                        key, mask):
                     logger.debug("Finding slot for {}, n_keys={}",
                                  hex(base_key), n_keys)
                     index = self._find_slot(base_key, lo=index)
@@ -249,7 +242,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # If we found a working key and mask that can be assigned,
         # Allocate them
         if key_found is not None and mask_found is not None:
-            for (base_key, n_keys) in utilities.generate_key_ranges_from_mask(
+            for (base_key, n_keys) in generate_key_ranges_from_mask(
                     key_found, mask):
                 self.allocate_elements(base_key, n_keys)
 

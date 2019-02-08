@@ -1,19 +1,14 @@
-# pacman imports
-from pacman.model.constraints.placer_constraints \
-    import RadialPlacementFromChipConstraint, SameChipAsConstraint
-from pacman.utilities.algorithm_utilities \
-    import placer_algorithm_utilities as placer_utils
+from collections import deque
+import logging
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.constraints.placer_constraints import (
+    RadialPlacementFromChipConstraint, SameChipAsConstraint)
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
-
-from spinn_utilities.progress_bar import ProgressBar
-
-# general imports
-from collections import deque
-import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +23,14 @@ class RadialPlacer(object):
         self._check_constraints(machine_graph.vertices)
 
         placements = Placements()
-        vertices = placer_utils.sort_vertices_by_known_constraints(
-            machine_graph.vertices)
+        vertices = sort_vertices_by_known_constraints(machine_graph.vertices)
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
-        vertices_on_same_chip = placer_utils.get_same_chip_vertex_groups(
-            machine_graph.vertices)
+        vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
@@ -110,12 +103,12 @@ class RadialPlacer(object):
         """ Generates the list of chips from a given starting point in a radial\
             format.
 
-        :param machine: the spinnaker machine object
+        :param machine: the SpiNNaker machine object
         :param resource_tracker:\
             the resource tracker object which contains what resources of the\
             machine have currently been used
         :type resource_tracker: None or \
-                :py:class:`ResourceTracker`
+            :py:class:`ResourceTracker`
         :param start_chip_x:\
             The chip x coordinate to start with for radial iteration
         :param start_chip_y:\

@@ -1,8 +1,7 @@
 import json
-
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.routing_table_by_partition import \
-    MulticastRoutingTableByPartitionEntry, MulticastRoutingTableByPartition
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartitionEntry, MulticastRoutingTableByPartition)
 
 _route_translation = {
     "CORE_0": (True, 0),
@@ -33,14 +32,14 @@ _route_translation = {
 
 
 class ConvertToMemoryMultiCastRoutes(object):
-    """ Converts between file routing paths and the pacman representation of\
+    """ Converts between file routing paths and the PACMAN representation of\
         the routes
     """
 
     __slots__ = []
 
     def __call__(self, file_routing_paths, partition_by_id):
-        # load the json files
+        # load the JSON files
         file_routing_paths = self._handle_json_files(file_routing_paths)
         progress = ProgressBar(file_routing_paths,
                                "Converting to PACMAN routes")
@@ -94,7 +93,6 @@ class ConvertToMemoryMultiCastRoutes(object):
     @staticmethod
     def _handle_json_files(file_routing_paths):
         """
-
         :param file_routing_paths:
         """
         with open(file_routing_paths, "r") as f:

@@ -1,13 +1,11 @@
 import logging
 import os
 import time
-
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 from pacman.model.graphs.common import EdgeTrafficType
-
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -342,7 +340,7 @@ def placement_report_with_application_graph_by_core(
     :param hostname: the machine's hostname to which the placer worked on
     :param graph_mapper: \
         the mapping between application and machine graphs
-    :param machine: the spinnaker machine object
+    :param machine: the SpiNNaker machine object
     :param placements: the placements objects built by the placer.
     """
 
@@ -402,7 +400,7 @@ def placement_report_without_application_graph_by_core(
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
-    :param machine: the spinnaker machine object
+    :param machine: the SpiNNaker machine object
     :param placements: the placements objects built by the placer.
     """
 
@@ -723,7 +721,7 @@ def _recursive_trace_to_destinations(
         chip_x, chip_y, key_and_mask,
         dest_chip_x, dest_chip_y, dest_p, machine, routing_tables,
         number_of_entries):
-    """ recursively search though routing tables till no more entries are\
+    """ Recursively search though routing tables till no more entries are\
         registered with this key
     """
 
