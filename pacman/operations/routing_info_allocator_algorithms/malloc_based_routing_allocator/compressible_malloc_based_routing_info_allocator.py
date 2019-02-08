@@ -1,7 +1,6 @@
 from collections import defaultdict, OrderedDict
 import math
 import logging
-from past.builtins import xrange
 from six import iteritems, itervalues
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet

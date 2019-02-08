@@ -1,6 +1,5 @@
 import math
 import logging
-from past.builtins import xrange
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from pacman.model.graphs.common import EdgeTrafficType
