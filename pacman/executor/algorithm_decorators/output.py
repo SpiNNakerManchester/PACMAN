@@ -1,5 +1,5 @@
 class Output(object):
-    """ Represents an output from an algorithm
+    """ Represents an output from an algorithm.
     """
 
     __slots__ = [
@@ -11,7 +11,6 @@ class Output(object):
 
     def __init__(self, output_type, file_name_type=None):
         """
-
         :param output_type: The type of the output
         :param file_name_type:\
             If the output is file based, the type of the input holding\

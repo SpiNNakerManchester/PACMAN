@@ -1,10 +1,10 @@
-from pacman.exceptions import PacmanValueError
 from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.exceptions import PacmanValueError
 
 
 class GraphMapper(object):
-    """ A mapping between an Application Graph and a Machine Graph
+    """ A mapping between an Application Graph and a Machine Graph.
     """
 
     __slots__ = [

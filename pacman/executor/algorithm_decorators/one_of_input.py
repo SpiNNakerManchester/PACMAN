@@ -1,9 +1,9 @@
-from .abstract_input import AbstractInput
 from spinn_utilities.overrides import overrides
+from .abstract_input import AbstractInput
 
 
 class OneOfInput(AbstractInput):
-    """ An input for which one of the input parameters must be matched
+    """ An input for which one of the input parameters must be matched.
     """
 
     __slots__ = [
@@ -13,7 +13,6 @@ class OneOfInput(AbstractInput):
 
     def __init__(self, inputs):
         """
-
         :param inputs: The inputs that make up this input
         """
         self._inputs = inputs

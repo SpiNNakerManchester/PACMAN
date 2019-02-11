@@ -1,17 +1,15 @@
+import sys
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
+from pacman.model.graphs.machine import MachineFPGAVertex
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.machine.machine_fpga_vertex \
-    import MachineFPGAVertex
-
-import sys
 
 
 class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
-    """ A virtual vertex on an FPGA link
+    """ A virtual vertex on an FPGA link.
     """
 
     __slots__ = [

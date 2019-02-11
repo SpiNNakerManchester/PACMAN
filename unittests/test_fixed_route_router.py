@@ -1,9 +1,7 @@
+import pytest
 from spinn_machine import VirtualMachine
 from pacman.model.placements import Placements, Placement
-from pacman.operations.fixed_route_router.fixed_route_router \
-    import FixedRouteRouter
-
-import pytest
+from pacman.operations.fixed_route_router import FixedRouteRouter
 
 
 class DestinationVertex(object):

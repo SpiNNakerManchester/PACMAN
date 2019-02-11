@@ -1,10 +1,8 @@
 import unittest
 from collections import deque
-
 from spinn_machine.virtual_machine import VirtualMachine
-
-from pacman.model.graphs.machine import \
-    MachineGraph, MachineEdge, SimpleMachineVertex
+from pacman.model.graphs.machine import (
+    MachineGraph, MachineEdge, SimpleMachineVertex)
 from pacman.operations.router_algorithms import BasicDijkstraRouting
 from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement

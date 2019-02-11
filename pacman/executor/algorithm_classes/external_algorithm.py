@@ -1,14 +1,13 @@
 import subprocess
-
-from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
-from .abstract_algorithm import AbstractAlgorithm
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.exceptions import PacmanExternalAlgorithmFailedToCompleteException
+from .abstract_algorithm import AbstractAlgorithm
 
 
 class ExternalAlgorithm(AbstractAlgorithm):
-    """
-    the container for a algorithm which is external to the SpiNNaker software
+    """ An algorithm which is external to the SpiNNaker software, or rather\
+        its wrapper into PACMAN.
     """
 
     __slots__ = [
@@ -59,7 +58,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
                     "    Output: {}\n"
                     "    Error: {}\n".format(
                         self._algorithm_id, child.returncode,
-                        inputs, stdout, stderr))
+                        inputs.keys(), stdout, stderr))
 
         # Return the results processed into a dict
         # Use None here as the results don't actually exist, and are expected

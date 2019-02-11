@@ -5,7 +5,7 @@ from pacman.model.graphs.impl import Graph
 
 
 class ApplicationGraph(Graph):
-    """ An application-level abstraction of a graph
+    """ An application-level abstraction of a graph.
     """
 
     __slots__ = []

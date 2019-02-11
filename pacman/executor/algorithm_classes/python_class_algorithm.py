@@ -1,19 +1,17 @@
 import importlib
 import logging
-
-from .abstract_python_algorithm import AbstractPythonAlgorithm
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from .abstract_python_algorithm import AbstractPythonAlgorithm
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PythonClassAlgorithm(AbstractPythonAlgorithm):
-    """ An algorithm that is a class
+    """ An algorithm that is a class.
     """
 
     __slots__ = [
-
         # Python Class to create
         "_python_class",
 
@@ -62,7 +60,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
                 method = self._python_method
             logger.error("Error when calling {}.{}.{} with inputs {}",
                          self._python_module, self._python_class, method,
-                         inputs)
+                         inputs.keys())
             raise
 
     def __repr__(self):

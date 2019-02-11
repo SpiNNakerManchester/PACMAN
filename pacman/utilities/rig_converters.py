@@ -1,26 +1,24 @@
 # These two warnings are disabled; because Enum Python hackery.
 # pylint: disable=not-an-iterable, not-callable
+from six import iteritems, itervalues
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
+from pacman.model.graphs import (
+    AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups)
+from pacman.model.placements import Placement, Placements
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
+from pacman.utilities.constants import EDGES
 from rig.machine import Machine, Links
 from rig.netlist import Net
-from rig.place_and_route.constraints import \
-    LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint
+from rig.place_and_route.constraints import (
+    LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint)
 from rig.place_and_route.routing_tree import RoutingTree
 from rig.routing_table import Routes
-from six import iteritems
-
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint, RadialPlacementFromChipConstraint
-from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
-from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
-
-from pacman.model.graphs.common import EdgeTrafficType
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
-    import get_same_chip_vertex_groups
-from pacman.model.placements import Placement, Placements
-from pacman.model.routing_table_by_partition import \
-    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
-from pacman.utilities.constants import EDGES
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
@@ -205,7 +203,7 @@ def create_rig_graph_constraints(machine_graph, machine):
                     constraints.append(LocationConstraint(
                         vertex, (constraint.x, constraint.y)))
 
-    for group in get_same_chip_vertex_groups(machine_graph.vertices).values():
+    for group in itervalues(get_same_chip_vertex_groups(machine_graph)):
         if len(group) > 1:
             constraints.append(SameChipConstraint(group))
     return constraints

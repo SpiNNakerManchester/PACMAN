@@ -1,11 +1,11 @@
 from spinn_utilities.overrides import overrides
-from .abstract_machine_partition_n_keys_map \
-    import AbstractMachinePartitionNKeysMap
+from .abstract_machine_partition_n_keys_map import (
+    AbstractMachinePartitionNKeysMap)
 
 
 class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     """ A python dict-based implementation of the\
-        :py:class`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
+        :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
     """
 
     __slots__ = [

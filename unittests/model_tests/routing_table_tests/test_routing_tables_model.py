@@ -1,17 +1,12 @@
-# pacman imports
-from pacman.model.graphs.impl import OutgoingEdgePartition
-from pacman.model.routing_tables \
-    import MulticastRoutingTable, MulticastRoutingTables
-from pacman.model.routing_table_by_partition import \
-    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
-from pacman.exceptions import PacmanAlreadyExistsException,\
-    PacmanInvalidParameterException
-
-# spinnmanchine imports
-from spinn_machine import MulticastRoutingEntry
-
-# general imports
 import unittest
+from spinn_machine import MulticastRoutingEntry
+from pacman.model.graphs.impl import OutgoingEdgePartition
+from pacman.model.routing_tables import (
+    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanInvalidParameterException)
 
 
 class TestRoutingTable(unittest.TestCase):

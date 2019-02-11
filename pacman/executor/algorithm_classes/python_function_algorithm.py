@@ -1,19 +1,17 @@
 import importlib
 import logging
-
-from .abstract_python_algorithm import AbstractPythonAlgorithm
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from .abstract_python_algorithm import AbstractPythonAlgorithm
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
-    """ An algorithm that is a function
+    """ An algorithm that is a function.
     """
 
     __slots__ = [
-
         # Python Function to call
         "_python_function"
     ]
@@ -45,7 +43,8 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
             return function(**inputs)
         except Exception:
             logger.error("Error when calling {}.{} with inputs {}",
-                         self._python_module, self._python_function, inputs)
+                         self._python_module, self._python_function,
+                         inputs.keys())
             raise
 
     def __repr__(self):

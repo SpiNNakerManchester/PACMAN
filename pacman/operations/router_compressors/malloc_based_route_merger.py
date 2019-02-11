@@ -1,18 +1,16 @@
-from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.routing_tables \
-    import MulticastRoutingTable, MulticastRoutingTables
-from pacman.exceptions import PacmanRoutingException
-from spinn_machine import MulticastRoutingEntry
-
 import math
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import MulticastRoutingEntry
+from pacman.model.routing_tables import (
+    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.exceptions import PacmanRoutingException
 
 _32_BITS = 0xFFFFFFFF
 
 
 class MallocBasedRouteMerger(object):
-    """ a routing table entry merging function, that merges based off a
-    malloc memory style.
-
+    """ Routing table entry merging function, that merges based off a\
+        malloc memory style.
     """
 
     __slots__ = []

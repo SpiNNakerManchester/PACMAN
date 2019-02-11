@@ -1,5 +1,5 @@
-from pacman.exceptions import PacmanValueError
 import collections
+from pacman.exceptions import PacmanValueError
 
 
 class Slice(collections.namedtuple('Slice',
@@ -10,7 +10,7 @@ class Slice(collections.namedtuple('Slice',
     :attr int hi_atom: The highest atom represented in the slice.
     :attr int n_atoms: The number of atoms represented by the slice.
     :attr as_slice: This slice represented as a :py:func:`slice` object (for
-                    use in indexing lists, arrays, etc.)
+        use in indexing lists, arrays, etc.)
     """
     def __new__(cls, lo_atom, hi_atom):
         """ Create a new Slice object.

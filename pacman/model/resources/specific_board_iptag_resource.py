@@ -1,7 +1,6 @@
 class SpecificBoardTagResource(object):
-    """
-    A resource that allocates a tag on a specific board before the class\
-    needing it has been built.
+    """ A resource that allocates a tag on a specific board before the class\
+        needing it has been built.
     """
 
     __slots__ = [
@@ -16,11 +15,11 @@ class SpecificBoardTagResource(object):
         # transmission of data
         "_strip_sdp",
 
-        # A fixed tag id to assign, or None if any tag is OK
+        # A fixed tag ID to assign, or None if any tag is OK
         "_tag",
 
         # The identifier that states what type of data is being transmitted
-        # through this IPTag
+        # through this IP tag
         "_traffic_identifier",
 
         # The board IP address that this tag is going to be placed upon
@@ -41,7 +40,7 @@ class SpecificBoardTagResource(object):
         :param strip_sdp: Whether the tag requires that SDP headers are\
             stripped before transmission of data
         :type strip_sdp: bool
-        :param tag: A fixed tag id to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int
         :param traffic_identifier: The traffic to be sent using this tag; \
             traffic with the same traffic_identifier can be sent using\
@@ -76,7 +75,7 @@ class SpecificBoardTagResource(object):
 
     @property
     def traffic_identifier(self):
-        """ The traffic identifier for this IPTag
+        """ The traffic identifier for this IP tag
         """
         return self._traffic_identifier
 
@@ -107,6 +106,9 @@ class SpecificBoardTagResource(object):
         return self._board
 
     def get_value(self):
+        """
+        :return: A description of the specific board's IP tag required.
+        """
         return [
             self._board, self._ip_address, self._port, self._strip_sdp,
             self._tag, self._traffic_identifier]

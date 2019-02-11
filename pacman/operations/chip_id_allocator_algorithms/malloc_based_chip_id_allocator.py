@@ -1,13 +1,11 @@
-# pacman imports
-from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs import AbstractFPGAVertex, AbstractSpiNNakerLinkVertex
-from pacman.model.graphs import AbstractVirtualVertex
-from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
-from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
-from spinn_utilities.progress_bar import ProgressBar
-
-# general imports
 import logging
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs import (
+    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex, AbstractVirtualVertex)
+from pacman.utilities.algorithm_utilities import (
+    machine_algorithm_utilities, ElementAllocatorAlgorithm)
+
 logger = logging.getLogger(__name__)
 _LOWER_16_BITS = 0xFFFF
 
@@ -29,7 +27,7 @@ class NoSpiNNakerLink(PacmanConfigurationException):
 
 
 class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
-    """ A Chip id Allocation Allocator algorithm that keeps track of\
+    """ A Chip ID Allocation Allocator algorithm that keeps track of\
         chip IDs and attempts to allocate them as requested
     """
 

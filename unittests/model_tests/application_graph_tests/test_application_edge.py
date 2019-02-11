@@ -1,12 +1,7 @@
-# pacman imports
+import unittest
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
-
-# unit tests imports
 from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
-
-# general imports
-import unittest
 
 
 class TestApplicationEdgeModel(unittest.TestCase):
