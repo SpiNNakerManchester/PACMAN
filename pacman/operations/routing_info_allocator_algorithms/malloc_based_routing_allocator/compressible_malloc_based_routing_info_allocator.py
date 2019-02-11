@@ -221,18 +221,26 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # with n_keys being 2^len(first_zeros)
         n_sets = 2 ** len(remaining_zeros)
         n_keys = 2 ** len(first_zeros)
+        if not remaining_zeros:
+            yield key, n_keys
+            return
         unwrapped_key = expand_to_bit_array(key)
         for value in xrange(n_sets):
             generated_key = numpy.copy(unwrapped_key)
-            unwrapped_value = expand_to_bit_array(value)[
-                -len(remaining_zeros):]
-            generated_key[remaining_zeros] = unwrapped_value
+            generated_key[remaining_zeros] = \
+                expand_to_bit_array(value)[-len(remaining_zeros):]
             yield compress_from_bit_array(generated_key), n_keys
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
+        """ Allocate fixed keys and masks
+
+        :param keys_and_masks: the fixed keys and masks combos
+        :param fixed_mask: fixed mask
+        :type fixed_mask: None or FixedMask object
+        :rtype: None
+        """
         # If there are fixed keys and masks, allocate them
         for key_and_mask in keys_and_masks:
-
             # If there is a fixed mask, check it doesn't clash
             if fixed_mask is not None and fixed_mask != key_and_mask.mask:
                 raise PacmanRouteInfoAllocationException(
@@ -243,15 +251,17 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     key_and_mask.key, key_and_mask.mask):
                 self._allocate_elements(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys):
-        # If there isn't a fixed mask, generate a fixed mask based on the
-        # number of keys required
+    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys,
+                                 contiguous_keys=True):
+        # If there isn't a fixed mask, generate a fixed mask based
+        # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = get_possible_masks(partition_n_keys)
+            masks_available = get_possible_masks(
+                partition_n_keys, contiguous_keys=contiguous_keys)
 
-        # For each usable mask, try all of the possible keys and see if a
-        # match is possible
+        # For each usable mask, try all of the possible keys and
+        # see if a match is possible
         mask_found = None
         key_found = None
         mask = None
@@ -260,8 +270,9 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                          hex(mask), partition_n_keys)
 
             key_found = None
-            for key in KeyFieldGenerator(
-                    mask, fields, self._free_space_tracker):
+            key_generator = KeyFieldGenerator(
+                mask, fields, self._free_space_tracker)
+            for key in key_generator:
                 logger.debug("Trying key {}", hex(key))
 
                 # Check if all the key ranges can be allocated
@@ -293,12 +304,13 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 break
 
         # If we found a working key and mask that can be assigned,
-        # allocate them. Otherwise raise an exception
-        if key_found is None or mask_found is None:
-            raise PacmanRouteInfoAllocationException(
-                "Could not find space to allocate keys")
+        # Allocate them
+        if key_found is not None and mask_found is not None:
+            for (base_key, n_keys) in self._get_key_ranges(key_found, mask):
+                self._allocate_elements(base_key, n_keys)
 
-        for (base_key, n_keys) in self._get_key_ranges(key_found, mask):
-            self._allocate_elements(base_key, n_keys)
-        # If we get here, we can assign the keys to the edges
-        return [BaseKeyAndMask(base_key=key_found, mask=mask)]
+            # If we get here, we can assign the keys to the edges
+            return [BaseKeyAndMask(base_key=key_found, mask=mask)]
+
+        raise PacmanRouteInfoAllocationException(
+            "Could not find space to allocate keys")

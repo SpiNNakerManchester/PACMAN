@@ -55,10 +55,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
          continuous, noncontinuous) = get_edge_groups(
              machine_graph, EdgeTrafficType.MULTICAST)
 
-        # Even non-continuous keys will be continuous
-        for group in noncontinuous:
-            continuous.append(group)
-
         # Go through the groups and allocate keys
         progress = ProgressBar(
             machine_graph.n_outgoing_edge_partitions,
@@ -82,7 +78,12 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._allocate_share_key(group, routing_infos, n_keys_map)
 
         for group in continuous:
-            self._allocate_continuous_groups(group, routing_infos, n_keys_map)
+            self._allocate_other_groups(group, routing_infos, n_keys_map,
+                                        continuous=True)
+
+        for group in noncontinuous:
+            self._allocate_other_groups(group, routing_infos, n_keys_map,
+                                        continuous=False)
 
         progress.end()
         return routing_infos
@@ -91,9 +92,11 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return max(
             n_keys_map.n_keys_for_partition(partition) for partition in group)
 
-    def _allocate_continuous_groups(self, group, routing_infos, n_keys_map):
+    def _allocate_other_groups(
+            self, group, routing_infos, n_keys_map, continuous):
         keys_and_masks = self._allocate_keys_and_masks(
-            None, None, self._get_n_keys(group, n_keys_map))
+            None, None, self._get_n_keys(group, n_keys_map),
+            contiguous_keys=continuous)
         for partition in group:
             self._update_routing_objects(
                 keys_and_masks, routing_infos, partition)
@@ -213,12 +216,14 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     key_and_mask.key, key_and_mask.mask):
                 self._allocate_elements(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys):
+    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys,
+                                 contiguous_keys=True):
         # If there isn't a fixed mask, generate a fixed mask based
         # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = get_possible_masks(partition_n_keys)
+            masks_available = get_possible_masks(
+                partition_n_keys, contiguous_keys=contiguous_keys)
 
         # For each usable mask, try all of the possible keys and
         # see if a match is possible
