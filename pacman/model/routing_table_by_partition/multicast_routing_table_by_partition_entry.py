@@ -74,7 +74,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             None if incoming_link is None else int(incoming_link))
 
     @property
-    def out_going_processors(self):
+    def processor_ids(self):
         """ The destination processors of the entry
 
         :rtype: set(int)
@@ -82,7 +82,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         return self._out_going_processors
 
     @property
-    def out_going_links(self):
+    def link_ids(self):
         """ The destination links of the entry
 
         :rtype: set(int)
@@ -176,9 +176,9 @@ class MulticastRoutingTableByPartitionEntry(object):
         valid_incoming_link = self.__merge_noneables(
             self._incoming_link, other.incoming_link, "incoming_link")
         merged_outgoing_processors = self._out_going_processors.union(
-            other.out_going_processors)
+            other.processor_ids)
         merged_outgoing_links = self._out_going_links.union(
-            other.out_going_links)
+            other.link_ids)
 
         return MulticastRoutingTableByPartitionEntry(
             merged_outgoing_links, merged_outgoing_processors,
