@@ -1,6 +1,9 @@
 from __future__ import absolute_import, print_function
 import unittest
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from spinn_machine import VirtualMachine
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex

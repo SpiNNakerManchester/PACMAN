@@ -3,7 +3,10 @@ try:
 except ImportError:
     from distutils.core import setup
 
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 import os
 
 __version__ = None

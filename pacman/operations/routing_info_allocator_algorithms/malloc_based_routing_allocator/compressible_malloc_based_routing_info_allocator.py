@@ -1,4 +1,7 @@
-from collections import defaultdict, OrderedDict
+try:
+    from collections.abc import defaultdict, OrderedDict
+except ImportError:
+    from collections import defaultdict, OrderedDict
 import logging
 import numpy
 from past.builtins import xrange

@@ -1,4 +1,7 @@
-from collections import defaultdict, OrderedDict
+try:
+    from collections.abc import defaultdict, OrderedDict
+except ImportError:
+    from collections import defaultdict, OrderedDict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
