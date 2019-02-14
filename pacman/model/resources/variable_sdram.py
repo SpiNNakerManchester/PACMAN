@@ -31,6 +31,9 @@ class VariableSDRAM(AbstractSDRAM):
             return self._fixed_sdram + \
                    (self._per_timestep_sdram * n_timesteps)
         else:
+            if n_timesteps == 0:
+                # Should never happen but is technically valid.
+                return self._fixed_sdram
             if self._per_timestep_sdram == 0:
                 return self._fixed_sdram
             else:
