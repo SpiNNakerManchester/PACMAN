@@ -278,7 +278,7 @@ class PartitionAndPlacePartitioner(object):
             self, lo_atom, hi_atom, vertices, plan_n_timesteps,
             resource_tracker, max_atoms_per_core, fixed_n_atoms=False):
         """ Reduce the number of atoms on a core so that it fits within the
-            resources_available available.
+            resources available.
 
         :param lo_atom: the number of atoms already partitioned
         :type lo_atom: int
@@ -310,7 +310,7 @@ class PartitionAndPlacePartitioner(object):
         used_placements = list()
 
         # Find the number of atoms that will fit in each vertex given the
-        # resources_available available
+        # resources available
         min_hi_atom = hi_atom
         for vertex in vertices:
 
@@ -325,7 +325,7 @@ class PartitionAndPlacePartitioner(object):
             reverse_ip_tags = None
             if not isinstance(vertex, AbstractVirtualVertex):
 
-                # get max resources_available available on machine
+                # get max resources_available on machine
                 resources_available = resource_tracker\
                     .get_maximum_constrained_resources_available(
                         used_resources, vertex.constraints)
@@ -347,7 +347,7 @@ class PartitionAndPlacePartitioner(object):
                                 plan_n_timesteps)))
 
                 while ratio > 1.0 and hi_atom >= lo_atom:
-                    # Scale the resources_available by the ratio
+                    # Scale the resources available by the ratio
                     old_n_atoms = (hi_atom - lo_atom) + 1
                     new_n_atoms = int(old_n_atoms / (ratio * 1.1))
 
@@ -385,13 +385,13 @@ class PartitionAndPlacePartitioner(object):
 
                 # If this hi_atom is smaller than the current minimum, update
                 # the other placements to use (hopefully) less
-                # resources_available
+                # resources available
                 if hi_atom < min_hi_atom:
                     min_hi_atom = hi_atom
                     used_placements = self._reallocate_resources(
                         used_placements, resource_tracker, lo_atom, hi_atom)
 
-                # Attempt to allocate the resources_available for this vertex
+                # Attempt to allocate the resources available for this vertex
                 # on the machine
                 try:
                     (x, y, p, ip_tags, reverse_ip_tags) = \
@@ -399,7 +399,7 @@ class PartitionAndPlacePartitioner(object):
                             used_resources, vertex.constraints)
                 except PacmanValueError as e:
                     raise_from(PacmanValueError(
-                        "Unable to allocate requested resources_available to"
+                        "Unable to allocate requested resources available to"
                         " vertex '{}':\n{}".format(vertex, e)), e)
 
             used_placements.append((vertex, x, y, p, used_resources,
