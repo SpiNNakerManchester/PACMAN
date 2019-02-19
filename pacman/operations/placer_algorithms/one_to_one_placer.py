@@ -186,7 +186,7 @@ class OneToOnePlacer(RadialPlacer):
             if not success:
 
                 # Something went wrong, try to allocate each individually
-                for vertex in progress.over(unallocated, False):
+                for vertex in unallocated:
                     self._allocate_same_chip_as_group(
                         vertex, placements, resource_tracker,
                         same_chip_vertex_groups, all_vertices_placed,
