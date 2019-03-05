@@ -1,9 +1,23 @@
-from collections import defaultdict, OrderedDict
+from collections import defaultdict, namedtuple, OrderedDict
 import json
-
-from pacman.utilities import file_format_schemas
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.router import Router
+from pacman.utilities import file_format_schemas
+
+# A description of a standard set of resources possessed by a chip
+_Desc = namedtuple("_Desc", [
+    # The cores where the monitors are
+    "monitors",
+    # The entries on the router
+    "router_entries",
+    # The speed of the router
+    "router_clock_speed",
+    # The amount of SDRAM on the chip
+    "sdram",
+    # Whether this is a virtual chip
+    "virtual",
+    # What tags this chip has
+    "tags"])
 
 
 class ConvertToJavaMachine(object):
@@ -15,8 +29,7 @@ class ConvertToJavaMachine(object):
     JAVA_MAX_INT = 2147483647
 
     def __call__(self, machine, file_path):
-        """
-        Runs the code to write the machine in Java readable JSON.
+        """ Runs the code to write the machine in Java readable JSON.
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
@@ -38,8 +51,7 @@ class ConvertToJavaMachine(object):
 
     @staticmethod
     def _find_virtual_links(machine):
-        """
-        Find all the virtual links and their inverse.
+        """ Find all the virtual links and their inverse.
 
         As these may well go to an unexpected source
 
@@ -64,9 +76,83 @@ class ConvertToJavaMachine(object):
         return virtual_links_dict
 
     @staticmethod
-    def do_convert(machine, file_path, progress=None):
+    def _describe_chip(chip, std, eth, virtual_links_dict):
+        """ Produce a JSON-suitable description of a single chip.
+
+        :param chip: The chip to describe.
+        :param std: The standard chip resources.
+        :param eth: The standard ethernet chip resources.
+        :param virtual_links_dict: Where the virtual links are.
+        :return: Description of chip that is trivial to serialize as JSON.
         """
-        Runs the code to write the machine in Java readable JSON.
+        details = OrderedDict()
+        details["cores"] = chip.n_processors
+        if chip.nearest_ethernet_x is not None:
+            details["ethernet"] =\
+                [chip.nearest_ethernet_x, chip.nearest_ethernet_y]
+
+        dead_links = []
+        for link_id in range(0, Router.MAX_LINKS_PER_ROUTER):
+            if not chip.router.is_link(link_id):
+                dead_links.append(link_id)
+        if dead_links:
+            details["deadLinks"] = dead_links
+
+        if chip in virtual_links_dict:
+            links = []
+            for link in virtual_links_dict[chip]:
+                link_details = OrderedDict()
+                link_details["sourceLinkId"] = link.source_link_id
+                link_details["destinationX"] = link.destination_x
+                link_details["destinationY"] = link.destination_y
+                links.append(link_details)
+            details["links"] = links
+
+        exceptions = OrderedDict()
+        router_entries = ConvertToJavaMachine.int_value(
+            chip.router.n_available_multicast_entries)
+        if chip.ip_address is not None:
+            details['ipAddress'] = chip.ip_address
+            # Write the Resources ONLY if different from the e_values
+            if (chip.n_processors - chip.n_user_processors) != eth.monitors:
+                exceptions["monitors"] = \
+                    chip.n_processors - chip.n_user_processors
+            if (router_entries != eth.router_entries):
+                exceptions["routerEntries"] = router_entries
+            if (chip.router.clock_speed != eth.router_clock_speed):
+                exceptions["routerClockSpeed"] = \
+                    chip.router.n_available_multicast_entries
+            if chip.sdram.size != eth.sdram:
+                exceptions["sdram"] = chip.sdram.size
+            if chip.virtual != eth.virtual:
+                exceptions["virtual"] = chip.virtual
+            if chip.tag_ids != eth.tags:
+                details["tags"] = list(chip.tag_ids)
+        else:
+            # Write the Resources ONLY if different from the s_values
+            if (chip.n_processors - chip.n_user_processors) != std.monitors:
+                exceptions["monitors"] = \
+                    chip.n_processors - chip.n_user_processors
+            if (router_entries != std.router_entries):
+                exceptions["routerEntries"] = router_entries
+            if (chip.router.clock_speed != std.router_clock_speed):
+                exceptions["routerClockSpeed"] = \
+                    chip.router.n_available_multicast_entries
+            if chip.sdram.size != std.sdram:
+                exceptions["sdram"] = chip.sdram.size
+            if chip.virtual != std.virtual:
+                exceptions["virtual"] = chip.virtual
+            if chip.tag_ids != std.tags:
+                details["tags"] = list(chip.tag_ids)
+
+        if exceptions:
+            return [chip.x, chip.y, details, exceptions]
+        else:
+            return [chip.x, chip.y, details]
+
+    @staticmethod
+    def do_convert(machine, file_path, progress=None):
+        """ Runs the code to write the machine in Java readable JSON.
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
@@ -74,45 +160,50 @@ class ConvertToJavaMachine(object):
         :type file_path: str
         """
 
-        # Find the s_ values for one non ethernet chip to use as standard
+        # Find the std values for one non-ethernet chip to use as standard
         for chip in machine.chips:
-            if (chip.ip_address is None):
-                s_monitors = chip.n_processors - chip.n_user_processors
-                s_router_entries = ConvertToJavaMachine.int_value(
-                    chip.router.n_available_multicast_entries)
-                s_router_clock_speed = chip.router.clock_speed
-                s_sdram = chip.sdram.size
-                s_virtual = chip.virtual
-                s_tags = chip.tag_ids
+            if chip.ip_address is None:
+                std = _Desc(
+                    monitors=chip.n_processors - chip.n_user_processors,
+                    router_entries = ConvertToJavaMachine.int_value(
+                        chip.router.n_available_multicast_entries),
+                    router_clock_speed=chip.router.clock_speed,
+                    sdram=chip.sdram.size,
+                    virtual=chip.virtual,
+                    tags=chip.tag_ids)
                 break
+        else:
+            # Probably ought to warn if std is unpopulated
+            pass
 
-        # find the e_ values to use for ethernet chips
+        # find the eth values to use for ethernet chips
         chip = machine.boot_chip
-        e_monitors = chip.n_processors - chip.n_user_processors
-        e_router_entries = ConvertToJavaMachine.int_value(
-            chip.router.n_available_multicast_entries)
-        e_router_clock_speed = chip.router.clock_speed
-        e_sdram = chip.sdram.size
-        e_virtual = chip.virtual
-        e_tags = chip.tag_ids
+        eth = _Desc(
+            monitors=chip.n_processors - chip.n_user_processors,
+            router_entries=ConvertToJavaMachine.int_value(
+                chip.router.n_available_multicast_entries),
+            router_clock_speed=chip.router.clock_speed,
+            sdram=chip.sdram.size,
+            virtual=chip.virtual,
+            tags=chip.tag_ids)
 
         # Save the standard data to be used as defaults to none ethernet chips
         standardResources = OrderedDict()
-        standardResources["monitors"] = s_monitors
-        standardResources["routerEntries"] = s_router_entries
-        standardResources["routerClockSpeed"] = s_router_clock_speed
-        standardResources["sdram"] = s_sdram
-        standardResources["virtual"] = s_virtual
-        standardResources["tags"] = list(s_tags)
+        standardResources["monitors"] = std.monitors
+        standardResources["routerEntries"] = std.router_entries
+        standardResources["routerClockSpeed"] = std.router_clock_speed
+        standardResources["sdram"] = std.sdram
+        standardResources["virtual"] = std.virtual
+        standardResources["tags"] = list(std.tags)
 
         # Save the standard data to be used as defaults to none ethernet chips
         ethernetResources = OrderedDict()
-        ethernetResources["monitors"] = e_monitors
-        ethernetResources["routerEntries"] = e_router_entries
-        ethernetResources["routerClockSpeed"] = e_router_clock_speed
-        ethernetResources["sdram"] = e_sdram
-        ethernetResources["virtual"] = e_virtual
-        ethernetResources["tags"] = list(e_tags)
+        ethernetResources["monitors"] = eth.monitors
+        ethernetResources["routerEntries"] = eth.router_entries
+        ethernetResources["routerClockSpeed"] = eth.router_clock_speed
+        ethernetResources["sdram"] = eth.sdram
+        ethernetResources["virtual"] = eth.virtual
+        ethernetResources["tags"] = list(eth.tags)
 
         # write basic stuff
         json_obj = OrderedDict()
@@ -127,68 +218,9 @@ class ConvertToJavaMachine(object):
 
         # handle chips
         for chip in machine.chips:
-            details = OrderedDict()
-            details["cores"] = chip.n_processors
-            if chip.nearest_ethernet_x is not None:
-                details["ethernet"] =\
-                    [chip.nearest_ethernet_x, chip.nearest_ethernet_y]
-            dead_links = []
-            for link_id in range(0, Router.MAX_LINKS_PER_ROUTER):
-                if not chip.router.is_link(link_id):
-                    dead_links.append(link_id)
-            if len(dead_links) > 0:
-                details["deadLinks"] = dead_links
-            if chip in virtual_links_dict:
-                links = []
-                for link in virtual_links_dict[chip]:
-                    link_details = OrderedDict()
-                    link_details["sourceLinkId"] = link.source_link_id
-                    link_details["destinationX"] = link.destination_x
-                    link_details["destinationY"] = link.destination_y
-                    links.append(link_details)
-                details["links"] = links
+            json_obj["chips"].append(ConvertToJavaMachine._describe_chip(
+                chip, std, eth, virtual_links_dict))
 
-            exceptions = OrderedDict()
-            router_entries = ConvertToJavaMachine.int_value(
-                chip.router.n_available_multicast_entries)
-            if chip.ip_address is not None:
-                details['ipAddress'] = chip.ip_address
-                # Write the Resources ONLY if different from the e_values
-                if (chip.n_processors - chip.n_user_processors) != e_monitors:
-                    exceptions["monitors"] = \
-                        chip.n_processors - chip.n_user_processors
-                if (router_entries != e_router_entries):
-                    exceptions["routerEntries"] = router_entries
-                if (chip.router.clock_speed != e_router_clock_speed):
-                    exceptions["routerClockSpeed"] = \
-                        chip.router.n_available_multicast_entries
-                if chip.sdram.size != e_sdram:
-                    exceptions["sdram"] = chip.sdram.size
-                if chip.virtual != e_virtual:
-                    exceptions["virtual"] = chip.virtual
-                if chip.tag_ids != e_tags:
-                    details["tags"] = list(chip.tag_ids)
-            else:
-                # Write the Resources ONLY if different from the s_values
-                if (chip.n_processors - chip.n_user_processors) != s_monitors:
-                    exceptions["monitors"] = \
-                        chip.n_processors - chip.n_user_processors
-                if (router_entries != s_router_entries):
-                    exceptions["routerEntries"] = router_entries
-                if (chip.router.clock_speed != s_router_clock_speed):
-                    exceptions["routerClockSpeed"] = \
-                        chip.router.n_available_multicast_entries
-                if chip.sdram.size != s_sdram:
-                    exceptions["sdram"] = chip.sdram.size
-                if chip.virtual != s_virtual:
-                    exceptions["virtual"] = chip.virtual
-                if chip.tag_ids != s_tags:
-                    details["tags"] = list(chip.tag_ids)
-
-            if len(exceptions) > 0:
-                json_obj["chips"].append([chip.x, chip.y, details, exceptions])
-            else:
-                json_obj["chips"].append([chip.x, chip.y, details])
         if progress:
             progress.update()
 
