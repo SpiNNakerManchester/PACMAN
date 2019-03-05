@@ -165,7 +165,7 @@ class ConvertToJavaMachine(object):
             if chip.ip_address is None:
                 std = _Desc(
                     monitors=chip.n_processors - chip.n_user_processors,
-                    router_entries = ConvertToJavaMachine.int_value(
+                    router_entries=ConvertToJavaMachine.int_value(
                         chip.router.n_available_multicast_entries),
                     router_clock_speed=chip.router.clock_speed,
                     sdram=chip.sdram.size,
