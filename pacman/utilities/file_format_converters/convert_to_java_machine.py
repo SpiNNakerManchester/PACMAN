@@ -16,7 +16,7 @@ class ConvertToJavaMachine(object):
 
     def __call__(self, machine, file_path):
         """
-        Runs the code to write the machine in Java readable json.
+        Runs the code to write the machine in Java readable JSON.
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
@@ -28,7 +28,6 @@ class ConvertToJavaMachine(object):
             "Converting to JSON machine")
 
         return ConvertToJavaMachine.do_convert(machine, file_path, progress)
-
 
     @staticmethod
     def int_value(value):
@@ -53,9 +52,9 @@ class ConvertToJavaMachine(object):
             for link in chip.router.links:
                 virtual_links_dict[chip].append(link)
                 # Find and save inverse link as well
-                inverse_id = (link.source_link_id
-                              + Router.MAX_LINKS_PER_ROUTER//2) \
-                             % Router.MAX_LINKS_PER_ROUTER
+                inverse_id = (
+                    (link.source_link_id + Router.MAX_LINKS_PER_ROUTER // 2)
+                    % Router.MAX_LINKS_PER_ROUTER)
                 destination = machine.get_chip_at(
                     link.destination_x, link.destination_y)
                 inverse_link = destination.router.get_link(inverse_id)
@@ -67,7 +66,7 @@ class ConvertToJavaMachine(object):
     @staticmethod
     def do_convert(machine, file_path, progress=None):
         """
-        Runs the code to write the machine in Java readable json.
+        Runs the code to write the machine in Java readable JSON.
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
