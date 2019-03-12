@@ -407,8 +407,7 @@ class ResourceTracker(object):
                 # Not a case of all the Chips never existed
                 return
         raise PacmanCanNotFindChipException(
-            "None of the chips {} where ever in the chips list".format(chips),
-            "No valid chips found on the specified board")
+            "None of the chips {} where ever in the chips list".format(chips))
 
     @property
     def chips_available(self):
