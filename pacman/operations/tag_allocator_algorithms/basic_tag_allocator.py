@@ -49,7 +49,7 @@ class BasicTagAllocator(object):
     def _gather_placements_with_tags(self, placement, collector):
         if (placement.vertex.resources_required.iptags or
                 placement.vertex.resources_required.reverse_iptags):
-            ResourceTracker.check_constraints([placement.vertex])
+            #ResourceTracker.check_constraints([placement.vertex])
             collector.append(placement)
 
     def _allocate_tags_for_placement(self, placement, resource_tracker,
