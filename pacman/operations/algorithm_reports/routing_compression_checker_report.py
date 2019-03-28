@@ -1,4 +1,7 @@
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 import logging
 import os
 from spinn_utilities.log import FormatAdapter

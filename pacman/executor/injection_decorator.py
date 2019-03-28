@@ -1,5 +1,12 @@
-from collections import defaultdict
-import inspect
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
+try:
+    from inspect import getfullargspec
+except ImportError:
+    # Python 2.7 hack
+    from inspect import getargspec as getfullargspec
 from functools import wraps
 from six import iteritems, itervalues
 
@@ -90,7 +97,7 @@ def inject_items(types):
     """
     def wrap(wrapped_method):
         exn_arg = None
-        method_args = inspect.getargspec(wrapped_method)
+        method_args = getfullargspec(wrapped_method)
         for type_arg in types:
             if type_arg not in method_args.args:
                 # Can't raise exception until run time

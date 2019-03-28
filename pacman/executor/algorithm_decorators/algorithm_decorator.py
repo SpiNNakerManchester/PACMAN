@@ -1,4 +1,9 @@
 import inspect
+try:
+    from inspect import getfullargspec
+except ImportError:
+    # Python 2.7 hack
+    from inspect import getargspec as getfullargspec
 import logging
 import os
 import pkgutil
@@ -120,7 +125,7 @@ def _decode_algorithm_details(
     :param function: The function to be called by the algorithm
     :param has_self: True if the self parameter is expected
     """
-    function_args = inspect.getargspec(function)
+    function_args = getfullargspec(function)
     if function_args.defaults is not None:
         n_defaults = len(function_args.defaults)
         required_args = OrderedSet(
@@ -238,7 +243,7 @@ def algorithm(
             if hasattr(algorithm, "__init__"):
                 init = getattr(algorithm, "__init__")
                 try:
-                    init_args = inspect.getargspec(init)
+                    init_args = getfullargspec(init)
                     n_init_defaults = 0
                     if init_args.defaults is not None:
                         n_init_defaults = len(init_args.defaults)
