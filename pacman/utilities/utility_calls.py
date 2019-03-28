@@ -184,11 +184,14 @@ def get_max_atoms_per_core(vertex):
     :param vertex: The vertex to determine the max atoms per core of
     :rtype: int
     """
+    # Definitely bounded by size of vertex
     possible_max_atoms = [vertex.n_atoms]
+    # Also bounded by a vertex-determined loading
     if isinstance(vertex, AbstractHasGlobalMaxAtoms):
         possible_max_atoms.append(vertex.get_max_atoms_per_core())
-    max_atom_constraints = locate_constraints_of_type(
-        vertex.constraints, MaxVertexAtomsConstraint)
-    for constraint in max_atom_constraints:
-        possible_max_atoms.append(constraint.size)
+    # And any relevant constraints that have been set
+    possible_max_atoms.extend(
+        c.size for c in vertex.constraints
+        if isinstance(c, MaxVertexAtomsConstraint))
+    # Finally, choose the smallest possible maximum
     return int(min(possible_max_atoms))
