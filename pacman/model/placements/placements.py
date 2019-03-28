@@ -1,4 +1,7 @@
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 from six import iterkeys, itervalues, raise_from
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,

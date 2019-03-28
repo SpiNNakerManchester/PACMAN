@@ -1,4 +1,7 @@
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
@@ -407,8 +410,7 @@ class ResourceTracker(object):
                 # Not a case of all the Chips never existed
                 return
         raise PacmanCanNotFindChipException(
-            "None of the chips {} where ever in the chips list".format(chips),
-            "No valid chips found on the specified board")
+            "None of the chips {} where ever in the chips list".format(chips))
 
     @property
     def chips_available(self):
