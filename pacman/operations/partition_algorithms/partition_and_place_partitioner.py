@@ -314,7 +314,7 @@ class PartitionAndPlacePartitioner(object):
         min_hi_atom = hi_atom
         for vertex in vertices:
 
-            # get resources_available used by vertex
+            # get resources used by vertex
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
 
@@ -330,7 +330,7 @@ class PartitionAndPlacePartitioner(object):
                     .get_maximum_constrained_resources_available(
                         used_resources, vertex.constraints)
 
-                # Work out the ratio of used to available resources_available
+                # Work out the ratio of used to available resources
                 ratio = self._find_max_ratio(
                     used_resources, resources_available, plan_n_timesteps)
 
