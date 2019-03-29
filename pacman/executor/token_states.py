@@ -1,5 +1,3 @@
-from six import iteritems
-
 from pacman.executor.algorithm_decorators import Token
 
 
@@ -53,7 +51,7 @@ class _TokenState(object):
     @property
     def complete_parts(self):
         """ returns the complete parts
-        
+
         :return: the complete parts of this token
         """
         return self._complete_parts
@@ -120,7 +118,7 @@ class TokenStates(object):
 
     def is_tracking_token_part(self, token):
         """ checks if a token part is actually being tracked
-        
+
         :param token: the token whom's part is to be checked.
         :return: bool
         """

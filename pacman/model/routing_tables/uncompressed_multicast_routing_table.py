@@ -116,10 +116,9 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._number_of_defaulted_routing_entries
 
     def get_entry_by_routing_entry_key(self, routing_entry_key):
-        """ 
-        Get the routing entry associated with the specified key\
+        """  Get the routing entry associated with the specified key \
             or None if the routing table does not match the key
-        
+
         :param routing_entry_key: the routing key to be searched
         :type routing_entry_key: int
         :return the routing entry associated with the routing key_combo or\

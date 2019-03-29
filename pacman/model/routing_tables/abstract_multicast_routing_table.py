@@ -35,7 +35,7 @@ class AbsractMulticastRoutingTable(object):
     def number_of_entries(self):
         """ The number of multi-cast routing entries there are in the\
             multicast routing table
-        
+
         :return: int
         """
 
@@ -62,4 +62,3 @@ class AbsractMulticastRoutingTable(object):
     @abstractmethod
     def __repr__(self):
         """repr"""
-

@@ -151,8 +151,10 @@ class TestRoutingTable(unittest.TestCase):
         multicast_entries2 = MulticastRoutingEntry(
             key_combo - 1, mask, proc_ids, link_ids, True)
         mrt = list()
-        mrt.append(UnCompressedMulticastRoutingTable(3, 0, [multicast_entries1]))
-        mrt.append(UnCompressedMulticastRoutingTable(3, 0, [multicast_entries2]))
+        mrt.append(
+            UnCompressedMulticastRoutingTable(3, 0, [multicast_entries1]))
+        mrt.append(
+            UnCompressedMulticastRoutingTable(3, 0, [multicast_entries2]))
         with self.assertRaises(PacmanAlreadyExistsException):
             MulticastRoutingTables(mrt)
 
