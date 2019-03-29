@@ -1,5 +1,8 @@
 from __future__ import print_function
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 import unittest
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (

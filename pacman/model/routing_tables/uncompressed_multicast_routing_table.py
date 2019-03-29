@@ -1,4 +1,7 @@
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanRoutingException)
 from pacman.model.routing_tables.abstract_multicast_routing_table import \

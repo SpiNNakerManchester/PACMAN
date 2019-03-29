@@ -1,4 +1,7 @@
-from collections import deque
+try:
+    from collections.abc import deque
+except ImportError:
+    from collections import deque
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import (

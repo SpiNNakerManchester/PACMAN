@@ -1,4 +1,7 @@
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
@@ -9,7 +12,8 @@ from pacman.utilities.utility_calls import (
     check_algorithm_can_support_constraints, check_constrained_value,
     is_equal_or_None)
 from pacman.exceptions import (
-    PacmanInvalidParameterException, PacmanValueError, PacmanException)
+    PacmanCanNotFindChipException, PacmanInvalidParameterException,
+    PacmanValueError, PacmanException)
 from sortedcollections import ValueSortedDict
 from pacman.utilities import constants
 
@@ -378,6 +382,7 @@ class ResourceTracker(object):
                     chip_found = True
                     yield (x, y)
             if not chip_found:
+                self._check_chip_not_used(chips)
                 raise PacmanInvalidParameterException(
                     "chips and board_address",
                     "{} and {}".format(chips, board_address),
@@ -390,6 +395,22 @@ class ResourceTracker(object):
             for (x, y) in self._chips_available:
                 if self._chip_available(x, y):
                     yield (x, y)
+
+    def _check_chip_not_used(self, chips):
+        """
+        Check to see if any of the candidates chip have already been used.
+        If not this may indicate the Chip was not there. Possibly a dead chip.
+        :param chips: iterable of tuples of (x, y) coordinates of chips to \
+            look though for usable chips, or None to use all available chips
+        :type chips: iterable(tuple(int, int))
+        :rtype: None
+        """
+        for chip in chips:
+            if chip in self._chips_used:
+                # Not a case of all the Chips never existed
+                return
+        raise PacmanCanNotFindChipException(
+            "None of the chips {} where ever in the chips list".format(chips))
 
     @property
     def chips_available(self):
