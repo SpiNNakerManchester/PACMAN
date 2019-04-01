@@ -78,14 +78,17 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
 
 
 def add_set(all_sets, new_set):
+    union = set()
+    removes = []
     for a_set in all_sets:
         intersection = new_set & a_set
         if intersection:
-            all_sets.remove(a_set)
-            union = a_set | new_set
-            add_set(all_sets, union)
-            return
-    all_sets.append(new_set)
+            removes.append(a_set)
+            union = union | a_set
+    union = union | new_set
+    for a_set in removes:
+        all_sets.remove(a_set)
+    all_sets.append(union)
     return
 
 
