@@ -1,15 +1,13 @@
-from pacman.model.graphs.machine \
-    import MachineVertex, MachineGraph, MachineEdge
+from six import itervalues
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import (
+    Router, FixedRouteEntry, Machine, VirtualMachine)
+from pacman.model.graphs.machine import (
+    MachineVertex, MachineGraph, MachineEdge)
 from pacman.model.placements import Placements, Placement
 from pacman.operations.router_algorithms import BasicDijkstraRouting
-from spinn_machine import Router
-from spinn_machine.fixed_route_entry import FixedRouteEntry
-from pacman.exceptions import \
-    PacmanAlreadyExistsException, PacmanConfigurationException
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine.virtual_machine import VirtualMachine
-from spinn_machine.machine import Machine
-from six import itervalues
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanConfigurationException)
 
 
 class FixedRouteRouter(object):
@@ -210,8 +208,8 @@ class FixedRouteRouter(object):
             # only want the first entry, as that will all be the same.
             mc_entry = next(itervalues(mc_entries))
             fixed_route_entry = FixedRouteEntry(
-                link_ids=mc_entry.out_going_links,
-                processor_ids=mc_entry.out_going_processors)
+                link_ids=mc_entry.link_ids,
+                processor_ids=mc_entry.processor_ids)
             x = (chip_x + eth_x) % (machine.max_chip_x + 1)
             y = (chip_y + eth_y) % (machine.max_chip_y + 1)
             key = (x, y)

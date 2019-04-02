@@ -1,21 +1,13 @@
-from spinn_utilities.progress_bar import ProgressBar
-
-# pacman imports
-from pacman.model.routing_tables \
-    import MulticastRoutingTable, MulticastRoutingTables
-from pacman.exceptions import PacmanElementAllocationException
-
-# spinnMachine imports
-from spinn_machine import MulticastRoutingEntry
-
-# rig imports
-from rig import routing_table as rig_routing_table
-from rig.routing_table import ordered_covering as rigs_compressor
-
-# general imports
 import collections
 import logging
 import itertools
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import MulticastRoutingEntry
+from pacman.model.routing_tables import (
+    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.exceptions import PacmanElementAllocationException
+from rig import routing_table as rig_routing_table
+from rig.routing_table import ordered_covering as rigs_compressor
 
 logger = logging.getLogger(__name__)
 

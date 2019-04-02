@@ -1,11 +1,12 @@
 import json
-
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractVirtualVertex
 from pacman.utilities.utility_calls import md5, ident
-
-from spinn_utilities.progress_bar import ProgressBar
-from collections import OrderedDict
 from pacman.utilities import file_format_schemas
 
 DEFAULT_NUMBER_OF_CORES_USED_PER_VERTEX = 1

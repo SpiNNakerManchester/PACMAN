@@ -1,4 +1,3 @@
-# pacman imports
 from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 

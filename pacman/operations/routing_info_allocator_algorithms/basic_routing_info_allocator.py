@@ -1,12 +1,11 @@
 from spinn_utilities.progress_bar import ProgressBar
-
-# pacman imports
-from pacman.model.routing_info \
-    import RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask
-from pacman.utilities import utility_calls
+from pacman.model.routing_info import (
+    RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
+from pacman.utilities.utility_calls import (
+    check_algorithm_can_support_constraints)
 from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.model.constraints.key_allocator_constraints\
-    import AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint
+from pacman.model.constraints.key_allocator_constraints import (
+    AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint)
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
@@ -48,11 +47,9 @@ class BasicRoutingInfoAllocator(object):
 
         # check that this algorithm supports the constraints put onto the
         # partitions
-        supported_constraints = [
-            ContiguousKeyRangeContraint]
-        utility_calls.check_algorithm_can_support_constraints(
+        check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
-            supported_constraints=supported_constraints,
+            supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         # take each edge and create keys from its placement

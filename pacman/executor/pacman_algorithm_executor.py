@@ -1,20 +1,20 @@
+import logging
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
+from six import iterkeys
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
-# pacman imports
 from pacman.exceptions import PacmanConfigurationException
 from pacman import operations
 from .injection_decorator import injection_context, do_injection
-from .algorithm_decorators import scan_packages, get_algorithms
+from .algorithm_decorators import (
+    scan_packages, get_algorithms, Token)
 from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
 from pacman.operations import algorithm_reports
 from pacman.utilities import file_format_converters
 from pacman.executor.token_states import TokenStates
-from pacman.executor.algorithm_decorators.token import Token
-
-# general imports
-import logging
-from collections import defaultdict
-from spinn_utilities.log import FormatAdapter
-from six import iterkeys
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

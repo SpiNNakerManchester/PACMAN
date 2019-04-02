@@ -1,19 +1,17 @@
-# pacman imports
-from pacman.model.constraints.placer_constraints \
-    import RadialPlacementFromChipConstraint, SameChipAsConstraint
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
-    import sort_vertices_by_known_constraints, get_same_chip_vertex_groups
+try:
+    from collections.abc import deque
+except ImportError:
+    from collections import deque
+import logging
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.constraints.placer_constraints import (
+    RadialPlacementFromChipConstraint, SameChipAsConstraint)
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
-
-from spinn_utilities.progress_bar import ProgressBar
-
-# general imports
-from collections import deque
-import logging
-
 
 logger = logging.getLogger(__name__)
 

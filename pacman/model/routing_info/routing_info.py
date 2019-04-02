@@ -1,6 +1,5 @@
-# pacman imports
-from pacman.exceptions import PacmanAlreadyExistsException
 from six import itervalues
+from pacman.exceptions import PacmanAlreadyExistsException
 
 
 class RoutingInfo(object):

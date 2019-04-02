@@ -1,6 +1,9 @@
-from pacman.exceptions import PacmanValueError
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.exceptions import PacmanValueError
 
 
 class GraphMapper(object):

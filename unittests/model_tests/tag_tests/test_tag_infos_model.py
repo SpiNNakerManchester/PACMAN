@@ -2,16 +2,11 @@
 TestTagsModel
 """
 from __future__ import absolute_import
-# pacman imports
+import unittest
+from spinn_machine.tags import IPTag, ReverseIPTag
+from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.tags import Tags
-
-# spinnmachine imports
-from spinn_machine.tags import IPTag, ReverseIPTag
-
-# general imports
-import unittest
-from pacman.exceptions import PacmanInvalidParameterException
 
 
 class TestTagsModel(unittest.TestCase):

@@ -245,3 +245,14 @@ class PacmanNoMergeException(PacmanException):
     """ An exception that indicates to indicate that there are no merges worth\
         performing.
     """
+
+
+class PacmanCanNotFindChipException(PacmanException):
+    """ An exception that indicates the chip was not in the list of chips.
+    """
+    def __init__(self, problem):
+        """
+        :param problem: The problem with the partitioning
+        :type problem: str
+        """
+        super(PacmanCanNotFindChipException, self).__init__(problem)

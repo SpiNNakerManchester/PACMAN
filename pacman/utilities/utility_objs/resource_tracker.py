@@ -1,17 +1,21 @@
-from pacman.model.constraints.placer_constraints\
-    import RadialPlacementFromChipConstraint, BoardConstraint
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint, AbstractPlacerConstraint
-from pacman.model.resources import ResourceContainer, DTCMResource, \
-    SDRAMResource, CPUCyclesPerTickResource
-from pacman.utilities import utility_calls, constants
-from pacman.exceptions import PacmanInvalidParameterException, \
-    PacmanValueError, PacmanException
-
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
-
-from collections import defaultdict
+from pacman.model.constraints.placer_constraints import (
+    RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
+    AbstractPlacerConstraint)
+from pacman.model.resources import (
+    ResourceContainer, DTCMResource, SDRAMResource, CPUCyclesPerTickResource)
+from pacman.utilities.utility_calls import (
+    check_algorithm_can_support_constraints, check_constrained_value,
+    is_equal_or_None)
+from pacman.exceptions import (
+    PacmanCanNotFindChipException, PacmanInvalidParameterException,
+    PacmanValueError, PacmanException)
 from sortedcollections import ValueSortedDict
+from pacman.utilities import constants
 
 
 class ResourceTracker(object):
@@ -268,7 +272,7 @@ class ResourceTracker(object):
             placement_constraints.update(additional_placement_constraints)
 
         # Check the placement constraints
-        utility_calls.check_algorithm_can_support_constraints(
+        check_algorithm_can_support_constraints(
             constrained_vertices=vertices,
             supported_constraints=placement_constraints,
             abstract_constraint_type=AbstractPlacerConstraint)
@@ -296,7 +300,7 @@ class ResourceTracker(object):
 
         for constraint in constraints:
             if isinstance(constraint, BoardConstraint):
-                board_address = utility_calls.check_constrained_value(
+                board_address = check_constrained_value(
                     constraint.board_address, board_address)
         return board_address, ip_tags, reverse_ip_tags
 
@@ -321,9 +325,9 @@ class ResourceTracker(object):
         p = None
         for constraint in constraints:
             if isinstance(constraint, ChipAndCoreConstraint):
-                x = utility_calls.check_constrained_value(constraint.x, x)
-                y = utility_calls.check_constrained_value(constraint.y, y)
-                p = utility_calls.check_constrained_value(constraint.p, p)
+                x = check_constrained_value(constraint.x, x)
+                y = check_constrained_value(constraint.y, y)
+                p = check_constrained_value(constraint.p, p)
 
         if chips is not None and x is not None and y is not None:
             if (x, y) not in chips:
@@ -378,6 +382,7 @@ class ResourceTracker(object):
                     chip_found = True
                     yield (x, y)
             if not chip_found:
+                self._check_chip_not_used(chips)
                 raise PacmanInvalidParameterException(
                     "chips and board_address",
                     "{} and {}".format(chips, board_address),
@@ -390,6 +395,22 @@ class ResourceTracker(object):
             for (x, y) in self._chips_available:
                 if self._chip_available(x, y):
                     yield (x, y)
+
+    def _check_chip_not_used(self, chips):
+        """
+        Check to see if any of the candidates chip have already been used.
+        If not this may indicate the Chip was not there. Possibly a dead chip.
+        :param chips: iterable of tuples of (x, y) coordinates of chips to \
+            look though for usable chips, or None to use all available chips
+        :type chips: iterable(tuple(int, int))
+        :rtype: None
+        """
+        for chip in chips:
+            if chip in self._chips_used:
+                # Not a case of all the Chips never existed
+                return
+        raise PacmanCanNotFindChipException(
+            "None of the chips {} where ever in the chips list".format(chips))
 
     @property
     def chips_available(self):
@@ -556,11 +577,10 @@ class ResourceTracker(object):
         for (other_board_address, other_tag) in existing_tags:
             (other_strip_sdp, other_port) = self._ip_tags_strip_sdp_and_port[
                 other_board_address, other_tag]
-            if (utility_calls.is_equal_or_None(
-                    other_board_address, board_address) and
-                    utility_calls.is_equal_or_None(other_tag, tag_id) and
+            if (is_equal_or_None(other_board_address, board_address) and
+                    is_equal_or_None(other_tag, tag_id) and
                     other_strip_sdp == strip_sdp and
-                    utility_calls.is_equal_or_None(other_port, port)):
+                    is_equal_or_None(other_port, port)):
 
                 # If the existing tag is on the same board, return immediately
                 if (eth_chip is not None and
@@ -963,7 +983,8 @@ class ResourceTracker(object):
         :return:\
             The x and y coordinates of the used chip, the processor_id,\
             and the IP tag and reverse IP tag allocation tuples
-        :rtype: (int, int, int, list((int, int)), list((int, int)))
+        :rtype: tuple(int, int, int, list(tuple(int, int)), \
+            list(tuple(int, int)))
         :raise PacmanValueError: \
             If the constraints cannot be met given the\
             current allocation of resources
@@ -1155,7 +1176,8 @@ class ResourceTracker(object):
             iterable(:py:class:`pacman.model.resources.ReverseIPtagResource`)
         :return: The x and y coordinates of the used chip, the processor_id,\
             and the IP tag and reverse IP tag allocation tuples
-        :rtype: (int, int, int, list((int, int, int, int)), list((int, int)))
+        :rtype: tuple(int, int, int, list(tuple(int, int, int, int)), \
+            list(tuple(int, int)))
         :raises pacman.exceptions.PacmanValueError: \
             If there isn't a chip available that can take the allocation.
         """
@@ -1313,7 +1335,7 @@ class ResourceTracker(object):
 
         :param area_code: A set of valid (x, y) coordinates to choose from
         :return: a resource which shows max resources available
-        :rtype: pacman.model.resources.ResourceContainer
+        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
         """
         # Go through the chips in order of sdram
         for ((chip_x, chip_y),

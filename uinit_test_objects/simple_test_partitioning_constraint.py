@@ -1,8 +1,8 @@
 """
 test constraint
 """
-from pacman.model.constraints.partitioner_constraints\
-    import AbstractPartitionerConstraint
+from pacman.model.constraints.partitioner_constraints import (
+    AbstractPartitionerConstraint)
 
 
 class NewPartitionerConstraint(AbstractPartitionerConstraint):

@@ -1,19 +1,17 @@
 from __future__ import print_function
 import unittest
-
 from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.model.constraints.key_allocator_constraints import \
-    FixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    share_key_constraint import ShareKeyConstraint
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex, \
-    MachineEdge
+from pacman.model.constraints.key_allocator_constraints import (
+    FixedKeyAndMaskConstraint, ShareKeyConstraint)
+from pacman.model.graphs.machine import (
+    MachineGraph, SimpleMachineVertex, MachineEdge)
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
-    import MallocBasedRoutingInfoAllocator
-from pacman.model.routing_info import BaseKeyAndMask, \
-    DictBasedMachinePartitionNKeysMap
+    import (
+        MallocBasedRoutingInfoAllocator)
+from pacman.model.routing_info import (
+    BaseKeyAndMask, DictBasedMachinePartitionNKeysMap)
 
 
 class MyTestCase(unittest.TestCase):
