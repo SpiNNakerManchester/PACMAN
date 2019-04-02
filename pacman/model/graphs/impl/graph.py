@@ -174,7 +174,7 @@ class Graph(ConstrainedObject, AbstractGraph):
 
     @overrides(AbstractGraph.get_outgoing_partition_for_edge)
     def get_outgoing_partition_for_edge(self, edge):
-        return self._outgoing_edge_partition_by_edge[edge]
+        return self._outgoing_edge_partition_by_edge.get(edge, None)
 
     @overrides(AbstractGraph.get_edges_starting_at_vertex)
     def get_edges_starting_at_vertex(self, vertex):
