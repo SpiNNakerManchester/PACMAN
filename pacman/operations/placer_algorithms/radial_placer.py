@@ -9,7 +9,6 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
 from pacman.model.placements import Placement, Placements
-from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
