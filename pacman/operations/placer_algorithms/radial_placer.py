@@ -59,8 +59,8 @@ class RadialPlacer(object):
         vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
-        radial_constraints = locate_constraints_of_type(
-            vertices, RadialPlacementFromChipConstraint)
+        radial_constraints = [c for v in vertices for c in v.constraints if
+                              isinstance(c, RadialPlacementFromChipConstraint)]
         start_x, start_y = self._get_start(radial_constraints)
         chips = None
         if start_x is not None and start_y is not None:
