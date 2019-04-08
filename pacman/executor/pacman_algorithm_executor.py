@@ -1,5 +1,8 @@
 import logging
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from six import iterkeys
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer

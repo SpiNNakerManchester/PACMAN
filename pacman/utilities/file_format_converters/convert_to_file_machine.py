@@ -1,5 +1,8 @@
 import json
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.constants import EDGES
 from pacman.utilities import file_format_schemas

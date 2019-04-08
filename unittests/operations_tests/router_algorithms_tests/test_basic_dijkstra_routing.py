@@ -1,5 +1,8 @@
 import unittest
-from collections import deque
+try:
+    from collections.abc import deque
+except ImportError:
+    from collections import deque
 from spinn_machine.virtual_machine import VirtualMachine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
