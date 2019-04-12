@@ -1,7 +1,7 @@
 try:
-    from collections.abc import defaultdict, OrderedDict
+    from collections.abc import OrderedDict
 except ImportError:
-    from collections import defaultdict, OrderedDict
+    from collections import OrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
