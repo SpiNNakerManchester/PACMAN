@@ -14,8 +14,10 @@ _LINK_LABELS = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
 _C_ROUTING_TABLE_DIR = "compressed_routing_tables_generated"
 _COMPARED_FILENAME = "comparison_of_compressed_uncompressed_routing_tables.rpt"
 _PARTITIONING_FILENAME = "partitioned_by_vertex.rpt"
-_PLACEMENT_VTX_FILENAME = "placement_by_vertex.rpt"
-_PLACEMENT_CORE_FILENAME = "placement_by_core.rpt"
+_PLACEMENT_VTX_GRAPH_FILENAME = "placement_by_vertex_using_graph.rpt"
+_PLACEMENT_VTX_SIMPLE_FILENAME = "placement_by_vertex_without_graph.rpt"
+_PLACEMENT_CORE_GRAPH_FILENAME = "placement_by_core_using_graph.rpt"
+_PLACEMENT_CORE_SIMPLE_FILENAME = "placement_by_core_without_graph.rpt"
 _ROUTING_FILENAME = "edge_routing_info.rpt"
 _ROUTING_TABLE_DIR = "routing_tables_generated"
 _SDRAM_FILENAME = "chip_sdram_usage_by_core.rpt"
@@ -209,7 +211,7 @@ def placement_report_with_application_graph_by_vertex(
 
     # Cycle through all vertices, and for each cycle through its vertices.
     # For each vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, _PLACEMENT_VTX_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_VTX_GRAPH_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
@@ -284,7 +286,7 @@ def placement_report_without_application_graph_by_vertex(
 
     # Cycle through all vertices, and for each cycle through its vertices.
     # For each vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, _PLACEMENT_VTX_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_VTX_SIMPLE_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
@@ -347,7 +349,7 @@ def placement_report_with_application_graph_by_core(
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
     # For each core, display what is held on it.
-    file_name = os.path.join(report_folder, _PLACEMENT_CORE_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_CORE_GRAPH_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
@@ -407,7 +409,7 @@ def placement_report_without_application_graph_by_core(
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
     # For each core, display what is held on it.
-    file_name = os.path.join(report_folder, _PLACEMENT_CORE_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_CORE_SIMPLE_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:

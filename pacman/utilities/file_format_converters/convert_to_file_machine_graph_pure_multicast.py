@@ -1,5 +1,8 @@
 import json
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractVirtualVertex

@@ -1,5 +1,8 @@
 import unittest
-from collections import deque
+try:
+    from collections.abc import deque
+except ImportError:
+    from collections import deque
 from spinn_machine.virtual_machine import VirtualMachine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
@@ -54,12 +57,12 @@ class MyTestCase(unittest.TestCase):
                     partition, x, y)
                 self.assertIsNotNone(entry)
                 chip = machine.get_chip_at(x, y)
-                for p in entry.out_going_processors:
+                for p in entry.processor_ids:
                     self.assertIsNotNone(chip.get_processor_with_id(p))
                     vertex_found = placements.get_vertex_on_processor(x, y, p)
                     vertices_reached.add(vertex_found)
                 seen_entries.add((x, y))
-                for link_id in entry.out_going_links:
+                for link_id in entry.link_ids:
                     link = chip.router.get_link(link_id)
                     self.assertIsNotNone(link)
                     dest_x, dest_y = link.destination_x, link.destination_y

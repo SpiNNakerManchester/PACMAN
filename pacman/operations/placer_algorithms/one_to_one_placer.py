@@ -8,10 +8,12 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
     get_vertices_on_same_chip)
 from pacman.model.constraints.placer_constraints import (
-    SameChipAsConstraint, ChipAndCoreConstraint)
+    SameChipAsConstraint, ChipAndCoreConstraint,
+    RadialPlacementFromChipConstraint)
 from pacman.utilities.utility_calls import (
     is_single, locate_constraints_of_type)
 from pacman.model.graphs import AbstractVirtualVertex
+from pacman.exceptions import PacmanPlaceException
 import functools
 
 
@@ -133,6 +135,15 @@ class OneToOnePlacer(RadialPlacer):
         resource_tracker = ResourceTracker(
             machine, self._generate_radial_chips(machine))
         all_vertices_placed = set()
+
+        # RadialPlacementFromChipConstraint won't work here
+        for vertex in machine_graph.vertices:
+            for constraint in vertex.constraints:
+                if isinstance(constraint, RadialPlacementFromChipConstraint):
+                    raise PacmanPlaceException(
+                        "A RadialPlacementFromChipConstraint will not work "
+                        "with the OneToOnePlacer algorithm; use the "
+                        "RadialPlacer algorithm instead")
 
         # Find vertices with harder constraints
         constrained = list()
