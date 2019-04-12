@@ -72,7 +72,7 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
     groups = create_vertices_groups(vertices, same_group_as_function)
     # Dict of vertex to setof vertices on same chip (repeated lists expected)
     # A empty set value indicates a set that is too big.
-    same_chip_vertices = dict()
+    same_chip_vertices = OrderedDict()
     for group in groups:
         for vertex in group:
             same_chip_vertices[vertex] = group
@@ -83,7 +83,7 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
 
 
 def add_set(all_sets, new_set):
-    union = set()
+    union = OrderedSet()
     removes = []
     for a_set in all_sets:
         intersection = new_set & a_set
@@ -102,7 +102,7 @@ def create_vertices_groups(vertices, same_group_as_function):
     for vertex in vertices:
         same_chip_as_vertices = same_group_as_function(vertex)
         if same_chip_as_vertices:
-            same_chip_as_vertices = set(same_chip_as_vertices)
+            same_chip_as_vertices = OrderedSet(same_chip_as_vertices)
             same_chip_as_vertices.add(vertex)
             # Singletons on interesting and added later if needed
             if len(same_chip_as_vertices) > 1:
@@ -124,7 +124,7 @@ def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
     :return:
     """
     if len(same_chip_as_vertices) >= cutoff:
-        return set()
+        return OrderedSet()
     # clone so we can iterate over it and change result
     result = same_chip_as_vertices
     for vertex in same_chip_as_vertices:
@@ -132,7 +132,7 @@ def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
             if same_chip_vertices[vertex]:
                 result = result | same_chip_vertices[vertex]
                 if len(result) >= cutoff:
-                    return set()
+                    return OrderedSet()
             else:
-                return set()
+                return OrderedSet()
     return result
