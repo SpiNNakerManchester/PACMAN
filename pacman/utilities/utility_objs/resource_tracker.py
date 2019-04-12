@@ -1003,7 +1003,6 @@ class ResourceTracker(object):
         (x, y, p) = self.get_chip_and_core(constraints, chips)
         (board_address, ip_tags, reverse_ip_tags) = \
             self.get_ip_tag_info(resources, constraints)
-        chips = None
         if x is not None and y is not None:
             chips = [(x, y)]
 

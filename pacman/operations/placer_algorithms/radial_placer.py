@@ -9,7 +9,6 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
 from pacman.model.placements import Placement, Placements
-from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
@@ -75,8 +74,8 @@ class RadialPlacer(object):
         vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
-        radial_constraints = locate_constraints_of_type(
-            vertices, RadialPlacementFromChipConstraint)
+        radial_constraints = [c for v in vertices for c in v.constraints if
+                              isinstance(c, RadialPlacementFromChipConstraint)]
         start_x, start_y = self._get_start(radial_constraints)
         chips = None
         if start_x is not None and start_y is not None:
