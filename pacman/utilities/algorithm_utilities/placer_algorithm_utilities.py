@@ -1,3 +1,8 @@
+try:
+    from collections.abc import defaultdict, OrderedDict
+except ImportError:
+    from collections import defaultdict, OrderedDict
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
     RadialPlacementFromChipConstraint)
@@ -64,7 +69,7 @@ def group_vertices(vertices, same_group_as_function):
     """
 
     # Dict of vertex to list of vertices on same chip (repeated lists expected)
-    same_chip_vertices = dict()
+    same_chip_vertices = OrderedDict()
 
     for vertex in vertices:
         # Find all vertices that should be grouped with this vertex
@@ -107,6 +112,6 @@ def group_vertices(vertices, same_group_as_function):
                     same_chip_vertices[vertex] = group
 
         else:
-            same_chip_vertices[vertex] = {vertex}
+            same_chip_vertices[vertex] = OrderedSet([vertex])
 
     return same_chip_vertices
