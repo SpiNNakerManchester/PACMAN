@@ -82,3 +82,9 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :return: The number of atoms
         :rtype: int
         """
+
+    def get_max_atoms_per_core(self):
+        for constraint in self.constraints:
+            if isinstance(constraint, MaxVertexAtomsConstraint):
+                return constraint.size
+        return self.n_atoms
