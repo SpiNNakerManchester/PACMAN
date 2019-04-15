@@ -2,8 +2,6 @@ import hashlib
 import numpy
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError)
-from pacman.model.constraints.partitioner_constraints \
-    import MaxVertexAtomsConstraint
 
 
 def locate_constraints_of_type(constraints, constraint_type):
