@@ -4,7 +4,7 @@ from pacman.utilities.rig_converters import (
     convert_from_rig_routes, convert_to_rig_graph, convert_to_rig_machine,
     convert_to_rig_placements, create_rig_graph_constraints,
     create_rig_machine_constraints)
-from rig.place_and_route.route.ner import route
+from pacman.myrig.place_and_route.route.ner import route
 
 
 class RigRoute(object):
