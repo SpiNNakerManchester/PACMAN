@@ -1,5 +1,4 @@
 import functools
-import sys
 try:
     from collections.abc import OrderedDict
 except ImportError:
