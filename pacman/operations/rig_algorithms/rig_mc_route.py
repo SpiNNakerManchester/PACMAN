@@ -16,7 +16,7 @@ class RigMCRoute(object):
     def __call__(self, machine_graph, machine, placements):
         progress_bar = ProgressBar(7, "Routing")
 
-        vertices_resources, nets, net_names = convert_to_rig_graph_pure_mc(
+        vertices_resources, net_names = convert_to_rig_graph_pure_mc(
             machine_graph)
         progress_bar.update()
 
@@ -35,7 +35,7 @@ class RigMCRoute(object):
         progress_bar.update()
 
         rig_routes = route(
-            vertices_resources, nets, rig_machine, rig_constraints,
+            vertices_resources, net_names.keys(), rig_machine, rig_constraints,
             rig_placements, rig_allocations, "cores")
         rig_routes2 = {
             name: rig_routes[net] for net, name in iteritems(net_names)}

@@ -1,6 +1,10 @@
 # These two warnings are disabled; because Enum Python hackery.
 # pylint: disable=not-an-iterable, not-callable
 from six import iteritems, itervalues
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
 from pacman.model.graphs import (
@@ -115,8 +119,7 @@ def convert_to_rig_machine(machine):
 
 def convert_to_rig_graph(machine_graph):
     vertices_resources = dict()
-    edges_resources = dict()
-
+    net_names = OrderedDict()
     for vertex in machine_graph.vertices:
         if isinstance(vertex, AbstractVirtualVertex):
             # handle external devices
@@ -132,14 +135,8 @@ def convert_to_rig_graph(machine_graph):
         for partition in \
                 machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     vertex):
-            edges_resources[partition] = {
-                "source": vertex,
-                "sinks": list(edge.post_vertex for edge in partition.edges),
-                "type": partition.traffic_type.name.lower()}
-
-    net_names = {
-        Net(edge["source"], edge["sinks"]): name
-        for name, edge in iteritems(edges_resources)}
+            sinks = list(edge.post_vertex for edge in partition.edges),
+            net_names[Net(vertex, sinks)] = partition
 
     return vertices_resources, list(net_names), net_names
 
@@ -170,11 +167,12 @@ def convert_to_rig_graph_pure_mc(machine_graph):
                     "type": partition.traffic_type.name.lower()}
 
     net_names = {
-        Net(edge["source"], edge["sinks"]): name
-        for name, edge in iteritems(edges_resources)
+        Net(edge["source"], edge["sinks"]): partition
+        for partition, edge in iteritems(edges_resources)
     }
 
-    return vertices_resources, list(net_names), net_names
+
+    return vertices_resources, net_names
 
 
 def create_rig_graph_constraints(machine_graph, machine):
