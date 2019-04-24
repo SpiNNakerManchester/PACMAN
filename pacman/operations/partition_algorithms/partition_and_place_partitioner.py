@@ -1,3 +1,7 @@
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 import logging
 from six import raise_from
 from spinn_utilities.progress_bar import ProgressBar
