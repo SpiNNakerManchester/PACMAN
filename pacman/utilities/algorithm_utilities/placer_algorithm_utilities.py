@@ -57,7 +57,7 @@ def get_same_chip_vertex_groups(graph):
         get_vertices_on_same_chip, graph=graph))
 
 
-def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
+def group_vertices(vertices, same_group_as_function):
     """ Group vertices according to some function that can indicate the groups\
         that any vertex can be contained within
 
@@ -65,7 +65,6 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
     :param same_group_as_function:\
         A function which takes a vertex and returns vertices that should be in\
         the same group (excluding the original vertex)
-    :param cutoff: Maximum number that will be in the same group
     :return:\
         A dictionary of vertex to list of vertices that are grouped with it
     """
