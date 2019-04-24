@@ -1,8 +1,9 @@
 try:
-    from collections.abc import defaultdict, OrderedDict
+    from collections.abc import OrderedDict
 except ImportError:
-    from collections import defaultdict, OrderedDict
+    from collections import OrderedDict
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
@@ -59,10 +60,11 @@ class Graph(ConstrainedObject, AbstractGraph):
 
         self._vertices = OrderedSet()
         self._outgoing_edge_partitions_by_name = OrderedDict()
-        self._outgoing_edges = defaultdict(OrderedSet)
-        self._incoming_edges = defaultdict(OrderedSet)
-        self._incoming_edges_by_partition_name = defaultdict(list)
-        self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
+        self._outgoing_edges = DefaultOrderedDict(OrderedSet)
+        self._incoming_edges = DefaultOrderedDict(OrderedSet)
+        self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
+        self._outgoing_edge_partitions_by_pre_vertex = \
+            DefaultOrderedDict(OrderedSet)
         self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
 
