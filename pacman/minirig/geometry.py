@@ -7,7 +7,7 @@ from math import sqrt
 
 import numpy as np
 
-from pacman.myrig.links import Links
+from pacman.minirig.links import Links
 
 
 def to_xyz(xy):

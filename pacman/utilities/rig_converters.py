@@ -12,14 +12,14 @@ from pacman.model.placements import Placement, Placements
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.constants import EDGES
-from pacman.myrig.place_and_route.machine import Machine
-from pacman.myrig.links import Links
-from pacman.myrig.netlist import Net
-from pacman.myrig.place_and_route.constraints import (
+from pacman.minirig.place_and_route.machine import Machine
+from pacman.minirig.links import Links
+from pacman.minirig.netlist import Net
+from pacman.minirig.place_and_route.constraints import (
     LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint)
-from pacman.myrig.place_and_route.routing_tree import RoutingTree
-from pacman.myrig.routing_table.entries import Routes
-from pacman.myrig.place_and_route.constraints import SameChipConstraint
+from pacman.minirig.place_and_route.routing_tree import RoutingTree
+from pacman.minirig.routing_table.entries import Routes
+from pacman.minirig.place_and_route.constraints import SameChipConstraint
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}

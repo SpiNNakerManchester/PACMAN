@@ -1,7 +1,7 @@
 from collections import defaultdict, namedtuple, OrderedDict
 
-from pacman.myrig.routing_table.entries import RoutingTableEntry
-from pacman.myrig.routing_table.exceptions import MultisourceRouteError
+from pacman.minirig.routing_table.entries import RoutingTableEntry
+from pacman.minirig.routing_table.exceptions import MultisourceRouteError
 from six import iteritems
 import warnings
 

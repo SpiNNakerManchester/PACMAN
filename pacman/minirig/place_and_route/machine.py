@@ -2,7 +2,7 @@
 performing placement, allocation and routing.
 """
 
-from pacman.myrig.links import Links
+from pacman.minirig.links import Links
 
 import sentinel
 

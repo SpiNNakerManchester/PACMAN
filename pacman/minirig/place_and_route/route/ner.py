@@ -10,22 +10,22 @@ import heapq
 
 from collections import deque
 
-from pacman.myrig.geometry import concentric_hexagons, to_xyz, \
+from pacman.minirig.geometry import concentric_hexagons, to_xyz, \
     shortest_mesh_path_length, shortest_mesh_path, \
     shortest_torus_path_length, shortest_torus_path
 
-from pacman.myrig.place_and_route.route.utils import longest_dimension_first, links_between
+from pacman.minirig.place_and_route.route.utils import longest_dimension_first, links_between
 
-from pacman.myrig.place_and_route.route.exceptions import MachineHasDisconnectedSubregion
+from pacman.minirig.place_and_route.route.exceptions import MachineHasDisconnectedSubregion
 
-from pacman.myrig.place_and_route.constraints import RouteEndpointConstraint
+from pacman.minirig.place_and_route.constraints import RouteEndpointConstraint
 
-from pacman.myrig.place_and_route.machine import Cores
+from pacman.minirig.place_and_route.machine import Cores
 
-from pacman.myrig.links import Links
-from pacman.myrig.routing_table.entries import Routes
+from pacman.minirig.links import Links
+from pacman.minirig.routing_table.entries import Routes
 
-from pacman.myrig.place_and_route.routing_tree import RoutingTree
+from pacman.minirig.place_and_route.routing_tree import RoutingTree
 
 
 _concentric_hexagons = {}

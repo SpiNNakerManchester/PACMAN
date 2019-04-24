@@ -6,8 +6,8 @@ from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import PacmanElementAllocationException
-from pacman.myrig.routing_table.entries import (RoutingTableEntry, Routes)
-from pacman.myrig.routing_table import ordered_covering as rigs_compressor
+from pacman.minirig.routing_table.entries import (RoutingTableEntry, Routes)
+from pacman.minirig.routing_table import ordered_covering as rigs_compressor
 
 logger = logging.getLogger(__name__)
 
