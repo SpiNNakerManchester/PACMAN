@@ -9,13 +9,11 @@ class Net(object):
     ----------
     source : vertex
         The vertex which is the source of the net.
-    weight : float or int
-        The "strength" of the net, in application specific units.
     sinks : list
         A list of vertices that the net connects to.
     """
 
-    def __init__(self, source, sinks, weight=1.0):
+    def __init__(self, source, sinks):
         """Create a new Net.
 
         Parameters
@@ -28,7 +26,6 @@ class Net(object):
         weight : float or int
         """
         self.source = source
-        self.weight = weight
 
         # If the sinks is a list then copy it, otherwise construct a new list
         # containing the sink we were given.

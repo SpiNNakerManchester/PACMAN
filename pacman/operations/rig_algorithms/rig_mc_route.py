@@ -37,11 +37,11 @@ class RigMCRoute(object):
         rig_routes = route(
             vertices_resources, nets, rig_machine, rig_constraints,
             rig_placements, rig_allocations, "cores")
-        rig_routes = {
+        rig_routes2 = {
             name: rig_routes[net] for net, name in iteritems(net_names)}
         progress_bar.update()
 
-        routes = convert_from_rig_routes(rig_routes)
+        routes = convert_from_rig_routes(rig_routes2)
         progress_bar.update()
         progress_bar.end()
 

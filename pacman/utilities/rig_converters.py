@@ -135,11 +135,10 @@ def convert_to_rig_graph(machine_graph):
             edges_resources[partition] = {
                 "source": vertex,
                 "sinks": list(edge.post_vertex for edge in partition.edges),
-                "weight": sum(edge.traffic_weight for edge in partition.edges),
                 "type": partition.traffic_type.name.lower()}
 
     net_names = {
-        Net(edge["source"], edge["sinks"], edge["weight"]): name
+        Net(edge["source"], edge["sinks"]): name
         for name, edge in iteritems(edges_resources)}
 
     return vertices_resources, list(net_names), net_names
@@ -168,11 +167,10 @@ def convert_to_rig_graph_pure_mc(machine_graph):
                 edges_resources[partition] = {
                     "source": vertex,
                     "sinks": list(e.post_vertex for e in partition.edges),
-                    "weight": sum(e.traffic_weight for e in partition.edges),
                     "type": partition.traffic_type.name.lower()}
 
     net_names = {
-        Net(edge["source"], edge["sinks"], edge["weight"]): name
+        Net(edge["source"], edge["sinks"]): name
         for name, edge in iteritems(edges_resources)
     }
 

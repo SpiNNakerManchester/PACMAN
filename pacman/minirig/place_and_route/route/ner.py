@@ -543,9 +543,10 @@ def route(vertices_resources, nets, machine, constraints, placements,
 
     routes = {}
     for net in nets:
+        source = placements[net.source]
+        destinations = set(placements[sink] for sink in net.sinks)
         # Generate routing tree (assuming a perfect machine)
-        root, lookup = ner_net(placements[net.source],
-                               set(placements[sink] for sink in net.sinks),
+        root, lookup = ner_net(source, destinations,
                                machine.width, machine.height,
                                wrap_around, radius)
 
