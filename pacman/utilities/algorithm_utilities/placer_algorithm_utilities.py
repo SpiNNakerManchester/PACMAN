@@ -65,6 +65,7 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
     :param same_group_as_function:\
         A function which takes a vertex and returns vertices that should be in\
         the same group (excluding the original vertex)
+    :param cutoff: Maximum number that will be in the same group
     :return:\
         A dictionary of vertex to list of vertices that are grouped with it
     """
@@ -83,6 +84,19 @@ def group_vertices(vertices, same_group_as_function, cutoff=sys.maxsize):
 
 
 def add_set(all_sets, new_set):
+    """
+    Adds a new set into the list of sets, concatenating ssets if required.
+
+    If the new set does not overlap any existing sets it is added.
+
+    However if the new sets overlaps one or more existing sets a super set is
+    created combining all the overlapping sets.
+    Existing overlapping sets are removed and only the new super set is added.
+
+    :param all_sets: List of Non overlapping sets
+    :param new_set: A new set which may or may not overlap the previous sets.
+    """
+
     union = OrderedSet()
     removes = []
     for a_set in all_sets:
@@ -108,31 +122,3 @@ def create_vertices_groups(vertices, same_group_as_function):
             if len(same_chip_as_vertices) > 1:
                 add_set(groups, same_chip_as_vertices)
     return groups
-
-
-def concat_all_groups(same_chip_as_vertices, same_chip_vertices, cutoff):
-    """
-    Will create a set which concatenate the vertixes in same_chip_as_vertices
-    with all the vertices in sets already saved for each of the orignal
-    vertices.
-
-    If the resulting set is bigger than the cutoff empty is returned.
-
-    :param same_chip_as_vertices:
-    :param same_chip_vertices:
-    :param cutoff:
-    :return:
-    """
-    if len(same_chip_as_vertices) >= cutoff:
-        return OrderedSet()
-    # clone so we can iterate over it and change result
-    result = same_chip_as_vertices
-    for vertex in same_chip_as_vertices:
-        if vertex in same_chip_vertices:
-            if same_chip_vertices[vertex]:
-                result = result | same_chip_vertices[vertex]
-                if len(result) >= cutoff:
-                    return OrderedSet()
-            else:
-                return OrderedSet()
-    return result

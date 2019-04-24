@@ -90,6 +90,8 @@ class OneToOnePlacer(RadialPlacer):
     def __call__(self, machine_graph, machine):
 
         # Iterate over vertices and generate placements
+        # +3 covers check_constraints, get_same_chip_vertex_groups and
+        #    create_vertices_groups
         progress = ProgressBar(
             machine_graph.n_vertices + 3, "Placing graph vertices")
         # check that the algorithm can handle the constraints
