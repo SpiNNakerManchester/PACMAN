@@ -23,7 +23,6 @@ class Net(object):
             If a list of vertices is provided then the list is copied, whereas
             if a single vertex is provided then this used to create the list of
             sinks.
-        weight : float or int
         """
         self.source = source
 
