@@ -531,7 +531,7 @@ def avoid_dead_links(root, machine):
     return (root, lookup)
 
 
-def route(nets, machine, constraints, vertex_to_xy_dict, vertex_to_p_dict):
+def route(net_to_partition_dict, machine, constraints, vertex_to_xy_dict, vertex_to_p_dict):
     """Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -556,32 +556,31 @@ def route(nets, machine, constraints, vertex_to_xy_dict, vertex_to_p_dict):
         if isinstance(constraint, RouteEndpointConstraint):
             route_to_endpoint[constraint.vertex] = constraint.route
 
-    routes = {}
-    for net in nets:
-        source = vertex_to_xy_dict[net.source]
-        destinations = set(vertex_to_xy_dict[sink] for sink in net.sinks)
+    partition_to_routingtree_dic = {}
+    for net, partition in net_to_partition_dict.items():
+        destinations = set(vertex_to_xy_dict[post_vertex] for post_vertex in net.post_vertexes)
         # Generate routing tree (assuming a perfect machine)
-        root, lookup = ner_net(source, destinations, machine)
+        root, lookup = ner_net(net.sourcexy, destinations, machine)
 
         # Fix routes to avoid dead chips/links
         if route_has_dead_links(root, machine):
             root, lookup = avoid_dead_links(root, machine)
 
         # Add the sinks in the net to the RoutingTree
-        for sink in net.sinks:
-            tree_node = lookup[vertex_to_xy_dict[sink]]
-            if sink in route_to_endpoint:
+        for post_vertex in net.post_vertexes:
+            tree_node = lookup[vertex_to_xy_dict[post_vertex]]
+            if post_vertex in route_to_endpoint:
                 # Sinks with route-to-endpoint constraints must be routed
                 # in the according directions.
-                tree_node.children.append((route_to_endpoint[sink], sink))
+                tree_node.children.append((route_to_endpoint[post_vertex], post_vertex))
             else:
-                core = vertex_to_p_dict.get(sink, None)
+                core = vertex_to_p_dict.get(post_vertex, None)
                 if core is not None:
-                    tree_node.children.append((Routes.core(core), sink))
+                    tree_node.children.append((Routes.core(core), post_vertex))
                 else:
                     # Sinks without that resource are simply included without
                     # an associated route
-                    tree_node.children.append((None, sink))
-        routes[net] = root
+                    tree_node.children.append((None, post_vertex))
+        partition_to_routingtree_dic[partition] = root
 
-    return routes
+    return partition_to_routingtree_dic

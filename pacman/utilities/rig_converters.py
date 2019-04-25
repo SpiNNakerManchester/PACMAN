@@ -56,39 +56,18 @@ def _is_dead(machine, chip, link_id):
     return dest_chip.virtual
 
 
-def convert_to_rig_graph(machine_graph):
-    vertices_resources = dict()
-    net_names = OrderedDict()
-    for vertex in machine_graph.vertices:
-        if isinstance(vertex, AbstractVirtualVertex):
-            # handle external devices
-            vertices_resources[vertex] = {
-                "cores": 0}
-        else:
-            # handle standard vertices
-            vertices_resources[vertex] = {
-                "cores": N_CORES_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
 
+def convert_to_rig_graph(machine_graph, vertex_to_xy_dict):
+    net_to_partition_dict = OrderedDict()
+    for source_vertex in machine_graph.vertices:
         # handle the vertex edges
         for partition in \
                 machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
-                    vertex):
-            sinks = list(edge.post_vertex for edge in partition.edges),
-            net_names[Net(vertex, sinks)] = partition
-
-    return vertices_resources, list(net_names), net_names
-
-
-def convert_to_rig_graph_pure_mc(machine_graph):
-    net_to_partition_dict = {}
-    for vertex in machine_graph.vertices:
-        # handle the vertex edges
-        for partition in \
-                machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
-                    vertex):
+                    source_vertex):
             if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                net = Net(vertex, list(e.post_vertex for e in partition.edges))
+                post_vertexes = list(e.post_vertex for e in partition.edges)
+                source_xy = vertex_to_xy_dict[source_vertex]
+                net = Net(source_xy, post_vertexes)
                 net_to_partition_dict[net] = partition
 
     return net_to_partition_dict
@@ -96,6 +75,7 @@ def convert_to_rig_graph_pure_mc(machine_graph):
 
 def create_rig_graph_constraints(machine_graph, machine):
     constraints = []
+    foo = LINK_LOOKUP[EDGES(2).name.lower()]
     for vertex in machine_graph.vertices:
         # We only support FPGA and SpiNNakerLink virtual vertices
         if isinstance(vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):
@@ -214,9 +194,9 @@ def _convert_next_route(
                     next_incoming_link = (link + 3) % 6
                 next_hops.append((next_hop, next_incoming_link))
 
-    routing_tables.add_path_entry(MulticastRoutingTableByPartitionEntry(
-        link_ids, processor_ids, incoming_processor,
-        incoming_link), x, y, partition)
+    entry = MulticastRoutingTableByPartitionEntry(
+        link_ids, processor_ids, incoming_processor, incoming_link)
+    routing_tables.add_path_entry(entry, x, y, partition)
 
     for next_hop, next_incoming_link in next_hops:
         _convert_next_route(
