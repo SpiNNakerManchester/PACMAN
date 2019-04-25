@@ -142,37 +142,17 @@ def convert_to_rig_graph(machine_graph):
 
 
 def convert_to_rig_graph_pure_mc(machine_graph):
-    vertices_resources = dict()
-    edges_resources = dict()
-
+    net_to_partition_dict = {}
     for vertex in machine_graph.vertices:
-        if isinstance(vertex, AbstractVirtualVertex):
-            # handle external devices
-            vertices_resources[vertex] = {
-                "cores": 0}
-        else:
-            # handle standard vertices
-            vertices_resources[vertex] = {
-                "cores": N_CORES_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
-
         # handle the vertex edges
         for partition in \
                 machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     vertex):
             if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                edges_resources[partition] = {
-                    "source": vertex,
-                    "sinks": list(e.post_vertex for e in partition.edges),
-                    "type": partition.traffic_type.name.lower()}
+                net = Net(vertex, list(e.post_vertex for e in partition.edges))
+                net_to_partition_dict[net] = partition
 
-    net_names = {
-        Net(edge["source"], edge["sinks"]): partition
-        for partition, edge in iteritems(edges_resources)
-    }
-
-
-    return vertices_resources, net_names
+    return net_to_partition_dict
 
 
 def create_rig_graph_constraints(machine_graph, machine):

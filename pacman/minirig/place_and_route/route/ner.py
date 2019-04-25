@@ -513,7 +513,7 @@ def avoid_dead_links(root, machine, wrap_around=False):
     return (root, lookup)
 
 
-def route(vertices_resources, nets, machine, constraints, placements,
+def route(nets, machine, constraints, placements,
           allocations={}, core_resource=Cores, radius=20):
     """Routing algorithm based on Neighbour Exploring Routing (NER).
 
