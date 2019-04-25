@@ -16,7 +16,7 @@ from pacman.model.placements import Placement, Placements
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.constants import EDGES
-from pacman.minirig.place_and_route.machine import Machine
+#from pacman.minirig.place_and_route.machine import Machine
 from pacman.minirig.links import Links
 from pacman.minirig.netlist import Net
 from pacman.minirig.place_and_route.constraints import (
@@ -54,67 +54,6 @@ def _is_dead(machine, chip, link_id):
     dest_chip = machine.get_chip_at(
         link.destination_x, link.destination_y)
     return dest_chip.virtual
-
-
-def convert_to_rig_machine(machine):
-
-    chip_resources = dict()
-    chip_resources['cores'] = CHIP_HOMOGENEOUS_CORES
-    chip_resources['sdram'] = CHIP_HOMOGENEOUS_SDRAM
-    chip_resources['sram'] = CHIP_HOMOGENEOUS_SRAM
-    chip_resources["router_entries"] = ROUTER_HOMOGENEOUS_ENTRIES
-    chip_resources['tags'] = CHIP_HOMOGENEOUS_TAGS
-    LINKS = range(0, ROUTER_MAX_NUMBER_OF_LINKS)
-
-    # handle exceptions
-    dead_chips = list()
-    dead_links = list()
-    chip_resource_exceptions = list()
-
-    # write dead chips
-    for x_coord in range(0, machine.max_chip_x + 1):
-        for y_coord in range(0, machine.max_chip_y + 1):
-            if (not machine.is_chip_at(x_coord, y_coord) or
-                    machine.get_chip_at(x_coord, y_coord).virtual):
-                dead_chips.append([x_coord, y_coord])
-                continue
-            chip = machine.get_chip_at(x_coord, y_coord)
-
-            # write dead links
-            for link_id in LINKS:
-                if _is_dead(machine, chip, link_id):
-                    dead_links.append([x_coord, y_coord, "{}".format(
-                        EDGES(link_id).name.lower())])
-
-            # Fix the number of processors when there are less
-            resource_exceptions = dict()
-            n_processors = len([
-                processor for processor in chip.processors])
-            if n_processors < CHIP_HOMOGENEOUS_CORES:
-                resource_exceptions["cores"] = n_processors
-
-            # Add tags if Ethernet chip
-            if chip.ip_address is not None:
-                resource_exceptions["tags"] = len(chip.tag_ids)
-
-            if resource_exceptions:
-                chip_resource_exceptions.append(
-                    (x_coord, y_coord, resource_exceptions))
-
-    return Machine(
-        width=machine.max_chip_x + 1,
-        height=machine.max_chip_y + 1,
-        chip_resources=chip_resources,
-        chip_resource_exceptions={
-            (x, y): {
-                resource: r.get(
-                    resource, chip_resources[resource])
-                for resource in chip_resources}
-            for x, y, r in chip_resource_exceptions},
-        dead_chips=set((x, y) for x, y in dead_chips),
-        dead_links=set(
-            (x, y, LINK_LOOKUP[link])
-            for x, y, link in dead_links))
 
 
 def convert_to_rig_graph(machine_graph):

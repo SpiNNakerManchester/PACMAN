@@ -49,7 +49,7 @@ def memoized_concentric_hexagons(radius):
     return out
 
 
-def ner_net(source, destinations, width, height, wrap_around=False):
+def ner_net(source, destinations, machine):
     """Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
@@ -81,6 +81,8 @@ def ner_net(source, destinations, width, height, wrap_around=False):
         to the associated RoutingTree is provided to allow the caller to insert
         these items.
     """
+    width = machine.max_chip_x + 1
+    height = machine.max_chip_y + 1
     radius = 20
     # Map from (x, y) to RoutingTree objects
     route = {source: RoutingTree(source)}
@@ -91,7 +93,7 @@ def ner_net(source, destinations, width, height, wrap_around=False):
                               key=(lambda destination:
                                    shortest_mesh_path_length(
                                        to_xyz(source), to_xyz(destination))
-                                   if not wrap_around else
+                                   if not machine.has_wrap_arounds else
                                    shortest_torus_path_length(
                                        to_xyz(source), to_xyz(destination),
                                        width, height))):
@@ -158,7 +160,7 @@ def ner_net(source, destinations, width, height, wrap_around=False):
             for x, y in concentric_hexagons:
                 x += destination[0]
                 y += destination[1]
-                if wrap_around:
+                if machine.has_wrap_arounds:
                     x %= width
                     y %= height
                 if (x, y) in route:
@@ -170,7 +172,7 @@ def ner_net(source, destinations, width, height, wrap_around=False):
             neighbour = None
             neighbour_distance = None
             for candidate_neighbour in route:
-                if wrap_around:
+                if machine.has_wrap_arounds:
                     distance = shortest_torus_path_length(
                         to_xyz(candidate_neighbour), to_xyz(destination),
                         width, height)
@@ -189,7 +191,7 @@ def ner_net(source, destinations, width, height, wrap_around=False):
             neighbour = source
 
         # Find the shortest vector from the neighbour to this destination
-        if wrap_around:
+        if machine.has_wrap_arounds:
             vector = shortest_torus_path(to_xyz(neighbour),
                                          to_xyz(destination),
                                          width, height)
@@ -224,6 +226,20 @@ def ner_net(source, destinations, width, height, wrap_around=False):
             last_node = this_node
 
     return (route[source], route)
+
+
+def is_linked(source, target, direction, machine):
+    s_chip = machine.get_chip_at(source[0], source[1])
+    if s_chip is None:
+        return False
+    link = s_chip.router.get_link(direction)
+    if link is None:
+        return False
+    if (link.destination_x != target[0]):
+        return False
+    if (link.destination_y != target[1]):
+        return False
+    return True
 
 
 def copy_and_disconnect_tree(root, machine):
@@ -271,7 +287,7 @@ def copy_and_disconnect_tree(root, machine):
     while to_visit:
         new_parent, direction, old_node = to_visit.popleft()
 
-        if old_node.chip in machine:
+        if machine.is_chip_at(old_node.chip[0], old_node.chip[1]):
             # Create a copy of the node
             new_node = RoutingTree(old_node.chip)
             new_lookup[new_node.chip] = new_node
@@ -287,9 +303,7 @@ def copy_and_disconnect_tree(root, machine):
         elif new_node is not new_parent:
             # If this node is not dead, check connectivity to parent node (no
             # reason to check connectivity between a dead node and its parent).
-            if direction in links_between(new_parent.chip,
-                                          new_node.chip,
-                                          machine):
+            if is_linked(new_parent.chip, new_node.chip, direction, machine):
                 # Is connected via working link
                 new_parent.children.append((direction, new_node))
             else:
@@ -304,7 +318,7 @@ def copy_and_disconnect_tree(root, machine):
     return (new_root, new_lookup, broken_links)
 
 
-def a_star(sink, heuristic_source, sources, machine, wrap_around):
+def a_star(sink, heuristic_source, sources, machine):
     """Use A* to find a path from any of the sources to the sink.
 
     Note that the heuristic means that the search will proceed towards
@@ -341,11 +355,13 @@ def a_star(sink, heuristic_source, sources, machine, wrap_around):
         If a path cannot be found.
     """
     # Select the heuristic function to use for distances
-    if wrap_around:
+    width = machine.max_chip_x + 1
+    height = machine.max_chip_y + 1
+    if machine.has_wrap_arounds:
         heuristic = (lambda node:
                      shortest_torus_path_length(to_xyz(node),
                                                 to_xyz(heuristic_source),
-                                                machine.width, machine.height))
+                                                width, height))
     else:
         heuristic = (lambda node:
                      shortest_mesh_path_length(to_xyz(node),
@@ -376,11 +392,12 @@ def a_star(sink, heuristic_source, sources, machine, wrap_around):
         # perspective of the neighbour, not the current node!
         for neighbour_link in Links:
             vector = neighbour_link.opposite.to_vector()
-            neighbour = ((node[0] + vector[0]) % machine.width,
-                         (node[1] + vector[1]) % machine.height)
+            neighbour = ((node[0] + vector[0]) % width,
+                         (node[1] + vector[1]) % height)
 
             # Skip links which are broken
-            if (neighbour[0], neighbour[1], neighbour_link) not in machine:
+            if not machine.is_link_at(neighbour[0], neighbour[1], neighbour_link):
+            #if (neighbour[0], neighbour[1], neighbour_link) not in machine:
                 continue
 
             # Skip neighbours who have already been visited
@@ -416,7 +433,7 @@ def route_has_dead_links(root, machine):
     root : :py:class:`~rig.place_and_route.routing_tree.RoutingTree`
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    machine : :py:class:`~rig.place_and_route.Machine`
+    machine : :py:class:spinn_machine.Machine`
         The machine in which the routes exist.
 
     Returns
@@ -424,14 +441,16 @@ def route_has_dead_links(root, machine):
     bool
         True if the route uses any dead/missing links, False otherwise.
     """
-    for direction, (x, y), routes in root.traverse():
+    for _, (x, y), routes in root.traverse():
+        chip = machine.get_chip_at(x, y)
         for route in routes:
-            if (x, y, route) not in machine:
+            if chip is None:
+                return True
+            if not chip.router.is_link(route):
                 return True
     return False
 
-
-def avoid_dead_links(root, machine, wrap_around=False):
+def avoid_dead_links(root, machine):
     """Modify a RoutingTree to route-around dead links in a Machine.
 
     Uses A* to reconnect disconnected branches of the tree (due to dead links
@@ -474,7 +493,7 @@ def avoid_dead_links(root, machine, wrap_around=False):
         # cycle).
         path = a_star(child, parent,
                       set(lookup).difference(child_chips),
-                      machine, wrap_around)
+                      machine)
 
         # Add new RoutingTree nodes to reconnect the child to the tree.
         last_node = lookup[path[0][1]]
@@ -531,8 +550,6 @@ def route(nets, machine, constraints, vertex_to_xy_dict, vertex_to_p_dict):
         the paper and shown to be acceptable in practice. If set to zero, this
         method is becomes longest dimension first routing.
     """
-    wrap_around = machine.has_wrap_around_links()
-
     # Vertices constrained to route to a specific link. {vertex: route}
     route_to_endpoint = {}
     for constraint in constraints:
@@ -544,13 +561,11 @@ def route(nets, machine, constraints, vertex_to_xy_dict, vertex_to_p_dict):
         source = vertex_to_xy_dict[net.source]
         destinations = set(vertex_to_xy_dict[sink] for sink in net.sinks)
         # Generate routing tree (assuming a perfect machine)
-        root, lookup = ner_net(source, destinations,
-                               machine.width, machine.height,
-                               wrap_around)
+        root, lookup = ner_net(source, destinations, machine)
 
         # Fix routes to avoid dead chips/links
         if route_has_dead_links(root, machine):
-            root, lookup = avoid_dead_links(root, machine, wrap_around)
+            root, lookup = avoid_dead_links(root, machine)
 
         # Add the sinks in the net to the RoutingTree
         for sink in net.sinks:

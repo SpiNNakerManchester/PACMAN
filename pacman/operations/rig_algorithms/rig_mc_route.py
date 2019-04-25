@@ -2,7 +2,7 @@ from six import iteritems
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.rig_converters import (
     convert_from_rig_routes, convert_to_rig_graph_pure_mc, convert_to_vertex_to_p_dict,
-    convert_to_rig_machine, convert_to_vertex_xy_dict,
+    convert_to_vertex_xy_dict,
     create_rig_machine_constraints, create_rig_graph_constraints)
 from pacman.minirig.place_and_route.route.ner import route
 
@@ -21,12 +21,9 @@ class RigMCRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        progress_bar = ProgressBar(7, "Routing")
+        progress_bar = ProgressBar(6, "Routing")
 
         net_to_partition_dict = convert_to_rig_graph_pure_mc(machine_graph)
-        progress_bar.update()
-
-        rig_machine = convert_to_rig_machine(machine)
         progress_bar.update()
 
         rig_constraints = create_rig_machine_constraints(machine)
@@ -39,10 +36,8 @@ class RigMCRoute(object):
         vertex_to_xy_dict = convert_to_vertex_xy_dict(placements, machine)
         vertex_to_p_dict = convert_to_vertex_to_p_dict(placements)
         progress_bar.update()
-
         rig_routes = route(
-            net_to_partition_dict.keys(), rig_machine, rig_constraints,
-            vertex_to_xy_dict, vertex_to_p_dict)
+            net_to_partition_dict.keys(), machine, rig_constraints, vertex_to_xy_dict, vertex_to_p_dict)
         rig_routes2 = {}
         for net, partition in iteritems(net_to_partition_dict):
             rig_routes2[partition] = rig_routes[net]

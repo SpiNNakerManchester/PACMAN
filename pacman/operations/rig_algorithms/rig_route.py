@@ -1,7 +1,7 @@
 from six import iteritems
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.rig_converters import (
-    convert_from_rig_routes, convert_to_rig_graph, convert_to_rig_machine,
+    convert_from_rig_routes, convert_to_rig_graph,
     convert_to_vertex_xy_dict, convert_to_vertex_to_p_dict, create_rig_graph_constraints,
     create_rig_machine_constraints)
 from pacman.minirig.place_and_route.route.ner import route
@@ -14,13 +14,10 @@ class RigRoute(object):
     __slots__ = []
 
     def __call__(self, machine_graph, machine, placements):
-        progress_bar = ProgressBar(7, "Routing")
+        progress_bar = ProgressBar(6, "Routing")
 
         vertices_resources, nets, net_names = convert_to_rig_graph(
             machine_graph)
-        progress_bar.update()
-
-        rig_machine = convert_to_rig_machine(machine)
         progress_bar.update()
 
         rig_constraints = create_rig_machine_constraints(machine)
@@ -35,7 +32,7 @@ class RigRoute(object):
         progress_bar.update()
 
         rig_routes = route(
-            vertices_resources, nets, rig_machine, rig_constraints,
+            vertices_resources, nets, machine, rig_constraints,
             vertex_to_xy_dict, vertex_to_p_dict)
         rig_routes = {
             name: rig_routes[net] for net, name in iteritems(net_names)}
