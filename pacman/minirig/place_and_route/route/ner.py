@@ -20,8 +20,6 @@ from pacman.minirig.place_and_route.route.exceptions import MachineHasDisconnect
 
 from pacman.minirig.place_and_route.constraints import RouteEndpointConstraint
 
-from pacman.minirig.place_and_route.machine import Cores
-
 from pacman.minirig.links import Links
 from pacman.minirig.routing_table.entries import Routes
 
@@ -51,7 +49,7 @@ def memoized_concentric_hexagons(radius):
     return out
 
 
-def ner_net(source, destinations, width, height, wrap_around=False, radius=10):
+def ner_net(source, destinations, width, height, wrap_around=False):
     """Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
@@ -83,6 +81,7 @@ def ner_net(source, destinations, width, height, wrap_around=False, radius=10):
         to the associated RoutingTree is provided to allow the caller to insert
         these items.
     """
+    radius = 20
     # Map from (x, y) to RoutingTree objects
     route = {source: RoutingTree(source)}
 
@@ -513,8 +512,7 @@ def avoid_dead_links(root, machine, wrap_around=False):
     return (root, lookup)
 
 
-def route(nets, machine, constraints, placements,
-          allocations={}, core_resource=Cores, radius=20):
+def route(nets, machine, constraints, vertex_to_xy_dict, vertex_to_p_dict):
     """Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -543,12 +541,12 @@ def route(nets, machine, constraints, placements,
 
     routes = {}
     for net in nets:
-        source = placements[net.source]
-        destinations = set(placements[sink] for sink in net.sinks)
+        source = vertex_to_xy_dict[net.source]
+        destinations = set(vertex_to_xy_dict[sink] for sink in net.sinks)
         # Generate routing tree (assuming a perfect machine)
         root, lookup = ner_net(source, destinations,
                                machine.width, machine.height,
-                               wrap_around, radius)
+                               wrap_around)
 
         # Fix routes to avoid dead chips/links
         if route_has_dead_links(root, machine):
@@ -556,18 +554,15 @@ def route(nets, machine, constraints, placements,
 
         # Add the sinks in the net to the RoutingTree
         for sink in net.sinks:
-            tree_node = lookup[placements[sink]]
+            tree_node = lookup[vertex_to_xy_dict[sink]]
             if sink in route_to_endpoint:
                 # Sinks with route-to-endpoint constraints must be routed
                 # in the according directions.
                 tree_node.children.append((route_to_endpoint[sink], sink))
             else:
-                cores = allocations.get(sink, {}).get(core_resource, None)
-                if cores is not None:
-                    # Sinks with the core_resource resource specified must be
-                    # routed to that set of cores.
-                    for core in range(cores.start, cores.stop):
-                        tree_node.children.append((Routes.core(core), sink))
+                core = vertex_to_p_dict.get(sink, None)
+                if core is not None:
+                    tree_node.children.append((Routes.core(core), sink))
                 else:
                     # Sinks without that resource are simply included without
                     # an associated route

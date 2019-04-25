@@ -196,11 +196,11 @@ def create_rig_machine_constraints(machine):
         if processor.is_monitor]
 
 
-def convert_to_rig_placements(placements, machine):
-    rig_placements = dict()
+def convert_to_vertex_xy_dict(placements, machine):
+    vertex_to_xy_dict = dict()
     for placement in placements:
         if not isinstance(placement.vertex, AbstractVirtualVertex):
-            rig_placements[placement.vertex] = (placement.x, placement.y)
+            vertex_to_xy_dict[placement.vertex] = (placement.x, placement.y)
             continue
         link_data = None
         vertex = placement.vertex
@@ -210,15 +210,19 @@ def convert_to_rig_placements(placements, machine):
         elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
             link_data = machine.get_spinnaker_link_with_id(
                 vertex.spinnaker_link_id, vertex.board_address)
-        rig_placements[placement.vertex] = (
+        vertex_to_xy_dict[placement.vertex] = (
             link_data.connected_chip_x, link_data.connected_chip_y)
 
-    core_allocations = {
-        p.vertex: {"cores": slice(p.p, p.p + 1)}
+    return vertex_to_xy_dict
+
+
+def convert_to_vertex_to_p_dict(placements):
+    vertex_to_p_dict = {
+        p.vertex: p.p
         for p in placements.placements
         if not isinstance(p.vertex, AbstractVirtualVertex)}
 
-    return rig_placements, core_allocations
+    return vertex_to_p_dict
 
 
 def convert_from_rig_placements(
