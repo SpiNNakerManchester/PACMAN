@@ -59,11 +59,12 @@ class RoutingTree(object):
     #   object
     # * Storing the chip coordinate as two values (_chip_x and _chip_y) rather
     #   than a tuple saves 56 bytes per instance.
-    __slots__ = ["_chip_x", "_chip_y", "children"]
+    __slots__ = ["_chip_x", "_chip_y", "_children"]
 
-    def __init__(self, chip, children=None):
+    def __init__(self, chip):
         self.chip = chip
-        self.children = children if children is not None else []
+        self._children = []
+        print(self)
 
     @property
     def chip(self):
@@ -73,6 +74,17 @@ class RoutingTree(object):
     def chip(self, chip):
         self._chip_x, self._chip_y = chip
 
+    @property
+    def children(self):
+        for child in self._children:
+            yield child
+
+    def append_child(self, child):
+        self._children.append(child)
+
+    def remove_child(self, child):
+        self._children.remove(child)
+
     def __iter__(self):
         """Iterate over this node and then all its children, recursively and in
         no specific order. This iterator iterates over the child *objects*
@@ -80,7 +92,7 @@ class RoutingTree(object):
         """
         yield self
 
-        for route, obj in self.children:
+        for route, obj in self._children:
             if isinstance(obj, RoutingTree):
                 for subchild in obj:
                     yield subchild
@@ -90,8 +102,8 @@ class RoutingTree(object):
     def __repr__(self):
         return "<RoutingTree at {} with {} {}>".format(
             self.chip,
-            len(self.children),
-            "child" if len(self.children) == 1 else "children")
+            len(self._children),
+            "child" if len(self._children) == 1 else "children")
 
     def traverse(self):
         """Traverse the tree yielding the direction taken to a node, the
@@ -113,7 +125,7 @@ class RoutingTree(object):
             # Determine the set of directions we must travel to reach the
             # children
             out_directions = set()
-            for child_direction, child in node.children:
+            for child_direction, child in node._children:
                 # Note that if the direction is unspecified, we simply
                 # (silently) don't add a route for that child.
                 if child_direction is not None:

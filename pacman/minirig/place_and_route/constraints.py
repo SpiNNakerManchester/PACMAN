@@ -6,69 +6,6 @@ implementation-specific constraints seperately.
 """
 
 
-class LocationConstraint(object):
-    """Unconditionally place a vertex on a specific chip.
-
-    Attributes
-    ----------
-    vertex : object
-        The user-supplied object representing the vertex.
-    location : (x, y)
-        The x- and y-coordinates of the chip the vertex must be placed on.
-    """
-
-    def __init__(self, vertex, location):
-        self.vertex = vertex
-        self.location = location
-
-
-class SameChipConstraint(object):
-    """Ensure that a group of vertices is always placed on the same chip.
-
-    Attributes
-    ----------
-    vertices : [object, ...]
-        The list of user-supplied objects representing the vertices to be
-        placed together.
-    """
-
-    def __init__(self, vertices):
-        self.vertices = vertices
-
-
-class ReserveResourceConstraint(object):
-    """Reserve a range of a resource on all or a specific chip.
-
-    For example, this can be used to reserve areas of SDRAM used by the system
-    software to prevent allocations occurring there.
-
-    Note: Reserved ranges must *not* be be partly or fully outside the
-    available resources for a chip nor may they overlap with one another.
-    Violation of these rules will result in undefined behaviour.
-
-    Note: placers are obliged by this constraint to subtract the reserved
-    resource from the total available resource but *not* to determine whether
-    the remaining resources include sufficient continuous ranges of resource
-    for their placement. Users should thus be extremely careful reserving
-    resources which are not immediately at the beginning or end of a resource
-    range.
-
-    Attributes
-    ----------
-    resource : object
-        A resource identifier for the resource being reserved.
-    reservation : :py:class:`slice`
-        The range over that resource which must not be used.
-    location : (x, y) or None
-        The chip to which this reservation applies. If None then the
-        reservation applies globally.
-    """
-
-    def __init__(self, resource, reservation, location=None):
-        self.resource = resource
-        self.reservation = reservation
-        self.location = location
-
 
 class AlignResourceConstraint(object):
     """Force alignment of start-indices of resource ranges.
@@ -115,8 +52,7 @@ class RouteEndpointConstraint(object):
     destined for the device vertex is routed to the appropriate link::
 
         my_device_vertex = ...
-        constraints = [LocationConstraint(my_device_vertex, (1, 1)),
-                       RouteEndpointConstraint(my_device_vertex, Routes.north)]
+        constraints = [RouteEndpointConstraint(my_device_vertex, Routes.north)]
 
     Attributes
     ----------

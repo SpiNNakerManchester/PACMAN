@@ -16,14 +16,12 @@ from pacman.model.placements import Placement, Placements
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.constants import EDGES
-#from pacman.minirig.place_and_route.machine import Machine
 from pacman.minirig.links import Links
 from pacman.minirig.netlist import Net
 from pacman.minirig.place_and_route.constraints import (
-    LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint)
+    RouteEndpointConstraint)
 from pacman.minirig.place_and_route.routing_tree import RoutingTree
 from pacman.minirig.routing_table.entries import Routes
-from pacman.minirig.place_and_route.constraints import SameChipConstraint
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
@@ -85,34 +83,10 @@ def create_rig_graph_constraints(machine_graph, machine):
             else:
                 link_data = machine.get_spinnaker_link_with_id(
                     vertex.spinnaker_link_id, vertex.board_address)
-            constraints.append(LocationConstraint(
-                vertex,
-                (link_data.connected_chip_x, link_data.connected_chip_y)))
             constraints.append(RouteEndpointConstraint(
                 vertex, LINK_LOOKUP[EDGES(
                     link_data.connected_link).name.lower()]))
-        else:
-            for constraint in vertex.constraints:
-                if isinstance(constraint, (
-                        ChipAndCoreConstraint,
-                        RadialPlacementFromChipConstraint)):
-                    constraints.append(LocationConstraint(
-                        vertex, (constraint.x, constraint.y)))
-
-    for group in itervalues(get_same_chip_vertex_groups(machine_graph)):
-        if len(group) > 1:
-            constraints.append(SameChipConstraint(group))
     return constraints
-
-
-def create_rig_machine_constraints(machine):
-    return [
-        ReserveResourceConstraint(
-            "cores",
-            slice(processor.processor_id, processor.processor_id + 1),
-            (chip.x, chip.y))
-        for chip in machine.chips for processor in chip.processors
-        if processor.is_monitor]
 
 
 def convert_to_vertex_xy_dict(placements, machine):
@@ -159,10 +133,10 @@ def convert_from_rig_placements(
     return placements
 
 
-def convert_from_rig_routes(rig_routes):
+def convert_from_rig_routes(partition_to_routingtree_dic):
     routing_tables = MulticastRoutingTableByPartition()
-    for partition in rig_routes:
-        partition_route = rig_routes[partition]
+    for partition in partition_to_routingtree_dic:
+        partition_route = partition_to_routingtree_dic[partition]
         _convert_next_route(
             routing_tables, partition, 0, None, partition_route)
     return routing_tables
