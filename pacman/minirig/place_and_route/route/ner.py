@@ -10,11 +10,11 @@ import heapq
 
 from collections import deque
 
-from pacman.minirig.geometry import concentric_hexagons, to_xyz, \
+from pacman.operations.rig_algorithms.geometry import concentric_hexagons, to_xyz, \
     shortest_mesh_path_length, shortest_mesh_path, \
     shortest_torus_path_length, shortest_torus_path
 
-from pacman.minirig.place_and_route.route.utils import longest_dimension_first, links_between
+from pacman.minirig.place_and_route.route.utils import longest_dimension_first
 
 from pacman.minirig.place_and_route.route.exceptions import MachineHasDisconnectedSubregion
 
