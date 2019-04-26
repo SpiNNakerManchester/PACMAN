@@ -1,4 +1,4 @@
-from pacman.minirig.place_and_route.route.ner import route
+from pacman.minirig.place_and_route.route.ner import do_route
 
 try:
     from collections.abc import OrderedDict
@@ -13,7 +13,6 @@ from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.constants import EDGES
 from pacman.minirig.links import Links
-from pacman.minirig.netlist import Net
 from pacman.minirig.place_and_route.routing_tree import RoutingTree
 from pacman.minirig.routing_table.entries import Routes
 
@@ -33,22 +32,6 @@ N_CORES_PER_VERTEX = 1
 
 _SUPPORTED_VIRTUAL_VERTEX_TYPES = (
     AbstractFPGAVertex, AbstractSpiNNakerLinkVertex)
-
-
-def convert_to_rig_graph(machine_graph, vertex_to_xy_dict):
-    net_to_partition_dict = OrderedDict()
-    for source_vertex in machine_graph.vertices:
-        # handle the vertex edges
-        for partition in \
-                machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
-                    source_vertex):
-            if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                post_vertexes = list(e.post_vertex for e in partition.edges)
-                source_xy = vertex_to_xy_dict[source_vertex]
-                net = Net(source_xy, post_vertexes)
-                net_to_partition_dict[net] = partition
-
-    return net_to_partition_dict
 
 
 def create_route_to_endpoint(machine_graph, machine):
@@ -112,17 +95,7 @@ def convert_from_rig_placements(
 
     return placements
 
-
-def convert_from_rig_routes(partition_to_routingtree_dic):
-    routing_tables = MulticastRoutingTableByPartition()
-    for partition in partition_to_routingtree_dic:
-        partition_route = partition_to_routingtree_dic[partition]
-        _convert_next_route(
-            routing_tables, partition, 0, None, partition_route)
-    return routing_tables
-
-
-def _convert_next_route(
+def convert_a_route(
         routing_tables, partition, incoming_processor, incoming_link,
         partition_route):
     x, y = partition_route.chip
@@ -153,7 +126,7 @@ def _convert_next_route(
     routing_tables.add_path_entry(entry, x, y, partition)
 
     for next_hop, next_incoming_link in next_hops:
-        _convert_next_route(
+        convert_a_route(
             routing_tables, partition, None, next_incoming_link, next_hop)
 
 
@@ -171,10 +144,9 @@ class RigMCRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        progress_bar = ProgressBar(5, "Routing")
+        progress_bar = ProgressBar(6, "Routing")
 
         vertex_to_xy_dict = convert_to_vertex_xy_dict(placements, machine)
-        net_to_partition_dict = convert_to_rig_graph(machine_graph, vertex_to_xy_dict)
         progress_bar.update()
 
         route_to_endpoint = create_route_to_endpoint(machine_graph, machine)
@@ -182,12 +154,24 @@ class RigMCRoute(object):
 
         vertex_to_p_dict = convert_to_vertex_to_p_dict(placements)
         progress_bar.update()
-        partition_to_routingtree_dic = route(
-            net_to_partition_dict, machine, route_to_endpoint, vertex_to_xy_dict, vertex_to_p_dict)
+
+        routing_tables = MulticastRoutingTableByPartition()
+
         progress_bar.update()
 
-        routes = convert_from_rig_routes(partition_to_routingtree_dic)
+        for source_vertex in machine_graph.vertices:
+            # handle the vertex edges
+            for partition in \
+                    machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+                        source_vertex):
+                if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                    post_vertexes = list(
+                        e.post_vertex for e in partition.edges)
+                    source_xy = vertex_to_xy_dict[source_vertex]
+                    routingtree = do_route(source_xy, post_vertexes, machine, route_to_endpoint, vertex_to_xy_dict, vertex_to_p_dict)
+                    convert_a_route(routing_tables, partition, 0, None, routingtree)
+
         progress_bar.update()
         progress_bar.end()
 
-        return routes
+        return routing_tables
