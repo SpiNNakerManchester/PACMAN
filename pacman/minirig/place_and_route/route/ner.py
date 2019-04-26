@@ -18,8 +18,6 @@ from pacman.minirig.place_and_route.route.utils import longest_dimension_first, 
 
 from pacman.minirig.place_and_route.route.exceptions import MachineHasDisconnectedSubregion
 
-from pacman.minirig.place_and_route.constraints import RouteEndpointConstraint
-
 from pacman.minirig.links import Links
 from pacman.minirig.routing_table.entries import Routes
 
@@ -531,7 +529,7 @@ def avoid_dead_links(root, machine):
     return (root, lookup)
 
 
-def route(net_to_partition_dict, machine, constraints, vertex_to_xy_dict, vertex_to_p_dict):
+def route(net_to_partition_dict, machine, route_to_endpoint, vertex_to_xy_dict, vertex_to_p_dict):
     """Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -550,12 +548,6 @@ def route(net_to_partition_dict, machine, constraints, vertex_to_xy_dict, vertex
         the paper and shown to be acceptable in practice. If set to zero, this
         method is becomes longest dimension first routing.
     """
-    # Vertices constrained to route to a specific link. {vertex: route}
-    route_to_endpoint = {}
-    for constraint in constraints:
-        if isinstance(constraint, RouteEndpointConstraint):
-            route_to_endpoint[constraint.vertex] = constraint.route
-
     partition_to_routingtree_dic = {}
     for net, partition in net_to_partition_dict.items():
         destinations = set(vertex_to_xy_dict[post_vertex] for post_vertex in net.post_vertexes)

@@ -1,3 +1,5 @@
+from pacman.minirig.place_and_route.route.ner import route
+
 try:
     from collections.abc import OrderedDict
 except ImportError:
@@ -12,9 +14,6 @@ from pacman.model.routing_table_by_partition import (
 from pacman.utilities.constants import EDGES
 from pacman.minirig.links import Links
 from pacman.minirig.netlist import Net
-from pacman.minirig.place_and_route.constraints import (
-    RouteEndpointConstraint)
-from pacman.minirig.place_and_route.route.ner import route
 from pacman.minirig.place_and_route.routing_tree import RoutingTree
 from pacman.minirig.routing_table.entries import Routes
 
@@ -52,9 +51,9 @@ def convert_to_rig_graph(machine_graph, vertex_to_xy_dict):
     return net_to_partition_dict
 
 
-def create_rig_graph_constraints(machine_graph, machine):
-    constraints = []
-    foo = LINK_LOOKUP[EDGES(2).name.lower()]
+def create_route_to_endpoint(machine_graph, machine):
+    # Vertices constrained to route to a specific link. {vertex: route}
+    route_to_endpoint = {}
     for vertex in machine_graph.vertices:
         # We only support FPGA and SpiNNakerLink virtual vertices
         if isinstance(vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):
@@ -64,10 +63,10 @@ def create_rig_graph_constraints(machine_graph, machine):
             else:
                 link_data = machine.get_spinnaker_link_with_id(
                     vertex.spinnaker_link_id, vertex.board_address)
-            constraints.append(RouteEndpointConstraint(
-                vertex, LINK_LOOKUP[EDGES(
-                    link_data.connected_link).name.lower()]))
-    return constraints
+            route = LINK_LOOKUP[EDGES(
+                    link_data.connected_link).name.lower()]
+            route_to_endpoint[vertex] = route
+    return route_to_endpoint
 
 
 def convert_to_vertex_xy_dict(placements, machine):
@@ -178,13 +177,13 @@ class RigMCRoute(object):
         net_to_partition_dict = convert_to_rig_graph(machine_graph, vertex_to_xy_dict)
         progress_bar.update()
 
-        rig_constraints = create_rig_graph_constraints(machine_graph, machine)
+        route_to_endpoint = create_route_to_endpoint(machine_graph, machine)
         progress_bar.update()
 
         vertex_to_p_dict = convert_to_vertex_to_p_dict(placements)
         progress_bar.update()
         partition_to_routingtree_dic = route(
-            net_to_partition_dict, machine, rig_constraints, vertex_to_xy_dict, vertex_to_p_dict)
+            net_to_partition_dict, machine, route_to_endpoint, vertex_to_xy_dict, vertex_to_p_dict)
         progress_bar.update()
 
         routes = convert_from_rig_routes(partition_to_routingtree_dic)
