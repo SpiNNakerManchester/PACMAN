@@ -1,7 +1,6 @@
-from collections import defaultdict, namedtuple, OrderedDict
 import json
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine.json_utils import (to_json, from_json_path)
+from spinn_machine import JsonMachine
 from pacman.utilities import file_format_schemas
 
 
@@ -17,12 +16,10 @@ class ConvertToJavaMachine(object):
         :param file_path: Location to write file to. Warning will overwrite!
         :type file_path: str
         """
-        progress = ProgressBar(
-            (machine.max_chip_x + 1) * (machine.max_chip_y + 1) + 2,
-            "Converting to JSON machine")
+        # Steps are tojson, validate and writefile
+        progress = ProgressBar(3, "Converting to JSON machine")
 
         return ConvertToJavaMachine.do_convert(machine, file_path, progress)
-
 
     @staticmethod
     def do_convert(machine, file_path, progress=None):
@@ -34,7 +31,7 @@ class ConvertToJavaMachine(object):
         :type file_path: str
         """
 
-        json_obj = to_json()
+        json_obj = JsonMachine.to_json(machine)
 
         if progress:
             progress.update()
