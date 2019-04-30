@@ -47,7 +47,8 @@ def _find_one_to_one_vertices(vertex, graph):
         if edge.post_vertex not in vertices_seen]
     while vertices_to_try:
         next_vertex = vertices_to_try.pop()
-        if next_vertex not in vertices_seen:
+        if next_vertex not in vertices_seen and \
+                not isinstance(next_vertex, AbstractVirtualVertex):
             vertices_seen.add(next_vertex)
             edges = graph.get_edges_ending_at_vertex(next_vertex)
             if is_single(edges):
@@ -147,21 +148,21 @@ class OneToOnePlacer(RadialPlacer):
                         "with the OneToOnePlacer algorithm; use the "
                         "RadialPlacer algorithm instead")
 
-        # Find vertices with harder constraints
-        constrained = list()
         unconstrained = list()
+        # Find and place vertices with hard constraints
         for vertex in machine_graph.vertices:
-            if locate_constraints_of_type(
+            if isinstance(vertex, AbstractVirtualVertex):
+                placements.add_placement(Placement(
+                    vertex, vertex.virtual_chip_x, vertex.virtual_chip_y, 0))
+                all_vertices_placed.add(vertex)
+            elif locate_constraints_of_type(
                     vertex.constraints, ChipAndCoreConstraint):
-                constrained.append(vertex)
+                self._allocate_same_chip_as_group(
+                    vertex, placements, resource_tracker,
+                    same_chip_vertex_groups,
+                    all_vertices_placed, progress)
             else:
                 unconstrained.append(vertex)
-
-        # Place vertices with hard constraints
-        for vertex in constrained:
-            self._allocate_same_chip_as_group(
-                vertex, placements, resource_tracker, same_chip_vertex_groups,
-                all_vertices_placed, progress)
 
         for grouped_vertices in one_to_one_groups:
             # Get unallocated vertices and placements of allocated vertices
