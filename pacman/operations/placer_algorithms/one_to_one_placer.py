@@ -174,7 +174,7 @@ class OneToOnePlacer(RadialPlacer):
                 else:
                     unallocated.append(vert)
 
-            if len(unallocated) <=\
+            if 0 < len(unallocated) <=\
                     resource_tracker.get_maximum_cores_available_on_a_chip():
                 # Try to allocate all vertices to the same chip
                 self._allocate_one_to_one_group(
