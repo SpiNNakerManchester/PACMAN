@@ -18,7 +18,10 @@
 				<xs:sequence>
 					<xs:element name="python_module" type="xs:token" />
 					<xs:choice>
-						<xs:element name="python_class" type="xs:token" />
+						<xs:sequence>
+							<xs:element name="python_class" type="xs:token" />
+							<xs:element name="python_method" type="xs:token" minOccurs="0" />
+						</xs:sequence>
 						<xs:element name="python_function" type="xs:token" />
 					</xs:choice>
 				</xs:sequence>
