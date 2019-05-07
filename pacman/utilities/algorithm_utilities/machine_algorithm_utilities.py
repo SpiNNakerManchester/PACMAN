@@ -51,7 +51,7 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
         link_data.connected_chip_y)
     connected_chip.router.add_link(to_virtual_chip_link)
 
-    machine.add_chip(Chip(
+    machine.add_virtual_chip(Chip(
         processors=processors, router=router_object,
         sdram=SDRAM(size=0),
         x=virtual_chip_x, y=virtual_chip_y,
