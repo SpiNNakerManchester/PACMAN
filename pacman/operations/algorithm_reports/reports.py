@@ -19,6 +19,7 @@ _PLACEMENT_VTX_SIMPLE_FILENAME = "placement_by_vertex_without_graph.rpt"
 _PLACEMENT_CORE_GRAPH_FILENAME = "placement_by_core_using_graph.rpt"
 _PLACEMENT_CORE_SIMPLE_FILENAME = "placement_by_core_without_graph.rpt"
 _ROUTING_FILENAME = "edge_routing_info.rpt"
+_ROUTING_SUMMARY_FILENAME = "routing_summary.rpt"
 _ROUTING_TABLE_DIR = "routing_tables_generated"
 _SDRAM_FILENAME = "chip_sdram_usage_by_core.rpt"
 _TAGS_FILENAME = "tags.rpt"
@@ -92,6 +93,52 @@ def placer_reports_without_application_graph(
         report_folder, hostname, placements, machine)
     sdram_usage_report_per_chip(
         report_folder, hostname, placements, machine)
+
+
+def router_summary_report(
+        report_folder, routing_tables,  hostname, machine):
+    """ Generates a text file of routing paths
+
+    :param routing_tables:
+    :param report_folder:
+    :param hostname:
+    :param machine:
+    :rtype: None
+    """
+    file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
+    time_date_string = time.strftime("%c")
+    try:
+        with open(file_name, "w") as f:
+            progress = ProgressBar(machine.n_chips,
+                                   "Generating Routing summary report")
+
+            f.write("        Routing Summary Report\n")
+            f.write("        ======================\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
+
+            total_entries = 0
+            max_entries = 0
+            max_none_defaultable = 0
+            for (x, y) in progress.over(machine.chip_coordinates):
+                table = routing_tables.get_routing_table_for_chip(x, y)
+                if table is not None:
+                    entries = table.number_of_entries
+                    defaultable = table.number_of_defaultable_entries
+                    f.write("Chip {}:{} has {} entries of which {} are "
+                            "defaultable\n".format(x, y, entries, defaultable))
+                    total_entries += entries
+                    max_entries = max(max_entries, entries)
+                    max_none_defaultable = max(
+                        max_none_defaultable, entries - defaultable)
+
+            f.write("\n Total entries {}, max per chip {} max none "
+                    "defaultable {}\n\n".format(
+                total_entries, max_entries, max_none_defaultable))
+
+    except IOError:
+        logger.exception("Generate_routing summary reports: "
+                         "Can't open file {} for writing.", file_name)
 
 
 def router_report_from_paths(
