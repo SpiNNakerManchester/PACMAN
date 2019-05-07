@@ -133,8 +133,8 @@ def router_summary_report(
                         max_none_defaultable, entries - defaultable)
 
             f.write("\n Total entries {}, max per chip {} max none "
-                    "defaultable {}\n\n".format(
-                total_entries, max_entries, max_none_defaultable))
+                    "defaultable {}\n\n".format(total_entries, max_entries,
+                                                max_none_defaultable))
 
     except IOError:
         logger.exception("Generate_routing summary reports: "
