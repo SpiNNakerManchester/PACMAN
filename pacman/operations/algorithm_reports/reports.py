@@ -99,10 +99,10 @@ def router_summary_report(
         report_folder, routing_tables,  hostname, machine):
     """ Generates a text file of routing paths
 
-    :param routing_tables:
-    :param report_folder:
-    :param hostname:
-    :param machine:
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
+    :param hostname: the machine's hostname to which the placer worked on
+    :param machine: the python machine object
     :rtype: None
     """
     file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
@@ -146,13 +146,13 @@ def router_report_from_paths(
         machine_graph, placements, machine):
     """ Generates a text file of routing paths
 
-    :param routing_tables:
-    :param report_folder:
-    :param hostname:
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
+    :param hostname: the machine's hostname to which the placer worked on
     :param routing_infos:
     :param machine_graph:
     :param placements:
-    :param machine:
+    :param machine: the python machine object
     :rtype: None
     """
     file_name = os.path.join(report_folder, _ROUTING_FILENAME)
@@ -201,6 +201,8 @@ def _write_one_router_partition_report(f, partition, machine, placements,
 
 def partitioner_report(report_folder, hostname, graph, graph_mapper):
     """ Generate report on the placement of vertices onto cores.
+    :param report_folder: the folder to which the reports are being written
+    :param hostname: the machine's hostname to which the placer worked on
     """
 
     # Cycle through all vertices, and for each cycle through its vertices.
@@ -593,8 +595,8 @@ def _write_vertex_virtual_keys(
 
 def router_report_from_router_tables(report_folder, routing_tables):
     """
-    :param report_folder:
-    :param routing_tables:
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
     :rtype: None
     """
 
@@ -610,8 +612,8 @@ def router_report_from_router_tables(report_folder, routing_tables):
 
 def router_report_from_compressed_router_tables(report_folder, routing_tables):
     """
-    :param report_folder:
-    :param routing_tables:
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
     :rtype: None
     """
 
