@@ -125,8 +125,14 @@ def router_summary_report(
                 if table is not None:
                     entries = table.number_of_entries
                     defaultable = table.number_of_defaultable_entries
+                    link_only = 0
+                    for entry in table.multicast_routing_entries:
+                        if not entry.processor_ids:
+                            link_only += 1
                     f.write("Chip {}:{} has {} entries of which {} are "
-                            "defaultable\n".format(x, y, entries, defaultable))
+                            "defaultable and {} link only\n".format(
+                         x, y, entries, defaultable, link_only))
+#                        x, y, entries, defaultable, table.number_of_link_only_routing_entries))
                     total_entries += entries
                     max_entries = max(max_entries, entries)
                     max_none_defaultable = max(
