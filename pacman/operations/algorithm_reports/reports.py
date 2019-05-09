@@ -130,9 +130,8 @@ def router_summary_report(
                         if not entry.processor_ids:
                             link_only += 1
                     f.write("Chip {}:{} has {} entries of which {} are "
-                            "defaultable and {} link only\n".format(
-                         x, y, entries, defaultable, link_only))
-#                        x, y, entries, defaultable, table.number_of_link_only_routing_entries))
+                            "defaultable and {} link only\n"
+                            "".format(x, y, entries, defaultable, link_only))
                     total_entries += entries
                     max_entries = max(max_entries, entries)
                     max_none_defaultable = max(
