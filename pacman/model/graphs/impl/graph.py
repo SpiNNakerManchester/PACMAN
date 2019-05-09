@@ -3,7 +3,7 @@ try:
 except ImportError:
     from collections import OrderedDict
 from spinn_utilities.overrides import overrides
-from spinn_utilities.ordered_default_dict import DefaultOrderedDict
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
