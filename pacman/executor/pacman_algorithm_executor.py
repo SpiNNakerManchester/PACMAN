@@ -283,8 +283,8 @@ class PACMANAlgorithmExecutor(object):
 
         # Set up the token tracking and make all specified tokens complete
         token_states = TokenStates()
-        for token in tokens:
-            token = Token(token.name, token.part)
+        for token_name in tokens:
+            token = Token(token_name)
             token_states.track_token(token)
             token_states.process_output_token(token)
 
@@ -293,8 +293,7 @@ class PACMANAlgorithmExecutor(object):
         for algorithms in (algorithm_data, optional_algorithm_data):
             for algorithm in algorithms:
                 for token in algorithm.generated_output_tokens:
-                    if (not token_states.is_token_complete(token) or
-                            not token_states.is_tracking_token_part(token)):
+                    if not token_states.is_token_complete(token):
                         token_states.track_token(token)
 
         # Go through the algorithms and add a fake token for any algorithm that
@@ -423,16 +422,6 @@ class PACMANAlgorithmExecutor(object):
                                 "{}: part={}".format(
                                     algorithm.algorithm_id, token.part))
 
-                # create complete token string
-                completed_tokens_string = ""
-                for token in token_states.get_completed_tokens():
-                    completed_tokens_string += "{}, ".format(token.name)
-
-                # create fake token string
-                fake_token_string = ""
-                for token in fake_tokens.get_completed_tokens():
-                    fake_token_string += "{}, ".format(token.name)
-
                 raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
                     "    Inputs: {}\n"
@@ -450,8 +439,8 @@ class PACMANAlgorithmExecutor(object):
                         input_types,
                         fake_inputs,
                         outputs_to_find,
-                        completed_tokens_string,
-                        fake_token_string,
+                        token_states.get_completed_tokens(),
+                        fake_tokens.get_completed_tokens(),
                         tokens_to_find,
                         algorithms_to_find_names,
                         optional_algorithms_names,
