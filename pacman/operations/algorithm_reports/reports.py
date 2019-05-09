@@ -151,8 +151,8 @@ def router_summary_report(
             f.write("\n Total entries {}, max per chip {} max none "
                     "defaultable {} max link only {} "
                     "max unique spinnaker routes {}\n\n".format(
-                total_entries, max_entries, max_none_defaultable,
-                max_link_only, max_spinnaker_routes))
+                        total_entries, max_entries, max_none_defaultable,
+                        max_link_only, max_spinnaker_routes))
 
     except IOError:
         logger.exception("Generate_routing summary reports: "
