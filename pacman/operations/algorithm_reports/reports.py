@@ -3,6 +3,7 @@ import os
 import time
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
+from spinn_machine import Router
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 from pacman.model.graphs.common import EdgeTrafficType
@@ -107,6 +108,7 @@ def router_summary_report(
     """
     file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
     time_date_string = time.strftime("%c")
+    convert = Router.convert_routing_table_entry_to_spinnaker_route
     try:
         with open(file_name, "w") as f:
             progress = ProgressBar(machine.n_chips,
@@ -120,26 +122,37 @@ def router_summary_report(
             total_entries = 0
             max_entries = 0
             max_none_defaultable = 0
+            max_link_only = 0
+            max_spinnaker_routes = 0
             for (x, y) in progress.over(machine.chip_coordinates):
                 table = routing_tables.get_routing_table_for_chip(x, y)
                 if table is not None:
                     entries = table.number_of_entries
                     defaultable = table.number_of_defaultable_entries
                     link_only = 0
+                    spinnaker_routes = set()
                     for entry in table.multicast_routing_entries:
                         if not entry.processor_ids:
                             link_only += 1
+                        spinnaker_routes.add(convert(entry))
                     f.write("Chip {}:{} has {} entries of which {} are "
-                            "defaultable and {} link only\n"
-                            "".format(x, y, entries, defaultable, link_only))
+                            "defaultable and {} link only with {} unique "
+                            "spinnaker routes\n"
+                            "".format(x, y, entries, defaultable, link_only,
+                                      len(spinnaker_routes)))
                     total_entries += entries
                     max_entries = max(max_entries, entries)
                     max_none_defaultable = max(
                         max_none_defaultable, entries - defaultable)
+                    max_link_only = max(max_link_only, link_only)
+                    max_spinnaker_routes = max(
+                        max_spinnaker_routes, len(spinnaker_routes))
 
             f.write("\n Total entries {}, max per chip {} max none "
-                    "defaultable {}\n\n".format(total_entries, max_entries,
-                                                max_none_defaultable))
+                    "defaultable {} max link only {} "
+                    "max unique spinnaker routes {}\n\n".format(
+                total_entries, max_entries, max_none_defaultable,
+                max_link_only, max_spinnaker_routes))
 
     except IOError:
         logger.exception("Generate_routing summary reports: "
