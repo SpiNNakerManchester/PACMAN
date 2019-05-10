@@ -159,16 +159,17 @@ class FixedRouteRouter(object):
         # Create a fake machine consisting of only the one board that
         # the routes should go over
         fake_machine = machine
-        if (board_version in machine.BOARD_VERSION_FOR_48_CHIPS and
-                (machine.max_chip_x > machine.MAX_CHIP_X_ID_ON_ONE_BOARD or
-                 machine.max_chip_y > machine.MAX_CHIP_Y_ID_ON_ONE_BOARD)):
+        if (machine.max_chip_x > machine.MAX_CHIP_X_ID_ON_ONE_BOARD or
+                machine.max_chip_y > machine.MAX_CHIP_Y_ID_ON_ONE_BOARD):
+            x_wrap = machine.max_chip_x + 1
+            y_wrap = machine.max_chip_y + 1
             down_chips = {
                 (x, y) for x, y in zip(
                     range(machine.SIZE_X_OF_ONE_BOARD),
                     range(machine.SIZE_Y_OF_ONE_BOARD))
                 if not machine.is_chip_at(
-                    (x + eth_x) % (machine.max_chip_x + 1),
-                    (y + eth_y) % (machine.max_chip_y + 1))}
+                    (x + eth_x) % x_wrap,
+                    (y + eth_y) % y_wrap)}
 
             # build a fake machine which is just one board but with the missing
             # bits of the real board
