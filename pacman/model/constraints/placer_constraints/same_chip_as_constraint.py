@@ -31,5 +31,10 @@ class SameChipAsConstraint(AbstractPlacerConstraint):
             return False
         return self._vertex == other.vertex
 
+    def __ne__(self, other):
+        if not isinstance(other, SameChipAsConstraint):
+            return True
+        return not other.__eq__()
+
     def __hash__(self):
         return hash((self._vertex, ))

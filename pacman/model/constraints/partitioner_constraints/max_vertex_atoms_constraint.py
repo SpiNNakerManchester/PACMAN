@@ -34,5 +34,10 @@ class MaxVertexAtomsConstraint(AbstractPartitionerConstraint):
             return False
         return self._size == other.size
 
+    def __ne__(self, other):
+        if not isinstance(other, MaxVertexAtomsConstraint):
+            return True
+        return not other.__eq__()
+
     def __hash__(self):
         return hash((self._size,))
