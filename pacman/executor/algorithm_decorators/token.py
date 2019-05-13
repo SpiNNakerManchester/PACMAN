@@ -36,4 +36,4 @@ class Token(object):
     def __ne__(self, other):
         if not isinstance(other, Token):
             return True
-        return not other.__eq__()
+        return not self.__eq__(other)
