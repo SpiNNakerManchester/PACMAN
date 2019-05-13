@@ -32,3 +32,8 @@ class Token(object):
         if not isinstance(other, Token):
             return False
         return self._name == other.name and self._part == other.part
+
+    def __ne__(self, other):
+        if not isinstance(other, Token):
+            return True
+        return not self.__eq__(other)
