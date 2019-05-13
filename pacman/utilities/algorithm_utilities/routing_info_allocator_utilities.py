@@ -38,6 +38,9 @@ class ConstraintGroup(list):
     def __eq__(self, other):
         return id(other) == id(self)
 
+    def __ne__(self, other):
+        return id(other) != id(self)
+
 
 def get_edge_groups(machine_graph, traffic_type):
     """ Utility method to get groups of edges using any\

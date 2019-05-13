@@ -177,8 +177,14 @@ class OneToOnePlacer(RadialPlacer):
         # Find and place vertices with hard constraints
         for vertex in machine_graph.vertices:
             if isinstance(vertex, AbstractVirtualVertex):
+                virtual_p = 0
+                while placements.is_processor_occupied(
+                        vertex.virtual_chip_x, vertex.virtual_chip_y,
+                        virtual_p):
+                    virtual_p += 1
                 placements.add_placement(Placement(
-                    vertex, vertex.virtual_chip_x, vertex.virtual_chip_y, 0))
+                    vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
+                    virtual_p))
                 all_vertices_placed.add(vertex)
             elif locate_constraints_of_type(
                     vertex.constraints, ChipAndCoreConstraint):
