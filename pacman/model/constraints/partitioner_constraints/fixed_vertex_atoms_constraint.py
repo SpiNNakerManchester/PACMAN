@@ -35,5 +35,10 @@ class FixedVertexAtomsConstraint(AbstractPartitionerConstraint):
             return False
         return self._size == other.size
 
+    def __ne__(self, other):
+        if not isinstance(other, FixedVertexAtomsConstraint):
+            return True
+        return not self.__eq__(other)
+
     def __hash__(self):
         return hash((self._size,))

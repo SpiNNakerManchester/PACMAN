@@ -32,5 +32,10 @@ class BoardConstraint(AbstractPlacerConstraint):
             return False
         return self._board_address == other.board_address
 
+    def __ne__(self, other):
+        if not isinstance(other, BoardConstraint):
+            return True
+        return not self.__eq__(other)
+
     def __hash__(self):
         return hash((self._board_address,))

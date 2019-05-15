@@ -25,62 +25,6 @@ def _conflict(x, y, post_x, post_y):
     return False
 
 
-def _find_one_to_one_vertices(vertex, graph):
-    """ Find vertices which have one to one connections with the given\
-        vertex, and where their constraints don't force them onto\
-        different chips.
-
-    :param graph: the graph to look for other one to one vertices
-    :param vertex: the vertex to use as a basis for one to one connections
-    :return: set of one to one vertices
-    """
-    # Virtual vertices can't be forced on other chips
-    if isinstance(vertex, AbstractVirtualVertex):
-        return []
-    found_vertices = set()
-    vertices_seen = {vertex}
-
-    # look for one to ones leaving this vertex
-    outgoing = graph.get_edges_starting_at_vertex(vertex)
-    vertices_to_try = [
-        edge.post_vertex for edge in outgoing
-        if edge.post_vertex not in vertices_seen]
-    while vertices_to_try:
-        next_vertex = vertices_to_try.pop()
-        if next_vertex not in vertices_seen and \
-                not isinstance(next_vertex, AbstractVirtualVertex):
-            vertices_seen.add(next_vertex)
-            edges = graph.get_edges_ending_at_vertex(next_vertex)
-            if is_single(edges):
-                found_vertices.add(next_vertex)
-                outgoing = graph.get_edges_starting_at_vertex(next_vertex)
-                vertices_to_try.extend([
-                    edge.post_vertex for edge in outgoing
-                    if edge.post_vertex not in vertices_seen])
-
-    # look for one to ones entering this vertex
-    incoming = graph.get_edges_ending_at_vertex(vertex)
-    vertices_to_try = [
-        edge.pre_vertex for edge in incoming
-        if edge.pre_vertex not in vertices_seen]
-    while vertices_to_try:
-        next_vertex = vertices_to_try.pop()
-        if next_vertex not in vertices_seen:
-            vertices_seen.add(next_vertex)
-            edges = graph.get_edges_starting_at_vertex(next_vertex)
-            if is_single(edges):
-                found_vertices.add(next_vertex)
-                incoming = graph.get_edges_ending_at_vertex(next_vertex)
-                vertices_to_try.extend([
-                    edge.pre_vertex for edge in incoming
-                    if edge.pre_vertex not in vertices_seen])
-
-    extra_vertices = get_vertices_on_same_chip(vertex, graph)
-    for vertex in extra_vertices:
-        found_vertices.add(vertex)
-    return found_vertices
-
-
 class OneToOnePlacer(RadialPlacer):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
@@ -99,21 +43,80 @@ class OneToOnePlacer(RadialPlacer):
         self._check_constraints(
             machine_graph.vertices,
             additional_placement_constraints={SameChipAsConstraint})
+
         progress.update()
         # Get which vertices must be placed on the same chip as another vertex
         same_chip_vertex_groups = get_same_chip_vertex_groups(machine_graph)
 
         progress.update()
+
         # Work out the vertices that should be on the same chip by one-to-one
         # connectivity
         one_to_one_groups = create_vertices_groups(
             machine_graph.vertices,
-            functools.partial(_find_one_to_one_vertices, graph=machine_graph))
+            functools.partial(
+                self._find_one_to_one_vertices, graph=machine_graph))
 
         progress.update()
         return self._do_allocation(
             one_to_one_groups, same_chip_vertex_groups, machine,
             machine_graph, progress)
+
+    @staticmethod
+    def _find_one_to_one_vertices(vertex, graph):
+        """ Find vertices which have one to one connections with the given\
+            vertex, and where their constraints don't force them onto\
+            different chips.
+
+        :param graph: the graph to look for other one to one vertices
+        :param vertex: the vertex to use as a basis for one to one connections
+        :return: set of one to one vertices
+        """
+        # Virtual vertices can't be forced on other chips
+        if isinstance(vertex, AbstractVirtualVertex):
+            return []
+        found_vertices = set()
+        vertices_seen = {vertex}
+
+        # look for one to ones leaving this vertex
+        outgoing = graph.get_edges_starting_at_vertex(vertex)
+        vertices_to_try = [
+            edge.post_vertex for edge in outgoing
+            if edge.post_vertex not in vertices_seen]
+        while vertices_to_try:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen and \
+                    not isinstance(next_vertex, AbstractVirtualVertex):
+                vertices_seen.add(next_vertex)
+                edges = graph.get_edges_ending_at_vertex(next_vertex)
+                if is_single(edges):
+                    found_vertices.add(next_vertex)
+                    outgoing = graph.get_edges_starting_at_vertex(next_vertex)
+                    vertices_to_try.extend([
+                        edge.post_vertex for edge in outgoing
+                        if edge.post_vertex not in vertices_seen])
+
+        # look for one to ones entering this vertex
+        incoming = graph.get_edges_ending_at_vertex(vertex)
+        vertices_to_try = [
+            edge.pre_vertex for edge in incoming
+            if edge.pre_vertex not in vertices_seen]
+        while vertices_to_try:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen:
+                vertices_seen.add(next_vertex)
+                edges = graph.get_edges_starting_at_vertex(next_vertex)
+                if is_single(edges):
+                    found_vertices.add(next_vertex)
+                    incoming = graph.get_edges_ending_at_vertex(next_vertex)
+                    vertices_to_try.extend([
+                        edge.pre_vertex for edge in incoming
+                        if edge.pre_vertex not in vertices_seen])
+
+        extra_vertices = get_vertices_on_same_chip(vertex, graph)
+        for vertex in extra_vertices:
+            found_vertices.add(vertex)
+        return found_vertices
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
@@ -148,7 +151,6 @@ class OneToOnePlacer(RadialPlacer):
                         "with the OneToOnePlacer algorithm; use the "
                         "RadialPlacer algorithm instead")
 
-        unconstrained = list()
         # Find and place vertices with hard constraints
         for vertex in machine_graph.vertices:
             if isinstance(vertex, AbstractVirtualVertex):
@@ -167,8 +169,6 @@ class OneToOnePlacer(RadialPlacer):
                     vertex, placements, resource_tracker,
                     same_chip_vertex_groups,
                     all_vertices_placed, progress)
-            else:
-                unconstrained.append(vertex)
 
         for grouped_vertices in one_to_one_groups:
             # Get unallocated vertices and placements of allocated vertices

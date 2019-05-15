@@ -69,7 +69,7 @@ def group_vertices(vertices, same_group_as_function):
     """
 
     groups = create_vertices_groups(vertices, same_group_as_function)
-    # Dict of vertex to setof vertices on same chip (repeated lists expected)
+    # Dict of vertex to set of vertices on same chip (repeated lists expected)
     # A empty set value indicates a set that is too big.
     same_chip_vertices = OrderedDict()
     for group in groups:
@@ -83,7 +83,7 @@ def group_vertices(vertices, same_group_as_function):
 
 def add_set(all_sets, new_set):
     """
-    Adds a new set into the list of sets, concatenating ssets if required.
+    Adds a new set into the list of sets, concatenating sets if required.
 
     If the new set does not overlap any existing sets it is added.
 
