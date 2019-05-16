@@ -1,27 +1,16 @@
-from collections import defaultdict
-
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import OneToOnePlacer
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
-    create_vertices_groups, get_same_chip_vertex_groups,
-    get_vertices_on_same_chip)
+    create_vertices_groups, get_same_chip_vertex_groups)
 from pacman.utilities.utility_objs import ResourceTracker
+from pacman.model.constraints.placer_constraints import (
+    SameChipAsConstraint, ChipAndCoreConstraint)
 
 import math
 import sys
-
-from pacman.model.constraints.placer_constraints import (
-    SameChipAsConstraint, ChipAndCoreConstraint,
-    RadialPlacementFromChipConstraint)
-from pacman.utilities.utility_calls import (
-    is_single, locate_constraints_of_type)
-from pacman.model.graphs import AbstractVirtualVertex
-from pacman.exceptions import PacmanPlaceException
 import functools
-
-from pacman.exceptions import (
-    PacmanException, PacmanInvalidParameterException, PacmanValueError)
+from collections import defaultdict
 
 
 class SpreaderPlacer(OneToOnePlacer):
@@ -138,7 +127,7 @@ class SpreaderPlacer(OneToOnePlacer):
                 incoming_size = self._get_incoming_size(
                     vertex, machine_graph, n_keys_map)
                 in_coming_size_map[incoming_size].append(vertex)
-        sorted_keys = sorted(in_coming_size_map.keys())
+        sorted_keys = sorted(in_coming_size_map.keys(), reverse=True)
         for key in sorted_keys:
             vert_list.extend(in_coming_size_map[key])
         return vert_list
@@ -149,11 +138,12 @@ class SpreaderPlacer(OneToOnePlacer):
         
         :param chips: iterable of chips to sort
         :param cost_per_chip: the map of (x,y) and cost. 
-        :return: iterable of chips in a sorted fasion.
-        :rtype: iterable of SPiNNMachine.machine.chip
+        :return: iterable of chips in a sorted fashion.
+        :rtype: list of chips
         """
 
-        return sorted(chips, key=lambda chip: cost_per_chip[chip.x, chip.y])
+        return sorted(
+            chips, key=lambda (chip_x, chip_y): cost_per_chip[chip_x, chip_y])
 
     @staticmethod
     def _get_incoming_size(vertex, machine_graph, n_keys_map):
@@ -208,31 +198,34 @@ class SpreaderPlacer(OneToOnePlacer):
         :rtype: None 
         """
         for vertex in same_chip_vertex_groups.keys():
-            if vertex not in placed_vertices:
-                to_do_as_group = list()
-                for other_vert in same_chip_vertex_groups[vertex]:
-                    if other_vert not in placed_vertices:
-                        to_do_as_group.append(
-                            (other_vert.resources_required,
-                             other_vert.constraints))
+            if len(same_chip_vertex_groups[vertex]) != 1:
+                if vertex not in placed_vertices:
+                    to_do_as_group = list()
+                    for other_vert in same_chip_vertex_groups[vertex]:
+                        if other_vert not in placed_vertices:
+                            to_do_as_group.append(
+                                (other_vert.resources_required,
+                                 other_vert.constraints))
 
-                # allocate as a group to sorted chips so that ones with least
-                #  incoming packets are considered first
-                results = resource_tracker.allocate_constrained_group_resources(
-                    to_do_as_group, chips=chips_in_order)
+                    # allocate as a group to sorted chips so that ones with
+                    # least incoming packets are considered first
+                    results = resource_tracker.\
+                        allocate_constrained_group_resources(
+                            to_do_as_group, chips=chips_in_order)
 
-                # create placements and add cost to the chip
-                for (x, y, p, _, _), placed_vertex in zip(
-                        results, same_chip_vertex_groups[vertex]):
-                    placements.add_placement(Placement(placed_vertex, x, y, p))
-                    placed_vertices.add(placed_vertex)
-                    cost_per_chip[(x, y)] += self._get_incoming_size(
-                        placed_vertex, machine_graph, n_keys_map)
+                    # create placements and add cost to the chip
+                    for (x, y, p, _, _), placed_vertex in zip(
+                            results, same_chip_vertex_groups[vertex]):
+                        placements.add_placement(
+                            Placement(placed_vertex, x, y, p))
+                        placed_vertices.add(placed_vertex)
+                        cost_per_chip[(x, y)] += self._get_incoming_size(
+                            placed_vertex, machine_graph, n_keys_map)
 
-            # resort the chips, as no idea where in the list the resource
-            # tracker selected
-            chips_in_order = self._sort_chips_based_off_incoming_cost(
-                chips_in_order, cost_per_chip)
+                # resort the chips, as no idea where in the list the resource
+                # tracker selected
+                chips_in_order = self._sort_chips_based_off_incoming_cost(
+                    chips_in_order, cost_per_chip)
 
         # update progress bar to cover one cycle of all the verts in the graph
         progress_bar.update(len(machine_graph.vertices))
@@ -309,7 +302,8 @@ class SpreaderPlacer(OneToOnePlacer):
                     one_to_one_vertex, machine_graph, n_keys_map)
 
             # sort chips for the next group cycle
-            self._sort_chips_based_off_incoming_cost(chips, cost_per_chip)
+            chips = self._sort_chips_based_off_incoming_cost(
+                chips, cost_per_chip)
         # update progress bar to cover one cycle of all the verts in the graph
         progress_bar.update(len(machine_graph.vertices))
 
@@ -342,7 +336,8 @@ class SpreaderPlacer(OneToOnePlacer):
             cost_per_chip[(x, y)] += (
                 self._get_incoming_size(vertex, machine_graph, n_keys_map))
             # sort chips for the next group cycle
-            self._sort_chips_based_off_incoming_cost(chips, cost_per_chip)
+            chips_in_order = self._sort_chips_based_off_incoming_cost(
+                chips_in_order, cost_per_chip)
 
         progress_bar.update(len(machine_graph.vertices))
 
@@ -381,6 +376,6 @@ class SpreaderPlacer(OneToOnePlacer):
             middle_chip_y = closest_chip.y
 
         # return the radial list from this middle point
-        return self._generate_radial_chips(
+        return list(self._generate_radial_chips(
             machine, resource_tracker=None, start_chip_x=middle_chip_x,
-            start_chip_y=middle_chip_y)
+            start_chip_y=middle_chip_y))
