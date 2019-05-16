@@ -298,6 +298,9 @@ class SpreaderPlacer(OneToOnePlacer):
                         one_to_one_vertex.resources_required,
                         one_to_one_vertex.constraints, chips)
 
+                # add to placed tracker
+                placed_vertices.add(one_to_one_vertex)
+
                 # make placement
                 placements.add_placement(Placement(
                     vertex=one_to_one_vertex, x=x, y=y, p=p))
