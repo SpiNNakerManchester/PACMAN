@@ -203,7 +203,7 @@ class SpreaderPlacer(OneToOnePlacer):
         :rtype: None 
         """
         for vertex in same_chip_vertex_groups.keys():
-            if len(same_chip_vertex_groups[vertex] != 1):
+            if len(same_chip_vertex_groups[vertex]) != 1:
                 if vertex not in placed_vertices:
                     to_do_as_group = list()
                     for other_vert in same_chip_vertex_groups[vertex]:
