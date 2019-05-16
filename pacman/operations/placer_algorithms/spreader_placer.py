@@ -6,20 +6,15 @@ from pacman.operations.placer_algorithms import OneToOnePlacer
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups)
 from pacman.utilities.utility_objs import ResourceTracker
-
-import math
-import sys
-
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 import functools
+import math
+import sys
 
-from pacman.exceptions import (
-    PacmanException, PacmanInvalidParameterException, PacmanValueError)
 
 
 class SpreaderPlacer(OneToOnePlacer):
-
     # number of cycles over the machine graph (
     # 1. same chip,
     # 2. 1 to 1,
@@ -117,7 +112,7 @@ class SpreaderPlacer(OneToOnePlacer):
             self, machine_graph, placed_vertices, n_keys_map):
         """ sort left overs verts so that the ones with the most costly verts 
         are at the front of the list
-        
+
         :param machine_graph: machine graph
         :param placed_vertices: the verts already placed
         :param n_keys_map: map between partition to n keys.
@@ -140,7 +135,7 @@ class SpreaderPlacer(OneToOnePlacer):
     @staticmethod
     def _sort_chips_based_off_incoming_cost(chips, cost_per_chip):
         """ sorts chips out so that the chip in front has least incoming cost.
-        
+
         :param chips: iterable of chips to sort
         :param cost_per_chip: the map of (x,y) and cost. 
         :return: iterable of chips in a sorted fasion.
@@ -153,7 +148,7 @@ class SpreaderPlacer(OneToOnePlacer):
     @staticmethod
     def _get_incoming_size(vertex, machine_graph, n_keys_map):
         """ gets how many packets are to be processed by a given vertex.
-        
+
         :param vertex: the vertex the get the cost of
         :param machine_graph: the machine graph
         :param n_keys_map: the map of outgoing partition and n keys down it.
@@ -174,7 +169,7 @@ class SpreaderPlacer(OneToOnePlacer):
     @staticmethod
     def _locate_hard_placement_verts(machine_graph):
         """ locates the verts with hard constraints
-        
+
         :param machine_graph: the machine graph
         :return: list of verts to just place where they demand it
         :rtype: iterable of machine vertex.
@@ -241,7 +236,7 @@ class SpreaderPlacer(OneToOnePlacer):
             n_keys_map, machine):
         """ place 1 to 1 groups on the same chip if possible. else radially 
         from it
-        
+
         :param one_to_one_groups: the 1 to 1 groups
         :param chips_in_order: chips in sorted order of lowest cost
         :param placements: placements holder
@@ -318,7 +313,7 @@ class SpreaderPlacer(OneToOnePlacer):
             self, machine_graph, chips_in_order, placements, progress_bar,
             resource_tracker, placed_vertices, cost_per_chip, n_keys_map):
         """ places left over vertices in locations with least costs.
-        
+
         :param machine_graph: machine graph
         :param chips_in_order: chips in sorted order
         :param placements: placements
@@ -337,8 +332,8 @@ class SpreaderPlacer(OneToOnePlacer):
 
         for vertex in sorted_verts:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-                    vertex.resources_required,
-                    vertex.constraints, chips_in_order)
+                vertex.resources_required,
+                vertex.constraints, chips_in_order)
             placements.add_placement(Placement(vertex=vertex, x=x, y=y, p=p))
             cost_per_chip[(x, y)] += (
                 self._get_incoming_size(vertex, machine_graph, n_keys_map))
