@@ -18,7 +18,7 @@ def test_virtual_placement(placer):
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)
     extended_machine = MallocBasedChipIdAllocator()(machine, graph)
-    placements = placer(graph, extended_machine)
+    placements = placer(graph, extended_machine, plan_n_timesteps=1000)
 
     placement = placements.get_placement_of_vertex(virtual_vertex)
     chip = extended_machine.get_chip_at(placement.x, placement.y)
