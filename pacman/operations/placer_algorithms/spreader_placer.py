@@ -81,7 +81,7 @@ class SpreaderPlacer(OneToOnePlacer):
                 hard_vertex.resources_required, hard_vertex.constraints)
             placements.add_placement(Placement(hard_vertex, x, y, p))
             placed_vertices.add(hard_vertex)
-            cost_per_chip[(x, y)] += self._get_incoming_size(
+            cost_per_chip[(x, y)] += self._get_cost(
                 hard_vertex, machine_graph, n_keys_map)
 
         # place groups of verts that need the same chip on the same chip,
@@ -124,7 +124,7 @@ class SpreaderPlacer(OneToOnePlacer):
         in_coming_size_map = defaultdict(list)
         for vertex in machine_graph.vertices:
             if vertex not in placed_vertices:
-                incoming_size = self._get_incoming_size(
+                incoming_size = self._get_cost(
                     vertex, machine_graph, n_keys_map)
                 in_coming_size_map[incoming_size].append(vertex)
         sorted_keys = sorted(in_coming_size_map.keys(), reverse=True)
@@ -142,11 +142,13 @@ class SpreaderPlacer(OneToOnePlacer):
         :rtype: iterable of SPiNNMachine.machine.chip
         """
 
-        return sorted(
-            chips, key=lambda (chip_x, chip_y): cost_per_chip[chip_x, chip_y])
+        data = sorted(
+            chips,
+            key=lambda (chip_x, chip_y): cost_per_chip[chip_x, chip_y])
+        return data
 
     @staticmethod
-    def _get_incoming_size(vertex, machine_graph, n_keys_map):
+    def _get_cost(vertex, machine_graph, n_keys_map):
         """ gets how many packets are to be processed by a given vertex.
 
         :param vertex: the vertex the get the cost of
@@ -158,12 +160,20 @@ class SpreaderPlacer(OneToOnePlacer):
 
         # NOTE we going to assume as a worst case scenario that every key is
         # sent every time step. but this is obviously not valid often
+        # handle incoming
         total_incoming_keys = 0
         for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
             incoming_partition = \
                 machine_graph.get_outgoing_partition_for_edge(incoming_edge)
             total_incoming_keys += n_keys_map.n_keys_for_partition(
                 incoming_partition)
+
+        # handle outgoing
+        out_going_partitions = \
+            machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+                vertex)
+        for partition in out_going_partitions:
+            total_incoming_keys += n_keys_map.n_keys_for_partition(partition)
         return total_incoming_keys
 
     @staticmethod
@@ -219,7 +229,7 @@ class SpreaderPlacer(OneToOnePlacer):
                         placements.add_placement(
                             Placement(placed_vertex, x, y, p))
                         placed_vertices.add(placed_vertex)
-                        cost_per_chip[(x, y)] += self._get_incoming_size(
+                        cost_per_chip[(x, y)] += self._get_cost(
                             placed_vertex, machine_graph, n_keys_map)
 
                 # resort the chips, as no idea where in the list the resource
@@ -301,12 +311,12 @@ class SpreaderPlacer(OneToOnePlacer):
                     vertex=one_to_one_vertex, x=x, y=y, p=p))
 
                 # update cost
-                cost_per_chip[(x, y)] += self._get_incoming_size(
+                cost_per_chip[(x, y)] += self._get_cost(
                     one_to_one_vertex, machine_graph, n_keys_map)
 
             # sort chips for the next group cycle
-            chips_in_order = \
-                self._sort_chips_based_off_incoming_cost(chips, cost_per_chip)
+            chips_in_order = self._sort_chips_based_off_incoming_cost(
+                chips, cost_per_chip)
         # update progress bar to cover one cycle of all the verts in the graph
         progress_bar.update(len(machine_graph.vertices))
 
@@ -336,8 +346,8 @@ class SpreaderPlacer(OneToOnePlacer):
                 vertex.resources_required,
                 vertex.constraints, chips_in_order)
             placements.add_placement(Placement(vertex=vertex, x=x, y=y, p=p))
-            cost_per_chip[(x, y)] += (
-                self._get_incoming_size(vertex, machine_graph, n_keys_map))
+            cost_per_chip[(x, y)] += self._get_cost(
+                vertex, machine_graph, n_keys_map)
             # sort chips for the next group cycle
             chips_in_order = self._sort_chips_based_off_incoming_cost(
                 chips_in_order, cost_per_chip)
