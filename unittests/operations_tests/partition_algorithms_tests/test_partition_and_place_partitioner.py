@@ -392,7 +392,7 @@ class TestBasicPartitioner(unittest.TestCase):
         graph.add_vertices([vertex_1, vertex_2, vertex_3])
         machine = VirtualMachine(version=3, with_wrap_arounds=None)
         partitioner = PartitionAndPlacePartitioner()
-        _, graph_mapper, _ = partitioner(graph, machine)
+        _, graph_mapper, _ = partitioner(graph, machine, plan_n_timesteps=None)
         subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
         subvertices_2 = list(graph_mapper.get_machine_vertices(vertex_2))
         subvertices_3 = list(graph_mapper.get_machine_vertices(vertex_3))
@@ -467,7 +467,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # Do the partitioning - this should result in an error
         with self.assertRaises(PacmanPartitionException):
             partitioner = PartitionAndPlacePartitioner()
-            partitioner(app_graph, machine)
+            partitioner(app_graph, machine, plan_n_timesteps=None)
 
     def test_partition_with_fixed_atom_constraints_at_limit(self):
         """
@@ -494,7 +494,8 @@ class TestBasicPartitioner(unittest.TestCase):
 
         # Do the partitioning - this should just work
         partitioner = PartitionAndPlacePartitioner()
-        machine_graph, _, _ = partitioner(app_graph, machine)
+        machine_graph, _, _ = partitioner(
+            app_graph, machine, plan_n_timesteps=None)
         self.assert_(len(machine_graph.vertices) == 4)
 
 

@@ -1,7 +1,7 @@
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import (
-    ResourceContainer, CPUCyclesPerTickResource, DTCMResource, SDRAMResource)
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
@@ -13,7 +13,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     return ResourceContainer(
         cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
         dtcm=DTCMResource(dtcm_requirement),
-        sdram=SDRAMResource(sdram_requirement))
+        sdram=ConstantSDRAM(sdram_requirement))
 
 
 class Vertex(ApplicationVertex):

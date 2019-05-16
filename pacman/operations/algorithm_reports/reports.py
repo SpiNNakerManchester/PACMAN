@@ -73,8 +73,6 @@ def placer_reports_with_application_graph(
         report_folder, hostname, graph, graph_mapper, placements)
     placement_report_with_application_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper)
-    sdram_usage_report_per_chip(
-        report_folder, hostname, placements, machine)
 
 
 def placer_reports_without_application_graph(
@@ -92,8 +90,6 @@ def placer_reports_without_application_graph(
     placement_report_without_application_graph_by_vertex(
         report_folder, hostname, placements, machine_graph)
     placement_report_without_application_graph_by_core(
-        report_folder, hostname, placements, machine)
-    sdram_usage_report_per_chip(
         report_folder, hostname, placements, machine)
 
 
@@ -538,67 +534,76 @@ def _write_one_chip_machine_placement(f, c, placements):
             f.write("\n")
 
 
-def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
+def sdram_usage_report_per_chip(
+        report_folder, hostname, placements, machine, plan_n_timesteps,
+        data_n_timesteps):
     """ Reports the SDRAM used per chip
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
+    :param plan_n_timesteps: The number of timesteps for which placer \
+        reserved space.
+    :param data_n_timesteps: The number of timesteps for which data can be
+    saved on the machine.
     :rtype: None
     """
 
     file_name = os.path.join(report_folder, _SDRAM_FILENAME)
     time_date_string = time.strftime("%c")
+    progress = ProgressBar((len(placements) * 2 + machine.n_chips * 2),
+                           "Generating SDRAM usage report")
     try:
         with open(file_name, "w") as f:
             f.write("        Memory Usage by Core\n")
             f.write("        ====================\n\n")
             f.write("Generated: {} for target machine '{}'\n\n".format(
                 time_date_string, hostname))
-            used_sdram_by_chip = dict()
-
-            progress = ProgressBar(len(placements) + machine.n_chips,
-                                   "Generating SDRAM usage report")
-            used_sdram_by_chip = _write_sdram_by_core(f, placements, progress)
-            for chip in progress.over(machine.chips):
-                _write_chip_sdram(f, chip, used_sdram_by_chip)
+            f.write("Planned by partitioner\n")
+            f.write("----------------------\n")
+            _sdram_usage_report_per_chip_with_timesteps(
+                f, placements, machine, plan_n_timesteps, progress, False)
+            f.write("\nActual space reserved on the machine\n")
+            f.write("----------------------\n")
+            _sdram_usage_report_per_chip_with_timesteps(
+                f, placements, machine, data_n_timesteps, progress, True)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for "
                          "writing.", file_name)
 
 
-def _write_sdram_by_core(f, placements, progress):
-    used_sdram = dict()
+def _sdram_usage_report_per_chip_with_timesteps(
+        f, placements, machine, timesteps, progress, end_progress):
+    f.write("Based on {} timesteps\n\n".format(timesteps))
+    used_sdram_by_chip = dict()
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.get_value()
+        sdram = placement.vertex.resources_required.sdram.get_total_sdram(
+            timesteps)
         x, y, p = placement.x, placement.y, placement.p
-        f.write("SDRAM reqs for core ({},{},{}) is {} KB\n".format(
-            x, y, p, int(sdram / 1024.0)))
+        f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
+                "".format(x, y, p, int(sdram / 1024.0), sdram, placement))
         key = (x, y)
-        if key not in used_sdram:
-            used_sdram[key] = sdram
+        if key not in used_sdram_by_chip:
+            used_sdram_by_chip[key] = sdram
         else:
-            used_sdram[key] += sdram
-    return used_sdram
-
-
-def _write_chip_sdram(f, chip, used_sdram_by_chip):
-    try:
-        used_sdram = used_sdram_by_chip[chip.x, chip.y]
-        if used_sdram:
-            f.write(
-                "**** Chip: ({}, {}) has total memory usage of"
-                " {} KB ({} bytes) out of a max of "
-                "{} KB ({} bytes)\n\n".format(
-                    chip.x, chip.y,
-                    int(used_sdram / 1024.0), used_sdram,
-                    int(chip.sdram.size / 1024.0), chip.sdram.size))
-    except KeyError:
-        # Do Nothing
-        pass
+            used_sdram_by_chip[key] += sdram
+    for chip in progress.over(machine.chips, end_progress):
+        try:
+            used_sdram = used_sdram_by_chip[chip.x, chip.y]
+            if used_sdram:
+                f.write(
+                    "**** Chip: ({}, {}) has total memory usage of"
+                    " {} KB ({} bytes) out of a max of "
+                    "{} KB ({} bytes)\n\n".format(
+                        chip.x, chip.y,
+                        int(used_sdram / 1024.0), used_sdram,
+                        int(chip.sdram.size / 1024.0), chip.sdram.size))
+        except KeyError:
+            # Do Nothing
+            pass
 
 
 def routing_info_report(report_folder, machine_graph, routing_infos):
