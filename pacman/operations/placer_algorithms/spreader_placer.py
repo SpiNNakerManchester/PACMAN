@@ -305,7 +305,8 @@ class SpreaderPlacer(OneToOnePlacer):
                     one_to_one_vertex, machine_graph, n_keys_map)
 
             # sort chips for the next group cycle
-            self._sort_chips_based_off_incoming_cost(chips, cost_per_chip)
+            chips_in_order = \
+                self._sort_chips_based_off_incoming_cost(chips, cost_per_chip)
         # update progress bar to cover one cycle of all the verts in the graph
         progress_bar.update(len(machine_graph.vertices))
 
@@ -338,7 +339,7 @@ class SpreaderPlacer(OneToOnePlacer):
             cost_per_chip[(x, y)] += (
                 self._get_incoming_size(vertex, machine_graph, n_keys_map))
             # sort chips for the next group cycle
-            self._sort_chips_based_off_incoming_cost(
+            chips_in_order = self._sort_chips_based_off_incoming_cost(
                 chips_in_order, cost_per_chip)
 
         progress_bar.update(len(machine_graph.vertices))
