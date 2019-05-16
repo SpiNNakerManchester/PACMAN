@@ -142,9 +142,7 @@ class SpreaderPlacer(OneToOnePlacer):
         :rtype: iterable of SPiNNMachine.machine.chip
         """
 
-        data = sorted(
-            chips,
-            key=lambda (chip_x, chip_y): cost_per_chip[chip_x, chip_y])
+        data = sorted(chips, key=lambda chip: cost_per_chip[chip[0], chip[1]])
         return data
 
     @staticmethod
