@@ -32,8 +32,22 @@ class OneToOnePlacer(RadialPlacer):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine):
-
+    def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+        :param machine_graph: The machine_graph to place
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
+        :param machine:\
+            The machine with respect to which to partition the application\
+            graph
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :return: A set of placements
+        :rtype: :py:class:`pacman.model.placements.Placements`
+        :raise pacman.exceptions.PacmanPlaceException: \
+            If something goes wrong with the placement
+        """
         # Iterate over vertices and generate placements
         # +3 covers check_constraints, get_same_chip_vertex_groups and
         #    create_vertices_groups
@@ -43,11 +57,10 @@ class OneToOnePlacer(RadialPlacer):
         self._check_constraints(
             machine_graph.vertices,
             additional_placement_constraints={SameChipAsConstraint})
-
         progress.update()
+
         # Get which vertices must be placed on the same chip as another vertex
         same_chip_vertex_groups = get_same_chip_vertex_groups(machine_graph)
-
         progress.update()
 
         # Work out the vertices that should be on the same chip by one-to-one
@@ -56,11 +69,11 @@ class OneToOnePlacer(RadialPlacer):
             machine_graph.vertices,
             functools.partial(
                 self._find_one_to_one_vertices, graph=machine_graph))
-
         progress.update()
+
         return self._do_allocation(
             one_to_one_groups, same_chip_vertex_groups, machine,
-            machine_graph, progress)
+            plan_n_timesteps, machine_graph, progress)
 
     @staticmethod
     def _find_one_to_one_vertices(vertex, graph):
@@ -120,7 +133,7 @@ class OneToOnePlacer(RadialPlacer):
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
-            machine, machine_graph, progress):
+            machine, plan_n_timesteps, machine_graph, progress):
         """
 
         :param one_to_one_groups:
@@ -131,15 +144,23 @@ class OneToOnePlacer(RadialPlacer):
             Mapping of Vertex to the Vertex that must be on the same Chip
         :type same_chip_vertex_groups:
             dict(vertex, collection(vertex))
-        :param machine:
-        :param machine_graph:
+        :param machine:\
+            The machine with respect to which to partition the application\
+            graph
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :param machine_graph: The machine_graph to place
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param progress:
         :return:
         """
+
         placements = Placements()
 
         resource_tracker = ResourceTracker(
-            machine, self._generate_radial_chips(machine))
+            machine, plan_n_timesteps, self._generate_radial_chips(machine))
         all_vertices_placed = set()
 
         # RadialPlacementFromChipConstraint won't work here
