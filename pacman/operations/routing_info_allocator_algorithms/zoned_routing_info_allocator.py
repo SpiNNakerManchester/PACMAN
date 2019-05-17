@@ -31,7 +31,8 @@ class ZonedRoutingInfoAllocator(object):
         "_placements",
         "_n_keys_map",
         "_max_partions",
-        "_max_app_keys_bites"
+        "_max_app_keys_bites",
+        "_key_bites_per_app"
     ]
 
 
@@ -83,6 +84,7 @@ class ZonedRoutingInfoAllocator(object):
         self._max_app_keys_bites = 0
         source_zones = 0
         self._max_partions = 0
+        self._key_bites_per_app = dict()
         for app_vertex in progress.over(self._application_graph.vertices):
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
@@ -103,6 +105,7 @@ class ZonedRoutingInfoAllocator(object):
                 machine_bites = self._bites_needed(len(machine_vertices))
                 self._max_app_keys_bites = max(
                     self._max_app_keys_bites, machine_bites + key_bites)
+                self._key_bites_per_app[app_vertex] = key_bites
         source_bites = self._bites_needed(source_zones)
 
         if source_bites + self._max_app_keys_bites > KEY_SIZE:
@@ -120,16 +123,14 @@ class ZonedRoutingInfoAllocator(object):
         for app_vertex in progress.over(self._application_graph.vertices):
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
-            for vertex in machine_vertices:
-                machine_index = self._graph_mapper.get_machine_vertex_index(
-                    vertex)
-                partitions = self._machine_graph. \
-                    get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                for partition in partitions:
+            if app_vertex in self._key_bites_per_app:
+                key_bites = self._key_bites_per_app[app_vertex]
+                for vertex in machine_vertices:
+                    machine_index = self._graph_mapper.get_machine_vertex_index(vertex)
+                    partitions = self._machine_graph. \
+                        get_outgoing_edge_partitions_starting_at_vertex(vertex)
+                    partition = partitions.peek()
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        n_keys = self._n_keys_map.n_keys_for_partition(
-                            partition)
-                        key_bites = self._bites_needed(n_keys)
                         mask = 2 ** 32 - 2 ** key_bites
                         key = source_index << self._max_app_keys_bites | \
                               machine_index << key_bites
@@ -142,5 +143,4 @@ class ZonedRoutingInfoAllocator(object):
         return routing_infos
 
     def _bites_needed(self, size):
-        print(size)
         return math.ceil(math.log(size, 2))
