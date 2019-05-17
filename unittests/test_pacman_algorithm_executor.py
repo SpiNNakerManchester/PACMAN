@@ -194,7 +194,7 @@ class Test(unittest.TestCase):
             optional_algorithms=[
                 "TestPartTokenOutput2", "TestPartTokenOutput1"],
             inputs={}, required_outputs=[],
-            tokens=["Test"], required_output_tokens=[])
+            tokens=[Token("Test")], required_output_tokens=[])
         executor.execute_mapping()
         self.assertFalse(TestPartTokenOutput1.called)
         self.assertFalse(TestPartTokenOutput2.called)

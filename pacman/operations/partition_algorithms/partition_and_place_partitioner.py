@@ -14,8 +14,8 @@ from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls as utils
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
     import (
-        generate_machine_edges, get_same_size_vertex_groups,
-        get_remaining_constraints)
+    generate_machine_edges, get_same_size_vertex_groups,
+    get_remaining_constraints, determine_max_atoms_for_vertex)
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
@@ -132,19 +132,8 @@ class PartitionAndPlacePartitioner(object):
             if isinstance(other_vertex, ApplicationVertex):
                 possible_max_atoms.append(
                     other_vertex.get_max_atoms_per_core())
-            max_atom_constraints = utils.locate_constraints_of_type(
-                other_vertex.constraints, MaxVertexAtomsConstraint)
-            for constraint in max_atom_constraints:
-                possible_max_atoms.append(constraint.size)
-            n_atom_constraints = utils.locate_constraints_of_type(
-                other_vertex.constraints, FixedVertexAtomsConstraint)
-            for constraint in n_atom_constraints:
-                if n_atoms is not None and constraint.size != n_atoms:
-                    raise PacmanPartitionException(
-                        "Vertex has multiple contradictory fixed atom "
-                        "constraints - cannot be both {} and {}".format(
-                            n_atoms, constraint.size))
-                n_atoms = constraint.size
+            possible_max_atoms.append(
+                determine_max_atoms_for_vertex(other_vertex))
 
         max_atoms_per_core = int(min(possible_max_atoms))
         if n_atoms is not None and max_atoms_per_core < n_atoms:
