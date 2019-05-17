@@ -15,11 +15,19 @@ class BasicTagAllocator(object):
 
     __slots__ = []
 
-    def __call__(self, machine, placements):
-        """ See :py:meth:`AbstractTagAllocatorAlgorithm.allocate_tags`
+    def __call__(self, machine, plan_n_timesteps, placements):
+        """ see AbstractTagAllocatorAlgorithm.allocate_tags
+        :param machine:\
+            The machine with respect to which to partition the application\
+            graph
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :param placements:
+        :return:
         """
 
-        resource_tracker = ResourceTracker(machine)
+        resource_tracker = ResourceTracker(machine, plan_n_timesteps)
 
         # Keep track of ports allocated to reverse IP tags and tags that still
         # need a port to be allocated
