@@ -1,7 +1,7 @@
 from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanValueError
-
+from spinnak_ear.AN_group_vertex import ANGroupVertex
 
 class GraphMapper(object):
     """ A mapping between an Application Graph and a Machine Graph.
@@ -58,7 +58,12 @@ class GraphMapper(object):
         :raise pacman.exceptions.PacmanValueError:\
             If atom selection is out of bounds.
         """
-        if vertex_slice.hi_atom >= application_vertex.n_atoms:
+        if isinstance(machine_vertex,ANGroupVertex):
+            if vertex_slice.hi_atom >= application_vertex._size:
+                raise PacmanValueError(
+                "hi_atom {:d} >= maximum {:d}".format(
+                    vertex_slice.hi_atom, application_vertex._size))
+        elif vertex_slice.hi_atom >= application_vertex.n_atoms:
             raise PacmanValueError(
                 "hi_atom {:d} >= maximum {:d}".format(
                     vertex_slice.hi_atom, application_vertex.n_atoms))

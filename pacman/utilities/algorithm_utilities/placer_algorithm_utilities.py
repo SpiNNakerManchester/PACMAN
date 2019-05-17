@@ -6,7 +6,7 @@ except ImportError:
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
-    RadialPlacementFromChipConstraint)
+    RadialPlacementFromChipConstraint,EarConstraint)
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
@@ -20,6 +20,8 @@ def sort_vertices_by_known_constraints(vertices):
         ConstraintOrder(ChipAndCoreConstraint, 1, ["p"]),
         ConstraintOrder(ChipAndCoreConstraint, 2),
         ConstraintOrder(SameChipAsConstraint, 3),
+        #HACK to force no reordering for SpiNNak-Ear
+        ConstraintOrder(EarConstraint,1),
         ConstraintOrder(BoardConstraint, 4),
         ConstraintOrder(RadialPlacementFromChipConstraint, 5)])
     return sorter.sort(vertices)

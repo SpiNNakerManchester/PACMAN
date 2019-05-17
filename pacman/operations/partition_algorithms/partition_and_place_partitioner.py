@@ -19,8 +19,12 @@ from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
-
+from spinnak_ear.spinnakear_vertex import SpiNNakEarVertex
+from spinn_front_end_common.utilities import globals_variables
+from spinnak_ear.IHCAN_vertex import IHCANVertex
+from spinnak_ear.AN_group_vertex import ANGroupVertex
 logger = logging.getLogger(__name__)
+import numpy as np
 
 
 class PartitionAndPlacePartitioner(object):
@@ -80,8 +84,10 @@ class PartitionAndPlacePartitioner(object):
         vertex_groups = get_same_size_vertex_groups(vertices)
 
         # Partition one vertex at a time
+        ear_count = 0
         for vertex in vertices:
-
+            if isinstance(vertex,SpiNNakEarVertex):
+                ear_count+=1
             # check that the vertex hasn't already been partitioned
             machine_vertices = graph_mapper.get_machine_vertices(vertex)
 
@@ -90,6 +96,16 @@ class PartitionAndPlacePartitioner(object):
                 self._partition_vertex(
                     vertex, plan_n_timesteps, machine_graph, graph_mapper,
                     resource_tracker, progress, vertex_groups)
+
+        if ear_count>0:
+            #add all the spinnakear edges and partitions to machine graph from the global "original machine graph"
+            original_machine_graph = globals_variables.get_simulator()._original_machine_graph
+            for outgoing_partition in \
+                    original_machine_graph.outgoing_edge_partitions:
+                # machine_graph.add_outgoing_edge_partition(outgoing_partition)
+                for edge in outgoing_partition.edges:
+                    machine_graph.add_edge(
+                        edge, outgoing_partition.identifier)
         progress.end()
 
         generate_machine_edges(machine_graph, graph_mapper, graph)
@@ -223,12 +239,26 @@ class PartitionAndPlacePartitioner(object):
                     label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
                     constraints=get_remaining_constraints(vertex))
 
+                if isinstance(machine_vertex,ANGroupVertex):
+                    row_index, =  np.where(vertex._max_n_atoms_per_group_tree_row==machine_vertex._max_n_atoms)
+                    row_index=row_index[0]
+                    if machine_vertex._is_final_row is True:
+                        an_group_ids = [i for i, name in enumerate(vertex._mv_index_list) if name == 'group_{}'.format(row_index)]
+                    else:
+                        an_group_ids = [i for i, name in enumerate(vertex._mv_index_list) if name == 'inter_{}'.format(row_index)]
+                    mod_lo_atom = an_group_ids.index(lo_atom) * machine_vertex._max_n_atoms
+                    mod_hi_atom = mod_lo_atom + machine_vertex._n_atoms - 1
+                    vertex_slice = Slice(mod_lo_atom, mod_hi_atom)
+
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
                 graph_mapper.add_vertex_mapping(
                     machine_vertex, vertex_slice, vertex)
 
-                progress.update(vertex_slice.n_atoms)
+                if isinstance(vertex,SpiNNakEarVertex):
+                    progress.update(1)
+                else:
+                    progress.update(vertex_slice.n_atoms)
 
     @staticmethod
     def _reallocate_resources(

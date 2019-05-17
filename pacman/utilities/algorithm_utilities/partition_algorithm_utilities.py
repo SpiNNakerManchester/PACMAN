@@ -9,7 +9,10 @@ from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, SameAtomsAsVertexConstraint)
-
+from spinnak_ear.IHCAN_vertex import IHCANVertex
+from spinnak_ear.spinnakear_vertex import SpiNNakEarVertex
+from spinnak_ear.DRNL_vertex import DRNLVertex
+from spinnak_ear.AN_group_vertex import ANGroupVertex
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     """ Generate the machine edges for the vertices in the graph
@@ -41,22 +44,26 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
                 # create new partitions
                 for dest_vertex in graph_mapper.get_machine_vertices(
                         application_edge.post_vertex):
-                    machine_edge = application_edge.create_machine_edge(
-                        source_vertex, dest_vertex,
-                        "machine_edge_for{}".format(application_edge.label))
-                    machine_graph.add_edge(
-                        machine_edge, application_partition.identifier)
+                    if (not isinstance(application_edge.post_vertex, SpiNNakEarVertex) \
+                        and not isinstance(application_edge.pre_vertex, SpiNNakEarVertex))\
+                        or isinstance(dest_vertex,DRNLVertex) or (isinstance(source_vertex,ANGroupVertex)
+                    and source_vertex._is_final_row == True):
+                        machine_edge = application_edge.create_machine_edge(
+                            source_vertex, dest_vertex,
+                            "machine_edge_for{}".format(application_edge.label))
+                        machine_graph.add_edge(
+                            machine_edge, application_partition.identifier)
 
-                    # add constraints from the application partition
-                    machine_partition = machine_graph.\
-                        get_outgoing_edge_partition_starting_at_vertex(
-                            source_vertex, application_partition.identifier)
-                    machine_partition.add_constraints(
-                        application_partition.constraints)
+                        # add constraints from the application partition
+                        machine_partition = machine_graph.\
+                            get_outgoing_edge_partition_starting_at_vertex(
+                                source_vertex, application_partition.identifier)
+                        machine_partition.add_constraints(
+                            application_partition.constraints)
 
-                    # update mapping object
-                    graph_mapper.add_edge_mapping(
-                        machine_edge, application_edge)
+                        # update mapping object
+                        graph_mapper.add_edge_mapping(
+                            machine_edge, application_edge)
 
 
 def get_remaining_constraints(vertex):
