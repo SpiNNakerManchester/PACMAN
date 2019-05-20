@@ -117,6 +117,8 @@ class ZonedRoutingInfoAllocator(object):
         progress = ProgressBar(
             self._application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
+        by_app_vertex = dict()
+        app_mask = 2 ** 32 - 2 ** self._max_app_keys_bites
 
         source_index = 0
         for app_vertex in progress.over(self._application_graph.vertices):
@@ -138,9 +140,12 @@ class ZonedRoutingInfoAllocator(object):
                             base_key=key, mask=mask)])
                         info = PartitionRoutingInfo(keys_and_masks, partition)
                         routing_infos.add_partition_info(info)
+            app_key = key = source_index << self._max_app_keys_bites
+            by_app_vertex[app_vertex] = BaseKeyAndMask(
+                base_key=app_key, mask=app_mask)
             source_index += 1
 
-        return routing_infos
+        return routing_infos, by_app_vertex
 
     def _bites_needed(self, size):
         return math.ceil(math.log(size, 2))
