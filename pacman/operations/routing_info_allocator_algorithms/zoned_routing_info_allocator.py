@@ -35,7 +35,6 @@ class ZonedRoutingInfoAllocator(object):
         "_key_bites_per_app"
     ]
 
-
     def __call__(self, application_graph, graph_mapper, machine_graph,
                  placements, n_keys_map):
         """
@@ -126,14 +125,15 @@ class ZonedRoutingInfoAllocator(object):
             if app_vertex in self._key_bites_per_app:
                 key_bites = self._key_bites_per_app[app_vertex]
                 for vertex in machine_vertices:
-                    machine_index = self._graph_mapper.get_machine_vertex_index(vertex)
+                    machine_index = self._graph_mapper.\
+                        get_machine_vertex_index(vertex)
                     partitions = self._machine_graph. \
                         get_outgoing_edge_partitions_starting_at_vertex(vertex)
                     partition = partitions.peek()
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
                         mask = 2 ** 32 - 2 ** key_bites
                         key = source_index << self._max_app_keys_bites | \
-                              machine_index << key_bites
+                            machine_index << key_bites
                         keys_and_masks = list([BaseKeyAndMask(
                             base_key=key, mask=mask)])
                         info = PartitionRoutingInfo(keys_and_masks, partition)
