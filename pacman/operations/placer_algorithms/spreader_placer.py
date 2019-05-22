@@ -1,6 +1,8 @@
 from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
+
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import OneToOnePlacer
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
@@ -163,17 +165,21 @@ class SpreaderPlacer(OneToOnePlacer):
         # handle incoming
         total_incoming_keys = 0
         for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
-            incoming_partition = \
-                machine_graph.get_outgoing_partition_for_edge(incoming_edge)
-            total_incoming_keys += n_keys_map.n_keys_for_partition(
-                incoming_partition)
+            if incoming_edge.traffic_type == EdgeTrafficType.MULTICAST:
+                incoming_partition = \
+                    machine_graph.get_outgoing_partition_for_edge(incoming_edge)
+                total_incoming_keys += n_keys_map.n_keys_for_partition(
+                    incoming_partition)
 
         # handle outgoing
         out_going_partitions = \
             machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
                 vertex)
         for partition in out_going_partitions:
-            total_incoming_keys += n_keys_map.n_keys_for_partition(partition)
+            edge = list(partition.edges)[0]
+            if edge.traffic_type == EdgeTrafficType.MULTICAST:
+                total_incoming_keys += \
+                    n_keys_map.n_keys_for_partition(partition)
         return total_incoming_keys
 
     @staticmethod
@@ -297,7 +303,7 @@ class SpreaderPlacer(OneToOnePlacer):
                         start_chip_y=y)
 
             # allocate verts.
-            for one_to_one_vertex in group:
+            for one_to_one_vertex in unallocated:
                 (x, y, p, _, _) = \
                     resource_tracker.allocate_constrained_resources(
                         one_to_one_vertex.resources_required,
