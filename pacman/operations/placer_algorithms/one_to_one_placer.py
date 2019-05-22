@@ -219,7 +219,7 @@ class OneToOnePlacer(RadialPlacer):
                     progress)
 
         progress.end()
-        return placements, resource_tracker.chips_used
+        return placements
 
     @staticmethod
     def _allocate_one_to_one_group(

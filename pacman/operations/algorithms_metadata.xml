@@ -123,7 +123,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
-            <param_type>NChipsUsed</param_type>
         </outputs>
     </algorithm>
     <algorithm name="RadialPlacer">
@@ -150,7 +149,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
-            <param_type>NChipsUsed</param_type>
         </outputs>
     </algorithm>
     <algorithm name="OneToOnePlacer">
@@ -177,7 +175,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
-            <param_type>NChipsUsed</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SpreaderPlacer">
@@ -209,7 +206,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
-            <param_type>NChipsUsed</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ConnectiveBasedPlacer">
@@ -236,7 +232,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
-            <param_type>NChipsUsed</param_type>
         </outputs>
     </algorithm>
     <algorithm name="HilbertPlacer">

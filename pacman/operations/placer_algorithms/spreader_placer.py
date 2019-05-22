@@ -110,7 +110,7 @@ class SpreaderPlacer(OneToOnePlacer):
         progress_bar.end()
 
         # return the built placements
-        return placements, resource_tracker.chips_used
+        return placements
 
     def _sort_left_over_verts_based_on_incoming_packets(
             self, machine_graph, placed_vertices, n_keys_map):

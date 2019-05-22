@@ -56,7 +56,7 @@ class RadialPlacer(object):
                     vertex, resource_tracker, machine, placements,
                     vertices_on_same_chip)
                 all_vertices_placed.update(vertices_placed)
-        return placements, resource_tracker.chips_used
+        return placements
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
