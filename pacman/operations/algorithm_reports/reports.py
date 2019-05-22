@@ -7,6 +7,7 @@ from spinn_machine import Router
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 from pacman.model.graphs.common import EdgeTrafficType
+from pacman.operations.algorithm_reports.router_summary import RouterSummary
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -106,7 +107,7 @@ def router_summary_report(
     file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
     progress = ProgressBar(machine.n_chips,
                            "Generating Routing summary report")
-    _do_router_summary_report(
+    return _do_router_summary_report(
         file_name, progress, routing_tables,  hostname, machine)
 
 
@@ -124,7 +125,7 @@ def router_compressed_summary_report(
         report_folder, _COMPRESSED_ROUTING_SUMMARY_FILENAME)
     progress = ProgressBar(machine.n_chips,
                            "Generating Routing summary report")
-    _do_router_summary_report(
+    return _do_router_summary_report(
         file_name, progress, routing_tables, hostname, machine)
 
 
@@ -173,6 +174,9 @@ def _do_router_summary_report(
                     "max unique spinnaker routes {}\n\n".format(
                         total_entries, max_entries, max_none_defaultable,
                         max_link_only, max_spinnaker_routes))
+            return RouterSummary(
+                total_entries, max_entries, max_none_defaultable,
+                max_link_only, max_spinnaker_routes)
 
     except IOError:
         logger.exception("Generate_routing summary reports: "

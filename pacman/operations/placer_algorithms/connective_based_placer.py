@@ -72,7 +72,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
 
         # finished, so stop progress bar and return placements
         progress.end()
-        return placements
+        return placements, resource_tracker.chips_used
 
     def _place_unconstrained_subgraph(
             self, starting_vertex, machine_graph, unplaced_vertices,

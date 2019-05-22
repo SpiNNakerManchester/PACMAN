@@ -143,6 +143,9 @@
             <param_name>hostname</param_name>
             <param_name>machine</param_name>
         </required_inputs>
+        <outputs>
+            <param_type>UnCompressedSummary</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="CompressedRouterSummaryReport">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
@@ -171,6 +174,9 @@
             <param_name>hostname</param_name>
             <param_name>machine</param_name>
         </required_inputs>
+        <outputs>
+            <param_type>CompressedSummary</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="routingInfoReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>

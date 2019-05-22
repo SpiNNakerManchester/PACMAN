@@ -48,4 +48,4 @@ class BasicPlacer(object):
                 vertex.resources_required, vertex.constraints, None)
             placement = Placement(vertex, x, y, p)
             placements.add_placement(placement)
-        return placements
+        return placements, resource_tracker.chips_used
