@@ -3,7 +3,7 @@ try:
     from collections.abc import deque
 except ImportError:
     from collections import deque
-from spinn_machine.virtual_machine import VirtualMachine
+from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
 from pacman.operations.router_algorithms import BasicDijkstraRouting
@@ -15,7 +15,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_routing(self):
         graph = MachineGraph("Test")
-        machine = VirtualMachine(2, 2)
+        machine = virtual_machine(2, 2)
         placements = Placements()
         vertices = list()
 

@@ -1,5 +1,5 @@
 import pytest
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import FixedRouteRouter
 
@@ -47,7 +47,7 @@ def test_all_working(
     router = FixedRouteRouter()
 
     joins, _ = router._get_joins_paths(board_version)
-    temp_machine = VirtualMachine(
+    temp_machine = virtual_machine(
         width=width, height=height, with_wrap_arounds=with_wrap_arounds,
         version=version)
     down_links = None
@@ -61,7 +61,7 @@ def test_all_working(
         down_chips = set(
             (ethernet_chip.x + 1, ethernet_chip.y + 1)
             for ethernet_chip in temp_machine.ethernet_connected_chips)
-    machine = VirtualMachine(
+    machine = virtual_machine(
         width=width, height=height, with_wrap_arounds=with_wrap_arounds,
         version=version, down_links=down_links, down_chips=down_chips)
 

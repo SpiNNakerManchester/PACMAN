@@ -1,7 +1,7 @@
 from six import itervalues
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import (
-    Router, FixedRouteEntry, Machine, VirtualMachine)
+    Router, FixedRouteEntry, Machine, virtual_machine)
 from pacman.model.graphs.machine import (
     MachineVertex, MachineGraph, MachineEdge)
 from pacman.model.placements import Placements, Placement
@@ -172,7 +172,7 @@ class FixedRouteRouter(object):
 
             # build a fake machine which is just one board but with the missing
             # bits of the real board
-            fake_machine = VirtualMachine(
+            fake_machine = virtual_machine(
                 machine.SIZE_X_OF_ONE_BOARD, machine.SIZE_Y_OF_ONE_BOARD,
                 False, down_chips=down_chips, down_links=down_links)
 
