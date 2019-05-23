@@ -391,7 +391,7 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex_2.add_constraint(SameAtomsAsVertexConstraint(
             vertex_1))
         graph.add_vertices([vertex_1, vertex_2, vertex_3])
-        machine = virtual_machine(version=3, with_wrap_arounds=None)
+        machine = virtual_machine(version=3)
         partitioner = PartitionAndPlacePartitioner()
         _, graph_mapper, _ = partitioner(graph, machine, plan_n_timesteps=None)
         subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))

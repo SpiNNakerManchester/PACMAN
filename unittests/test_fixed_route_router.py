@@ -28,28 +28,27 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
 
 
 @pytest.mark.parametrize(
-    "width,height,with_wrap_arounds,version,board_version",
-    [(2, 2, True, None, 3),
-     (2, 2, False, None, 3),
-     (None, None, None, 3, 3),
-     (8, 8, None, None, 5),
-     (None, None, None, 5, 5),
-     (12, 12, True, None, 5),
-     (16, 16, False, None, 5)])
+    "width,height,version,board_version",
+    [(2, 2, None, 3),
+     (2, 2, None, 3),
+     (None, None, 3, 3),
+     (8, 8, None, 5),
+     (None, None, 5, 5),
+     (12, 12, None, 5),
+     (16, 16, None, 5)])
 @pytest.mark.parametrize(
     "with_down_links,with_down_chips",
     [(False, False),
      (True, False),
      (False, True)])
 def test_all_working(
-        width, height, with_wrap_arounds, version, board_version,
+        width, height, version, board_version,
         with_down_links, with_down_chips):
     router = FixedRouteRouter()
 
     joins, _ = router._get_joins_paths(board_version)
     temp_machine = virtual_machine(
-        width=width, height=height, with_wrap_arounds=with_wrap_arounds,
-        version=version)
+        width=width, height=height, version=version)
     down_links = None
     if with_down_links:
         down_links = set()
@@ -62,8 +61,8 @@ def test_all_working(
             (ethernet_chip.x + 1, ethernet_chip.y + 1)
             for ethernet_chip in temp_machine.ethernet_connected_chips)
     machine = virtual_machine(
-        width=width, height=height, with_wrap_arounds=with_wrap_arounds,
-        version=version, down_links=down_links, down_chips=down_chips)
+        width=width, height=height, version=version,
+        down_links=down_links, down_chips=down_chips)
 
     ethernet_chips = machine.ethernet_connected_chips
     placements = Placements(
@@ -94,10 +93,10 @@ if __name__ == '__main__':
         (True, False),
         (False, True)]
     for (x, y) in iterations:
-        test_all_working(2, 2, True, None, 3, x, y)
-        test_all_working(2, 2, False, None, 3, x, y)
-        test_all_working(None, None, None, 3, 3, x, y)
-        test_all_working(8, 8, None, None, 5, x, y)
-        test_all_working(None, None, None, 5, 5, x, y)
-        test_all_working(12, 12, True, None, 5, x, y)
-        test_all_working(16, 16, False, None, 5, x, y)
+        test_all_working(2, 2, None, 3, x, y)
+        test_all_working(2, 2,  None, 3, x, y)
+        test_all_working(None, None, 3, 3, x, y)
+        test_all_working(8, 8, None, 5, x, y)
+        test_all_working(None, None, 5, 5, x, y)
+        test_all_working(12, 12, None, 5, x, y)
+        test_all_working(16, 16, None, 5, x, y)
