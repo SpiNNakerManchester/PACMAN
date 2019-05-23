@@ -19,18 +19,14 @@ class MyTestCase(unittest.TestCase):
         placements = Placements()
         vertices = list()
 
-        for x in range(machine.max_chip_x + 1):
-            for y in range(machine.max_chip_y + 1):
-                chip = machine.get_chip_at(x, y)
-                if chip is not None:
-                    for processor in chip.processors:
-                        if not processor.is_monitor:
-                            vertex = SimpleMachineVertex(
-                                resources=ResourceContainer())
-                            graph.add_vertex(vertex)
-                            placements.add_placement(Placement(
-                                vertex, x, y, processor.processor_id))
-                            vertices.append(vertex)
+        for chip in machine.chips:
+            for processor in chip.processors:
+                if not processor.is_monitor:
+                    vertex = SimpleMachineVertex(resources=ResourceContainer())
+                    graph.add_vertex(vertex)
+                    placements.add_placement(Placement(
+                        vertex, chip.x, chip.y, processor.processor_id))
+                    vertices.append(vertex)
 
         for vertex in vertices:
             for vertex_to in vertices:
