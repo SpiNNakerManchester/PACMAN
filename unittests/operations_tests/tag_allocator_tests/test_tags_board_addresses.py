@@ -1,6 +1,9 @@
 from __future__ import absolute_import, print_function
 import unittest
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from spinn_machine import VirtualMachine
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
@@ -26,7 +29,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
         allocator = BasicTagAllocator()
-        _, _, tags = allocator(machine, placements)
+        _, _, tags = allocator(
+            machine, plan_n_timesteps=None, placements=placements)
 
         for vertex, chip in zip(vertices, eth_chips):
             iptags = tags.get_ip_tags_for_vertex(vertex)
@@ -72,7 +76,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
             for proc, vertex in zip(eth2_procs, eth2_vertices))
         allocator = BasicTagAllocator()
-        _, _, tags = allocator(machine, placements)
+        _, _, tags = allocator(
+            machine, plan_n_timesteps=None, placements=placements)
 
         tags_by_board = defaultdict(set)
         for vertices in (eth_vertices, eth2_vertices):

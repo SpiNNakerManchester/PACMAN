@@ -16,11 +16,11 @@ class RigPlaceAndRoute(object):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine):
+    def __call__(self, machine_graph, machine, plan_n_timesteps):
         progress_bar = ProgressBar(9, "Placing and Routing")
 
         vertices_resources, nets, net_names = \
-            convert_to_rig_graph(machine_graph)
+            convert_to_rig_graph(machine_graph, plan_n_timesteps)
         progress_bar.update()
 
         rig_machine = convert_to_rig_machine(machine)

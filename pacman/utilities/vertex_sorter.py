@@ -1,6 +1,6 @@
-from collections import defaultdict
 import sys
 from six import itervalues
+from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 
 
 class ConstraintOrder(object):
@@ -77,7 +77,7 @@ class VertexSorter(object):
         """
 
         # Group constraints based on the class
-        self._constraints = defaultdict(list)
+        self._constraints = DefaultOrderedDict(list)
         for c in constraint_order:
             self._constraints[c.constraint_class].append(
                 (c.relative_order, c.required_optional_properties))
@@ -114,7 +114,8 @@ class VertexSorter(object):
         # Sort the vertices - because ranks is a list, things with the same
         # min rank will be sorted by the next highest rank and so on
         vertices_with_rank.sort(key=lambda thing: thing[1])
-        return [vertex for vertex, _ in vertices_with_rank]
+        results = [vertex for vertex, _ in vertices_with_rank]
+        return results
 
     @staticmethod
     def _matches(constraint, opts):

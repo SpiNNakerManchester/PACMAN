@@ -1,4 +1,4 @@
-from collections import defaultdict
+from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanValueError
 
@@ -36,12 +36,14 @@ class GraphMapper(object):
         self._application_vertex_by_machine_vertex = dict()
         self._application_edge_by_machine_edge = dict()
 
-        self._machine_vertices_by_application_vertex = defaultdict(OrderedSet)
-        self._machine_edges_by_application_edge = defaultdict(OrderedSet)
+        self._machine_vertices_by_application_vertex = \
+            DefaultOrderedDict(OrderedSet)
+        self._machine_edges_by_application_edge = \
+            DefaultOrderedDict(OrderedSet)
 
         self._index_by_machine_vertex = dict()
         self._slice_by_machine_vertex = dict()
-        self._slices_by_application_vertex = defaultdict(list)
+        self._slices_by_application_vertex = DefaultOrderedDict(list)
 
     def add_vertex_mapping(
             self, machine_vertex, vertex_slice, application_vertex):

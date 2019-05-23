@@ -1,5 +1,11 @@
-import logging
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 from six import itervalues
+import logging
+from spinn_utilities.ordered_set import OrderedSet
+
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyFieldConstraint, FlexiKeyFieldConstraint,
     ContiguousKeyRangeContraint, FixedMaskConstraint,
@@ -32,6 +38,9 @@ class ConstraintGroup(list):
     def __eq__(self, other):
         return id(other) == id(self)
 
+    def __ne__(self, other):
+        return id(other) != id(self)
+
 
 def get_edge_groups(machine_graph, traffic_type):
     """ Utility method to get groups of edges using any\
@@ -44,7 +53,7 @@ def get_edge_groups(machine_graph, traffic_type):
     """
 
     # mapping between partition and shared key group it is in
-    partition_groups = dict()
+    partition_groups = OrderedDict()
 
     # process each partition one by one in a bubble sort kinda way
     for vertex in machine_graph.vertices:
@@ -86,7 +95,7 @@ def get_edge_groups(machine_graph, traffic_type):
         FixedKeyFieldConstraint: fixed_field_groups,
         FlexiKeyFieldConstraint: flexi_field_groups,
     }
-    groups = set(itervalues(partition_groups))
+    groups = OrderedSet(itervalues(partition_groups))
     for group in groups:
 
         # Get all expected constraints in the group

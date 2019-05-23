@@ -1,9 +1,14 @@
+import functools
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
     RadialPlacementFromChipConstraint)
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
-import functools
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 
 
@@ -63,50 +68,55 @@ def group_vertices(vertices, same_group_as_function):
         A dictionary of vertex to list of vertices that are grouped with it
     """
 
-    # Dict of vertex to list of vertices on same chip (repeated lists expected)
-    same_chip_vertices = dict()
-
+    groups = create_vertices_groups(vertices, same_group_as_function)
+    # Dict of vertex to setof vertices on same chip (repeated lists expected)
+    # A empty set value indicates a set that is too big.
+    same_chip_vertices = OrderedDict()
+    for group in groups:
+        for vertex in group:
+            same_chip_vertices[vertex] = group
     for vertex in vertices:
-        # Find all vertices that should be grouped with this vertex
-        same_chip_as_vertices = same_group_as_function(vertex)
-
-        if same_chip_as_vertices:
-            # Go through all the vertices that want to be on the same chip as
-            # the top level vertex
-            for same_as_chip_vertex in same_chip_as_vertices:
-                # Neither vertex has been seen
-                if (same_as_chip_vertex not in same_chip_vertices and
-                        vertex not in same_chip_vertices):
-                    # add both to a new group
-                    group = {vertex, same_as_chip_vertex}
-                    same_chip_vertices[vertex] = group
-                    same_chip_vertices[same_as_chip_vertex] = group
-
-                # Both vertices have been seen elsewhere
-                elif (same_as_chip_vertex in same_chip_vertices and
-                        vertex in same_chip_vertices):
-                    # merge their groups
-                    group_1 = same_chip_vertices[vertex]
-                    group_2 = same_chip_vertices[same_as_chip_vertex]
-                    group_1.update(group_2)
-                    for vert in group_1:
-                        same_chip_vertices[vert] = group_1
-
-                # The current vertex has been seen elsewhere
-                elif vertex in same_chip_vertices:
-                    # add the new vertex to the existing group
-                    group = same_chip_vertices[vertex]
-                    group.add(same_as_chip_vertex)
-                    same_chip_vertices[same_as_chip_vertex] = group
-
-                # The other vertex has been seen elsewhere
-                elif same_as_chip_vertex in same_chip_vertices:
-                    #  so add this vertex to the existing group
-                    group = same_chip_vertices[same_as_chip_vertex]
-                    group.add(vertex)
-                    same_chip_vertices[vertex] = group
-
-        else:
+        if vertex not in same_chip_vertices:
             same_chip_vertices[vertex] = {vertex}
-
     return same_chip_vertices
+
+
+def add_set(all_sets, new_set):
+    """
+    Adds a new set into the list of sets, concatenating ssets if required.
+
+    If the new set does not overlap any existing sets it is added.
+
+    However if the new sets overlaps one or more existing sets a super set is
+    created combining all the overlapping sets.
+    Existing overlapping sets are removed and only the new super set is added.
+
+    :param all_sets: List of Non overlapping sets
+    :param new_set: A new set which may or may not overlap the previous sets.
+    """
+
+    union = OrderedSet()
+    removes = []
+    for a_set in all_sets:
+        intersection = new_set & a_set
+        if intersection:
+            removes.append(a_set)
+            union = union | a_set
+    union = union | new_set
+    for a_set in removes:
+        all_sets.remove(a_set)
+    all_sets.append(union)
+    return
+
+
+def create_vertices_groups(vertices, same_group_as_function):
+    groups = list()
+    for vertex in vertices:
+        same_chip_as_vertices = same_group_as_function(vertex)
+        if same_chip_as_vertices:
+            same_chip_as_vertices = OrderedSet(same_chip_as_vertices)
+            same_chip_as_vertices.add(vertex)
+            # Singletons on interesting and added later if needed
+            if len(same_chip_as_vertices) > 1:
+                add_set(groups, same_chip_as_vertices)
+    return groups

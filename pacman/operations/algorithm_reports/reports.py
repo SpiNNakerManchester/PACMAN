@@ -3,6 +3,7 @@ import os
 import time
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
+from spinn_machine import Router
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 from pacman.model.graphs.common import EdgeTrafficType
@@ -14,9 +15,12 @@ _LINK_LABELS = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
 _C_ROUTING_TABLE_DIR = "compressed_routing_tables_generated"
 _COMPARED_FILENAME = "comparison_of_compressed_uncompressed_routing_tables.rpt"
 _PARTITIONING_FILENAME = "partitioned_by_vertex.rpt"
-_PLACEMENT_VTX_FILENAME = "placement_by_vertex.rpt"
-_PLACEMENT_CORE_FILENAME = "placement_by_core.rpt"
+_PLACEMENT_VTX_GRAPH_FILENAME = "placement_by_vertex_using_graph.rpt"
+_PLACEMENT_VTX_SIMPLE_FILENAME = "placement_by_vertex_without_graph.rpt"
+_PLACEMENT_CORE_GRAPH_FILENAME = "placement_by_core_using_graph.rpt"
+_PLACEMENT_CORE_SIMPLE_FILENAME = "placement_by_core_without_graph.rpt"
 _ROUTING_FILENAME = "edge_routing_info.rpt"
+_ROUTING_SUMMARY_FILENAME = "routing_summary.rpt"
 _ROUTING_TABLE_DIR = "routing_tables_generated"
 _SDRAM_FILENAME = "chip_sdram_usage_by_core.rpt"
 _TAGS_FILENAME = "tags.rpt"
@@ -68,8 +72,6 @@ def placer_reports_with_application_graph(
         report_folder, hostname, graph, graph_mapper, placements)
     placement_report_with_application_graph_by_core(
         report_folder, hostname, placements, machine, graph_mapper)
-    sdram_usage_report_per_chip(
-        report_folder, hostname, placements, machine)
 
 
 def placer_reports_without_application_graph(
@@ -88,8 +90,69 @@ def placer_reports_without_application_graph(
         report_folder, hostname, placements, machine_graph)
     placement_report_without_application_graph_by_core(
         report_folder, hostname, placements, machine)
-    sdram_usage_report_per_chip(
-        report_folder, hostname, placements, machine)
+
+
+def router_summary_report(
+        report_folder, routing_tables,  hostname, machine):
+    """ Generates a text file of routing paths
+
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
+    :param hostname: the machine's hostname to which the placer worked on
+    :param machine: the python machine object
+    :rtype: None
+    """
+    file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
+    time_date_string = time.strftime("%c")
+    convert = Router.convert_routing_table_entry_to_spinnaker_route
+    try:
+        with open(file_name, "w") as f:
+            progress = ProgressBar(machine.n_chips,
+                                   "Generating Routing summary report")
+
+            f.write("        Routing Summary Report\n")
+            f.write("        ======================\n\n")
+            f.write("Generated: {} for target machine '{}'\n\n".format(
+                time_date_string, hostname))
+
+            total_entries = 0
+            max_entries = 0
+            max_none_defaultable = 0
+            max_link_only = 0
+            max_spinnaker_routes = 0
+            for (x, y) in progress.over(machine.chip_coordinates):
+                table = routing_tables.get_routing_table_for_chip(x, y)
+                if table is not None:
+                    entries = table.number_of_entries
+                    defaultable = table.number_of_defaultable_entries
+                    link_only = 0
+                    spinnaker_routes = set()
+                    for entry in table.multicast_routing_entries:
+                        if not entry.processor_ids:
+                            link_only += 1
+                        spinnaker_routes.add(convert(entry))
+                    f.write("Chip {}:{} has {} entries of which {} are "
+                            "defaultable and {} link only with {} unique "
+                            "spinnaker routes\n"
+                            "".format(x, y, entries, defaultable, link_only,
+                                      len(spinnaker_routes)))
+                    total_entries += entries
+                    max_entries = max(max_entries, entries)
+                    max_none_defaultable = max(
+                        max_none_defaultable, entries - defaultable)
+                    max_link_only = max(max_link_only, link_only)
+                    max_spinnaker_routes = max(
+                        max_spinnaker_routes, len(spinnaker_routes))
+
+            f.write("\n Total entries {}, max per chip {} max none "
+                    "defaultable {} max link only {} "
+                    "max unique spinnaker routes {}\n\n".format(
+                        total_entries, max_entries, max_none_defaultable,
+                        max_link_only, max_spinnaker_routes))
+
+    except IOError:
+        logger.exception("Generate_routing summary reports: "
+                         "Can't open file {} for writing.", file_name)
 
 
 def router_report_from_paths(
@@ -97,13 +160,13 @@ def router_report_from_paths(
         machine_graph, placements, machine):
     """ Generates a text file of routing paths
 
-    :param routing_tables:
-    :param report_folder:
-    :param hostname:
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
+    :param hostname: the machine's hostname to which the placer worked on
     :param routing_infos:
     :param machine_graph:
     :param placements:
-    :param machine:
+    :param machine: the python machine object
     :rtype: None
     """
     file_name = os.path.join(report_folder, _ROUTING_FILENAME)
@@ -152,6 +215,8 @@ def _write_one_router_partition_report(f, partition, machine, placements,
 
 def partitioner_report(report_folder, hostname, graph, graph_mapper):
     """ Generate report on the placement of vertices onto cores.
+    :param report_folder: the folder to which the reports are being written
+    :param hostname: the machine's hostname to which the placer worked on
     """
 
     # Cycle through all vertices, and for each cycle through its vertices.
@@ -209,7 +274,7 @@ def placement_report_with_application_graph_by_vertex(
 
     # Cycle through all vertices, and for each cycle through its vertices.
     # For each vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, _PLACEMENT_VTX_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_VTX_GRAPH_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
@@ -284,7 +349,7 @@ def placement_report_without_application_graph_by_vertex(
 
     # Cycle through all vertices, and for each cycle through its vertices.
     # For each vertex, describe its core mapping.
-    file_name = os.path.join(report_folder, _PLACEMENT_VTX_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_VTX_SIMPLE_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
@@ -347,7 +412,7 @@ def placement_report_with_application_graph_by_core(
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
     # For each core, display what is held on it.
-    file_name = os.path.join(report_folder, _PLACEMENT_CORE_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_CORE_GRAPH_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
@@ -407,7 +472,7 @@ def placement_report_without_application_graph_by_core(
     # File 2: Placement by core.
     # Cycle through all chips and by all cores within each chip.
     # For each core, display what is held on it.
-    file_name = os.path.join(report_folder, _PLACEMENT_CORE_FILENAME)
+    file_name = os.path.join(report_folder, _PLACEMENT_CORE_SIMPLE_FILENAME)
     time_date_string = time.strftime("%c")
     try:
         with open(file_name, "w") as f:
@@ -445,67 +510,76 @@ def _write_one_chip_machine_placement(f, c, placements):
             f.write("\n")
 
 
-def sdram_usage_report_per_chip(report_folder, hostname, placements, machine):
+def sdram_usage_report_per_chip(
+        report_folder, hostname, placements, machine, plan_n_timesteps,
+        data_n_timesteps):
     """ Reports the SDRAM used per chip
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
+    :param plan_n_timesteps: The number of timesteps for which placer \
+        reserved space.
+    :param data_n_timesteps: The number of timesteps for which data can be
+    saved on the machine.
     :rtype: None
     """
 
     file_name = os.path.join(report_folder, _SDRAM_FILENAME)
     time_date_string = time.strftime("%c")
+    progress = ProgressBar((len(placements) * 2 + machine.n_chips * 2),
+                           "Generating SDRAM usage report")
     try:
         with open(file_name, "w") as f:
             f.write("        Memory Usage by Core\n")
             f.write("        ====================\n\n")
             f.write("Generated: {} for target machine '{}'\n\n".format(
                 time_date_string, hostname))
-            used_sdram_by_chip = dict()
-
-            progress = ProgressBar(len(placements) + machine.n_chips,
-                                   "Generating SDRAM usage report")
-            used_sdram_by_chip = _write_sdram_by_core(f, placements, progress)
-            for chip in progress.over(machine.chips):
-                _write_chip_sdram(f, chip, used_sdram_by_chip)
+            f.write("Planned by partitioner\n")
+            f.write("----------------------\n")
+            _sdram_usage_report_per_chip_with_timesteps(
+                f, placements, machine, plan_n_timesteps, progress, False)
+            f.write("\nActual space reserved on the machine\n")
+            f.write("----------------------\n")
+            _sdram_usage_report_per_chip_with_timesteps(
+                f, placements, machine, data_n_timesteps, progress, True)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for "
                          "writing.", file_name)
 
 
-def _write_sdram_by_core(f, placements, progress):
-    used_sdram = dict()
+def _sdram_usage_report_per_chip_with_timesteps(
+        f, placements, machine, timesteps, progress, end_progress):
+    f.write("Based on {} timesteps\n\n".format(timesteps))
+    used_sdram_by_chip = dict()
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.get_value()
+        sdram = placement.vertex.resources_required.sdram.get_total_sdram(
+            timesteps)
         x, y, p = placement.x, placement.y, placement.p
-        f.write("SDRAM reqs for core ({},{},{}) is {} KB\n".format(
-            x, y, p, int(sdram / 1024.0)))
+        f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
+                "".format(x, y, p, int(sdram / 1024.0), sdram, placement))
         key = (x, y)
-        if key not in used_sdram:
-            used_sdram[key] = sdram
+        if key not in used_sdram_by_chip:
+            used_sdram_by_chip[key] = sdram
         else:
-            used_sdram[key] += sdram
-    return used_sdram
-
-
-def _write_chip_sdram(f, chip, used_sdram_by_chip):
-    try:
-        used_sdram = used_sdram_by_chip[chip.x, chip.y]
-        if used_sdram:
-            f.write(
-                "**** Chip: ({}, {}) has total memory usage of"
-                " {} KB ({} bytes) out of a max of "
-                "{} KB ({} bytes)\n\n".format(
-                    chip.x, chip.y,
-                    int(used_sdram / 1024.0), used_sdram,
-                    int(chip.sdram.size / 1024.0), chip.sdram.size))
-    except KeyError:
-        # Do Nothing
-        pass
+            used_sdram_by_chip[key] += sdram
+    for chip in progress.over(machine.chips, end_progress):
+        try:
+            used_sdram = used_sdram_by_chip[chip.x, chip.y]
+            if used_sdram:
+                f.write(
+                    "**** Chip: ({}, {}) has total memory usage of"
+                    " {} KB ({} bytes) out of a max of "
+                    "{} KB ({} bytes)\n\n".format(
+                        chip.x, chip.y,
+                        int(used_sdram / 1024.0), used_sdram,
+                        int(chip.sdram.size / 1024.0), chip.sdram.size))
+        except KeyError:
+            # Do Nothing
+            pass
 
 
 def routing_info_report(report_folder, machine_graph, routing_infos):
@@ -544,8 +618,8 @@ def _write_vertex_virtual_keys(
 
 def router_report_from_router_tables(report_folder, routing_tables):
     """
-    :param report_folder:
-    :param routing_tables:
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
     :rtype: None
     """
 
@@ -561,8 +635,8 @@ def router_report_from_router_tables(report_folder, routing_tables):
 
 def router_report_from_compressed_router_tables(report_folder, routing_tables):
     """
-    :param report_folder:
-    :param routing_tables:
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
     :rtype: None
     """
 

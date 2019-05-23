@@ -1,5 +1,8 @@
 import logging
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 from six import iterkeys
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
@@ -433,8 +436,8 @@ class PACMANAlgorithmExecutor(object):
                     "    Algorithm by outputs: {}\n"
                     "    Algorithm by tokens: {}\n"
                     "    Inputs required per function: \n{}\n".format(
-                        input_types,
-                        fake_inputs,
+                        sorted(input_types),
+                        sorted(fake_inputs),
                         outputs_to_find,
                         token_states.get_completed_tokens(),
                         fake_tokens.get_completed_tokens(),
