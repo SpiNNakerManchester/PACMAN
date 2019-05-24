@@ -111,7 +111,7 @@ class ZonedRoutingInfoAllocator(object):
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bites"
-                "".format(self.source_bites, self._max_app_keys_bites))
+                "".format(source_bites, self._max_app_keys_bites))
 
     def _simple_allocate(self):
         progress = ProgressBar(
