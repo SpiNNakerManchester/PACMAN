@@ -85,14 +85,14 @@ class ZonedRoutingInfoAllocator(object):
         self._max_partions = 0
         self._key_bites_per_app = dict()
         for app_vertex in progress.over(self._application_graph.vertices):
+            app_max_partions = 0
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
             for vertex in machine_vertices:
                 partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
+                app_max_partions = max(app_max_partions, len(partitions))
                 # Do we need to check type here
-                source_zones += len(partitions)
-                self._max_partions = max(self._max_partions, len(partitions))
                 max_keys = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
@@ -100,6 +100,8 @@ class ZonedRoutingInfoAllocator(object):
                             partition)
                         max_keys = max(max_keys, n_keys)
             if max_keys > 0:
+                self._max_partions = max(self._max_partions, app_max_partions)
+                source_zones += app_max_partions
                 key_bites = self._bites_needed(max_keys)
                 machine_bites = self._bites_needed(len(machine_vertices))
                 self._max_app_keys_bites = max(
@@ -111,7 +113,7 @@ class ZonedRoutingInfoAllocator(object):
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bites"
-                "".format(source_bites, self._max_app_keys_bites))
+                "".format(self.source_bites, self._max_app_keys_bites))
 
     def _simple_allocate(self):
         progress = ProgressBar(
