@@ -65,7 +65,10 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp = PartitionAndPlacePartitioner()
@@ -165,7 +168,10 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         singular_vertex = SimpleTestVertex(450, "Large vertex",
@@ -208,7 +214,10 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
@@ -249,7 +258,10 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
@@ -284,7 +296,10 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
