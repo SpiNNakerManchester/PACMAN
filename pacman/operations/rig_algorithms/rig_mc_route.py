@@ -34,24 +34,6 @@ _SUPPORTED_VIRTUAL_VERTEX_TYPES = (
     AbstractFPGAVertex, AbstractSpiNNakerLinkVertex)
 
 
-def create_route_to_endpoint(machine_graph, machine):
-    # Vertices constrained to route to a specific link. {vertex: route}
-    route_to_endpoint = {}
-    for vertex in machine_graph.vertices:
-        # We only support FPGA and SpiNNakerLink virtual vertices
-        if isinstance(vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):
-            if isinstance(vertex, AbstractFPGAVertex):
-                link_data = machine.get_fpga_link_with_id(
-                    vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-            else:
-                link_data = machine.get_spinnaker_link_with_id(
-                    vertex.spinnaker_link_id, vertex.board_address)
-            route = LINK_LOOKUP[EDGES(
-                    link_data.connected_link).name.lower()]
-            route_to_endpoint[vertex] = route
-    return route_to_endpoint
-
-
 def convert_to_vertex_to_p_dict(placements):
     vertex_to_p_dict = {
         p.vertex: p.p
@@ -74,6 +56,7 @@ def convert_from_rig_placements(
             placements.add_placement(Placement(vertex, x, y, p))
 
     return placements
+
 
 def convert_a_route(
         routing_tables, partition, incoming_processor, incoming_link,
@@ -124,10 +107,7 @@ class RigMCRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        progress_bar = ProgressBar(5, "Routing")
-
-        route_to_endpoint = create_route_to_endpoint(machine_graph, machine)
-        progress_bar.update()
+        progress_bar = ProgressBar(3, "Routing")
 
         vertex_to_p_dict = convert_to_vertex_to_p_dict(placements)
         progress_bar.update()
@@ -144,7 +124,7 @@ class RigMCRoute(object):
                 if partition.traffic_type == EdgeTrafficType.MULTICAST:
                     post_vertexes = list(
                         e.post_vertex for e in partition.edges)
-                    routingtree = do_route(source_vertex, post_vertexes, machine, route_to_endpoint, vertex_to_p_dict, placements)
+                    routingtree = do_route(source_vertex, post_vertexes, machine, vertex_to_p_dict, placements)
                     convert_a_route(routing_tables, partition, 0, None, routingtree)
 
         progress_bar.update()

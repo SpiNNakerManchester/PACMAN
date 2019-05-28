@@ -25,6 +25,8 @@ from pacman.minirig.place_and_route.routing_tree import RoutingTree
 from pacman.model.graphs import (
     AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 
+_SUPPORTED_VIRTUAL_VERTEX_TYPES = (
+    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex)
 
 _concentric_hexagons = {}
 """Memoized concentric_hexagons outputs, as lists.  Access via
@@ -530,7 +532,7 @@ def avoid_dead_links(root, machine):
 
     return (root, lookup)
 
-def do_route(source_vertex, post_vertexes, machine, route_to_endpoint, vertex_to_p_dict, placements):
+def do_route(source_vertex, post_vertexes, machine, vertex_to_p_dict, placements):
     """Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -562,10 +564,10 @@ def do_route(source_vertex, post_vertexes, machine, route_to_endpoint, vertex_to
     # Add the sinks in the net to the RoutingTree
     for post_vertex in post_vertexes:
         tree_node = lookup[_vertex_xy(post_vertex, placements, machine)]
-        if post_vertex in route_to_endpoint:
-            # Sinks with route-to-endpoint constraints must be routed
+        if isinstance(post_vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):            # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
-            tree_node.append_child((route_to_endpoint[post_vertex], post_vertex))
+            route = _route_to_endpoint(post_vertex, machine)
+            tree_node.append_child((route, post_vertex))
         else:
             core = vertex_to_p_dict.get(post_vertex, None)
             if core is not None:
@@ -576,6 +578,7 @@ def do_route(source_vertex, post_vertexes, machine, route_to_endpoint, vertex_to
                 tree_node.append_child((None, post_vertex))
 
     return root
+
 
 def _vertex_xy(vertex, placements, machine):
     if not isinstance(vertex, AbstractVirtualVertex):
@@ -589,3 +592,13 @@ def _vertex_xy(vertex, placements, machine):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return (link_data.connected_chip_x, link_data.connected_chip_y)
+
+
+def _route_to_endpoint(vertex, machine):
+    if isinstance(vertex, AbstractFPGAVertex):
+        link_data = machine.get_fpga_link_with_id(
+            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+    else:
+        link_data = machine.get_spinnaker_link_with_id(
+            vertex.spinnaker_link_id, vertex.board_address)
+    return Links(link_data.connected_link)
