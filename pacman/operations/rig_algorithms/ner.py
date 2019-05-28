@@ -97,8 +97,7 @@ def ner_net(source, destinations, machine):
                                        source, destination)
                                    if not machine.has_wrap_arounds else
                                    shortest_torus_path_length(
-                                       to_xyz(source), to_xyz(destination),
-                                       width, height))):
+                                       source, destination, width, height))):
         # We shall attempt to find our nearest neighbouring placed node.
         neighbour = None
 
@@ -176,8 +175,7 @@ def ner_net(source, destinations, machine):
             for candidate_neighbour in route:
                 if machine.has_wrap_arounds:
                     distance = shortest_torus_path_length(
-                        to_xyz(candidate_neighbour), to_xyz(destination),
-                        width, height)
+                        candidate_neighbour, destination, width, height)
                 else:
                     distance = shortest_mesh_path_length(
                         candidate_neighbour, destination)
@@ -361,9 +359,8 @@ def a_star(sink, heuristic_source, sources, machine):
     height = machine.max_chip_y + 1
     if machine.has_wrap_arounds:
         heuristic = (lambda node:
-                     shortest_torus_path_length(to_xyz(node),
-                                                to_xyz(heuristic_source),
-                                                width, height))
+                     shortest_torus_path_length(
+                         node, heuristic_source, width, height))
     else:
         heuristic = (lambda node:
                      shortest_mesh_path_length(node, heuristic_source))

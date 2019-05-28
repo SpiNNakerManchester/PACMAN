@@ -90,8 +90,8 @@ def shortest_torus_path_length(source, destination, width, height):
 
     Parameters
     ----------
-    source : (x, y, z)
-    destination : (x, y, z)
+    source : (x, y)
+    destination : (x, y)
     width : int
     height : int
 
@@ -106,8 +106,6 @@ def shortest_torus_path_length(source, destination, width, height):
     # source was at (0, 0).
     x = destination[0] - source[0]
     y = destination[1] - source[1]
-    z = destination[2] - source[2]
-    x, y = x - z, y - z
     x %= w
     y %= h
 
