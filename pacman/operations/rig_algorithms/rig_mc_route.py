@@ -10,7 +10,7 @@ from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.operations.rig_algorithms.links import Links
 from pacman.minirig.place_and_route.routing_tree import RoutingTree
-from pacman.minirig.routing_table.entries import Routes
+from pacman.operations.rig_algorithms.routes import Routes
 
 
 def convert_a_route(

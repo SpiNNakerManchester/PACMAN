@@ -126,7 +126,7 @@ As a heuristic:
 """
 from collections import namedtuple
 from pacman.minirig.routing_table.exceptions import MinimisationFailedError
-from pacman.minirig.routing_table.entries import RoutingTableEntry
+from pacman.operations.rig_algorithms.routing_table_entry import RoutingTableEntry
 from pacman.minirig.routing_table.remove_default_routes import \
     minimise as remove_default_routes
 from pacman.minirig.routing_table.utils import intersect
