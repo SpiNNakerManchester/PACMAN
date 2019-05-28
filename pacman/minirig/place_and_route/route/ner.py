@@ -532,7 +532,8 @@ def avoid_dead_links(root, machine):
 
     return (root, lookup)
 
-def do_route(source_vertex, post_vertexes, machine, vertex_to_p_dict, placements):
+
+def do_route(source_vertex, post_vertexes, machine, placements):
     """Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -569,7 +570,7 @@ def do_route(source_vertex, post_vertexes, machine, vertex_to_p_dict, placements
             route = _route_to_endpoint(post_vertex, machine)
             tree_node.append_child((route, post_vertex))
         else:
-            core = vertex_to_p_dict.get(post_vertex, None)
+            core = placements.get_placement_of_vertex(post_vertex).p
             if core is not None:
                 tree_node.append_child((Routes.core(core), post_vertex))
             else:

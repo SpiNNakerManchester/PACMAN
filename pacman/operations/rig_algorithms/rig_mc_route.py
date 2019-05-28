@@ -8,54 +8,11 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs import (
     AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.placements import Placement, Placements
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
-from pacman.utilities.constants import EDGES
 from pacman.minirig.links import Links
 from pacman.minirig.place_and_route.routing_tree import RoutingTree
 from pacman.minirig.routing_table.entries import Routes
-
-# A lookup from link name (string) to Links enum entry.
-LINK_LOOKUP = {l.name: l for l in Links}
-ROUTE_LOOKUP = {"core_{}".format(r.core_num) if r.is_core else r.name: r
-                for r in Routes}
-
-CHIP_HOMOGENEOUS_CORES = 18
-CHIP_HOMOGENEOUS_SDRAM = 119275520
-CHIP_HOMOGENEOUS_SRAM = 24320
-CHIP_HOMOGENEOUS_TAGS = 0
-ROUTER_MAX_NUMBER_OF_LINKS = 6
-ROUTER_HOMOGENEOUS_ENTRIES = 1023
-
-N_CORES_PER_VERTEX = 1
-
-_SUPPORTED_VIRTUAL_VERTEX_TYPES = (
-    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex)
-
-
-def convert_to_vertex_to_p_dict(placements):
-    vertex_to_p_dict = {
-        p.vertex: p.p
-        for p in placements.placements
-        if not isinstance(p.vertex, AbstractVirtualVertex)}
-
-    return vertex_to_p_dict
-
-
-def convert_from_rig_placements(
-        rig_placements, rig_allocations, machine_graph):
-    placements = Placements()
-    for vertex in rig_placements:
-        if isinstance(vertex, AbstractVirtualVertex):
-            placements.add_placement(Placement(
-                vertex, vertex.virtual_chip_x, vertex.virtual_chip_y, None))
-        else:
-            x, y = rig_placements[vertex]
-            p = rig_allocations[vertex]["cores"].start
-            placements.add_placement(Placement(vertex, x, y, p))
-
-    return placements
 
 
 def convert_a_route(
@@ -107,10 +64,7 @@ class RigMCRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        progress_bar = ProgressBar(3, "Routing")
-
-        vertex_to_p_dict = convert_to_vertex_to_p_dict(placements)
-        progress_bar.update()
+        progress_bar = ProgressBar(2, "Routing")
 
         routing_tables = MulticastRoutingTableByPartition()
 
@@ -124,7 +78,7 @@ class RigMCRoute(object):
                 if partition.traffic_type == EdgeTrafficType.MULTICAST:
                     post_vertexes = list(
                         e.post_vertex for e in partition.edges)
-                    routingtree = do_route(source_vertex, post_vertexes, machine, vertex_to_p_dict, placements)
+                    routingtree = do_route(source_vertex, post_vertexes, machine, placements)
                     convert_a_route(routing_tables, partition, 0, None, routingtree)
 
         progress_bar.update()
