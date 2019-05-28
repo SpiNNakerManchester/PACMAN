@@ -94,7 +94,7 @@ def ner_net(source, destinations, machine):
     for destination in sorted(destinations,
                               key=(lambda destination:
                                    shortest_mesh_path_length(
-                                       to_xyz(source), to_xyz(destination))
+                                       source, destination)
                                    if not machine.has_wrap_arounds else
                                    shortest_torus_path_length(
                                        to_xyz(source), to_xyz(destination),
@@ -180,7 +180,7 @@ def ner_net(source, destinations, machine):
                         width, height)
                 else:
                     distance = shortest_mesh_path_length(
-                        to_xyz(candidate_neighbour), to_xyz(destination))
+                        candidate_neighbour, destination)
 
                 if distance <= radius and (neighbour is None or
                                            distance < neighbour_distance):
@@ -366,8 +366,7 @@ def a_star(sink, heuristic_source, sources, machine):
                                                 width, height))
     else:
         heuristic = (lambda node:
-                     shortest_mesh_path_length(to_xyz(node),
-                                               to_xyz(heuristic_source)))
+                     shortest_mesh_path_length(node, heuristic_source))
 
     # A dictionary {node: (direction, previous_node}. An entry indicates that
     # 1) the node has been visited and 2) which node we hopped from (and the
@@ -451,6 +450,7 @@ def route_has_dead_links(root, machine):
             if not chip.router.is_link(route):
                 return True
     return False
+
 
 def avoid_dead_links(root, machine):
     """Modify a RoutingTree to route-around dead links in a Machine.
@@ -565,7 +565,8 @@ def do_route(source_vertex, post_vertexes, machine, placements):
     # Add the sinks in the net to the RoutingTree
     for post_vertex in post_vertexes:
         tree_node = lookup[_vertex_xy(post_vertex, placements, machine)]
-        if isinstance(post_vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):            # Sinks with route-to-endpoint constraints must be routed
+        if isinstance(post_vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):
+            # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
             route = _route_to_endpoint(post_vertex, machine)
             tree_node.append_child((route, post_vertex))

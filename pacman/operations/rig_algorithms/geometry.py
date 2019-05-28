@@ -25,8 +25,8 @@ def shortest_mesh_path_length(source, destination):
 
     Parameters
     ----------
-    source : (x, y, z)
-    destination : (x, y, z)
+    source : (x, y)
+    destination : (x, y)
 
     Returns
     -------
@@ -34,7 +34,6 @@ def shortest_mesh_path_length(source, destination):
     """
     x = destination[0] - source[0]
     y = destination[1] - source[1]
-    z = destination[2] - source[2]
 
     # When vectors are minimised, (1,1,1) is added or subtracted from them.
     # This process does not change the range of numbers in the vector. When a
@@ -53,15 +52,15 @@ def shortest_mesh_path_length(source, destination):
     maximum = x
     if y > maximum:
         maximum = y
-    if z > maximum:
-        maximum = z
+    if 0 > maximum:
+        maximum = 0
 
     # min(x, y, z)
     minimum = x
     if y < minimum:
         minimum = y
-    if z < minimum:
-        minimum = z
+    if 0 < minimum:
+        minimum = 0
 
     return maximum - minimum
 
@@ -188,6 +187,7 @@ def shortest_torus_path(source, destination, width, height):
     # Select a minimal approach
     _, vector = min(approaches, key=(lambda a: a[0]))
     x, y, z = minimise_xyz(vector)
+
 
     return (x, y, z)
 
