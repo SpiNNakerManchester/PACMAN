@@ -52,26 +52,6 @@ def create_route_to_endpoint(machine_graph, machine):
     return route_to_endpoint
 
 
-def convert_to_vertex_xy_dict(placements, machine):
-    vertex_to_xy_dict = dict()
-    for placement in placements:
-        if not isinstance(placement.vertex, AbstractVirtualVertex):
-            vertex_to_xy_dict[placement.vertex] = (placement.x, placement.y)
-            continue
-        link_data = None
-        vertex = placement.vertex
-        if isinstance(vertex, AbstractFPGAVertex):
-            link_data = machine.get_fpga_link_with_id(
-                vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-        elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
-            link_data = machine.get_spinnaker_link_with_id(
-                vertex.spinnaker_link_id, vertex.board_address)
-        vertex_to_xy_dict[placement.vertex] = (
-            link_data.connected_chip_x, link_data.connected_chip_y)
-
-    return vertex_to_xy_dict
-
-
 def convert_to_vertex_to_p_dict(placements):
     vertex_to_p_dict = {
         p.vertex: p.p
@@ -144,10 +124,7 @@ class RigMCRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        progress_bar = ProgressBar(6, "Routing")
-
-        vertex_to_xy_dict = convert_to_vertex_xy_dict(placements, machine)
-        progress_bar.update()
+        progress_bar = ProgressBar(5, "Routing")
 
         route_to_endpoint = create_route_to_endpoint(machine_graph, machine)
         progress_bar.update()
@@ -167,8 +144,7 @@ class RigMCRoute(object):
                 if partition.traffic_type == EdgeTrafficType.MULTICAST:
                     post_vertexes = list(
                         e.post_vertex for e in partition.edges)
-                    source_xy = vertex_to_xy_dict[source_vertex]
-                    routingtree = do_route(source_xy, post_vertexes, machine, route_to_endpoint, vertex_to_xy_dict, vertex_to_p_dict)
+                    routingtree = do_route(source_vertex, post_vertexes, machine, route_to_endpoint, vertex_to_p_dict, placements)
                     convert_a_route(routing_tables, partition, 0, None, routingtree)
 
         progress_bar.update()

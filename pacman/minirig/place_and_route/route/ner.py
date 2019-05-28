@@ -22,6 +22,8 @@ from pacman.minirig.links import Links
 from pacman.minirig.routing_table.entries import Routes
 
 from pacman.minirig.place_and_route.routing_tree import RoutingTree
+from pacman.model.graphs import (
+    AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 
 
 _concentric_hexagons = {}
@@ -528,7 +530,7 @@ def avoid_dead_links(root, machine):
 
     return (root, lookup)
 
-def do_route(source_xy, post_vertexes, machine, route_to_endpoint, vertex_to_xy_dict, vertex_to_p_dict):
+def do_route(source_vertex, post_vertexes, machine, route_to_endpoint, vertex_to_p_dict, placements):
     """Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -547,7 +549,9 @@ def do_route(source_xy, post_vertexes, machine, route_to_endpoint, vertex_to_xy_
         the paper and shown to be acceptable in practice. If set to zero, this
         method is becomes longest dimension first routing.
     """
-    destinations = set(vertex_to_xy_dict[post_vertex] for post_vertex in post_vertexes)
+    source_xy = _vertex_xy(source_vertex, placements, machine)
+    destinations = set(_vertex_xy(post_vertex, placements, machine)
+                       for post_vertex in post_vertexes)
     # Generate routing tree (assuming a perfect machine)
     root, lookup = ner_net(source_xy, destinations, machine)
 
@@ -557,7 +561,7 @@ def do_route(source_xy, post_vertexes, machine, route_to_endpoint, vertex_to_xy_
 
     # Add the sinks in the net to the RoutingTree
     for post_vertex in post_vertexes:
-        tree_node = lookup[vertex_to_xy_dict[post_vertex]]
+        tree_node = lookup[_vertex_xy(post_vertex, placements, machine)]
         if post_vertex in route_to_endpoint:
             # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
@@ -572,3 +576,16 @@ def do_route(source_xy, post_vertexes, machine, route_to_endpoint, vertex_to_xy_
                 tree_node.append_child((None, post_vertex))
 
     return root
+
+def _vertex_xy(vertex, placements, machine):
+    if not isinstance(vertex, AbstractVirtualVertex):
+        placement = placements.get_placement_of_vertex(vertex)
+        return (placement.x, placement.y)
+    link_data = None
+    if isinstance(vertex, AbstractFPGAVertex):
+        link_data = machine.get_fpga_link_with_id(
+            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+    elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+        link_data = machine.get_spinnaker_link_with_id(
+            vertex.spinnaker_link_id, vertex.board_address)
+    return (link_data.connected_chip_x, link_data.connected_chip_y)
