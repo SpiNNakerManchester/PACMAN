@@ -3,7 +3,7 @@
 
 import random
 
-from pacman.minirig.links import Links
+from pacman.operations.rig_algorithms.links import Links
 
 
 def longest_dimension_first(vector, start=(0, 0), width=None, height=None):

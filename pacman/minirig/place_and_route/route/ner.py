@@ -14,11 +14,11 @@ from pacman.operations.rig_algorithms.geometry import concentric_hexagons, to_xy
     shortest_mesh_path_length, shortest_mesh_path, \
     shortest_torus_path_length, shortest_torus_path
 
-from pacman.minirig.place_and_route.route.utils import longest_dimension_first
+from pacman.operations.rig_algorithms.utils import longest_dimension_first
 
-from pacman.minirig.place_and_route.route.exceptions import MachineHasDisconnectedSubregion
+from pacman.exceptions import MachineHasDisconnectedSubregion
 
-from pacman.minirig.links import Links
+from pacman.operations.rig_algorithms.links import Links
 from pacman.minirig.routing_table.entries import Routes
 
 from pacman.minirig.place_and_route.routing_tree import RoutingTree

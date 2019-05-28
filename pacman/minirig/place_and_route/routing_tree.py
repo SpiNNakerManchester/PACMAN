@@ -64,7 +64,6 @@ class RoutingTree(object):
     def __init__(self, chip):
         self.chip = chip
         self._children = []
-        print(self)
 
     @property
     def chip(self):

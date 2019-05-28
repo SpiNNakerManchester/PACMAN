@@ -5,12 +5,10 @@ try:
 except ImportError:
     from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.graphs import (
-    AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
-from pacman.minirig.links import Links
+from pacman.operations.rig_algorithms.links import Links
 from pacman.minirig.place_and_route.routing_tree import RoutingTree
 from pacman.minirig.routing_table.entries import Routes
 
@@ -64,13 +62,11 @@ class RigMCRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        progress_bar = ProgressBar(2, "Routing")
-
         routing_tables = MulticastRoutingTableByPartition()
 
-        progress_bar.update()
+        progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
 
-        for source_vertex in machine_graph.vertices:
+        for source_vertex in progress_bar.over(machine_graph.vertices):
             # handle the vertex edges
             for partition in \
                     machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
@@ -81,7 +77,6 @@ class RigMCRoute(object):
                     routingtree = do_route(source_vertex, post_vertexes, machine, placements)
                     convert_a_route(routing_tables, partition, 0, None, routingtree)
 
-        progress_bar.update()
         progress_bar.end()
 
         return routing_tables
