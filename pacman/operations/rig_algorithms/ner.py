@@ -196,7 +196,7 @@ def ner_net(source, destinations, machine):
                                          to_xyz(destination),
                                          width, height)
         else:
-            vector = shortest_mesh_path(to_xyz(neighbour), to_xyz(destination))
+            vector = shortest_mesh_path(neighbour, destination)
 
         # The longest-dimension-first route may inadvertently pass through an
         # already connected node. If the route is allowed to pass through that

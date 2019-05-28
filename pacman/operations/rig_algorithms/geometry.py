@@ -19,6 +19,13 @@ def minimise_xyz(xyz):
     return (x-m, y-m, z-m)
 
 
+def minimise_xy(xy):
+    """Minimise an (x, y, 0) coordinate."""
+    x, y = xy
+    m = max(min(x, y), min(max(x, y), 0))
+    return (x-m, y-m, -m)
+
+
 def shortest_mesh_path_length(source, destination):
     """Get the length of a shortest path from source to destination without
     using wrap-around links.
@@ -71,14 +78,14 @@ def shortest_mesh_path(source, destination):
 
     Parameters
     ----------
-    source : (x, y, z)
-    destination : (x, y, z)
+    source : (x, y)
+    destination : (x, y)
 
     Returns
     -------
     (x, y, z)
     """
-    return minimise_xyz(d - s for s, d in zip(source, destination))
+    return minimise_xy((destination[0] - source[0], destination[1] - source[1]))
 
 
 def shortest_torus_path_length(source, destination, width, height):
