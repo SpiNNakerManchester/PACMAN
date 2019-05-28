@@ -46,10 +46,15 @@
                 <param_type>MemoryExtendedVirtualMachine</param_type>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
@@ -71,6 +76,10 @@
                 <param_type>MemoryMachine</param_type>
             </parameter>
             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+            <parameter>
                 <param_name>preallocated_resources</param_name>
                 <param_type>MemoryPreAllocatedResources</param_type>
             </parameter>
@@ -78,6 +87,7 @@
         <required_inputs>
             <param_name>graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <optional_inputs>
             <token>GeneratedPreAllocatedResources</token>
@@ -101,10 +111,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -122,10 +137,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -143,10 +163,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -164,10 +189,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
-        </input_definitions>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+       </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -185,10 +215,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -206,10 +241,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -545,11 +585,16 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
-        </input_definitions>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+       </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
-        </required_inputs>
+            <param_name>plan_n_timesteps</param_name>
+         </required_inputs>
         <outputs>
             <param_type>MemoryIpTags</param_type>
             <param_type>MemoryReverseIpTags</param_type>
@@ -596,6 +641,90 @@
         <optional_inputs>
             <param_name>graph_mapper</param_name>
         </optional_inputs>
+    </algorithm>
+    <algorithm name="RigPlaceAndRoute">
+        <python_module>pacman.operations.rig_algorithms.rig_place_and_route</python_module>
+        <python_class>RigPlaceAndRoute</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryPlacements</param_type>
+            <param_type>MemoryRoutingTableByPartition</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="RigPlace">
+        <python_module>pacman.operations.rig_algorithms.rig_place</python_module>
+        <python_class>RigPlace</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryPlacements</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="RigRoute">
+        <python_module>pacman.operations.rig_algorithms.rig_route</python_module>
+        <python_class>RigRoute</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
+            <param_name>placements</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryRoutingTableByPartition</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="RigMCRoute">
         <python_module>pacman.operations.rig_algorithms.rig_mc_route</python_module>
