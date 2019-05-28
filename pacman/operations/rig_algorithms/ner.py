@@ -21,7 +21,7 @@ from pacman.exceptions import MachineHasDisconnectedSubregion
 from pacman.operations.rig_algorithms.links import Links
 from pacman.operations.rig_algorithms.routes import Routes
 
-from pacman.minirig.place_and_route.routing_tree import RoutingTree
+from pacman.operations.rig_algorithms.routing_tree import RoutingTree
 from pacman.model.graphs import (
     AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 

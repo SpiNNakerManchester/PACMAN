@@ -1,4 +1,4 @@
-from pacman.minirig.place_and_route.route.ner import do_route
+from pacman.operations.rig_algorithms.ner import do_route
 
 try:
     from collections.abc import OrderedDict
@@ -9,7 +9,7 @@ from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.operations.rig_algorithms.links import Links
-from pacman.minirig.place_and_route.routing_tree import RoutingTree
+from pacman.operations.rig_algorithms.routing_tree import RoutingTree
 from pacman.operations.rig_algorithms.routes import Routes
 
 
