@@ -91,13 +91,15 @@ def ner_net(source, destinations, machine):
 
     # Handle each destination, sorted by distance from the source, closest
     # first.
-    for destination in sorted(destinations,
-                              key=(lambda destination:
-                                   shortest_mesh_path_length(
-                                       source, destination)
-                                   if not machine.has_wrap_arounds else
-                                   shortest_torus_path_length(
-                                       source, destination, width, height))):
+    if machine.has_wrap_arounds:
+        sorted_dest = sorted(
+            destinations, key=(lambda destination: shortest_torus_path_length(
+                source, destination, width, height)))
+    else:
+        sorted_dest = sorted(
+            destinations, key=(lambda destination: shortest_mesh_path_length(
+                source, destination)))
+    for destination in sorted_dest:
         # We shall attempt to find our nearest neighbouring placed node.
         neighbour = None
 
