@@ -1,8 +1,6 @@
 """General-purpose SpiNNaker-related geometry functions.
 """
 
-import random
-
 from math import sqrt
 
 import numpy as np
@@ -158,9 +156,6 @@ def shortest_torus_path(source, destination, width, height):
     See http://jhnet.co.uk/articles/torus_paths for an explanation of how this
     method works.
 
-    Note that when multiple shortest paths exist, one will be chosen at random
-    with uniform probability.
-
     Parameters
     ----------
     source : (x, y, z)
@@ -190,22 +185,9 @@ def shortest_torus_path(source, destination, width, height):
                   (dx+h-dy, (dx, -(h-dy), 0)),               # Wrap Y only
                   (max(w-dx, h-dy), (-(w-dx), -(h-dy), 0))]  # Wrap X and Y
 
-    # Select a minimal approach at random
-    _, vector = min(approaches, key=(lambda a: a[0]+random.random()))
+    # Select a minimal approach
+    _, vector = min(approaches, key=(lambda a: a[0]))
     x, y, z = minimise_xyz(vector)
-
-    # Transform to include a random number of 'spirals' on Z axis where
-    # possible.
-    if abs(x) >= height:
-        max_spirals = (x + height - 1 if x < 0 else x) // height
-        d = random.randint(min(0, max_spirals), max(0, max_spirals)) * height
-        x -= d
-        z -= d
-    elif abs(y) >= width:
-        max_spirals = (y + width - 1 if y < 0 else y) // width
-        d = random.randint(min(0, max_spirals), max(0, max_spirals)) * width
-        y -= d
-        z -= d
 
     return (x, y, z)
 
