@@ -1,13 +1,10 @@
 """Data structures for the definition of SpiNNaker routing tables.
 """
 
-from collections import namedtuple
 
 
-class RoutingTableEntry(namedtuple("RoutingTableEntry",
-                                   "route key mask sources")):
-    """Named tuple representing a single routing entry in a SpiNNaker routing
-    table.
+class RoutingTableEntry(object):
+    """representing a single routing entry in a SpiNNaker routing table.
 
     Parameters
     ----------
@@ -25,10 +22,14 @@ class RoutingTableEntry(namedtuple("RoutingTableEntry",
         If the source directions are unknown ``{None}`` should be used (the
         default).
     """
-    def __new__(cls, route, key, mask, sources={None}):
-        return super(RoutingTableEntry, cls).__new__(
-            cls, frozenset(route), key, mask, set(sources)
-        )
+
+    _slots__ = ["route", "key", "mask", "sources"]
+
+    def __init__(self, route, key, mask, sources={None}):
+        self.route = frozenset(route)
+        self.key = key
+        self.mask = mask
+        self.sources = set(sources)
 
     def __str__(self):
         """Get an easily readable representation of the routing table entry.
