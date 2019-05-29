@@ -20,9 +20,6 @@ class MundyRouterCompressor(object):
 
     __slots__ = []
 
-    KeyMask = collections.namedtuple('KeyMask', 'key mask')
-    RoutingEntry = collections.namedtuple('RoutingEntry',
-                                          'key mask route defaultable')
     max_supported_length = 1023
 
     def __call__(self, router_tables, target_length=None):
