@@ -1,5 +1,5 @@
-from pacman.minirig.routing_table.exceptions import MinimisationFailedError
-from pacman.minirig.routing_table.utils import intersect
+from pacman.operations.router_compressors.mundys_router_compressor.exceptions import MinimisationFailedError
+from pacman.operations.router_compressors.mundys_router_compressor.utils import intersect
 
 
 def minimise(table, target_length, check_for_aliases=True):

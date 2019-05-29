@@ -8,7 +8,8 @@ from pacman.model.routing_tables import (
 from pacman.exceptions import PacmanElementAllocationException
 from pacman.operations.rig_algorithms.routing_table_entry import RoutingTableEntry
 from pacman.operations.rig_algorithms.routes import Routes
-from pacman.minirig.routing_table import ordered_covering as rigs_compressor
+from pacman.operations.router_compressors.mundys_router_compressor import \
+    ordered_covering as rigs_compressor
 
 logger = logging.getLogger(__name__)
 

@@ -125,11 +125,11 @@ As a heuristic:
       ``0XX0`` must be inserted below it.
 """
 from collections import namedtuple
-from pacman.minirig.routing_table.exceptions import MinimisationFailedError
+from pacman.operations.router_compressors.mundys_router_compressor.exceptions import MinimisationFailedError
 from pacman.operations.rig_algorithms.routing_table_entry import RoutingTableEntry
-from pacman.minirig.routing_table.remove_default_routes import \
+from pacman.operations.router_compressors.mundys_router_compressor.remove_default_routes import \
     minimise as remove_default_routes
-from pacman.minirig.routing_table.utils import intersect
+from pacman.operations.router_compressors.mundys_router_compressor.utils import intersect
 
 
 def minimise(routing_table, target_length):
