@@ -1,5 +1,7 @@
+"""
+based on https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_routes.py
+"""
 from pacman.operations.router_compressors.mundys_router_compressor.exceptions import MinimisationFailedError
-from pacman.operations.router_compressors.mundys_router_compressor.utils import intersect
 
 
 def minimise(table, target_length, check_for_aliases=True):

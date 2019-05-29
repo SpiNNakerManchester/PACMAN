@@ -123,6 +123,8 @@ As a heuristic:
    a) New entries must also be inserted below any entries of the same
       generality. If ``XX00`` were already present in the table the new entry
       ``0XX0`` must be inserted below it.
+
+based on https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_covering.py
 """
 from collections import namedtuple
 from pacman.operations.router_compressors.mundys_router_compressor.exceptions import MinimisationFailedError
