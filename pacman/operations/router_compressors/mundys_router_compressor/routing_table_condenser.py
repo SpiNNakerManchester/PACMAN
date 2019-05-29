@@ -66,9 +66,7 @@ class MundyRouterCompressor(object):
             for processor_id in router_entry.processor_ids:
                 new_processor_ids.append(processor_id + 6)
 
-            route = set(Routes(i) for i in
-                        itertools.chain(router_entry.link_ids,
-                                        new_processor_ids))
+            route = router_entry.spinnaker_route
 
             # Add the new entry
             entries.append(RoutingTableEntry(
@@ -98,8 +96,7 @@ class MundyRouterCompressor(object):
 
         for entry in mundy_compressed_router_table_entries:
             table.add_multicast_routing_entry(MulticastRoutingEntry(
-                entry.key, entry.mask,  # Key and mask
-                ((int(c) - 6) for c in entry.route if c.is_core),  # Cores
-                (int(l) for l in entry.route if l.is_link),  # Links
-                False))  # NOT defaultable
+                entry.key, entry.mask,  defaultable=False, # NOT defaultable
+                spinnaker_route=entry.route,
+                ))
         return table

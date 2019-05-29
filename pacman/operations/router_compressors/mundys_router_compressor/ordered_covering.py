@@ -429,8 +429,6 @@ class _Merge(object):
     insertion_index : int
         Where in the routing table the entry generated would need to be
         inserted.
-    sources : {Routes, ...}
-        Set of Routes that packets reaching the merge may arrive from.
     """
     def __init__(self, routing_table, entries=set()):
         # Generate the new key, mask and sources

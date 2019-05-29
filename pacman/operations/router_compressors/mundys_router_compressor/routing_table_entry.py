@@ -24,7 +24,7 @@ class RoutingTableEntry(object):
     _slots__ = ["route", "key", "mask", "defaultable"]
 
     def __init__(self, route, key, mask, defaultable):
-        self.route = frozenset(route)
+        self.route = route
         self.key = key
         self.mask = mask
         self.defaultable = defaultable
