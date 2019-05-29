@@ -46,7 +46,7 @@ def minimise(table, target_length, check_for_aliases=True):
     # Generate a new table with default-route entries removed
     new_table = list()
     for i, entry in enumerate(table):
-        if not _is_defaultable(i, entry, table, check_for_aliases):
+        if not entry.defaultable:
             # If the entry cannot be removed then add it to the table
             new_table.append(entry)
 
@@ -74,20 +74,3 @@ def _is_defaultable(i, entry, table, check_for_aliases=True):
         route may be default routed.
     """
     # May only have one source and sink (which may not be None)
-    if (len(entry.sources) == 1 and
-            len(entry.route) == 1 and
-            None not in entry.sources):
-        # Neither the source nor sink may be a core
-        source = next(iter(entry.sources))
-        sink = next(iter(entry.route))
-
-        if source.is_link and sink.is_link:
-            # The source must be going in the same direction as the link
-            if source.opposite is sink:
-                # And the entry must not be aliased
-                key, mask = entry.key, entry.mask
-                if not check_for_aliases or \
-                        not any(intersect(key, mask, d.key, d.mask) for
-                                d in table[i+1:]):
-                    return True
-    return False

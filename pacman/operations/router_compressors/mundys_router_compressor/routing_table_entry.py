@@ -19,19 +19,15 @@ class RoutingTableEntry(object):
     mask : int
         32-bit unsigned integer mask to apply to keys of packets arriving at
         the router.
-    sources : {:py:class:`~.Routes`, ...}
-        Links on which a packet may enter the router before taking this route.
-        If the source directions are unknown ``{None}`` should be used (the
-        default).
     """
 
-    _slots__ = ["route", "key", "mask", "sources"]
+    _slots__ = ["route", "key", "mask", "defaultable"]
 
-    def __init__(self, route, key, mask, sources={None}):
+    def __init__(self, route, key, mask, defaultable):
         self.route = frozenset(route)
         self.key = key
         self.mask = mask
-        self.sources = set(sources)
+        self.defaultable = defaultable
 
     def __str__(self):
         """Get an easily readable representation of the routing table entry.
@@ -67,11 +63,5 @@ class RoutingTableEntry(object):
         # Get the routes strings
         route = " ".join(r.initial for r in sorted(self.route))
 
-        if not self.sources or self.sources == {None}:
-            # If no sources then don't display sources
-            return "{} -> {}".format(keymask, route)
-        else:
-            # Otherwise get the sources
-            source = " ".join(s.initial for s in
-                              sorted(self.sources - {None}))
-            return "{} -> {} -> {}".format(source, keymask, route)
+        # If no sources then don't display sources
+        return "{} -> {} -> {}".format(keymask, route, self.defaultable)

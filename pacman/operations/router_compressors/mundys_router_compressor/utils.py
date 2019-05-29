@@ -1,9 +1,3 @@
-from collections import defaultdict, namedtuple, OrderedDict
-
-from pacman.operations.rig_algorithms.routing_table_entry import RoutingTableEntry
-import warnings
-
-
 def intersect(key_a, mask_a, key_b, mask_b):
     """Return if key-mask pairs intersect (i.e., would both match some of the
     same keys).

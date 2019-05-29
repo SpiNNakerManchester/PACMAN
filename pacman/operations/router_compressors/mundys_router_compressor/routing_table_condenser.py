@@ -6,7 +6,7 @@ from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import PacmanElementAllocationException
-from pacman.operations.rig_algorithms.routing_table_entry import RoutingTableEntry
+from pacman.operations.router_compressors.mundys_router_compressor.routing_table_entry import RoutingTableEntry
 from pacman.operations.rig_algorithms.routes import Routes
 from pacman.operations.router_compressors.mundys_router_compressor import \
     ordered_covering as rigs_compressor
@@ -73,16 +73,10 @@ class MundyRouterCompressor(object):
                         itertools.chain(router_entry.link_ids,
                                         new_processor_ids))
 
-            # Get the source for the entry
-            if router_entry.defaultable:
-                source = {next(iter(route)).opposite}
-            else:
-                source = {None}
-
             # Add the new entry
             entries.append(RoutingTableEntry(
                 route, router_entry.routing_entry_key, router_entry.mask,
-                source))
+                router_entry.defaultable))
 
         return entries
 

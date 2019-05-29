@@ -126,7 +126,7 @@ As a heuristic:
 """
 from collections import namedtuple
 from pacman.operations.router_compressors.mundys_router_compressor.exceptions import MinimisationFailedError
-from pacman.operations.rig_algorithms.routing_table_entry import RoutingTableEntry
+from pacman.operations.router_compressors.mundys_router_compressor.routing_table_entry import RoutingTableEntry
 from pacman.operations.router_compressors.mundys_router_compressor.remove_default_routes import \
     minimise as remove_default_routes
 from pacman.operations.router_compressors.mundys_router_compressor.utils import intersect
@@ -405,7 +405,7 @@ def _get_insertion_index(routing_table, generality):
 
 class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
                                    "generality", "goodness",
-                                   "insertion_index", "sources"])):
+                                   "insertion_index", "defaultable"])):
     """Represents a potential merge of routing table entries.
 
     Parameters
@@ -430,10 +430,10 @@ class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
     """
     def __new__(cls, routing_table, entries=set()):
         # Generate the new key, mask and sources
-        sources = set()
         any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
         all_ones = 0xffffffff  # ... 1 in *all* of the keys
         all_selected = 0xffffffff  # ... 1 in *all* of the masks
+        defaultable = True
 
         for i in entries:
             # Get the entry
@@ -443,7 +443,7 @@ class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
             any_ones |= entry.key
             all_ones &= entry.key
             all_selected &= entry.mask
-            sources.update(entry.sources)
+            defaultable = defaultable and entry.defaultable
 
         # Compute the new mask, key and generality
         any_zeros = ~all_ones
@@ -459,7 +459,7 @@ class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
 
         return super(_Merge, cls).__new__(
             cls, routing_table, frozenset(entries), key, mask,
-            generality, goodness, insertion_index, sources
+            generality, goodness, insertion_index, defaultable
         )
 
     def apply(self, aliases):
@@ -483,7 +483,7 @@ class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
         # Get the new entry
         new_entry = RoutingTableEntry(
             route=self.routing_table[next(iter(self.entries))].route,
-            key=self.key, mask=self.mask, sources=self.sources
+            key=self.key, mask=self.mask, defaultable=self.defaultable
         )
         aliases[(self.key, self.mask)] = our_aliases = set([])
 
