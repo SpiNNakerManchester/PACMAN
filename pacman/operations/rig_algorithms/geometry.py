@@ -1,4 +1,6 @@
 """General-purpose SpiNNaker-related geometry functions.
+
+Based on https://github.com/project-rig/rig/blob/master/rig/geometry.py
 """
 
 from math import sqrt

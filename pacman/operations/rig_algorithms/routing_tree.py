@@ -4,6 +4,8 @@ This representation of a route explicitly describes a tree-structure and the
 complete path taken by a route. This is used during place and route in
 preference to a set of RoutingTableEntry tuples since it is more easily
 verified and more accurately represents the problem at hand.
+
+Based on https://github.com/project-rig/rig/blob/master/rig/place_and_route/routing_tree.py
 """
 from collections import deque
 

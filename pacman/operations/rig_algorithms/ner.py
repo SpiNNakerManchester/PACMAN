@@ -4,6 +4,8 @@ Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
 Parallel Computing (2014).
 
 `http://dx.doi.org/10.1016/j.parco.2015.01.002`
+
+Based on https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
 """
 
 import heapq

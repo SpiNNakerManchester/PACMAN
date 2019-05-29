@@ -1,4 +1,6 @@
 """A datastructure representing links in a SpiNNaker machine.
+
+Based on https://github.com/project-rig/rig/blob/master/rig/links.py
 """
 
 from six import iteritems
