@@ -7,10 +7,7 @@ from six import iteritems
 
 from enum import IntEnum
 
-#from rig.utils.docstrings import add_int_enums_to_docstring
 
-
-#@add_int_enums_to_docstring
 class Links(IntEnum):
     """Enumeration of links from a SpiNNaker chip.
 

@@ -5,14 +5,15 @@ Parallel Computing (2014).
 
 `http://dx.doi.org/10.1016/j.parco.2015.01.002`
 
-Based on https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
+Based on
+https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
 """
 
 import heapq
 
 from collections import deque
 
-from pacman.operations.rig_algorithms.geometry import concentric_hexagons, to_xyz, \
+from .geometry import concentric_hexagons, to_xyz, \
     shortest_mesh_path_length, shortest_mesh_path, \
     shortest_torus_path_length, shortest_torus_path
 
@@ -398,8 +399,8 @@ def a_star(sink, heuristic_source, sources, machine):
                          (node[1] + vector[1]) % height)
 
             # Skip links which are broken
-            if not machine.is_link_at(neighbour[0], neighbour[1], neighbour_link):
-            #if (neighbour[0], neighbour[1], neighbour_link) not in machine:
+            if not machine.is_link_at(
+                    neighbour[0], neighbour[1], neighbour_link):
                 continue
 
             # Skip neighbours who have already been visited

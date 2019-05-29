@@ -5,7 +5,8 @@ complete path taken by a route. This is used during place and route in
 preference to a set of RoutingTableEntry tuples since it is more easily
 verified and more accurately represents the problem at hand.
 
-Based on https://github.com/project-rig/rig/blob/master/rig/place_and_route/routing_tree.py
+Based on
+https://github.com/project-rig/rig/blob/master/rig/place_and_route/routing_tree.py
 """
 from collections import deque
 
@@ -52,7 +53,7 @@ class RoutingTree(object):
     rig.routing_table.routing_tree_to_tables:
         May be used to convert :py:class:`.RoutingTree` objects into routing
         tables suitable for loading onto a SpiNNaker machine.
-    """
+    """  # noqa W605
 
     # A *lot* of instances of this data structure are created and so its memory
     # consumption is a sensitive matter. The following optimisations have been

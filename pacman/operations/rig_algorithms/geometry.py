@@ -87,7 +87,8 @@ def shortest_mesh_path(source, destination):
     -------
     (x, y, z)
     """
-    return minimise_xy((destination[0] - source[0], destination[1] - source[1]))
+    return minimise_xy(
+        (destination[0] - source[0], destination[1] - source[1]))
 
 
 def shortest_torus_path_length(source, destination, width, height):
@@ -194,7 +195,6 @@ def shortest_torus_path(source, destination, width, height):
     # Select a minimal approach
     _, vector = min(approaches, key=(lambda a: a[0]))
     x, y, z = minimise_xyz(vector)
-
 
     return (x, y, z)
 
@@ -409,5 +409,3 @@ def spinn5_chip_coord(x, y, root_x=0, root_y=0):
     """
     dx, dy = SPINN5_ETH_OFFSET[(y - root_y) % 12][(x - root_x) % 12]
     return (-int(dx), -int(dy))
-
-

@@ -1,8 +1,8 @@
 """Data structures for the definition of SpiNNaker routing tables.
 
-Based on https://github.com/project-rig/rig/blob/master/rig/routing_table/entries.py
+Based on
+https://github.com/project-rig/rig/blob/master/rig/routing_table/entries.py
 """
-
 
 
 class RoutingTableEntry(object):

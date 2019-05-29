@@ -1,13 +1,10 @@
-import collections
 import logging
-import itertools
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import PacmanElementAllocationException
-from pacman.operations.router_compressors.mundys_router_compressor.routing_table_entry import RoutingTableEntry
-from pacman.operations.rig_algorithms.routes import Routes
+from .routing_table_entry import RoutingTableEntry
 from pacman.operations.router_compressors.mundys_router_compressor import \
     ordered_covering as rigs_compressor
 
@@ -96,7 +93,7 @@ class MundyRouterCompressor(object):
 
         for entry in mundy_compressed_router_table_entries:
             table.add_multicast_routing_entry(MulticastRoutingEntry(
-                entry.key, entry.mask,  defaultable=False, # NOT defaultable
+                entry.key, entry.mask,  defaultable=False,  # NOT defaultable
                 spinnaker_route=entry.route,
                 ))
         return table

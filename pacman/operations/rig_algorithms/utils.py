@@ -1,6 +1,7 @@
 """Utility functions which may be of value to router implementations.
 
-Based on https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.py
+Based on
+https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.py
 """
 
 

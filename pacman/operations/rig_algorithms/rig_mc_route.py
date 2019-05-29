@@ -1,9 +1,5 @@
 from pacman.operations.rig_algorithms.ner import do_route
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
@@ -68,14 +64,16 @@ class RigMCRoute(object):
 
         for source_vertex in progress_bar.over(machine_graph.vertices):
             # handle the vertex edges
-            for partition in \
-                    machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+            for partition in machine_graph.\
+                    get_outgoing_edge_partitions_starting_at_vertex(
                         source_vertex):
                 if partition.traffic_type == EdgeTrafficType.MULTICAST:
                     post_vertexes = list(
                         e.post_vertex for e in partition.edges)
-                    routingtree = do_route(source_vertex, post_vertexes, machine, placements)
-                    convert_a_route(routing_tables, partition, 0, None, routingtree)
+                    routingtree = do_route(
+                        source_vertex, post_vertexes, machine, placements)
+                    convert_a_route(routing_tables, partition, 0, None,
+                                    routingtree)
 
         progress_bar.end()
 

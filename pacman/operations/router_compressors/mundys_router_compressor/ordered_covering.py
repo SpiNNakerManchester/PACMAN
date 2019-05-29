@@ -124,14 +124,14 @@ As a heuristic:
       generality. If ``XX00`` were already present in the table the new entry
       ``0XX0`` must be inserted below it.
 
-based on https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_covering.py
+based on
+https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_covering.py
 """
-from collections import namedtuple
-from pacman.operations.router_compressors.mundys_router_compressor.exceptions import MinimisationFailedError
-from pacman.operations.router_compressors.mundys_router_compressor.routing_table_entry import RoutingTableEntry
-from pacman.operations.router_compressors.mundys_router_compressor.remove_default_routes import \
+from .exceptions import MinimisationFailedError
+from .routing_table_entry import RoutingTableEntry
+from .remove_default_routes import \
     minimise as remove_default_routes
-from pacman.operations.router_compressors.mundys_router_compressor.utils import intersect
+from .utils import intersect
 
 
 def minimise(routing_table, target_length):
@@ -429,7 +429,7 @@ class _Merge(object):
     insertion_index : int
         Where in the routing table the entry generated would need to be
         inserted.
-    """
+    """  # noqa W605
     def __init__(self, routing_table, entries=set()):
         # Generate the new key, mask and sources
         any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
@@ -454,7 +454,8 @@ class _Merge(object):
         self.key = all_ones & self.mask
 
         self.generality = _get_generality(self.key, self.mask)
-        self.insertion_index = _get_insertion_index(routing_table, self.generality)
+        self.insertion_index = _get_insertion_index(
+            routing_table, self.generality)
 
         # Compute the goodness of the merge
         self.goodness = len(entries) - 1
