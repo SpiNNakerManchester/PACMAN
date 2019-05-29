@@ -405,9 +405,11 @@ def _get_insertion_index(routing_table, generality):
     return pos
 
 
-class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
-                                   "generality", "goodness",
-                                   "insertion_index", "defaultable"])):
+class _Merge(object):
+
+    _slots__ = ["routing_table", "entries", "key", "mask", "generality",
+                "goodness", "insertion_index", "defaultable"]
+
     """Represents a potential merge of routing table entries.
 
     Parameters
@@ -430,12 +432,12 @@ class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
     sources : {Routes, ...}
         Set of Routes that packets reaching the merge may arrive from.
     """
-    def __new__(cls, routing_table, entries=set()):
+    def __init__(self, routing_table, entries=set()):
         # Generate the new key, mask and sources
         any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
         all_ones = 0xffffffff  # ... 1 in *all* of the keys
         all_selected = 0xffffffff  # ... 1 in *all* of the masks
-        defaultable = True
+        self.defaultable = True
 
         for i in entries:
             # Get the entry
@@ -445,24 +447,21 @@ class _Merge(namedtuple("_Merge", ["routing_table", "entries", "key", "mask",
             any_ones |= entry.key
             all_ones &= entry.key
             all_selected &= entry.mask
-            defaultable = defaultable and entry.defaultable
+            self.defaultable = self.defaultable and entry.defaultable
 
         # Compute the new mask, key and generality
         any_zeros = ~all_ones
         new_xs = any_ones ^ any_zeros
-        mask = all_selected & new_xs  # Combine existing and new Xs
-        key = all_ones & mask
+        self.mask = all_selected & new_xs  # Combine existing and new Xs
+        self.key = all_ones & self.mask
 
-        generality = _get_generality(key, mask)
-        insertion_index = _get_insertion_index(routing_table, generality)
+        self.generality = _get_generality(self.key, self.mask)
+        self.insertion_index = _get_insertion_index(routing_table, self.generality)
 
         # Compute the goodness of the merge
-        goodness = len(entries) - 1
-
-        return super(_Merge, cls).__new__(
-            cls, routing_table, frozenset(entries), key, mask,
-            generality, goodness, insertion_index, defaultable
-        )
+        self.goodness = len(entries) - 1
+        self.routing_table = routing_table
+        self.entries = frozenset(entries)
 
     def apply(self, aliases):
         """Apply the merge to the routing table it is defined against and get a
