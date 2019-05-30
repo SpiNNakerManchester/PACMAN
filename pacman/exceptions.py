@@ -258,7 +258,7 @@ class PacmanCanNotFindChipException(PacmanException):
         super(PacmanCanNotFindChipException, self).__init__(problem)
 
 
-class MachineHasDisconnectedSubregion(PacmanException):
+class MachineHasDisconnectedSubRegion(PacmanException):
     """Some part of the machine has no paths connecting it to the rest of the
     machine.
     """

@@ -39,10 +39,8 @@ def longest_dimension_first(vector, start=(0, 0), width=None, height=None):
 
     out = []
 
-    for dimension, magnitude in sorted(enumerate(vector),
-                                       key=(lambda x:
-                                            abs(x[1])),
-                                       reverse=True):
+    for dimension, magnitude in sorted(
+            enumerate(vector), key=(lambda x: abs(x[1])), reverse=True):
         if magnitude == 0:
             break
 

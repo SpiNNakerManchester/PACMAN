@@ -19,7 +19,7 @@ from .geometry import concentric_hexagons, to_xyz, \
 
 from pacman.operations.rig_algorithms.utils import longest_dimension_first
 
-from pacman.exceptions import MachineHasDisconnectedSubregion
+from pacman.exceptions import MachineHasDisconnectedSubRegion
 
 from pacman.operations.rig_algorithms.links import Links
 from pacman.operations.rig_algorithms.routes import Routes
@@ -413,7 +413,7 @@ def a_star(sink, heuristic_source, sources, machine):
 
     # Fail of no paths exist
     if selected_source is None:
-        raise MachineHasDisconnectedSubregion(
+        raise MachineHasDisconnectedSubRegion(
             "Could not find path from {} to {}".format(
                 sink, heuristic_source))
 
