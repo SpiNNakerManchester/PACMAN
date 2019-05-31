@@ -14,8 +14,8 @@ from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls as utils
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
     import (
-    generate_machine_edges, get_same_size_vertex_groups,
-    get_remaining_constraints, determine_max_atoms_for_vertex)
+        generate_machine_edges, get_same_size_vertex_groups,
+        get_remaining_constraints, determine_max_atoms_for_vertex)
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker

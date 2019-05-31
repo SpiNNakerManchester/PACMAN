@@ -115,11 +115,11 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
 
     def __repr__(self):
         edges = ""
-        #for edge in self._edges:
-        #    if edge.label is not None:
-        #        edges += edge.label + ","
-        #    else:
-        #        edges += str(edge) + ","
+        for edge in self._edges:
+            if edge.label is not None:
+                edges += edge.label + ","
+            else:
+                edges += str(edge) + ","
         return _REPR_TEMPLATE.format(
             self._identifier, edges, self.constraints, self.label)
 

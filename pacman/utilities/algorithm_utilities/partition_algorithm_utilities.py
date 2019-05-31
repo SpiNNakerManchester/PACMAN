@@ -15,8 +15,8 @@ from pacman.model.constraints.partitioner_constraints import (
 
 def determine_max_atoms_for_vertex(vertex):
     """  returns the max atom constraint after assessing them all.
-    
-    :param vertex: the vertex to find max atoms of 
+
+    :param vertex: the vertex to find max atoms of
     :return: the max number of atoms per core
     """
     possible_max_atoms = list()
@@ -38,6 +38,7 @@ def determine_max_atoms_for_vertex(vertex):
         return int(min(possible_max_atoms))
     else:
         return vertex.n_atoms
+
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     """ Generate the machine edges for the vertices in the graph
