@@ -130,7 +130,7 @@ class FixedRouteRouter(object):
         eth_x = ethernet_connected_chip.x
         eth_y = ethernet_connected_chip.y
         down_links = set()
-        for (chip_x, chip_y) in machine.get_chips_on_board(
+        for (chip_x, chip_y) in machine.get_existing_xys_on_board(
                 ethernet_connected_chip):
             vertex = RoutingMachineVertex()
             graph.add_vertex(vertex)
@@ -174,7 +174,8 @@ class FixedRouteRouter(object):
             # bits of the real board
             fake_machine = virtual_machine(
                 machine.SIZE_X_OF_ONE_BOARD, machine.SIZE_Y_OF_ONE_BOARD,
-                False, down_chips=down_chips, down_links=down_links)
+                False, down_chips=down_chips, down_links=down_links,
+                validate=False)
 
         # build destination
         verts = graph.vertices
@@ -314,7 +315,7 @@ class FixedRouteRouter(object):
         """
         # Check for correct chips by counting them
         num_working_chips = len(list(
-            machine.get_chips_on_board(ethernet_connected_chip)))
+            machine.get_existing_xys_on_board(ethernet_connected_chip)))
         if (board_version in Machine.BOARD_VERSION_FOR_4_CHIPS
                 and num_working_chips != Machine.MAX_CHIPS_PER_4_CHIP_BOARD):
             return False
@@ -327,7 +328,7 @@ class FixedRouteRouter(object):
         for ethernet_chip in machine.ethernet_connected_chips:
             ethernet_chip_x = ethernet_chip.x
             ethernet_chip_y = ethernet_chip.y
-            for chip_x, chip_y in machine.get_chips_on_board(ethernet_chip):
+            for chip_x, chip_y in machine.get_existing_xys_on_board(ethernet_chip):
                 join_chip_x = chip_x - ethernet_chip_x
                 join_chip_y = chip_y - ethernet_chip_y
                 if (join_chip_x, join_chip_y) in joins:
