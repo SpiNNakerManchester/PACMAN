@@ -328,7 +328,8 @@ class FixedRouteRouter(object):
         for ethernet_chip in machine.ethernet_connected_chips:
             ethernet_chip_x = ethernet_chip.x
             ethernet_chip_y = ethernet_chip.y
-            for chip_x, chip_y in machine.get_existing_xys_on_board(ethernet_chip):
+            for chip_x, chip_y in machine.get_existing_xys_on_board(
+                    ethernet_chip):
                 join_chip_x = chip_x - ethernet_chip_x
                 join_chip_y = chip_y - ethernet_chip_y
                 if (join_chip_x, join_chip_y) in joins:
