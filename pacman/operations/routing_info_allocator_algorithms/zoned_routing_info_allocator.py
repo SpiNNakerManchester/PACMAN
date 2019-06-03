@@ -145,4 +145,4 @@ class ZonedRoutingInfoAllocator(object):
         return routing_infos
 
     def _bites_needed(self, size):
-        return math.ceil(math.log(size, 2))
+        return int(math.ceil(math.log(size, 2)))
