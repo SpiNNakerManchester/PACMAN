@@ -2,7 +2,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 
 
 class SharedEntry(object):
@@ -54,7 +54,7 @@ class ZonedRoutingTableGenerator(object):
 
     def _create_routing_table(self, chip, partitions_in_table, routing_infos,
                               graph_mapper, info_by_app_vertex):
-        table = MulticastRoutingTable(chip.x, chip.y)
+        table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
         partitions_by_app_vertex = DefaultOrderedDict(set)
         for partition in partitions_in_table:
             machine_vertex = partition.pre_vertex
