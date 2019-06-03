@@ -85,14 +85,14 @@ class ZonedRoutingInfoAllocator(object):
         self._max_partions = 0
         self._key_bites_per_app = dict()
         for app_vertex in progress.over(self._application_graph.vertices):
+            app_max_partions = 0
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
             for vertex in machine_vertices:
                 partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
+                app_max_partions = max(app_max_partions, len(partitions))
                 # Do we need to check type here
-                source_zones += len(partitions)
-                self._max_partions = max(self._max_partions, len(partitions))
                 max_keys = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
@@ -100,6 +100,8 @@ class ZonedRoutingInfoAllocator(object):
                             partition)
                         max_keys = max(max_keys, n_keys)
             if max_keys > 0:
+                self._max_partions = max(self._max_partions, app_max_partions)
+                source_zones += app_max_partions
                 key_bites = self._bites_needed(max_keys)
                 machine_bites = self._bites_needed(len(machine_vertices))
                 self._max_app_keys_bites = max(
@@ -117,6 +119,8 @@ class ZonedRoutingInfoAllocator(object):
         progress = ProgressBar(
             self._application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
+        by_app_vertex = dict()
+        app_mask = 2 ** 32 - 2 ** self._max_app_keys_bites
 
         source_index = 0
         for app_vertex in progress.over(self._application_graph.vertices):
@@ -138,9 +142,12 @@ class ZonedRoutingInfoAllocator(object):
                             base_key=key, mask=mask)])
                         info = PartitionRoutingInfo(keys_and_masks, partition)
                         routing_infos.add_partition_info(info)
+            app_key = key = source_index << self._max_app_keys_bites
+            by_app_vertex[app_vertex] = BaseKeyAndMask(
+                base_key=app_key, mask=app_mask)
             source_index += 1
 
-        return routing_infos
+        return routing_infos, by_app_vertex
 
     def _bites_needed(self, size):
         return int(math.ceil(math.log(size, 2)))
