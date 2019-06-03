@@ -5,7 +5,7 @@ except ImportError:
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
-    AbstractPlacerConstraint,EarConstraint)
+    AbstractPlacerConstraint)
 from pacman.model.resources import (
     ConstantSDRAM, ResourceContainer, DTCMResource, CPUCyclesPerTickResource)
 from pacman.utilities.utility_calls import (
@@ -276,7 +276,7 @@ class ResourceTracker(object):
         # These placement constraints are supported by the resource tracker
         placement_constraints = {
             ChipAndCoreConstraint, BoardConstraint,
-            RadialPlacementFromChipConstraint,EarConstraint
+            RadialPlacementFromChipConstraint
         }
         if additional_placement_constraints is not None:
             placement_constraints.update(additional_placement_constraints)
