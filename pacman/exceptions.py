@@ -256,3 +256,10 @@ class PacmanCanNotFindChipException(PacmanException):
         :type problem: str
         """
         super(PacmanCanNotFindChipException, self).__init__(problem)
+
+
+class MachineHasDisconnectedSubRegion(PacmanException):
+    """Some part of the machine has no paths connecting it to the rest of the
+    machine.
+    """
+    pass

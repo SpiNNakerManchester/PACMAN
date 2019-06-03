@@ -1,10 +1,47 @@
-from six import iteritems
+from pacman.operations.rig_algorithms.ner import do_route
+
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities.rig_converters import (
-    convert_from_rig_routes, convert_to_rig_graph_pure_mc,
-    convert_to_rig_machine, convert_to_rig_placements,
-    create_rig_machine_constraints, create_rig_graph_constraints)
-from rig.place_and_route.route.ner import route
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
+from pacman.operations.rig_algorithms.links import Links
+from pacman.operations.rig_algorithms.routing_tree import RoutingTree
+from pacman.operations.rig_algorithms.routes import Routes
+
+
+def convert_a_route(
+        routing_tables, partition, incoming_processor, incoming_link,
+        partition_route):
+    x, y = partition_route.chip
+
+    next_hops = list()
+    processor_ids = list()
+    link_ids = list()
+    for (route, next_hop) in partition_route.children:
+        if route is not None:
+            link = None
+            if isinstance(route, Routes):
+                if route.is_core:
+                    processor_ids.append(route.core_num)
+                else:
+                    link = route.value
+                    link_ids.append(link)
+            elif isinstance(route, Links):
+                link = route.value
+                link_ids.append(link)
+            if isinstance(next_hop, RoutingTree):
+                next_incoming_link = None
+                if link is not None:
+                    next_incoming_link = (link + 3) % 6
+                next_hops.append((next_hop, next_incoming_link))
+
+    entry = MulticastRoutingTableByPartitionEntry(
+        link_ids, processor_ids, incoming_processor, incoming_link)
+    routing_tables.add_path_entry(entry, x, y, partition)
+
+    for next_hop, next_incoming_link in next_hops:
+        convert_a_route(
+            routing_tables, partition, None, next_incoming_link, next_hop)
 
 
 class RigMCRoute(object):
@@ -13,36 +50,31 @@ class RigMCRoute(object):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps, placements):
-        progress_bar = ProgressBar(7, "Routing")
+    def __call__(self, machine_graph, machine, placements):
+        """
 
-        vertices_resources, nets, net_names = \
-            convert_to_rig_graph_pure_mc(machine_graph, plan_n_timesteps)
-        progress_bar.update()
+        :param machine_graph:
+        :param machine:
+        :param placements:  pacman.model.placements.placements.py
+        :return:
+        """
+        routing_tables = MulticastRoutingTableByPartition()
 
-        rig_machine = convert_to_rig_machine(machine)
-        progress_bar.update()
+        progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
 
-        rig_constraints = create_rig_machine_constraints(machine)
-        progress_bar.update()
+        for source_vertex in progress_bar.over(machine_graph.vertices):
+            # handle the vertex edges
+            for partition in machine_graph.\
+                    get_outgoing_edge_partitions_starting_at_vertex(
+                        source_vertex):
+                if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                    post_vertexes = list(
+                        e.post_vertex for e in partition.edges)
+                    routingtree = do_route(
+                        source_vertex, post_vertexes, machine, placements)
+                    convert_a_route(routing_tables, partition, 0, None,
+                                    routingtree)
 
-        rig_constraints.extend(create_rig_graph_constraints(
-            machine_graph, machine))
-        progress_bar.update()
-
-        rig_placements, rig_allocations = convert_to_rig_placements(
-            placements, machine)
-        progress_bar.update()
-
-        rig_routes = route(
-            vertices_resources, nets, rig_machine, rig_constraints,
-            rig_placements, rig_allocations, "cores")
-        rig_routes = {
-            name: rig_routes[net] for net, name in iteritems(net_names)}
-        progress_bar.update()
-
-        routes = convert_from_rig_routes(rig_routes)
-        progress_bar.update()
         progress_bar.end()
 
-        return routes
+        return routing_tables
