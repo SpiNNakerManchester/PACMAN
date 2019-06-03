@@ -105,12 +105,19 @@ class FixedRouteRouter(object):
             else:  # use router for avoiding dead chips
                 self._do_dynamic_routing(
                     fixed_route_tables, placements, ethernet_connected_chip,
-                    destination_class, machine, board_version)
+                    destination_class, machine)
         return fixed_route_tables
+
+    def __get_free_root_processor_id(self, machine, placements):
+        for p in range(machine.MAX_CORES_PER_CHIP):
+            if not placements.is_processor_occupied(0, 0, p):
+                return p
+        # Ought to throw an exception here; shouldn't happen
+        return machine.MAX_CORES_PER_CHIP
 
     def _do_dynamic_routing(
             self, fixed_route_tables, placements, ethernet_connected_chip,
-            destination_class, machine, board_version):
+            destination_class, machine):
         """ Uses a router to route fixed routes
 
         :param fixed_route_tables: fixed route tables entry holder
@@ -119,7 +126,6 @@ class FixedRouteRouter(object):
         :param destination_class: the class at the Ethernet connected chip\
             for receiving all these routes.
         :param machine: SpiNNMachine instance
-        :param board_version: The version of the machine
         :rtype: None
         """
         graph = MachineGraph(label="routing graph")
@@ -127,8 +133,8 @@ class FixedRouteRouter(object):
 
         # Create a fake machine consisting of only the one board that
         # the routes should go over
-        fake_machine = machine_factory.create_one_board_machine(
-            board_version, machine, ethernet_connected_chip)
+        fake_machine = machine_factory.create_one_board_submachine(
+            machine, ethernet_connected_chip)
 
         # build fake setup for the routing
         eth_x = ethernet_connected_chip.x
@@ -137,15 +143,9 @@ class FixedRouteRouter(object):
             vertex = RoutingMachineVertex()
             graph.add_vertex(vertex)
 
-            free_processor = 0
-            while ((free_processor < machine.MAX_CORES_PER_CHIP) and
-                   fake_placements.is_processor_occupied(
-                       x=self.FAKE_ETHERNET_CHIP_X,
-                       y=self.FAKE_ETHERNET_CHIP_Y,
-                       p=free_processor)):
-                free_processor += 1
-
-            rel_x, rel_y = machine.get_local_xy(machine.get_chip_at(*chip))
+            free_processor = self.__get_free_root_processor_id(
+                machine, fake_placements)
+            rel_x, rel_y = machine.get_local_xy(chip)
             fake_placements.add_placement(Placement(
                 x=rel_x, y=rel_y, p=free_processor, vertex=vertex))
 
@@ -153,8 +153,7 @@ class FixedRouteRouter(object):
         vertex_dest = RoutingMachineVertex()
         graph.add_vertex(vertex_dest)
         destination_processor = self._locate_destination(
-            ethernet_chip_x=ethernet_connected_chip.x,
-            ethernet_chip_y=ethernet_connected_chip.y,
+            ethernet_chip_x=eth_x, ethernet_chip_y=eth_y,
             destination_class=destination_class,
             placements=placements)
         fake_placements.add_placement(Placement(
@@ -287,7 +286,7 @@ class FixedRouteRouter(object):
         """
         # Check for correct chips by counting them
         num_working_chips = len(list(
-            machine.get_chips_on_board(ethernet_connected_chip)))
+            machine.get_existing_xys_on_board(ethernet_connected_chip)))
         if (board_version in Machine.BOARD_VERSION_FOR_4_CHIPS
                 and num_working_chips != Machine.MAX_CHIPS_PER_4_CHIP_BOARD):
             return False
@@ -300,7 +299,8 @@ class FixedRouteRouter(object):
         for ethernet_chip in machine.ethernet_connected_chips:
             ethernet_chip_x = ethernet_chip.x
             ethernet_chip_y = ethernet_chip.y
-            for chip_x, chip_y in machine.get_chips_on_board(ethernet_chip):
+            for chip_x, chip_y in machine.get_existing_xys_on_board(
+                    ethernet_chip):
                 join_chip_x = chip_x - ethernet_chip_x
                 join_chip_y = chip_y - ethernet_chip_y
                 if (join_chip_x, join_chip_y) in joins:

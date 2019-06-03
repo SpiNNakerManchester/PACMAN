@@ -384,7 +384,8 @@ class ResourceTracker(object):
         if chips is not None:
             area_code = None
             if eth_chip is not None:
-                area_code = set(self._machine.get_chips_on_board(eth_chip))
+                area_code = set(self._machine.get_existing_xys_on_board(
+                    eth_chip))
             chip_found = False
             for (x, y) in chips:
                 if ((area_code is None or (x, y) in area_code) and
@@ -398,7 +399,7 @@ class ResourceTracker(object):
                     "{} and {}".format(chips, board_address),
                     "No valid chips found on the specified board")
         elif board_address is not None:
-            for (x, y) in self._machine.get_chips_on_board(eth_chip):
+            for (x, y) in self._machine.get_existing_xys_on_board(eth_chip):
                 if self._chip_available(x, y):
                     yield (x, y)
         else:
@@ -1319,7 +1320,7 @@ class ResourceTracker(object):
                     "Unrecognised board address")
             eth_chip = self._machine.get_chip_at(
                 *self._ethernet_chips[board_address])
-            area_code = set(self._machine.get_chips_on_board(eth_chip))
+            area_code = set(self._machine.get_existing_xys_on_board(eth_chip))
 
         (x, y, p) = self.get_chip_and_core(constraints)
         if x is not None and y is not None:
