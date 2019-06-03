@@ -88,12 +88,12 @@ class ZonedRoutingInfoAllocator(object):
             app_max_partions = 0
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
+            max_keys = 0
             for vertex in machine_vertices:
                 partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 app_max_partions = max(app_max_partions, len(partitions))
                 # Do we need to check type here
-                max_keys = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
                         n_keys = self._n_keys_map.n_keys_for_partition(
