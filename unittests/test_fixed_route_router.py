@@ -2,6 +2,7 @@ import pytest
 from spinn_machine import virtual_machine
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import FixedRouteRouter
+# pylint: disable=protected-access
 
 
 class DestinationVertex(object):
@@ -45,8 +46,9 @@ def test_all_working(
         width, height, version, board_version,
         with_down_links, with_down_chips):
     router = FixedRouteRouter()
+    router._board_version = board_version
 
-    joins, _ = router._get_joins_paths(board_version)
+    joins, _ = router._get_joins_paths()
     temp_machine = virtual_machine(
         width=width, height=height, version=version)
     down_links = None
@@ -63,6 +65,7 @@ def test_all_working(
     machine = virtual_machine(
         width=width, height=height, version=version,
         down_links=down_links, down_chips=down_chips)
+    router._machine = machine
 
     ethernet_chips = machine.ethernet_connected_chips
     placements = Placements(
@@ -71,7 +74,7 @@ def test_all_working(
 
     for ethernet_chip in ethernet_chips:
         uses_simple_routes = router._detect_failed_chips_on_board(
-            machine, ethernet_chip, board_version)
+            ethernet_chip)
         assert((with_down_chips or with_down_links) != uses_simple_routes)
 
     fixed_route_tables = router(
@@ -92,11 +95,11 @@ if __name__ == '__main__':
         (False, False),
         (True, False),
         (False, True)]
-    for (x, y) in iterations:
-        test_all_working(2, 2, None, 3, x, y)
-        test_all_working(2, 2,  None, 3, x, y)
-        test_all_working(None, None, 3, 3, x, y)
-        test_all_working(8, 8, None, 5, x, y)
-        test_all_working(None, None, 5, 5, x, y)
-        test_all_working(12, 12, None, 5, x, y)
-        test_all_working(16, 16, None, 5, x, y)
+    for (_x, _y) in iterations:
+        test_all_working(2, 2, None, 3, _x, _y)
+        test_all_working(2, 2,  None, 3, _x, _y)
+        test_all_working(None, None, 3, 3, _x, _y)
+        test_all_working(8, 8, None, 5, _x, _y)
+        test_all_working(None, None, 5, 5, _x, _y)
+        test_all_working(12, 12, None, 5, _x, _y)
+        test_all_working(16, 16, None, 5, _x, _y)
