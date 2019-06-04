@@ -181,8 +181,6 @@ def test_convert_to_file_placement(tmpdir):
         ident(v): [1, 2]}
     assert obj == baseline
 
-"""
-Broken and not worth fixing
 def test_create_constraints_to_file(tmpdir):
     # Construct the sample machine and graph
     machine = virtual_machine(version=3)
@@ -232,7 +230,7 @@ def test_create_constraints_to_file(tmpdir):
             "type": "location",
             "location": [0, 0], "vertex": v1_id}]
     assert obj == baseline
-"""
+
 
 def test_convert_to_memory_multi_cast_routes(tmpdir):
     algo = ConvertToMemoryMultiCastRoutes()

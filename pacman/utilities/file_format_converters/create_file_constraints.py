@@ -1,5 +1,6 @@
 import json
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import Router
 from pacman.model.graphs import AbstractVirtualVertex
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, AbstractPlacerConstraint)
@@ -91,9 +92,8 @@ class CreateConstraintsToFile(object):
             raise PacmanConfigurationException(
                 "Can't find the real chip this virtual chip is connected to."
                 "Please fix and try again.")
-        raise NotImplementedError("Need to find a new way to get the direction")
         return ([link.destination_x, link.destination_y],
-                )
+                Router.opposite(link.source_link_id))
 
     @staticmethod
     def _handle_vertex_constraint(constraint, json_obj, vertex, vertex_id):
