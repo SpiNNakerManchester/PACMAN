@@ -1,7 +1,6 @@
 import unittest
 from spinn_machine import (
-    virtual_machine, Chip, Router, SDRAM)
-from spinn_machine.machine_factory import machine_from_chips
+    virtual_machine, Chip, Router, SDRAM, machine_from_chips)
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer,
     CoreResource, SpecificCoreResource)

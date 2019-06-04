@@ -4,8 +4,7 @@ test for partitioning
 from __future__ import division
 import unittest
 from spinn_machine import (
-    Processor, SDRAM, Link, Router, Chip, virtual_machine)
-from spinn_machine.machine_factory import machine_from_chips
+    Processor, SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
     PacmanPartitionException, PacmanInvalidParameterException,
