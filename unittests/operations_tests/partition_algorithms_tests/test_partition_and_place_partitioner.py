@@ -42,23 +42,22 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_edges(self.edges, "foo")
 
         flops = 200000000
-        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
             processors.append(Processor(i, flops))
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1, s, s))
+        links.append(Link(0, 0, 0, 0, 1))
 
         _sdram = SDRAM(128 * (2**20))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1, n, n))
-        links.append(Link(0, 1, 1, 1, 0, s, s))
-        links.append(Link(1, 1, 2, 0, 0, e, e))
-        links.append(Link(1, 0, 3, 0, 1, w, w))
+        links.append(Link(0, 0, 0, 1, 1))
+        links.append(Link(0, 1, 1, 1, 0))
+        links.append(Link(1, 1, 2, 0, 0))
+        links.append(Link(1, 0, 3, 0, 1))
         r = Router(links, False, 100, 1024)
 
         ip = "192.162.240.253"
@@ -152,16 +151,16 @@ class TestBasicPartitioner(unittest.TestCase):
             processors.append(Processor(i, flops))
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1, s, s))
+        links.append(Link(0, 0, 0, 0, 1))
 
         _sdram = SDRAM(2**12)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1, n, n))
-        links.append(Link(0, 1, 1, 1, 0, s, s))
-        links.append(Link(1, 1, 2, 0, 0, e, e))
-        links.append(Link(1, 0, 3, 0, 1, w, w))
+        links.append(Link(0, 0, 0, 1, 1))
+        links.append(Link(0, 1, 1, 1, 0))
+        links.append(Link(1, 1, 2, 0, 0))
+        links.append(Link(1, 0, 3, 0, 1))
         r = Router(links, False, 100, 1024)
 
         ip = "192.162.240.253"
@@ -198,16 +197,16 @@ class TestBasicPartitioner(unittest.TestCase):
             processors.append(Processor(i, flops))
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1, s, s))
+        links.append(Link(0, 0, 0, 0, 1))
 
         _sdram = SDRAM(2**11)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1, n, n))
-        links.append(Link(0, 1, 1, 1, 0, s, s))
-        links.append(Link(1, 1, 2, 0, 0, e, e))
-        links.append(Link(1, 0, 3, 0, 1, w, w))
+        links.append(Link(0, 0, 0, 1, 1))
+        links.append(Link(0, 1, 1, 1, 0))
+        links.append(Link(1, 1, 2, 0, 0))
+        links.append(Link(1, 0, 3, 0, 1))
         r = Router(links, False, 100, 1024)
 
         ip = "192.162.240.253"
@@ -242,16 +241,16 @@ class TestBasicPartitioner(unittest.TestCase):
             processors.append(Processor(i, flops))
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1, s, s))
+        links.append(Link(0, 0, 0, 0, 1))
 
         _sdram = SDRAM(128 * (2**19))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1, n, n))
-        links.append(Link(0, 1, 1, 1, 0, s, s))
-        links.append(Link(1, 1, 2, 0, 0, e, e))
-        links.append(Link(1, 0, 3, 0, 1, w, w))
+        links.append(Link(0, 0, 0, 1, 1))
+        links.append(Link(0, 1, 1, 1, 0))
+        links.append(Link(1, 1, 2, 0, 0))
+        links.append(Link(1, 0, 3, 0, 1))
         r = Router(links, False, 100, 1024)
 
         ip = "192.162.240.253"
@@ -280,16 +279,16 @@ class TestBasicPartitioner(unittest.TestCase):
             processors.append(Processor(i, flops))
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1, s, s))
+        links.append(Link(0, 0, 0, 0, 1))
 
         _sdram = SDRAM(128 * (2**21))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1, n, n))
-        links.append(Link(0, 1, 1, 1, 0, s, s))
-        links.append(Link(1, 1, 2, 0, 0, e, e))
-        links.append(Link(1, 0, 3, 0, 1, w, w))
+        links.append(Link(0, 0, 0, 1, 1))
+        links.append(Link(0, 1, 1, 1, 0))
+        links.append(Link(1, 1, 2, 0, 0))
+        links.append(Link(1, 0, 3, 0, 1))
         r = Router(links, False, 100, 1024)
 
         ip = "192.162.240.253"
