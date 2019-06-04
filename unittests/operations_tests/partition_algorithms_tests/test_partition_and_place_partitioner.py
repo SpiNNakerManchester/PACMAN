@@ -4,7 +4,8 @@ test for partitioning
 from __future__ import division
 import unittest
 from spinn_machine import (
-    Machine, Processor, SDRAM, Link, Router, Chip, VirtualMachine)
+    Processor, SDRAM, Link, Router, Chip, virtual_machine)
+from spinn_machine.machine_factory import machine_from_chips
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
     PacmanPartitionException, PacmanInvalidParameterException,
@@ -64,9 +65,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         self.bp = PartitionAndPlacePartitioner()
 
     def test_partition_with_no_additional_constraints(self):
@@ -164,9 +168,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         singular_vertex = SimpleTestVertex(450, "Large vertex",
                                            max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
@@ -207,9 +214,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
                                         max_atoms_per_core=1)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
@@ -248,9 +258,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
 
     def test_partition_with_more_sdram_than_default(self):
@@ -283,9 +296,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
 
     def test_partition_with_unsupported_constraints(self):
@@ -390,7 +406,7 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex_2.add_constraint(SameAtomsAsVertexConstraint(
             vertex_1))
         graph.add_vertices([vertex_1, vertex_2, vertex_3])
-        machine = VirtualMachine(version=3, with_wrap_arounds=None)
+        machine = virtual_machine(version=3)
         partitioner = PartitionAndPlacePartitioner()
         _, graph_mapper, _ = partitioner(graph, machine, plan_n_timesteps=None)
         subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
@@ -449,7 +465,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # but 1MB off 2MB per chip (so 19MB per chip)
         n_cores_per_chip = 10
         sdram_per_chip = (n_cores_per_chip * 2) - 1
-        machine = VirtualMachine(
+        machine = virtual_machine(
             width=2, height=2, with_monitors=False,
             n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
@@ -479,7 +495,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # and 8MB SDRAM per chip
         n_cores_per_chip = 1
         sdram_per_chip = 8
-        machine = VirtualMachine(
+        machine = virtual_machine(
             width=2, height=2, with_monitors=False,
             n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
