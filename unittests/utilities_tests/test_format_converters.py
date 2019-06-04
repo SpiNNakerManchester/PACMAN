@@ -81,6 +81,7 @@ def test_convert_to_file_machine_graph_pure_multicast(tmpdir):
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"}}}
     assert obj == baseline
 
+
 def test_convert_to_file_machine_graph(tmpdir):
     # Construct the sample graph
     graph = MachineGraph("foo")
@@ -131,6 +132,7 @@ def test_convert_to_file_machine_graph(tmpdir):
                 "weight": 1.0, "type": "FAKE_TAG_EDGE"}}}
     assert obj == baseline
 
+
 def test_convert_to_file_machine(tmpdir):
     # Construct the sample machine
     machine = virtual_machine(version=3)
@@ -168,6 +170,7 @@ def test_convert_to_file_machine(tmpdir):
          "height": 2, "width": 2}
     assert fix_cre(obj) == fix_cre(baseline)
 
+
 def test_convert_to_file_placement(tmpdir):
     v = SimpleMachineVertex(ResourceContainer())
     pl = Placement(v, 1, 2, 3)
@@ -180,6 +183,7 @@ def test_convert_to_file_placement(tmpdir):
     baseline = {
         ident(v): [1, 2]}
     assert obj == baseline
+
 
 def test_create_constraints_to_file(tmpdir):
     # Construct the sample machine and graph
