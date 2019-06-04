@@ -1,6 +1,6 @@
 from six import itervalues
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import FixedRouteEntry, Machine, machine_factory
+from spinn_machine import FixedRouteEntry, Machine, virtual_submachine
 from pacman.model.graphs.machine import (
     MachineVertex, MachineGraph, MachineEdge)
 from pacman.model.placements import Placements, Placement
@@ -124,8 +124,7 @@ class FixedRouteRouter(object):
 
         # Create a fake machine consisting of only the one board that
         # the routes should go over
-        fake_machine = machine_factory.create_one_board_submachine(
-            self._machine, ethernet_chip)
+        fake_machine = virtual_submachine(self._machine, ethernet_chip)
 
         # build fake setup for the routing
         eth_x = ethernet_chip.x
