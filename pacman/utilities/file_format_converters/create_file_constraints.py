@@ -91,8 +91,9 @@ class CreateConstraintsToFile(object):
             raise PacmanConfigurationException(
                 "Can't find the real chip this virtual chip is connected to."
                 "Please fix and try again.")
+        raise NotImplementedError("Need to find a new way to get the direction")
         return ([link.destination_x, link.destination_y],
-                link.multicast_default_from)
+                )
 
     @staticmethod
     def _handle_vertex_constraint(constraint, json_obj, vertex, vertex_id):
