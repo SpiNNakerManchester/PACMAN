@@ -7,13 +7,13 @@ from pacman.model.graphs.machine import (
 from pacman.operations.chip_id_allocator_algorithms import (
     MallocBasedChipIdAllocator)
 
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 
 
 @pytest.mark.parametrize(
     "placer", [OneToOnePlacer(), BasicPlacer(), RadialPlacer()])
 def test_virtual_placement(placer):
-    machine = VirtualMachine(version=5)
+    machine = virtual_machine(version=5)
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)

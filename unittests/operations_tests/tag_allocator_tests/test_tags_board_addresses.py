@@ -4,7 +4,7 @@ try:
     from collections.abc import defaultdict
 except ImportError:
     from collections import defaultdict
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, IPtagResource
@@ -16,7 +16,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """
 
     def test_ip_tags(self):
-        machine = VirtualMachine(12, 12, with_wrap_arounds=True)
+        machine = virtual_machine(12, 12)
         eth_chips = machine.ethernet_connected_chips
         vertices = [
             SimpleMachineVertex(
@@ -47,7 +47,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
     def test_too_many_ip_tags_for_1_board(self):
         n_extra_vertices = 3
-        machine = VirtualMachine(12, 12, with_wrap_arounds=True)
+        machine = virtual_machine(12, 12)
         eth_chips = machine.ethernet_connected_chips
         eth_chip = eth_chips[0]
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
