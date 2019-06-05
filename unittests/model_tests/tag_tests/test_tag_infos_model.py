@@ -48,7 +48,7 @@ class TestTagsModel(unittest.TestCase):
         tag_info.add_ip_tag(iptag, machine_vertex)
 
         gotton_tag = tag_info.get_ip_tags_for_vertex(machine_vertex)
-        self.assertEqual(gotton_tag[0], iptag)
+        self.assertEquals(gotton_tag[0], iptag)
 
     def test_add_iptag_then_fail_to_locate(self):
         """
@@ -61,7 +61,7 @@ class TestTagsModel(unittest.TestCase):
         tag_info.add_ip_tag(iptag, machine_vertex)
 
         gotton_tag = tag_info.get_ip_tags_for_vertex(machine_vertex_2)
-        self.assertEqual(gotton_tag, None)
+        self.assertEquals(gotton_tag, None)
 
     def test_add_reverse_iptag_then_locate_tag(self):
         """
@@ -74,7 +74,7 @@ class TestTagsModel(unittest.TestCase):
         tag_info.add_reverse_ip_tag(reverse_iptag, machine_vertex)
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(
             machine_vertex)
-        self.assertEqual(gotton_tag[0], reverse_iptag)
+        self.assertEquals(gotton_tag[0], reverse_iptag)
 
     def test_add_reverse_iptag_then_not_locate_tag(self):
         """
@@ -88,7 +88,7 @@ class TestTagsModel(unittest.TestCase):
         tag_info.add_reverse_ip_tag(reverse_iptag, machine_vertex2)
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(
             machine_vertex)
-        self.assertEqual(gotton_tag, None)
+        self.assertEquals(gotton_tag, None)
 
     def test_add_conflicting_ip_tag(self):
         tags = Tags()

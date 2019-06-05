@@ -18,10 +18,10 @@ class TestPlacement(unittest.TestCase):
         """
         subv = SimpleMachineVertex(None, "")
         pl = Placement(subv, 0, 0, 1)
-        self.assertEqual(pl.x, 0)
-        self.assertEqual(pl.y, 0)
-        self.assertEqual(pl.p, 1)
-        self.assertEqual(subv, pl.vertex)
+        self.assertEquals(pl.x, 0)
+        self.assertEquals(pl.y, 0)
+        self.assertEquals(pl.p, 1)
+        self.assertEquals(subv, pl.vertex)
 
     def test_create_new_placements_duplicate_vertex(self):
         """

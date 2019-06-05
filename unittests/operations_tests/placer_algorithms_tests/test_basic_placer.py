@@ -84,8 +84,8 @@ class TestBasicPlacer(unittest.TestCase):
     @unittest.skip("demonstrating skipping")
     def test_new_basic_placer(self):
         self.bp = BasicPlacer(self.machine, self.graph)
-        self.assertEqual(self.bp._machine, self.machine)
-        self.assertEqual(self.bp._graph, self.graph)
+        self.assertEquals(self.bp._machine, self.machine)
+        self.assertEquals(self.bp._graph, self.graph)
 
     @unittest.skip("demonstrating skipping")
     def test_place_where_vertices_dont_have_vertex(self):
@@ -122,7 +122,7 @@ class TestBasicPlacer(unittest.TestCase):
 
     @unittest.skip("demonstrating skipping")
     def test_try_to_place(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
@@ -172,15 +172,15 @@ class TestBasicPlacer(unittest.TestCase):
 
     @unittest.skip("demonstrating skipping")
     def test_unsupported_non_placer_constraint(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("demonstrating skipping")
     def test_unsupported_placer_constraint(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("demonstrating skipping")
     def test_unsupported_placer_constraints(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("demonstrating skipping")
     def test_many_vertices(self):

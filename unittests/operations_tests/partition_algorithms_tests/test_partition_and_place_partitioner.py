@@ -78,11 +78,11 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         graph, mapper, _ = self.bp(self.graph, self.machine,
                                    PreAllocatedResourceContainer())
-        self.assertEqual(len(list(graph.vertices)), 3)
+        self.assertEquals(len(list(graph.vertices)), 3)
         vert_sizes = []
         for vert in self.verts:
             vert_sizes.append(vert.n_atoms)
-        self.assertEqual(len(list(graph.edges)), 3)
+        self.assertEquals(len(list(graph.edges)), 3)
         for vertex in graph.vertices:
             self.assertIn(mapper.get_slice(vertex).n_atoms, vert_sizes)
 
@@ -94,8 +94,8 @@ class TestBasicPartitioner(unittest.TestCase):
             ApplicationEdge(self.vert3, self.vert1), "TEST")
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
-        self.assertEqual(len(list(graph.vertices)), 3)
-        self.assertEqual(len(list(graph.edges)), 4)
+        self.assertEquals(len(list(graph.vertices)), 3)
+        self.assertEquals(len(list(graph.edges)), 4)
 
     def test_partition_on_large_vertex_than_has_to_be_split(self):
         """
@@ -107,7 +107,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
 
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
@@ -117,12 +117,12 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = SimpleTestVertex(500, "Large vertex")
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
@@ -136,7 +136,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
-        self.assertEqual(len(list(graph.vertices)), 100)
+        self.assertEquals(len(list(graph.vertices)), 100)
 
     def test_partition_with_barely_sufficient_space(self):
         """
@@ -175,13 +175,13 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = machine_from_chips(chips)
         singular_vertex = SimpleTestVertex(450, "Large vertex",
                                            max_atoms_per_core=1)
-        self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
+        self.assertEquals(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
-        self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.assertEqual(len(list(graph.vertices)), 450)
+        self.assertEquals(singular_vertex._model_based_max_atoms_per_core, 1)
+        self.assertEquals(len(list(graph.vertices)), 450)
 
     def test_partition_with_insufficient_space(self):
         """
@@ -221,7 +221,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
                                         max_atoms_per_core=1)
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         with self.assertRaises(PacmanValueError):
@@ -325,7 +325,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("foo")
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
-        self.assertEqual(len(list(graph.vertices)), 0)
+        self.assertEquals(len(list(graph.vertices)), 0)
 
     def test_operation_with_same_size_as_vertex_constraint(self):
         """
@@ -340,7 +340,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
                                   PreAllocatedResourceContainer())
-        self.assertEqual(len(list(graph.vertices)), 4)
+        self.assertEquals(len(list(graph.vertices)), 4)
 
     def test_operation_with_same_size_as_vertex_constraint_large_vertices(
             self):
@@ -357,7 +357,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         graph, _, _ = partitioner(self.graph, self.machine,
                                   PreAllocatedResourceContainer())
-        self.assertEqual(len(list(graph.vertices)), 7)
+        self.assertEquals(len(list(graph.vertices)), 7)
 
     def test_operation_same_size_as_vertex_constraint_different_order(self):
         """
@@ -375,7 +375,7 @@ class TestBasicPartitioner(unittest.TestCase):
         graph, _, _ = partitioner(self.graph, self.machine,
                                   PreAllocatedResourceContainer())
         # split in 256 each, so 4 machine vertices
-        self.assertEqual(len(list(graph.vertices)), 7)
+        self.assertEquals(len(list(graph.vertices)), 7)
 
     def test_operation_with_same_size_as_vertex_constraint_exception(self):
         """
@@ -411,8 +411,8 @@ class TestBasicPartitioner(unittest.TestCase):
         subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
         subvertices_2 = list(graph_mapper.get_machine_vertices(vertex_2))
         subvertices_3 = list(graph_mapper.get_machine_vertices(vertex_3))
-        self.assertEqual(len(subvertices_1), len(subvertices_2))
-        self.assertEqual(len(subvertices_2), len(subvertices_3))
+        self.assertEquals(len(subvertices_1), len(subvertices_2))
+        self.assertEquals(len(subvertices_2), len(subvertices_3))
 
     def test_partitioning_with_2_massive_pops(self):
         self.setup()
@@ -425,35 +425,35 @@ class TestBasicPartitioner(unittest.TestCase):
 
     @unittest.skip("Test not implemented yet")
     def test_detect_subclass_hierarchy(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("Test not implemented yet")
     def test_partition_by_atoms(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("Test not implemented yet")
     def test_scale_down_resource_usage(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("Test not implemented yet")
     def test_scale_up_resource_usage(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("Test not implemented yet")
     def test_find_max_ratio(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("Test not implemented yet")
     def test_locate_vertices_to_partition_now(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("Test not implemented yet")
     def test_partition_with_supported_constraints_enough_space(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     @unittest.skip("Test not implemented yet")
     def test_partition_with_supported_constraints_not_enough_space(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        self.assertEquals(True, False, "Test not implemented yet")
 
     def test_partition_with_fixed_atom_constraints(self):
         """

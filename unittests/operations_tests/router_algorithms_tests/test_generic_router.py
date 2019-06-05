@@ -256,23 +256,23 @@ class TestRouter(unittest.TestCase):
     def test_new_router(self):
         report_folder = "..\reports"
         self.routing = BasicDijkstraRouting()
-        self.assertEqual(self.routing._report_folder, report_folder)
-        self.assertEqual(self.routing._graph, None)
-        self.assertEqual(self.routing.report_states, None)
-        self.assertEqual(self.routing._hostname, None)
+        self.assertEquals(self.routing._report_folder, report_folder)
+        self.assertEquals(self.routing._graph, None)
+        self.assertEquals(self.routing.report_states, None)
+        self.assertEquals(self.routing._hostname, None)
         self.assertIsInstance(self.routing._router_algorithm,
                               BasicDijkstraRouting)
-        self.assertEqual(self.routing._graph_mappings, None)
+        self.assertEquals(self.routing._graph_mappings, None)
 
     @unittest.skip("demonstrating skipping")
     def test_new_router_set_non_default_routing_algorithm(self):
         report_folder = "..\reports"
         self.routing = BasicDijkstraRouting()
-        self.assertEqual(self.routing._report_folder, report_folder)
-        self.assertEqual(self.routing._graph, None)
-        self.assertEqual(self.routing.report_states, None)
-        self.assertEqual(self.routing._hostname, None)
-        self.assertEqual(self.routing._graph_mappings, None)
+        self.assertEquals(self.routing._report_folder, report_folder)
+        self.assertEquals(self.routing._graph, None)
+        self.assertEquals(self.routing.report_states, None)
+        self.assertEquals(self.routing._hostname, None)
+        self.assertEquals(self.routing._graph_mappings, None)
 
     @unittest.skip("demonstrating skipping")
     def test_run_router(self):

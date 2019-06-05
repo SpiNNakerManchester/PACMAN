@@ -23,14 +23,14 @@ class MyTestCase(unittest.TestCase):
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
         print(allocator._free_space_tracker)
-        self.assertEqual(len(allocator._free_space_tracker), 2, error)
-        self.assertEqual(allocator._free_space_tracker[0].start_address, 0,
+        self.assertEquals(len(allocator._free_space_tracker), 2, error)
+        self.assertEquals(allocator._free_space_tracker[0].start_address, 0,
                          error)
-        self.assertEqual(allocator._free_space_tracker[0].size, 2048,
+        self.assertEquals(allocator._free_space_tracker[0].size, 2048,
                          error)
-        self.assertEqual(allocator._free_space_tracker[1].start_address,
+        self.assertEquals(allocator._free_space_tracker[1].start_address,
                          0x1000, error)
-        self.assertEqual(allocator._free_space_tracker[1].size, 0xFFFFF000,
+        self.assertEquals(allocator._free_space_tracker[1].size, 0xFFFFF000,
                          error)
 
     def _print_keys_and_masks(self, keys_and_masks):
@@ -45,10 +45,10 @@ class MyTestCase(unittest.TestCase):
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
         print(allocator._free_space_tracker)
-        self.assertEqual(len(allocator._free_space_tracker), 1, error)
-        self.assertEqual(allocator._free_space_tracker[0].start_address, 0x100,
+        self.assertEquals(len(allocator._free_space_tracker), 1, error)
+        self.assertEquals(allocator._free_space_tracker[0].start_address, 0x100,
                          error)
-        self.assertEqual(allocator._free_space_tracker[0].size, 0xFFFFFF00,
+        self.assertEquals(allocator._free_space_tracker[0].size, 0xFFFFFF00,
                          error)
 
     def test_allocate_n_keys(self):
@@ -58,10 +58,10 @@ class MyTestCase(unittest.TestCase):
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
         print(allocator._free_space_tracker)
-        self.assertEqual(len(allocator._free_space_tracker), 1, error)
-        self.assertEqual(allocator._free_space_tracker[0].start_address, 32,
+        self.assertEquals(len(allocator._free_space_tracker), 1, error)
+        self.assertEquals(allocator._free_space_tracker[0].start_address, 32,
                          error)
-        self.assertEqual(allocator._free_space_tracker[0].size,
+        self.assertEquals(allocator._free_space_tracker[0].size,
                          0x100000000 - 32, error)
 
     def test_allocate_mixed_keys(self):
@@ -84,18 +84,18 @@ class MyTestCase(unittest.TestCase):
 
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
-        self.assertEqual(len(allocator._free_space_tracker), 3, error)
-        self.assertEqual(allocator._free_space_tracker[0].start_address,
+        self.assertEquals(len(allocator._free_space_tracker), 3, error)
+        self.assertEquals(allocator._free_space_tracker[0].start_address,
                          0x120, error)
-        self.assertEqual(allocator._free_space_tracker[0].size,
+        self.assertEquals(allocator._free_space_tracker[0].size,
                          224, error)
-        self.assertEqual(allocator._free_space_tracker[1].start_address,
+        self.assertEquals(allocator._free_space_tracker[1].start_address,
                          0x300, error)
-        self.assertEqual(allocator._free_space_tracker[1].size,
+        self.assertEquals(allocator._free_space_tracker[1].size,
                          1280, error)
-        self.assertEqual(allocator._free_space_tracker[2].start_address,
+        self.assertEquals(allocator._free_space_tracker[2].start_address,
                          0x1800, error)
-        self.assertEqual(allocator._free_space_tracker[2].size,
+        self.assertEquals(allocator._free_space_tracker[2].size,
                          0x100000000 - 0x1800, error)
 
     def _integration_setup(self):
@@ -158,11 +158,11 @@ class MyTestCase(unittest.TestCase):
         edge4_key = results.get_first_key_for_edge(e4)
         edge5_key = results.get_first_key_for_edge(e5)
 
-        self.assertEqual(edge1_key, key)
-        self.assertEqual(edge2_key, key)
-        self.assertEqual(edge3_key, key)
-        self.assertEqual(edge4_key, key)
-        self.assertEqual(edge5_key, key)
+        self.assertEquals(edge1_key, key)
+        self.assertEquals(edge2_key, key)
+        self.assertEquals(edge3_key, key)
+        self.assertEquals(edge4_key, key)
+        self.assertEquals(edge5_key, key)
 
     def test_share_key_with_conflicting_fixed_key_on_partitions(self):
         machine_graph, n_keys_map, v1, v2, _v3, _v4, _e1, _e2, _e3, _e4 = \
@@ -206,10 +206,10 @@ class MyTestCase(unittest.TestCase):
         edge3_key = results.get_first_key_for_edge(e3)
         edge4_key = results.get_first_key_for_edge(e4)
 
-        self.assertEqual(key, 25)
-        self.assertEqual(edge1_key, key)
-        self.assertEqual(edge2_key, key)
-        self.assertEqual(edge3_key, key)
+        self.assertEquals(key, 25)
+        self.assertEquals(edge1_key, key)
+        self.assertEquals(edge2_key, key)
+        self.assertEquals(edge3_key, key)
         self.assertNotEqual(edge4_key, key)
 
     def test_share_key_with_fixed_key_on_new_partitions(self):
@@ -235,10 +235,10 @@ class MyTestCase(unittest.TestCase):
         edge3_key = results.get_first_key_for_edge(e3)
         edge4_key = results.get_first_key_for_edge(e4)
 
-        self.assertEqual(key, 25)
-        self.assertEqual(edge1_key, key)
-        self.assertEqual(edge2_key, key)
-        self.assertEqual(edge3_key, key)
+        self.assertEquals(key, 25)
+        self.assertEquals(edge1_key, key)
+        self.assertEquals(edge2_key, key)
+        self.assertEquals(edge3_key, key)
         self.assertNotEqual(edge4_key, key)
 
     def test_share_key_on_own_partition(self):
@@ -262,10 +262,10 @@ class MyTestCase(unittest.TestCase):
         edge3_key = results.get_first_key_for_edge(e3)
         edge4_key = results.get_first_key_for_edge(e4)
 
-        self.assertEqual(edge1_key, key)
-        self.assertEqual(edge2_key, key)
+        self.assertEquals(edge1_key, key)
+        self.assertEquals(edge2_key, key)
         self.assertNotEqual(edge3_key, key)
-        self.assertEqual(edge4_key, key)
+        self.assertEquals(edge4_key, key)
 
     def test_share_key_on_new_partitions(self):
         machine_graph, n_keys_map, v1, v2, _v3, _v4, e1, e2, e3, e4 = \
@@ -288,9 +288,9 @@ class MyTestCase(unittest.TestCase):
         edge3_key = results.get_first_key_for_edge(e3)
         edge4_key = results.get_first_key_for_edge(e4)
 
-        self.assertEqual(edge1_key, key)
-        self.assertEqual(edge2_key, key)
-        self.assertEqual(edge3_key, key)
+        self.assertEquals(edge1_key, key)
+        self.assertEquals(edge2_key, key)
+        self.assertEquals(edge3_key, key)
         self.assertNotEqual(edge4_key, key)
 
     def test_no_share_key_on_partitions(self):
@@ -309,8 +309,8 @@ class MyTestCase(unittest.TestCase):
         edge3_key = results.get_first_key_for_edge(e3)
         edge4_key = results.get_first_key_for_edge(e4)
 
-        self.assertEqual(edge1_key, key)
-        self.assertEqual(edge2_key, key)
+        self.assertEquals(edge1_key, key)
+        self.assertEquals(edge2_key, key)
         self.assertNotEqual(edge3_key, key)
         self.assertNotEqual(edge4_key, key)
 

@@ -45,7 +45,7 @@ class MyTestCase(unittest.TestCase):
                 vertex, "Test")
             entry = routing_paths.get_entry_on_coords_for_edge(
                 partition, placement.x, placement.y)
-            self.assertEqual(entry.incoming_processor, placement.p)
+            self.assertEquals(entry.incoming_processor, placement.p)
             queue.append((placement.x, placement.y))
             while len(queue) > 0:
                 x, y = queue.pop()

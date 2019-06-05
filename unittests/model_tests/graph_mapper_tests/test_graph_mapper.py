@@ -88,13 +88,13 @@ class TestGraphMapper(unittest.TestCase):
         vertex_slice = Slice(2, 3)
         graph_mapper.add_vertex_mapping(vertex2, vertex_slice, vert)
 
-        self.assertEqual(
+        self.assertEquals(
             vert, graph_mapper.get_application_vertex(vertex1))
-        self.assertEqual(
+        self.assertEquals(
             vert, graph_mapper.get_application_vertex(vertex2))
-        self.assertEqual(
+        self.assertEquals(
             None, graph_mapper.get_application_vertex(vertices[0]))
-        self.assertEqual(
+        self.assertEquals(
             None, graph_mapper.get_application_vertex(vertices[1]))
 
     def test_get_edge_from_machine_edge(self):
@@ -122,8 +122,8 @@ class TestGraphMapper(unittest.TestCase):
 
         edge_from_machine_edge = graph.get_application_edge(sube)
 
-        self.assertEqual(edge_from_machine_edge, edge)
-        self.assertEqual(
+        self.assertEquals(edge_from_machine_edge, edge)
+        self.assertEquals(
             graph.get_application_edge(edges[0]),
             edge)
         self.assertIsNone(graph.get_application_edge(edges[1]))

@@ -43,21 +43,21 @@ class TestRoutingTable(unittest.TestCase):
                 MulticastRoutingEntry(key_combo + i, mask + i, proc_ids,
                                       link_ids, True))
         mrt = MulticastRoutingTable(0, 0, multicast_entries)
-        self.assertEqual(mrt.x, 0)
-        self.assertEqual(mrt.y, 0)
+        self.assertEquals(mrt.x, 0)
+        self.assertEquals(mrt.y, 0)
 
         mre = mrt.multicast_routing_entries
         for entry in mre:
             self.assertIn(entry, multicast_entries)
-        self.assertEqual(len(mre), len(multicast_entries))
+        self.assertEquals(len(mre), len(multicast_entries))
         for i in range(5):
-            self.assertEqual(
+            self.assertEquals(
                 mrt.get_multicast_routing_entry_by_routing_entry_key(
                     key_combo + i, mask + i),
                 multicast_entries[i])
-        self.assertEqual(mrt.get_multicast_routing_entry_by_routing_entry_key(
+        self.assertEquals(mrt.get_multicast_routing_entry_by_routing_entry_key(
             key_combo + 5, mask + 5), None)
-        self.assertEqual(mrt.get_multicast_routing_entry_by_routing_entry_key(
+        self.assertEquals(mrt.get_multicast_routing_entry_by_routing_entry_key(
             key_combo - 1, mask - 1), None)
 
     def test_new_multicast_routing_table_empty(self):
@@ -125,13 +125,13 @@ class TestRoutingTable(unittest.TestCase):
         mrt.append(t2)
         tables = MulticastRoutingTables(mrt)
         retrieved_tables = tables.routing_tables
-        self.assertEqual(len(retrieved_tables), len(mrt))
+        self.assertEquals(len(retrieved_tables), len(mrt))
         for tab in retrieved_tables:
             self.assertIn(tab, mrt)
 
-        self.assertEqual(tables.get_routing_table_for_chip(0, 0), t1)
-        self.assertEqual(tables.get_routing_table_for_chip(1, 0), t2)
-        self.assertEqual(tables.get_routing_table_for_chip(2, 0), None)
+        self.assertEquals(tables.get_routing_table_for_chip(0, 0), t1)
+        self.assertEquals(tables.get_routing_table_for_chip(1, 0), t2)
+        self.assertEquals(tables.get_routing_table_for_chip(2, 0), None)
 
     def test_new_multicast_routing_tables_empty(self):
         MulticastRoutingTables()

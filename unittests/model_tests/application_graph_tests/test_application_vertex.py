@@ -15,15 +15,15 @@ class TestApplicationGraphModel(unittest.TestCase):
         test initialisation of a vertex
         """
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        self.assertEqual(vert.n_atoms, 10)
-        self.assertEqual(vert.label, "New AbstractConstrainedVertex")
+        self.assertEquals(vert.n_atoms, 10)
+        self.assertEquals(vert.label, "New AbstractConstrainedVertex")
 
     def test_create_new_vertex_without_label(self):
         """
         test initialisation of a vertex without a label
         """
         vert = SimpleTestVertex(10, "Population", 256)
-        self.assertEqual(vert.n_atoms, 10)
+        self.assertEquals(vert.n_atoms, 10)
         pieces = vert.label.split(" ")
         self.assertIn(pieces[0], "Population n")
 
@@ -34,8 +34,8 @@ class TestApplicationGraphModel(unittest.TestCase):
         constraint = MaxVertexAtomsConstraint(2)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint)
-        self.assertEqual(vert.n_atoms, 10)
-        self.assertEqual(vert.label, "New AbstractConstrainedVertex")
+        self.assertEquals(vert.n_atoms, 10)
+        self.assertEquals(vert.label, "New AbstractConstrainedVertex")
         assert constraint in vert.constraints
 
     def test_create_new_vertex_add_constraint(self):
@@ -50,9 +50,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint2)
         vert.add_constraint(constraint1)
-        self.assertEqual(vert.n_atoms, 10)
-        self.assertEqual(len(vert.constraints), 3)
-        self.assertEqual(vert.label, "New AbstractConstrainedVertex")
+        self.assertEquals(vert.n_atoms, 10)
+        self.assertEquals(len(vert.constraints), 3)
+        self.assertEquals(vert.label, "New AbstractConstrainedVertex")
         for constraint in constr:
             if constraint not in vert.constraints:
                 raise Exception("dont exist where should")
@@ -68,9 +68,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         constr.append(constraint2)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraints(constr)
-        self.assertEqual(vert.n_atoms, 10)
-        self.assertEqual(vert.label, "New AbstractConstrainedVertex")
-        self.assertEqual(len(vert.constraints), 3)
+        self.assertEquals(vert.n_atoms, 10)
+        self.assertEquals(vert.label, "New AbstractConstrainedVertex")
+        self.assertEquals(len(vert.constraints), 3)
         for constraint in constr:
             self.assertIn(constraint, vert.constraints)
 
@@ -108,7 +108,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         resources = vert.get_resources_used_by_atoms(Slice(0, 9))
         subv_from_vert = vert.create_machine_vertex(Slice(0, 9), resources, "")
-        self.assertEqual(subv_from_vert.resources_required, resources)
+        self.assertEquals(subv_from_vert.resources_required, resources)
 
     @unittest.skip("demonstrating skipping")
     def test_create_new_vertex_from_vertex_with_additional_constraints(
@@ -126,6 +126,6 @@ class TestApplicationGraphModel(unittest.TestCase):
             vert.get_resources_used_by_atoms(Slice(0, 9)), "",
             [constraint2])
         subv_from_vert.add_constraint(constraint1)
-        self.assertEqual(len(subv_from_vert.constraints), 2)
-        self.assertEqual(subv_from_vert.constraints[1], constraint1)
-        self.assertEqual(subv_from_vert.constraints[0], constraint2)
+        self.assertEquals(len(subv_from_vert.constraints), 2)
+        self.assertEquals(subv_from_vert.constraints[1], constraint1)
+        self.assertEquals(subv_from_vert.constraints[0], constraint2)

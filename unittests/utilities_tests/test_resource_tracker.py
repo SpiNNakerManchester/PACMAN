@@ -24,22 +24,22 @@ class TestResourceTracker(unittest.TestCase):
             preallocated_resources=preallocated_resources)
 
         # Should be 14 cores = 18 - 1 monitor - 1 specific core - 2 other cores
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 14)
+        self.assertEquals(tracker._n_cores_available(chip, (0, 0), None), 14)
 
         # Should be 0 since the core is already pre allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 1), 0)
+        self.assertEquals(tracker._n_cores_available(chip, (0, 0), 1), 0)
 
         # Should be 1 since the core is not pre allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 2), 1)
+        self.assertEquals(tracker._n_cores_available(chip, (0, 0), 2), 1)
 
         # Should be 0 since the core is monitor
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 0), 0)
+        self.assertEquals(tracker._n_cores_available(chip, (0, 0), 0), 0)
 
         # Allocate a core
         tracker._allocate_core(chip, (0, 0), 2)
 
         # Should be 13 cores as one now allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 13)
+        self.assertEquals(tracker._n_cores_available(chip, (0, 0), None), 13)
 
     def test_deallocation_of_resources(self):
         machine = virtual_machine(
@@ -69,11 +69,11 @@ class TestResourceTracker(unittest.TestCase):
 
         # verify chips used is updated
         cores = list(tracker._core_tracker[(0, 0)])
-        self.assertEqual(len(cores), chip_0.n_user_processors - 1)
+        self.assertEquals(len(cores), chip_0.n_user_processors - 1)
 
         # verify sdram used is updated
         sdram = tracker._sdram_tracker[(0, 0)]
-        self.assertEqual(sdram, chip_sdram-res_sdram)
+        self.assertEquals(sdram, chip_sdram-res_sdram)
 
         if (0, 0) not in tracker._chips_used:
             raise Exception("should exist")

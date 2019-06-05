@@ -13,8 +13,8 @@ class Test(unittest.TestCase):
         spinn_machine_parts = spinn_machine.__version__.split('.')
         pacman_parts = pacman.__version__.split('.')
 
-        self.assertEqual(spinn_utilities_parts[0], pacman_parts[0])
+        self.assertEquals(spinn_utilities_parts[0], pacman_parts[0])
         self.assertLessEqual(spinn_utilities_parts[1], pacman_parts[1])
 
-        self.assertEqual(spinn_machine_parts[0], pacman_parts[0])
+        self.assertEquals(spinn_machine_parts[0], pacman_parts[0])
         self.assertLessEqual(spinn_machine_parts[1], pacman_parts[1])

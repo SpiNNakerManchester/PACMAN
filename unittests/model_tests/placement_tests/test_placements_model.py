@@ -24,8 +24,8 @@ class TestPlacements(unittest.TestCase):
         checks that creating an empty placements object is valid
         """
         pls = Placements()
-        self.assertEqual(pls._placements, dict())
-        self.assertEqual(pls._machine_vertices, dict())
+        self.assertEquals(pls._placements, dict())
+        self.assertEquals(pls._machine_vertices, dict())
 
     def test_get_placement_of_vertex(self):
         """
@@ -41,7 +41,7 @@ class TestPlacements(unittest.TestCase):
 
         pls = Placements(pl)
         for i in range(4):
-            self.assertEqual(pls.get_placement_of_vertex(subv[i]), pl[i])
+            self.assertEquals(pls.get_placement_of_vertex(subv[i]), pl[i])
 
     def test_get_vertex_on_processor(self):
         """
@@ -58,9 +58,9 @@ class TestPlacements(unittest.TestCase):
 
         pls = Placements(pl)
         for i in range(4):
-            self.assertEqual(pls.get_vertex_on_processor(0, 0, i), subv[i])
+            self.assertEquals(pls.get_vertex_on_processor(0, 0, i), subv[i])
 
-        self.assertEqual(pls.get_placement_of_vertex(subv[0]), pl[0])
+        self.assertEquals(pls.get_placement_of_vertex(subv[0]), pl[0])
 
     def test_get_placements(self):
         """

@@ -34,12 +34,12 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
         for vertex, chip in zip(vertices, eth_chips):
             iptags = tags.get_ip_tags_for_vertex(vertex)
-            self.assertEqual(
+            self.assertEquals(
                 len(iptags), 1, "Incorrect number of tags assigned")
-            self.assertEqual(
+            self.assertEquals(
                 iptags[0].destination_x, chip.x,
                 "Destination of tag incorrect")
-            self.assertEqual(
+            self.assertEquals(
                 iptags[0].destination_y, chip.y,
                 "Destination of tag incorrect")
             placement = placements.get_placement_of_vertex(vertex)
@@ -83,7 +83,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         for vertices in (eth_vertices, eth2_vertices):
             for vertex in vertices:
                 iptags = tags.get_ip_tags_for_vertex(vertex)
-                self.assertEqual(
+                self.assertEquals(
                     len(iptags), 1, "Incorrect number of tags assigned")
                 placement = placements.get_placement_of_vertex(vertex)
                 print(placement, "has tag", iptags[0])
@@ -92,6 +92,6 @@ class TestTagsBoardAddresses(unittest.TestCase):
                     "Tag used more than once")
                 tags_by_board[iptags[0].board_address].add(iptags[0].tag)
 
-        self.assertEqual(
+        self.assertEquals(
             len(tags_by_board[eth_chip.ip_address]), len(eth_chip.tag_ids),
             "Wrong number of tags assigned to first Ethernet")

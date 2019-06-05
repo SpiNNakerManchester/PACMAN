@@ -80,11 +80,11 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         graph, mapper, _ = self.bp(
             self.graph, self.machine, plan_n_timesteps=None)
-        self.assertEqual(len(list(graph.vertices)), 3)
+        self.assertEquals(len(list(graph.vertices)), 3)
         vert_sizes = []
         for vert in self.verts:
             vert_sizes.append(vert.n_atoms)
-        self.assertEqual(len(list(graph.edges)), 3)
+        self.assertEquals(len(list(graph.edges)), 3)
         for vertex in graph.vertices:
             self.assertIn(mapper.get_slice(vertex).n_atoms, vert_sizes)
 
@@ -96,8 +96,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, None, "extra"), "TEST")
         graph, _, _ = self.bp(self.graph, self.machine, plan_n_timesteps=None)
-        self.assertEqual(len(list(graph.vertices)), 3)
-        self.assertEqual(len(list(graph.edges)), 4)
+        self.assertEquals(len(list(graph.vertices)), 3)
+        self.assertEquals(len(list(graph.edges)), 4)
 
     def test_partition_on_large_vertex_than_has_to_be_split(self):
         """
@@ -107,7 +107,7 @@ class TestBasicPartitioner(unittest.TestCase):
         large_vertex = SimpleTestVertex(300, "Large vertex")
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 256)
         graph, _, _ = self.bp(self.graph, self.machine, 1000)
         self.assertGreater(len(list(graph.vertices)), 1)
 
@@ -118,11 +118,11 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = SimpleTestVertex(500, "Large vertex")
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine, plan_n_timesteps=None)
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
@@ -135,7 +135,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _, _ = self.bp(self.graph, self.machine, plan_n_timesteps=None)
-        self.assertEqual(len(list(graph.vertices)), 100)
+        self.assertEquals(len(list(graph.vertices)), 100)
 
     def test_partition_with_barely_sufficient_space(self):
         """
@@ -174,12 +174,12 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = machine_from_chips(chips)
         singular_vertex = SimpleTestVertex(450, "Large vertex",
                                            max_atoms_per_core=1)
-        self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
+        self.assertEquals(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
         graph, _, _ = self.bp(self.graph, self.machine, plan_n_timesteps=None)
-        self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.assertEqual(len(list(graph.vertices)), 450)
+        self.assertEquals(singular_vertex._model_based_max_atoms_per_core, 1)
+        self.assertEquals(len(list(graph.vertices)), 450)
 
     def test_partition_with_insufficient_space(self):
         """
@@ -219,7 +219,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
                                         max_atoms_per_core=1)
-        self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
+        self.assertEquals(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         with self.assertRaises(PacmanPartitionException):
@@ -323,7 +323,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         self.graph = ApplicationGraph("foo")
         graph, _, _ = self.bp(self.graph, self.machine, plan_n_timesteps=None)
-        self.assertEqual(len(list(graph.vertices)), 0)
+        self.assertEquals(len(list(graph.vertices)), 0)
 
     def test_partition_with_fixed_atom_constraints(self):
         """

@@ -16,8 +16,8 @@ class TestApplicationEdgeModel(unittest.TestCase):
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2", 256)
         edge1 = SimpleTestEdge(vert1, vert2, "First edge")
-        self.assertEqual(edge1.pre_vertex, vert1)
-        self.assertEqual(edge1.post_vertex, vert2)
+        self.assertEquals(edge1.pre_vertex, vert1)
+        self.assertEquals(edge1.post_vertex, vert2)
 
     def test_create_new_edge_without_label(self):
         """
@@ -26,9 +26,9 @@ class TestApplicationEdgeModel(unittest.TestCase):
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2", 256)
         edge1 = SimpleTestEdge(vert1, vert2)
-        self.assertEqual(edge1.pre_vertex, vert1)
-        self.assertEqual(edge1.post_vertex, vert2)
-        self.assertEqual(edge1.label, None)
+        self.assertEquals(edge1.pre_vertex, vert1)
+        self.assertEquals(edge1.post_vertex, vert2)
+        self.assertEquals(edge1.label, None)
 
     def test_new_create_machine_vertex_from_vertex_no_constraints(self):
         """
@@ -63,4 +63,4 @@ class TestApplicationEdgeModel(unittest.TestCase):
         edge1 = SimpleTestEdge(vert1, vert2, "First edge")
         edge = edge1.create_machine_edge(v_from_vert1, v_from_vert2,
                                          "First edge")
-        self.assertEqual(edge.label, "First edge")
+        self.assertEquals(edge.label, "First edge")

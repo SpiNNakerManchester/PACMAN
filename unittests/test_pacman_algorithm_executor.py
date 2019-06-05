@@ -147,7 +147,7 @@ class Test(unittest.TestCase):
         self.assertTrue(TestAlgorithm.called)
         self.assertFalse(TestNoChangesAlgorithm.called)
         self.assertTrue(TestAlgorithm3.called)
-        self.assertEqual(executor.get_item("TestType3"), "TestType3")
+        self.assertEquals(executor.get_item("TestType3"), "TestType3")
 
     def test_token_workflow(self):
         """ Tests that a workflow with tokens works
@@ -231,7 +231,7 @@ class Test(unittest.TestCase):
         executor.execute_mapping()
         self.assertTrue(TestRecursiveOptionalAlgorithm.called)
         self.assertTrue(TestAlgorithm3.called)
-        self.assertEqual(
+        self.assertEquals(
             [algorithm.algorithm_id for algorithm in executor._algorithms],
             ["TestRecursiveOptionalAlgorithm", "TestAlgorithm3"])
 
@@ -272,9 +272,9 @@ class Test(unittest.TestCase):
             optional_algorithms=[], inputs=inputs, required_outputs=[],
             tokens=[], required_output_tokens=[])
         executor.execute_mapping()
-        self.assertEqual(executor.get_item("Foo"), name)
+        self.assertEquals(executor.get_item("Foo"), name)
         with os.fdopen(fd) as f:
-            self.assertEqual(f.read(), "foo\n")
+            self.assertEquals(f.read(), "foo\n")
 
     def test_failing_external_algorithm(self):
         if not os.access("/bin/sh", os.X_OK):
@@ -292,9 +292,9 @@ class Test(unittest.TestCase):
         self.assertIn(
             "Algorithm FailingExternal returned a non-zero error code 1",
             str(e.exception))
-        self.assertEqual(executor.get_item("Foo"), None)
+        self.assertEquals(executor.get_item("Foo"), None)
         with os.fdopen(fd) as f:
-            self.assertEqual(f.read(), "foo\n")
+            self.assertEquals(f.read(), "foo\n")
 
     def test_tokens(self):
         t1 = Token("abc")
@@ -304,11 +304,11 @@ class Test(unittest.TestCase):
         t5 = Token("ghi", "def")
         t6 = Token("abc", "def")
         self.assertNotEqual(t1, t2)
-        self.assertEqual(t1, t3)
+        self.assertEquals(t1, t3)
         self.assertNotEqual(t1, t4)
         self.assertNotEqual(t1, t5)
         self.assertNotEqual(t2, t5)
-        self.assertEqual(t2, t6)
+        self.assertEquals(t2, t6)
         d = {}
         d[t1] = 1
         d[t2] = 2
@@ -316,8 +316,8 @@ class Test(unittest.TestCase):
         d[t4] = 4
         d[t5] = 5
         d[t6] = 6
-        self.assertEqual(len(d), 4)
-        self.assertEqual(repr(t2), "Token(name=abc, part=def)")
+        self.assertEquals(len(d), 4)
+        self.assertEquals(repr(t2), "Token(name=abc, part=def)")
 
 
 if __name__ == "__main__":

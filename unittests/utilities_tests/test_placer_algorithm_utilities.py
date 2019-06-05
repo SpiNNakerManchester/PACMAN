@@ -12,7 +12,7 @@ class TestUtilities(unittest.TestCase):
         all_sets.append({5, 6})
         new_set = {2, 4}
         add_set(all_sets, new_set)
-        self.assertEqual(2, len(all_sets))
+        self.assertEquals(2, len(all_sets))
         self.assertIn({1, 2, 3, 4}, all_sets)
         self.assertIn({5, 6}, all_sets)
 
@@ -23,7 +23,7 @@ class TestUtilities(unittest.TestCase):
         all_sets.append({5, 6})
         new_set = {2, 7}
         add_set(all_sets, new_set)
-        self.assertEqual(3, len(all_sets))
+        self.assertEquals(3, len(all_sets))
         self.assertIn({1, 2, 7}, all_sets)
         self.assertIn({3, 4}, all_sets)
         self.assertIn({5, 6}, all_sets)
@@ -35,7 +35,7 @@ class TestUtilities(unittest.TestCase):
         all_sets.append({5, 6})
         new_set = {8, 7}
         add_set(all_sets, new_set)
-        self.assertEqual(4, len(all_sets))
+        self.assertEquals(4, len(all_sets))
         self.assertIn({1, 2}, all_sets)
         self.assertIn({3, 4}, all_sets)
         self.assertIn({5, 6}, all_sets)
