@@ -127,14 +127,20 @@ As a heuristic:
 based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_covering.py
 """
+import os
+
 from .exceptions import MinimisationFailedError
 from .routing_table_entry import RoutingTableEntry
 from .remove_default_routes import \
     minimise as remove_default_routes
 from .utils import intersect
 
+from spinn_utilities.timer import Timer
 
-def minimise(routing_table, target_length):
+
+def minimise(
+        routing_table, target_length, time_to_run_for_before_raising_exception,
+        use_timer_cut_off, default_report_folder, x, y):
     """Reduce the size of a routing table by merging together entries where
     possible and by removing any remaining default routes.
 
@@ -164,32 +170,45 @@ def minimise(routing_table, target_length):
             orthogonal table and receive warnings if the input table is not
             orthogonal.
 
-    Parameters
-    ----------
-    routing_table : [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Routing entries to be merged.
-    target_length : int or None
-        Target length of the routing table; the minimisation procedure will
-        halt once either this target is reached or no further minimisation is
-        possible. If None then the table will be made as small as possible.
-
-    Raises
-    ------
-    MinimisationFailedError
-        If the smallest table that can be produced is larger than
-        `target_length`.
-
-    Returns
-    -------
-    [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Reduced routing table entries.
+    :type routing_table: \
+        [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
+    :param routing_table : Routing entries to be merged.
+    :type target_length : int or None
+    :param target_length: Target length of the routing table; the minimisation\
+        procedure will halt once either this target is reached or no further \
+        minimisation is possible. If None then the table will be made as \
+        small as possible.
+    :type time_to_run_for_before_raising_exception: int
+    :param time_to_run_for_before_raising_exception: the time to run for \
+        in seconds before raising an exception
+    :param use_timer_cut_off: bool flag for is timing cutoff is to be used.
+    :type use_timer_cut_off: bool
+    :param default_report_folder: file path to where reports are stored
+    :type default_report_folder: file
+    :param x: x coord
+    :type x: int
+    :param y: y coord
+    :type y: int
+    :raises MinimisationFailedError: If the smallest table that can be \
+        produced is larger than `target_length`.
+    :return: the compressed routing entries
+    :rtype: [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
     """
-    table, _ = ordered_covering(routing_table, target_length, no_raise=True)
+    report_file = os.path.join(
+        default_report_folder, "compression_for_{}{}".format(x, y))
+
+    with open(report_file, "w+") as writer:
+        table, _ = ordered_covering(
+            routing_table=routing_table, target_length=target_length,
+            no_raise=True,  use_timer_cut_off=use_timer_cut_off,
+            time_to_run_for=time_to_run_for_before_raising_exception,
+            report_writer=writer)
     return remove_default_routes(table, target_length)
 
 
-def ordered_covering(routing_table, target_length, aliases=dict(),
-                     no_raise=False):
+def ordered_covering(
+        routing_table, target_length, time_to_run_for, report_writer,
+        aliases=None, no_raise=False, use_timer_cut_off=False):
     """Reduce the size of a routing table by merging together entries where
     possible.
 
@@ -219,43 +238,43 @@ def ordered_covering(routing_table, target_length, aliases=dict(),
             orthogonal table and receive warnings if the input table is not
             orthogonal.
 
-    Parameters
-    ----------
-    routing_table : [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Routing entries to be merged.
-    target_length : int or None
-        Target length of the routing table; the minimisation procedure will
-        halt once either this target is reached or no further minimisation is
-        possible. If None then the table will be made as small as possible.
-
-    Other Parameters
-    ----------------
-    aliases : {(key, mask): {(key, mask), ...}, ...}
-        Dictionary of which keys and masks in the routing table are
-        combinations of other (now removed) keys and masks; this allows us to
-        consider only the keys and masks the user actually cares about when
-        determining if inserting a new entry will break the correctness of the
-        table. This should be supplied when using this method to update an
+    :param routing_table: Routing entries to be merged.
+    :type routing_table: \
+        [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
+    :type target_length : int or None
+    :param target_length: Target length of the routing table; the \
+        minimisation procedure will halt once either this target is reached \
+        or no further minimisation is possible. If None then the table will \
+        be made as small as possible.
+    :type aliases : {(key, mask): {(key, mask), ...}, ...}
+    :param aliases: Dictionary of which keys and masks in the routing table \
+        are combinations of other (now removed) keys and masks; this allows us\
+        to consider only the keys and masks the user actually cares about when\
+        determining if inserting a new entry will break the correctness of the\
+        table. This should be supplied when using this method to update an\
         already minimised table.
-    no_raise : bool
-        If False (the default) then an error will be raised if the table cannot
-        be minimised to be smaller than `target_length` and `target_length` is
-        not None. If True then a table will be returned regardless of the size
-        of the final table.
-
-    Raises
-    ------
-    MinimisationFailedError
-        If the smallest table that can be produced is larger than
-        `target_length` and `no_raise` is False.
-
-    Returns
-    -------
-    [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Reduced routing table entries.
-    {(key, mask): {(key, mask), ...}, ...}
-        A new aliases dictionary.
+    :type no_raise : bool
+    :param no_raise: If False (the default) then an error will be raised if \
+        the table cannot be minimised to be smaller than `target_length` and \
+        `target_length` is not None. If True then a table will be returned \
+        regardless of the size of the final table.
+    :param time_to_run_for: how long to run for in seconds before raises \
+        exception
+    :type time_to_run_for: int
+    :param use_timer_cut_off: bool flag for using time cutoff
+    :type use_timer_cut_off: bool
+    :raises MinimisationFailedError: If the smallest table that can be \
+        produced is larger than target_length` and `no_raise` is False.
+    :return: Reduced routing table entries.
+    :rtype: [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
     """
+
+    timer = Timer()
+    timer.start_timing()
+
+    if aliases is None:
+        aliases = dict()
+
     # Copy the aliases dictionary
     aliases = dict(aliases)
 
@@ -263,12 +282,23 @@ def ordered_covering(routing_table, target_length, aliases=dict(),
     # generality.
     routing_table = sorted(
         routing_table,
-        key=lambda entry: _get_generality(entry.key, entry.mask)
+        key=lambda table_e: get_generality(table_e.key, table_e.mask)
     )
+
+    for i, entry in enumerate(routing_table):
+        report_writer.write("entry {} has key {} mask {} route {}\n".format(
+            i, entry.key, entry.mask, entry.route))
 
     while target_length is None or len(routing_table) > target_length:
         # Get the best merge
         merge = _get_best_merge(routing_table, aliases)
+
+        report_writer.write(
+            "the best merge is considering key {} and mask {} and"
+            "entries: ".format(merge.key, merge.mask))
+        for entry in merge.entries:
+            report_writer.write("{},".format(entry))
+        report_writer.write("\n\n")
 
         # If there is no merge then stop
         if merge.goodness <= 0:
@@ -278,9 +308,21 @@ def ordered_covering(routing_table, target_length, aliases=dict(),
         # aliases dictionary.
         routing_table, aliases = merge.apply(aliases)
 
+        report_writer.write("after merge applied table looks like: \n")
+        for i, entry in enumerate(routing_table):
+            report_writer.write(
+                "entry {} has key {} mask {} route {}\n".format(
+                    i, entry.key, entry.mask, entry.route))
+
+        # control for limiting the search
+        if use_timer_cut_off:
+            diff = timer.take_sample()
+            if diff.total_seconds() >= time_to_run_for:
+                raise MinimisationFailedError(
+                    target_length, len(routing_table))
+
     # If the table is still too big then raise an error
-    if (not no_raise and
-            target_length is not None and
+    if (not no_raise and target_length is not None and
             len(routing_table) > target_length):
         raise MinimisationFailedError(target_length, len(routing_table))
 
@@ -288,17 +330,17 @@ def ordered_covering(routing_table, target_length, aliases=dict(),
     return routing_table, aliases
 
 
-def _get_generality(key, mask):
+def get_generality(key, mask):
     """Count the number of Xs in the key-mask pair.
 
     For example, there are 32 Xs in ``0x00000000/0x00000000``::
 
-        >>> _get_generality(0x0, 0x0)
+        >>> get_generality(0x0, 0x0)
         32
 
     And no Xs in ``0xffffffff/0xffffffff``::
 
-        >>> _get_generality(0xffffffff, 0xffffffff)
+        >>> get_generality(0xffffffff, 0xffffffff)
         0
     """
     xs = (~key) & (~mask)
@@ -309,9 +351,7 @@ def _get_best_merge(routing_table, aliases):
     """Inspect all possible merges for the routing table and return the merge
     which would combine the greatest number of entries.
 
-    Returns
-    -------
-    :py:class:`~.Merge`
+    :rtype :py:class:`~.Merge`
     """
     # Create an empty merge to start with
     best_merge = _Merge(routing_table)
@@ -342,9 +382,7 @@ def _get_best_merge(routing_table, aliases):
 def _get_all_merges(routing_table):
     """Get possible sets of entries to merge.
 
-    Yields
-    ------
-    :py:class:`~.Merge`
+    :rtype :py:class:`~.Merge`
     """
     # Memorise entries that have been considered as part of a merge
     considered_entries = set()
@@ -356,7 +394,7 @@ def _get_all_merges(routing_table):
 
         # Construct a merge by including other routing table entries below this
         # one which have equivalent routes.
-        merge = set([i])
+        merge = {i}
         merge.update(
             j for j, other_entry in enumerate(routing_table[i+1:], start=i+1)
             if entry.route == other_entry.route
@@ -380,7 +418,7 @@ def _get_insertion_index(routing_table, generality):
 
     # Wrapper for _get_generality which accepts a routing entry
     def gg(entry):
-        return _get_generality(entry.key, entry.mask)
+        return get_generality(entry.key, entry.mask)
 
     # Perform a binary search through the routing table
     bottom = 0
@@ -453,7 +491,7 @@ class _Merge(object):
         self.mask = all_selected & new_xs  # Combine existing and new Xs
         self.key = all_ones & self.mask
 
-        self.generality = _get_generality(self.key, self.mask)
+        self.generality = get_generality(self.key, self.mask)
         self.insertion_index = _get_insertion_index(
             routing_table, self.generality)
 
