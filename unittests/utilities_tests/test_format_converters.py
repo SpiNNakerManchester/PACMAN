@@ -1,7 +1,7 @@
 import json
 import pytest
 from six import iterkeys
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex, MachineSpiNNakerLinkVertex)
@@ -135,7 +135,7 @@ def test_convert_to_file_machine_graph(tmpdir):
 
 def test_convert_to_file_machine(tmpdir):
     # Construct the sample machine
-    machine = VirtualMachine(version=3, with_wrap_arounds=None)
+    machine = virtual_machine(version=3)
 
     # Convert it to JSON
     algo = ConvertToFileMachine()
@@ -187,7 +187,7 @@ def test_convert_to_file_placement(tmpdir):
 
 def test_create_constraints_to_file(tmpdir):
     # Construct the sample machine and graph
-    machine = VirtualMachine(version=3, with_wrap_arounds=None)
+    machine = virtual_machine(version=3)
     # TODO: define some extra monitor cores (how?)
     graph = MachineGraph("foo")
     tag1 = IPtagResource("1.2.3.4", 5, False, tag="footag")
