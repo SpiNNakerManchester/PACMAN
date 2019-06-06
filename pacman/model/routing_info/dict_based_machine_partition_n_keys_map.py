@@ -33,4 +33,4 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
         if partition in self._n_keys_map:
             return self._n_keys_map[partition]
         else:
-            print "AHHHG"
+            print None
