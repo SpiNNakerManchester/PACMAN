@@ -13,9 +13,7 @@ import heapq
 
 from collections import deque
 
-from .geometry import concentric_hexagons, to_xyz, \
-    shortest_mesh_path_length, shortest_mesh_path, \
-    shortest_torus_path_length, shortest_torus_path
+from .geometry import concentric_hexagons
 
 from pacman.operations.rig_algorithms.utils import longest_dimension_first
 
@@ -94,13 +92,8 @@ def ner_net(source, destinations, machine):
 
     # Handle each destination, sorted by distance from the source, closest
     # first.
-    if machine.has_wrap_arounds:
-        sorted_dest = sorted(
-            destinations, key=(lambda destination: shortest_torus_path_length(
-                source, destination, width, height)))
-    else:
-        sorted_dest = sorted(
-            destinations, key=(lambda destination: shortest_mesh_path_length(
+    sorted_dest = sorted(
+        destinations, key=(lambda destination: machine.shortest_path_length(
                 source, destination)))
     for destination in sorted_dest:
         # We shall attempt to find our nearest neighbouring placed node.
@@ -178,13 +171,8 @@ def ner_net(source, destinations, machine):
             neighbour = None
             neighbour_distance = None
             for candidate_neighbour in route:
-                if machine.has_wrap_arounds:
-                    distance = shortest_torus_path_length(
-                        candidate_neighbour, destination, width, height)
-                else:
-                    distance = shortest_mesh_path_length(
+                distance = machine.shortest_path_length(
                         candidate_neighbour, destination)
-
                 if distance <= radius and (neighbour is None or
                                            distance < neighbour_distance):
                     neighbour = candidate_neighbour
@@ -196,12 +184,7 @@ def ner_net(source, destinations, machine):
             neighbour = source
 
         # Find the shortest vector from the neighbour to this destination
-        if machine.has_wrap_arounds:
-            vector = shortest_torus_path(to_xyz(neighbour),
-                                         to_xyz(destination),
-                                         width, height)
-        else:
-            vector = shortest_mesh_path(neighbour, destination)
+        vector = machine.shortest_path(neighbour, destination)
 
         # The longest-dimension-first route may inadvertently pass through an
         # already connected node. If the route is allowed to pass through that
@@ -362,13 +345,8 @@ def a_star(sink, heuristic_source, sources, machine):
     # Select the heuristic function to use for distances
     width = machine.max_chip_x + 1
     height = machine.max_chip_y + 1
-    if machine.has_wrap_arounds:
-        heuristic = (lambda node:
-                     shortest_torus_path_length(
-                         node, heuristic_source, width, height))
-    else:
-        heuristic = (lambda node:
-                     shortest_mesh_path_length(node, heuristic_source))
+    heuristic = (lambda node: machine.shortest_path_length(
+        node, heuristic_source))
 
     # A dictionary {node: (direction, previous_node}. An entry indicates that
     # 1) the node has been visited and 2) which node we hopped from (and the

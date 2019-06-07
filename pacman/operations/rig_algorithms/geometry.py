@@ -52,19 +52,19 @@ def shortest_mesh_path_length(source, destination):
     #
     # Though ideally this code would be written::
     #
-    #     >>> return max(x, y, z) - min(x, y, z)
+    #     >>> return max(x, y, 0) - min(x, y, 0)
     #
     # Unfortunately the min/max functions are very slow (as of CPython 3.5) so
     # this expression is unrolled as IF/else statements.
 
-    # max(x, y, z)
+    # max(x, y, 0)
     maximum = x
     if y > maximum:
         maximum = y
     if 0 > maximum:
         maximum = 0
 
-    # min(x, y, z)
+    # min(x, y, 0)
     minimum = x
     if y < minimum:
         minimum = y
