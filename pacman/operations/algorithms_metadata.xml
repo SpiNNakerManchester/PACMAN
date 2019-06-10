@@ -413,38 +413,6 @@
             <param_type>MemoryRoutingInfos</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="VertexBasedRoutingInfoAllocator">
-        <python_module>pacman.operations.routing_info_allocator_algorithms.field_based_routing_allocator.vertex_based_routing_info_allocator</python_module>
-        <python_class>VertexBasedRoutingInfoAllocator</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachinePartitionNKeysMap</param_type>
-            </parameter>
-            <parameter>
-                <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>n_keys_map</param_name>
-            <param_name>application_graph</param_name>
-            <param_name>graph_mapper</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
-            <param_type>MemoryFields</param_type>
-        </outputs>
-    </algorithm>
     <algorithm name="BasicRoutingTableGenerator">
         <python_module>pacman.operations.routing_table_generators.basic_routing_table_generator</python_module>
         <python_class>BasicRoutingTableGenerator</python_class>
