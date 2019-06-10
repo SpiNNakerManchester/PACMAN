@@ -7,13 +7,13 @@ Parallel Computing (2014).
 
 Based on
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
+https://github.com/project-rig/rig/blob/master/rig/geometry.py
+
 """
 
 import heapq
 
 from collections import deque
-
-from .geometry import concentric_hexagons
 
 from pacman.operations.rig_algorithms.utils import longest_dimension_first
 
@@ -584,3 +584,26 @@ def _route_to_endpoint(vertex, machine):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return Links(link_data.connected_link)
+
+
+def concentric_hexagons(radius, start=(0, 0)):
+    """A generator which produces coordinates of concentric rings of hexagons.
+
+    Parameters
+    ----------
+    radius : int
+        Number of layers to produce (0 is just one hexagon)
+    start : (x, y)
+        The coordinate of the central hexagon.
+    """
+    x, y = start
+    yield (x, y)
+    for r in range(1, radius + 1):
+        # Move to the next layer
+        y -= 1
+        # Walk around the hexagon of this radius
+        for dx, dy in [(1, 1), (0, 1), (-1, 0), (-1, -1), (0, -1), (1, 0)]:
+            for _ in range(r):
+                yield (x, y)
+                x += dx
+                y += dy
