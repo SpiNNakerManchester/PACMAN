@@ -726,9 +726,9 @@
             <param_type>MemoryRoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="RigMCRoute">
-        <python_module>pacman.operations.rig_algorithms.rig_mc_route</python_module>
-        <python_class>RigMCRoute</python_class>
+    <algorithm name="NerRoute">
+        <python_module>pacman.operations.router_algorithms.ner_route.py</python_module>
+        <python_class>NerRoute</python_class>
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
