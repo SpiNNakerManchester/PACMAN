@@ -199,7 +199,6 @@ class PACMANAlgorithmExecutor(object):
         # set up XML reader for standard PACMAN algorithms XML file reader
         # (used in decode_algorithm_data_objects function)
         copy_of_xml_paths.append(operations.algorithms_metdata_file)
-        copy_of_xml_paths.append(operations.rigs_algorithm_metadata_file)
         copy_of_xml_paths.append(algorithm_reports.reports_metadata_file)
 
         # decode the algorithms specs
