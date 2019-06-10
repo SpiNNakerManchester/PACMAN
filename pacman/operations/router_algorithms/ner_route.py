@@ -45,12 +45,14 @@ def _convert_a_route(
         if route is not None:
             link = None
             if route >= 6:
+                # The route was offset as first 6 are the links
                 processor_ids.append(route - 6)
             else:
                 link_ids.append(route)
             if isinstance(next_hop, RoutingTree):
                 next_incoming_link = None
                 if link is not None:
+                    #  Same as Router.opposite just inlined for speed
                     next_incoming_link = (link + 3) % 6
                 next_hops.append((next_hop, next_incoming_link))
 
@@ -372,7 +374,7 @@ def _a_star(sink, heuristic_source, sources, machine):
             # Note: link identifiers arefrom the perspective of the neighbour,
             # not the current node!
             neighbour = machine.xy_over_link(
-                #  link + Router.LINK_OPPOSITE) % Router.MAX_LINKS_PER_ROUTER
+                #                  Same as Router.opposite
                 node[0], node[1], (neighbour_link + 3) % 6)
 
             # Skip links which are broken
@@ -531,7 +533,8 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
         else:
             core = placements.get_placement_of_vertex(post_vertex).p
             if core is not None:
-                tree_node.append_child((core, post_vertex))
+                #  Offset the core by 6 as first 6 are the links
+                tree_node.append_child((core + 6, post_vertex))
             else:
                 # Sinks without that resource are simply included without
                 # an associated route
