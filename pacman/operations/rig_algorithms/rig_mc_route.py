@@ -5,7 +5,6 @@ from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.operations.rig_algorithms.routing_tree import RoutingTree
-from pacman.operations.rig_algorithms.routes import Routes
 
 
 def convert_a_route(
@@ -19,13 +18,9 @@ def convert_a_route(
     for (route, next_hop) in partition_route.children:
         if route is not None:
             link = None
-            if isinstance(route, Routes):
-                if route.is_core:
-                    processor_ids.append(route.core_num)
-                else:
-                    link = route.value
-                    link_ids.append(link)
-            elif isinstance(route, int):
+            if route >= 6:
+                processor_ids.append(route - 6)
+            else:
                 link_ids.append(route)
             if isinstance(next_hop, RoutingTree):
                 next_incoming_link = None
@@ -70,6 +65,7 @@ class RigMCRoute(object):
                         e.post_vertex for e in partition.edges)
                     routingtree = do_route(
                         source_vertex, post_vertexes, machine, placements)
+                    print(routingtree)
                     convert_a_route(routing_tables, partition, 0, None,
                                     routingtree)
 

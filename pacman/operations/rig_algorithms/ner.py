@@ -17,8 +17,6 @@ from collections import deque
 
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 
-from pacman.operations.rig_algorithms.routes import Routes
-
 from pacman.operations.rig_algorithms.routing_tree import RoutingTree
 from pacman.model.graphs import (
     AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
@@ -207,7 +205,7 @@ def ner_net(source, destinations, machine):
             this_node = RoutingTree((x, y))
             route[(x, y)] = this_node
 
-            last_node.append_child((Routes(direction), this_node))
+            last_node.append_child((direction, this_node))
             last_node = this_node
 
     return (route[source], route)
@@ -395,10 +393,10 @@ def a_star(sink, heuristic_source, sources, machine):
 
     # Reconstruct the discovered path, starting from the source we found and
     # working back until the sink.
-    path = [(Routes(visited[selected_source][0]), selected_source)]
+    path = [(visited[selected_source][0], selected_source)]
     while visited[path[-1][1]][1] != sink:
         node = visited[path[-1][1]][1]
-        direction = Routes(visited[node][0])
+        direction =visited[node][0]
         path.append((direction, node))
 
     return path
@@ -471,13 +469,9 @@ def avoid_dead_links(root, machine):
         # Try to reconnect broken links to any other part of the tree
         # (excluding this broken subtree itself since that would create a
         # cycle).
-        pathx = a_star(child, parent,
-                      set(lookup).difference(child_chips),
-                      machine)
         path = a_star(child, parent,
                       set(lookup).difference(child_chips),
                       machine)
-        assert pathx == path
         # Add new RoutingTree nodes to reconnect the child to the tree.
         last_node = lookup[path[0][1]]
         last_direction = path[0][0]
@@ -506,7 +500,7 @@ def avoid_dead_links(root, machine):
                         node.remove_child(dn[0])
                         # A node can only have one parent so we can stop now.
                         break
-            last_node.append_child((Routes(last_direction), new_node))
+            last_node.append_child((last_direction, new_node))
             last_node = new_node
             last_direction = direction
         last_node.append_child((last_direction, lookup[child]))
@@ -554,7 +548,7 @@ def do_route(source_vertex, post_vertexes, machine, placements):
         else:
             core = placements.get_placement_of_vertex(post_vertex).p
             if core is not None:
-                tree_node.append_child((Routes.core(core), post_vertex))
+                tree_node.append_child((core, post_vertex))
             else:
                 # Sinks without that resource are simply included without
                 # an associated route
