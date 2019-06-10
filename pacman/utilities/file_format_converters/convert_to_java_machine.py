@@ -1,6 +1,6 @@
 import json
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import JsonMachine
+from spinn_machine.json_machine import to_json
 from pacman.utilities import file_format_schemas
 
 
@@ -31,7 +31,7 @@ class ConvertToJavaMachine(object):
         :type file_path: str
         """
 
-        json_obj = JsonMachine.to_json(machine)
+        json_obj = to_json(machine)
 
         if progress:
             progress.update()

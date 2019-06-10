@@ -1,4 +1,4 @@
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError,
     PacmanPartitionException)
@@ -21,7 +21,7 @@ class TestPartitionerWithPreAllocatedResources(object):
     """
 
     def test_1_chip_over_pre_allocated(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -45,7 +45,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             pass
 
     def test_1_chip_under_pre_allocated(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -68,7 +68,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             raise Exception("should have blown up here")
 
     def test_1_chip_pre_allocated_same_core(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -95,7 +95,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             raise Exception("should have blown up here")
 
     def test_1_chip_pre_allocated_too_much_sdram(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -127,7 +127,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             six.reraise(*exc_info)
 
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
