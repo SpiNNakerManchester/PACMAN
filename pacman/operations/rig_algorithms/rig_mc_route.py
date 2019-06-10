@@ -4,7 +4,6 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
-from pacman.operations.rig_algorithms.links import Links
 from pacman.operations.rig_algorithms.routing_tree import RoutingTree
 from pacman.operations.rig_algorithms.routes import Routes
 
@@ -26,9 +25,8 @@ def convert_a_route(
                 else:
                     link = route.value
                     link_ids.append(link)
-            elif isinstance(route, Links):
-                link = route.value
-                link_ids.append(link)
+            elif isinstance(route, int):
+                link_ids.append(route)
             if isinstance(next_hop, RoutingTree):
                 next_incoming_link = None
                 if link is not None:

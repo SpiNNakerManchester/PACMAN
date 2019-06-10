@@ -8,18 +8,15 @@ Parallel Computing (2014).
 Based on
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
 https://github.com/project-rig/rig/blob/master/rig/geometry.py
-
+https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.py
 """
 
 import heapq
 
 from collections import deque
 
-from pacman.operations.rig_algorithms.utils import longest_dimension_first
-
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 
-from pacman.operations.rig_algorithms.links import Links
 from pacman.operations.rig_algorithms.routes import Routes
 
 from pacman.operations.rig_algorithms.routing_tree import RoutingTree
@@ -191,7 +188,7 @@ def ner_net(source, destinations, machine):
         # node it would create a cycle in the route which would be VeryBad(TM).
         # As a result, we work backward through the route and truncate it at
         # the first point where the route intersects with a connected node.
-        ldf = longest_dimension_first(vector, neighbour, width, height)
+        ldf = longest_dimension_first(vector, neighbour, machine)
         i = len(ldf)
         for direction, (x, y) in reversed(ldf):
             i -= 1
@@ -369,12 +366,13 @@ def a_star(sink, heuristic_source, sources, machine):
             selected_source = node
             break
 
-        # Try all neighbouring locations. Note: link identifiers are from the
-        # perspective of the neighbour, not the current node!
-        for neighbour_link in Links:
-            vector = neighbour_link.opposite.to_vector()
-            neighbour = ((node[0] + vector[0]) % width,
-                         (node[1] + vector[1]) % height)
+        # Try all neighbouring locations.
+        for neighbour_link in range(6):  # Router.MAX_LINKS_PER_ROUTER
+            # Note: link identifiers arefrom the perspective of the neighbour,
+            # not the current node!
+            neighbour = machine.xy_over_link(
+                #  link + Router.LINK_OPPOSITE) % Router.MAX_LINKS_PER_ROUTER
+                node[0], node[1], (neighbour_link + 3) % 6)
 
             # Skip links which are broken
             if not machine.is_link_at(
@@ -473,10 +471,13 @@ def avoid_dead_links(root, machine):
         # Try to reconnect broken links to any other part of the tree
         # (excluding this broken subtree itself since that would create a
         # cycle).
+        pathx = a_star(child, parent,
+                      set(lookup).difference(child_chips),
+                      machine)
         path = a_star(child, parent,
                       set(lookup).difference(child_chips),
                       machine)
-
+        assert pathx == path
         # Add new RoutingTree nodes to reconnect the child to the tree.
         last_node = lookup[path[0][1]]
         last_direction = path[0][0]
@@ -583,7 +584,7 @@ def _route_to_endpoint(vertex, machine):
     else:
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
-    return Links(link_data.connected_link)
+    return link_data.connected_link
 
 
 def concentric_hexagons(radius, start=(0, 0)):
@@ -607,3 +608,60 @@ def concentric_hexagons(radius, start=(0, 0)):
                 yield (x, y)
                 x += dx
                 y += dy
+
+
+def longest_dimension_first(vector, start, machine):
+    """
+    List the (x, y) steps on a longest-dimension first route.
+
+    :param vector: (x, y, z)
+        The vector which the path should cover.
+    :param start: (x, y)
+        The coordinates from which the path should start (note this is a 2D
+        coordinate).
+    :param machine:
+    :return:
+    """
+    x, y = start
+
+    out = []
+
+    for dimension, magnitude in sorted(
+            enumerate(vector), key=(lambda x: abs(x[1])), reverse=True):
+        if magnitude == 0:
+            break
+
+        if dimension == 0:  # x
+            if magnitude > 0:
+                # Move East (0) magnitude times
+                for _ in range(magnitude):
+                    x, y = machine.xy_over_link(x, y, 0)
+                    out.append((0, (x, y)))
+            else:
+                # Move West (3) -magnitude times
+                for _ in range(magnitude, 0):
+                    x, y = machine.xy_over_link(x, y, 3)
+                    out.append((3, (x, y)))
+        elif dimension == 1:  # y
+            if magnitude > 0:
+                # Move North (2) magnitude times
+                for _ in range(magnitude):
+                    x, y = machine.xy_over_link(x, y, 2)
+                    out.append((2, (x, y)))
+            else:
+                # Move South (5) -magnitude times
+                for _ in range(magnitude, 0):
+                    x, y = machine.xy_over_link(x, y, 5)
+                    out.append((5, (x, y)))
+        else:  # z
+            if magnitude > 0:
+                # Move SouthWest (4) magnitude times
+                for _ in range(magnitude):
+                    x, y = machine.xy_over_link(x, y, 4)
+                    out.append((4, (x, y)))
+            else:
+                # Move NorthEast (1) -magnitude times
+                for _ in range(magnitude, 0):
+                    x, y = machine.xy_over_link(x, y, 1)
+                    out.append((1, (x, y)))
+    return out
