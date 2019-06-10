@@ -32,6 +32,7 @@ _concentric_hexagons = {}
 :py:func:`.memoized_concentric_hexagons`.
 """
 
+
 def _convert_a_route(
         routing_tables, partition, incoming_processor, incoming_link,
         partition_route):
@@ -342,8 +343,6 @@ def _a_star(sink, heuristic_source, sources, machine):
 
     """
     # Select the heuristic function to use for distances
-    width = machine.max_chip_x + 1
-    height = machine.max_chip_y + 1
     heuristic = (lambda node: machine.shortest_path_length(
         node, heuristic_source))
 
@@ -400,7 +399,7 @@ def _a_star(sink, heuristic_source, sources, machine):
     path = [(visited[selected_source][0], selected_source)]
     while visited[path[-1][1]][1] != sink:
         node = visited[path[-1][1]][1]
-        direction =visited[node][0]
+        direction = visited[node][0]
         path.append((direction, node))
 
     return path
