@@ -1,25 +1,25 @@
 """ Collection of functions which together validate routes.
 """
-
-from collections import namedtuple
+try:
+    from collections.abc import namedtuple
+except ImportError:
+    from collections import namedtuple
 import logging
-
-from pacman.exceptions import PacmanRoutingException
-from spinn_utilities.log import FormatAdapter
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
+from pacman.exceptions import PacmanRoutingException
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.utilities import utility_calls
 
 logger = FormatAdapter(logging.getLogger(__name__))
+_32_BITS = 0xFFFFFFFF
+range_masks = {_32_BITS - ((2 ** i) - 1) for i in range(33)}
 
 # Define an internal class for placements
 PlacementTuple = namedtuple('PlacementTuple', 'x y p')
-
-_32_BITS = 0xFFFFFFFF
-range_masks = {_32_BITS - ((2 ** i) - 1) for i in range(33)}
 
 
 def validate_routes(machine_graph, placements, routing_infos,

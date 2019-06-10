@@ -1,8 +1,7 @@
-from pacman.model.routing_tables \
-    import MulticastRoutingTable, MulticastRoutingTables
-
-from spinn_machine import MulticastRoutingEntry
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import MulticastRoutingEntry
+from pacman.model.routing_tables import (
+    MulticastRoutingTable, MulticastRoutingTables)
 
 MAX_KEYS_SUPPORTED = 2048
 MASK = 0xFFFFF800
@@ -41,6 +40,6 @@ class BasicRoutingTableGenerator(object):
                 table.add_multicast_routing_entry(MulticastRoutingEntry(
                     routing_entry_key=key_and_mask.key_combo,
                     defaultable=entry.defaultable, mask=key_and_mask.mask,
-                    link_ids=entry.out_going_links,
-                    processor_ids=entry.out_going_processors))
+                    link_ids=entry.link_ids,
+                    processor_ids=entry.processor_ids))
         return table

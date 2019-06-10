@@ -1,10 +1,11 @@
-from pacman.utilities import constants
-from pacman.utilities import file_format_schemas
-from spinn_utilities.progress_bar import ProgressBar
-
-from collections import defaultdict
-
 import json
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities.constants import EDGES
+from pacman.utilities import file_format_schemas
 
 CHIP_HOMOGENEOUS_CORES = 18
 CHIP_HOMOGENEOUS_SDRAM = 119275520
@@ -76,7 +77,7 @@ class ConvertToFileMachine(object):
         for link_id in range(0, ROUTER_MAX_NUMBER_OF_LINKS):
             if not chip.router.is_link(link_id):
                 json_obj['dead_links'].append(
-                    [x, y, "{}".format(constants.EDGES(link_id).name.lower())])
+                    [x, y, "{}".format(EDGES(link_id).name.lower())])
 
         # locate number of monitor cores and determine
         num_monitors = self._locate_no_monitors(chip)

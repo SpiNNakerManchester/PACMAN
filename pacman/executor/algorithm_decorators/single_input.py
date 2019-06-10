@@ -1,5 +1,5 @@
-from .abstract_input import AbstractInput
 from spinn_utilities.overrides import overrides
+from .abstract_input import AbstractInput
 
 
 class SingleInput(AbstractInput):

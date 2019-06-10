@@ -1,7 +1,6 @@
 from six import add_metaclass
-
-from spinn_utilities.abstract_base import \
-    AbstractBase, abstractmethod, abstractproperty
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 
 
 @add_metaclass(AbstractBase)
@@ -154,6 +153,16 @@ class AbstractGraph(object):
         :param vertex: The vertex at which the edges to get start
         :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
         :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
+        """
+
+    @abstractmethod
+    def get_outgoing_partition_for_edge(self, edge):
+        """ gets the outgoing partition this edge is associated with.
+
+        :param edge: the edge to find associated partition
+        :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
+        :return: the outgoing partition
+        :rtype: :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
         """
 
     @abstractmethod

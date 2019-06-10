@@ -1,13 +1,14 @@
+""" A collection of methods which support partitioning algorithms.
 """
-A collection of methods which support partitioning algorithms.
-"""
-
-from pacman.model.constraints.partitioner_constraints\
-    import AbstractPartitionerConstraint, SameAtomsAsVertexConstraint
-
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanPartitionException
+from pacman.model.constraints.partitioner_constraints import (
+    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint)
 
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):
@@ -73,7 +74,7 @@ def get_same_size_vertex_groups(vertices):
 
     # Dict of vertex to list of vertices with same size
     # (repeated lists expected)
-    same_size_vertices = dict()
+    same_size_vertices = OrderedDict()
 
     for vertex in vertices:
 

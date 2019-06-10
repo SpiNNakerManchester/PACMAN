@@ -1,9 +1,8 @@
-from six import add_metaclass
 import math
-
+from six import add_metaclass
+from spinn_utilities.abstract_base import AbstractBase
 from pacman.model.resources import ElementFreeSpace
 from pacman.exceptions import PacmanElementAllocationException
-from spinn_utilities.abstract_base import AbstractBase
 
 
 @add_metaclass(AbstractBase)

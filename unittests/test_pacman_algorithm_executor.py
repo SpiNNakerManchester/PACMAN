@@ -2,11 +2,10 @@ import os
 import tempfile
 import unittest
 from pacman.executor import PACMANAlgorithmExecutor
-from pacman.executor.algorithm_decorators import algorithm
-from pacman.executor.algorithm_decorators.token import Token
-from pacman.exceptions import \
-    PacmanExternalAlgorithmFailedToCompleteException,\
-    PacmanConfigurationException
+from pacman.executor.algorithm_decorators import algorithm, Token
+from pacman.exceptions import (
+    PacmanExternalAlgorithmFailedToCompleteException,
+    PacmanConfigurationException)
 
 
 @algorithm({"param": "TestType1"}, ["TestType2"])

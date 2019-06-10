@@ -36,7 +36,7 @@ class IPtagResource(object):
             stripped before transmission of data
         :type strip_sdp: bool
         :param tag: A fixed tag ID to assign, or None if any tag is OK
-        :type tag: int
+        :type tag: int or None
         :param traffic_identifier: The traffic to be sent using this tag; \
             traffic with the same traffic_identifier can be sent using\
             the same tag
@@ -93,6 +93,9 @@ class IPtagResource(object):
         return self._tag
 
     def get_value(self):
+        """
+        :return: The description of the IP tag.
+        """
         return [
             self._ip_address, self._port, self._strip_sdp, self._tag,
             self._traffic_identifier

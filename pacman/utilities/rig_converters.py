@@ -1,26 +1,24 @@
 # These two warnings are disabled; because Enum Python hackery.
 # pylint: disable=not-an-iterable, not-callable
+from six import iteritems, itervalues
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
+from pacman.model.graphs import (
+    AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups)
+from pacman.model.placements import Placement, Placements
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
+from pacman.utilities.constants import EDGES
 from rig.machine import Machine, Links
 from rig.netlist import Net
-from rig.place_and_route.constraints import \
-    LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint
+from rig.place_and_route.constraints import (
+    LocationConstraint, ReserveResourceConstraint, RouteEndpointConstraint)
 from rig.place_and_route.routing_tree import RoutingTree
 from rig.routing_table import Routes
-from six import iteritems, itervalues
-
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint, RadialPlacementFromChipConstraint
-from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
-from pacman.model.graphs import AbstractSpiNNakerLinkVertex
 from rig.place_and_route.constraints import SameChipConstraint
-
-from pacman.model.graphs.common import EdgeTrafficType
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities \
-    import get_same_chip_vertex_groups
-from pacman.model.placements import Placement, Placements
-from pacman.model.routing_table_by_partition import \
-    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry
-from pacman.utilities.constants import EDGES
 
 # A lookup from link name (string) to Links enum entry.
 LINK_LOOKUP = {l.name: l for l in Links}
@@ -114,7 +112,7 @@ def convert_to_rig_machine(machine):
             for x, y, link in dead_links))
 
 
-def convert_to_rig_graph(machine_graph):
+def convert_to_rig_graph(machine_graph, plan_n_timesteps):
     vertices_resources = dict()
     edges_resources = dict()
 
@@ -127,7 +125,8 @@ def convert_to_rig_graph(machine_graph):
             # handle standard vertices
             vertices_resources[vertex] = {
                 "cores": N_CORES_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
+                "sdram": int(vertex.resources_required.sdram.get_total_sdram(
+                    plan_n_timesteps))}
 
         # handle the vertex edges
         for partition in \
@@ -146,7 +145,7 @@ def convert_to_rig_graph(machine_graph):
     return vertices_resources, list(net_names), net_names
 
 
-def convert_to_rig_graph_pure_mc(machine_graph):
+def convert_to_rig_graph_pure_mc(machine_graph, plan_n_timesteps):
     vertices_resources = dict()
     edges_resources = dict()
 
@@ -159,7 +158,8 @@ def convert_to_rig_graph_pure_mc(machine_graph):
             # handle standard vertices
             vertices_resources[vertex] = {
                 "cores": N_CORES_PER_VERTEX,
-                "sdram": int(vertex.resources_required.sdram.get_value())}
+                "sdram": int(vertex.resources_required.sdram.get_total_sdram(
+                    plan_n_timesteps))}
 
         # handle the vertex edges
         for partition in \

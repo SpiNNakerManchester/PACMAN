@@ -1,14 +1,12 @@
-from six import add_metaclass
 import sys
-
-from pacman.model.constraints.partitioner_constraints import \
-    MaxVertexAtomsConstraint
+from six import add_metaclass
+from spinn_utilities.overrides import overrides
+from spinn_utilities.abstract_base import (
+    abstractmethod, abstractproperty, AbstractBase)
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
-
-from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import \
-    abstractmethod, abstractproperty, AbstractBase
 
 
 @add_metaclass(AbstractBase)
@@ -84,3 +82,9 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :return: The number of atoms
         :rtype: int
         """
+
+    def get_max_atoms_per_core(self):
+        for constraint in self.constraints:
+            if isinstance(constraint, MaxVertexAtomsConstraint):
+                return constraint.size
+        return self.n_atoms

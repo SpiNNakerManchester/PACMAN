@@ -1,13 +1,12 @@
+import sys
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.placer_constraints \
-    import ChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs \
-    import AbstractVirtualVertex, AbstractSpiNNakerLinkVertex
+from pacman.model.graphs import (
+    AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
-
-import sys
 
 
 class ApplicationSpiNNakerLinkVertex(
@@ -76,6 +75,4 @@ class ApplicationSpiNNakerLinkVertex(
             constraints=None):
         vertex = MachineSpiNNakerLinkVertex(
             self._spinnaker_link_id, self._board_address, label, constraints)
-        vertex.set_virtual_chip_coordinates(
-            self._virtual_chip_x, self._virtual_chip_y)
         return vertex

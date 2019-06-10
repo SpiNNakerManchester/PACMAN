@@ -2,27 +2,19 @@
 test for partitioning
 """
 from __future__ import division
-
-# pacman imports
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-
-from pacman.exceptions import PacmanPartitionException, \
-    PacmanInvalidParameterException, PacmanValueError
-from pacman.model.constraints.partitioner_constraints\
-    import MaxVertexAtomsConstraint, FixedVertexAtomsConstraint
-from pacman.model.constraints.partitioner_constraints\
-    import SameAtomsAsVertexConstraint
-from pacman.model.resources.pre_allocated_resource_container import \
-    PreAllocatedResourceContainer
-from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
-
-# spinnMachine imports
-from spinn_machine import Machine, Processor, SDRAM, Link, Router, Chip
-
-# general imports
 import unittest
+from spinn_machine import (
+    Processor, SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from pacman.exceptions import (
+    PacmanPartitionException, PacmanInvalidParameterException,
+    PacmanValueError)
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
+    SameAtomsAsVertexConstraint)
+from pacman.model.resources import PreAllocatedResourceContainer
+from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
-from spinn_machine.virtual_machine import VirtualMachine
 
 
 class TestBasicPartitioner(unittest.TestCase):
@@ -72,9 +64,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         self.bp = PartitionAndPlacePartitioner()
 
     def test_partition_with_no_additional_constraints(self):
@@ -172,9 +167,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         singular_vertex = SimpleTestVertex(450, "Large vertex",
                                            max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
@@ -215,9 +213,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
                                         max_atoms_per_core=1)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
@@ -229,7 +230,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_partition_with_less_sdram_than_default(self):
         """
         test that the partitioner works when its machine is slightly malformed
-        in that it has less sdram available
+        in that it has less SDRAM available
         """
         self.setup()
         flops = 200000000
@@ -256,15 +257,18 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
 
     def test_partition_with_more_sdram_than_default(self):
         """
         test that the partitioner works when its machine is slightly malformed
-        in that it has more sdram available
+        in that it has more SDRAM available
         """
         self.setup()
         flops = 200000000
@@ -291,9 +295,12 @@ class TestBasicPartitioner(unittest.TestCase):
         chips = list()
         for x in range(5):
             for y in range(5):
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                if x == y == 0:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                else:
+                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
 
-        self.machine = Machine(chips, 0, 0)
+        self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
 
     def test_partition_with_unsupported_constraints(self):
@@ -323,7 +330,7 @@ class TestBasicPartitioner(unittest.TestCase):
     def test_operation_with_same_size_as_vertex_constraint(self):
         """
         test that the partition and place partitioner can handle same size as
-        constraints ona  vertex that is split into one core
+        constraints on a vertex that is split into one core
         """
         self.setup()
         constrained_vertex = SimpleTestVertex(5, "Constrained")
@@ -398,9 +405,9 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex_2.add_constraint(SameAtomsAsVertexConstraint(
             vertex_1))
         graph.add_vertices([vertex_1, vertex_2, vertex_3])
-        machine = VirtualMachine(version=3, with_wrap_arounds=None)
+        machine = virtual_machine(version=3)
         partitioner = PartitionAndPlacePartitioner()
-        _, graph_mapper, _ = partitioner(graph, machine)
+        _, graph_mapper, _ = partitioner(graph, machine, plan_n_timesteps=None)
         subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
         subvertices_2 = list(graph_mapper.get_machine_vertices(vertex_2))
         subvertices_3 = list(graph_mapper.get_machine_vertices(vertex_3))
@@ -457,7 +464,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # but 1MB off 2MB per chip (so 19MB per chip)
         n_cores_per_chip = 10
         sdram_per_chip = (n_cores_per_chip * 2) - 1
-        machine = VirtualMachine(
+        machine = virtual_machine(
             width=2, height=2, with_monitors=False,
             n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
@@ -475,7 +482,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # Do the partitioning - this should result in an error
         with self.assertRaises(PacmanPartitionException):
             partitioner = PartitionAndPlacePartitioner()
-            partitioner(app_graph, machine)
+            partitioner(app_graph, machine, plan_n_timesteps=None)
 
     def test_partition_with_fixed_atom_constraints_at_limit(self):
         """
@@ -487,7 +494,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # and 8MB SDRAM per chip
         n_cores_per_chip = 1
         sdram_per_chip = 8
-        machine = VirtualMachine(
+        machine = virtual_machine(
             width=2, height=2, with_monitors=False,
             n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
@@ -502,7 +509,8 @@ class TestBasicPartitioner(unittest.TestCase):
 
         # Do the partitioning - this should just work
         partitioner = PartitionAndPlacePartitioner()
-        machine_graph, _, _ = partitioner(app_graph, machine)
+        machine_graph, _, _ = partitioner(
+            app_graph, machine, plan_n_timesteps=None)
         self.assert_(len(machine_graph.vertices) == 4)
 
 

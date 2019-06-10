@@ -1,12 +1,10 @@
-from pacman.utilities.utility_objs import ResourceTracker
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import \
-    get_same_chip_vertex_groups, sort_vertices_by_known_constraints
-from pacman.model.placements import Placement, Placements
-
-from spinn_utilities.progress_bar import ProgressBar
-
 import random
 import numpy
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs import ResourceTracker
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
+from pacman.model.placements import Placement, Placements
 
 
 class RandomPlacer(object):
@@ -19,7 +17,19 @@ class RandomPlacer(object):
     # a list.
     THRESHOLD = 3
 
-    def __call__(self, machine_graph, machine):
+    def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """ Place each vertex in a machine graph on a core in the machine.
+
+        :param machine_graph: The machine_graph to place
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
+        :param machine: A SpiNNaker machine object.
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :return placements: Placements of vertices on the machine
+        :rtype :py:class:`pacman.model.placements.Placements`
+        """
 
         # check that the algorithm can handle the constraints
         ResourceTracker.check_constraints(machine_graph.vertices)
@@ -31,7 +41,7 @@ class RandomPlacer(object):
         progress = ProgressBar(machine_graph.n_vertices,
                                "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_random_chips(machine))
+            machine, plan_n_timesteps, self._generate_random_chips(machine))
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         vertices_placed = set()
         for vertex in progress.over(vertices):

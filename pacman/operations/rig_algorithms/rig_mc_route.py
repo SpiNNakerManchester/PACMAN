@@ -1,7 +1,10 @@
-from pacman.utilities import rig_converters
-from rig.place_and_route.route.ner import route
-from spinn_utilities.progress_bar import ProgressBar
 from six import iteritems
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities.rig_converters import (
+    convert_from_rig_routes, convert_to_rig_graph_pure_mc,
+    convert_to_rig_machine, convert_to_rig_placements,
+    create_rig_machine_constraints, create_rig_graph_constraints)
+from rig.place_and_route.route.ner import route
 
 
 class RigMCRoute(object):
@@ -10,27 +13,25 @@ class RigMCRoute(object):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine, placements):
+    def __call__(self, machine_graph, machine, plan_n_timesteps, placements):
         progress_bar = ProgressBar(7, "Routing")
 
         vertices_resources, nets, net_names = \
-            rig_converters.convert_to_rig_graph_pure_mc(machine_graph)
+            convert_to_rig_graph_pure_mc(machine_graph, plan_n_timesteps)
         progress_bar.update()
 
-        rig_machine = rig_converters.convert_to_rig_machine(machine)
+        rig_machine = convert_to_rig_machine(machine)
         progress_bar.update()
 
-        rig_constraints = rig_converters.create_rig_machine_constraints(
-            machine)
+        rig_constraints = create_rig_machine_constraints(machine)
         progress_bar.update()
 
-        rig_constraints.extend(
-            rig_converters.create_rig_graph_constraints(
-                machine_graph, machine))
+        rig_constraints.extend(create_rig_graph_constraints(
+            machine_graph, machine))
         progress_bar.update()
 
-        rig_placements, rig_allocations = \
-            rig_converters.convert_to_rig_placements(placements, machine)
+        rig_placements, rig_allocations = convert_to_rig_placements(
+            placements, machine)
         progress_bar.update()
 
         rig_routes = route(
@@ -40,7 +41,7 @@ class RigMCRoute(object):
             name: rig_routes[net] for net, name in iteritems(net_names)}
         progress_bar.update()
 
-        routes = rig_converters.convert_from_rig_routes(rig_routes)
+        routes = convert_from_rig_routes(rig_routes)
         progress_bar.update()
         progress_bar.end()
 

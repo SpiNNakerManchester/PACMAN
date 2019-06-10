@@ -1,13 +1,10 @@
 """
 tests for placement
 """
-# pacman imports
+import unittest
 from pacman.exceptions import PacmanAlreadyPlacedError
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placement, Placements
-
-# general imports
-import unittest
 
 
 class TestPlacement(unittest.TestCase):

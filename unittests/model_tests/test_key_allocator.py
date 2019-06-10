@@ -1,9 +1,9 @@
 import unittest
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.utility_objs import Field, FlexiField
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint, \
-    FixedKeyFieldConstraint, FixedMaskConstraint, FlexiKeyFieldConstraint
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
+    FixedKeyFieldConstraint, FixedMaskConstraint, FlexiKeyFieldConstraint)
 
 
 class TestKeyAllocatorConstraints(unittest.TestCase):

@@ -1,10 +1,11 @@
 import unittest
-from collections import deque
-
-from spinn_machine.virtual_machine import VirtualMachine
-
-from pacman.model.graphs.machine import \
-    MachineGraph, MachineEdge, SimpleMachineVertex
+try:
+    from collections.abc import deque
+except ImportError:
+    from collections import deque
+from spinn_machine.virtual_machine import virtual_machine
+from pacman.model.graphs.machine import (
+    MachineGraph, MachineEdge, SimpleMachineVertex)
 from pacman.operations.router_algorithms import BasicDijkstraRouting
 from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
@@ -14,22 +15,18 @@ class MyTestCase(unittest.TestCase):
 
     def test_routing(self):
         graph = MachineGraph("Test")
-        machine = VirtualMachine(2, 2)
+        machine = virtual_machine(2, 2)
         placements = Placements()
         vertices = list()
 
-        for x in range(machine.max_chip_x + 1):
-            for y in range(machine.max_chip_y + 1):
-                chip = machine.get_chip_at(x, y)
-                if chip is not None:
-                    for processor in chip.processors:
-                        if not processor.is_monitor:
-                            vertex = SimpleMachineVertex(
-                                resources=ResourceContainer())
-                            graph.add_vertex(vertex)
-                            placements.add_placement(Placement(
-                                vertex, x, y, processor.processor_id))
-                            vertices.append(vertex)
+        for chip in machine.chips:
+            for processor in chip.processors:
+                if not processor.is_monitor:
+                    vertex = SimpleMachineVertex(resources=ResourceContainer())
+                    graph.add_vertex(vertex)
+                    placements.add_placement(Placement(
+                        vertex, chip.x, chip.y, processor.processor_id))
+                    vertices.append(vertex)
 
         for vertex in vertices:
             for vertex_to in vertices:
@@ -56,12 +53,12 @@ class MyTestCase(unittest.TestCase):
                     partition, x, y)
                 self.assertIsNotNone(entry)
                 chip = machine.get_chip_at(x, y)
-                for p in entry.out_going_processors:
+                for p in entry.processor_ids:
                     self.assertIsNotNone(chip.get_processor_with_id(p))
                     vertex_found = placements.get_vertex_on_processor(x, y, p)
                     vertices_reached.add(vertex_found)
                 seen_entries.add((x, y))
-                for link_id in entry.out_going_links:
+                for link_id in entry.link_ids:
                     link = chip.router.get_link(link_id)
                     self.assertIsNotNone(link)
                     dest_x, dest_y = link.destination_x, link.destination_y

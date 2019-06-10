@@ -1,7 +1,5 @@
-from pacman.executor.algorithm_classes import PythonClassAlgorithm
-
-# general imports
 import unittest
+from pacman.executor.algorithm_classes import PythonClassAlgorithm
 
 
 class TestPythonClassAlgorithm(unittest.TestCase):
@@ -13,4 +11,4 @@ class TestPythonClassAlgorithm(unittest.TestCase):
         python_module = "Foo"
         alg = PythonClassAlgorithm("algorithm_id", [], [], [],
                                    python_module, "python_function")
-        self.assertEquals(python_module, alg._python_module)
+        self.assertEqual(python_module, alg._python_module)

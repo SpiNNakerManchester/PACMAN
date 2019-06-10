@@ -1,4 +1,3 @@
-# pacman imports
 from .abstract_partitioner_constraint import AbstractPartitionerConstraint
 
 
@@ -40,6 +39,11 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
         if not isinstance(other, SameAtomsAsVertexConstraint):
             return False
         return self._vertex == other.vertex
+
+    def __ne__(self, other):
+        if not isinstance(other, SameAtomsAsVertexConstraint):
+            return True
+        return not self.__eq__(other)
 
     def __hash__(self):
         return hash((self._vertex,))
