@@ -105,8 +105,7 @@ def to_json(router_table):
             json_entry["key"] = entry.routing_entry_key
             json_entry["mask"] = entry.mask
             json_entry["defaultable"] = entry.defaultable
-            json_entry["processor_ids"] = list(entry.processor_ids)
-            json_entry["link_ids"] = list(entry.link_ids)
+            json_entry["spinnaker_route"] = entry.spinnaker_route
             entries.append(json_entry)
         json_routing_table["entries"] = entries
         json_list.append(json_routing_table)
@@ -124,8 +123,9 @@ def from_json(j_router):
         tables.add_routing_table(table)
         for j_entry in j_table["entries"]:
             table.add_multicast_routing_entry(MulticastRoutingEntry(
-                j_entry["key"], j_entry["mask"], j_entry["processor_ids"],
-                j_entry["link_ids"], j_entry["defaultable"]))
+                j_entry["key"], j_entry["mask"],
+                defaultable=j_entry["defaultable"],
+                spinnaker_route=j_entry["spinnaker_route"]))
     return tables
 
 
