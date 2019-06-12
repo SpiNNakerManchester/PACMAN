@@ -1,7 +1,6 @@
 import json
 import os
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine.json_machine import to_json
 from pacman.utilities import file_format_schemas
 from pacman.model.routing_tables.multicast_routing_tables import to_json
 
