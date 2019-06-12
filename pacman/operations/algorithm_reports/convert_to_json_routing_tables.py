@@ -44,11 +44,11 @@ class ConvertToJsonRoutingTables(object):
             progress.update()
 
         # validate the schema
-        #file_format_schemas.validate(json_obj, "jmachine.json")
+        file_format_schemas.validate(json_obj, "routes.json")
 
         # update and complete progress bar
-        #if progress:
-        #    progress.end()
+        if progress:
+            progress.end()
 
         # dump to json file
         with open(file_path, "w") as f:

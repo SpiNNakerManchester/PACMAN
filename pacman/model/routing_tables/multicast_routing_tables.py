@@ -1,9 +1,11 @@
 try:
-    from collections.abc import defaultdict, namedtuple, OrderedDict
+    from collections.abc import OrderedDict
 except ImportError:
-    from collections import defaultdict, namedtuple, OrderedDict
+    from collections import OrderedDict
 import json
 from pacman.exceptions import PacmanAlreadyExistsException
+from .multicast_routing_table import MulticastRoutingTable
+from spinn_machine import MulticastRoutingEntry
 
 
 class MulticastRoutingTables(object):
@@ -109,3 +111,21 @@ def to_json(router_table):
         json_routing_table["entries"] = entries
         json_list.append(json_routing_table)
     return json_list
+
+
+def from_json(j_router):
+    if isinstance(j_router, str):
+        with open(j_router) as j_file:
+            j_router = json.load(j_file)
+
+    tables = MulticastRoutingTables()
+    for j_table in j_router:
+        table = MulticastRoutingTable(j_table["x"], j_table["y"])
+        tables.add_routing_table(table)
+        for j_entry in j_table["entries"]:
+            table.add_multicast_routing_entry(MulticastRoutingEntry(
+                j_entry["key"], j_entry["mask"], j_entry["processor_ids"],
+                j_entry["link_ids"], j_entry["defaultable"]))
+    return tables
+
+
