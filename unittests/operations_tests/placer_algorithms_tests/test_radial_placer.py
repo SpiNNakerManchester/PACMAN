@@ -46,12 +46,12 @@ class TestRadialPlacer(unittest.TestCase):
             for y in range(10):
                 links = list()
 
-                links.append(Link(x, y, 0, (x + 1) % 10, y, n, n))
-                links.append(Link(x, y, 1, (x + 1) % 10, (y + 1) % 10, s, s))
-                links.append(Link(x, y, 2, x, (y + 1) % 10, n, n))
-                links.append(Link(x, y, 3, (x - 1) % 10, y, s, s))
-                links.append(Link(x, y, 4, (x - 1) % 10, (y - 1) % 10, n, n))
-                links.append(Link(x, y, 5, x, (y - 1) % 10, s, s))
+                links.append(Link(x, y, 0, (x + 1) % 10, y))
+                links.append(Link(x, y, 1, (x + 1) % 10, (y + 1) % 10))
+                links.append(Link(x, y, 2, x, (y + 1) % 10))
+                links.append(Link(x, y, 3, (x - 1) % 10, y))
+                links.append(Link(x, y, 4, (x - 1) % 10, (y - 1) % 10))
+                links.append(Link(x, y, 5, x, (y - 1) % 10))
 
                 r = Router(links, False, 100, 1024)
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
