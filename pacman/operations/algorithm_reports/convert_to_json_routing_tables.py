@@ -43,7 +43,7 @@ class ConvertToJsonRoutingTables(object):
             progress.update()
 
         # validate the schema
-        file_format_schemas.validate(json_obj, "routes.json")
+        file_format_schemas.validate(json_obj, "router.json")
 
         # update and complete progress bar
         if progress:
