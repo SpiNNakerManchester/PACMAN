@@ -1,6 +1,9 @@
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
-from pacman.model.routing_tables.multicast_routing_tables import from_json
+from pacman.model.routing_tables.multicast_routing_tables import (from_json, to_json)
+from spinn_machine import MulticastRoutingEntry
+import json
+
 
 def intersect(key_a, mask_a, key_b, mask_b):
     """Return if key-mask pairs intersect (i.e., would both match some of the
@@ -30,8 +33,30 @@ def intersect(key_a, mask_a, key_b, mask_b):
 
 
 def merge(entry1, entry2, unchecked):
-    sharedmask = entry1.mask & entry2.mask
+    any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
+    all_ones = 0xffffffff  # ... 1 in *all* of the keys
+    all_selected = 0xffffffff  # ... 1 in *all* of the masks
 
+    # Update the values
+    any_ones |= entry1.routing_entry_key
+    any_ones |= entry2.routing_entry_key
+    all_ones &= entry1.routing_entry_key
+    all_ones &= entry2.routing_entry_key
+    all_selected &= entry1.mask
+    all_selected &= entry2.mask
+
+    # Compute the new mask, key and generality
+    any_zeros = ~all_ones
+    new_xs = any_ones ^ any_zeros
+    mask = all_selected & new_xs  # Combine existing and new Xs
+    key = all_ones & mask
+    return MulticastRoutingEntry(key, mask, entry1.processor_ids, entry2.link_ids, True)
+    print(entry1)
+    print("key: {0:b} mask: {1:b}".format(entry1.routing_entry_key, entry1.mask))
+    print("key: {} mask: {}".format(entry1.routing_entry_key, entry1.mask))
+    print(entry2)
+    print("key: {0:b} mask: {1:b}".format(entry2.routing_entry_key, entry2.mask))
+    print("key: {0:b} mask: {1:b}".format(key, mask))
 
 def compress_by_route(to_check, unchecked):
     unmergable = []
@@ -44,7 +69,7 @@ def compress_by_route(to_check, unchecked):
                 to_check.append(merged)
         break
         unmergable.append(entry)
-    unmergable.append(to_check.pop)
+    unmergable.append(to_check.pop())
     return unmergable
 
 def compress_table(router_table):
@@ -74,5 +99,14 @@ def compress_tables(router_tables):
     return compressed_tables
 
 if __name__ == '__main__':
-    router_tables = from_json("routing_tables.json")
-    compress_tables(router_tables)
+    router_tables = from_json("small_routing_tables.json")
+    compressed = compress_tables(router_tables)
+    with open("compressed_routing_tables.json", "w") as f:
+        json.dump(to_json(compressed), f)
+    """
+    proc_ids = range(18)
+    link_ids = range(6)
+    entry1 = MulticastRoutingEntry(0, 4294967232, proc_ids, link_ids, True)
+    entry2 = MulticastRoutingEntry(64, 4294967232, proc_ids, link_ids, True)
+    merge(entry1, entry2, [])
+    """
