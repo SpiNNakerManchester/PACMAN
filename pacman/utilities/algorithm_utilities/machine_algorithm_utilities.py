@@ -19,8 +19,6 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
         destination_y=virtual_chip_y,
         source_x=link_data.connected_chip_x,
         source_y=link_data.connected_chip_y,
-        multicast_default_from=virtual_link_id,
-        multicast_default_to=virtual_link_id,
         source_link_id=link_data.connected_link)
 
     # Create link to the real chip from the virtual chip
@@ -29,8 +27,6 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
         destination_y=link_data.connected_chip_y,
         source_x=virtual_chip_x,
         source_y=virtual_chip_y,
-        multicast_default_from=link_data.connected_link,
-        multicast_default_to=link_data.connected_link,
         source_link_id=virtual_link_id)
 
     # create the router
