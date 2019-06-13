@@ -352,4 +352,25 @@
             <param_name>graph</param_name>
         </required_inputs>
     </algorithm>
+    <algorithm name="ConvertToJsonRoutingTables">
+        <python_module>pacman.operations.algorithm_reports.convert_to_json_routing_tables</python_module>
+        <python_class>ConvertToJsonRoutingTables</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+            <param_name>report_folder</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>JsonRoutingTablesPath</param_type>
+        </outputs>
+    </algorithm>
 </algorithms>
