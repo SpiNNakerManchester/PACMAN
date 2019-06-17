@@ -96,13 +96,15 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
                     "Compressed route {} covers original route {} but has "
                     "a different defaultable value.".format(c_route, o_route))
             if o_route.processor_ids != c_route.processor_ids:
-                raise PacmanRoutingException(
-                    "Compressed route {} covers original route {} but has "
-                    "a different processor_ids.".format(c_route, o_route))
+                if set(o_route.processor_ids) != set(c_route.processor_ids):
+                    raise PacmanRoutingException(
+                        "Compressed route {} covers original route {} but has "
+                        "a different processor_ids.".format(c_route, o_route))
             if o_route.link_ids != c_route.link_ids:
-                raise PacmanRoutingException(
-                    "Compressed route {} covers original route {} but has "
-                    "a different link_ids.".format(c_route, o_route))
+                if set(o_route.link_ids) != set(c_route.link_ids):
+                    raise PacmanRoutingException(
+                        "Compressed route {} covers original route {} but has "
+                        "a different link_ids.".format(c_route, o_route))
             remainders = calc_remainders(o_code, c_code)
             for remainder in remainders:
                 compare_route(f, o_route, compressed_dict, o_code=remainder,
@@ -110,7 +112,6 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
             return
         compare_route(f, o_route, compressed_dict, o_code=o_code, start=i+1)
         return
-
 
 def generate_routing_compression_checker_report(
         report_folder, routing_tables, compressed_routing_tables):
@@ -130,7 +131,6 @@ def generate_routing_compression_checker_report(
             progress = ProgressBar(
                 routing_tables.routing_tables,
                 "Generating routing compression checker report")
-
             f.write("If this table did not raise an exception compression "
                     "was fully checked. \n\n")
             f.write("The format is:\n"
