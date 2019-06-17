@@ -39,34 +39,34 @@ def intersect(key_a, mask_a, key_b, mask_b):
 
 
 def merge(entry1, entry2):
-    any_ones = entry1.routing_entry_key | entry2.routing_entry_key
-    all_ones = entry1.routing_entry_key & entry2.routing_entry_key
-    all_selected = entry1.mask & entry2.mask
+    key1, mask1, defaultable1 = entry1
+    key2, mask2, defaultable2 = entry2
+    any_ones = key1 | key2
+    all_ones = key1 & key2
+    all_selected = mask1 & mask2
 
     # Compute the new mask  and key
     any_zeros = ~all_ones
     new_xs = any_ones ^ any_zeros
     mask = all_selected & new_xs  # Combine existing and new Xs
     key = all_ones & mask
-    return key, mask
+    return key, mask, defaultable1 and defaultable2
 
-def find_merge(entry1, entry2, all_entries):
-    m_key, m_mask = merge(entry1, entry2)
-    for spinnaker_route in all_entries:
-        if spinnaker_route != entry1.spinnaker_route:
-            for check in all_entries[spinnaker_route]:
-                if intersect(check.routing_entry_key, check.mask, m_key, m_mask):
+def find_merge(entry1, entry2, spinnaker_route, all_entries):
+    m_key, m_mask, defaultable  = merge(entry1, entry2)
+    for check_route in all_entries:
+        if check_route != spinnaker_route:
+            for c_key, c_mask, _ in all_entries[check_route]:
+                if intersect(c_key, c_mask, m_key, m_mask):
                     return None
-    return MulticastRoutingEntry(
-        m_key, m_mask, defaultable=entry1.defaultable &entry2.defaultable ,
-        spinnaker_route=entry1.spinnaker_route)
+    return m_key, m_mask, defaultable
 
-def compress_by_route(to_check, all_entries):
+def compress_by_route(to_check, spinnaker_route, all_entries):
     unmergable = []
     while len(to_check) > 1:
         entry = to_check.pop()
         for other in to_check:
-            merged = find_merge(entry, other, all_entries)
+            merged = find_merge(entry, other, spinnaker_route, all_entries)
             if merged is not None:
                 to_check.remove(other)
                 to_check.append(merged)
@@ -81,7 +81,7 @@ def compress_table(router_table):
     all_entries = defaultdict(list)
     spinnaker_routes = set()
     for entry in router_table.multicast_routing_entries:
-        all_entries[entry.spinnaker_route].append(entry)
+        all_entries[entry.spinnaker_route].append((entry.routing_entry_key, entry.mask, entry.defaultable))
         spinnaker_routes.add(entry.spinnaker_route)
 
     length = router_table.number_of_entries
@@ -89,13 +89,17 @@ def compress_table(router_table):
         if length > MAX_SUPPORTED_LENGTH:
             to_check = all_entries[spinnaker_route]
             length -= len(to_check)
-            compressed = compress_by_route(to_check, all_entries)
+            compressed = compress_by_route(to_check, spinnaker_route, all_entries)
             length += len(compressed)
             all_entries[spinnaker_route] = compressed
         else:
             compressed = all_entries[spinnaker_route]
-        for entry in compressed:
-            compressed_table.add_multicast_routing_entry(entry)
+
+    for spinnaker_route in spinnaker_routes:
+        for key, mask, defaultable in all_entries[spinnaker_route]:
+            compressed_table.add_multicast_routing_entry(
+                MulticastRoutingEntry(key, mask, defaultable= defaultable,
+                                      spinnaker_route=spinnaker_route))
     print(router_table.number_of_entries, len(spinnaker_routes), compressed_table.number_of_entries)
     return compressed_table
 
@@ -104,7 +108,7 @@ def compress_tables(router_tables):
     compressed_tables = MulticastRoutingTables()
     for table in router_tables:
         print(table.number_of_entries)
-        if table.number_of_entries < MAX_SUPPORTED_LENGTH:
+        if table.number_of_entries < 3000: # MAX_SUPPORTED_LENGTH:
             compressed_table = table
         else:
             compressed_table = compress_table(table)

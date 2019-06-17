@@ -91,7 +91,7 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
             f.write("\t\t{}\n".format(reports.format_route(c_route)))
-            if o_route.defaultable != c_route.defaultable:
+            if c_route.defaultable and not c_route.defaultable:
                 raise PacmanRoutingException(
                     "Compressed route {} covers original route {} but has "
                     "a different defaultable value.".format(c_route, o_route))
