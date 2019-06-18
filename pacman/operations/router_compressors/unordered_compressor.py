@@ -12,7 +12,8 @@ MAX_SUPPORTED_LENGTH = 1023
 
 class UnorderedCompressor(object):
     """
-    Routing Table compressor based on bute force find mergable pairs to replace.
+    Routing Table compressor based on bute force.
+    Finds mergable pairs to replace.
 
     This algorithm assumes unordered rounting tables and returns
     unordered routing tables. It can therefor be used either as the main
@@ -20,18 +21,19 @@ class UnorderedCompressor(object):
 
     In the simplest format the algorithm is.
     For every pair of entries in the table
-        If they the same spinnaker_route
+        If they have the same spinnaker_route
             Create a merged entry
             Check that does not intersect any entry with a different route
-                remove the two original entries
-                add the merged entry
-                start over
+                Remove the two original entries
+                Add the merged entry
+                Start over
 
     A slightly optimised algorithm is:
     Split the entries into buckets based on spinnaker route
     Process the buckets one at a time
         For each entry in the buckets
-            Try to merge with every other entry in the bucket
+            For each other entry in the bucket
+                Create a merge entry
                 Make sure there is no clash with an entry in another bucket
                 Replace the two entries and add the merge
                 Start the bucket over
@@ -144,7 +146,7 @@ class UnorderedCompressor(object):
         :type entry1: [(int, int, bool)]
         :param spinnaker_route: The route shared by all to_check entries
         :type spinnaker_route: int
-        :return: (Key, Mask, defaultable) from each entry in the compressed list
+        :return: (Key, Mask, defaultable) for each entry in the compressed list
         :rtype: [(int, int, bool)]
         """
         results = []
@@ -195,7 +197,8 @@ class UnorderedCompressor(object):
                 break
 
         # convert the results back to a routing table
-        compressed_table = MulticastRoutingTable(router_table.x, router_table.y)
+        compressed_table = MulticastRoutingTable(
+            router_table.x, router_table.y)
         for spinnaker_route in spinnaker_routes:
             for key, mask, defaultable in self._all_entries[spinnaker_route]:
                 compressed_table.add_multicast_routing_entry(

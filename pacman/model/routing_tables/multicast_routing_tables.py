@@ -127,5 +127,3 @@ def from_json(j_router):
                 defaultable=j_entry["defaultable"],
                 spinnaker_route=j_entry["spinnaker_route"]))
     return tables
-
-

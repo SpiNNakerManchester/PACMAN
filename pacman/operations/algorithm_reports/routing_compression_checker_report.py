@@ -113,6 +113,7 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
         compare_route(f, o_route, compressed_dict, o_code=o_code, start=i+1)
         return
 
+
 def generate_routing_compression_checker_report(
         report_folder, routing_tables, compressed_routing_tables):
     """ Make a full report of how the compressed covers all routes in the\
