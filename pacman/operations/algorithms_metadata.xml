@@ -494,6 +494,52 @@
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="UnorderdedCompressor">
+        <python_module>pacman.operations.router_compressors.unordered_compressor</python_module>
+        <python_class>UnorderedCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>target_length</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryCompressedRoutingTables</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="UnorderdedPreCompressor">
+        <python_module>pacman.operations.router_compressors.unordered_compressor</python_module>
+        <python_class>UnorderedCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>target_length</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryRoutingTables</param_type>
+        </outputs>
+    </algorithm>
     <algorithm name="BasicRouteMerger">
         <python_module>pacman.operations.router_compressors.basic_route_merger</python_module>
         <python_class>BasicRouteMerger</python_class>
