@@ -5,9 +5,7 @@ except ImportError:
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
-from pacman.model.routing_tables.multicast_routing_tables import (from_json, to_json)
 from spinn_machine import MulticastRoutingEntry
-import json
 
 MAX_SUPPORTED_LENGTH = 1023
 
@@ -129,7 +127,7 @@ class UnorderedCompressor(object):
         :return: Key, Mask, defaultable from checked merged entry or None
         :rtype: (int, int, bool)
         """
-        m_key, m_mask, defaultable  = self.merge(entry1, entry2)
+        m_key, m_mask, defaultable = self.merge(entry1, entry2)
         for check_route in self._all_entries:
             if check_route != spinnaker_route:
                 for c_key, c_mask, _ in self._all_entries[check_route]:
@@ -163,7 +161,7 @@ class UnorderedCompressor(object):
         results.append(to_check.pop())
         return results
 
-    def compress_table(self,router_table):
+    def compress_table(self, router_table):
         """
         Compresses all the entries for a single table.
 
@@ -201,12 +199,9 @@ class UnorderedCompressor(object):
         for spinnaker_route in spinnaker_routes:
             for key, mask, defaultable in self._all_entries[spinnaker_route]:
                 compressed_table.add_multicast_routing_entry(
-                    MulticastRoutingEntry(key, mask, defaultable= defaultable,
+                    MulticastRoutingEntry(key, mask, defaultable=defaultable,
                                           spinnaker_route=spinnaker_route))
-        print(router_table.number_of_entries,
-              len(spinnaker_routes), compressed_table.number_of_entries)
         return compressed_table
-
 
     def compress_tables(self, router_tables, progress):
         """
@@ -222,7 +217,6 @@ class UnorderedCompressor(object):
         """
         compressed_tables = MulticastRoutingTables()
         for table in progress.over(router_tables.routing_tables):
-            print(table.number_of_entries)
             if table.number_of_entries < self._target_length:
                 compressed_table = table
             else:
@@ -230,17 +224,3 @@ class UnorderedCompressor(object):
             compressed_tables.add_routing_table(compressed_table)
 
         return compressed_tables
-
-
-from pacman.operations.algorithm_reports.routing_compression_checker_report \
-    import generate_routing_compression_checker_report
-
-if __name__ == '__main__':
-    router_tables = from_json("D:\spinnaker\my_spinnaker\malloc_hard_routing_tables.json")
-    #router_tables = from_json("small_routing_tables.json")
-    compressor = UnorderedCompressor()
-    compressed = compressor(router_tables, 3000)
-    generate_routing_compression_checker_report("", router_tables, compressed)
-    with open("compressed_routing_tables.json", "w") as f:
-        json.dump(to_json(compressed), f)
-
