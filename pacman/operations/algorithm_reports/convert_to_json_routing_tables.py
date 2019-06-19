@@ -21,7 +21,7 @@ class ConvertToJsonRoutingTables(object):
        :type report_folder: str
         """
         # Steps are tojson, validate and writefile
-        progress = ProgressBar(2, "Converting to JSON RouterTables")
+        progress = ProgressBar(3, "Converting to JSON RouterTables")
 
         file_path = os.path.join(report_folder, _ROUTING_FILENAME)
         return ConvertToJsonRoutingTables.do_convert(
@@ -43,17 +43,17 @@ class ConvertToJsonRoutingTables(object):
             progress.update()
 
         # validate the schema
-        file_format_schemas.validate(json_obj, "routes.json")
+        file_format_schemas.validate(json_obj, "router.json")
 
         # update and complete progress bar
         if progress:
-            progress.end()
+            progress.update()
 
         # dump to json file
         with open(file_path, "w") as f:
             json.dump(json_obj, f)
 
         if progress:
-            progress.update()
+            progress.end()
 
         return file_path
