@@ -129,8 +129,8 @@ class TestRoutingTable(unittest.TestCase):
         tables = MulticastRoutingTables(mrt)
         retrieved_tables = tables.routing_tables
         self.assertEqual(len(retrieved_tables), len(mrt))
-        #for tab in retrieved_tables:
-        #    self.assertIn(tab, mrt)
+        for tab in retrieved_tables:
+            self.assertIn(tab, mrt)
 
         self.assertEqual(tables.get_routing_table_for_chip(0, 0), t1)
         self.assertEqual(tables.get_routing_table_for_chip(1, 0), t2)
