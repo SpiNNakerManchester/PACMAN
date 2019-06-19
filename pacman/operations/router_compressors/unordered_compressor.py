@@ -7,12 +7,11 @@ from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from spinn_machine import MulticastRoutingEntry
 
-MAX_SUPPORTED_LENGTH = 1023
 
 
 class UnorderedCompressor(object):
     """
-    Routing Table compressor based on bute force.
+    Routing Table compressor based on brute force.
     Finds mergable pairs to replace.
 
     This algorithm assumes unordered rounting tables and returns
@@ -56,12 +55,12 @@ class UnorderedCompressor(object):
 
     def __call__(self, router_tables, target_length=None):
         if target_length is None:
-            self._target_length = MAX_SUPPORTED_LENGTH
+            self._target_length = 0  # Compress as much as you can
         else:
             self._target_length = target_length
         # create progress bar
         progress = ProgressBar(
-            router_tables.routing_tables, "(Pre)Compressing routing Tables")
+            router_tables.routing_tables, "PreCompressing routing Tables")
         return self.compress_tables(router_tables, progress)
 
     def intersect(self, key_a, mask_a, key_b, mask_b):

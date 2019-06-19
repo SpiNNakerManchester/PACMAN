@@ -495,8 +495,8 @@
         </outputs>
     </algorithm>
     <algorithm name="UnorderdedCompressor">
-        <python_module>pacman.operations.router_compressors.unordered_compressor</python_module>
-        <python_class>UnorderedCompressor</python_class>
+        <python_module>pacman.operations.router_compressors.checked_unordered_compressor</python_module>
+        <python_class>CheckedUnorderedCompressor</python_class>
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
