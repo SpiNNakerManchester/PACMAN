@@ -1,7 +1,8 @@
 import pytest
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import FixedRouteRouter
+# pylint: disable=protected-access
 
 
 class DestinationVertex(object):
@@ -28,28 +29,28 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
 
 
 @pytest.mark.parametrize(
-    "width,height,with_wrap_arounds,version,board_version",
-    [(2, 2, True, None, 3),
-     (2, 2, False, None, 3),
-     (None, None, None, 3, 3),
-     (8, 8, None, None, 5),
-     (None, None, None, 5, 5),
-     (12, 12, True, None, 5),
-     (16, 16, False, None, 5)])
+    "width,height,version,board_version",
+    [(2, 2, None, 3),
+     (2, 2, None, 3),
+     (None, None, 3, 3),
+     (8, 8, None, 5),
+     (None, None, 5, 5),
+     (12, 12, None, 5),
+     (16, 16, None, 5)])
 @pytest.mark.parametrize(
     "with_down_links,with_down_chips",
     [(False, False),
      (True, False),
      (False, True)])
 def test_all_working(
-        width, height, with_wrap_arounds, version, board_version,
+        width, height, version, board_version,
         with_down_links, with_down_chips):
     router = FixedRouteRouter()
+    router._board_version = board_version
 
-    joins, _ = router._get_joins_paths(board_version)
-    temp_machine = VirtualMachine(
-        width=width, height=height, with_wrap_arounds=with_wrap_arounds,
-        version=version)
+    joins, _ = router._get_joins_paths()
+    temp_machine = virtual_machine(
+        width=width, height=height, version=version)
     down_links = None
     if with_down_links:
         down_links = set()
@@ -61,9 +62,10 @@ def test_all_working(
         down_chips = set(
             (ethernet_chip.x + 1, ethernet_chip.y + 1)
             for ethernet_chip in temp_machine.ethernet_connected_chips)
-    machine = VirtualMachine(
-        width=width, height=height, with_wrap_arounds=with_wrap_arounds,
-        version=version, down_links=down_links, down_chips=down_chips)
+    machine = virtual_machine(
+        width=width, height=height, version=version,
+        down_links=down_links, down_chips=down_chips)
+    router._machine = machine
 
     ethernet_chips = machine.ethernet_connected_chips
     placements = Placements(
@@ -72,7 +74,7 @@ def test_all_working(
 
     for ethernet_chip in ethernet_chips:
         uses_simple_routes = router._detect_failed_chips_on_board(
-            machine, ethernet_chip, board_version)
+            ethernet_chip)
         assert((with_down_chips or with_down_links) != uses_simple_routes)
 
     fixed_route_tables = router(
@@ -93,11 +95,11 @@ if __name__ == '__main__':
         (False, False),
         (True, False),
         (False, True)]
-    for (x, y) in iterations:
-        test_all_working(2, 2, True, None, 3, x, y)
-        test_all_working(2, 2, False, None, 3, x, y)
-        test_all_working(None, None, None, 3, 3, x, y)
-        test_all_working(8, 8, None, None, 5, x, y)
-        test_all_working(None, None, None, 5, 5, x, y)
-        test_all_working(12, 12, True, None, 5, x, y)
-        test_all_working(16, 16, False, None, 5, x, y)
+    for (_x, _y) in iterations:
+        test_all_working(2, 2, None, 3, _x, _y)
+        test_all_working(2, 2,  None, 3, _x, _y)
+        test_all_working(None, None, 3, 3, _x, _y)
+        test_all_working(8, 8, None, 5, _x, _y)
+        test_all_working(None, None, 5, 5, _x, _y)
+        test_all_working(12, 12, None, 5, _x, _y)
+        test_all_working(16, 16, None, 5, _x, _y)

@@ -1,6 +1,6 @@
 import unittest
 from spinn_machine import (
-    VirtualMachine, Machine, Chip, Router, SDRAM)
+    virtual_machine, Chip, Router, SDRAM, machine_from_chips)
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer,
     CoreResource, SpecificCoreResource)
@@ -11,7 +11,7 @@ from pacman.utilities.utility_objs import ResourceTracker
 class TestResourceTracker(unittest.TestCase):
 
     def test_n_cores_available(self):
-        machine = VirtualMachine(
+        machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
         chip = machine.get_chip_at(0, 0)
         preallocated_resources = PreAllocatedResourceContainer(
@@ -42,7 +42,7 @@ class TestResourceTracker(unittest.TestCase):
         self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 13)
 
     def test_deallocation_of_resources(self):
-        machine = VirtualMachine(
+        machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
         chip_sdram = machine.get_chip_at(1, 1).sdram.size
         res_sdram = 12345
@@ -102,7 +102,7 @@ class TestResourceTracker(unittest.TestCase):
         empty_chip = Chip(
             0, 0, [], router, sdram, 0, 0, "127.0.0.1",
             virtual=False, tag_ids=[1])
-        machine = Machine([empty_chip], 0, 0)
+        machine = machine_from_chips([empty_chip])
         resource_tracker = ResourceTracker(machine, plan_n_timesteps=None)
         with self.assertRaises(PacmanValueError):
             resource_tracker.allocate_resources(
