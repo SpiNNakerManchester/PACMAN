@@ -9,10 +9,15 @@ from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, SameAtomsAsVertexConstraint)
-from spinnak_ear.IHCAN_vertex import IHCANVertex
-from spinnak_ear.spinnakear_vertex import SpiNNakEarVertex
-from spinnak_ear.DRNL_vertex import DRNLVertex
-from spinnak_ear.AN_group_vertex import ANGroupVertex
+from spinnak_ear.spinnak_ear_machine_vertices.ihcan_machine_vertex import \
+    IHCANMachineVertex
+from spinnak_ear.spinnak_ear_application_vertex.spinnakear_application_vertex\
+    import SpiNNakEarApplicationVertex
+from spinnak_ear.spinnak_ear_machine_vertices.drnl_machine_vertex import \
+    DRNLMachineVertex
+from spinnak_ear.spinnak_ear_machine_vertices.an_group_machine_vertex import \
+    ANGroupMachineVertex
+
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     """ Generate the machine edges for the vertices in the graph
@@ -44,10 +49,16 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
                 # create new partitions
                 for dest_vertex in graph_mapper.get_machine_vertices(
                         application_edge.post_vertex):
-                    if (not isinstance(application_edge.post_vertex, SpiNNakEarVertex) \
-                        and not isinstance(application_edge.pre_vertex, SpiNNakEarVertex))\
-                        or isinstance(dest_vertex,DRNLVertex) or (isinstance(source_vertex,ANGroupVertex)
-                    and source_vertex._is_final_row == True):
+                    if ((not isinstance(
+                            application_edge.post_vertex,
+                            SpiNNakEarApplicationVertex)
+                        and not isinstance(
+                            application_edge.pre_vertex,
+                            SpiNNakEarApplicationVertex))
+                        or isinstance(
+                            dest_vertex, DRNLMachineVertex)
+                        or isinstance(source_vertex, ANGroupMachineVertex)
+                    and source_vertex._is_final_row):
                         machine_edge = application_edge.create_machine_edge(
                             source_vertex, dest_vertex,
                             "machine_edge_for{}".format(application_edge.label))
