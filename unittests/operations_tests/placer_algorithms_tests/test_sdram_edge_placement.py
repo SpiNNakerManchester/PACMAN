@@ -3,7 +3,6 @@ from spinn_machine import virtual_machine
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
-from pacman.operations.rig_algorithms.rig_place import RigPlace
 from pacman.operations.placer_algorithms.one_to_one_placer \
     import OneToOnePlacer
 from pacman.operations.placer_algorithms import RadialPlacer
@@ -52,6 +51,3 @@ class TestSameChipConstraint(unittest.TestCase):
 
     def test_radial(self):
         self._do_test(RadialPlacer())
-
-    def test_rig(self):
-        self._do_test(RigPlace())

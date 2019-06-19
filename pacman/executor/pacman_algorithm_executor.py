@@ -283,8 +283,8 @@ class PACMANAlgorithmExecutor(object):
 
         # Set up the token tracking and make all specified tokens complete
         token_states = TokenStates()
-        for token_name in tokens:
-            token = Token(token_name)
+        for token in tokens:
+            token = Token(token.name, token.part)
             token_states.track_token(token)
             token_states.process_output_token(token)
 
@@ -293,7 +293,8 @@ class PACMANAlgorithmExecutor(object):
         for algorithms in (algorithm_data, optional_algorithm_data):
             for algorithm in algorithms:
                 for token in algorithm.generated_output_tokens:
-                    if not token_states.is_token_complete(token):
+                    if (not token_states.is_token_complete(token) or
+                            not token_states.is_tracking_token_part(token)):
                         token_states.track_token(token)
 
         # Go through the algorithms and add a fake token for any algorithm that
@@ -422,6 +423,16 @@ class PACMANAlgorithmExecutor(object):
                                 "{}: part={}".format(
                                     algorithm.algorithm_id, token.part))
 
+                # create complete token string
+                completed_tokens_string = ""
+                for token in token_states.get_completed_tokens():
+                    completed_tokens_string += "{}, ".format(token.name)
+
+                # create fake token string
+                fake_token_string = ""
+                for token in fake_tokens.get_completed_tokens():
+                    fake_token_string += "{}, ".format(token.name)
+
                 raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
                     "    Inputs: {}\n"
@@ -439,8 +450,8 @@ class PACMANAlgorithmExecutor(object):
                         sorted(input_types),
                         sorted(fake_inputs),
                         outputs_to_find,
-                        token_states.get_completed_tokens(),
-                        fake_tokens.get_completed_tokens(),
+                        completed_tokens_string,
+                        fake_token_string,
                         tokens_to_find,
                         algorithms_to_find_names,
                         optional_algorithms_names,
@@ -465,7 +476,8 @@ class PACMANAlgorithmExecutor(object):
         self._algorithms = allocated_algorithms
         self._completed_tokens = token_states.get_completed_tokens()
 
-    def _remove_outputs_which_are_inputs(self, required_outputs, inputs):
+    @staticmethod
+    def _remove_outputs_which_are_inputs(required_outputs, inputs):
         """ Generates the output list which has pruned outputs which are\
             already in the input list
 
@@ -480,14 +492,16 @@ class PACMANAlgorithmExecutor(object):
                 copy_required_outputs.remove(input_type)
         return copy_required_outputs
 
-    def _remove_complete_tokens(self, tokens, output_tokens):
+    @staticmethod
+    def _remove_complete_tokens(tokens, output_tokens):
         return {
             token for token in output_tokens
             if not tokens.is_token_complete(Token(token))
         }
 
+    @staticmethod
     def _deduce_inputs_required_to_run(
-            self, algorithm, inputs, tokens, fake_inputs, fake_tokens):
+            algorithm, inputs, tokens, fake_inputs, fake_tokens):
         left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
         separator = ""
         for algorithm_inputs, extra in (

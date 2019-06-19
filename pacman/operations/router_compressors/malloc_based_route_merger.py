@@ -1,8 +1,10 @@
 import math
+
+from pacman.model.routing_tables.compressed_multicast_routing_table import \
+    CompressedMulticastRoutingTable
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.exceptions import PacmanRoutingException
 
 _32_BITS = 0xFFFFFFFF
@@ -51,7 +53,8 @@ class MallocBasedRouteMerger(object):
         return tables
 
     def _merge_routes(self, router_table, previous_masks):
-        merged_routes = MulticastRoutingTable(router_table.x, router_table.y)
+        merged_routes = \
+            CompressedMulticastRoutingTable(router_table.x, router_table.y)
 
         # Order the routes by key
         entries = sorted(

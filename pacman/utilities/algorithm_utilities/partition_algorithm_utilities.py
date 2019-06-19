@@ -6,9 +6,11 @@ except ImportError:
     from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.utilities import utility_calls as utils
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
-    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint)
+    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint,
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from spinnak_ear.spinnak_ear_machine_vertices.ihcan_machine_vertex import \
     IHCANMachineVertex
 from spinnak_ear.spinnak_ear_application_vertex.spinnakear_application_vertex\
@@ -17,6 +19,33 @@ from spinnak_ear.spinnak_ear_machine_vertices.drnl_machine_vertex import \
     DRNLMachineVertex
 from spinnak_ear.spinnak_ear_machine_vertices.an_group_machine_vertex import \
     ANGroupMachineVertex
+
+
+def determine_max_atoms_for_vertex(vertex):
+    """  returns the max atom constraint after assessing them all.
+
+    :param vertex: the vertex to find max atoms of
+    :return: the max number of atoms per core
+    """
+    possible_max_atoms = list()
+    n_atoms = None
+    max_atom_constraints = utils.locate_constraints_of_type(
+        vertex.constraints, MaxVertexAtomsConstraint)
+    for constraint in max_atom_constraints:
+        possible_max_atoms.append(constraint.size)
+    n_atom_constraints = utils.locate_constraints_of_type(
+        vertex.constraints, FixedVertexAtomsConstraint)
+    for constraint in n_atom_constraints:
+        if n_atoms is not None and constraint.size != n_atoms:
+            raise PacmanPartitionException(
+                "Vertex has multiple contradictory fixed atom "
+                "constraints - cannot be both {} and {}".format(
+                    n_atoms, constraint.size))
+        n_atoms = constraint.size
+    if len(possible_max_atoms) != 0:
+        return int(min(possible_max_atoms))
+    else:
+        return vertex.n_atoms
 
 
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):

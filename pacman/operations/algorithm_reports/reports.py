@@ -7,6 +7,7 @@ from spinn_machine import Router
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
 from pacman.model.graphs.common import EdgeTrafficType
+from pacman.operations.algorithm_reports.router_summary import RouterSummary
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -14,6 +15,7 @@ _LINK_LABELS = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
 
 _C_ROUTING_TABLE_DIR = "compressed_routing_tables_generated"
 _COMPARED_FILENAME = "comparison_of_compressed_uncompressed_routing_tables.rpt"
+_COMPRESSED_ROUTING_SUMMARY_FILENAME = "compressed_routing_summary.rpt"
 _PARTITIONING_FILENAME = "partitioned_by_vertex.rpt"
 _PLACEMENT_VTX_GRAPH_FILENAME = "placement_by_vertex_using_graph.rpt"
 _PLACEMENT_VTX_SIMPLE_FILENAME = "placement_by_vertex_without_graph.rpt"
@@ -94,7 +96,7 @@ def placer_reports_without_application_graph(
 
 def router_summary_report(
         report_folder, routing_tables,  hostname, machine):
-    """ Generates a text file of routing paths
+    """ Generates a text file of routing summaries
 
     :param report_folder: the report folder to store this value
     :param routing_tables: the original routing tables
@@ -103,13 +105,36 @@ def router_summary_report(
     :rtype: None
     """
     file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
+    progress = ProgressBar(machine.n_chips,
+                           "Generating Routing summary report")
+    return _do_router_summary_report(
+        file_name, progress, routing_tables,  hostname, machine)
+
+
+def router_compressed_summary_report(
+        report_folder, routing_tables, hostname, machine):
+    """ Generates a text file of routing summaries
+
+    :param report_folder: the report folder to store this value
+    :param routing_tables: the original routing tables
+    :param hostname: the machine's hostname to which the placer worked on
+    :param machine: the python machine object
+    :rtype: None
+    """
+    file_name = os.path.join(
+        report_folder, _COMPRESSED_ROUTING_SUMMARY_FILENAME)
+    progress = ProgressBar(machine.n_chips,
+                           "Generating Routing summary report")
+    return _do_router_summary_report(
+        file_name, progress, routing_tables, hostname, machine)
+
+
+def _do_router_summary_report(
+        file_name, progress, routing_tables,  hostname, machine):
     time_date_string = time.strftime("%c")
     convert = Router.convert_routing_table_entry_to_spinnaker_route
     try:
         with open(file_name, "w") as f:
-            progress = ProgressBar(machine.n_chips,
-                                   "Generating Routing summary report")
-
             f.write("        Routing Summary Report\n")
             f.write("        ======================\n\n")
             f.write("Generated: {} for target machine '{}'\n\n".format(
@@ -149,6 +174,9 @@ def router_summary_report(
                     "max unique spinnaker routes {}\n\n".format(
                         total_entries, max_entries, max_none_defaultable,
                         max_link_only, max_spinnaker_routes))
+            return RouterSummary(
+                total_entries, max_entries, max_none_defaultable,
+                max_link_only, max_spinnaker_routes)
 
     except IOError:
         logger.exception("Generate_routing summary reports: "
