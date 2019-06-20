@@ -10,7 +10,8 @@ class CheckedUnorderedCompressor(UnorderedCompressor):
 
     def __call__(self, router_tables, target_length=None):
         if target_length is None:
-            self._target_length = MAX_SUPPORTED_LENGTH  # Compress as much as you can
+            # Stop when enought
+            self._target_length = MAX_SUPPORTED_LENGTH
         else:
             self._target_length = target_length
         # create progress bar

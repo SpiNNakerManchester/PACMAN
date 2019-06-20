@@ -8,7 +8,6 @@ from pacman.model.routing_tables import (
 from spinn_machine import MulticastRoutingEntry
 
 
-
 class UnorderedCompressor(object):
     """
     Routing Table compressor based on brute force.
