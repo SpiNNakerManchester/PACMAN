@@ -488,6 +488,7 @@
             <param_name>router_tables</param_name>
         </required_inputs>
         <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
             <param_name>target_length</param_name>
         </optional_inputs>
         <outputs>
@@ -538,6 +539,7 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingTables</param_type>
+            <token>RoutingTablesPreCompressed</token>
         </outputs>
     </algorithm>
     <algorithm name="BasicRouteMerger">
@@ -552,6 +554,9 @@
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
@@ -568,6 +573,9 @@
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
