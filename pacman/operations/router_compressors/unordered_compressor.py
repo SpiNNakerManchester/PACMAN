@@ -176,15 +176,13 @@ class UnorderedCompressor(object):
 
         # Split the entries into buckets based on spinnaker_route
         self._all_entries = defaultdict(list)
-        spinnaker_routes = set()
         for entry in router_table.multicast_routing_entries:
             self._all_entries[entry.spinnaker_route].append(
                 (entry.routing_entry_key, entry.mask, entry.defaultable))
-            spinnaker_routes.add(entry.spinnaker_route)
 
         # Process the buckets one at a time keeping track of total length
         length = router_table.number_of_entries
-        for spinnaker_route in spinnaker_routes:
+        for spinnaker_route in self._all_entries:
             if length > self._target_length:
                 to_check = self._all_entries[spinnaker_route]
                 length -= len(to_check)
@@ -197,7 +195,7 @@ class UnorderedCompressor(object):
         # convert the results back to a routing table
         compressed_table = MulticastRoutingTable(
             router_table.x, router_table.y)
-        for spinnaker_route in spinnaker_routes:
+        for spinnaker_route in self._all_entries:
             for key, mask, defaultable in self._all_entries[spinnaker_route]:
                 compressed_table.add_multicast_routing_entry(
                     MulticastRoutingEntry(key, mask, defaultable=defaultable,
