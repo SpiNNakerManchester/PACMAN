@@ -9,11 +9,12 @@ class AbstractControlsSourceOfEdges(object):
         pass
 
     @abstractmethod
-    def get_destinations_for_edge_from(self, destination, partition_id):
+    def get_sources_for_edge_from(self, app_edge, partition_id, graph_mapper):
         """ allows a vertex to decide which of its internal machine vertices 
         sends a given machine edge
 
-        :param destination: the dest of the edge
+        :param app_edge: the application edge
         :param partition_id: the outgoing partition id
+        :param graph_mapper: the graph mapper
         :return: iterable of src machine vertices
         """
