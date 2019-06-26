@@ -217,10 +217,13 @@ class PartitionAndPlacePartitioner(object):
 
             # Create the vertices
             for (vertex, used_resources) in used_placements:
-                vertex_slice = Slice(lo_atom, hi_atom)
+                offset = 0
+                if hasattr(vertex, 'atoms_offset'):
+                    offset = vertex.atoms_offset
+                vertex_slice = Slice(lo_atom + offset, hi_atom + offset)
                 machine_vertex = vertex.create_machine_vertex(
                     vertex_slice, used_resources,
-                    label="{}:{}:{}".format(vertex.label, lo_atom, hi_atom),
+                    label="{}:{}:{}".format(vertex.label, lo_atom + offset, hi_atom + offset),
                     constraints=get_remaining_constraints(vertex))
 
                 # update objects
@@ -315,8 +318,15 @@ class PartitionAndPlacePartitioner(object):
         min_hi_atom = hi_atom
         for vertex in vertices:
 
+            offset = 0
+            if hasattr(vertex, 'atoms_offset'):
+                offset = vertex.atoms_offset
+
+            curr_lo_atom = lo_atom + offset
+            curr_hi_atom = hi_atom + offset
+
             # get resources used by vertex
-            vertex_slice = Slice(lo_atom, hi_atom)
+            vertex_slice = Slice(curr_lo_atom, curr_hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
 
             x = None
@@ -341,15 +351,15 @@ class PartitionAndPlacePartitioner(object):
                         "    Allocated so far: {} atoms\n"
                         "    Request for SDRAM: {}\n"
                         "    Largest SDRAM space: {}".format(
-                            vertex, lo_atom - 1,
+                            vertex, curr_lo_atom - 1,
                             used_resources.sdram.get_total_sdram(
                                 plan_n_timesteps),
                             resources_available.sdram.get_total_sdram(
                                 plan_n_timesteps)))
 
-                while ratio > 1.0 and hi_atom >= lo_atom:
+                while ratio > 1.0 and curr_hi_atom >= curr_lo_atom:
                     # Scale the resources available by the ratio
-                    old_n_atoms = (hi_atom - lo_atom) + 1
+                    old_n_atoms = (curr_hi_atom - curr_lo_atom) + 1
                     new_n_atoms = int(old_n_atoms / (ratio * 1.1))
 
                     # Avoid infinite looping
@@ -357,9 +367,10 @@ class PartitionAndPlacePartitioner(object):
                         new_n_atoms -= 1
 
                     # Find the new resource usage
-                    hi_atom = lo_atom + new_n_atoms - 1
-                    if hi_atom >= lo_atom:
-                        vertex_slice = Slice(lo_atom, hi_atom)
+                    hi_atom = curr_lo_atom + new_n_atoms - 1
+                    curr_hi_atom = hi_atom
+                    if curr_hi_atom >= curr_lo_atom:
+                        vertex_slice = Slice(curr_lo_atom, curr_hi_atom)
                         used_resources = \
                             vertex.get_resources_used_by_atoms(vertex_slice)
                         ratio = self._find_max_ratio(
@@ -367,13 +378,13 @@ class PartitionAndPlacePartitioner(object):
                             plan_n_timesteps)
 
                 # If we couldn't partition, raise an exception
-                if hi_atom < lo_atom:
+                if curr_hi_atom < curr_lo_atom:
                     raise PacmanPartitionException(
                         "No more of vertex '{}' would fit on the board:\n"
                         "    Allocated so far: {} atoms\n"
                         "    Request for SDRAM: {}\n"
                         "    Largest SDRAM space: {}".format(
-                            vertex, lo_atom - 1,
+                            vertex, curr_lo_atom - 1,
                             used_resources.sdram.get_total_sdram(
                                 plan_n_timesteps),
                             resources_available.sdram.get_total_sdram(
@@ -381,16 +392,17 @@ class PartitionAndPlacePartitioner(object):
 
                 # Try to scale up until just below the resource usage
                 used_resources, hi_atom = self._scale_up_resource_usage(
-                    used_resources, hi_atom, lo_atom, max_atoms_per_core,
+                    used_resources, curr_hi_atom, curr_lo_atom, max_atoms_per_core,
                     vertex, plan_n_timesteps, resources_available, ratio)
+                curr_hi_atom = hi_atom
 
                 # If this hi_atom is smaller than the current minimum, update
                 # the other placements to use (hopefully) less
                 # resources available
-                if hi_atom < min_hi_atom:
-                    min_hi_atom = hi_atom
+                if curr_hi_atom < min_hi_atom:
+                    min_hi_atom = curr_hi_atom
                     used_placements = self._reallocate_resources(
-                        used_placements, resource_tracker, lo_atom, hi_atom)
+                        used_placements, resource_tracker, curr_lo_atom, curr_hi_atom)
 
                 # Attempt to allocate the resources available for this vertex
                 # on the machine

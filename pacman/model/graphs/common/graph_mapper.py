@@ -58,10 +58,13 @@ class GraphMapper(object):
         :raise pacman.exceptions.PacmanValueError:\
             If atom selection is out of bounds.
         """
-        if vertex_slice.hi_atom >= application_vertex.n_atoms:
+        offset = 0
+        if hasattr(application_vertex, 'atoms_offset'):
+            offset = application_vertex.atoms_offset
+        if vertex_slice.hi_atom >= application_vertex.n_atoms + offset:
             raise PacmanValueError(
                 "hi_atom {:d} >= maximum {:d}".format(
-                    vertex_slice.hi_atom, application_vertex.n_atoms))
+                    vertex_slice.hi_atom, application_vertex.n_atoms + application_vertex.atoms_offset))
 
         self._application_vertex_by_machine_vertex[machine_vertex] = \
             application_vertex
