@@ -1,6 +1,6 @@
 from six import add_metaclass
 from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod)
+    AbstractBase, abstractmethod, abstractproperty)
 
 
 @add_metaclass(AbstractBase)
@@ -28,4 +28,12 @@ class SplitterByAtoms(object):
             The slice of atoms that the machine vertex will cover
         :param resources_required: the resources used by the machine vertex
         :param constraints: Constraints to be passed on to the machine vertex
+        """
+
+    @abstractproperty
+    def n_atoms(self):
+        """ The number of atoms in the vertex
+
+        :return: The number of atoms
+        :rtype: int
         """

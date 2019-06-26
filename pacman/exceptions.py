@@ -263,3 +263,9 @@ class MachineHasDisconnectedSubRegion(PacmanException):
     machine.
     """
     pass
+
+
+class SDRAMEdgeSizeException(PacmanException):
+    """ raised when a constant SDRAM partition discovers its edges have 
+    inconsistent size requests
+    """
