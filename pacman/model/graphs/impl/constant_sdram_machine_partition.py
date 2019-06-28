@@ -1,6 +1,7 @@
 from pacman.exceptions import SDRAMEdgeSizeException
 from pacman.model.graphs.abstract_sdram_partition import AbstractSDRAMPartition
-from pacman.model.graphs.abstract_traffic_type_secure_outgoing_partition import \
+from pacman.model.graphs.\
+    abstract_traffic_type_secure_outgoing_partition import \
     AbstractTrafficTypeSecureOutgoingPartition
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine.machine_sdram_edge import SDRAMMachineEdge
