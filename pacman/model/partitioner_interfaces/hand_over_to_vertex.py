@@ -16,19 +16,3 @@ class HandOverToVertex(object):
         :param graph_mapper: the graph mapper to be updated.
         :return: None
         """
-
-    @abstractmethod
-    def source_vertices_from_edge(self, edge):
-        """ returns vertices for connecting this edge
-
-        :param edge: edge to connect to sources
-        :return: the iterable of vertices to be sources of this edge
-        """
-
-    @abstractmethod
-    def destination_vertices_from_edge(self, edge):
-        """ return vertices for connecting this edge
-
-        :param edge: edge to connect to destinations
-        :return: the iterable of vertices to be destinations of this edge.
-        """

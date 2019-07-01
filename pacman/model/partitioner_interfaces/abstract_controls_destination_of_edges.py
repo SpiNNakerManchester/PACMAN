@@ -20,3 +20,12 @@ class AbstractControlsDestinationOfEdges(object):
         :param graph_mapper: the graph mapper
         :return: iterable of destination machine vertices
         """
+
+    @abstractmethod
+    def get_post_slice_for(self, machine_vertex):
+        """ allows a application vertex to control the slices perceived by 
+        out systems.
+
+        :param machine_vertex: the machine vertex to hand slice for
+        :return: the slice considered for this vertex
+        """
