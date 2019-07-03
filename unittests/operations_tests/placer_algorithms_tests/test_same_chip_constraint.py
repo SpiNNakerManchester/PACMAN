@@ -1,6 +1,6 @@
 import random
 import unittest
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
@@ -13,7 +13,7 @@ from pacman.operations.placer_algorithms import RadialPlacer
 class TestSameChipConstraint(unittest.TestCase):
 
     def _do_test(self, placer):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = MachineGraph("Test")
 
         vertices = [
@@ -35,7 +35,7 @@ class TestSameChipConstraint(unittest.TestCase):
                     SameChipAsConstraint(
                         vertices[random.randint(0, 99)]))
 
-        placements = placer(graph, machine)
+        placements = placer(graph, machine, plan_n_timesteps=None)
         for same in same_vertices:
             print("{0.vertex.label}, {0.x}, {0.y}, {0.p}: {1}".format(
                 placements.get_placement_of_vertex(same),

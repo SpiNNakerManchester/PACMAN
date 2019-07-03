@@ -1,6 +1,6 @@
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.common import EdgeTrafficType
-from spinn_machine.virtual_machine import VirtualMachine
+from spinn_machine.virtual_machine import virtual_machine
 
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge)
@@ -43,11 +43,12 @@ def test_virtual_vertices_one_to_one():
         one_to_one_vertices.append(one_to_one_vertex)
 
     # Get and extend the machine for the virtual chip
-    machine = VirtualMachine(version=5)
+    machine = virtual_machine(version=5)
     extended_machine = MallocBasedChipIdAllocator()(machine, machine_graph)
 
     # Do placements
-    placements = OneToOnePlacer()(machine_graph, extended_machine)
+    placements = OneToOnePlacer()(
+        machine_graph, extended_machine, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -102,8 +103,9 @@ def test_one_to_one():
         last_vertex = vertex
 
     # Do placements
-    machine = VirtualMachine(version=5)
-    placements = OneToOnePlacer()(machine_graph, machine)
+    machine = virtual_machine(version=5)
+    placements = OneToOnePlacer()(
+        machine_graph, machine, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -143,9 +145,9 @@ def test_sdram_links():
         machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements
-    machine = VirtualMachine(version=5)
+    machine = virtual_machine(version=5)
     try:
-        OneToOnePlacer()(machine_graph, machine)
+        OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
         raise Exception("should blow up here")
     except PacmanException:
         pass

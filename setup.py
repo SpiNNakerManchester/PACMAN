@@ -51,5 +51,7 @@ setup(
         'lxml',
         'jsonschema',
         'sortedcollections',
-        'rig >= 2.0.0, < 3.0.0']
+        'rig >= 2.0.0, < 3.0.0'],
+    maintainer="SpiNNakerTeam",
+    maintainer_email="spinnakerusers@googlegroups.com"
 )

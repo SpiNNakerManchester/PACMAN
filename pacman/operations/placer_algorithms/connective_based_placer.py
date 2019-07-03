@@ -21,8 +21,23 @@ class ConnectiveBasedPlacer(RadialPlacer):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine):
+    def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
 
+        :param machine_graph: The machine_graph to place
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
+        :param machine:\
+            The machine with respect to which to partition the application\
+            graph
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :return: A set of placements
+        :rtype: :py:class:`pacman.model.placements.Placements`
+        :raise pacman.exceptions.PacmanPlaceException: \
+            If something goes wrong with the placement
+        """
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 
@@ -42,7 +57,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_radial_chips(machine))
+            machine, plan_n_timesteps, self._generate_radial_chips(machine))
         constrained = sort_vertices_by_known_constraints(constrained)
         for vertex in progress.over(constrained, False):
             self._place_vertex(vertex, resource_tracker, machine, placements)

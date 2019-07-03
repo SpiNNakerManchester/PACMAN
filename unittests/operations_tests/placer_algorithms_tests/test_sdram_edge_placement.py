@@ -1,5 +1,5 @@
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
-from spinn_machine import VirtualMachine
+from spinn_machine import virtual_machine
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
@@ -14,8 +14,9 @@ import unittest
 class TestSameChipConstraint(unittest.TestCase):
 
     def _do_test(self, placer):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = MachineGraph("Test")
+        plan_n_timesteps = 100
 
         vertices = [
             SimpleMachineVertex(ResourceContainer(), label="v{}".format(i))
@@ -39,7 +40,7 @@ class TestSameChipConstraint(unittest.TestCase):
                 sdram_edges.append(sdram_edge)
                 graph.add_edge(sdram_edge, "Test")
 
-        placements = placer(graph, machine)
+        placements = placer(graph, machine, plan_n_timesteps)
         for edge in sdram_edges:
             pre_place = placements.get_placement_of_vertex(edge.pre_vertex)
             post_place = placements.get_placement_of_vertex(edge.post_vertex)
