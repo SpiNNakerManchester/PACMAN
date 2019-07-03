@@ -129,9 +129,7 @@ class PartitionAndPlacePartitioner(object):
         possible_max_atoms = list()
         n_atoms = None
         for other_vertex in partition_together_vertices:
-            if isinstance(other_vertex, ApplicationVertex):
-                possible_max_atoms.append(
-                    other_vertex.get_max_atoms_per_core())
+            possible_max_atoms.append(other_vertex.get_max_atoms_per_core())
             max_atom_constraints = utils.locate_constraints_of_type(
                 other_vertex.constraints, MaxVertexAtomsConstraint)
             for constraint in max_atom_constraints:
