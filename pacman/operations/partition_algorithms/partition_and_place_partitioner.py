@@ -3,8 +3,6 @@ import logging
 from six import raise_from
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
-from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
