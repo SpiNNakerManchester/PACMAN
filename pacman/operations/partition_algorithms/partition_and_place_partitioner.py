@@ -367,8 +367,9 @@ class PartitionAndPlacePartitioner(object):
                         new_n_atoms -= 1
 
                     # Find the new resource usage
-                    hi_atom = curr_lo_atom + new_n_atoms - 1
-                    curr_hi_atom = hi_atom
+                    curr_hi_atom = curr_lo_atom + new_n_atoms - 1
+                    #curr_hi_atom = hi_atom
+                    hi_atom = curr_hi_atom - offset
                     if curr_hi_atom >= curr_lo_atom:
                         vertex_slice = Slice(curr_lo_atom, curr_hi_atom)
                         used_resources = \
@@ -391,16 +392,16 @@ class PartitionAndPlacePartitioner(object):
                                 plan_n_timesteps)))
 
                 # Try to scale up until just below the resource usage
-                used_resources, hi_atom = self._scale_up_resource_usage(
+                used_resources, curr_hi_atom = self._scale_up_resource_usage(
                     used_resources, curr_hi_atom, curr_lo_atom, max_atoms_per_core,
                     vertex, plan_n_timesteps, resources_available, ratio)
-                curr_hi_atom = hi_atom
+                hi_atom = curr_hi_atom - offset
 
                 # If this hi_atom is smaller than the current minimum, update
                 # the other placements to use (hopefully) less
                 # resources available
-                if curr_hi_atom < min_hi_atom:
-                    min_hi_atom = curr_hi_atom
+                if hi_atom < min_hi_atom:
+                    min_hi_atom = hi_atom
                     used_placements = self._reallocate_resources(
                         used_placements, resource_tracker, curr_lo_atom, curr_hi_atom)
 
