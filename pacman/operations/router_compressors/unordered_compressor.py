@@ -6,6 +6,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from spinn_machine import MulticastRoutingEntry
+from .entry import Entry
 
 
 class UnorderedCompressor(object):
@@ -38,10 +39,8 @@ class UnorderedCompressor(object):
             If no merge found move the entry from the bucket to the result list
         When the bucket is empty the result list becomes the bucket
 
-    Another optimisation is that instead of saving entries in the buckets
-    Save just triples of key, mask and defaultable
-        (spinneker_route is assigned at the bucket level)
-    Then create entries at the end using the tuples
+    A farther optimisation is to do the whole thing in place in a single list.
+    
     """
 
     __slots__ = [
@@ -49,7 +48,12 @@ class UnorderedCompressor(object):
         #   of entries represented as (key, mask, defautible)
         "_all_entries",
         # Max length below which the algorithm should stop compressing
-        "_target_length"
+        "_target_length",
+        "_write_pointer",
+        "_max_index",
+        "_previous_pointer",
+        "_remaining_pointer"
+
     ]
 
     def __call__(self, router_tables, target_length=None):
@@ -61,6 +65,31 @@ class UnorderedCompressor(object):
         progress = ProgressBar(
             router_tables.routing_tables, "PreCompressing routing Tables")
         return self.compress_tables(router_tables, progress)
+
+    def three_way_partition(self, low, high):
+        check = low + 1
+        pivot = self._all_entries[low].spinnaker_route
+        while check <= high:
+            if self._all_entries[check].spinnaker_route < pivot:
+                temp = self._all_entries[low]
+                self._all_entries[low] = self._all_entries[check]
+                self._all_entries[check] = temp
+                low += 1
+                check += 1
+            elif self._all_entries[check].spinnaker_route > pivot:
+                temp = self._all_entries[high]
+                self._all_entries[high] = self._all_entries[check]
+                self._all_entries[check] = temp
+                high -= 1
+            else:
+                check += 1
+        return low, check
+
+    def quicksort(self, low, high):
+        if low < high:
+            left, right = self.three_way_partition(low, high)
+            self.quicksort(low, left - 1)
+            self.quicksort(right, high)
 
     def intersect(self, key_a, mask_a, key_b, mask_b):
         """
@@ -99,67 +128,62 @@ class UnorderedCompressor(object):
         :return: Key, Mask, defaultable from merged entry
         :rtype: (int, int, bool)
         """
-        key1, mask1, defaultable1 = entry1
-        key2, mask2, defaultable2 = entry2
-        any_ones = key1 | key2
-        all_ones = key1 & key2
-        all_selected = mask1 & mask2
+        any_ones = entry1.key | entry2.key
+        all_ones = entry1.key & entry2.key
+        all_selected = entry1.mask & entry2.mask
 
         # Compute the new mask  and key
         any_zeros = ~all_ones
         new_xs = any_ones ^ any_zeros
         mask = all_selected & new_xs  # Combine existing and new Xs
         key = all_ones & mask
-        return key, mask, defaultable1 and defaultable2
+        return key, mask, entry1.defaultable and entry2.defaultable
 
-    def find_merge(self, entry1, entry2, spinnaker_route):
-        """
-        Creates and check the merge between the two entries
 
-        If legal the merge is returned otherwise None
+    def find_merge(self, left, index):
+        m_key, m_mask, defaultable = self.merge(
+            self._all_entries[left], self._all_entries[index])
+        check = 0
+        while check < self._previous_pointer:
+            if self.intersect(
+                    self._all_entries[check].key, self._all_entries[check].mask,
+                    m_key, m_mask):
+                return False
+            check += 1
+        check = self._remaining_pointer
+        while check < self._max_index:
+            if self.intersect(
+                    self._all_entries[check].key, self._all_entries[check].mask,
+                    m_key, m_mask):
+                return False
+            check += 1
+        self._all_entries[left] = Entry(
+            m_key, m_mask, defaultable, self._all_entries[left].spinnaker_route)
+        return True
 
-        :param entry1: Key, Mask, defaultable from the first entry
-        :type entry1: (int, int, bool)
-        :param entry2: Key, Mask, defaultable from the second entry
-        :type entry2: (int, int, bool)
-        :param spinnaker_route: The route shared by both entries
-        :type spinnaker_route: int
-        :return: Key, Mask, defaultable from checked merged entry or None
-        :rtype: (int, int, bool)
-        """
-        m_key, m_mask, defaultable = self.merge(entry1, entry2)
-        for check_route in self._all_entries:
-            if check_route != spinnaker_route:
-                for c_key, c_mask, _ in self._all_entries[check_route]:
-                    if self.intersect(c_key, c_mask, m_key, m_mask):
-                        return None
-        return m_key, m_mask, defaultable
-
-    def compress_by_route(self, to_check, spinnaker_route):
-        """
-        Compresses (if possible) the entries for a single spinnaker_route
-
-        :param to_check: List of (Key, Mask, defaultable) from each entry with
-            this spinnaker_route
-        :type entry1: [(int, int, bool)]
-        :param spinnaker_route: The route shared by all to_check entries
-        :type spinnaker_route: int
-        :return: (Key, Mask, defaultable) for each entry in the compressed list
-        :rtype: [(int, int, bool)]
-        """
-        results = []
-        while len(to_check) > 1:
-            entry = to_check.pop()
-            for other in to_check:
-                merged = self.find_merge(entry, other, spinnaker_route)
-                if merged is not None:
-                    to_check.remove(other)
-                    to_check.append(merged)
+    def compress_by_route(self, left, right):
+        while left < right:
+            index = left + 1
+            while index <= right:
+                merged = self.find_merge(left, index)
+                if merged:
+                    self._all_entries[index] = self._all_entries[right]
+                    # Setting None not needed but easier when debugging
+                    # self._all_entries[right] = None
+                    right -= 1
                     break
-            if merged is None:
-                results.append(entry)
-        results.append(to_check.pop())
-        return results
+
+                index += 1
+            if not merged:
+                self._all_entries[self._write_pointer] = self._all_entries[left]
+                self._write_pointer += 1
+                left += 1
+        if left == right:
+            self._all_entries[self._write_pointer] = self._all_entries[left]
+            # Setting None not needed but easier when debugging
+            # if left != self._write_pointer:
+            #    self._all_entries[left] = None
+            self._write_pointer += 1
 
     def compress_table(self, router_table):
         """
@@ -175,31 +199,40 @@ class UnorderedCompressor(object):
         """
 
         # Split the entries into buckets based on spinnaker_route
-        self._all_entries = defaultdict(list)
+        self._all_entries = []
         for entry in router_table.multicast_routing_entries:
-            self._all_entries[entry.spinnaker_route].append(
-                (entry.routing_entry_key, entry.mask, entry.defaultable))
+            self._all_entries.append(Entry(
+                entry.routing_entry_key, entry.mask, entry.defaultable,
+                entry.spinnaker_route))
+        self.quicksort(0, len(self._all_entries)-1)
 
-        # Process the buckets one at a time keeping track of total length
-        length = router_table.number_of_entries
-        for spinnaker_route in self._all_entries:
-            if length > self._target_length:
-                to_check = self._all_entries[spinnaker_route]
-                length -= len(to_check)
-                compressed = self.compress_by_route(to_check, spinnaker_route)
-                length += len(compressed)
-                self._all_entries[spinnaker_route] = compressed
-            else:
-                break
+        self._write_pointer = 0
+        self._max_index = len(self._all_entries) - 1
+        self._previous_pointer = 0
+        ""
+        left = 0
+        while left < self._max_index:
+            right = left
+            while (right < len(self._all_entries) - 1 and
+                   self._all_entries[right+1].spinnaker_route
+                   == self._all_entries[left].spinnaker_route):
+                right += 1
+            self._remaining_pointer = right + 1
+            self.compress_by_route(left, right)
+            left = right + 1
+            self._previous_pointer = self._write_pointer
 
         # convert the results back to a routing table
         compressed_table = MulticastRoutingTable(
             router_table.x, router_table.y)
-        for spinnaker_route in self._all_entries:
-            for key, mask, defaultable in self._all_entries[spinnaker_route]:
-                compressed_table.add_multicast_routing_entry(
-                    MulticastRoutingEntry(key, mask, defaultable=defaultable,
-                                          spinnaker_route=spinnaker_route))
+        index = 0
+        while index < self._write_pointer:
+            entry = self._all_entries[index]
+            m = MulticastRoutingEntry(
+                entry.key, entry.mask, defaultable=entry.defaultable,
+                spinnaker_route=entry.spinnaker_route)
+            compressed_table.add_multicast_routing_entry(m)
+            index += 1
         return compressed_table
 
     def compress_tables(self, router_tables, progress):
