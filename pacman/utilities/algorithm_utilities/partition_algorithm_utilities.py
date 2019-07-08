@@ -61,14 +61,16 @@ def _process_edge(
     # get destinations
     if isinstance(app_edge.post_vertex, AbstractControlsDestinationOfEdges):
         dest_vertices = app_edge.post_vertex.get_destinations_for_edge_from(
-            app_edge, application_partition, graph_mapper)
+            app_edge, application_partition, graph_mapper,
+            original_source_machine_vertex)
     else:
         dest_vertices = graph_mapper.get_machine_vertices(app_edge.post_vertex)
 
     # get sources
     if isinstance(app_edge.pre_vertex, AbstractControlsSourceOfEdges):
         source_vertices = app_edge.pre_vertex.get_sources_for_edge_from(
-            app_edge, application_partition, graph_mapper)
+            app_edge, application_partition, graph_mapper,
+            original_source_machine_vertex)
     else:
         source_vertices = [original_source_machine_vertex]
 
