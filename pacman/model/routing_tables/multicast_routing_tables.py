@@ -2,6 +2,7 @@ try:
     from collections.abc import OrderedDict
 except ImportError:
     from collections import OrderedDict
+import gzip
 import json
 from pacman.exceptions import PacmanAlreadyExistsException
 from .multicast_routing_table import MulticastRoutingTable
@@ -114,8 +115,12 @@ def to_json(router_table):
 
 def from_json(j_router):
     if isinstance(j_router, str):
-        with open(j_router) as j_file:
-            j_router = json.load(j_file)
+        if j_router.endswith(".gz"):
+            with gzip.open(j_router) as j_file:
+                j_router = json.load(j_file)
+        else:
+            with open(j_router) as j_file:
+                j_router = json.load(j_file)
 
     tables = MulticastRoutingTables()
     for j_table in j_router:

@@ -108,10 +108,13 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
                         "a different link_ids.".format(c_route, o_route))
             remainders = calc_remainders(o_code, c_code)
             for remainder in remainders:
+                print(remainder)
                 compare_route(o_route, compressed_dict, o_code=remainder,
                               start=i + 1, f=f)
             return
-    raise PacmanRoutingException("No route found {}".format(o_route))
+    if not o_route.defaultable:
+        # print("No route found {}".format(o_route))
+        raise PacmanRoutingException("No route found {}".format(o_route))
 
 
 def compare_tables(original, compressed):
