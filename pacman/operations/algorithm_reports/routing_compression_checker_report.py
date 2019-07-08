@@ -82,7 +82,7 @@ def calc_remainders(o_code, c_code):
     return remainders
 
 
-def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
+def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
     if o_code is None:
         o_code = codify(o_route)
     keys = list(compressed_dict.keys())
@@ -90,8 +90,9 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
         c_code = keys[i]
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
-            f.write("\t\t{}\n".format(reports.format_route(c_route)))
-            if c_route.defaultable and not c_route.defaultable:
+            if f is not None:
+                f.write("\t\t{}\n".format(reports.format_route(c_route)))
+            if not o_route.defaultable and c_route.defaultable:
                 raise PacmanRoutingException(
                     "Compressed route {} covers original route {} but has "
                     "a different defaultable value.".format(c_route, o_route))
@@ -107,11 +108,24 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
                         "a different link_ids.".format(c_route, o_route))
             remainders = calc_remainders(o_code, c_code)
             for remainder in remainders:
-                compare_route(f, o_route, compressed_dict, o_code=remainder,
-                              start=i + 1)
+                compare_route(o_route, compressed_dict, o_code=remainder,
+                              start=i + 1, f=f)
             return
-        compare_route(f, o_route, compressed_dict, o_code=o_code, start=i+1)
-        return
+    raise PacmanRoutingException("No route found {}".format(o_route))
+
+
+def compare_tables(original, compressed):
+    """
+    Compares the two tables without generating any out
+
+    :param original: The orginal routing tables
+    :param compressed: The compressed routing tables.
+        Which will be considered in order.
+    :raises: PacmanRoutingException if there is any error
+    """
+    compressed_dict = codify_table(compressed)
+    for o_route in original.multicast_routing_entries:
+        compare_route(o_route, compressed_dict)
 
 
 def generate_routing_compression_checker_report(
@@ -149,7 +163,7 @@ def generate_routing_compression_checker_report(
                 compressed_dict = codify_table(compressed_table)
                 for o_route in original.multicast_routing_entries:
                     f.write("\t{}\n".format(reports.format_route(o_route)))
-                    compare_route(f, o_route, compressed_dict)
+                    compare_route(o_route, compressed_dict, f=f)
     except IOError:
         logger.exception("Generate_router_comparison_reports: Can't open file"
                          " {} for writing.", file_name)
