@@ -72,6 +72,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :param vertex_slice:\
             The slice of atoms that the machine vertex will cover
         :param resources_required: the resources used by the machine vertex
+        :param label: human readable label for the machine vertex
         :param constraints: Constraints to be passed on to the machine vertex
         """
 
