@@ -37,7 +37,8 @@ class TestBigCompression(unittest.TestCase):
             org_routes = set()
             for entry in original.multicast_routing_entries:
                 org_routes.add(entry.spinnaker_route)
-            mundy = mundy_tables.get_routing_table_for_chip(original.x, original.y)
+            mundy = mundy_tables.get_routing_table_for_chip(
+                original.x, original.y)
             mundy_routes = set()
             for entry in mundy.multicast_routing_entries:
                 mundy_routes.add(entry.spinnaker_route)
@@ -47,7 +48,8 @@ class TestBigCompression(unittest.TestCase):
             for entry in pre.multicast_routing_entries:
                 pre_routes.add(entry.spinnaker_route)
             compare_tables(original, pre)
-            both = both_tables.get_routing_table_for_chip(original.x, original.y)
+            both = both_tables.get_routing_table_for_chip(
+                original.x, original.y)
             both_routes = set()
             for entry in both.multicast_routing_entries:
                 both_routes.add(entry.spinnaker_route)
@@ -55,8 +57,8 @@ class TestBigCompression(unittest.TestCase):
 
             print("org:", original.number_of_entries, len(org_routes),
                   "mundy:", mundy.number_of_entries, len(mundy_routes),
-                "pre:", pre.number_of_entries, len(pre_routes),
-                "both:", both.number_of_entries, len(both_routes))
+                  "pre:", pre.number_of_entries, len(pre_routes),
+                  "both:", both.number_of_entries, len(both_routes))
         print("Mundy", mundy_time-start)
         print("Unordered", pre_time-mundy_time)
         print("Mundy after Unordered", both_time-pre_time)

@@ -1,5 +1,5 @@
 class Entry(object):
-    __slots__ = ["key","mask","defaultable","spinnaker_route"]
+    __slots__ = ["key", "mask", "defaultable", "spinnaker_route"]
 
     def __init__(self, key, mask, defaultable, spinnaker_route):
         self.key = key
