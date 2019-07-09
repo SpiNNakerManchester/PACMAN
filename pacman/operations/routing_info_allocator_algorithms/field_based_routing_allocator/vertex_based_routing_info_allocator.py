@@ -190,7 +190,7 @@ class VertexBasedRoutingInfoAllocator(object):
         application_field = None
         success = False
 
-        required_bits = len(seen_fields).bit_length()
+        required_bits = (len(seen_fields) - 1).bit_length()
         if FIXED_KEY_NAME in seen_fields:
             success = self._fixed_key_application_field_allocation(
                 seen_fields, required_bits)
