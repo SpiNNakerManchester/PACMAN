@@ -1,4 +1,3 @@
-import math
 import itertools
 from six.moves import reduce, xrange
 
@@ -17,7 +16,7 @@ def get_possible_masks(n_keys, mask_width=32, contiguous_keys=True):
     :rtype: iterable(int)
     """
     # Starting values
-    n_zeros = int(math.ceil(math.log(n_keys, 2)))
+    n_zeros = n_keys.bit_length()
     assert n_zeros <= mask_width
     all_ones_mask = (1 << mask_width) - 1
 

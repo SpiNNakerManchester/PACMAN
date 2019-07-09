@@ -1,4 +1,3 @@
-import math
 from past.builtins import range, xrange
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.key_allocator_constraints import (
@@ -191,7 +190,7 @@ class VertexBasedRoutingInfoAllocator(object):
         application_field = None
         success = False
 
-        required_bits = int(math.ceil(math.log(len(seen_fields), 2)))
+        required_bits = len(seen_fields).bit_length()
         if FIXED_KEY_NAME in seen_fields:
             success = self._fixed_key_application_field_allocation(
                 seen_fields, required_bits)

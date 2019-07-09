@@ -1,4 +1,3 @@
-import math
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
@@ -93,7 +92,7 @@ class MallocBasedRouteMerger(object):
                     entries[next_pos].routing_entry_key +
                     (~entries[next_pos].mask & _32_BITS))
                 n_keys = (last_key - base_key) + 1
-                next_log_n_keys = int(math.ceil(math.log(n_keys, 2)))
+                next_log_n_keys = n_keys.bit_length()
                 n_keys = (1 << next_log_n_keys) - 1
                 n_keys_mask = ~n_keys & _32_BITS
                 base_key = base_key & n_keys_mask
