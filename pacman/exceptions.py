@@ -256,3 +256,9 @@ class PacmanCanNotFindChipException(PacmanException):
         :type problem: str
         """
         super(PacmanCanNotFindChipException, self).__init__(problem)
+
+
+class SDRAMEdgeSizeException(PacmanException):
+    """ raised when a constant SDRAM partition discovers its edges have 
+    inconsistent size requests
+    """
