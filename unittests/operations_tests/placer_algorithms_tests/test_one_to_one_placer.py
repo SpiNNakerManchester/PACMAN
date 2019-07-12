@@ -20,7 +20,7 @@ from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge)
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from pacman.operations.chip_id_allocator_algorithms  import (
+from pacman.operations.chip_id_allocator_algorithms import (
     MallocBasedChipIdAllocator)
 from pacman.operations.placer_algorithms import OneToOnePlacer
 
