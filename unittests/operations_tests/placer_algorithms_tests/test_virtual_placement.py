@@ -1,7 +1,5 @@
 import pytest
 
-from pacman.operations.placer_algorithms import (
-    OneToOnePlacer, BasicPlacer, RadialPlacer, SpreaderPlacer)
 from pacman.model.graphs.machine import (
     MachineGraph, MachineSpiNNakerLinkVertex)
 from pacman.operations.chip_id_allocator_algorithms import (
