@@ -163,7 +163,8 @@ def test_sdram_links():
     # Do placements
     machine = virtual_machine(version=5)
     try:
-        SpreaderPlacer()(machine_graph, machine, n_keys_map, plan_n_timesteps=1000)
+        SpreaderPlacer()(machine_graph, machine, n_keys_map,
+                         plan_n_timesteps=1000)
         raise Exception("should blow up here")
     except PacmanException:
         pass
