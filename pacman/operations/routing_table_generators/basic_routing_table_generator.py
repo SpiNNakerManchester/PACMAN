@@ -18,9 +18,6 @@ from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 
-MAX_KEYS_SUPPORTED = 2048
-MASK = 0xFFFFF800
-
 
 class BasicRoutingTableGenerator(object):
     """ An basic algorithm that can produce routing tables
