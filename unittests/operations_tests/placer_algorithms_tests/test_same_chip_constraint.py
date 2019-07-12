@@ -4,10 +4,8 @@ from spinn_machine import virtual_machine
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
-from pacman.operations.rig_algorithms.rig_place import RigPlace
-from pacman.operations.placer_algorithms.one_to_one_placer import (
-    OneToOnePlacer)
-from pacman.operations.placer_algorithms import RadialPlacer
+from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
+from pacman.executor import PACMANAlgorithmExecutor
 
 
 class TestSameChipConstraint(unittest.TestCase):
@@ -35,7 +33,22 @@ class TestSameChipConstraint(unittest.TestCase):
                     SameChipAsConstraint(
                         vertices[random.randint(0, 99)]))
 
-        placements = placer(graph, machine, plan_n_timesteps=None)
+        n_keys_map = DictBasedMachinePartitionNKeysMap()
+
+        inputs = {
+            "MemoryExtendedMachine": machine,
+            "MemoryMachine": machine,
+            "MemoryMachineGraph": graph,
+            "PlanNTimeSteps": None,
+            "MemoryMachinePartitionNKeysMap": n_keys_map
+        }
+        algorithms = [placer]
+        xml_paths = []
+        executor = PACMANAlgorithmExecutor(
+            algorithms, [], inputs, [], [], [], xml_paths)
+        executor.execute_mapping()
+
+        placements = executor.get_item("MemoryPlacements")
         for same in same_vertices:
             print("{0.vertex.label}, {0.x}, {0.y}, {0.p}: {1}".format(
                 placements.get_placement_of_vertex(same),
@@ -53,10 +66,13 @@ class TestSameChipConstraint(unittest.TestCase):
                         "Vertex was not placed on the same chip as requested")
 
     def test_one_to_one(self):
-        self._do_test(OneToOnePlacer())
+        self._do_test("OneToOnePlacer")
 
     def test_radial(self):
-        self._do_test(RadialPlacer())
+        self._do_test("RadialPlacer")
 
     def test_rig(self):
-        self._do_test(RigPlace())
+        self._do_test("RigPlace")
+
+    def test_spreader(self):
+        self._do_test("SpreaderPlacer")
