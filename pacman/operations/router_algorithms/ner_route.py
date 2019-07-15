@@ -111,7 +111,7 @@ def _ner_net(source, destinations, machine):
     # Handle each destination, sorted by distance from the source, closest
     # first.
     sorted_dest = sorted(
-        destinations, key=(lambda destination: machine.shortest_path_length(
+        destinations, key=(lambda destination: machine.get_vector_length(
                 source, destination)))
     for destination in sorted_dest:
         # We shall attempt to find our nearest neighbouring placed node.
@@ -189,7 +189,7 @@ def _ner_net(source, destinations, machine):
             neighbour = None
             neighbour_distance = None
             for candidate_neighbour in route:
-                distance = machine.shortest_path_length(
+                distance = machine.get_vector_length(
                         candidate_neighbour, destination)
                 if distance <= radius and (neighbour is None or
                                            distance < neighbour_distance):
@@ -202,7 +202,7 @@ def _ner_net(source, destinations, machine):
             neighbour = source
 
         # Find the shortest vector from the neighbour to this destination
-        vector = machine.shortest_path(neighbour, destination)
+        vector = machine.get_vector(neighbour, destination)
 
         # The longest-dimension-first route may inadvertently pass through an
         # already connected node. If the route is allowed to pass through that
@@ -345,7 +345,7 @@ def _a_star(sink, heuristic_source, sources, machine):
 
     """
     # Select the heuristic function to use for distances
-    heuristic = (lambda node: machine.shortest_path_length(
+    heuristic = (lambda node: machine.get_vector_length(
         node, heuristic_source))
 
     # A dictionary {node: (direction, previous_node}. An entry indicates that
