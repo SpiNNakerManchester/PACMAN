@@ -36,6 +36,15 @@ _concentric_hexagons = {}
 def _convert_a_route(
         routing_tables, partition, incoming_processor, incoming_link,
         partition_route):
+    """
+    Converts the algorithm specific partition_route back to standard spinnaker
+    and ands it to the routing_tables.
+    :param routing_tables:  spinnaker format routing tables
+    :param partition: Partition this route applices to
+    :param incoming_processor: collections of processors this link came from
+    :param incoming_link: collection of links this link came from
+    :param partition_route: algorithm specific format of the route
+    """
     x, y = partition_route.chip
 
     next_hops = list()
@@ -66,12 +75,12 @@ def _convert_a_route(
 
 
 def _memoized_concentric_hexagons(radius):
-    """A memoized wrapper around :py:func:`rig.geometry.concentric_hexagons`
+    """A memoized wrapper around concentric_hexagons`
     which memoizes the coordinates and stores them as a tuple. Note that the
     caller must manually offset the coordinates as required.
 
     This wrapper is used to avoid the need to repeatedly call
-    :py:func:`rig.geometry.concentric_hexagons` for every sink in a network.
+    concentric_hexagons` for every sink in a network.
     This results in a relatively minor speedup (but at equally minor cost) in
     large networks.
     """
@@ -93,8 +102,8 @@ def _ner_net(source, destinations, machine):
     :param destinations:  iterable([(x, y), ...])
         The coordinates of destination vertices.
     :param machine: machine for which routes are being generated
-    :return: (:py:class:`~.rig.place_and_route.routing_tree.RoutingTree`,
-     {(x,y): :py:class:`~.rig.place_and_route.routing_tree.RoutingTree`, ...})
+    :return: (:py:class:`RoutingTree`
+     {(x,y): :py:class:`RoutingTree`, ...})
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc. For
         convenience, a dictionarry mapping from destination (x, y) coordinates
@@ -260,7 +269,7 @@ def _copy_and_disconnect_tree(root, machine):
     situation is impossible to confirm since the input routing trees have not
     yet been populated with vertices. The caller is responsible for being
     sensible.
-    :param root: :py:class:`~rig.place_and_route.routing_tree.RoutingTree`
+    :param root: :py:class:`RoutingTree`
         The root of the RoutingTree that contains nothing but RoutingTrees
         (i.e. no children which are vertices or links).
     :param machine: The machine in which the routes exist
