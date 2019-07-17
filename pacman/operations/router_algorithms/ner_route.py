@@ -24,9 +24,6 @@ from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from .routing_tree import RoutingTree
 
-_SUPPORTED_VIRTUAL_VERTEX_TYPES = (
-    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex)
-
 _concentric_hexagons = {}
 """Memoized concentric_hexagons outputs, as lists.  Access via
 :py:func:`.memoized_concentric_hexagons`.
@@ -534,7 +531,7 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
     # Add the sinks in the net to the RoutingTree
     for post_vertex in post_vertexes:
         tree_node = lookup[_vertex_xy(post_vertex, placements, machine)]
-        if isinstance(post_vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):
+        if isinstance(post_vertex, AbstractVirtualVertex):
             # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
             route = _route_to_endpoint(post_vertex, machine)
