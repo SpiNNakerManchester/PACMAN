@@ -67,8 +67,8 @@ class VariableSDRAM(AbstractSDRAM):
                 self._per_timestep_sdram)
         else:
             return VariableSDRAM(
-                self._fixed_sdram + other._fixed_sdram,
-                self._per_timestep_sdram + other._per_timestep_sdram)
+                self._fixed_sdram + other.fixed,
+                self._per_timestep_sdram + other.per_timestep)
 
     def __sub__(self, other):
         if isinstance(other, ConstantSDRAM):
@@ -77,8 +77,8 @@ class VariableSDRAM(AbstractSDRAM):
                 self._per_timestep_sdram)
         else:
             return VariableSDRAM(
-                self._fixed_sdram - other._fixed_sdram,
-                self._per_timestep_sdram - other._per_timestep_sdram)
+                self._fixed_sdram - other.fixed,
+                self._per_timestep_sdram - other.per_timestep)
 
     def sub_from(self, other):
         if isinstance(other, ConstantSDRAM):
@@ -87,5 +87,5 @@ class VariableSDRAM(AbstractSDRAM):
                 0 - self._per_timestep_sdram)
         else:
             return VariableSDRAM(
-                other._fixed_sdram - self._fixed_sdram,
-                other._per_timestep_sdram - self._per_timestep_sdram)
+                other.fixed - self._fixed_sdram,
+                other.per_timestep - self._per_timestep_sdram)
