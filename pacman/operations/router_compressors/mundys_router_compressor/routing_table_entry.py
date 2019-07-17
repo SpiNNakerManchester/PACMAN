@@ -6,8 +6,14 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/entries.py
 
 
 class RoutingTableEntry(object):
-    """representing a single routing entry in a SpiNNaker routing table.
+    """
+    Representing a single routing entry in a SpiNNaker routing table.
 
+    Similar to to SpiNNaker route but without the parameter protection which
+    speeds frequent access.
+    """
+
+    """
     Parameters
     ----------
     route : {:py:class:`~.Routes`, ...}

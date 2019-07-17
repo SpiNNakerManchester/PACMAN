@@ -48,11 +48,6 @@ class RoutingTree(object):
           additional logic may be required to determine what core to target to
           reach the vertex.
 
-    See Also
-    --------
-    rig.routing_table.routing_tree_to_tables:
-        May be used to convert :py:class:`.RoutingTree` objects into routing
-        tables suitable for loading onto a SpiNNaker machine.
     """  # noqa W605
 
     # A *lot* of instances of this data structure are created and so its memory
@@ -108,14 +103,13 @@ class RoutingTree(object):
             "child" if len(self._children) == 1 else "children")
 
     def traverse(self):
-        """Traverse the tree yielding the direction taken to a node, the
+        """ Traverse the tree yielding the direction taken to a node, the
         co-ordinates of that node and the directions leading from the Node.
 
-        Yields
-        ------
-        (direction, (x, y), {:py:class:`~rig.routing_table.Routes`, ...})
+        :return: (direction, (x, y), set(route))
             Direction taken to reach a Node in the tree, the (x, y) co-ordinate
             of that Node and routes leading to children of the Node.
+
         """
         # A queue of (direction, node) to visit. The direction is the Links
         # entry which describes the direction in which we last moved to reach

@@ -135,7 +135,7 @@ from .utils import intersect
 
 
 def minimise(routing_table, target_length):
-    """Reduce the size of a routing table by merging together entries where
+    """ Reduce the size of a routing table by merging together entries where
     possible and by removing any remaining default routes.
 
     .. warning::
@@ -152,37 +152,19 @@ def minimise(routing_table, target_length):
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
-        .. note::
 
-            If *all* the keys in the table are derived from a single instance
-            of :py:class:`~rig.bitfield.BitField` then the table is guaranteed
-            to be orthogonal and reorderable.
-
-        .. note::
-
-            Use :py:meth:`~rig.routing_table.expand_entries` to generate an
-            orthogonal table and receive warnings if the input table is not
-            orthogonal.
-
-    Parameters
-    ----------
-    routing_table : [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Routing entries to be merged.
-    target_length : int or None
+    :param routing_table: Routing entries to be merged.
+    :type routing_table: RoutingTableEntry
+    :param target_length :
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
         possible. If None then the table will be made as small as possible.
+    :type target_length : int or None
 
-    Raises
-    ------
-    MinimisationFailedError
+    :return: list(RoutingTableEntry)
+    :raises MinimisationFailedError
         If the smallest table that can be produced is larger than
         `target_length`.
-
-    Returns
-    -------
-    [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Reduced routing table entries.
     """
     table, _ = ordered_covering(routing_table, target_length, no_raise=True)
     return remove_default_routes(table, target_length)
@@ -190,7 +172,8 @@ def minimise(routing_table, target_length):
 
 def ordered_covering(routing_table, target_length, aliases=dict(),
                      no_raise=False):
-    """Reduce the size of a routing table by merging together entries where
+    """
+    Reduce the size of a routing table by merging together entries where
     possible.
 
     .. warning::
@@ -207,54 +190,32 @@ def ordered_covering(routing_table, target_length, aliases=dict(),
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
-        .. note::
-
-            If *all* the keys in the table are derived from a single instance
-            of :py:class:`~rig.bitfield.BitField` then the table is guaranteed
-            to be orthogonal and reorderable.
-
-        .. note::
-
-            Use :py:meth:`~rig.routing_table.expand_entries` to generate an
-            orthogonal table and receive warnings if the input table is not
-            orthogonal.
-
-    Parameters
-    ----------
-    routing_table : [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Routing entries to be merged.
-    target_length : int or None
+    :param routing_table: Routing entries to be merged.
+    :type routing_table: RoutingTableEntry
+    :param target_length :
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
         possible. If None then the table will be made as small as possible.
-
-    Other Parameters
-    ----------------
-    aliases : {(key, mask): {(key, mask), ...}, ...}
+    :type target_length : int or None
+    :param aliases:
         Dictionary of which keys and masks in the routing table are
         combinations of other (now removed) keys and masks; this allows us to
         consider only the keys and masks the user actually cares about when
         determining if inserting a new entry will break the correctness of the
         table. This should be supplied when using this method to update an
         already minimised table.
-    no_raise : bool
+    :type aliases: dict((int, int): set((int, int))
+    :param no_raise:
         If False (the default) then an error will be raised if the table cannot
         be minimised to be smaller than `target_length` and `target_length` is
         not None. If True then a table will be returned regardless of the size
         of the final table.
-
-    Raises
-    ------
-    MinimisationFailedError
+    :type no_raise: bool
+    :return: list(RoutingTableEntry) , {(key, mask): {(key, mask), ...}, ...}
+        new routing table, A new aliases dictionary.
+    :raises MinimisationFailedError
         If the smallest table that can be produced is larger than
-        `target_length` and `no_raise` is False.
-
-    Returns
-    -------
-    [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Reduced routing table entries.
-    {(key, mask): {(key, mask), ...}, ...}
-        A new aliases dictionary.
+        `target_length`.
     """
     # Copy the aliases dictionary
     aliases = dict(aliases)
@@ -306,12 +267,22 @@ def _get_generality(key, mask):
 
 
 def _get_best_merge(routing_table, aliases):
-    """Inspect all possible merges for the routing table and return the merge
+    """
+    Inspect all possible merges for the routing table and return the merge
     which would combine the greatest number of entries.
 
-    Returns
-    -------
-    :py:class:`~.Merge`
+    :param routing_table: Routing entries to be merged.
+    :type routing_table: RoutingTableEntry
+    :param aliases:
+        Dictionary of which keys and masks in the routing table are
+        combinations of other (now removed) keys and masks; this allows us to
+        consider only the keys and masks the user actually cares about when
+        determining if inserting a new entry will break the correctness of the
+        table. This should be supplied when using this method to update an
+        already minimised table.
+    :type aliases: dict((int, int): set((int, int))
+    :return: Merge
+    :rtype py:class:`~._Merge`
     """
     # Create an empty merge to start with
     best_merge = _Merge(routing_table)
@@ -340,11 +311,11 @@ def _get_best_merge(routing_table, aliases):
 
 
 def _get_all_merges(routing_table):
-    """Get possible sets of entries to merge.
+    """ Get possible sets of entries to merge.
 
-    Yields
-    ------
-    :py:class:`~.Merge`
+    :param routing_table: Routing entries to be merged.
+    :type routing_table: RoutingTableEntry
+    :rtype: py:class:`~.Merge`
     """
     # Memorise entries that have been considered as part of a merge
     considered_entries = set()
@@ -407,29 +378,32 @@ def _get_insertion_index(routing_table, generality):
 
 class _Merge(object):
 
-    _slots__ = ["routing_table", "entries", "key", "mask", "generality",
-                "goodness", "insertion_index", "defaultable"]
+    _slots__ = [
+        # Reference to the routing table against which the merge is defined.
+        # list(RoutingTableEntry)
+        "routing_table",
+        # Indices of entries in the routing table which are included in this
+        #    merge.
+        # set(int)
+        "entries",
+        # Key and mask pair generated by this merge.
+        # int
+        "key",
+        # int
+        "mask",
+        # Number of ``X``\ s in the key - mask pair generated by this merge.  # noqa W605
+        # int
+        "generality",
+        # Measure of how "good" this merge is
+        # int
+        "goodness",
+        # Where in the routing table the entry generated would need to be
+        #     inserted.
+        # int
+        "insertion_index",
+        "defaultable"]
 
-    """Represents a potential merge of routing table entries.
-
-    Parameters
-    ----------
-    routing_table : [:py:class:`~.RoutingTableEntry`, ...]
-        Reference to the routing table against which the merge is defined.
-    entries : {int, ...}
-        Indices of entries in the routing table which are included in this
-        merge.
-    key : int
-    mask : int
-        Key and mask pair generated by this merge.
-    generality : int
-        Number of ``X``\ s in the key-mask pair generated by this merge.
-    goodness : int
-        Measure of how "good" this merge is
-    insertion_index : int
-        Where in the routing table the entry generated would need to be
-        inserted.
-    """  # noqa W605
+    """Represents a potential merge of routing table entries. """
     def __init__(self, routing_table, entries=set()):
         # Generate the new key, mask and sources
         any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
@@ -463,15 +437,23 @@ class _Merge(object):
         self.entries = frozenset(entries)
 
     def apply(self, aliases):
-        """Apply the merge to the routing table it is defined against and get a
+        """
+        Apply the merge to the routing table it is defined against and get a
         new routing table and alias dictionary.
 
-        Returns
-        -------
-        [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-            A new routing table which may be minimised further.
-        {(key, mask): {(key, mask), ...}}
-            A new aliases dictionary.
+        :param aliases:
+            Dictionary of which keys and masks in the routing table are
+            combinations of other (now removed) keys and masks; this allows us
+            to consider only the keys and masks the user actually cares about
+            when determining if inserting a new entry will break the
+            correctness of the table. This should be supplied when using this
+            method to update an already minimised table.
+        :type aliases: dict((int, int): set((int, int))
+        :return:
+            # new routing table
+            list(RoutingTableEntry) ,
+            # A new aliases dictionary.
+            {(key, mask): {(key, mask), ...}, ...}
         """
         # Create a new routing table of the correct size
         new_size = len(self.routing_table) - len(self.entries) + 1
@@ -515,23 +497,23 @@ class _Merge(object):
 
 
 def _refine_merge(merge, aliases, min_goodness):
-    """Remove entries from a merge to generate a valid merge which may be
+    """ Remove entries from a merge to generate a valid merge which may be
     applied to the routing table.
 
-    Parameters
-    ----------
-    merge : :py:class:`~.Merge`
-        Initial merge to refine.
-    aliases : {(key, mask): {(key, mask), ...}, ...}
-        Map of key-mask pairs to the sets of key-mask pairs that they actually
-        represent.
-    min_goodness : int
+    :param merge:  Initial merge to refine.
+    :type merge: py:class:`~_Merge`
+    :param aliases:
+        Dictionary of which keys and masks in the routing table are
+        combinations of other (now removed) keys and masks; this allows us to
+        consider only the keys and masks the user actually cares about when
+        determining if inserting a new entry will break the correctness of the
+        table. This should be supplied when using this method to update an
+        already minimised table.
+    :type aliases: dict((int, int): set((int, int))
+    :param min_goodness:
         Reject merges which are worse than the minimum goodness.
-
-    Returns
-    -------
-    :py:class:`~.Merge`
-        Valid merge which may be applied to the routing table.
+    :return: Valid merge which may be applied to the routing table
+    :rtype: _Merge
     """
     # Perform the down-check
     merge = _refine_downcheck(merge, aliases, min_goodness)
@@ -552,7 +534,8 @@ def _refine_merge(merge, aliases, min_goodness):
 
 
 def _refine_upcheck(merge, min_goodness):
-    """Remove from the merge any entries which would be covered by entries
+    """
+    Remove from the merge any entries which would be covered by entries
     between their current position and the merge insertion position.
 
     For example, the third entry of::
@@ -566,13 +549,12 @@ def _refine_upcheck(merge, min_goodness):
     new entry ``XXXX`` which would move ``1000`` below the entry with the
     key-mask pair of ``X000``, which would cover it.
 
-    Returns
-    -------
-    :py:class:`~.Merge`
+    :param merge:
+    :param min_goodness:
+    :return:
         New merge with entries possibly removed. If the goodness of the merge
         ever drops below `min_goodness` then an empty merge will be returned.
-    bool
-        If the merge has been changed at all.
+        (bool) If the merge has been changed at all
     """
     # Remove any entries which would be covered by entries above the merge
     # position.
@@ -600,7 +582,8 @@ def _refine_upcheck(merge, min_goodness):
 
 
 def _refine_downcheck(merge, aliases, min_goodness):
-    """Prune the merge to avoid it covering up any entries which are below the
+    """
+    Prune the merge to avoid it covering up any entries which are below the
     merge insertion position.
 
     For example, in the (non-orthogonal) table::
@@ -633,11 +616,13 @@ def _refine_downcheck(merge, aliases, min_goodness):
         000X1 -> N S
         XX1XX -> 3 5
 
-    Returns
-    -------
-    :py:class:`~.Merge`
+    :param merge:
+    :param aliases:
+    :param min_goodness:
+    :return:
         New merge with entries possibly removed. If the goodness of the merge
         ever drops below `min_goodness` then an empty merge will be returned.
+    :rtype: _Merge
     """
     # Operation
     # ---------
@@ -803,18 +788,15 @@ def _refine_downcheck(merge, aliases, min_goodness):
 
 
 def _get_covered_keys_and_masks(merge, aliases):
-    """Get keys and masks which would be covered by the entry resulting from
+    """
+    Get keys and masks which would be covered by the entry resulting from
     the merge.
 
-    Parameters
-    ----------
-    aliases : {(key, mask): {(key, mask), ...}, ...}
+    :param merge:
+    :param aliases: {(key, mask): {(key, mask), ...}, ...}
         Map of key-mask pairs to the sets of key-mask pairs that they actually
         represent.
-
-    Yields
-    ------
-    (key, mask)
+    :return: (key, mask)
         Pairs of keys and masks which would be covered if the given `merge`
         were to be applied to the routing table.
     """
