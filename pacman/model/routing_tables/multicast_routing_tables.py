@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import gzip
 try:
     from collections.abc import OrderedDict
 except ImportError:
     from collections import OrderedDict
-import gzip
-import json
 from pacman.exceptions import PacmanAlreadyExistsException
 from .multicast_routing_table import MulticastRoutingTable
 from spinn_machine import MulticastRoutingEntry
