@@ -28,21 +28,18 @@ class RoutingTableEntry(object):
     speeds frequent access.
     """
 
-    """
-    Parameters
-    ----------
-    route : {:py:class:`~.Routes`, ...}
-        The set of destinations a packet should be routed to where each element
-        in the set is a value from the enumeration
-        :py:class:`~rig.routing_table.Routes`.
-    key : int
-        32-bit unsigned integer routing key to match after applying the mask.
-    mask : int
-        32-bit unsigned integer mask to apply to keys of packets arriving at
-        the router.
-    """
-
-    _slots__ = ["route", "key", "mask", "defaultable"]
+    _slots__ = [
+        # int value representing The set of destinations a packet should be
+        # routed to where each element in the set is a value from the
+        # enumeration
+        "route",
+        # 32-bit unsigned integer routing key to match after applying the mask.
+        "key",
+        # 32-bit unsigned integer mask to apply to keys of packets arriving at
+        # the router.
+        "mask",
+        # bool value to say if the route is defaultable
+        "defaultable"]
 
     def __init__(self, route, key, mask, defaultable):
         self.route = route

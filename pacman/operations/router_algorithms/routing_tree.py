@@ -47,17 +47,12 @@ class RoutingTree(object):
             a large memory overhead and in practice the set-like behaviour of
             the list of children is not useful.
 
-        The route must be either :py:class:`~rig.routing_table.Routes` or
-        `None`. If :py:class:`~rig.routing_table.Routes` then this indicates
-        the next step in the route uses a particular route.
-
         The object indicates the intended destination of this step in the
         route. It may be one of:
 
-        * :py:class:`~.rig.place_and_route.routing_tree.RoutingTree`
+        * :py:class:`RoutingTree`
           representing the continuation of the routing tree after following a
-          given link. (Only used if the :py:class:`~rig.routing_table.Routes`
-          object is a link and not a core).
+          given link. 
         * A vertex (i.e. some other Python object) when the route terminates at
           the supplied vertex. Note that the direction may be None and so
           additional logic may be required to determine what core to target to
