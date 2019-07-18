@@ -13,7 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
+import json
 from pacman.exceptions import PacmanAlreadyExistsException
+from .multicast_routing_table import MulticastRoutingTable
+from spinn_machine import MulticastRoutingEntry
 
 
 class MulticastRoutingTables(object):
@@ -99,3 +106,39 @@ class MulticastRoutingTables(object):
         :return: iterator of multicast_routing_table
         """
         return iter(self._routing_tables)
+
+
+def to_json(router_table):
+    json_list = []
+    for routing_table in router_table:
+        json_routing_table = OrderedDict()
+        json_routing_table["x"] = routing_table.x
+        json_routing_table["y"] = routing_table.y
+        entries = []
+        for entry in routing_table.multicast_routing_entries:
+            json_entry = OrderedDict()
+            json_entry["key"] = entry.routing_entry_key
+            json_entry["mask"] = entry.mask
+            json_entry["defaultable"] = entry.defaultable
+            json_entry["spinnaker_route"] = entry.spinnaker_route
+            entries.append(json_entry)
+        json_routing_table["entries"] = entries
+        json_list.append(json_routing_table)
+    return json_list
+
+
+def from_json(j_router):
+    if isinstance(j_router, str):
+        with open(j_router) as j_file:
+            j_router = json.load(j_file)
+
+    tables = MulticastRoutingTables()
+    for j_table in j_router:
+        table = MulticastRoutingTable(j_table["x"], j_table["y"])
+        tables.add_routing_table(table)
+        for j_entry in j_table["entries"]:
+            table.add_multicast_routing_entry(MulticastRoutingEntry(
+                j_entry["key"], j_entry["mask"],
+                defaultable=j_entry["defaultable"],
+                spinnaker_route=j_entry["spinnaker_route"]))
+    return tables

@@ -18,10 +18,13 @@ from spinn_machine import MulticastRoutingEntry
 from pacman.model.graphs.impl import OutgoingEdgePartition
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
+from pacman.model.routing_tables.multicast_routing_tables import (
+    to_json, from_json)
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from pacman.utilities import file_format_schemas
 
 
 class TestRoutingTable(unittest.TestCase):
@@ -147,6 +150,13 @@ class TestRoutingTable(unittest.TestCase):
         self.assertEqual(tables.get_routing_table_for_chip(0, 0), t1)
         self.assertEqual(tables.get_routing_table_for_chip(1, 0), t2)
         self.assertEqual(tables.get_routing_table_for_chip(2, 0), None)
+
+        json_obj = to_json(tables)
+        file_format_schemas.validate(json_obj, "router.json")
+        new_tables = from_json(json_obj)
+        self.assertEqual(new_tables.get_routing_table_for_chip(0, 0), t1)
+        self.assertEqual(new_tables.get_routing_table_for_chip(1, 0), t2)
+        self.assertEqual(new_tables.get_routing_table_for_chip(2, 0), None)
 
     def test_new_multicast_routing_tables_empty(self):
         MulticastRoutingTables()
