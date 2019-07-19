@@ -26,6 +26,9 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
+import functools
+import math
+import sys
 
 
 class SpreaderPlacer(OneToOnePlacer):
