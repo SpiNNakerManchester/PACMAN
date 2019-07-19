@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 """An explicit representation of a routing tree in a machine.
 
 This representation of a route explicitly describes a tree-structure and the
@@ -32,27 +47,17 @@ class RoutingTree(object):
             a large memory overhead and in practice the set-like behaviour of
             the list of children is not useful.
 
-        The route must be either :py:class:`~rig.routing_table.Routes` or
-        `None`. If :py:class:`~rig.routing_table.Routes` then this indicates
-        the next step in the route uses a particular route.
-
         The object indicates the intended destination of this step in the
         route. It may be one of:
 
-        * :py:class:`~.rig.place_and_route.routing_tree.RoutingTree`
+        * :py:class:`RoutingTree`
           representing the continuation of the routing tree after following a
-          given link. (Only used if the :py:class:`~rig.routing_table.Routes`
-          object is a link and not a core).
+          given link. 
         * A vertex (i.e. some other Python object) when the route terminates at
           the supplied vertex. Note that the direction may be None and so
           additional logic may be required to determine what core to target to
           reach the vertex.
 
-    See Also
-    --------
-    rig.routing_table.routing_tree_to_tables:
-        May be used to convert :py:class:`.RoutingTree` objects into routing
-        tables suitable for loading onto a SpiNNaker machine.
     """  # noqa W605
 
     # A *lot* of instances of this data structure are created and so its memory
@@ -108,14 +113,13 @@ class RoutingTree(object):
             "child" if len(self._children) == 1 else "children")
 
     def traverse(self):
-        """Traverse the tree yielding the direction taken to a node, the
+        """ Traverse the tree yielding the direction taken to a node, the
         co-ordinates of that node and the directions leading from the Node.
 
-        Yields
-        ------
-        (direction, (x, y), {:py:class:`~rig.routing_table.Routes`, ...})
+        :return: (direction, (x, y), set(route))
             Direction taken to reach a Node in the tree, the (x, y) co-ordinate
             of that Node and routes leading to children of the Node.
+
         """
         # A queue of (direction, node) to visit. The direction is the Links
         # entry which describes the direction in which we last moved to reach

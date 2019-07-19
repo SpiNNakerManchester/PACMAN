@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_routes.py
@@ -5,20 +20,22 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_
 
 from pacman.operations.router_compressors.mundys_router_compressor.exceptions \
     import MinimisationFailedError
+from .utils import intersect
 
 
 def minimise(table, target_length, check_for_aliases=True):
-    """Remove from the routing table any entries which could be replaced by
+    """
+    Remove from the routing table any entries which could be replaced by
     default routing.
 
-    Parameters
-    ----------
-    routing_table : [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Routing table from which to remove entries which could be handled by
-        default routing.
-    target_length : int or None
-        Target length of the routing table.
-    check_for_aliases : bool
+    :param routing_table: Routing entries to be merged.
+    :type routing_table: RoutingTableEntry
+    :param target_length :
+        Target length of the routing table; the minimisation procedure will
+        halt once either this target is reached or no further minimisation is
+        possible. If None then the table will be made as small as possible.
+    :type target_length : int or None
+    :param check_for_aliases:
         If True (the default), default-route candidates are checked for aliased
         entries before suggesting a route may be default routed. This check is
         required to ensure correctness in the general case but has a runtime
@@ -28,16 +45,10 @@ def minimise(table, target_length, check_for_aliases=True):
         option should only be used if the supplied table is guaranteed not to
         contain any aliased entries.
 
-    Raises
-    ------
-    MinimisationFailedError
+    :return: list(RoutingTableEntry)
+    :raises MinimisationFailedError
         If the smallest table that can be produced is larger than
         `target_length`.
-
-    Returns
-    -------
-    [:py:class:`~rig.routing_table.RoutingTableEntry`, ...]
-        Reduced routing table entries.
     """
     # If alias checking is required, see if we can cheaply prove that no
     # aliases exist in the table to skip this costly check.
@@ -54,28 +65,15 @@ def minimise(table, target_length, check_for_aliases=True):
         if not entry.defaultable:
             # If the entry cannot be removed then add it to the table
             new_table.append(entry)
+        elif check_for_aliases:
+            key, mask = entry.key, entry.mask
+            # If there is an intersect with a later entry we have to keep it
+            if any(intersect(key, mask, d.key, d.mask) for
+                    d in table[i + 1:]):
+                new_table.append(entry)
 
-    # If the resultant table is larger than the target raise an exception
+        # If the resultant table is larger than the target raise an exception
     if target_length is not None and target_length < len(new_table):
         raise MinimisationFailedError(target_length, len(new_table))
 
     return new_table
-
-
-def _is_defaultable(i, entry, table, check_for_aliases=True):
-    """Determine if an entry may be removed from a routing table and be
-    replaced by a default route.
-
-    Parameters
-    ----------
-    i : int
-        Position of the entry in the table
-    entry : RoutingTableEntry
-        The entry itself
-    table : [RoutingTableEntry, ...]
-        The table containing the entry.
-    check_for_aliases : bool
-        If True, the table is checked for aliased entries before suggesting a
-        route may be default routed.
-    """
-    # May only have one source and sink (which may not be None)
