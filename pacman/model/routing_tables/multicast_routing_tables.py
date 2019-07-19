@@ -1,10 +1,3 @@
-<<<<<<<<< Temporary merge branch 1
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
-import json
-=========
 # Copyright (c) 2017-2019 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,13 +13,12 @@ import json
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import json
+import gzip
 try:
     from collections.abc import OrderedDict
 except ImportError:
     from collections import OrderedDict
-import json
-import json
-import gzip
 try:
     from collections.abc import OrderedDict
 except ImportError:
