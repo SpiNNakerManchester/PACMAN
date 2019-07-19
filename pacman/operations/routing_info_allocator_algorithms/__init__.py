@@ -24,12 +24,8 @@ from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.\
     compressible_malloc_based_routing_info_allocator import (
         CompressibleMallocBasedRoutingInfoAllocator)
-from pacman.operations.routing_info_allocator_algorithms.\
-    field_based_routing_allocator.vertex_based_routing_info_allocator import (
-        VertexBasedRoutingInfoAllocator)
 
 __all__ = ['BasicRoutingInfoAllocator',
            'CompressibleMallocBasedRoutingInfoAllocator',
            'DestinationBasedRoutingInfoAllocator',
-           'MallocBasedRoutingInfoAllocator',
-           'VertexBasedRoutingInfoAllocator']
+           'MallocBasedRoutingInfoAllocator']
