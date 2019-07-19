@@ -107,10 +107,6 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
             c_route = compressed_dict[c_code]
             if f is not None:
                 f.write("\t\t{}\n".format(reports.format_route(c_route)))
-            if not o_route.defaultable and c_route.defaultable:
-                raise PacmanRoutingException(
-                    "Compressed route {} covers original route {} but has "
-                    "a different defaultable value.".format(c_route, o_route))
             if o_route.processor_ids != c_route.processor_ids:
                 if set(o_route.processor_ids) != set(c_route.processor_ids):
                     raise PacmanRoutingException(
@@ -121,10 +117,19 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
                     raise PacmanRoutingException(
                         "Compressed route {} covers original route {} but has "
                         "a different link_ids.".format(c_route, o_route))
-            remainders = calc_remainders(o_code, c_code)
-            for remainder in remainders:
-                print(remainder)
-                compare_route(o_route, compressed_dict, o_code=remainder,
+            if not o_route.defaultable and c_route.defaultable:
+                if o_route == c_route:
+                    raise PacmanRoutingException(
+                        "Compressed route {} while original route {} but has "
+                        "a different defaultable value.".format(
+                            c_route, o_route))
+                else:
+                    compare_route(o_route, compressed_dict, o_code=o_code,
+                                  start=i + 1, f=f)
+            else:
+                remainders = calc_remainders(o_code, c_code)
+                for remainder in remainders:
+                    compare_route(o_route, compressed_dict, o_code=remainder,
                               start=i + 1, f=f)
             return
     if not o_route.defaultable:
