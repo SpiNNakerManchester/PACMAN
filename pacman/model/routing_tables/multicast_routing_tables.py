@@ -19,10 +19,6 @@ try:
     from collections.abc import OrderedDict
 except ImportError:
     from collections import OrderedDict
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
 from pacman.exceptions import PacmanAlreadyExistsException
 from .multicast_routing_table import MulticastRoutingTable
 from spinn_machine import MulticastRoutingEntry
