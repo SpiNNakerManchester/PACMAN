@@ -86,8 +86,5 @@ class TestSameChipConstraint(unittest.TestCase):
     def test_radial(self):
         self._do_test("RadialPlacer")
 
-    def test_rig(self):
-        self._do_test("RigPlace")
-
     def test_spreader(self):
         self._do_test("SpreaderPlacer")

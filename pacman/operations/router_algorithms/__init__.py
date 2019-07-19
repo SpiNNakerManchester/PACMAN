@@ -14,5 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .basic_dijkstra_routing import BasicDijkstraRouting
+from .ner_route import NerRoute
 
-__all__ = ['BasicDijkstraRouting', ]
+__all__ = ['BasicDijkstraRouting', 'NerRoute']
