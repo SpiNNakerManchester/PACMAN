@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 """Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
 Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
@@ -7,29 +22,22 @@ Parallel Computing (2014).
 
 Based on
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
+https://github.com/project-rig/rig/blob/master/rig/geometry.py
+https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.py
 """
 
 import heapq
 
 from collections import deque
 
-from .geometry import concentric_hexagons, to_xyz, \
-    shortest_mesh_path_length, shortest_mesh_path, \
-    shortest_torus_path_length, shortest_torus_path
-
-from pacman.operations.rig_algorithms.utils import longest_dimension_first
-
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import MachineHasDisconnectedSubRegion
-
-from pacman.operations.rig_algorithms.links import Links
-from pacman.operations.rig_algorithms.routes import Routes
-
-from pacman.operations.rig_algorithms.routing_tree import RoutingTree
 from pacman.model.graphs import (
     AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
-
-_SUPPORTED_VIRTUAL_VERTEX_TYPES = (
-    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex)
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
+from .routing_tree import RoutingTree
 
 _concentric_hexagons = {}
 """Memoized concentric_hexagons outputs, as lists.  Access via
@@ -37,54 +45,83 @@ _concentric_hexagons = {}
 """
 
 
-def memoized_concentric_hexagons(radius):
-    """A memoized wrapper around :py:func:`rig.geometry.concentric_hexagons`
+def _convert_a_route(
+        routing_tables, partition, incoming_processor, incoming_link,
+        partition_route):
+    """
+    Converts the algorithm specific partition_route back to standard spinnaker
+    and ands it to the routing_tables.
+    :param routing_tables:  spinnaker format routing tables
+    :param partition: Partition this route applices to
+    :param incoming_processor: collections of processors this link came from
+    :param incoming_link: collection of links this link came from
+    :param partition_route: algorithm specific format of the route
+    """
+    x, y = partition_route.chip
+
+    next_hops = list()
+    processor_ids = list()
+    link_ids = list()
+    for (route, next_hop) in partition_route.children:
+        if route is not None:
+            link = None
+            if route >= 6:
+                # The route was offset as first 6 are the links
+                processor_ids.append(route - 6)
+            else:
+                link_ids.append(route)
+            if isinstance(next_hop, RoutingTree):
+                next_incoming_link = None
+                if link is not None:
+                    #  Same as Router.opposite just inlined for speed
+                    next_incoming_link = (link + 3) % 6
+                next_hops.append((next_hop, next_incoming_link))
+
+    entry = MulticastRoutingTableByPartitionEntry(
+        link_ids, processor_ids, incoming_processor, incoming_link)
+    routing_tables.add_path_entry(entry, x, y, partition)
+
+    for next_hop, next_incoming_link in next_hops:
+        _convert_a_route(
+            routing_tables, partition, None, next_incoming_link, next_hop)
+
+
+def _memoized_concentric_hexagons(radius):
+    """A memoized wrapper around concentric_hexagons`
     which memoizes the coordinates and stores them as a tuple. Note that the
     caller must manually offset the coordinates as required.
 
     This wrapper is used to avoid the need to repeatedly call
-    :py:func:`rig.geometry.concentric_hexagons` for every sink in a network.
+    concentric_hexagons` for every sink in a network.
     This results in a relatively minor speedup (but at equally minor cost) in
     large networks.
     """
     out = _concentric_hexagons.get(radius)
     if out is None:
-        out = tuple(concentric_hexagons(radius))
+        out = tuple(_get_concentric_hexagons(radius))
         _concentric_hexagons[radius] = out
     return out
 
 
-def ner_net(source, destinations, machine):
-    """Produce a shortest path tree for a given net using NER.
+def _ner_net(source, destinations, machine):
+    """ Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
 
-    Parameters
-    ----------
-    source : (x, y)
-        The coordinate of the source vertex.
-    destinations : iterable([(x, y), ...])
-        The coordinates of destination vertices.
-    width : int
-        Width of the system (nodes)
-    height : int
-        Height of the system (nodes)
-    wrap_around : bool
-        True if wrap-around links should be used, false if they should be
-        avoided.
-    radius : int
-        Radius of area to search from each node. 20 is arbitrarily selected in
-        the paper and shown to be acceptable in practice.
 
-    Returns
-    -------
-    (:py:class:`~.rig.place_and_route.routing_tree.RoutingTree`,
-     {(x,y): :py:class:`~.rig.place_and_route.routing_tree.RoutingTree`, ...})
+    :param source:  (x, y)
+        The coordinate of the source vertex.
+    :param destinations:  iterable([(x, y), ...])
+        The coordinates of destination vertices.
+    :param machine: machine for which routes are being generated
+    :return: (:py:class:`RoutingTree`
+     {(x,y): :py:class:`RoutingTree`, ...})
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc. For
         convenience, a dictionarry mapping from destination (x, y) coordinates
         to the associated RoutingTree is provided to allow the caller to insert
         these items.
+
     """
     width = machine.max_chip_x + 1
     height = machine.max_chip_y + 1
@@ -94,13 +131,8 @@ def ner_net(source, destinations, machine):
 
     # Handle each destination, sorted by distance from the source, closest
     # first.
-    if machine.has_wrap_arounds:
-        sorted_dest = sorted(
-            destinations, key=(lambda destination: shortest_torus_path_length(
-                source, destination, width, height)))
-    else:
-        sorted_dest = sorted(
-            destinations, key=(lambda destination: shortest_mesh_path_length(
+    sorted_dest = sorted(
+        destinations, key=(lambda destination: machine.get_vector_length(
                 source, destination)))
     for destination in sorted_dest:
         # We shall attempt to find our nearest neighbouring placed node.
@@ -159,7 +191,7 @@ def ner_net(source, destinations, machine):
         # is 3x more expensive per iteration. A very crude heuristic is to use
         # the original approach when the number of route nodes is more than
         # 1/3rd of the number of routes checked by the original method.
-        concentric_hexagons = memoized_concentric_hexagons(radius)
+        concentric_hexagons = _memoized_concentric_hexagons(radius)
         if len(concentric_hexagons) < len(route) / 3:
             # Original approach: Start looking for route nodes in a concentric
             # spiral pattern out from the destination node.
@@ -178,13 +210,8 @@ def ner_net(source, destinations, machine):
             neighbour = None
             neighbour_distance = None
             for candidate_neighbour in route:
-                if machine.has_wrap_arounds:
-                    distance = shortest_torus_path_length(
-                        candidate_neighbour, destination, width, height)
-                else:
-                    distance = shortest_mesh_path_length(
+                distance = machine.get_vector_length(
                         candidate_neighbour, destination)
-
                 if distance <= radius and (neighbour is None or
                                            distance < neighbour_distance):
                     neighbour = candidate_neighbour
@@ -196,19 +223,14 @@ def ner_net(source, destinations, machine):
             neighbour = source
 
         # Find the shortest vector from the neighbour to this destination
-        if machine.has_wrap_arounds:
-            vector = shortest_torus_path(to_xyz(neighbour),
-                                         to_xyz(destination),
-                                         width, height)
-        else:
-            vector = shortest_mesh_path(neighbour, destination)
+        vector = machine.get_vector(neighbour, destination)
 
         # The longest-dimension-first route may inadvertently pass through an
         # already connected node. If the route is allowed to pass through that
         # node it would create a cycle in the route which would be VeryBad(TM).
         # As a result, we work backward through the route and truncate it at
         # the first point where the route intersects with a connected node.
-        ldf = longest_dimension_first(vector, neighbour, width, height)
+        ldf = _longest_dimension_first(vector, neighbour, machine)
         i = len(ldf)
         for direction, (x, y) in reversed(ldf):
             i -= 1
@@ -227,13 +249,13 @@ def ner_net(source, destinations, machine):
             this_node = RoutingTree((x, y))
             route[(x, y)] = this_node
 
-            last_node.append_child((Routes(direction), this_node))
+            last_node.append_child((direction, this_node))
             last_node = this_node
 
     return (route[source], route)
 
 
-def is_linked(source, target, direction, machine):
+def _is_linked(source, target, direction, machine):
     s_chip = machine.get_chip_at(source[0], source[1])
     if s_chip is None:
         return False
@@ -247,8 +269,9 @@ def is_linked(source, target, direction, machine):
     return True
 
 
-def copy_and_disconnect_tree(root, machine):
-    """Copy a RoutingTree (containing nothing but RoutingTrees), disconnecting
+def _copy_and_disconnect_tree(root, machine):
+    """
+    Copy a RoutingTree (containing nothing but RoutingTrees), disconnecting
     nodes which are not connected in the machine.
 
     Note that if a dead chip is part of the input RoutingTree, no corresponding
@@ -258,23 +281,16 @@ def copy_and_disconnect_tree(root, machine):
     situation is impossible to confirm since the input routing trees have not
     yet been populated with vertices. The caller is responsible for being
     sensible.
-
-    Parameters
-    ----------
-    root : :py:class:`~rig.place_and_route.routing_tree.RoutingTree`
+    :param root: :py:class:`RoutingTree`
         The root of the RoutingTree that contains nothing but RoutingTrees
         (i.e. no children which are vertices or links).
-    machine : :py:class:`~rig.place_and_route.Machine`
-        The machine in which the routes exist.
-
-    Returns
-    -------
-    (root, lookup, broken_links)
+    :param machine: The machine in which the routes exist
+    :return: (root, lookup, broken_links)
         Where:
         * `root` is the new root of the tree
-          :py:class:`~rig.place_and_route.routing_tree.RoutingTree`
+          :py:class:`~.RoutingTree`
         * `lookup` is a dict {(x, y):
-          :py:class:`~rig.place_and_route.routing_tree.RoutingTree`, ...}
+          :py:class:`~.RoutingTree`, ...}
         * `broken_links` is a set ([(parent, child), ...]) containing all
           disconnected parent and child (x, y) pairs due to broken links.
     """
@@ -308,7 +324,7 @@ def copy_and_disconnect_tree(root, machine):
         elif new_node is not new_parent:
             # If this node is not dead, check connectivity to parent node (no
             # reason to check connectivity between a dead node and its parent).
-            if is_linked(new_parent.chip, new_node.chip, direction, machine):
+            if _is_linked(new_parent.chip, new_node.chip, direction, machine):
                 # Is connected via working link
                 new_parent.append_child((direction, new_node))
             else:
@@ -323,8 +339,9 @@ def copy_and_disconnect_tree(root, machine):
     return (new_root, new_lookup, broken_links)
 
 
-def a_star(sink, heuristic_source, sources, machine):
-    """Use A* to find a path from any of the sources to the sink.
+def _a_star(sink, heuristic_source, sources, machine):
+    """
+    Use A* to find a path from any of the sources to the sink.
 
     Note that the heuristic means that the search will proceed towards
     heuristic_source without any concern for any other sources. This means that
@@ -335,40 +352,22 @@ def a_star(sink, heuristic_source, sources, machine):
     forming loops in the rest of the tree since we'll stop as soon as we touch
     any part of it.
 
-    Parameters
-    ----------
-    sink : (x, y)
-    heuristic_source : (x, y)
+    :param sink: (x, y)
+    :param heuristic_source: (x, y)
         An element from `sources` which is used as a guiding heuristic for the
         A* algorithm.
-    sources : set([(x, y), ...])
-    machine : :py:class:`~rig.place_and_route.Machine`
-    wrap_around : bool
-        Consider wrap-around links in heuristic distance calculations.
-
-    Returns
-    -------
-    [(:py:class:`~rig.routing_table.Routes`, (x, y)), ...]
+    :param sources: set([(x, y), ...])
+    :param machine:
+    :return: [(int, (x, y)), ...]
         A path starting with a coordinate in `sources` and terminating at
         connected neighbour of `sink` (i.e. the path does not include `sink`).
         The direction given is the link down which to proceed from the given
         (x, y) to arrive at the next point in the path.
 
-    Raises
-    ------
-    :py:class:~rig.place_and_route.exceptions.MachineHasDisconnectedSubregion`
-        If a path cannot be found.
     """
     # Select the heuristic function to use for distances
-    width = machine.max_chip_x + 1
-    height = machine.max_chip_y + 1
-    if machine.has_wrap_arounds:
-        heuristic = (lambda node:
-                     shortest_torus_path_length(
-                         node, heuristic_source, width, height))
-    else:
-        heuristic = (lambda node:
-                     shortest_mesh_path_length(node, heuristic_source))
+    heuristic = (lambda node: machine.get_vector_length(
+        node, heuristic_source))
 
     # A dictionary {node: (direction, previous_node}. An entry indicates that
     # 1) the node has been visited and 2) which node we hopped from (and the
@@ -391,12 +390,13 @@ def a_star(sink, heuristic_source, sources, machine):
             selected_source = node
             break
 
-        # Try all neighbouring locations. Note: link identifiers are from the
-        # perspective of the neighbour, not the current node!
-        for neighbour_link in Links:
-            vector = neighbour_link.opposite.to_vector()
-            neighbour = ((node[0] + vector[0]) % width,
-                         (node[1] + vector[1]) % height)
+        # Try all neighbouring locations.
+        for neighbour_link in range(6):  # Router.MAX_LINKS_PER_ROUTER
+            # Note: link identifiers arefrom the perspective of the neighbour,
+            # not the current node!
+            neighbour = machine.xy_over_link(
+                #                  Same as Router.opposite
+                node[0], node[1], (neighbour_link + 3) % 6)
 
             # Skip links which are broken
             if not machine.is_link_at(
@@ -419,30 +419,23 @@ def a_star(sink, heuristic_source, sources, machine):
 
     # Reconstruct the discovered path, starting from the source we found and
     # working back until the sink.
-    path = [(Routes(visited[selected_source][0]), selected_source)]
+    path = [(visited[selected_source][0], selected_source)]
     while visited[path[-1][1]][1] != sink:
         node = visited[path[-1][1]][1]
-        direction = Routes(visited[node][0])
+        direction = visited[node][0]
         path.append((direction, node))
 
     return path
 
 
-def route_has_dead_links(root, machine):
-    """Quickly determine if a route uses any dead links.
+def _route_has_dead_links(root, machine):
+    """ Quickly determine if a route uses any dead links.
 
-    Parameters
-    ----------
-    root : :py:class:`~rig.place_and_route.routing_tree.RoutingTree`
+    :param root: :py:class:`.routing_tree.RoutingTree`
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    machine : :py:class:spinn_machine.Machine`
-        The machine in which the routes exist.
-
-    Returns
-    -------
-    bool
-        True if the route uses any dead/missing links, False otherwise.
+    :param machine: The machine in which the routes exist.
+    :return: True if the route uses any dead/missing links, False otherwise.
     """
     for _, (x, y), routes in root.traverse():
         chip = machine.get_chip_at(x, y)
@@ -454,36 +447,23 @@ def route_has_dead_links(root, machine):
     return False
 
 
-def avoid_dead_links(root, machine):
-    """Modify a RoutingTree to route-around dead links in a Machine.
+def _avoid_dead_links(root, machine):
+    """ Modify a RoutingTree to route-around dead links in a Machine.
 
     Uses A* to reconnect disconnected branches of the tree (due to dead links
     in the machine).
 
-    Parameters
-    ----------
-    root : :py:class:`~rig.place_and_route.routing_tree.RoutingTree`
+    :param root: :py:class:`~.routing_tree.RoutingTree`
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    machine : :py:class:`~rig.place_and_route.Machine`
-        The machine in which the routes exist.
-    wrap_around : bool
-        Consider wrap-around links in pathfinding heuristics.
-
-    Returns
-    -------
-    (:py:class:`~.rig.place_and_route.routing_tree.RoutingTree`,
-     {(x,y): :py:class:`~.rig.place_and_route.routing_tree.RoutingTree`, ...})
+    :param machine: The machine in which the routes exist.
+    :return: (:py:class:`~.RoutingTree`,
+     {(x,y): :py:class:`~.routing_tree.RoutingTree`, ...})
         A new RoutingTree is produced rooted as before. A dictionarry mapping
-        from (x, y) to the associated RoutingTree is provided for convenience.
-
-    Raises
-    ------
-    :py:class:~rig.place_and_route.exceptions.MachineHasDisconnectedSubregion`
-        If a path to reconnect the tree cannot be found.
+        from (x, y) to the associated RoutingTree is provided for convenienc
     """
     # Make a copy of the RoutingTree with all broken parts disconnected
-    root, lookup, broken_links = copy_and_disconnect_tree(root, machine)
+    root, lookup, broken_links = _copy_and_disconnect_tree(root, machine)
 
     # For each disconnected subtree, use A* to connect the tree to *any* other
     # disconnected subtree. Note that this process will eventually result in
@@ -495,10 +475,9 @@ def avoid_dead_links(root, machine):
         # Try to reconnect broken links to any other part of the tree
         # (excluding this broken subtree itself since that would create a
         # cycle).
-        path = a_star(child, parent,
-                      set(lookup).difference(child_chips),
-                      machine)
-
+        path = _a_star(child, parent,
+                       set(lookup).difference(child_chips),
+                       machine)
         # Add new RoutingTree nodes to reconnect the child to the tree.
         last_node = lookup[path[0][1]]
         last_direction = path[0][0]
@@ -527,7 +506,7 @@ def avoid_dead_links(root, machine):
                         node.remove_child(dn[0])
                         # A node can only have one parent so we can stop now.
                         break
-            last_node.append_child((Routes(last_direction), new_node))
+            last_node.append_child((last_direction, new_node))
             last_node = new_node
             last_direction = direction
         last_node.append_child((last_direction, lookup[child]))
@@ -535,8 +514,9 @@ def avoid_dead_links(root, machine):
     return (root, lookup)
 
 
-def do_route(source_vertex, post_vertexes, machine, placements):
-    """Routing algorithm based on Neighbour Exploring Routing (NER).
+def _do_route(source_vertex, post_vertexes, machine, placements):
+    """
+    Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
     routing, Parallel Computing (2014).
@@ -547,27 +527,26 @@ def do_route(source_vertex, post_vertexes, machine, placements):
     fully connected, this algorithm will always succeed though no consideration
     of congestion or routing-table usage is attempted.
 
-    Parameters
-    ----------
-    radius : int
-        Radius of area to search from each node. 20 is arbitrarily selected in
-        the paper and shown to be acceptable in practice. If set to zero, this
-        method is becomes longest dimension first routing.
+    :param source_vertex:
+    :param post_vertexes:
+    :param machine:
+    :param placements:
+    :return:
     """
     source_xy = _vertex_xy(source_vertex, placements, machine)
     destinations = set(_vertex_xy(post_vertex, placements, machine)
                        for post_vertex in post_vertexes)
     # Generate routing tree (assuming a perfect machine)
-    root, lookup = ner_net(source_xy, destinations, machine)
+    root, lookup = _ner_net(source_xy, destinations, machine)
 
     # Fix routes to avoid dead chips/links
-    if route_has_dead_links(root, machine):
-        root, lookup = avoid_dead_links(root, machine)
+    if _route_has_dead_links(root, machine):
+        root, lookup = _avoid_dead_links(root, machine)
 
     # Add the sinks in the net to the RoutingTree
     for post_vertex in post_vertexes:
         tree_node = lookup[_vertex_xy(post_vertex, placements, machine)]
-        if isinstance(post_vertex, _SUPPORTED_VIRTUAL_VERTEX_TYPES):
+        if isinstance(post_vertex, AbstractVirtualVertex):
             # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
             route = _route_to_endpoint(post_vertex, machine)
@@ -575,7 +554,8 @@ def do_route(source_vertex, post_vertexes, machine, placements):
         else:
             core = placements.get_placement_of_vertex(post_vertex).p
             if core is not None:
-                tree_node.append_child((Routes.core(core), post_vertex))
+                #  Offset the core by 6 as first 6 are the links
+                tree_node.append_child((core + 6, post_vertex))
             else:
                 # Sinks without that resource are simply included without
                 # an associated route
@@ -605,4 +585,119 @@ def _route_to_endpoint(vertex, machine):
     else:
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
-    return Links(link_data.connected_link)
+    return link_data.connected_link
+
+
+def _get_concentric_hexagons(radius, start=(0, 0)):
+    """
+    A generator which produces coordinates of concentric rings of hexagons.
+
+    :param radius:  Number of layers to produce (0 is just one hexagon)
+    :param start:  (x, y)
+        The coordinate of the central hexagon.
+    :return:
+    """
+    x, y = start
+    yield (x, y)
+    for r in range(1, radius + 1):
+        # Move to the next layer
+        y -= 1
+        # Walk around the hexagon of this radius
+        for dx, dy in [(1, 1), (0, 1), (-1, 0), (-1, -1), (0, -1), (1, 0)]:
+            for _ in range(r):
+                yield (x, y)
+                x += dx
+                y += dy
+
+
+def _longest_dimension_first(vector, start, machine):
+    """
+    List the (x, y) steps on a longest-dimension first route.
+
+    :param vector: (x, y, z)
+        The vector which the path should cover.
+    :param start: (x, y)
+        The coordinates from which the path should start (note this is a 2D
+        coordinate).
+    :param machine:
+    :return:
+    """
+    x, y = start
+
+    out = []
+
+    for dimension, magnitude in sorted(
+            enumerate(vector), key=(lambda x: abs(x[1])), reverse=True):
+        if magnitude == 0:
+            break
+
+        if dimension == 0:  # x
+            if magnitude > 0:
+                # Move East (0) magnitude times
+                for _ in range(magnitude):
+                    x, y = machine.xy_over_link(x, y, 0)
+                    out.append((0, (x, y)))
+            else:
+                # Move West (3) -magnitude times
+                for _ in range(magnitude, 0):
+                    x, y = machine.xy_over_link(x, y, 3)
+                    out.append((3, (x, y)))
+        elif dimension == 1:  # y
+            if magnitude > 0:
+                # Move North (2) magnitude times
+                for _ in range(magnitude):
+                    x, y = machine.xy_over_link(x, y, 2)
+                    out.append((2, (x, y)))
+            else:
+                # Move South (5) -magnitude times
+                for _ in range(magnitude, 0):
+                    x, y = machine.xy_over_link(x, y, 5)
+                    out.append((5, (x, y)))
+        else:  # z
+            if magnitude > 0:
+                # Move SouthWest (4) magnitude times
+                for _ in range(magnitude):
+                    x, y = machine.xy_over_link(x, y, 4)
+                    out.append((4, (x, y)))
+            else:
+                # Move NorthEast (1) -magnitude times
+                for _ in range(magnitude, 0):
+                    x, y = machine.xy_over_link(x, y, 1)
+                    out.append((1, (x, y)))
+    return out
+
+
+class NerRoute(object):
+    """ Performs routing using rig algorithm
+    """
+
+    __slots__ = []
+
+    def __call__(self, machine_graph, machine, placements):
+        """
+
+        :param machine_graph:
+        :param machine:
+        :param placements:  pacman.model.placements.placements.py
+        :return:
+        """
+        routing_tables = MulticastRoutingTableByPartition()
+
+        progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
+
+        for source_vertex in progress_bar.over(machine_graph.vertices):
+            # handle the vertex edges
+            for partition in machine_graph.\
+                    get_outgoing_edge_partitions_starting_at_vertex(
+                        source_vertex):
+                if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                    post_vertexes = list(
+                        e.post_vertex for e in partition.edges)
+                    routingtree = _do_route(
+                        source_vertex, post_vertexes, machine, placements)
+                    _convert_a_route(routing_tables, partition, 0, None,
+                                     routingtree)
+
+        progress_bar.end()
+
+        return routing_tables
