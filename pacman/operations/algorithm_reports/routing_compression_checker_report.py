@@ -130,7 +130,7 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
                 remainders = calc_remainders(o_code, c_code)
                 for remainder in remainders:
                     compare_route(o_route, compressed_dict, o_code=remainder,
-                              start=i + 1, f=f)
+                                  start=i + 1, f=f)
             return
     if not o_route.defaultable:
         # print("No route found {}".format(o_route))
