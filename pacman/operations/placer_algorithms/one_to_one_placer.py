@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import (
     PacmanException, PacmanInvalidParameterException, PacmanValueError)
@@ -25,62 +40,6 @@ def _conflict(x, y, post_x, post_y):
     return False
 
 
-def _find_one_to_one_vertices(vertex, graph):
-    """ Find vertices which have one to one connections with the given\
-        vertex, and where their constraints don't force them onto\
-        different chips.
-
-    :param graph: the graph to look for other one to one vertices
-    :param vertex: the vertex to use as a basis for one to one connections
-    :return: set of one to one vertices
-    """
-    # Virtual vertices can't be forced on other chips
-    if isinstance(vertex, AbstractVirtualVertex):
-        return []
-    found_vertices = set()
-    vertices_seen = {vertex}
-
-    # look for one to ones leaving this vertex
-    outgoing = graph.get_edges_starting_at_vertex(vertex)
-    vertices_to_try = [
-        edge.post_vertex for edge in outgoing
-        if edge.post_vertex not in vertices_seen]
-    while vertices_to_try:
-        next_vertex = vertices_to_try.pop()
-        if next_vertex not in vertices_seen and \
-                not isinstance(next_vertex, AbstractVirtualVertex):
-            vertices_seen.add(next_vertex)
-            edges = graph.get_edges_ending_at_vertex(next_vertex)
-            if is_single(edges):
-                found_vertices.add(next_vertex)
-                outgoing = graph.get_edges_starting_at_vertex(next_vertex)
-                vertices_to_try.extend([
-                    edge.post_vertex for edge in outgoing
-                    if edge.post_vertex not in vertices_seen])
-
-    # look for one to ones entering this vertex
-    incoming = graph.get_edges_ending_at_vertex(vertex)
-    vertices_to_try = [
-        edge.pre_vertex for edge in incoming
-        if edge.pre_vertex not in vertices_seen]
-    while vertices_to_try:
-        next_vertex = vertices_to_try.pop()
-        if next_vertex not in vertices_seen:
-            vertices_seen.add(next_vertex)
-            edges = graph.get_edges_starting_at_vertex(next_vertex)
-            if is_single(edges):
-                found_vertices.add(next_vertex)
-                incoming = graph.get_edges_ending_at_vertex(next_vertex)
-                vertices_to_try.extend([
-                    edge.pre_vertex for edge in incoming
-                    if edge.pre_vertex not in vertices_seen])
-
-    extra_vertices = get_vertices_on_same_chip(vertex, graph)
-    for vertex in extra_vertices:
-        found_vertices.add(vertex)
-    return found_vertices
-
-
 class OneToOnePlacer(RadialPlacer):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
@@ -90,7 +49,6 @@ class OneToOnePlacer(RadialPlacer):
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
         """
-
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
@@ -105,7 +63,6 @@ class OneToOnePlacer(RadialPlacer):
         :raise pacman.exceptions.PacmanPlaceException: \
             If something goes wrong with the placement
         """
-
         # Iterate over vertices and generate placements
         # +3 covers check_constraints, get_same_chip_vertex_groups and
         #    create_vertices_groups
@@ -125,12 +82,69 @@ class OneToOnePlacer(RadialPlacer):
         # connectivity
         one_to_one_groups = create_vertices_groups(
             machine_graph.vertices,
-            functools.partial(_find_one_to_one_vertices, graph=machine_graph))
+            functools.partial(
+                self._find_one_to_one_vertices, graph=machine_graph))
         progress.update()
 
         return self._do_allocation(
             one_to_one_groups, same_chip_vertex_groups, machine,
             plan_n_timesteps, machine_graph, progress)
+
+    @staticmethod
+    def _find_one_to_one_vertices(vertex, graph):
+        """ Find vertices which have one to one connections with the given\
+            vertex, and where their constraints don't force them onto\
+            different chips.
+
+        :param graph: the graph to look for other one to one vertices
+        :param vertex: the vertex to use as a basis for one to one connections
+        :return: set of one to one vertices
+        """
+        # Virtual vertices can't be forced on other chips
+        if isinstance(vertex, AbstractVirtualVertex):
+            return []
+        found_vertices = set()
+        vertices_seen = {vertex}
+
+        # look for one to ones leaving this vertex
+        outgoing = graph.get_edges_starting_at_vertex(vertex)
+        vertices_to_try = [
+            edge.post_vertex for edge in outgoing
+            if edge.post_vertex not in vertices_seen]
+        while vertices_to_try:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen and \
+                    not isinstance(next_vertex, AbstractVirtualVertex):
+                vertices_seen.add(next_vertex)
+                edges = graph.get_edges_ending_at_vertex(next_vertex)
+                if is_single(edges):
+                    found_vertices.add(next_vertex)
+                    outgoing = graph.get_edges_starting_at_vertex(next_vertex)
+                    vertices_to_try.extend([
+                        edge.post_vertex for edge in outgoing
+                        if edge.post_vertex not in vertices_seen])
+
+        # look for one to ones entering this vertex
+        incoming = graph.get_edges_ending_at_vertex(vertex)
+        vertices_to_try = [
+            edge.pre_vertex for edge in incoming
+            if edge.pre_vertex not in vertices_seen]
+        while vertices_to_try:
+            next_vertex = vertices_to_try.pop()
+            if next_vertex not in vertices_seen:
+                vertices_seen.add(next_vertex)
+                edges = graph.get_edges_starting_at_vertex(next_vertex)
+                if is_single(edges):
+                    found_vertices.add(next_vertex)
+                    incoming = graph.get_edges_ending_at_vertex(next_vertex)
+                    vertices_to_try.extend([
+                        edge.pre_vertex for edge in incoming
+                        if edge.pre_vertex not in vertices_seen])
+
+        extra_vertices = get_vertices_on_same_chip(vertex, graph)
+        for vertex in extra_vertices:
+            found_vertices.add(vertex)
+        return found_vertices
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
@@ -173,7 +187,6 @@ class OneToOnePlacer(RadialPlacer):
                         "with the OneToOnePlacer algorithm; use the "
                         "RadialPlacer algorithm instead")
 
-        unconstrained = list()
         # Find and place vertices with hard constraints
         for vertex in machine_graph.vertices:
             if isinstance(vertex, AbstractVirtualVertex):
@@ -192,8 +205,6 @@ class OneToOnePlacer(RadialPlacer):
                     vertex, placements, resource_tracker,
                     same_chip_vertex_groups,
                     all_vertices_placed, progress)
-            else:
-                unconstrained.append(vertex)
 
         for grouped_vertices in one_to_one_groups:
             # Get unallocated vertices and placements of allocated vertices
