@@ -175,7 +175,7 @@ def minimise(
 
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
+    :type routing_table: iterable of RoutingTableEntry
     :param target_length :
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
@@ -230,7 +230,7 @@ def ordered_covering(
         the same key) and reorderable.
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
+    :type routing_table: iterable of RoutingTableEntry
     :param target_length :
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
