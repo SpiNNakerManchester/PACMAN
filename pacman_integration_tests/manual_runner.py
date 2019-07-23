@@ -29,8 +29,9 @@ from pacman.operations.router_compressors.unordered_compressor import \
 
 
 #  original_tables = from_json("malloc_1hard_routing_tables.json.gz")
-original_tables = from_json("routing_tables.json")
+original_tables = from_json("no_singles_routing_tables.json")
 
+"""
 bad = MulticastRoutingTables()
 good = MulticastRoutingTables()
 for original in original_tables:
@@ -52,9 +53,10 @@ json_obj = to_json(good)
 with open("good_routing_tables.json", "w") as f:
     json.dump(json_obj, f)
 original = good
+"""
 
-MUNDY = False
-PRE = False
+MUNDY = True
+PRE = True
 mundy_compressor = MundyRouterCompressor()
 # Hack to stop it throwing a wobly for too many entries
 MundyRouterCompressor.max_supported_length = 5000
