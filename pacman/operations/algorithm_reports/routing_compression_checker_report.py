@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 try:
     from collections.abc import OrderedDict
 except ImportError:
@@ -91,10 +106,6 @@ def compare_route(f, o_route, compressed_dict, o_code=None, start=0):
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
             f.write("\t\t{}\n".format(reports.format_route(c_route)))
-            if o_route.defaultable != c_route.defaultable:
-                raise PacmanRoutingException(
-                    "Compressed route {} covers original route {} but has "
-                    "a different defaultable value.".format(c_route, o_route))
             if o_route.processor_ids != c_route.processor_ids:
                 raise PacmanRoutingException(
                     "Compressed route {} covers original route {} but has "

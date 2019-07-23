@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import functools
 try:
     from collections.abc import OrderedDict
@@ -69,7 +84,7 @@ def group_vertices(vertices, same_group_as_function):
     """
 
     groups = create_vertices_groups(vertices, same_group_as_function)
-    # Dict of vertex to setof vertices on same chip (repeated lists expected)
+    # Dict of vertex to set of vertices on same chip (repeated lists expected)
     # A empty set value indicates a set that is too big.
     same_chip_vertices = OrderedDict()
     for group in groups:
@@ -83,7 +98,7 @@ def group_vertices(vertices, same_group_as_function):
 
 def add_set(all_sets, new_set):
     """
-    Adds a new set into the list of sets, concatenating ssets if required.
+    Adds a new set into the list of sets, concatenating sets if required.
 
     If the new set does not overlap any existing sets it is added.
 
