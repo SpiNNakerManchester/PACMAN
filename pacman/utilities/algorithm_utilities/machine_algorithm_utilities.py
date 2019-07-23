@@ -1,18 +1,3 @@
-# Copyright (c) 2017-2019 The University of Manchester
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import sys
 from pacman.utilities import constants
 from spinn_machine import SDRAM, Chip, Link, Processor, Router
@@ -34,6 +19,8 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
         destination_y=virtual_chip_y,
         source_x=link_data.connected_chip_x,
         source_y=link_data.connected_chip_y,
+        multicast_default_from=virtual_link_id,
+        multicast_default_to=virtual_link_id,
         source_link_id=link_data.connected_link)
 
     # Create link to the real chip from the virtual chip
@@ -42,6 +29,8 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
         destination_y=link_data.connected_chip_y,
         source_x=virtual_chip_x,
         source_y=virtual_chip_y,
+        multicast_default_from=link_data.connected_link,
+        multicast_default_to=link_data.connected_link,
         source_link_id=virtual_link_id)
 
     # create the router

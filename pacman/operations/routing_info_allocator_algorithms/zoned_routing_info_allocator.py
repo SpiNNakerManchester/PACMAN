@@ -1,18 +1,3 @@
-# Copyright (c) 2019 The University of Manchester
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import math
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_info import (
@@ -134,8 +119,6 @@ class ZonedRoutingInfoAllocator(object):
         progress = ProgressBar(
             self._application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
-        by_app_vertex = dict()
-        app_mask = 2 ** 32 - 2 ** self._max_app_keys_bites
 
         source_index = 0
         for app_vertex in progress.over(self._application_graph.vertices):
@@ -157,12 +140,9 @@ class ZonedRoutingInfoAllocator(object):
                             base_key=key, mask=mask)])
                         info = PartitionRoutingInfo(keys_and_masks, partition)
                         routing_infos.add_partition_info(info)
-            app_key = key = source_index << self._max_app_keys_bites
-            by_app_vertex[app_vertex] = BaseKeyAndMask(
-                base_key=app_key, mask=app_mask)
             source_index += 1
 
-        return routing_infos, by_app_vertex
+        return routing_infos
 
     def _bites_needed(self, size):
         return int(math.ceil(math.log(size, 2)))

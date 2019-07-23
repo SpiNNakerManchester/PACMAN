@@ -1,18 +1,3 @@
-# Copyright (c) 2017-2019 The University of Manchester
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from __future__ import print_function
 import unittest
 from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
@@ -48,6 +33,7 @@ class TestBasicPlacer(unittest.TestCase):
         # Setting up machine                                                  #
         #######################################################################
         flops = 1000
+        (_, _, n, _, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -61,12 +47,12 @@ class TestBasicPlacer(unittest.TestCase):
             for y in range(10):
                 links = list()
 
-                links.append(Link(x, y, 0, (x + 1) % 10, y))
-                links.append(Link(x, y, 1, (x + 1) % 10, (y + 1) % 10))
-                links.append(Link(x, y, 2, x, (y + 1) % 10))
-                links.append(Link(x, y, 3, (x - 1) % 10, y))
-                links.append(Link(x, y, 4, (x - 1) % 10, (y - 1) % 10))
-                links.append(Link(x, y, 5, x, (y - 1) % 10))
+                links.append(Link(x, y, 0, (x + 1) % 10, y, n, n))
+                links.append(Link(x, y, 1, (x + 1) % 10, (y + 1) % 10, s, s))
+                links.append(Link(x, y, 2, x, (y + 1) % 10, n, n))
+                links.append(Link(x, y, 3, (x - 1) % 10, y, s, s))
+                links.append(Link(x, y, 4, (x - 1) % 10, (y - 1) % 10, n, n))
+                links.append(Link(x, y, 5, x, (y - 1) % 10, s, s))
 
                 r = Router(links, False, 100, 1024)
                 chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))

@@ -1,23 +1,10 @@
-# Copyright (c) 2017-2019 The University of Manchester
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from __future__ import division
 import logging
 from six import raise_from
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex)
 from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
@@ -142,7 +129,9 @@ class PartitionAndPlacePartitioner(object):
         possible_max_atoms = list()
         n_atoms = None
         for other_vertex in partition_together_vertices:
-            possible_max_atoms.append(other_vertex.get_max_atoms_per_core())
+            if isinstance(other_vertex, ApplicationVertex):
+                possible_max_atoms.append(
+                    other_vertex.get_max_atoms_per_core())
             max_atom_constraints = utils.locate_constraints_of_type(
                 other_vertex.constraints, MaxVertexAtomsConstraint)
             for constraint in max_atom_constraints:

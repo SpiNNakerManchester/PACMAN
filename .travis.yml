@@ -1,43 +1,32 @@
-# Copyright (c) 2017-2019 The University of Manchester
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 language: python
 python:
   - 2.7
   - 3.6
-  - 3.7
-dist: xenial
+dist: trusty
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
 cache: pip
+
 addons:
   apt:
     packages:
       - libxml2-utils
-      - openjdk-8-jre-headless
-      - ant
 
 before_install:
   # Work around ludicrous Travis bug
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
-  - support/rat.sh download
   # Bring pip up to date 
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy numpy scipy
   # SpiNNakerManchester internal dependencies; development mode
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
+  # Which version of rig should we really use?
+  - pip install --upgrade git+git://github.com/project-rig/rig.git@master
 
 install:
   - pip install -r requirements-test.txt
@@ -51,8 +40,7 @@ script:
   # Code quality check
   - flake8 pacman
   - flake8 integration_tests unittests uinit_test_objects
-  - find pacman -name '*.xml' | xargs -n 1 support/validate-xml.sh
-  - support/rat.sh run
+  - find pacman -name '*.xml' | xargs -n 1 support/validate-xml.sh 
   - cd doc/source
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
