@@ -38,7 +38,7 @@ class MundyRouterCompressor(object):
 
     def __call__(
             self, router_tables, time_to_try_for_each_iteration,
-            use_timer_cut_off, default_report_folder, target_length=None):
+            use_timer_cut_off, target_length=None):
         # build storage
         compressed_pacman_router_tables = MulticastRoutingTables()
 
@@ -55,8 +55,7 @@ class MundyRouterCompressor(object):
             compressed_router_table_entries = \
                 rigs_compressor.minimise(
                     entries, target_length, time_to_try_for_each_iteration,
-                    use_timer_cut_off, default_report_folder, router_table.x,
-                    router_table.y)
+                    use_timer_cut_off)
 
             # convert back to pacman model
             compressed_pacman_table = self.convert_to_pacman_router_table(
