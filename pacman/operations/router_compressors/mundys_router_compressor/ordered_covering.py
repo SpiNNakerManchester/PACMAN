@@ -142,7 +142,6 @@ As a heuristic:
 based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_covering.py
 """
-import os
 
 from .exceptions import MinimisationFailedError
 from .routing_table_entry import RoutingTableEntry
