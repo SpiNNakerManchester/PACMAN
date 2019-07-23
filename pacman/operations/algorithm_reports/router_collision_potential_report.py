@@ -32,8 +32,9 @@ class RouterCollisionPotentialReport(object):
         for (x, y) in router_tables_by_partition.get_routers():
             for partition in \
                     router_tables_by_partition.get_entries_for_router(x, y):
-                entry = router_tables_by_partition.get_entry_on_coords_for_edge(
-                    partition, x, y)
+                entry = \
+                    router_tables_by_partition.get_entry_on_coords_for_edge(
+                        partition, x, y)
                 for link in entry.link_ids:
                     if collisions[(x, y)][link] == 0:
                         chip = machine.get_chip_at(x, y)
@@ -55,7 +56,7 @@ class RouterCollisionPotentialReport(object):
     @staticmethod
     def _get_collisions_with_other_router(
             x, y, collision_route, router_tables_by_partition, n_key_map):
-        total= 0
+        total = 0
         for partition in \
                 router_tables_by_partition.get_entries_for_router(x, y):
             entry = router_tables_by_partition.get_entry_on_coords_for_edge(
@@ -63,9 +64,3 @@ class RouterCollisionPotentialReport(object):
             if collision_route in entry.link_ids:
                 total += n_key_map.n_keys_for_partition(partition)
         return total
-
-
-
-
-
-

@@ -192,8 +192,6 @@ def minimise(
     :type x: int
     :param y: y coord
     :type y: int
-    :raises MinimisationFailedError: 
-
     :return: list(RoutingTableEntry)
     :raises MinimisationFailedError
         If the smallest table that can be produced is larger than
