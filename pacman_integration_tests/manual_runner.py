@@ -30,35 +30,30 @@ from pacman.operations.router_compressors.pair_compressor import PairCompressor
 
 
 #  original_tables = from_json("malloc_1hard_routing_tables.json.gz")
-original_tables = from_json("routing_tables_eight.json")
+original_tables = from_json("routing_tables_zoned_big.json.gz")
 
-"""
-bad = MulticastRoutingTables()
+#bad = MulticastRoutingTables()
 good = MulticastRoutingTables()
 for original in original_tables:
-    try:
-        print(original.x, original.y, original.number_of_entries)
-        compare_tables(original, original)
+    if original.number_of_entries > 1023:
         good.add_routing_table(original)
-    except Exception as ex:
-        print(ex)
-        bad.add_routing_table(original)
-        break
+    #else:
+    #    bad.add_routing_table(original)
 
-json_obj = to_json(bad)
+#json_obj = to_json(bad)
 # dump to json file
-with open("bad_routing_tables.json", "w") as f:
-    json.dump(json_obj, f)
-json_obj = to_json(good)
+#with open("bad_routing_tables.json", "w") as f:
+#    json.dump(json_obj, f)
+#json_obj = to_json(good)
 # dump to json file
-with open("good_routing_tables.json", "w") as f:
-    json.dump(json_obj, f)
-original = good
-"""
+#with open("routing_tables_zoned_big.json", "w") as f:
+#    json.dump(json_obj, f)
+#original_tables = good
+
 
 MUNDY = False
 PRE = False
-TEST = True
+TEST = False
 mundy_compressor = MundyRouterCompressor()
 # Hack to stop it throwing a wobly for too many entries
 MundyRouterCompressor.max_supported_length = 5000
