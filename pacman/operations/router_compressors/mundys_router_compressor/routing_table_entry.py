@@ -20,7 +20,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/entries.py
 """
 
 
-class RoutingTableEntry(object):
+class Entry(object):
     """
     Representing a single routing entry in a SpiNNaker routing table.
 
@@ -41,7 +41,7 @@ class RoutingTableEntry(object):
         # bool value to say if the route is defaultable
         "defaultable"]
 
-    def __init__(self, spinnaker_route, key, mask, defaultable):
+    def __init__(self, key, mask, defaultable, spinnaker_route):
         self.spinnaker_route = spinnaker_route
         self.key = key
         self.mask = mask
