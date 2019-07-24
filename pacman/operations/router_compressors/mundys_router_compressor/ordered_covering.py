@@ -142,8 +142,8 @@ As a heuristic:
 based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_covering.py
 """
+from pacman.operations.router_compressors import Entry
 from .exceptions import MinimisationFailedError
-from .routing_table_entry import Entry
 from .remove_default_routes import \
     minimise as remove_default_routes
 from .utils import intersect

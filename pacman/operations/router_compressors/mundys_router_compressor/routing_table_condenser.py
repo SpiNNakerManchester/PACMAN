@@ -18,8 +18,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
+from pacman.operations.router_compressors import Entry
 from pacman.exceptions import PacmanElementAllocationException
-from .routing_table_entry import Entry
 from pacman.operations.router_compressors.mundys_router_compressor import \
     ordered_covering as rigs_compressor
 
