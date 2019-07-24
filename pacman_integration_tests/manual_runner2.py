@@ -26,7 +26,7 @@ from pacman.operations.router_compressors.mundys_router_compressor.\
         MundyRouterCompressor)
 from pacman.operations.router_compressors.unordered_compressor import \
     UnorderedCompressor
-from pacman.operations.router_compressors.test_compressor import TestCompressor
+from pacman.operations.router_compressors.test_compressor import PairCompressor
 
 
 #  original_tables = from_json("malloc_1hard_routing_tables.json.gz")
@@ -61,7 +61,7 @@ PRE = True
 mundy_compressor = MundyRouterCompressor()
 # Hack to stop it throwing a wobly for too many entries
 MundyRouterCompressor.max_supported_length = 5000
-pre_compressor = TestCompressor()
+pre_compressor = PairCompressor()
 
 if MUNDY:
     start = time.time()

@@ -26,10 +26,11 @@ from pacman.operations.router_compressors.mundys_router_compressor.\
         MundyRouterCompressor)
 from pacman.operations.router_compressors.unordered_compressor import \
     UnorderedCompressor
+from pacman.operations.router_compressors.pair_compressor import PairCompressor
 
 
 #  original_tables = from_json("malloc_1hard_routing_tables.json.gz")
-original_tables = from_json("no_singles_routing_tables.json")
+original_tables = from_json("routing_tables_eight.json")
 
 """
 bad = MulticastRoutingTables()
@@ -55,12 +56,14 @@ with open("good_routing_tables.json", "w") as f:
 original = good
 """
 
-MUNDY = True
-PRE = True
+MUNDY = False
+PRE = False
+TEST = True
 mundy_compressor = MundyRouterCompressor()
 # Hack to stop it throwing a wobly for too many entries
 MundyRouterCompressor.max_supported_length = 5000
 pre_compressor = UnorderedCompressor()
+test_compressor = PairCompressor()
 
 if MUNDY:
     start = time.time()
@@ -71,7 +74,10 @@ if PRE:
 pre_time = time.time()
 if MUNDY and PRE:
     both_tables = mundy_compressor(pre_tables)
-    both_time = time.time()
+both_time = time.time()
+if TEST:
+    test_tables = test_compressor(original_tables)
+test_time = time.time()
 for original in original_tables:
     org_routes = set()
     for entry in original.multicast_routing_entries:
@@ -108,23 +114,29 @@ for original in original_tables:
             print("Both Passed")
         except PacmanRoutingException as ex:
             print(ex)
+    if TEST:
+        test = test_tables.get_routing_table_for_chip(original.x, original.y)
+        test_routes = set()
+        for entry in test.multicast_routing_entries:
+            test_routes.add(entry.spinnaker_route)
+        print("Testing test")
+        compare_tables(original, test)
+        print("Test Passed")
 
+    print("org:", original.number_of_entries, len(org_routes))
+    if PRE:
+        print("pre:", pre.number_of_entries, len(pre_routes))
     if MUNDY:
+        print("mundy:", mundy.number_of_entries, len(mundy_routes))
         if PRE:
-            print("org:", original.number_of_entries, len(org_routes),
-                  "mundy:", mundy.number_of_entries, len(mundy_routes),
-                  "pre:", pre.number_of_entries, len(pre_routes),
-                  "both:", both.number_of_entries, len(both_routes))
-        else:
-            print("org:", original.number_of_entries, len(org_routes),
-                  "mundy:", mundy.number_of_entries, len(mundy_routes))
-    else:
-        if PRE:
-            print("org:", original.number_of_entries, len(org_routes),
-                  "pre:", pre.number_of_entries, len(pre_routes))
+            print("both:", both.number_of_entries, len(both_routes))
+    if PRE:
+        print("test:", test.number_of_entries, len(test_routes))
 if MUNDY:
     print(mundy_time-start)
 if PRE:
     print(pre_time-mundy_time)
 if MUNDY and PRE:
     print(both_time-pre_time)
+if TEST:
+    print(test_time-both_time)
