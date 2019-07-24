@@ -47,4 +47,3 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     def n_keys_for_partition(self, partition):
         if partition in self._n_keys_map:
             return self._n_keys_map[partition]
-

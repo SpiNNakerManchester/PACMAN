@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import itertools
 
 from pacman.model.routing_tables.compressed_multicast_routing_table import \
     CompressedMulticastRoutingTable
@@ -37,7 +36,9 @@ class MundyRouterCompressor(object):
 
     max_supported_length = 1023
 
-    def __call__(self, router_tables, target_length=None):
+    def __call__(
+            self, router_tables, time_to_try_for_each_iteration,
+            use_timer_cut_off, target_length=None):
         # build storage
         compressed_pacman_router_tables = MulticastRoutingTables()
 
@@ -52,7 +53,9 @@ class MundyRouterCompressor(object):
 
             # compress the router entries
             compressed_router_table_entries = \
-                rigs_compressor.minimise(entries, target_length)
+                rigs_compressor.minimise(
+                    entries, target_length, time_to_try_for_each_iteration,
+                    use_timer_cut_off)
 
             # convert back to pacman model
             compressed_pacman_table = self.convert_to_pacman_router_table(

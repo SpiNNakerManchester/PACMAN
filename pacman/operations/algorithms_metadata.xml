@@ -572,9 +572,19 @@
                 <param_name>target_length</param_name>
                 <param_type>CompressionTargetSize</param_type>
             </parameter>
+            <parameter>
+                <param_name>time_to_try_for_each_iteration</param_name>
+                <param_type>RouterCompressorBitFieldTimePerAttempt</param_type>
+            </parameter>
+            <parameter>
+                <param_name>use_timer_cut_off</param_name>
+                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
+            <param_name>time_to_try_for_each_iteration</param_name>
+            <param_name>use_timer_cut_off</param_name>
         </required_inputs>
         <optional_inputs>
             <param_name>target_length</param_name>

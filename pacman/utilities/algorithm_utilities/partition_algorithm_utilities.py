@@ -33,14 +33,6 @@ from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, SameAtomsAsVertexConstraint,
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
-from spinnak_ear.spinnak_ear_machine_vertices.ihcan_machine_vertex import \
-    IHCANMachineVertex
-from spinnak_ear.spinnak_ear_application_vertex.spinnakear_application_vertex\
-    import SpiNNakEarApplicationVertex
-from spinnak_ear.spinnak_ear_machine_vertices.drnl_machine_vertex import \
-    DRNLMachineVertex
-from spinnak_ear.spinnak_ear_machine_vertices.an_group_machine_vertex import \
-    ANGroupMachineVertex
 
 
 def determine_max_atoms_for_vertex(vertex):
