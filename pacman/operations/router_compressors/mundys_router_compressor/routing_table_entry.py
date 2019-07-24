@@ -41,8 +41,8 @@ class RoutingTableEntry(object):
         # bool value to say if the route is defaultable
         "defaultable"]
 
-    def __init__(self, route, key, mask, defaultable):
-        self.spinnaker_route = route
+    def __init__(self, spinnaker_route, key, mask, defaultable):
+        self.spinnaker_route = spinnaker_route
         self.key = key
         self.mask = mask
         self.defaultable = defaultable

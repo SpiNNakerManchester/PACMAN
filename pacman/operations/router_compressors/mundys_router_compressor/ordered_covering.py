@@ -479,7 +479,7 @@ class _Merge(object):
 
         # Get the new entry
         new_entry = RoutingTableEntry(
-            route=self.routing_table[next(iter(self.entries))].spinnaker_route,
+            spinnaker_route=self.routing_table[next(iter(self.entries))].spinnaker_route,
             key=self.key, mask=self.mask, defaultable=self.defaultable
         )
         aliases[(self.key, self.mask)] = our_aliases = set([])
