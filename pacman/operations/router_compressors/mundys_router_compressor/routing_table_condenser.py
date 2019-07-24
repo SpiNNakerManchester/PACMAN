@@ -109,6 +109,6 @@ class MundyRouterCompressor(object):
         for entry in mundy_compressed_router_table_entries:
             table.add_multicast_routing_entry(MulticastRoutingEntry(
                 entry.key, entry.mask,  defaultable=False,  # NOT defaultable
-                spinnaker_route=entry.route,
+                spinnaker_route=entry.spinnaker_route,
                 ))
         return table

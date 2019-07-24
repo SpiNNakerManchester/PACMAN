@@ -32,7 +32,7 @@ class RoutingTableEntry(object):
         # int value representing The set of destinations a packet should be
         # routed to where each element in the set is a value from the
         # enumeration
-        "route",
+        "spinnaker_route",
         # 32-bit unsigned integer routing key to match after applying the mask.
         "key",
         # 32-bit unsigned integer mask to apply to keys of packets arriving at
@@ -42,7 +42,7 @@ class RoutingTableEntry(object):
         "defaultable"]
 
     def __init__(self, route, key, mask, defaultable):
-        self.route = route
+        self.spinnaker_route = route
         self.key = key
         self.mask = mask
         self.defaultable = defaultable
@@ -50,4 +50,4 @@ class RoutingTableEntry(object):
     def __str__(self):
         # If no sources then don't display sources
         return "key:{} mask:{} route:{} defaultable:{}".format(
-            self.key, self.mask, self.route, self.defaultable)
+            self.key, self.mask, self.spinnaker_route, self.defaultable)

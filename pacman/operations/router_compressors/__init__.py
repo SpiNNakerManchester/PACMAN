@@ -13,6 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.operations.router_compressors import mundys_router_compressor
+from .checked_unordered_compressor import CheckedUnorderedCompressor
+from .entry import Entry
+from .pair_compressor import PairCompressor
+from .unordered_compressor import UnorderedCompressor
 
-__all__ = ['mundys_router_compressor', ]
+__all__ = ['CheckedUnorderedCompressor', 'Entry', 'PairCompressor',
+           'UnorderedCompressor']

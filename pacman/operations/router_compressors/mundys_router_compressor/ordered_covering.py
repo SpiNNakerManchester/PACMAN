@@ -345,7 +345,7 @@ def _get_all_merges(routing_table):
         merge = set([i])
         merge.update(
             j for j, other_entry in enumerate(routing_table[i+1:], start=i+1)
-            if entry.route == other_entry.route
+            if entry.spinnaker_route == other_entry.spinnaker_route
         )
 
         # Mark all these entries as considered
@@ -479,7 +479,7 @@ class _Merge(object):
 
         # Get the new entry
         new_entry = RoutingTableEntry(
-            route=self.routing_table[next(iter(self.entries))].route,
+            route=self.routing_table[next(iter(self.entries))].spinnaker_route,
             key=self.key, mask=self.mask, defaultable=self.defaultable
         )
         aliases[(self.key, self.mask)] = our_aliases = set([])
