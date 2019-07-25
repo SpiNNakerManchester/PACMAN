@@ -17,16 +17,26 @@ from spinn_machine import MulticastRoutingEntry
 
 
 class Entry(object):
-    __slots__ = ["key", "mask", "defaultable", "spinnaker_route"]
+    __slots__ = ["key", "mask", "defaultable", "spinnaker_route","clashes"]
 
-    def __init__(self, key, mask, defaultable, spinnaker_route):
+    def __init__(self, key, mask, defaultable, spinnaker_route, clashes=None):
         self.key = key
         self.mask = mask
         self.defaultable = defaultable
         self.spinnaker_route = spinnaker_route
+        if clashes is None:
+            self.clashes = 0
+        else:
+            self.clashes = clashes
 
     def __str__(self):
         return "{} {} {}".format(self.key, self.mask, self.spinnaker_route)
+
+    def __eq__(self, other):
+        if not isinstance(other, Entry):
+            return False
+        return (self.key == other.key and self.mask == other.mask and
+                self.spinnaker_route == other.spinnaker_route)
 
     @staticmethod
     def from_MulticastRoutingEntry(mre):

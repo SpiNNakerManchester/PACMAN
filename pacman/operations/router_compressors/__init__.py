@@ -15,9 +15,11 @@
 
 from .abstract_compressor import AbstractCompressor
 from .checked_unordered_compressor import CheckedUnorderedCompressor
+from .clash_compressor import ClashCompressor
 from .entry import Entry
 from .pair_compressor import PairCompressor
 from .unordered_compressor import UnorderedCompressor
 
-__all__ = ['AbstractCompressor','CheckedUnorderedCompressor', 'Entry',
+__all__ = ['AbstractCompressor','CheckedUnorderedCompressor', 'ClashCompressor',
+           'Entry',
            'PairCompressor', 'UnorderedCompressor']
