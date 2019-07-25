@@ -18,7 +18,6 @@ based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_routes.py
 """
 
-from pacman.exceptions import MinimisationFailedError
 from .utils import intersect
 
 
@@ -70,9 +69,5 @@ def minimise(table, target_length, check_for_aliases=True):
             if any(intersect(key, mask, d.key, d.mask) for
                     d in table[i + 1:]):
                 new_table.append(entry)
-
-        # If the resultant table is larger than the target raise an exception
-    if target_length is not None and target_length < len(new_table):
-        raise MinimisationFailedError(target_length, len(new_table))
 
     return new_table

@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_machine import MulticastRoutingEntry
+
 
 class Entry(object):
     __slots__ = ["key", "mask", "defaultable", "spinnaker_route"]
@@ -25,3 +27,16 @@ class Entry(object):
 
     def __str__(self):
         return "{} {} {}".format(self.key, self.mask, self.spinnaker_route)
+
+    @staticmethod
+    def from_MulticastRoutingEntry(mre):
+        # Yes I know using _params is ugly but this is for speed
+        return Entry(
+            mre._routing_entry_key, mre._mask, mre._defaultable,
+            mre._spinnaker_route)
+
+    def to_MulticastRoutingEntry(self):
+        return MulticastRoutingEntry(
+            self.key, self.mask, defaultable=self.defaultable,
+            spinnaker_route=self.spinnaker_route)
+

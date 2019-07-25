@@ -17,10 +17,11 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from spinn_machine import MulticastRoutingEntry
+from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
 
-class UnorderedCompressor(object):
+class UnorderedCompressor(AbstractCompressor):
     """
     Routing Table compressor based on brute force.
     Finds mergable pairs to replace.
@@ -75,8 +76,6 @@ class UnorderedCompressor(object):
         # Dict (by spinnaker_route) (for current chip)
         #   of entries represented as (key, mask, defautible)
         "_all_entries",
-        # Max length below which the algorithm should stop compressing
-        "_target_length",
         # The next index to write a merged/unmergable entry to
         "_write_index",
         # Inclusive index of last entry in the array (len in python)
@@ -85,18 +84,7 @@ class UnorderedCompressor(object):
         "_previous_index",
         # Inclusive index to the first entry for later buckets
         "_remaining_index"
-
     ]
-
-    def __call__(self, router_tables, target_length=None):
-        if target_length is None:
-            self._target_length = 0  # Compress as much as you can
-        else:
-            self._target_length = target_length
-        # create progress bar
-        progress = ProgressBar(
-            router_tables.routing_tables, "PreCompressing routing Tables")
-        return self.compress_tables(router_tables, progress)
 
     def _three_way_partition(self, low, high):
         """
@@ -135,54 +123,6 @@ class UnorderedCompressor(object):
             left, right = self._three_way_partition(low, high)
             self._quicksort(low, left - 1)
             self._quicksort(right, high)
-
-    def intersect(self, key_a, mask_a, key_b, mask_b):
-        """
-        Return if key-mask pairs intersect (i.e., would both match some of the
-        same keys).
-        For example, the key-mask pairs ``00XX`` and ``001X`` both match the
-        keys ``0010`` and ``0011`` (i.e., they do intersect)::
-            >>> intersect(0b0000, 0b1100, 0b0010, 0b1110)
-            True
-        But the key-mask pairs ``00XX`` and ``11XX`` do not match any of the
-        same keys (i.e., they do not intersect)::
-            >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
-            False
-        :param key_a: key of the first key-mask pair
-        :type key_a: int
-        :param mask_a: mask of the first key-mask pair
-        :type mask_a: int
-        :param key_b: key of the second key-mask pair
-        :type key_b: int
-        :param mask_b: mask of the second key-mask pair
-        :type mask_b: int
-        :return: True if and only if there is an intersection
-        """
-        return (key_a & mask_b) == (key_b & mask_a)
-
-    def merge(self, entry1, entry2):
-        """
-        Merges two entries/triples into one that covers both
-
-        The assumption is that they both have the same known spinnaker_route
-
-        :param entry1: Key, Mask, defaultable from the first entry
-        :type entry1: Entry
-        :param entry2: Key, Mask, defaultable from the second entry
-        :type entry2: Entry
-        :return: Key, Mask, defaultable from merged entry
-        :rtype: (int, int, bool)
-        """
-        any_ones = entry1.key | entry2.key
-        all_ones = entry1.key & entry2.key
-        all_selected = entry1.mask & entry2.mask
-
-        # Compute the new mask  and key
-        any_zeros = ~all_ones
-        new_xs = any_ones ^ any_zeros
-        mask = all_selected & new_xs  # Combine existing and new Xs
-        key = all_ones & mask
-        return key, mask, entry1.defaultable and entry2.defaultable
 
     def _find_merge(self, left, index):
         """
@@ -262,9 +202,8 @@ class UnorderedCompressor(object):
         # Split the entries into buckets based on spinnaker_route
         self._all_entries = []
         for entry in router_table.multicast_routing_entries:
-            self._all_entries.append(Entry(
-                entry.routing_entry_key, entry.mask, entry.defaultable,
-                entry.spinnaker_route))
+            self._all_entries.append(
+                Entry.from_MulticastRoutingEntry(entry))
         self._quicksort(0, len(self._all_entries) - 1)
 
         self._write_index = 0
@@ -283,37 +222,15 @@ class UnorderedCompressor(object):
             left = right + 1
             self._previous_index = self._write_index
 
+        """
         # convert the results back to a routing table
         compressed_table = MulticastRoutingTable(
             router_table.x, router_table.y)
         index = 0
         while index < self._write_index:
             entry = self._all_entries[index]
-            m = MulticastRoutingEntry(
-                entry.key, entry.mask, defaultable=entry.defaultable,
-                spinnaker_route=entry.spinnaker_route)
-            compressed_table.add_multicast_routing_entry(m)
+            compressed_table.add_multicast_routing_entry(entry.to_MulticastRoutingEntry())
             index += 1
         return compressed_table
-
-    def compress_tables(self, router_tables, progress):
         """
-        Compress all the unordered routing tables
-
-        Tables who start of smaller than target_length are not compressed
-
-        :param router_tables: Routing tables
-        :type router_tables: MulticastRoutingTables
-        :param progress: Progress bar to show while working
-        :tpye progress: ProgressBar
-        :return: The compressed but still unordered routing tables
-        """
-        compressed_tables = MulticastRoutingTables()
-        for table in progress.over(router_tables.routing_tables):
-            if table.number_of_entries < self._target_length:
-                compressed_table = table
-            else:
-                compressed_table = self.compress_table(table)
-            compressed_tables.add_routing_table(compressed_table)
-
-        return compressed_tables
+        return self._all_entries[0:self._write_index]

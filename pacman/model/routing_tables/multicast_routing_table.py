@@ -83,7 +83,10 @@ class MulticastRoutingTable(object):
         mask = multicast_routing_entry.mask
 
         tuple_key = (routing_entry_key, mask)
+        print(tuple_key, len(self._multicast_routing_entries_by_routing_entry_key))
         if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
+            for existing in self._multicast_routing_entries_by_routing_entry_key:
+                print("--", existing)
             raise PacmanAlreadyExistsException(
                 "Multicast_routing_entry", str(multicast_routing_entry))
 
