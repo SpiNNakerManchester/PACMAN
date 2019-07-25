@@ -17,8 +17,7 @@ try:
     from collections.abc import defaultdict
 except ImportError:
     from collections import defaultdict
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.exceptions import MinimisationFailedError
 
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
@@ -71,54 +70,66 @@ class ClashCompressor(AbstractCompressor):
 
         return results
 
-    def compress_ignore_clashers(self, router_table, clashers):
-        self._all_entries = defaultdict(list)
-        for entry in clashers:
-            print(entry.clashes, entry)
-        for mcr_entry in router_table.multicast_routing_entries:
-            entry =  Entry.from_MulticastRoutingEntry(mcr_entry)
-            if entry not in clashers:
-                self._all_entries[entry.spinnaker_route].append(entry)
+    def compress_ignore_clashers(self, router_table, top_entries):
+        while True:
+            self._all_entries = defaultdict(list)
+            for mcr_entry in router_table.multicast_routing_entries:
+                entry =  Entry.from_MulticastRoutingEntry(mcr_entry)
+                if entry not in top_entries:
+                    self._all_entries[entry.spinnaker_route].append(entry)
 
-        results = []
-        all_routes = list(self._all_entries)
-        for spinnaker_route in all_routes:
-            if len(self._all_entries[spinnaker_route]) == 1:
-                results.extend(self._all_entries.pop(spinnaker_route))
+            if len(top_entries) + len(self._all_entries) >  self.MAX_SUPPORTED_LENGTH:
+                raise MinimisationFailedError("Too many top entries")
 
-        complex_routes = sorted(
-            list(self._all_entries),
-            key=lambda x: len(self._all_entries[x]) + 1/(self._all_entries[x][0].spinnaker_route+1),
-            reverse=False)
-        for spinnaker_route in complex_routes:
-            compressed = self.compress_by_route(
-                self._all_entries.pop(spinnaker_route))
-            results.extend(compressed)
+            results = []
+            all_routes = list(self._all_entries)
+            for spinnaker_route in all_routes:
+                if len(self._all_entries[spinnaker_route]) == 1:
+                    results.extend(self._all_entries.pop(spinnaker_route))
 
-        return results
+            complex_routes = sorted(
+                list(self._all_entries),
+                key=lambda x: len(self._all_entries[x]) + 1/(self._all_entries[x][0].spinnaker_route+1),
+                reverse=False)
+            for spinnaker_route in complex_routes:
+                compressed = self.compress_by_route(
+                    self._all_entries.pop(spinnaker_route))
+                results.extend(compressed)
+
+            if len(top_entries) + len(results) < self._target_length:
+                print("success!", len(top_entries) + len(results), len(top_entries),
+                      len(results))
+                answer = top_entries + results
+                print ("Good Results ", len(answer))
+                return answer
+
+            clashers = []
+            for entry in results:
+                if entry.clashes > 0:
+                    clashers.append(entry)
+            print(len(top_entries) + len(results), len(top_entries), len(results),
+                  len(clashers))
+
+            if len(clashers) == 0:
+                answer = top_entries + results
+                print ("Best Results ", len(answer))
+                if len(answer) > self.MAX_SUPPORTED_LENGTH:
+                    raise MinimisationFailedError("No clashers left")
+                return answer
+
+            clashers = sorted(clashers, key=lambda x: x.clashes, reverse=True)
+            top_entries.extend(clashers[0:1])
 
     def compress_table(self, router_table):
         # Split the entries into buckets based on spinnaker_route
 
         self._max_clashes = 1
 
-        results = self.compress_ignore_clashers(router_table, [])
-        print("run1 ", len(results))
-        if len(results) > self._target_length:
-            clashers = []
-            for entry in results:
-                if entry.clashes > 0:
-                    clashers.append(entry)
-            clashers = sorted(clashers, key=lambda x: x.clashes, reverse=True)
-            top_clashers = clashers[0:5]
-            results = self.compress_ignore_clashers(router_table, top_clashers)
-            print("run2 ", len(results) + len(top_clashers), len(results), len(top_clashers))
-            top_clashers.extend(results)
-            results = top_clashers
-
-        if len(results) > self.MAX_SUPPORTED_LENGTH:
+        try:
+            results = self.compress_ignore_clashers(router_table, [])
+            return results
+        except Exception as ex:
+            print (ex)
             self._problems += "(x:{},y:{})={} ".format(
                 router_table.x, router_table.y, len(results))
-
-        return results
-
+        return []
