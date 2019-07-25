@@ -28,7 +28,7 @@ from pacman.operations.router_compressors import (
 
 
 #original_tables = from_json("malloc_hard_routing_tables.json.gz")
-original_tables = from_json("routing_tables_zoned_bad.json")
+original_tables = from_json("routing_tables_speader_big.json.gz")
 
 bad = MulticastRoutingTables()
 #good = MulticastRoutingTables()
@@ -133,4 +133,12 @@ if MUNDY and PRE:
 if PAIR:
     print("Pair time", pair_time - both_time)
 if CLASH:
-    print("Clash time", pair_time - both_time)
+    print("Clash time", clash_time - pair_time)
+
+"""
+routing_tables_zoned_bad.json
+x: 18 y: 26 Org:2770 pair:1040 clash:1020 
+x: 19 y: 22 Org:2435 pair:1024 clash:996 
+x: 22 y: 26 Org:2881 pair:1214 clash:1185 
+x: 19 y: 25 Org:2001 pair:1069 clash:1025 
+"""
