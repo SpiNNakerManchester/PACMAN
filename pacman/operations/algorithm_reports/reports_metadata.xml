@@ -245,7 +245,7 @@
             <param_name>routing_infos</param_name>
         </required_inputs>
     </algorithm>
-    <algorithm name="SdramUsageReportPperChip">
+    <algorithm name="SdramUsageReportPerChip">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>sdram_usage_report_per_chip</python_function>
         <input_definitions>
