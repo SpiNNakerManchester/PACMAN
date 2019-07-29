@@ -20,6 +20,6 @@ from .entry import Entry
 from .pair_compressor import PairCompressor
 from .unordered_compressor import UnorderedCompressor
 
-__all__ = ['AbstractCompressor','CheckedUnorderedCompressor', 'ClashCompressor',
-           'Entry',
+__all__ = ['AbstractCompressor', 'CheckedUnorderedCompressor',
+           'ClashCompressor', 'Entry',
            'PairCompressor', 'UnorderedCompressor']

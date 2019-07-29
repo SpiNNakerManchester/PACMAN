@@ -14,12 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import MulticastRoutingEntry
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
 from pacman.operations.router_compressors import (AbstractCompressor, Entry)
-from pacman.exceptions import PacmanElementAllocationException
 from pacman.operations.router_compressors.mundys_router_compressor import \
     ordered_covering as rigs_compressor
 
@@ -40,7 +35,7 @@ class MundyRouterCompressor(AbstractCompressor):
             rigs_compressor.minimise(entries, self._target_length)
 
         # compress the router entries
-        return  compressed_router_table_entries
+        return compressed_router_table_entries
 
     @staticmethod
     def _convert_to_mundy_format(pacman_router_table):

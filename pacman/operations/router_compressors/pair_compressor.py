@@ -17,9 +17,6 @@ try:
     from collections.abc import defaultdict
 except ImportError:
     from collections import defaultdict
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
-
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
@@ -27,8 +24,6 @@ from .entry import Entry
 class PairCompressor(AbstractCompressor):
 
     __slots__ = [
-        #X Dict (by spinnaker_route) (for current chip)
-        #X   of entries represented as (key, mask, defautible)
         "_all_entries",
     ]
 
@@ -78,7 +73,8 @@ class PairCompressor(AbstractCompressor):
 
         complex_routes = sorted(
             list(self._all_entries),
-            key=lambda x: len(self._all_entries[x]) + 1/(self._all_entries[x][0].spinnaker_route+1),
+            key=lambda x: len(self._all_entries[x]) +
+                          1/(self._all_entries[x][0].spinnaker_route+1),
             reverse=False)
         for spinnaker_route in complex_routes:
             compressed = self.compress_by_route(
@@ -89,4 +85,3 @@ class PairCompressor(AbstractCompressor):
             self._problems += "(x:{},y:{})={} ".format(
                 router_table.x, router_table.y, len(results))
         return results
-

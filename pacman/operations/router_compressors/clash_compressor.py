@@ -26,8 +26,6 @@ from .entry import Entry
 class ClashCompressor(AbstractCompressor):
 
     __slots__ = [
-        #X Dict (by spinnaker_route) (for current chip)
-        #X   of entries represented as (key, mask, defautible)
         "_all_entries",
         "_max_clashes"
     ]
@@ -36,7 +34,6 @@ class ClashCompressor(AbstractCompressor):
         for another in route_entries:
             m_key, m_mask, defaultable = self.merge(an_entry, another)
             clashers = []
-            ok = True
             for route in self._all_entries:
                 for check in self._all_entries[route]:
                     if self.intersect(check.key, check.mask, m_key, m_mask):
@@ -49,7 +46,8 @@ class ClashCompressor(AbstractCompressor):
             if len(clashers) == 0:
                 route_entries.remove(another)
                 return Entry(
-                     m_key, m_mask, defaultable, an_entry.spinnaker_route, -10000000)
+                    m_key, m_mask, defaultable, an_entry.spinnaker_route,
+                    -10000000)
             if len(clashers) <= self._max_clashes:
                 for entry in clashers:
                     entry.clashes += 1
@@ -74,11 +72,12 @@ class ClashCompressor(AbstractCompressor):
         while True:
             self._all_entries = defaultdict(list)
             for mcr_entry in router_table.multicast_routing_entries:
-                entry =  Entry.from_MulticastRoutingEntry(mcr_entry)
+                entry = Entry.from_MulticastRoutingEntry(mcr_entry)
                 if entry not in top_entries:
                     self._all_entries[entry.spinnaker_route].append(entry)
 
-            if len(top_entries) + len(self._all_entries) >  self.MAX_SUPPORTED_LENGTH:
+            if len(top_entries) + \
+                    len(self._all_entries) > self.MAX_SUPPORTED_LENGTH:
                 raise MinimisationFailedError("Too many top entries")
 
             results = []
@@ -89,7 +88,8 @@ class ClashCompressor(AbstractCompressor):
 
             complex_routes = sorted(
                 list(self._all_entries),
-                key=lambda x: len(self._all_entries[x]) + 1/(self._all_entries[x][0].spinnaker_route+1),
+                key=lambda x: len(self._all_entries[x]) +
+                              1/(self._all_entries[x][0].spinnaker_route+1),
                 reverse=False)
             for spinnaker_route in complex_routes:
                 compressed = self.compress_by_route(
@@ -97,22 +97,22 @@ class ClashCompressor(AbstractCompressor):
                 results.extend(compressed)
 
             if len(top_entries) + len(results) < self._target_length:
-                print("success!", len(top_entries) + len(results), len(top_entries),
-                      len(results))
+                print("success!", len(top_entries) + len(results),
+                      len(top_entries), len(results))
                 answer = top_entries + results
-                print ("Good Results ", len(answer))
+                print("Good Results ", len(answer))
                 return answer
 
             clashers = []
             for entry in results:
                 if entry.clashes > 0:
                     clashers.append(entry)
-            print(len(top_entries) + len(results), len(top_entries), len(results),
-                  len(clashers))
+            print(len(top_entries) + len(results), len(top_entries),
+                  len(results), len(clashers))
 
             if len(clashers) == 0:
                 answer = top_entries + results
-                print ("Best Results ", len(answer))
+                print("Best Results ", len(answer))
                 if len(answer) > self.MAX_SUPPORTED_LENGTH:
                     raise MinimisationFailedError("No clashers left")
                 return answer

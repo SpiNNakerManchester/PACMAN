@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
-from spinn_machine import MulticastRoutingEntry
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
@@ -222,15 +220,4 @@ class UnorderedCompressor(AbstractCompressor):
             left = right + 1
             self._previous_index = self._write_index
 
-        """
-        # convert the results back to a routing table
-        compressed_table = MulticastRoutingTable(
-            router_table.x, router_table.y)
-        index = 0
-        while index < self._write_index:
-            entry = self._all_entries[index]
-            compressed_table.add_multicast_routing_entry(entry.to_MulticastRoutingEntry())
-            index += 1
-        return compressed_table
-        """
         return self._all_entries[0:self._write_index]

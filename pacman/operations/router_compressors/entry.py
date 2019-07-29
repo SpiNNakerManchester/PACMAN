@@ -17,7 +17,10 @@ from spinn_machine import MulticastRoutingEntry
 
 
 class Entry(object):
-    __slots__ = ["key", "mask", "defaultable", "spinnaker_route","clashes"]
+    __slots__ = ["key", "mask", "defaultable", "spinnaker_route",
+                 # clashes is currently only used in protoypes
+                 # so may be removed
+                 "clashes"]
 
     def __init__(self, key, mask, defaultable, spinnaker_route, clashes=None):
         self.key = key
@@ -49,4 +52,3 @@ class Entry(object):
         return MulticastRoutingEntry(
             self.key, self.mask, defaultable=self.defaultable,
             spinnaker_route=self.spinnaker_route)
-
