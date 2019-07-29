@@ -129,7 +129,7 @@ class ClashCompressor(AbstractCompressor):
             results = self.compress_ignore_clashers(router_table, [])
             return results
         except Exception as ex:
-            print (ex)
+            print(ex)
             self._problems += "(x:{},y:{})={} ".format(
                 router_table.x, router_table.y, len(results))
         return []
