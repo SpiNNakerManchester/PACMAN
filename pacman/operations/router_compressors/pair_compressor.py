@@ -74,7 +74,7 @@ class PairCompressor(AbstractCompressor):
         complex_routes = sorted(
             list(self._all_entries),
             key=lambda x: len(self._all_entries[x]) +
-                          1/(self._all_entries[x][0].spinnaker_route+1),
+            1/(self._all_entries[x][0].spinnaker_route+1),
             reverse=False)
         for spinnaker_route in complex_routes:
             compressed = self.compress_by_route(
