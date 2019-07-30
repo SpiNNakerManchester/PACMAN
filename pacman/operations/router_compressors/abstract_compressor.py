@@ -121,7 +121,7 @@ class AbstractCompressor(object):
         self._problems = ""
         for table in progress.over(router_tables.routing_tables):
             if table.number_of_entries < self._target_length:
-                compressed_table = table
+                new_table = table
             else:
                 compressed_table = self.compress_table(table)
 
