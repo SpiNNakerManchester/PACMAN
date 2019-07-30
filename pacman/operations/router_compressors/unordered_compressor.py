@@ -205,8 +205,8 @@ class UnorderedCompressor(AbstractCompressor):
         self._write_index = 0
         self._max_index = len(self._all_entries) - 1
         self._previous_index = 0
-
         left = 0
+
         while left < self._max_index:
             right = left
             while (right < len(self._all_entries) - 1 and
