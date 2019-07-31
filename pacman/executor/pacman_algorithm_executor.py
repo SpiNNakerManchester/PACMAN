@@ -445,7 +445,16 @@ class PACMANAlgorithmExecutor(object):
                 # create fake token string
                 fake_token_string = ""
                 for token in fake_tokens.get_completed_tokens():
-                    fake_token_string += "{}, ".format(token.name)
+                    fake_token_string += (
+                        "{},{} ".format(token.name, token.part))
+
+                # tokens to find string
+                token_to_find_string = ""
+                for token_name in tokens_to_find:
+                    token = token_states.get_token(token_name)
+                    for incomplete_part in token.incomplete_parts:
+                        token_to_find_string += (
+                            "{}:{}".format(token_name, incomplete_part))
 
                 raise PacmanConfigurationException(
                     "Unable to deduce a future algorithm to use.\n"
@@ -466,7 +475,7 @@ class PACMANAlgorithmExecutor(object):
                         outputs_to_find,
                         completed_tokens_string,
                         fake_token_string,
-                        tokens_to_find,
+                        token_to_find_string,
                         algorithms_to_find_names,
                         optional_algorithms_names,
                         algorithms_used,
@@ -706,7 +715,7 @@ class PACMANAlgorithmExecutor(object):
     def get_items(self):
         """ Get all the outputs from a execution
 
-        :return: dictionary of types as keys and values.
+        :return: dictionary of string types as keys and values.
         """
         return self._internal_type_mapping
 

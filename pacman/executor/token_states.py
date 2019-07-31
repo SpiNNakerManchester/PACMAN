@@ -71,6 +71,10 @@ class _TokenState(object):
         """
         return self._complete_parts
 
+    @property
+    def incomplete_parts(self):
+        return self._incomplete_parts
+
 
 class TokenStates(object):
     """ Keeps track of multiple token state objects to determine if they\
@@ -130,6 +134,9 @@ class TokenStates(object):
                 tokens_to_return.append(
                     Token(name=token_name, part=completed_part))
         return tokens_to_return
+
+    def get_token(self, name):
+        return self._tokens[name]
 
     def is_tracking_token_part(self, token):
         """ checks if a token part is actually being tracked
