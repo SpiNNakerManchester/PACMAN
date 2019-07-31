@@ -24,29 +24,31 @@ from pacman.operations.router_compressors.mundys_router_compressor.\
     routing_table_condenser import (
         MundyRouterCompressor)
 from pacman.operations.router_compressors import (
-    AbstractCompressor, ClashCompressor, PairCompressor, UnorderedCompressor)
+    AbstractCompressor, PairCompressor, UnorderedCompressor)
 
-original_tables = from_json("routing_table_15_25.json")
-#original_tables = from_json("malloc_hard_routing_tables.json.gz")
-#original_tables = from_json("routing_tables_speader_big.json.gz")
+# original_tables = from_json("routing_table_15_25.json")
+original_tables = from_json("malloc_hard_routing_tables.json.gz")
+# original_tables = from_json("routing_tables_speader_big.json.gz")
 
-bad = MulticastRoutingTables()
-#good = MulticastRoutingTables()
-#for original in original_tables:
-#    if original.x ==19 and original.y == 22:
-#        bad.add_routing_table(original)
-    #else:
-    #    bad.add_routing_table(original)
+SPLIT = False
+if SPLIT:
+    bad = MulticastRoutingTables()
+    good = MulticastRoutingTables()
+    for original in original_tables:
+        if original.x ==19 and original.y == 22:
+            good.add_routing_table(original)
+    else:
+        bad.add_routing_table(original)
 
-#json_obj = to_json(bad)
-# dump to json file
-#with open("routing_tables_zoned_bad1.json", "w") as f:
-#    json.dump(json_obj, f)
-#json_obj = to_json(good)
-# dump to json file
-#with open("routing_tables_zoned_2000.json", "w") as f:
-#    json.dump(json_obj, f)
-#original_tables = bad
+    json_obj = to_json(bad)
+    # dump to json file
+    with open("routing_tables_zoned_bad1.json", "w") as f:
+        json.dump(json_obj, f)
+    json_obj = to_json(good)
+    # dump to json file
+    with open("routing_tables_zoned_2000.json", "w") as f:
+        json.dump(json_obj, f)
+    original_tables = bad
 
 MUNDY = True
 PRE = False
@@ -54,7 +56,6 @@ PAIR = True
 CLASH = False
 # Hack to stop it throwing a wobly for too many entries
 AbstractCompressor.MAX_SUPPORTED_LENGTH = 500000
-clash_compressor = ClashCompressor()
 mundy_compressor = MundyRouterCompressor()
 pre_compressor = UnorderedCompressor()
 pair_compressor = PairCompressor()
@@ -83,8 +84,6 @@ for original in original_tables:
         mundy = mundy_tables.get_routing_table_for_chip(original.x, original.y)
         mundy_routes = set()
         for entry in mundy.multicast_routing_entries:
-            if entry.spinnaker_route == 32:
-                print(entry)
             mundy_routes.add(entry.spinnaker_route)
         compare_tables(original, mundy)
     if PRE:
@@ -100,14 +99,11 @@ for original in original_tables:
             both_routes.add(entry.spinnaker_route)
         compare_tables(original, both)
     if PAIR:
-        print("1")
         pair = pair_tables.get_routing_table_for_chip(original.x, original.y)
         pair_routes = set()
         for entry in pair.multicast_routing_entries:
             pair_routes.add(entry.spinnaker_route)
-        print("2")
         compare_tables(original, pair)
-        print("3")
     if CLASH:
         clash = clash_tables.get_routing_table_for_chip(original.x, original.y)
         clash_routes = set()
@@ -115,7 +111,8 @@ for original in original_tables:
             clash_routes.add(entry.spinnaker_route)
         compare_tables(original, clash)
 
-    result = "x: {} y: {} Org:{} ".format(original.x, original.y, original.number_of_entries)
+    result = "x: {} y: {} Org:{} ".format(
+        original.x, original.y, original.number_of_entries)
     if PRE:
         result += "pre:{} ".format(pre.number_of_entries)
     if MUNDY:
@@ -137,11 +134,3 @@ if PAIR:
     print("Pair time", pair_time - both_time)
 if CLASH:
     print("Clash time", clash_time - pair_time)
-
-"""
-routing_tables_zoned_bad.json
-x: 18 y: 26 Org:2770 pair:1040 clash:1020 
-x: 19 y: 22 Org:2435 pair:1024 clash:996 
-x: 22 y: 26 Org:2881 pair:1214 clash:1185 
-x: 19 y: 25 Org:2001 pair:1069 clash:1025 
-"""

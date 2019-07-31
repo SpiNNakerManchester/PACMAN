@@ -18,8 +18,6 @@ from .entry import Entry
 
 
 class UnorderedCompressor(PairCompressor):
-    """
-    """
 
     def __init__(self):
         self._ordered = False
