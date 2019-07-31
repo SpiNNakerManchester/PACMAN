@@ -13,12 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from pacman.operations.router_compressors import (AbstractCompressor, Entry)
 from pacman.operations.router_compressors.mundys_router_compressor import \
     ordered_covering as rigs_compressor
-
-logger = logging.getLogger(__name__)
 
 
 class MundyRouterCompressor(AbstractCompressor):
@@ -27,27 +24,20 @@ class MundyRouterCompressor(AbstractCompressor):
 
     __slots__ = []
 
+    def __init__(self):
+        self._ordered = True
+
     def compress_table(self, router_table):
         # convert to rig inspired format
-        entries = self._convert_to_mundy_format(router_table)
+        entries = list()
+
+        # handle entries
+        for router_entry in router_table.multicast_routing_entries:
+            # Add the new entry
+            entries.append(Entry.from_MulticastRoutingEntry(router_entry))
 
         compressed_router_table_entries = \
             rigs_compressor.minimise(entries, self._target_length)
 
         # compress the router entries
         return compressed_router_table_entries
-
-    @staticmethod
-    def _convert_to_mundy_format(pacman_router_table):
-        """
-        :param pacman_router_table: pacman version of the routing table
-        :return: rig version of the router table
-        """
-        entries = list()
-
-        # handle entries
-        for router_entry in pacman_router_table.multicast_routing_entries:
-            # Add the new entry
-            entries.append(Entry.from_MulticastRoutingEntry(router_entry))
-
-        return entries

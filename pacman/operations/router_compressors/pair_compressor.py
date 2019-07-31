@@ -19,18 +19,77 @@ from .entry import Entry
 
 class PairCompressor(AbstractCompressor):
     """
-    Builds on UnorderedCompressor
+    Routing Table compressor based on brute force.
+    Finds mergable pairs to replace.
 
-    The difference here is that the buckets are sorted by size and compressed
-    starting with the smallest.
+    This algorithm assumes unordered rounting tables and returns
+        a possiibly ordered routing tables. If unordered it can be used
+        as a precompressor for another that makes use of order.
 
-    Previously merged buckets are ignored so this is an Order Dependent Version.
+    In the simplest format the algorithm is.
+        For every pair of entries in the table
+            If they have the same spinnaker_route
+                Create a merged entry
+                Check that does not intersect any entry with a different route
+                    Remove the two original entries
+                    Add the merged entry
+                    Start over
 
-    Note this version used c style Objects only.
+    A slightly optimised algorithm is:
+        Split the entries into buckets based on spinnaker route
+        Process the buckets one at a time
+            For each entry in the buckets
+                For each other entry in the bucket
+                    Create a merge entry
+                    Make sure there is no clash with an entry in another bucket
+                    Replace the two entries and add the merge
+                    Start the bucket over
+                If no merge found move the entry from the bucket to the result
+                    list
+            When the bucket is empty the result list becomes the bucket
+
+    A farther optimisation is to do the whole thing in place in a single list.
+        Step 1 is sort the list by route in place
+
+        Step 2 do the compression route by route usings indexes into the array
+            The array is split into 6 parts.
+                0 to _previous_pointer(-1):
+                    Entries in buckets that have already been compressed
+                _previous_pointer to _write_pointer(-1):
+                    Finished entries for the current bucket
+                _write_pointer to left(-1);
+                    Unused space due to previous merges
+                left to right:
+                    Not yet finished entries from the current bucket
+                right(+ 1) to _remaining_index(-1)
+                    Unused space due to previous merges
+                _remaining_index to max_index(-1)
+                    Entries in buckets not yet compressed
+
+        Step 3 use only the entries up to _write_pointer(-1)
+
+    A farther optimisation is to uses order.
+        The entries are sorted by route frequency from low to highg.
+        The results are considered ordered so previous routes are not
+            considered.
+
+        The advatange is this allows all the entries from the most frequent
+            route to be merged into a single entry. And the second most
+            frequent only has to consider the most frequent routes.
+
+        Step 1 requires the counting of the frequency of routes and the
+                sorting the routes based on this ferequency.
+            The current tie break between routes with the same frequency is
+                the route but this is arbitrary at the algorithm level.
+            This code does not use a dictionary to keep the code the same as
+                the c
+
+        Step 2 is change in that the previous entries
+            (0 to _previous_pointer(-1)) are not considered for clash checking
     """
 
     __slots__ = [
-        # Dict (by spinnaker_route) (for current chip)
+        # A list of all entries which may be sorted
         #   of entries represented as (key, mask, defautible)
         "_all_entries",
         # The next index to write a merged/unmergable entry to
@@ -51,6 +110,9 @@ class PairCompressor(AbstractCompressor):
         # Number of unique routes found so far
         "_routes_count",
     ]
+
+    def __init__(self):
+        self._ordered = True
 
     def _compare_routes(self, route_a, route_b):
         """
@@ -180,7 +242,13 @@ class PairCompressor(AbstractCompressor):
         """
         m_key, m_mask, defaultable = self.merge(
             self._all_entries[left], self._all_entries[index])
-        # Note: Ignore higher entries as table is sorted.
+        if not self._ordered:
+            for check in range(self._previous_index):
+                if self.intersect(
+                        self._all_entries[check].key,
+                        self._all_entries[check].mask,
+                        m_key, m_mask):
+                    return False
         for check in range(self._remaining_index, self._max_index + 1):
             if self.intersect(
                     self._all_entries[check].key,

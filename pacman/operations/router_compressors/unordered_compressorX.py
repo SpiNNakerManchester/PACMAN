@@ -17,16 +17,55 @@ from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
 
-class PairCCompressor(AbstractCompressor):
+class UnorderedCompressor(AbstractCompressor):
     """
-    Builds on UnorderedCompressor
+    Routing Table compressor based on brute force.
+    Finds mergable pairs to replace.
 
-    The difference here is that the buckets are sorted by size and compressed
-    starting with the smallest.
+    This algorithm assumes unordered rounting tables and returns
+    unordered routing tables. It can therefor be used either as the main
+    compressor or as a precompressor for another that makes use of order.
 
-    Previously merged buckets are ignored so this is an Order Dependent Version.
+    In the simplest format the algorithm is.
+    For every pair of entries in the table
+        If they have the same spinnaker_route
+            Create a merged entry
+            Check that does not intersect any entry with a different route
+                Remove the two original entries
+                Add the merged entry
+                Start over
 
-    Note this version used c style Objects only.
+    A slightly optimised algorithm is:
+    Split the entries into buckets based on spinnaker route
+    Process the buckets one at a time
+        For each entry in the buckets
+            For each other entry in the bucket
+                Create a merge entry
+                Make sure there is no clash with an entry in another bucket
+                Replace the two entries and add the merge
+                Start the bucket over
+            If no merge found move the entry from the bucket to the result list
+        When the bucket is empty the result list becomes the bucket
+
+    A farther optimisation is to do the whole thing in place in a single list.
+    Step 1 is sort the list by route in place
+
+    Step 2 do the compression route by route usings indexes into the array
+    The array is split into 6 parts.
+    0 to _previous_pointer(-1):
+        Entries in buckets that have already been compressed
+    _previous_pointer to _write_pointer(-1):
+        Finished entries for the current bucket
+    _write_pointer to left(-1);
+        Unused space due to previous merges
+    left to right:
+        Not yet finished entries from the current bucket
+    right(+ 1) to _remaining_index(-1)
+        Unused space due to previous merges
+    _remaining_index to max_index(-1)
+        Entries in buckets not yet compressed
+
+    Step 3 use only the entries up to _write_pointer(-1)
     """
 
     __slots__ = [
@@ -40,23 +79,10 @@ class PairCCompressor(AbstractCompressor):
         # Exclusive pointer to the end of the entries for previous buckets
         "_previous_index",
         # Inclusive index to the first entry for later buckets
-        "_remaining_index",
-        "_routes",
-        "_routes_count",
-        "_routes_frequency"
+        "_remaining_index"
     ]
 
-    def _compare_routes_by_frequency(self, route_a, route_b):
-        if route_a == route_b:
-            return 0
-        for i in range(self._routes_count):
-            if self._routes[i] == route_a:
-               return 1
-            if self._routes[i] == route_b:
-               return -1
-        raise Exception("Apply Gibbs slap!")
-
-    def _three_way_partition_table(self, low, high):
+    def _three_way_partition(self, low, high):
         """
         Partitions the entries between low and high into three parts
 
@@ -68,15 +94,13 @@ class PairCCompressor(AbstractCompressor):
         check = low + 1
         pivot = self._all_entries[low].spinnaker_route
         while check <= high:
-            compare = self._compare_routes_by_frequency(
-                self._all_entries[check].spinnaker_route, pivot)
-            if compare < 0:
+            if self._all_entries[check].spinnaker_route < pivot:
                 temp = self._all_entries[low]
                 self._all_entries[low] = self._all_entries[check]
                 self._all_entries[check] = temp
                 low += 1
                 check += 1
-            elif compare > 0:
+            elif self._all_entries[check].spinnaker_route > pivot:
                 temp = self._all_entries[high]
                 self._all_entries[high] = self._all_entries[check]
                 self._all_entries[check] = temp
@@ -85,58 +109,16 @@ class PairCCompressor(AbstractCompressor):
                 check += 1
         return low, check
 
-    def _quicksort_table(self, low, high):
+    def _quicksort(self, low, high):
         """
         Sorts the entries in place based on route
         :param low: Inclusive lowest index to consider
         :param high: Inclusive highest index to consider
         """
         if low < high:
-            left, right = self._three_way_partition_table(low, high)
-            self._quicksort_table(low, left - 1)
-            self._quicksort_table(right, high)
-
-    def _swap_routes(self, index_a, index_b):
-        temp = self._routes_frequency[index_a]
-        self._routes_frequency[index_a] = self._routes_frequency[index_b]
-        self._routes_frequency[index_b] = temp
-        temp = self._routes[index_a]
-        self._routes[index_a] = self._routes[index_b]
-        self._routes[index_b] = temp
-
-    def _three_way_partition_routes(self, low, high):
-        """
-        Partitions the entries between low and high into three parts
-
-        based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-        :param low: Lowest index to consider
-        :param high: Highest index to consider
-        :return: (last_index of lower, last_index_of_middle)
-        """
-        check = low + 1
-        pivot = self._routes_frequency[low]
-        while check <= high:
-            if self._routes_frequency[check] > pivot:
-                self._swap_routes(low, check)
-                low += 1
-                check += 1
-            elif self._routes_frequency[check] < pivot:
-                self._swap_routes(high, check)
-                high -= 1
-            else:
-                check += 1
-        return low, check
-
-    def _quicksort_routes(self, low, high):
-        """
-        Sorts the entries in place based on route
-        :param low: Inclusive lowest index to consider
-        :param high: Inclusive highest index to consider
-        """
-        if low < high:
-            left, right = self._three_way_partition_routes(low, high)
-            self._quicksort_routes(low, left - 1)
-            self._quicksort_routes(right, high)
+            left, right = self._three_way_partition(low, high)
+            self._quicksort(low, left - 1)
+            self._quicksort(right, high)
 
     def _find_merge(self, left, index):
         """
@@ -153,12 +135,12 @@ class PairCCompressor(AbstractCompressor):
         """
         m_key, m_mask, defaultable = self.merge(
             self._all_entries[left], self._all_entries[index])
-        #for check in range(self._previous_index):
-        #    if self.intersect(
-        #            self._all_entries[check].key,
-        #            self._all_entries[check].mask,
-        #            m_key, m_mask):
-        #        return False
+        for check in range(self._previous_index):
+            if self.intersect(
+                    self._all_entries[check].key,
+                    self._all_entries[check].mask,
+                    m_key, m_mask):
+                return False
         for check in range(self._remaining_index, self._max_index + 1):
             if self.intersect(
                     self._all_entries[check].key,
@@ -200,15 +182,6 @@ class PairCCompressor(AbstractCompressor):
             #    self._all_entries[left] = None
             self._write_index += 1
 
-    def update_frequency(self, route):
-        for i in range(self._routes_count):
-            if self._routes[i] == route:
-                self._routes_frequency[i] += 1
-                return
-        self._routes[self._routes_count] = route
-        self._routes_frequency[self._routes_count] = 1
-        self._routes_count += 1
-
     def compress_table(self, router_table):
         """
         Compresses all the entries for a single table.
@@ -224,18 +197,10 @@ class PairCCompressor(AbstractCompressor):
 
         # Split the entries into buckets based on spinnaker_route
         self._all_entries = []
-        self._routes_count = 0
-        # Imitate creating fixed size arrays
-        self._routes = self.MAX_SUPPORTED_LENGTH * [None]
-        self._routes_frequency = self.MAX_SUPPORTED_LENGTH * [None]
-
         for entry in router_table.multicast_routing_entries:
             self._all_entries.append(
                 Entry.from_MulticastRoutingEntry(entry))
-            self.update_frequency(entry.spinnaker_route)
-
-        self._quicksort_routes(0, self._routes_count - 1)
-        self._quicksort_table(0, len(self._all_entries) - 1)
+        self._quicksort(0, len(self._all_entries) - 1)
 
         self._write_index = 0
         self._max_index = len(self._all_entries) - 1

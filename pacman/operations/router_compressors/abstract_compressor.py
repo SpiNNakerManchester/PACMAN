@@ -18,10 +18,13 @@ based on https://github.com/project-rig/
 """
 
 from abc import abstractmethod
+import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractCompressor(object):
@@ -32,7 +35,9 @@ class AbstractCompressor(object):
         # Max length below which the algorithm should stop compressing
         "_target_length",
         # String of problems detected. Must be "" to finsih
-        "_problems"
+        "_problems",
+        # Flag to say if the results can be order dependant
+        "_ordered",
     ]
 
     def __call__(self, router_tables, target_length=None):
@@ -130,11 +135,17 @@ class AbstractCompressor(object):
                 for entry in compressed_table:
                     new_table.add_multicast_routing_entry(
                         entry.to_MulticastRoutingEntry())
+                if new_table.number_of_entries > self.MAX_SUPPORTED_LENGTH:
+                    self._problems += "(x:{},y:{})={} ".format(
+                        new_table.x, new_table.y, new_table.number_of_entries)
 
             compressed_tables.add_routing_table(new_table)
 
         if len(self._problems) > 0:
-            raise MinimisationFailedError(
-                "The routing table after compression will still not fit"
-                " within the machines router: {}".format(self._problems))
+            if self._ordered:
+                raise MinimisationFailedError(
+                    "The routing table after compression will still not fit"
+                    " within the machines router: {}".format(self._problems))
+            else:
+                logger.warning(self._problems)
         return compressed_tables

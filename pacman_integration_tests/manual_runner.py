@@ -26,9 +26,9 @@ from pacman.operations.router_compressors.mundys_router_compressor.\
 from pacman.operations.router_compressors import (
     AbstractCompressor, ClashCompressor, PairCompressor, UnorderedCompressor)
 
-
+original_tables = from_json("routing_table_15_25.json")
 #original_tables = from_json("malloc_hard_routing_tables.json.gz")
-original_tables = from_json("routing_tables_speader_big.json.gz")
+#original_tables = from_json("routing_tables_speader_big.json.gz")
 
 bad = MulticastRoutingTables()
 #good = MulticastRoutingTables()
@@ -48,10 +48,10 @@ bad = MulticastRoutingTables()
 #    json.dump(json_obj, f)
 #original_tables = bad
 
-MUNDY = False
+MUNDY = True
 PRE = False
 PAIR = True
-CLASH = True
+CLASH = False
 # Hack to stop it throwing a wobly for too many entries
 AbstractCompressor.MAX_SUPPORTED_LENGTH = 500000
 clash_compressor = ClashCompressor()
@@ -100,11 +100,14 @@ for original in original_tables:
             both_routes.add(entry.spinnaker_route)
         compare_tables(original, both)
     if PAIR:
+        print("1")
         pair = pair_tables.get_routing_table_for_chip(original.x, original.y)
         pair_routes = set()
         for entry in pair.multicast_routing_entries:
             pair_routes.add(entry.spinnaker_route)
+        print("2")
         compare_tables(original, pair)
+        print("3")
     if CLASH:
         clash = clash_tables.get_routing_table_for_chip(original.x, original.y)
         clash_routes = set()
