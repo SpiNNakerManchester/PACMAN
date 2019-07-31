@@ -13,11 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
 import unittest
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (

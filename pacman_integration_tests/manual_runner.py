@@ -35,7 +35,7 @@ if SPLIT:
     bad = MulticastRoutingTables()
     good = MulticastRoutingTables()
     for original in original_tables:
-        if original.x ==19 and original.y == 22:
+        if original.x == 19 and original.y == 22:
             good.add_routing_table(original)
     else:
         bad.add_routing_table(original)
@@ -50,12 +50,12 @@ if SPLIT:
         json.dump(json_obj, f)
     original_tables = bad
 
-MUNDY = True
+MUNDY = False
 PRE = False
 PAIR = True
 CLASH = False
 # Hack to stop it throwing a wobly for too many entries
-AbstractCompressor.MAX_SUPPORTED_LENGTH = 500000
+AbstractCompressor.MAX_SUPPORTED_LENGTH = 50000
 mundy_compressor = MundyRouterCompressor()
 pre_compressor = UnorderedCompressor()
 pair_compressor = PairCompressor()
@@ -74,7 +74,7 @@ if PAIR:
     pair_tables = pair_compressor(original_tables)
 pair_time = time.time()
 if CLASH:
-    clash_tables = clash_compressor(original_tables)
+    clash_tables = None  # clash_compressor(original_tables)
 clash_time = time.time()
 for original in original_tables:
     org_routes = set()

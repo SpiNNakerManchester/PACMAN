@@ -24,6 +24,8 @@ from pacman.operations.algorithm_reports.routing_compression_checker_report \
 from pacman.operations.router_compressors.mundys_router_compressor.\
     routing_table_condenser import (
         MundyRouterCompressor)
+from pacman.operations.router_compressors.abstract_compressor import \
+    AbstractCompressor
 from pacman.operations.router_compressors.unordered_compressor import \
     UnorderedCompressor
 
@@ -38,7 +40,7 @@ class TestBigCompression(unittest.TestCase):
 
         mundy_compressor = MundyRouterCompressor()
         # Hack to stop it throwing a wobly for too many entries
-        MundyRouterCompressor.max_supported_length = 5000
+        AbstractCompressor.MAX_SUPPORTED_LENGTH = 5000
         pre_compressor = UnorderedCompressor()
 
         start = time.time()
