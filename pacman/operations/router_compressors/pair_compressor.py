@@ -133,9 +133,9 @@ class PairCompressor(AbstractCompressor):
             return 0
         for i in range(self._routes_count):
             if self._routes[i] == route_a:
-               return 1
+                return 1
             if self._routes[i] == route_b:
-               return -1
+                return -1
         raise Exception("Apply Gibbs slap!")
 
     def _three_way_partition_table(self, low, high):

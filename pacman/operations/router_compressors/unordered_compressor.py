@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .pair_compressor import PairCompressor
-from .entry import Entry
 
 
 class UnorderedCompressor(PairCompressor):
