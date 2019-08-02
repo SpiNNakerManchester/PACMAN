@@ -110,9 +110,7 @@ class MallocBasedRouteMerger(object):
                 last_key = (
                     entries[next_pos].routing_entry_key +
                     (~entries[next_pos].mask & _32_BITS))
-                n_keys = (last_key - base_key) + 1
-                next_log_n_keys = int(math.ceil(math.log(n_keys, 2)))
-                n_keys = (1 << next_log_n_keys) - 1
+                n_keys = (1 << (last_key - base_key).bit_length()) - 1
                 n_keys_mask = ~n_keys & _32_BITS
                 base_key = base_key & n_keys_mask
                 if ((base_key + n_keys) >= last_key and
