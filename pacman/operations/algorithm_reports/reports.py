@@ -749,6 +749,8 @@ def generate_comparison_router_report(
                 "Generating comparison of router table report")
             total_uncompressed = 0
             total_compressed = 0
+            max_compressed = 0
+            uncompressed_for_max = None
             for table in progress.over(routing_tables.routing_tables):
                 x = table.x
                 y = table.y
@@ -766,12 +768,22 @@ def generate_comparison_router_report(
                     "This is a decrease of {} %\n".format(
                         x, y, n_entries_uncompressed, n_entries_compressed,
                         ratio * 100))
+                if max_compressed < n_entries_compressed:
+                    max_compressed = n_entries_compressed
+                    uncompressed_for_max = n_entries_uncompressed
             ratio = ((total_uncompressed - total_compressed) /
                      float(total_uncompressed))
             f.write(
                 "Total has {} entries whereas compressed tables "
-                "have {} entries. This is a decrease of {} %\n".format(
+                "have {} entries. This is an average decrease of {} %\n "
+                "".format(
                     total_uncompressed, total_compressed, ratio * 100))
+            ratio = ((uncompressed_for_max - max_compressed) /
+                     float(uncompressed_for_max))
+            f.write(
+                "Worst has {} entries whereas compressed tables "
+                "have {} entries. This is a decrease of {} %\n ".format(
+                    uncompressed_for_max, max_compressed, ratio * 100))
     except IOError:
         logger.exception("Generate_router_comparison_reports: Can't open file"
                          " {} for writing.", file_name)
