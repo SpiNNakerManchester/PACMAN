@@ -761,17 +761,17 @@ def generate_comparison_router_report(
                 ratio = ((n_entries_uncompressed - n_entries_compressed) /
                          float(n_entries_uncompressed))
                 f.write(
-                    "Uncompressed table at {}:{} has {} entries whereas compressed table "
-                    "has {} entries. This is a decrease of {} %\n".format(
+                    "Uncompressed table at {}:{} has {} entries "
+                    "whereas compressed table has {} entries. "
+                    "This is a decrease of {} %\n".format(
                         x, y, n_entries_uncompressed, n_entries_compressed,
                         ratio * 100))
             ratio = ((total_uncompressed - total_compressed) /
                      float(total_uncompressed))
             f.write(
                 "Total has {} entries whereas compressed tables "
-                    "have {} entries. This is a decrease of {} %\n".format(
-                        total_uncompressed, total_compressed,
-                        ratio * 100))
+                "have {} entries. This is a decrease of {} %\n".format(
+                    total_uncompressed, total_compressed, ratio * 100))
     except IOError:
         logger.exception("Generate_router_comparison_reports: Can't open file"
                          " {} for writing.", file_name)
