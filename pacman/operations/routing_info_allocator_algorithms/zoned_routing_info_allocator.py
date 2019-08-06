@@ -207,8 +207,6 @@ class ZonedRoutingInfoAllocator(object):
         source_index = 0
         for (app_vertex, identifier) in self._iterate_vertex_identifier(
                 "Allocating routing keys"):
-            if identifier.startswith("COMMAND"):
-                print("here")
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
             if app_vertex in self._key_bites_per_app:
@@ -226,8 +224,6 @@ class ZonedRoutingInfoAllocator(object):
                             keys_and_masks = list([BaseKeyAndMask(
                                 base_key=key, mask=mask)])
                             info = PartitionRoutingInfo(keys_and_masks, partition)
-                            if identifier.startswith("COMMAND"):
-                                print("here")
                             routing_infos.add_partition_info(info)
             app_key = key = source_index << self._max_app_keys_bites
             by_app_vertex[app_vertex] = BaseKeyAndMask(
