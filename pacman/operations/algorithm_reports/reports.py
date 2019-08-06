@@ -747,26 +747,34 @@ def generate_comparison_router_report(
             progress = ProgressBar(
                 routing_tables.routing_tables,
                 "Generating comparison of router table report")
+            total_uncompressed = 0
+            total_compressed = 0
             for table in progress.over(routing_tables.routing_tables):
-                _write_one_router_table_comparison(
-                    f, table, compressed_routing_tables)
+                x = table.x
+                y = table.y
+                compressed_table = compressed_routing_tables.\
+                    get_routing_table_for_chip(x, y)
+                n_entries_uncompressed = table.number_of_entries
+                total_uncompressed += n_entries_uncompressed
+                n_entries_compressed = compressed_table.number_of_entries
+                total_compressed += n_entries_compressed
+                ratio = ((n_entries_uncompressed - n_entries_compressed) /
+                         float(n_entries_uncompressed))
+                f.write(
+                    "Uncompressed table at {}:{} has {} entries "
+                    "whereas compressed table has {} entries. "
+                    "This is a decrease of {} %\n".format(
+                        x, y, n_entries_uncompressed, n_entries_compressed,
+                        ratio * 100))
+            ratio = ((total_uncompressed - total_compressed) /
+                     float(total_uncompressed))
+            f.write(
+                "Total has {} entries whereas compressed tables "
+                "have {} entries. This is a decrease of {} %\n".format(
+                    total_uncompressed, total_compressed, ratio * 100))
     except IOError:
         logger.exception("Generate_router_comparison_reports: Can't open file"
                          " {} for writing.", file_name)
-
-
-def _write_one_router_table_comparison(f, table, compressed_tables):
-    x = table.x
-    y = table.y
-    compressed_table = compressed_tables.get_routing_table_for_chip(x, y)
-    n_entries_uncompressed = table.number_of_entries
-    n_entries_compressed = compressed_table.number_of_entries
-    ratio = ((n_entries_uncompressed - n_entries_compressed) /
-             float(n_entries_uncompressed))
-    f.write(
-        "Uncompressed table at {}:{} has {} entries whereas compressed table "
-        "has {} entries. This is a decrease of {} %\n".format(
-            x, y, n_entries_uncompressed, n_entries_compressed, ratio * 100))
 
 
 def _reduce_route_value(processors_ids, link_ids):
