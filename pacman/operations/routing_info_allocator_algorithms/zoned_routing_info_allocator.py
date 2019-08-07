@@ -50,12 +50,14 @@ class ZonedRoutingInfoAllocator(object):
         "_machine_graph",
         "_placements",
         "_n_keys_map",
-        # The maximum number of partitions going from any vertex
-        "_max_partions",
-        # the maximum number of bytes for the key fo any vertex
+        # the maximum number of bytes for the key for any vertex
         "_max_app_keys_bites",
-        "_key_bites_per_app",
+        # Map of (app_vertex, identifier) to the number of bites needed for
+        #   their key.
+        "_key_bites_map",
+        # Map from core_sets to list of (app_vertex, identifier) pairs
         "_targets_map",
+        # The Number of app vertex, identifier pairs in the graph
         "_n_vertex_identifier"
     ]
 
@@ -97,10 +99,23 @@ class ZonedRoutingInfoAllocator(object):
 
         self._group_by_targets()
         self._calculate_zones()
+        self._check_sizes()
 
         return self._allocate_keys()
 
     def _group_by_targets(self):
+        """
+        Groups the vertex, identifier pairs by target cores
+
+        Finds the partition.identifier(s) for each app_vertex
+
+        Then for each pair of app_vertex and identifier it finds all the cores
+            the edge's post_vertexes are on.
+
+        The vertex, identifier pairs are groups if they have the same target
+            cores. There groups are saved in self._targets_map
+
+        """
         self._targets_map = defaultdict(list)
         self._n_vertex_identifier = self._application_graph.n_vertices
         progress = ProgressBar(
@@ -109,6 +124,17 @@ class ZonedRoutingInfoAllocator(object):
             self._group_by_targets_simple(app_vertex)
 
     def _group_by_targets_simple(self, app_vertex):
+        """
+        Groups a vertex and its partition identifer
+
+        Adds the pair to the self._targets_map
+
+        If more than one identifier found this method delegates to
+        _group_by_targets_with_partition
+
+        :param app_vertex:
+        :return:
+        """
         cores_set = set()
         machine_vertices = self._graph_mapper.get_machine_vertices(app_vertex)
         identifiers = set()
@@ -130,12 +156,27 @@ class ZonedRoutingInfoAllocator(object):
             self._group_by_targets_with_partition(app_vertex, identifiers)
 
     def _update_tragets_map(self, app_vertex, identifier, cores_set):
-            as_list = list(cores_set)
-            as_list.sort()
-            core_str = str(as_list)
-            self._targets_map[core_str].append((app_vertex, identifier))
+        """
+        Add the app_vertex, identifer pair to the self._targets_map
+
+        Currently just based on a str of the cores_set
+        :param app_vertex:
+        :param identifier:
+        :param cores_set:
+        :return:
+        """
+        as_list = list(cores_set)
+        as_list.sort()
+        core_str = str(as_list)
+        self._targets_map[core_str].append((app_vertex, identifier))
 
     def _group_by_targets_with_partition(self, app_vertex, identifiers):
+        """
+        Groups a vertex and each of its partition identifers
+
+        These pairs are added to the self._targets_map
+        """
+
         self._n_vertex_identifier += (len(identifiers) - 1)
         for identifier in identifiers:
             cores_set = set()
@@ -155,6 +196,15 @@ class ZonedRoutingInfoAllocator(object):
             self._update_tragets_map(app_vertex, identifier, cores_set)
 
     def _iterate_vertex_identifier(self, progress_message):
+        """
+        Iterates over the (app_vertex, identifier) pairs with a progress bar.
+
+        The order of the pairs will be based on an guess of which pairs
+        may benefit from having keys near each other.
+
+        :param progress_message: Message for the progress bar
+        :return: (app_vertex, identifier)
+        """
         progress = ProgressBar(self._n_vertex_identifier, progress_message)
         for app_list in self._targets_map.values():
             for (app_vertex, identifier) in progress.over(
@@ -163,20 +213,24 @@ class ZonedRoutingInfoAllocator(object):
         progress.end()
 
     def _calculate_zones(self):
+        """
+        Calculates the bites needed for the keys of each
+            app vertex, identifier pair
+
+        results are stored in
+            self._max_app_keys_bites: Which is the largest found.
+            self._key_bites_map: Which is a map of app_vertex, identifier
+         """
         self._max_app_keys_bites = 0
-        source_zones = 0
-        self._max_partions = 0
-        self._key_bites_per_app = dict()
+        self._key_bites_map = dict()
         for (app_vertex, identifier) in self._iterate_vertex_identifier(
                 "Calculating zones"):
-            app_max_partions = 0
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
             max_keys = 0
             for vertex in machine_vertices:
                 partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                app_max_partions = max(app_max_partions, len(partitions))
                 # Do we need to check type here
                 for partition in partitions:
                     if partition.identifier == identifier:
@@ -184,15 +238,18 @@ class ZonedRoutingInfoAllocator(object):
                             partition)
                         max_keys = max(max_keys, n_keys)
             if max_keys > 0:
-                self._max_partions = max(self._max_partions, app_max_partions)
-                source_zones += app_max_partions
                 key_bites = self._bites_needed(max_keys)
                 machine_bites = self._bites_needed(len(machine_vertices))
                 self._max_app_keys_bites = max(
                     self._max_app_keys_bites, machine_bites + key_bites)
-                self._key_bites_per_app[app_vertex] = key_bites
-        source_bites = self._bites_needed(source_zones)
+                self._key_bites_map[(app_vertex, identifier)] = key_bites
 
+    def _check_sizes(self):
+        """
+        Check that there is enough room to allocate zone based.
+
+        """
+        source_bites = self._bites_needed(self._n_vertex_identifier)
         if source_bites + self._max_app_keys_bites > KEY_SIZE:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
@@ -200,6 +257,27 @@ class ZonedRoutingInfoAllocator(object):
                 "".format(self.source_bites, self._max_app_keys_bites))
 
     def _allocate_keys(self):
+        """
+        Allocates the keys for each app_vertex, identifer pair
+
+        The keys are allocated so that all app_vertexes start at a multiple
+        of 2^^self._max_app_keys_bites
+
+        Within an app_vertex, identifer pair keys are allocated as continious
+            as possible while still making sure that
+            1. All machine vertexs have none intersecting key, map pairs
+            2. The number of bites used for the key is the same
+
+        Keys will be continious if and only if for app vertex, identifer pair
+        the n_keys_for_partition for all partitions
+        (except possibly the last one)
+        is the same number AND a power of 2
+
+        WARNING: The map of app_vertex to BaseKeyAndMask is currently BROKEN
+            for app_vertexes with multiple partitions.
+
+        :return: RoutingInfo, dict of app_vertex to BaseKeyAndMask
+        """
         routing_infos = RoutingInfo()
         by_app_vertex = dict()
         app_mask = 2 ** 32 - 2 ** self._max_app_keys_bites
@@ -209,8 +287,8 @@ class ZonedRoutingInfoAllocator(object):
                 "Allocating routing keys"):
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
-            if app_vertex in self._key_bites_per_app:
-                key_bites = self._key_bites_per_app[app_vertex]
+            if (app_vertex, identifier) in self._key_bites_map:
+                key_bites = self._key_bites_map[(app_vertex, identifier)]
                 for vertex in machine_vertices:
                     machine_index = self._graph_mapper.\
                         get_machine_vertex_index(vertex)
@@ -225,7 +303,7 @@ class ZonedRoutingInfoAllocator(object):
                                 base_key=key, mask=mask)])
                             info = PartitionRoutingInfo(keys_and_masks, partition)
                             routing_infos.add_partition_info(info)
-            app_key = key = source_index << self._max_app_keys_bites
+            app_key = source_index << self._max_app_keys_bites
             by_app_vertex[app_vertex] = BaseKeyAndMask(
                 base_key=app_key, mask=app_mask)
             source_index += 1
