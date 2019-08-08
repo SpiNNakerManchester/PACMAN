@@ -58,7 +58,11 @@ class ZonedRoutingInfoAllocator(object):
         # Map from core_sets to list of (app_vertex, identifier) pairs
         "_targets_map",
         # The Number of app vertex, identifier pairs in the graph
-        "_n_vertex_identifier"
+        "_n_vertex_identifier",
+        # Routing infor being collected
+        "_routing_infos",
+        # dict of app_vertex to BaseKeyAndMask
+        "_by_app_vertex",
     ]
 
     def __call__(self, application_graph, graph_mapper, machine_graph,
@@ -93,15 +97,21 @@ class ZonedRoutingInfoAllocator(object):
         # partitions
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
-            supported_constraints=[ContiguousKeyRangeContraint,
-                                   FixedKeyAndMaskConstraint],
+            #supported_constraints=[ContiguousKeyRangeContraint,
+            #                       FixedKeyAndMaskConstraint],
+            supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         self._group_by_targets()
         self._calculate_zones()
         self._check_sizes()
 
-        return self._allocate_keys()
+        self._routing_infos = RoutingInfo()
+        self._by_app_vertex = dict()
+        self._allocate_fixed_keys()
+        self._allocate_keys()
+
+        return self._routing_infos, self._by_app_vertex
 
     def _group_by_targets(self):
         """
@@ -212,6 +222,49 @@ class ZonedRoutingInfoAllocator(object):
                 yield (app_vertex, identifier)
         progress.end()
 
+    def _check_constraint(self, partition, constraint_class):
+        if constraint_class:
+            for constraint in partition.constraints:
+                if isinstance(constraint, constraint_class):
+                        return constraint
+            return None
+        return None
+
+    def _iterate_partitions_and_index(
+            self, app_vertex, identifier, constraint_class=None):
+        machine_vertices = self._graph_mapper.get_machine_vertices(app_vertex)
+        for vertex in machine_vertices:
+            index = self._graph_mapper.get_machine_vertex_index(vertex)
+            partitions = self._machine_graph. \
+                get_outgoing_edge_partitions_starting_at_vertex(vertex)
+            for partition in partitions:
+                if partition.identifier == identifier:
+                    if self._check_constraint(
+                            partition, constraint_class) is None:
+                        yield partition, index
+
+    def _iterate_partitions_and_constraint(
+            self, app_vertex, identifier, constraint_class=None):
+        machine_vertices = self._graph_mapper.get_machine_vertices(app_vertex)
+        for vertex in machine_vertices:
+            partitions = self._machine_graph. \
+                get_outgoing_edge_partitions_starting_at_vertex(vertex)
+            for partition in partitions:
+                if partition.identifier == identifier:
+                    constraint = self._check_constraint(
+                        partition, constraint_class)
+                    if constraint is not None:
+                        yield partition, constraint
+
+    def _iterate_partitions(self, app_vertex, identifier):
+        machine_vertices = self._graph_mapper.get_machine_vertices(app_vertex)
+        for vertex in machine_vertices:
+            partitions = self._machine_graph. \
+                get_outgoing_edge_partitions_starting_at_vertex(vertex)
+            for partition in partitions:
+                if partition.identifier == identifier:
+                    yield partition
+
     def _calculate_zones(self):
         """
         Calculates the bites needed for the keys of each
@@ -228,15 +281,9 @@ class ZonedRoutingInfoAllocator(object):
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
             max_keys = 0
-            for vertex in machine_vertices:
-                partitions = self._machine_graph.\
-                    get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                # Do we need to check type here
-                for partition in partitions:
-                    if partition.identifier == identifier:
-                        n_keys = self._n_keys_map.n_keys_for_partition(
-                            partition)
-                        max_keys = max(max_keys, n_keys)
+            for partition in self._iterate_partitions(app_vertex, identifier):
+                n_keys = self._n_keys_map.n_keys_for_partition(partition)
+                max_keys = max(max_keys, n_keys)
             if max_keys > 0:
                 key_bites = self._bites_needed(max_keys)
                 machine_bites = self._bites_needed(len(machine_vertices))
@@ -278,37 +325,41 @@ class ZonedRoutingInfoAllocator(object):
 
         :return: RoutingInfo, dict of app_vertex to BaseKeyAndMask
         """
-        routing_infos = RoutingInfo()
-        by_app_vertex = dict()
         app_mask = 2 ** 32 - 2 ** self._max_app_keys_bites
 
         source_index = 0
         for (app_vertex, identifier) in self._iterate_vertex_identifier(
                 "Allocating routing keys"):
-            machine_vertices = self._graph_mapper.get_machine_vertices(
-                app_vertex)
             if (app_vertex, identifier) in self._key_bites_map:
                 key_bites = self._key_bites_map[(app_vertex, identifier)]
-                for vertex in machine_vertices:
-                    machine_index = self._graph_mapper.\
-                        get_machine_vertex_index(vertex)
-                    partitions = self._machine_graph. \
-                        get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                    for partition in partitions:
-                        if partition.identifier == identifier:
-                            mask = 2 ** 32 - 2 ** key_bites
-                            key = source_index << self._max_app_keys_bites | \
-                                machine_index << key_bites
-                            keys_and_masks = list([BaseKeyAndMask(
-                                base_key=key, mask=mask)])
-                            info = PartitionRoutingInfo(keys_and_masks, partition)
-                            routing_infos.add_partition_info(info)
+                for partition, index in self._iterate_partitions_and_index(
+                        app_vertex, identifier):
+                    mask = 2 ** 32 - 2 ** key_bites
+                    key = source_index << self._max_app_keys_bites | \
+                        index << key_bites
+                    keys_and_masks = list([BaseKeyAndMask(
+                        base_key=key, mask=mask)])
+                    info = PartitionRoutingInfo(keys_and_masks, partition)
+                    self._routing_infos.add_partition_info(info)
             app_key = source_index << self._max_app_keys_bites
-            by_app_vertex[app_vertex] = BaseKeyAndMask(
+            self._by_app_vertex[app_vertex] = BaseKeyAndMask(
                 base_key=app_key, mask=app_mask)
             source_index += 1
 
-        return routing_infos, by_app_vertex
+    def _allocate_fixed_keys(self):
+        for (app_vertex, identifier) in self._iterate_vertex_identifier(
+                "Allocating routing keys"):
+            if (app_vertex, identifier) in self._key_bites_map:
+                for partition, constraint in \
+                        self._iterate_partitions_and_constraint(
+                            app_vertex, identifier, FixedKeyAndMaskConstraint):
+                    print(constraint)
+                    #keys_and_masks = list([BaseKeyAndMask(
+                    #    base_key=key, mask=mask)])
+                    #info = PartitionRoutingInfo(keys_and_masks, partition)
+                    #self._routing_infos.add_partition_info(info)
+            #self._by_app_vertex[app_vertex] = BaseKeyAndMask(
+            #    base_key=app_key, mask=app_mask)
 
     def _bites_needed(self, size):
         return math.ceil(math.log(size, 2))
