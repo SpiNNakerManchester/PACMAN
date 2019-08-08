@@ -38,6 +38,44 @@ from .utils import get_possible_masks
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
+def get_key_ranges(key, mask):
+    """ Get a generator of base_key, n_keys pairs that represent ranges
+        allowed by the mask
+
+    :param key: The base key
+    :param mask: The mask
+    """
+    unwrapped_mask = expand_to_bit_array(mask)
+    first_zeros = list()
+    remaining_zeros = list()
+    pos = len(unwrapped_mask) - 1
+
+    # Keep the indices of the first set of zeros
+    while pos >= 0 and unwrapped_mask[pos] == 0:
+        first_zeros.append(pos)
+        pos -= 1
+
+    # Find all the remaining zeros
+    while pos >= 0:
+        if unwrapped_mask[pos] == 0:
+            remaining_zeros.append(pos)
+        pos -= 1
+
+    # Loop over 2^len(remaining_zeros) to produce the base key,
+    # with n_keys being 2^len(first_zeros)
+    n_sets = 2 ** len(remaining_zeros)
+    n_keys = 2 ** len(first_zeros)
+    if not remaining_zeros:
+        yield key, n_keys
+        return
+    unwrapped_key = expand_to_bit_array(key)
+    for value in xrange(n_sets):
+        generated_key = numpy.copy(unwrapped_key)
+        generated_key[remaining_zeros] = \
+            expand_to_bit_array(value)[-len(remaining_zeros):]
+        yield compress_from_bit_array(generated_key), n_keys
+
+
 class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     """ A Routing Info Allocation Allocator algorithm that keeps track of\
         free keys and attempts to allocate them as requested
@@ -173,44 +211,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         partition_info = PartitionRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)
 
-    @staticmethod
-    def _get_key_ranges(key, mask):
-        """ Get a generator of base_key, n_keys pairs that represent ranges
-            allowed by the mask
-
-        :param key: The base key
-        :param mask: The mask
-        """
-        unwrapped_mask = expand_to_bit_array(mask)
-        first_zeros = list()
-        remaining_zeros = list()
-        pos = len(unwrapped_mask) - 1
-
-        # Keep the indices of the first set of zeros
-        while pos >= 0 and unwrapped_mask[pos] == 0:
-            first_zeros.append(pos)
-            pos -= 1
-
-        # Find all the remaining zeros
-        while pos >= 0:
-            if unwrapped_mask[pos] == 0:
-                remaining_zeros.append(pos)
-            pos -= 1
-
-        # Loop over 2^len(remaining_zeros) to produce the base key,
-        # with n_keys being 2^len(first_zeros)
-        n_sets = 2 ** len(remaining_zeros)
-        n_keys = 2 ** len(first_zeros)
-        if not remaining_zeros:
-            yield key, n_keys
-            return
-        unwrapped_key = expand_to_bit_array(key)
-        for value in xrange(n_sets):
-            generated_key = numpy.copy(unwrapped_key)
-            generated_key[remaining_zeros] = \
-                expand_to_bit_array(value)[-len(remaining_zeros):]
-            yield compress_from_bit_array(generated_key), n_keys
-
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
         """ Allocate fixed keys and masks
 
@@ -227,7 +227,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     "Cannot meet conflicting constraints")
 
             # Go through the mask sets and allocate
-            for key, n_keys in self._get_key_ranges(
+            for key, n_keys in get_key_ranges(
                     key_and_mask.key, key_and_mask.mask):
                 self._allocate_elements(key, n_keys)
 
@@ -258,7 +258,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 # Check if all the key ranges can be allocated
                 matched_all = True
                 index = 0
-                for (base_key, n_keys) in self._get_key_ranges(key, mask):
+                for (base_key, n_keys) in get_key_ranges(key, mask):
                     logger.debug("Finding slot for {}, n_keys={}",
                                  hex(base_key), n_keys)
                     index = self._find_slot(base_key, lo=index)
@@ -286,7 +286,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # If we found a working key and mask that can be assigned,
         # Allocate them
         if key_found is not None and mask_found is not None:
-            for (base_key, n_keys) in self._get_key_ranges(key_found, mask):
+            for (base_key, n_keys) in get_key_ranges(key_found, mask):
                 self._allocate_elements(base_key, n_keys)
 
             # If we get here, we can assign the keys to the edges
