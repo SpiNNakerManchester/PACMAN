@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import json
+import gzip
 try:
     from collections.abc import OrderedDict
 except ImportError:
     from collections import OrderedDict
-import json
 from pacman.exceptions import PacmanAlreadyExistsException
 from .multicast_routing_table import MulticastRoutingTable
 from spinn_machine import MulticastRoutingEntry
@@ -129,8 +130,12 @@ def to_json(router_table):
 
 def from_json(j_router):
     if isinstance(j_router, str):
-        with open(j_router) as j_file:
-            j_router = json.load(j_file)
+        if j_router.endswith(".gz"):
+            with gzip.open(j_router) as j_file:
+                j_router = json.load(j_file)
+        else:
+            with open(j_router) as j_file:
+                j_router = json.load(j_file)
 
     tables = MulticastRoutingTables()
     for j_table in j_router:
