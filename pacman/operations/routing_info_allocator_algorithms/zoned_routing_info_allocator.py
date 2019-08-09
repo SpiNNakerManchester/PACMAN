@@ -28,6 +28,9 @@ from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint,
     FixedKeyAndMaskConstraint)
 from pacman.model.graphs.common import EdgeTrafficType
+from pacman.operations.routing_info_allocator_algorithms.\
+    malloc_based_routing_allocator.malloc_based_routing_info_allocator import (
+    get_key_ranges)
 
 KEY_SIZE = 32
 
@@ -63,6 +66,8 @@ class ZonedRoutingInfoAllocator(object):
         "_routing_infos",
         # dict of app_vertex to BaseKeyAndMask
         "_by_app_vertex",
+        # Indexes used by fixed keys ext
+        "_used_indexes"
     ]
 
     def __call__(self, application_graph, graph_mapper, machine_graph,
@@ -97,18 +102,19 @@ class ZonedRoutingInfoAllocator(object):
         # partitions
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
-            #supported_constraints=[ContiguousKeyRangeContraint,
-            #                       FixedKeyAndMaskConstraint],
-            supported_constraints=[ContiguousKeyRangeContraint],
+            supported_constraints=[ContiguousKeyRangeContraint,
+                                   FixedKeyAndMaskConstraint],
+            #supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
-
-        self._group_by_targets()
-        self._calculate_zones()
-        self._check_sizes()
 
         self._routing_infos = RoutingInfo()
         self._by_app_vertex = dict()
+        self._used_indexes = set()
+
+        self._group_by_targets()
+        self._calculate_zones()
         self._allocate_fixed_keys()
+        self._check_sizes()
         self._allocate_keys()
 
         return self._routing_infos, self._by_app_vertex
@@ -153,6 +159,7 @@ class ZonedRoutingInfoAllocator(object):
                 get_outgoing_edge_partitions_starting_at_vertex(vertex)
             for partition in partitions:
                 if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                    print(partition)
                     identifiers.add(partition.identifier)
                     for edge in partition.edges:
                         placement = \
@@ -223,6 +230,12 @@ class ZonedRoutingInfoAllocator(object):
         progress.end()
 
     def _check_constraint(self, partition, constraint_class):
+        """
+        Checks the contraints on a partition and attempts to find one of the
+        class being looked for
+
+        :return: constraints if found or None if not found
+        """
         if constraint_class:
             for constraint in partition.constraints:
                 if isinstance(constraint, constraint_class):
@@ -230,8 +243,14 @@ class ZonedRoutingInfoAllocator(object):
             return None
         return None
 
-    def _iterate_partitions_and_index(
+    def _except_constraint(
             self, app_vertex, identifier, constraint_class=None):
+        """
+        Iterates over the partitions of this app_vertex that DO NOT have a
+            constraint of this type
+
+        yields partition, machine_vertex_index
+        """
         machine_vertices = self._graph_mapper.get_machine_vertices(app_vertex)
         for vertex in machine_vertices:
             index = self._graph_mapper.get_machine_vertex_index(vertex)
@@ -243,8 +262,17 @@ class ZonedRoutingInfoAllocator(object):
                             partition, constraint_class) is None:
                         yield partition, index
 
-    def _iterate_partitions_and_constraint(
+    def _only_constraint(
             self, app_vertex, identifier, constraint_class=None):
+        """
+        Iterates over the partitions of this app_vertex that DO have a
+            constraint of this type
+
+        Note: The assumption is that NO partition will have more than one
+            constraint of the given type
+
+        yields partition, constraint
+        """
         machine_vertices = self._graph_mapper.get_machine_vertices(app_vertex)
         for vertex in machine_vertices:
             partitions = self._machine_graph. \
@@ -255,15 +283,6 @@ class ZonedRoutingInfoAllocator(object):
                         partition, constraint_class)
                     if constraint is not None:
                         yield partition, constraint
-
-    def _iterate_partitions(self, app_vertex, identifier):
-        machine_vertices = self._graph_mapper.get_machine_vertices(app_vertex)
-        for vertex in machine_vertices:
-            partitions = self._machine_graph. \
-                get_outgoing_edge_partitions_starting_at_vertex(vertex)
-            for partition in partitions:
-                if partition.identifier == identifier:
-                    yield partition
 
     def _calculate_zones(self):
         """
@@ -281,7 +300,8 @@ class ZonedRoutingInfoAllocator(object):
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
             max_keys = 0
-            for partition in self._iterate_partitions(app_vertex, identifier):
+            for partition, index in self._except_constraint(
+                    app_vertex, identifier, FixedKeyAndMaskConstraint):
                 n_keys = self._n_keys_map.n_keys_for_partition(partition)
                 max_keys = max(max_keys, n_keys)
             if max_keys > 0:
@@ -291,17 +311,69 @@ class ZonedRoutingInfoAllocator(object):
                     self._max_app_keys_bites, machine_bites + key_bites)
                 self._key_bites_map[(app_vertex, identifier)] = key_bites
 
+    def _bites_needed(self, size):
+        """
+        Computes the bytes need to distiniquish size values
+
+        For example for 7 values you need 3 bites
+
+        Note: That the values are assumed to start at zero so for size which
+        is a power of 2 the bites do not need to include that power position
+        size of 8 needs 3 bits which are the values
+            (000, 001, 010, 011, 100, 101, 110 and 111)
+        size 1 needs ZERO bytes as there is no need to distiniquish
+
+        :param size: Number of values to distinguish
+        :return: minimum bites needed
+        """
+        return math.ceil(math.log(size, 2))
+
+    def _mark_source_indexes_used(self, constraint):
+        """
+        Mark the source_index used by fixed keys and masks as taken
+
+        If even one of the key range covered is used mark the whole as used
+
+        results saved in self._used_indexes
+        """
+        for key_mask in constraint.keys_and_masks:
+            for key, n_keys in get_key_ranges(key_mask.key, key_mask.mask):
+                low_index = key >> self._max_app_keys_bites
+                high_index = self._max_app_keys_bites
+                for index in range(low_index, high_index+1):
+                    self._used_indexes.add(index)
+
+    def _allocate_fixed_keys(self):
+        """
+        Allocate any partitions with fixed keys and masks and
+        mark the source indexs they cover as used
+        """
+        for (app_vertex, identifier) in self._iterate_vertex_identifier(
+                "Allocating routing keys"):
+            for partition, constraint in self._only_constraint(
+                    app_vertex, identifier, FixedKeyAndMaskConstraint):
+                self._mark_source_indexes_used(constraint)
+                info = PartitionRoutingInfo(
+                    constraint.keys_and_masks, partition)
+                self._routing_infos.add_partition_info(info)
+                # TODO work out how this is used to know what to do with
+                # multiple identifiers
+                # self._by_app_vertex[app_vertex] = constraint.keys_and_masks
+
     def _check_sizes(self):
         """
         Check that there is enough room to allocate zone based.
 
+        Taking into consideration indexs taken by fixed keys
+
         """
-        source_bites = self._bites_needed(self._n_vertex_identifier)
+        indexes_needed = self._n_vertex_identifier + len(self._used_indexes)
+        source_bites = self._bites_needed(indexes_needed)
         if source_bites + self._max_app_keys_bites > KEY_SIZE:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bites"
-                "".format(self.source_bites, self._max_app_keys_bites))
+                "".format(source_bites, self._max_app_keys_bites))
 
     def _allocate_keys(self):
         """
@@ -330,36 +402,20 @@ class ZonedRoutingInfoAllocator(object):
         source_index = 0
         for (app_vertex, identifier) in self._iterate_vertex_identifier(
                 "Allocating routing keys"):
-            if (app_vertex, identifier) in self._key_bites_map:
+            for partition, index in self._except_constraint(
+                    app_vertex, identifier, FixedKeyAndMaskConstraint):
                 key_bites = self._key_bites_map[(app_vertex, identifier)]
-                for partition, index in self._iterate_partitions_and_index(
-                        app_vertex, identifier):
-                    mask = 2 ** 32 - 2 ** key_bites
-                    key = source_index << self._max_app_keys_bites | \
-                        index << key_bites
-                    keys_and_masks = list([BaseKeyAndMask(
-                        base_key=key, mask=mask)])
-                    info = PartitionRoutingInfo(keys_and_masks, partition)
-                    self._routing_infos.add_partition_info(info)
+                mask = 2 ** 32 - 2 ** key_bites
+                key = source_index << self._max_app_keys_bites | \
+                    index << key_bites
+                keys_and_masks = list([BaseKeyAndMask(
+                    base_key=key, mask=mask)])
+                info = PartitionRoutingInfo(keys_and_masks, partition)
+                self._routing_infos.add_partition_info(info)
             app_key = source_index << self._max_app_keys_bites
             self._by_app_vertex[app_vertex] = BaseKeyAndMask(
                 base_key=app_key, mask=app_mask)
             source_index += 1
-
-    def _allocate_fixed_keys(self):
-        for (app_vertex, identifier) in self._iterate_vertex_identifier(
-                "Allocating routing keys"):
-            if (app_vertex, identifier) in self._key_bites_map:
-                for partition, constraint in \
-                        self._iterate_partitions_and_constraint(
-                            app_vertex, identifier, FixedKeyAndMaskConstraint):
-                    print(constraint)
-                    #keys_and_masks = list([BaseKeyAndMask(
-                    #    base_key=key, mask=mask)])
-                    #info = PartitionRoutingInfo(keys_and_masks, partition)
-                    #self._routing_infos.add_partition_info(info)
-            #self._by_app_vertex[app_vertex] = BaseKeyAndMask(
-            #    base_key=app_key, mask=app_mask)
-
-    def _bites_needed(self, size):
-        return math.ceil(math.log(size, 2))
+            # Skip anying source_indexes used by fix keys
+            while source_index in self._used_indexes:
+                source_index += 1
