@@ -61,7 +61,8 @@ class FixedRouteRouter(object):
         eth_x = ethernet_connected_chip.x
         eth_y = ethernet_connected_chip.y
 
-        to_route = set(self._machine.get_existing_xys_by_ethernet(eth_x, eth_y))
+        to_route = set(
+            self._machine.get_existing_xys_by_ethernet(eth_x, eth_y))
         routed = set()
         routed.add((eth_x, eth_y))
         to_route.remove((eth_x, eth_y))

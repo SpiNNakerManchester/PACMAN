@@ -17,7 +17,6 @@ import pytest
 from spinn_machine import virtual_machine
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import FixedRouteRouter
-#### pylint#: disable=protected-access
 from pacman.exceptions import PacmanRoutingException
 
 
@@ -43,12 +42,12 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
         visited.add((x, y))
     return destinations
 
+
 def _check_setup(width, height, down_chips, down_links):
     router = FixedRouteRouter()
     machine = virtual_machine(
         width=width, height=height,
         down_links=down_links, down_chips=down_chips)
-    #router._machine = machine
 
     ethernet_chips = machine.ethernet_connected_chips
     placements = Placements(
@@ -66,7 +65,6 @@ def _check_setup(width, height, down_chips, down_links):
         assert (
             (chip.nearest_ethernet_x, chip.nearest_ethernet_y, 1)
             in destinations)
-
 
 
 @pytest.mark.parametrize(
