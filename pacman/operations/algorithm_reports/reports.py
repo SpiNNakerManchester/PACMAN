@@ -750,7 +750,7 @@ def generate_comparison_router_report(
             total_uncompressed = 0
             total_compressed = 0
             max_compressed = 0
-            uncompressed_for_max = None
+            uncompressed_for_max = 0
             for table in progress.over(routing_tables.routing_tables):
                 x = table.x
                 y = table.y
