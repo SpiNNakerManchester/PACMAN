@@ -780,8 +780,10 @@ def generate_comparison_router_report(
                 "have {} entries. This is an average decrease of {} %\n "
                 "".format(
                     total_uncompressed, total_compressed, ratio * 100))
-            ratio = ((uncompressed_for_max - max_compressed) /
-                     float(uncompressed_for_max))
+            ratio = 0
+            if uncompressed_for_max != 0:
+                ratio = ((uncompressed_for_max - max_compressed) /
+                         float(uncompressed_for_max))
             f.write(
                 "Worst has {} entries whereas compressed tables "
                 "have {} entries. This is a decrease of {} %\n ".format(
