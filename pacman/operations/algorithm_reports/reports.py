@@ -771,8 +771,10 @@ def generate_comparison_router_report(
                 if max_compressed < n_entries_compressed:
                     max_compressed = n_entries_compressed
                     uncompressed_for_max = n_entries_uncompressed
-            ratio = ((total_uncompressed - total_compressed) /
-                     float(total_uncompressed))
+            ratio = 0
+            if total_uncompressed != 0:
+                ratio = ((total_uncompressed - total_compressed) /
+                         float(total_uncompressed))
             f.write(
                 "Total has {} entries whereas compressed tables "
                 "have {} entries. This is an average decrease of {} %\n "
