@@ -67,8 +67,6 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS",
 
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
@@ -77,8 +75,8 @@ setup(
     packages=packages,
     package_data=package_data,
     install_requires=[
-        'SpiNNUtilities >= 1!4.0.1, < 1!5.0.0',
-        'SpiNNMachine >= 1!4.0.1, < 1!5.0.0',
+        'SpiNNUtilities >= 1!5.0.1, < 1!6.0.0',
+        'SpiNNMachine >= 1!5.0.1, < 1!6.0.0',
         'six',
         'enum34',
         'future',
