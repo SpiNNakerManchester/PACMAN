@@ -54,11 +54,6 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         self.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
 
-    @property
-    @overrides(AbstractVertex.label)
-    def label(self):
-        return self._label
-
     def __str__(self):
         return self.label
 
