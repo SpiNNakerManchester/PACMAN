@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_compressor import AbstractCompressor
-from .checked_unordered_compressor import CheckedUnorderedCompressor
-from .entry import Entry
 from .pair_compressor import PairCompressor
-from .unordered_compressor import UnorderedCompressor
 
-__all__ = ['AbstractCompressor', 'CheckedUnorderedCompressor',
-           'Entry', 'PairCompressor', 'UnorderedCompressor']
+
+class UnorderedCompressor(PairCompressor):
+
+    def __init__(self):
+        self._ordered = False

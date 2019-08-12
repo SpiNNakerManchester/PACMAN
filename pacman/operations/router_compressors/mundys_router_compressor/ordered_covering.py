@@ -142,8 +142,8 @@ As a heuristic:
 based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_covering.py
 """
-from .exceptions import MinimisationFailedError
-from .routing_table_entry import RoutingTableEntry
+from pacman.operations.router_compressors import Entry
+from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import \
     minimise as remove_default_routes
 from .utils import intersect
@@ -169,7 +169,7 @@ def minimise(routing_table, target_length):
 
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
+    :type routing_table: Entry
     :param target_length :
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
@@ -206,7 +206,7 @@ def ordered_covering(routing_table, target_length, aliases=dict(),
         the same key) and reorderable.
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
+    :type routing_table: Entry
     :param target_length :
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
@@ -287,7 +287,7 @@ def _get_best_merge(routing_table, aliases):
     which would combine the greatest number of entries.
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
+    :type routing_table: Entry
     :param aliases:
         Dictionary of which keys and masks in the routing table are
         combinations of other (now removed) keys and masks; this allows us to
@@ -329,7 +329,7 @@ def _get_all_merges(routing_table):
     """ Get possible sets of entries to merge.
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
+    :type routing_table: Entry
     :rtype: py:class:`~.Merge`
     """
     # Memorise entries that have been considered as part of a merge
@@ -345,7 +345,7 @@ def _get_all_merges(routing_table):
         merge = set([i])
         merge.update(
             j for j, other_entry in enumerate(routing_table[i+1:], start=i+1)
-            if entry.route == other_entry.route
+            if entry.spinnaker_route == other_entry.spinnaker_route
         )
 
         # Mark all these entries as considered
@@ -478,8 +478,9 @@ class _Merge(object):
         aliases = dict(aliases)
 
         # Get the new entry
-        new_entry = RoutingTableEntry(
-            route=self.routing_table[next(iter(self.entries))].route,
+        new_entry = Entry(
+            spinnaker_route=self.routing_table[
+                next(iter(self.entries))].spinnaker_route,
             key=self.key, mask=self.mask, defaultable=self.defaultable
         )
         aliases[(self.key, self.mask)] = our_aliases = set([])
