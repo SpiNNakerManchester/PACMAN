@@ -23,6 +23,7 @@ class AbstractVertex(object):
     """ A vertex in a graph.
     """
 
+    # Because of diamond inheritance slots must be empty
     __slots__ = ()
 
     @abstractproperty
@@ -30,6 +31,25 @@ class AbstractVertex(object):
         """ The label of the vertex.
 
         :rtype: str
+        """
+
+    @abstractmethod
+    def set_label(self, label):
+        """
+        Changes the label for a vertex NOT yet ADDED to a graph
+
+        :param label: new value for the label
+        :raises PacmanConfigurationException:
+            If there is an attempt to change the label once the vertex has
+            been added to a graph
+        """
+
+    @abstractmethod
+    def addedToGraph(self):
+        """
+        Records that the vertex has been added to a graph
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
         """
 
     @abstractproperty

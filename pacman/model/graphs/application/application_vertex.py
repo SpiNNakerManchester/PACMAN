@@ -18,6 +18,7 @@ from six import add_metaclass
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import (
     abstractmethod, abstractproperty, AbstractBase)
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
@@ -30,7 +31,11 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         based on the resources that the vertex requires.
     """
 
-    __slots__ = ["_label"]
+    __slots__ = [
+        # Indicates if the Vertex has been added to a graph
+        "_added_to_graph",
+        # Label for the vertex. Changable until added to graph
+        "_label"]
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
@@ -47,12 +52,38 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
             * If one of the constraints is not valid
         """
 
-        super(ApplicationVertex, self).__init__(constraints)
+        ConstrainedObject.__init__(self, constraints)
         self._label = label
+        self._added_to_graph = False
 
         # add a constraint for max partitioning
         self.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
+
+    @property
+    @overrides(AbstractVertex.label)
+    def label(self):
+        """
+        Returns the current label to the vertex.
+
+        This label could change when the vertex is added to the graph.
+        :return: The label
+        """
+        return self._label
+
+    @overrides(AbstractVertex.set_label)
+    def set_label(self, label):
+        if self._added_to_graph:
+            raise PacmanConfigurationException(
+                "As Labels are also IDs they can not be changed.")
+
+    @overrides(AbstractVertex.addedToGraph)
+    def addedToGraph(self):
+        """
+        Records that the vertex has been added to a graph
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
+        """
 
     def __str__(self):
         return self.label
