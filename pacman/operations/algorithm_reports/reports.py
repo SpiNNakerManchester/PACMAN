@@ -731,6 +731,12 @@ def _generate_routing_table(routing_table, top_level_folder):
                          " {} for writing.", file_path)
 
 
+def _compression_ratio(uncompressed, compressed):
+    """ Get the compression ratio, as a percentage.
+    """
+    return (uncompressed - compressed) / float(uncompressed) * 100
+
+
 def generate_comparison_router_report(
         report_folder, routing_tables, compressed_routing_tables):
     """ Make a report on comparison of the compressed and uncompressed \
@@ -750,7 +756,7 @@ def generate_comparison_router_report(
             total_uncompressed = 0
             total_compressed = 0
             max_compressed = 0
-            uncompressed_for_max = None
+            uncompressed_for_max = 0
             for table in progress.over(routing_tables.routing_tables):
                 x = table.x
                 y = table.y
@@ -760,31 +766,30 @@ def generate_comparison_router_report(
                 total_uncompressed += n_entries_uncompressed
                 n_entries_compressed = compressed_table.number_of_entries
                 total_compressed += n_entries_compressed
-                ratio = ((n_entries_uncompressed - n_entries_compressed) /
-                         float(n_entries_uncompressed))
                 f.write(
                     "Uncompressed table at {}:{} has {} entries "
                     "whereas compressed table has {} entries. "
-                    "This is a decrease of {} %\n".format(
+                    "This is a decrease of {}%\n".format(
                         x, y, n_entries_uncompressed, n_entries_compressed,
-                        ratio * 100))
+                        _compression_ratio(
+                            n_entries_uncompressed, n_entries_compressed)))
                 if max_compressed < n_entries_compressed:
                     max_compressed = n_entries_compressed
                     uncompressed_for_max = n_entries_uncompressed
-            ratio = ((total_uncompressed - total_compressed) /
-                     float(total_uncompressed))
             if total_uncompressed > 0:
                 f.write(
-                    "Total has {} entries whereas compressed tables "
-                    "have {} entries. This is an average decrease of {} %\n "
+                    "\nTotal has {} entries whereas compressed tables "
+                    "have {} entries. This is an average decrease of {}%\n"
                     "".format(
-                        total_uncompressed, total_compressed, ratio * 100))
-                ratio = ((uncompressed_for_max - max_compressed) /
-                         float(uncompressed_for_max))
+                        total_uncompressed, total_compressed,
+                        _compression_ratio(
+                            total_uncompressed, total_compressed)))
                 f.write(
-                    "Worst has {} entries whereas compressed tables "
-                    "have {} entries. This is a decrease of {} %\n ".format(
-                        uncompressed_for_max, max_compressed, ratio * 100))
+                    "Worst case has {} entries whereas compressed tables "
+                    "have {} entries. This is a decrease of {}%\n".format(
+                        uncompressed_for_max, max_compressed,
+                        _compression_ratio(
+                            uncompressed_for_max, max_compressed)))
     except IOError:
         logger.exception("Generate_router_comparison_reports: Can't open file"
                          " {} for writing.", file_name)
