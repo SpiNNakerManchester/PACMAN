@@ -32,7 +32,6 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         # Label for the vertex. Changable until added to graph
         "_label"]
 
-
     def __init__(self, label=None, constraints=None):
         """
         :param label: The optional name of the vertex
@@ -74,11 +73,8 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
 
     @overrides(AbstractVertex.addedToGraph)
     def addedToGraph(self):
-        """
-        Records that the vertex has been added to a graph
-        :raises PacmanConfigurationException:
-            If there is an attempt to add the same vertex more than once
-        """
+        if self._added_to_graph:
+            raise PacmanConfigurationException("Already added to a graph")
 
     def __str__(self):
         _l = self.label
