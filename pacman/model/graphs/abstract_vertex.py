@@ -28,8 +28,11 @@ class AbstractVertex(object):
 
     @abstractproperty
     def label(self):
-        """ The label of the vertex.
+        """
+        Returns the current label to the vertex.
 
+        This label could change when the vertex is added to the graph.
+        :return: The label
         :rtype: str
         """
 

@@ -54,17 +54,6 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
     def label(self):
         return self._label
 
-    @property
-    @overrides(AbstractVertex.label)
-    def label(self):
-        """
-        Returns the current label to the vertex.
-
-        This label could change when the vertex is added to the graph.
-        :return: The label
-        """
-        return self._label
-
     @overrides(AbstractVertex.set_label)
     def set_label(self, label):
         if self._added_to_graph:
