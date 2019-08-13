@@ -81,6 +81,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
     def addedToGraph(self):
         if self._added_to_graph:
             raise PacmanConfigurationException("Already added to a graph")
+        self._added_to_graph = True
 
     def __str__(self):
         return self.label
