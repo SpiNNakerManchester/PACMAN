@@ -166,6 +166,12 @@ class Graph(ConstrainedObject, AbstractGraph):
     def vertices(self):
         return self._vertices
 
+    # TEMP method until another PR does this better
+    def vertex_by_label(self, label):
+        for vertex in self._vertices:
+            if vertex.label == label:
+                return label
+
     @property
     @overrides(AbstractGraph.n_vertices)
     def n_vertices(self):
