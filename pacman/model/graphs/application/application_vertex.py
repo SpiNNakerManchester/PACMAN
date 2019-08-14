@@ -15,27 +15,20 @@
 
 import sys
 from six import add_metaclass
-from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import (
     abstractmethod, abstractproperty, AbstractBase)
-from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import ConstrainedObject
 
 
 @add_metaclass(AbstractBase)
-class ApplicationVertex(ConstrainedObject, AbstractVertex):
+class ApplicationVertex(AbstractVertex):
     """ A vertex that can be broken down into a number of smaller vertices
         based on the resources that the vertex requires.
     """
 
-    __slots__ = [
-        # Indicates if the Vertex has been added to a graph
-        "_added_to_graph",
-        # Label for the vertex. Changable until added to graph
-        "_label"]
+    __slots__ = []
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
@@ -52,30 +45,11 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
             * If one of the constraints is not valid
         """
 
-        ConstrainedObject.__init__(self, constraints)
-        self._label = label
-        self._added_to_graph = False
+        super(ApplicationVertex, self).__init__(label, constraints)
 
         # add a constraint for max partitioning
         self.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
-
-    @property
-    @overrides(AbstractVertex.label)
-    def label(self):
-        return self._label
-
-    @overrides(AbstractVertex.set_label)
-    def set_label(self, label):
-        if self._added_to_graph:
-            raise PacmanConfigurationException(
-                "As Labels are also IDs they can not be changed.")
-
-    @overrides(AbstractVertex.addedToGraph)
-    def addedToGraph(self):
-        if self._added_to_graph:
-            raise PacmanConfigurationException("Already added to a graph")
-        self._added_to_graph = True
 
     def __str__(self):
         return self.label

@@ -15,22 +15,15 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
-from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import ConstrainedObject
 
 
 @add_metaclass(AbstractBase)
-class MachineVertex(ConstrainedObject, AbstractVertex):
+class MachineVertex(AbstractVertex):
     """ A machine graph vertex.
     """
 
-    __slots__ = [
-        # Indicates if the Vertex has been added to a graph
-        "_added_to_graph",
-        # Label for the vertex. Changable until added to graph
-        "_label"]
+    __slots__ = []
 
     def __init__(self, label=None, constraints=None):
         """
@@ -42,29 +35,10 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
-        ConstrainedObject.__init__(self, constraints)
-        if label:
-            self._label = label
-        else:
-            self._label = str(type(self))
+        if label is None:
+            label = str(type(self))
+        super(MachineVertex, self).__init__(label, constraints)
         self._added_to_graph = False
-
-    @property
-    @overrides(AbstractVertex.label)
-    def label(self):
-        return self._label
-
-    @overrides(AbstractVertex.set_label)
-    def set_label(self, label):
-        if self._added_to_graph:
-            raise PacmanConfigurationException(
-                "As Labels are also IDs they can not be changed.")
-
-    @overrides(AbstractVertex.addedToGraph)
-    def addedToGraph(self):
-        if self._added_to_graph:
-            raise PacmanConfigurationException("Already added to a graph")
-        self._added_to_graph = True
 
     def __str__(self):
         _l = self.label
