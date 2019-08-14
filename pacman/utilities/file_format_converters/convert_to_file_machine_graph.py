@@ -19,7 +19,7 @@ try:
 except ImportError:
     from collections import defaultdict
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.graphs import AbstractVirtualVertex
+from pacman.model.graphs import AbstractVirtual
 from pacman.utilities.utility_calls import md5, ident
 from pacman.utilities import file_format_schemas
 
@@ -75,7 +75,7 @@ class ConvertToFileMachineGraph(object):
         vertex_by_id[ident(vertex)] = vertex
 
         # handle external devices
-        if isinstance(vertex, AbstractVirtualVertex):
+        if isinstance(vertex, AbstractVirtual):
             vertices[vertex_id] = {
                 "cores": 0}
         elif vertex.resources_required.iptags or \

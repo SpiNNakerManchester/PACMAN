@@ -24,7 +24,7 @@ from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint)
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtual
 
 
 def sort_vertices_by_known_constraints(vertices):
@@ -47,7 +47,7 @@ def get_vertices_on_same_chip(vertex, graph):
     :param graph: The graph containing the vertex
     """
     # Virtual vertices can't be forced on different chips
-    if isinstance(vertex, AbstractVirtualVertex):
+    if isinstance(vertex, AbstractVirtual):
         return []
     same_chip_as_vertices = list()
     for constraint in vertex.constraints:

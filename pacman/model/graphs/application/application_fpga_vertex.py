@@ -18,7 +18,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
-from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtualVertex
+from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtual
 from pacman.model.graphs.machine import MachineFPGAVertex
 from pacman.model.resources import ResourceContainer
 
@@ -60,21 +60,21 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
         return self._fpga_link_id
 
     @property
-    @overrides(AbstractVirtualVertex.board_address)
+    @overrides(AbstractVirtual.board_address)
     def board_address(self):
         return self._board_address
 
     @property
-    @overrides(AbstractVirtualVertex.virtual_chip_x)
+    @overrides(AbstractVirtual.virtual_chip_x)
     def virtual_chip_x(self):
         return self._virtual_chip_x
 
     @property
-    @overrides(AbstractVirtualVertex.virtual_chip_y)
+    @overrides(AbstractVirtual.virtual_chip_y)
     def virtual_chip_y(self):
         return self._virtual_chip_y
 
-    @overrides(AbstractVirtualVertex.set_virtual_chip_coordinates)
+    @overrides(AbstractVirtual.set_virtual_chip_coordinates)
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y

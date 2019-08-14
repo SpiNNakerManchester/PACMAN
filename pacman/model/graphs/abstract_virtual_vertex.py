@@ -18,9 +18,13 @@ from spinn_utilities.abstract_base import (
 from .abstract_vertex import AbstractVertex
 
 
-class AbstractVirtualVertex(AbstractVertex):
-    """ A vertex which exists outside of the machine, allowing a graph to\
-        formally participate in I/O.
+class AbstractVirtual(object):
+    """ An Object (most likely a vertex which exists outside of the machine,
+        allowing a graph to formally participate in I/O.
+
+        Note: It is expected that everything that is an instance of
+        AbstractVertex,
+        This is not enforced to avoid diamond inheritance.
     """
 
     __slots__ = ()

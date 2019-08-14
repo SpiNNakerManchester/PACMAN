@@ -17,7 +17,7 @@ import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
-    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex, AbstractVirtualVertex)
+    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex, AbstractVirtual)
 from pacman.utilities.algorithm_utilities import (
     machine_algorithm_utilities, ElementAllocatorAlgorithm)
 
@@ -76,7 +76,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
         # allocate IDs for virtual chips
         for vertex in progress.over(graph.vertices):
-            if isinstance(vertex, AbstractVirtualVertex):
+            if isinstance(vertex, AbstractVirtual):
                 x, y = self._assign_virtual_chip_info(
                     machine, self._get_link_data(machine, vertex))
                 vertex.set_virtual_chip_coordinates(x, y)

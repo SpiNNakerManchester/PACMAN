@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import abstractproperty
-from .abstract_virtual_vertex import AbstractVirtualVertex
+from .abstract_virtual_vertex import AbstractVirtual
 
 
-class AbstractFPGAVertex(AbstractVirtualVertex):
+class AbstractFPGAVertex(AbstractVirtual):
     """ A vertex connected to an FPGA.
     """
 

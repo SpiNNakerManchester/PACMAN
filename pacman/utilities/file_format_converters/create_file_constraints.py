@@ -16,7 +16,7 @@
 import json
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Router
-from pacman.model.graphs import AbstractVirtualVertex
+from pacman.model.graphs import AbstractVirtual
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, AbstractPlacerConstraint)
 from pacman.exceptions import PacmanConfigurationException
@@ -70,7 +70,7 @@ class CreateConstraintsToFile(object):
                     constraint, json_obj, vertex, vertex_id)
             self._handle_vertex_resources(
                 vertex.resources_required, json_obj, vertex_id)
-            if isinstance(vertex, AbstractVirtualVertex):
+            if isinstance(vertex, AbstractVirtual):
                 self._handle_virtual_vertex(
                     vertex, vertex_id, json_obj, machine)
         return vertex_by_id
@@ -112,7 +112,7 @@ class CreateConstraintsToFile(object):
 
     @staticmethod
     def _handle_vertex_constraint(constraint, json_obj, vertex, vertex_id):
-        if isinstance(vertex, AbstractVirtualVertex):
+        if isinstance(vertex, AbstractVirtual):
             return
         if isinstance(constraint, AbstractPlacerConstraint):
             if not isinstance(constraint, ChipAndCoreConstraint):
