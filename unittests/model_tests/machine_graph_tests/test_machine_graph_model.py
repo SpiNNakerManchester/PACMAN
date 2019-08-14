@@ -73,6 +73,8 @@ class TestMachineGraphModel(unittest.TestCase):
         vertices_from_graph = list(graph.vertices)
         for vert in vertices_from_graph:
             self.assertIn(vert, vertices)
+        for vert in vertices:
+            self.assertEqual(vert, graph.vertex_by_label(vert.label))
         edges_from_graph = list(graph.edges)
         for edge in edges_from_graph:
             self.assertIn(edge, edges)

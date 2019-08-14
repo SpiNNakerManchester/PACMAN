@@ -189,6 +189,9 @@ class Graph(ConstrainedObject, AbstractGraph):
     def vertices(self):
         return self._vertices
 
+    def vertex_by_label(self, label):
+        return self._vertex_by_label[label]
+
     @property
     @overrides(AbstractGraph.n_vertices)
     def n_vertices(self):
