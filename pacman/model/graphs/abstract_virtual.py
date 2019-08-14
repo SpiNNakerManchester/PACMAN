@@ -15,7 +15,6 @@
 
 from spinn_utilities.abstract_base import (
     abstractmethod, abstractproperty)
-from .abstract_vertex import AbstractVertex
 
 
 class AbstractVirtual(object):
