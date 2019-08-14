@@ -24,7 +24,7 @@ from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint)
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtual
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
 
 
 def sort_vertices_by_known_constraints(vertices):
