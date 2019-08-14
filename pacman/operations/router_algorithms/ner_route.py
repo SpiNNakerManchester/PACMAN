@@ -33,7 +33,7 @@ from collections import deque
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.graphs import (
-    AbstractFPGAVertex, AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
+    AbstractFPGA, AbstractVirtual, AbstractSpiNNakerLink)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
@@ -546,7 +546,7 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
     # Add the sinks in the net to the RoutingTree
     for post_vertex in post_vertexes:
         tree_node = lookup[_vertex_xy(post_vertex, placements, machine)]
-        if isinstance(post_vertex, AbstractVirtualVertex):
+        if isinstance(post_vertex, AbstractVirtual):
             # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
             route = _route_to_endpoint(post_vertex, machine)
@@ -565,21 +565,21 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
 
 
 def _vertex_xy(vertex, placements, machine):
-    if not isinstance(vertex, AbstractVirtualVertex):
+    if not isinstance(vertex, AbstractVirtual):
         placement = placements.get_placement_of_vertex(vertex)
         return (placement.x, placement.y)
     link_data = None
-    if isinstance(vertex, AbstractFPGAVertex):
+    if isinstance(vertex, AbstractFPGA):
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-    elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+    elif isinstance(vertex, AbstractSpiNNakerLink):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return (link_data.connected_chip_x, link_data.connected_chip_y)
 
 
 def _route_to_endpoint(vertex, machine):
-    if isinstance(vertex, AbstractFPGAVertex):
+    if isinstance(vertex, AbstractFPGA):
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
     else:

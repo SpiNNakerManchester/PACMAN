@@ -13,6 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_router_constraint import AbstractRouterConstraint
+from spinn_utilities.abstract_base import abstractproperty
+from .abstract_virtual import AbstractVirtual
 
-__all__ = ["AbstractRouterConstraint"]
+
+class AbstractSpiNNakerLink(AbstractVirtual):
+    """ A An Object (most likely a vertex)  connected to a SpiNNaker Link.
+
+        Note: It is expected that everything that is an instance of
+        AbstractSpiNNakerLink is also an instance of AbstractVertex,
+        This is not enforced to avoid diamond inheritance.
+    """
+
+    __slots__ = ()
+
+    @abstractproperty
+    def spinnaker_link_id(self):
+        """ The SpiNNaker Link that the vertex is connected to.
+        """
+        return self._spinnaker_link_id

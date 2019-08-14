@@ -18,7 +18,7 @@ import logging
 from six import raise_from
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
     FixedVertexAtomsConstraint, SameAtomsAsVertexConstraint)
@@ -265,7 +265,7 @@ class PartitionAndPlacePartitioner(object):
         for (placed_vertex, x, y, p, placed_resources,
                 ip_tags, reverse_ip_tags) in used_placements:
 
-            if not isinstance(placed_vertex, AbstractVirtualVertex):
+            if not isinstance(placed_vertex, AbstractVirtual):
                 # Deallocate the existing resources
                 resource_tracker.unallocate_resources(
                     x, y, p, placed_resources, ip_tags, reverse_ip_tags)
@@ -275,7 +275,7 @@ class PartitionAndPlacePartitioner(object):
             new_resources = \
                 placed_vertex.get_resources_used_by_atoms(vertex_slice)
 
-            if not isinstance(placed_vertex, AbstractVirtualVertex):
+            if not isinstance(placed_vertex, AbstractVirtual):
                 # Re-allocate the existing resources
                 (x, y, p, ip_tags, reverse_ip_tags) = \
                     resource_tracker.allocate_constrained_resources(
@@ -335,7 +335,7 @@ class PartitionAndPlacePartitioner(object):
             p = None
             ip_tags = None
             reverse_ip_tags = None
-            if not isinstance(vertex, AbstractVirtualVertex):
+            if not isinstance(vertex, AbstractVirtual):
 
                 # get max resources_available on machine
                 resources_available = resource_tracker\
