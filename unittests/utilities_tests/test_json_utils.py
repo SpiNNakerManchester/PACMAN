@@ -14,6 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint, FixedKeyFieldConstraint,
+    FixedKeyAndMaskConstraint, FixedMaskConstraint,
+    FlexiKeyFieldConstraint, ShareKeyConstraint)
 from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
@@ -59,3 +63,14 @@ class TestJsonUtils(unittest.TestCase):
         v1 = SimpleMachineVertex(None, "v1")
         c1 = SameAtomsAsVertexConstraint(v1)
         self.there_and_back_by_vertex(c1)
+
+    def test_max_vertex_atoms_constraint(self):
+        c1 = MaxVertexAtomsConstraint(5)
+        self.there_and_back(c1)
+
+    def test_fixed_vertex_atoms_constraint(self):
+        c1 = FixedVertexAtomsConstraint(5)
+        self.there_and_back(c1)
+
+    def test_contiguous_key_range_constraint(self):
+        c1 = ContiguousKeyRangeContraint()

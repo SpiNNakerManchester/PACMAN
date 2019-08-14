@@ -19,7 +19,8 @@ except ImportError:
 import json
 import gzip
 from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint, FixedKeyFieldConstraint, FixedKeyAndMaskConstraint, FixedMaskConstraint,
+    ContiguousKeyRangeContraint, FixedKeyFieldConstraint,
+    FixedKeyAndMaskConstraint, FixedMaskConstraint,
     FlexiKeyFieldConstraint, ShareKeyConstraint)
 from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
@@ -56,6 +57,13 @@ def constraint_to_json(constaint):
     if isinstance(constaint,
                   (SameChipAsConstraint, SameAtomsAsVertexConstraint)):
         json_object["vertex"] = constaint.vertex.label
+    if isinstance(constaint,
+                  (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)):
+        json_object["size"] = constaint.size
+    #if isinstance(constaint, FixedKeyAndMaskConstraint)
+    if isinstance(constaint, FixedKeyFieldConstraint):
+        raise NotImplementedError(
+            "FixedKeyFieldConstraint not yet supported by json")
     return json_object
 
 
@@ -69,6 +77,12 @@ def contraint_from_json(json_object):
         else:
             p = None
         return ChipAndCoreConstraint(json_object["x"], json_object["y"], p)
+    if json_object["class"] == "ContiguousKeyRangeContraint":
+        return ContiguousKeyRangeContraint()
+    if json_object["class"] == "FixedVertexAtomsConstraint":
+        return FixedVertexAtomsConstraint(json_object["size"])
+    if json_object["class"] == "MaxVertexAtomsConstraint":
+        return MaxVertexAtomsConstraint(json_object["size"])
     if json_object["class"] == "RadialPlacementFromChipConstraint":
         return RadialPlacementFromChipConstraint(
             json_object["x"], json_object["y"])
