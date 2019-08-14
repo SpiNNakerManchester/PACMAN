@@ -17,7 +17,7 @@ import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
-    AbstractFPGA, AbstractSpiNNakerLinkVertex, AbstractVirtual)
+    AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
 from pacman.utilities.algorithm_utilities import (
     machine_algorithm_utilities, ElementAllocatorAlgorithm)
 
@@ -89,7 +89,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             if link_data is None:
                 raise NoFPGALink(vertex)
             return link_data
-        elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+        elif isinstance(vertex, AbstractSpiNNakerLink):
             link_data = machine.get_spinnaker_link_with_id(
                 vertex.spinnaker_link_id, vertex.board_address)
             if link_data is None:

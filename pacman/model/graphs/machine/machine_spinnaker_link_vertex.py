@@ -17,11 +17,11 @@ from spinn_utilities.overrides import overrides
 from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
 from pacman.model.graphs import (
-    AbstractVirtual, AbstractSpiNNakerLinkVertex)
+    AbstractVirtual, AbstractSpiNNakerLink)
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 
-class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
+class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
     """ A virtual vertex on a SpiNNaker Link.
     """
 
@@ -47,7 +47,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLinkVertex):
         return ResourceContainer()
 
     @property
-    @overrides(AbstractSpiNNakerLinkVertex.spinnaker_link_id)
+    @overrides(AbstractSpiNNakerLink.spinnaker_link_id)
     def spinnaker_link_id(self):
         return self._spinnaker_link_id
 

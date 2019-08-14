@@ -33,7 +33,7 @@ from collections import deque
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.graphs import (
-    AbstractFPGA, AbstractVirtual, AbstractSpiNNakerLinkVertex)
+    AbstractFPGA, AbstractVirtual, AbstractSpiNNakerLink)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
@@ -572,7 +572,7 @@ def _vertex_xy(vertex, placements, machine):
     if isinstance(vertex, AbstractFPGA):
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-    elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+    elif isinstance(vertex, AbstractSpiNNakerLink):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return (link_data.connected_chip_x, link_data.connected_chip_y)

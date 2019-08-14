@@ -20,12 +20,12 @@ from pacman.model.constraints.placer_constraints import (
 from .application_vertex import ApplicationVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs import (
-    AbstractVirtual, AbstractSpiNNakerLinkVertex)
+    AbstractVirtual, AbstractSpiNNakerLink)
 from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
 
 
 class ApplicationSpiNNakerLinkVertex(
-        ApplicationVertex, AbstractSpiNNakerLinkVertex):
+        ApplicationVertex, AbstractSpiNNakerLink):
     """ A virtual vertex on a SpiNNaker Link.
     """
 
@@ -49,7 +49,7 @@ class ApplicationSpiNNakerLinkVertex(
         self._virtual_chip_y = None
 
     @property
-    @overrides(AbstractSpiNNakerLinkVertex.spinnaker_link_id)
+    @overrides(AbstractSpiNNakerLink.spinnaker_link_id)
     def spinnaker_link_id(self):
         return self._spinnaker_link_id
 
