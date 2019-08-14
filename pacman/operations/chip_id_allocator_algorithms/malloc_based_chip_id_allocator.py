@@ -17,7 +17,7 @@ import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
-    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex, AbstractVirtual)
+    AbstractFPGA, AbstractSpiNNakerLinkVertex, AbstractVirtual)
 from pacman.utilities.algorithm_utilities import (
     machine_algorithm_utilities, ElementAllocatorAlgorithm)
 
@@ -83,7 +83,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
     @staticmethod
     def _get_link_data(machine, vertex):
-        if isinstance(vertex, AbstractFPGAVertex):
+        if isinstance(vertex, AbstractFPGA):
             link_data = machine.get_fpga_link_with_id(
                 vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
             if link_data is None:

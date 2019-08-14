@@ -18,12 +18,12 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
-from pacman.model.graphs import AbstractFPGAVertex, AbstractVirtual
+from pacman.model.graphs import AbstractFPGA, AbstractVirtual
 from pacman.model.graphs.machine import MachineFPGAVertex
 from pacman.model.resources import ResourceContainer
 
 
-class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
+class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGA):
     """ A virtual vertex on an FPGA link.
     """
 
@@ -50,12 +50,12 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
         self._virtual_chip_y = None
 
     @property
-    @overrides(AbstractFPGAVertex.fpga_id)
+    @overrides(AbstractFPGA.fpga_id)
     def fpga_id(self):
         return self._fpga_id
 
     @property
-    @overrides(AbstractFPGAVertex.fpga_link_id)
+    @overrides(AbstractFPGA.fpga_link_id)
     def fpga_link_id(self):
         return self._fpga_link_id
 
