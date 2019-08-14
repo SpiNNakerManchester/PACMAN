@@ -66,6 +66,7 @@ class AbstractVertex(ConstrainedObject):
         if self._added_to_graph:
             raise PacmanConfigurationException(
                 "As Labels are also IDs they can not be changed.")
+        self._label = label
 
     def addedToGraph(self):
         """
