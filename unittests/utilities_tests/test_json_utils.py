@@ -24,6 +24,7 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
+from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.json_utils import constraint_to_json, contraint_from_json
 from pacman.model.graphs.machine import SimpleMachineVertex
 
@@ -74,3 +75,16 @@ class TestJsonUtils(unittest.TestCase):
 
     def test_contiguous_key_range_constraint(self):
         c1 = ContiguousKeyRangeContraint()
+
+    def test_fixed_key_and_mask_constraint(self):
+        c1 = FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0xFF0, 0xFF8)])
+        self.there_and_back(c1)
+        km = BaseKeyAndMask(0xFF0, 0xFF8)
+        km2 = BaseKeyAndMask(0xFE0, 0xFF8)
+        c2 = FixedKeyAndMaskConstraint([km, km2])
+        self.there_and_back(c2)
+
+    def test_fixed_mask_constraint(self):
+        c1 = FixedMaskConstraint(0xFF0)
+        self.there_and_back(c1)

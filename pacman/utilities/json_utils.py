@@ -19,15 +19,16 @@ except ImportError:
 import json
 import gzip
 from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint, FixedKeyFieldConstraint,
+    ContiguousKeyRangeContraint,
     FixedKeyAndMaskConstraint, FixedMaskConstraint,
-    FlexiKeyFieldConstraint, ShareKeyConstraint)
+    ShareKeyConstraint)
 from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
+from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 
@@ -42,33 +43,49 @@ def json_to_object(json_object):
     return json_object
 
 
-def constraint_to_json(constaint):
+def constraint_to_json(constraint):
     json_object = OrderedDict()
-    json_object["class"] = constaint.__class__.__name__
-    if isinstance(constaint, BoardConstraint):
-        json_object["board_address"] = constaint.board_address
-    if isinstance(constaint, (
-            ChipAndCoreConstraint, RadialPlacementFromChipConstraint)):
-        json_object["x"] = constaint.x
-        json_object["y"] = constaint.y
-    if isinstance(constaint, ChipAndCoreConstraint):
-        if constaint.p is not None:
-            json_object["p"] = constaint.p
-    if isinstance(constaint,
-                  (SameChipAsConstraint, SameAtomsAsVertexConstraint)):
-        json_object["vertex"] = constaint.vertex.label
-    if isinstance(constaint,
-                  (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)):
-        json_object["size"] = constaint.size
-    #if isinstance(constaint, FixedKeyAndMaskConstraint)
-    if isinstance(constaint, FixedKeyFieldConstraint):
-        raise NotImplementedError(
-            "FixedKeyFieldConstraint not yet supported by json")
+    try:
+        json_object["class"] = constraint.__class__.__name__
+        if isinstance(constraint, BoardConstraint):
+            json_object["board_address"] = constraint.board_address
+        elif isinstance(constraint, (
+                ChipAndCoreConstraint, RadialPlacementFromChipConstraint)):
+            json_object["x"] = constraint.x
+            json_object["y"] = constraint.y
+            if isinstance(constraint, ChipAndCoreConstraint):
+                if constraint.p is not None:
+                    json_object["p"] = constraint.p
+        elif isinstance(constraint,
+                        (SameChipAsConstraint, SameAtomsAsVertexConstraint)):
+            json_object["vertex"] = constraint.vertex.label
+        elif isinstance(constraint,
+                        (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)):
+            json_object["size"] = constraint.size
+        elif isinstance(constraint, FixedKeyAndMaskConstraint):
+            json_object["keys_and_masks"] = key_mask_collection_to_json(
+                constraint.keys_and_masks)
+            if constraint.key_list_function:
+                json_object["key_list_function"] = str(
+                    constraint.key_list_function)
+        elif isinstance(constraint, FixedMaskConstraint):
+            json_object["mask"] = constraint.mask
+        elif isinstance(constraint, "ContiguousKeyRangeContraint"):
+             # No extra parameters
+            pass
+        else:
+            # Oops an unexpected class
+            # Classes Not covered include
+            # FixedKeyFieldConstraint
+            # FlexiKeyFieldConstraint
+            json_object["str"] = str(constraint)
+            json_object["repr"] = repr(constraint)
+    except Exception as ex:
+        json_object["exception"] = str(ex)
     return json_object
 
 
 def contraint_from_json(json_object):
-    json_object = json_to_object(json_object)
     if json_object["class"] == "BoardConstraint":
         return BoardConstraint(json_object["board_address"])
     if json_object["class"] == "ChipAndCoreConstraint":
@@ -79,6 +96,14 @@ def contraint_from_json(json_object):
         return ChipAndCoreConstraint(json_object["x"], json_object["y"], p)
     if json_object["class"] == "ContiguousKeyRangeContraint":
         return ContiguousKeyRangeContraint()
+    if json_object["class"] == "FixedKeyAndMaskConstraint":
+        if "key_list_function" in json_object:
+            raise NotImplementedError(
+                "key_list_function {}".format(json_object["key_list_function"]))
+        return FixedKeyAndMaskConstraint(
+            key_mask_list_from_json(json_object["keys_and_masks"]))
+    if json_object["class"] == "FixedMaskConstraint":
+        return FixedMaskConstraint(json_object["mask"])
     if json_object["class"] == "FixedVertexAtomsConstraint":
         return FixedVertexAtomsConstraint(json_object["size"])
     if json_object["class"] == "MaxVertexAtomsConstraint":
@@ -91,11 +116,38 @@ def contraint_from_json(json_object):
     if json_object["class"] == "SameAtomsAsVertexConstraint":
         return SameAtomsAsVertexConstraint(
             vertex_lookup(json_object["vertex"]))
+    raise NotImplementedError("contraint {}".format(json_object["class"]))
 
+def key_mask_to_json(key_mask):
+    try:
+        json_object = OrderedDict()
+        json_object["key"] = key_mask.key
+        json_object["mask"] = key_mask.mask
+    except Exception as ex:
+        json_object["exception"] = str(ex)
+    return json_object
+
+def key_mask_from_json(json_object):
+    return BaseKeyAndMask(json_object["key"], json_object["mask"])
+
+def key_mask_collection_to_json(key_masks):
+    json_object = []
+    for key_mask in key_masks:
+        json_object.append(key_mask_to_json(key_mask))
+    return json_object
+
+def key_mask_list_from_json(json_object):
+    key_masks = []
+    for sub in json_object:
+        key_masks.append(key_mask_from_json(sub))
+    return key_masks
 
 def vertex_to_json(vertex):
     json_object = OrderedDict()
-    json_object["label"] = vertex.label
+    try:
+        json_object["label"] = vertex.label
+    except Exception as ex:
+        json_object["exception"] = str(ex)
     return json_object
 
 
