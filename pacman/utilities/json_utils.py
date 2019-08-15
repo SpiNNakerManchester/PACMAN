@@ -28,6 +28,9 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
+from pacman.model.resources import (
+    CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
+    VariableSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import SimpleMachineVertex
 
@@ -42,34 +45,34 @@ def json_to_object(json_object):
                 return json.load(j_file)
     return json_object
 
-
+# TODO ShareKeyConstraint
 def constraint_to_json(constraint):
-    json_object = OrderedDict()
+    json_dict = OrderedDict()
     try:
-        json_object["class"] = constraint.__class__.__name__
+        json_dict["class"] = constraint.__class__.__name__
         if isinstance(constraint, BoardConstraint):
-            json_object["board_address"] = constraint.board_address
+            json_dict["board_address"] = constraint.board_address
         elif isinstance(constraint, (
                 ChipAndCoreConstraint, RadialPlacementFromChipConstraint)):
-            json_object["x"] = constraint.x
-            json_object["y"] = constraint.y
+            json_dict["x"] = constraint.x
+            json_dict["y"] = constraint.y
             if isinstance(constraint, ChipAndCoreConstraint):
                 if constraint.p is not None:
-                    json_object["p"] = constraint.p
+                    json_dict["p"] = constraint.p
         elif isinstance(constraint,
                         (SameChipAsConstraint, SameAtomsAsVertexConstraint)):
-            json_object["vertex"] = constraint.vertex.label
+            json_dict["vertex"] = constraint.vertex.label
         elif isinstance(constraint,
                         (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)):
-            json_object["size"] = constraint.size
+            json_dict["size"] = constraint.size
         elif isinstance(constraint, FixedKeyAndMaskConstraint):
-            json_object["keys_and_masks"] = key_mask_collection_to_json(
+            json_dict["keys_and_masks"] = key_masks_to_json(
                 constraint.keys_and_masks)
             if constraint.key_list_function:
-                json_object["key_list_function"] = str(
+                json_dict["key_list_function"] = str(
                     constraint.key_list_function)
         elif isinstance(constraint, FixedMaskConstraint):
-            json_object["mask"] = constraint.mask
+            json_dict["mask"] = constraint.mask
         elif isinstance(constraint, "ContiguousKeyRangeContraint"):
              # No extra parameters
             pass
@@ -78,45 +81,46 @@ def constraint_to_json(constraint):
             # Classes Not covered include
             # FixedKeyFieldConstraint
             # FlexiKeyFieldConstraint
-            json_object["str"] = str(constraint)
-            json_object["repr"] = repr(constraint)
+            json_dict["str"] = str(constraint)
+            json_dict["repr"] = repr(constraint)
     except Exception as ex:
-        json_object["exception"] = str(ex)
-    return json_object
+        json_dict["exception"] = str(ex)
+    return json_dict
 
 
-def contraint_from_json(json_object):
-    if json_object["class"] == "BoardConstraint":
-        return BoardConstraint(json_object["board_address"])
-    if json_object["class"] == "ChipAndCoreConstraint":
-        if "p" in json_object:
-            p = json_object["p"]
+def contraint_from_json(json_dict):
+    if json_dict["class"] == "BoardConstraint":
+        return BoardConstraint(json_dict["board_address"])
+    if json_dict["class"] == "ChipAndCoreConstraint":
+        if "p" in json_dict:
+            p = json_dict["p"]
         else:
             p = None
-        return ChipAndCoreConstraint(json_object["x"], json_object["y"], p)
-    if json_object["class"] == "ContiguousKeyRangeContraint":
+        return ChipAndCoreConstraint(json_dict["x"], json_dict["y"], p)
+    if json_dict["class"] == "ContiguousKeyRangeContraint":
         return ContiguousKeyRangeContraint()
-    if json_object["class"] == "FixedKeyAndMaskConstraint":
-        if "key_list_function" in json_object:
+    if json_dict["class"] == "FixedKeyAndMaskConstraint":
+        if "key_list_function" in json_dict:
             raise NotImplementedError(
-                "key_list_function {}".format(json_object["key_list_function"]))
+                "key_list_function {}".format(json_dict["key_list_function"]))
         return FixedKeyAndMaskConstraint(
-            key_mask_list_from_json(json_object["keys_and_masks"]))
-    if json_object["class"] == "FixedMaskConstraint":
-        return FixedMaskConstraint(json_object["mask"])
-    if json_object["class"] == "FixedVertexAtomsConstraint":
-        return FixedVertexAtomsConstraint(json_object["size"])
-    if json_object["class"] == "MaxVertexAtomsConstraint":
-        return MaxVertexAtomsConstraint(json_object["size"])
-    if json_object["class"] == "RadialPlacementFromChipConstraint":
+            key_masks_from_json(json_dict["keys_and_masks"]))
+    if json_dict["class"] == "FixedMaskConstraint":
+        return FixedMaskConstraint(json_dict["mask"])
+    if json_dict["class"] == "FixedVertexAtomsConstraint":
+        return FixedVertexAtomsConstraint(json_dict["size"])
+    if json_dict["class"] == "MaxVertexAtomsConstraint":
+        return MaxVertexAtomsConstraint(json_dict["size"])
+    if json_dict["class"] == "RadialPlacementFromChipConstraint":
         return RadialPlacementFromChipConstraint(
-            json_object["x"], json_object["y"])
-    if json_object["class"] == "SameChipAsConstraint":
-        return SameChipAsConstraint(vertex_lookup(json_object["vertex"]))
-    if json_object["class"] == "SameAtomsAsVertexConstraint":
+            json_dict["x"], json_dict["y"])
+    if json_dict["class"] == "SameChipAsConstraint":
+        return SameChipAsConstraint(vertex_lookup(json_dict["vertex"]))
+    if json_dict["class"] == "SameAtomsAsVertexConstraint":
         return SameAtomsAsVertexConstraint(
-            vertex_lookup(json_object["vertex"]))
-    raise NotImplementedError("contraint {}".format(json_object["class"]))
+            vertex_lookup(json_dict["vertex"]))
+    raise NotImplementedError("contraint {}".format(json_dict["class"]))
+
 
 def key_mask_to_json(key_mask):
     try:
@@ -127,28 +131,109 @@ def key_mask_to_json(key_mask):
         json_object["exception"] = str(ex)
     return json_object
 
-def key_mask_from_json(json_object):
-    return BaseKeyAndMask(json_object["key"], json_object["mask"])
 
-def key_mask_collection_to_json(key_masks):
-    json_object = []
+def key_mask_from_json(json_dict):
+    return BaseKeyAndMask(json_dict["key"], json_dict["mask"])
+
+
+def key_masks_to_json(key_masks):
+    json_list = []
     for key_mask in key_masks:
-        json_object.append(key_mask_to_json(key_mask))
-    return json_object
+        json_list.append(key_mask_to_json(key_mask))
+    return json_list
 
-def key_mask_list_from_json(json_object):
+
+def key_masks_from_json(json_list):
     key_masks = []
-    for sub in json_object:
+    for sub in json_list:
         key_masks.append(key_mask_from_json(sub))
     return key_masks
 
+
 def vertex_to_json(vertex):
-    json_object = OrderedDict()
+    json_dict = OrderedDict()
     try:
-        json_object["label"] = vertex.label
+        json_dict["label"] = vertex.label
     except Exception as ex:
-        json_object["exception"] = str(ex)
-    return json_object
+        json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def resource_container_to_json(container):
+    json_dict = OrderedDict()
+    try:
+        json_dict["dtcm"] = container.dtcm.get_value()
+        json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
+        json_dict["fixed_sdram"] = container.sdram.fixed
+        json_dict["per_timestep_sdram"] = container.sdram.per_timestep
+        json_dict["iptag"] = iptag_resources_to_json(container.iptags)
+        json_dict["reverse_iptags"] = iptag_resources_to_json(
+            container.reverse_iptags)
+    except Exception as ex:
+        json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def resource_container_from_json(json_dict):
+    dtcm = DTCMResource(json_dict["dtcm"])
+    sdram = VariableSDRAM(
+        json_dict["fixed_sdram"], json_dict["per_timestep_sdram"])
+    cpu_cycles = CPUCyclesPerTickResource(json_dict["cpu_cycles"])
+    iptags = iptag_resources_from_json(json_dict["iptag"])
+    reverse_iptags = iptag_resources_from_json(json_dict["reverse_iptags"])
+    return ResourceContainer(dtcm, sdram, cpu_cycles, iptags, reverse_iptags)
+
+
+def iptag_resource_to_json(iptag):
+    json_dict = OrderedDict()
+    try:
+        json_dict["ip_address"] = iptag.ip_address
+        if iptag.port is not None:
+            json_dict["port"] = iptag.port
+        json_dict["strip_sdp"] = iptag.strip_sdp
+        if iptag.tag is not None:
+            json_dict["tag"] = iptag.tag
+        json_dict["traffic_identifier"] = iptag.traffic_identifier
+    except Exception as ex:
+        json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def iptag_resource_from_json(json_dict):
+    if "port" in json_dict:
+        port = json_dict["port"]
+    else:
+        port = None
+    if "tag" in json_dict:
+        tag = json_dict["tag"]
+    else:
+        tag = None
+    return IPtagResource(
+        json_dict["ip_address"], port, json_dict["strip_sdp"], tag,
+        json_dict["traffic_identifier"])
+
+
+def iptag_resources_to_json(iptags):
+    json_list = []
+    for iptag in iptags:
+        json_list.append(iptag_resource_to_json(iptag))
+    return json_list
+
+
+def iptag_resources_from_json(json_list):
+    iptags = []
+    for json_dict in json_list:
+        iptags.append(iptag_resource_from_json(json_dict))
+    return iptags
+
+
+def bacon_to_json(bacon):
+    json_list = OrderedDict()
+    try:
+        alan_likes_eggs_too = 1/0
+    except Exception as ex:
+            json_list["exception"] = str(ex)
+    return json_list
 
 
 def vertex_lookup(label):
