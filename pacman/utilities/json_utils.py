@@ -88,7 +88,7 @@ def constraint_to_json(constraint):
     return json_dict
 
 
-def contraint_from_json(json_dict):
+def constraint_from_json(json_dict):
     if json_dict["class"] == "BoardConstraint":
         return BoardConstraint(json_dict["board_address"])
     if json_dict["class"] == "ChipAndCoreConstraint":
@@ -122,6 +122,20 @@ def contraint_from_json(json_dict):
     raise NotImplementedError("contraint {}".format(json_dict["class"]))
 
 
+def constraints_to_json(constraints):
+    json_list = []
+    for constraint in constraints:
+        json_list.append(constraint_to_json(constraint))
+    return json_list
+
+
+def constraints_from_json(json_list):
+    constraints = []
+    for sub in json_list:
+        constraints.append(constraint_from_json(sub))
+    return constraints
+
+
 def key_mask_to_json(key_mask):
     try:
         json_object = OrderedDict()
@@ -148,15 +162,6 @@ def key_masks_from_json(json_list):
     for sub in json_list:
         key_masks.append(key_mask_from_json(sub))
     return key_masks
-
-
-def vertex_to_json(vertex):
-    json_dict = OrderedDict()
-    try:
-        json_dict["label"] = vertex.label
-    except Exception as ex:
-        json_dict["exception"] = str(ex)
-    return json_dict
 
 
 def resource_container_to_json(container):
@@ -227,13 +232,34 @@ def iptag_resources_from_json(json_list):
     return iptags
 
 
+def vertex_to_json(vertex):
+    json_dict = OrderedDict()
+    try:
+        json_dict["class"] = vertex.__class__.__name__
+        json_dict["label"] = vertex.label
+        json_dict["constraints"] = constraints_to_json(vertex.constraints)
+        json_dict["resources"] = resource_container_to_json(
+            vertex.resources_required)
+    except Exception as ex:
+            json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def vertex_from_json(json_dict):
+    constraints = constraints_from_json(json_dict["constraints"])
+    resources = resource_container_from_json(
+        json_dict["resources"])
+    return SimpleMachineVertex(
+        resources, label=json_dict["label"], constraints=constraints)
+
+
 def bacon_to_json(bacon):
-    json_list = OrderedDict()
+    json_dict = OrderedDict()
     try:
         alan_likes_eggs_too = 1/0
     except Exception as ex:
-            json_list["exception"] = str(ex)
-    return json_list
+            json_dict["exception"] = str(ex)
+    return json_dict
 
 
 def vertex_lookup(label):

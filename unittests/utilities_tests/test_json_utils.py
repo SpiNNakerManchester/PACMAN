@@ -23,20 +23,28 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
-from pacman.model.resources import ResourceContainer, IPtagResource
-from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer, VariableSDRAM)
-from pacman.utilities.json_utils import constraint_to_json, contraint_from_json, resource_container_to_json, resource_container_from_json
+from pacman.model.routing_info import BaseKeyAndMask
+from pacman.utilities.json_utils import (
+    constraint_to_json, constraint_from_json,
+    resource_container_to_json, resource_container_from_json,
+    vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 
 class TestJsonUtils(unittest.TestCase):
 
+    def compare_constraint(self, c1, c2):
+        if c1 == c2:
+            return
+        if c1.__class__ != c2.__class__:
+            pass
+
     def constraint_there_and_back(self, there):
         j_object = constraint_to_json(there)
-        back = contraint_from_json(j_object)
+        back = constraint_from_json(j_object)
         self.assertEqual(there, back)
 
     def resource_there_and_back(self, there):
@@ -44,9 +52,16 @@ class TestJsonUtils(unittest.TestCase):
         back = resource_container_from_json(j_object)
         self.assertEqual(there, back)
 
+    def vertext_there_and_back(self, there):
+        j_object = vertex_to_json(there)
+        back = vertex_from_json(j_object)
+        self.assertEqual(there.label, back.label)
+        self.assertEqual(there.resources_required, back.resources_required)
+        self.assertEqual(there.constraints, back.constraints)
+
     def there_and_back_by_vertex(self, there):
         j_object = constraint_to_json(there)
-        back = contraint_from_json(j_object)
+        back = constraint_from_json(j_object)
         self.assertEqual(there.vertex.label, back.vertex.label)
 
     def test_board_constraint(self):
@@ -116,3 +131,9 @@ class TestJsonUtils(unittest.TestCase):
         t2 = IPtagResource("1.2.3.4", 2, False, 4, 5)
         r2 = r1 = ResourceContainer(dtcm, sdram1, cpu, iptags=[t1, t2])
         self.resource_there_and_back(r2)
+
+    def test_vertex(self):
+        s1 = SimpleMachineVertex(ResourceContainer(iptags=[IPtagResource(
+            "127.0.0.1", port=None, strip_sdp=True)]),
+            label="Vertex")
+        self.vertext_there_and_back(s1)
