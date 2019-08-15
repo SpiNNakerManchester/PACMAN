@@ -40,12 +40,14 @@ class TestJsonUtils(unittest.TestCase):
         if c1 == c2:
             return
         if c1.__class__ != c2.__class__:
-            pass
+            raise AssertionError("{} != {}".format(
+                c1.__class__, c2.__class__))
+        self.assertEqual(c1.vertex.label, c2.vertex.label)
 
     def constraint_there_and_back(self, there):
         j_object = constraint_to_json(there)
         back = constraint_from_json(j_object)
-        self.assertEqual(there, back)
+        self.compare_constraint(there, back)
 
     def resource_there_and_back(self, there):
         j_object = resource_container_to_json(there)
@@ -57,12 +59,9 @@ class TestJsonUtils(unittest.TestCase):
         back = vertex_from_json(j_object)
         self.assertEqual(there.label, back.label)
         self.assertEqual(there.resources_required, back.resources_required)
-        self.assertEqual(there.constraints, back.constraints)
-
-    def there_and_back_by_vertex(self, there):
-        j_object = constraint_to_json(there)
-        back = constraint_from_json(j_object)
-        self.assertEqual(there.vertex.label, back.vertex.label)
+        self.assertCountEqual(there.constraints, back.constraints)
+        for c1, c2 in zip(there.constraints, back.constraints) :
+            self.compare_constraint(c1, c2)
 
     def test_board_constraint(self):
         c1 = BoardConstraint("1.2.3.4")
@@ -81,12 +80,12 @@ class TestJsonUtils(unittest.TestCase):
     def test_same_chip_as_constraint(self):
         v1 = SimpleMachineVertex(None, "v1")
         c1 = SameChipAsConstraint(v1)
-        self.there_and_back_by_vertex(c1)
+        self.constraint_there_and_back(c1)
 
     def test_same_atoms_as_vertex_constraint(self):
         v1 = SimpleMachineVertex(None, "v1")
         c1 = SameAtomsAsVertexConstraint(v1)
-        self.there_and_back_by_vertex(c1)
+        self.constraint_there_and_back(c1)
 
     def test_max_vertex_atoms_constraint(self):
         c1 = MaxVertexAtomsConstraint(5)
@@ -98,6 +97,7 @@ class TestJsonUtils(unittest.TestCase):
 
     def test_contiguous_key_range_constraint(self):
         c1 = ContiguousKeyRangeContraint()
+        self.constraint_there_and_back(c1)
 
     def test_fixed_key_and_mask_constraint(self):
         c1 = FixedKeyAndMaskConstraint([
@@ -137,3 +137,16 @@ class TestJsonUtils(unittest.TestCase):
             "127.0.0.1", port=None, strip_sdp=True)]),
             label="Vertex")
         self.vertext_there_and_back(s1)
+
+    def test_vertex2(self):
+        c1 = ContiguousKeyRangeContraint()
+        c2 = BoardConstraint("1.2.3.4")
+        s1 = SimpleMachineVertex(ResourceContainer(iptags=[IPtagResource(
+            "127.0.0.1", port=None, strip_sdp=True)]),
+            label="Vertex", constraints=[c1, c2])
+        self.vertext_there_and_back(s1)
+
+    def test_same_chip_as_constraint_plus(self):
+        v1 = SimpleMachineVertex(None, "v1")
+        c1 = SameChipAsConstraint(v1)
+        self.constraint_there_and_back(c1)
