@@ -29,9 +29,12 @@ from pacman.model.resources import (
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.json_utils import (
     constraint_to_json, constraint_from_json,
+    edge_to_json, edge_from_json,
+    graph_to_json, graph_from_json,
     resource_container_to_json, resource_container_from_json,
     vertex_to_json, vertex_from_json)
-from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.machine import (
+    MachineEdge, MachineGraph, SimpleMachineVertex)
 
 
 class TestJsonUtils(unittest.TestCase):
@@ -62,6 +65,20 @@ class TestJsonUtils(unittest.TestCase):
         self.assertCountEqual(there.constraints, back.constraints)
         for c1, c2 in zip(there.constraints, back.constraints) :
             self.compare_constraint(c1, c2)
+
+    def edge_there_and_back(self, there):
+        j_object = edge_to_json(there)
+        back = edge_from_json(j_object)
+        self.assertEqual(there.label, back.label)
+        self.assertEqual(there.pre_vertex.label, back.pre_vertex.label)
+        self.assertEqual(there.post_vertex.label, back.post_vertex.label)
+        self.assertEqual(there.traffic_type, back.traffic_type)
+        self.assertEqual(there.traffic_weight, back.traffic_weight)
+
+    def graph_there_and_back(self, there):
+        j_object = graph_to_json(there)
+        print(j_object)
+        back = graph_from_json(j_object)
 
     def test_board_constraint(self):
         c1 = BoardConstraint("1.2.3.4")
@@ -150,3 +167,36 @@ class TestJsonUtils(unittest.TestCase):
         v1 = SimpleMachineVertex(None, "v1")
         c1 = SameChipAsConstraint(v1)
         self.constraint_there_and_back(c1)
+
+    def test_edge(self):
+        v1 = SimpleMachineVertex(None, "One")
+        v2 = SimpleMachineVertex(None, "Two")
+        e1 = MachineEdge(v1, v2)
+        self.edge_there_and_back(e1)
+
+    def test_new_empty_graph(self):
+        """
+        test that the creation of a empty machine graph works
+        """
+        m1 = MachineGraph("foo")
+        self.graph_there_and_back(m1)
+
+    def test_new_graph(self):
+        """
+        tests that after building a machine graph, all partitined vertices
+        and partitioned edges are in existence
+        """
+        vertices = list()
+        edges = list()
+        for i in range(10):
+            vertices.append(SimpleMachineVertex(None, "V{}".format(i)))
+        for i in range(5):
+            edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
+        for i in range(5, 10):
+            edges.append(MachineEdge(
+                vertices[5], vertices[(i + 1) % 10]))
+        graph = MachineGraph("foo")
+        graph.add_vertices(vertices)
+        graph.add_edges(edges, "bar")
+        self.graph_there_and_back(graph)
+

@@ -19,9 +19,8 @@ except ImportError:
 import json
 import gzip
 from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint,
-    FixedKeyAndMaskConstraint, FixedMaskConstraint,
-    ShareKeyConstraint)
+    ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
+    FixedMaskConstraint)
 from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
@@ -32,7 +31,8 @@ from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
     VariableSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.machine import (
+    MachineEdge, MachineGraph, SimpleMachineVertex)
 
 
 def json_to_object(json_object):
@@ -45,7 +45,7 @@ def json_to_object(json_object):
                 return json.load(j_file)
     return json_object
 
-# TODO ShareKeyConstraint
+
 def constraint_to_json(constraint):
     json_dict = OrderedDict()
     try:
@@ -81,6 +81,7 @@ def constraint_to_json(constraint):
             # Classes Not covered include
             # FixedKeyFieldConstraint
             # FlexiKeyFieldConstraint
+            # ShareKeyConstraint
             json_dict["str"] = str(constraint)
             json_dict["repr"] = repr(constraint)
     except Exception as ex:
@@ -180,6 +181,8 @@ def resource_container_to_json(container):
 
 
 def resource_container_from_json(json_dict):
+    if json_dict is None:
+        return None
     dtcm = DTCMResource(json_dict["dtcm"])
     sdram = VariableSDRAM(
         json_dict["fixed_sdram"], json_dict["per_timestep_sdram"])
@@ -205,14 +208,8 @@ def iptag_resource_to_json(iptag):
 
 
 def iptag_resource_from_json(json_dict):
-    if "port" in json_dict:
-        port = json_dict["port"]
-    else:
-        port = None
-    if "tag" in json_dict:
-        tag = json_dict["tag"]
-    else:
-        tag = None
+    port = json_dict.get("port")
+    tag = json_dict.get("tag")
     return IPtagResource(
         json_dict["ip_address"], port, json_dict["strip_sdp"], tag,
         json_dict["traffic_identifier"])
@@ -238,8 +235,9 @@ def vertex_to_json(vertex):
         json_dict["class"] = vertex.__class__.__name__
         json_dict["label"] = vertex.label
         json_dict["constraints"] = constraints_to_json(vertex.constraints)
-        json_dict["resources"] = resource_container_to_json(
-            vertex.resources_required)
+        if vertex.resources_required is not None:
+            json_dict["resources"] = resource_container_to_json(
+                vertex.resources_required)
     except Exception as ex:
             json_dict["exception"] = str(ex)
     return json_dict
@@ -247,10 +245,60 @@ def vertex_to_json(vertex):
 
 def vertex_from_json(json_dict):
     constraints = constraints_from_json(json_dict["constraints"])
-    resources = resource_container_from_json(
-        json_dict["resources"])
+    resources = resource_container_from_json(json_dict.get("resources"))
     return SimpleMachineVertex(
         resources, label=json_dict["label"], constraints=constraints)
+
+
+def edge_to_json(edge):
+    json_dict = OrderedDict()
+    try:
+        json_dict["pre_vertex"] = edge.pre_vertex.label
+        json_dict["post_vertex"] = edge.post_vertex.label
+        json_dict["traffic_type"] = edge.traffic_type
+        if edge.label is not None:
+            json_dict["label"] = edge.label
+        json_dict["traffic_weight"] = edge.traffic_weight
+    except Exception as ex:
+            json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def edge_from_json(json_dict, graph=None):
+    label = json_dict.get("label")
+    return MachineEdge(
+        vertex_lookup(json_dict["pre_vertex"], graph),
+        vertex_lookup(json_dict["post_vertex"], graph),
+        json_dict["traffic_type"], label, json_dict["traffic_weight"])
+
+
+def graph_to_json(graph):
+    json_dict = OrderedDict()
+    try:
+        if graph.label is not None:
+            json_dict["label"] = graph.label
+        json_list = []
+        for vertex in graph.vertices:
+            json_list.append(vertex_to_json(vertex))
+        json_dict["vertices"] = json_list
+        json_list = []
+        for edge in graph.edges:
+            json_list.append(edge_to_json(edge))
+        json_dict["edges"] = json_list
+
+    except Exception as ex:
+            json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def graph_from_json(json_dict):
+    graph = MachineGraph(json_dict.get("label"))
+    for j_vertex in json_dict["vertices"]:
+        graph.add_vertex(vertex_from_json(j_vertex))
+    for j_edge in json_dict["edges"]:
+        edge = edge_from_json(j_edge, graph)
+        graph.add_edge(edge, "JSON_MOCK")
+    return graph
 
 
 def bacon_to_json(bacon):
@@ -262,5 +310,7 @@ def bacon_to_json(bacon):
     return json_dict
 
 
-def vertex_lookup(label):
+def vertex_lookup(label, graph=None):
+    if graph:
+        return graph.vertex_by_label(label)
     return SimpleMachineVertex(None, label)

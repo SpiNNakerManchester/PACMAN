@@ -170,7 +170,8 @@ class Graph(ConstrainedObject, AbstractGraph):
     def vertex_by_label(self, label):
         for vertex in self._vertices:
             if vertex.label == label:
-                return label
+                return vertex
+
 
     @property
     @overrides(AbstractGraph.n_vertices)
