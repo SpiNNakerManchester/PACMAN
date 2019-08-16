@@ -24,9 +24,6 @@ class GraphMapper(object):
     """
 
     __slots__ = [
-        # dict of machine edge -> application edge
-        "_application_edge_by_machine_edge",
-
         # dict of application vertex -> set of machine vertices
         "_machine_vertices_by_application_vertex",
 
@@ -45,8 +42,6 @@ class GraphMapper(object):
     ]
 
     def __init__(self):
-        self._application_edge_by_machine_edge = dict()
-
         self._machine_vertices_by_application_vertex = \
             DefaultOrderedDict(OrderedSet)
         self._machine_edges_by_application_edge = \
@@ -90,7 +85,6 @@ class GraphMapper(object):
         """
         self._machine_edges_by_application_edge[application_edge].add(
             machine_edge)
-        self._application_edge_by_machine_edge[machine_edge] = application_edge
 
     def get_machine_vertices(self, application_vertex):
         """ Get all machine vertices mapped to a given application vertex
@@ -127,13 +121,16 @@ class GraphMapper(object):
         """
         return machine_vertex.app_vertex
 
+    @deprecated("just do machine_edge.app_edge")
     def get_application_edge(self, machine_edge):
         """ Get the application edge mapped to a machine edge
+
+        DEPRECATED
 
         :param machine_edge: An edge from a Machine Graph
         :return: A machine edge, or None if none
         """
-        return self._application_edge_by_machine_edge.get(machine_edge, None)
+        return machine_edge.app_edge
 
     def get_slice(self, machine_vertex):
         """ Get the slice mapped to a machine vertex

@@ -36,13 +36,16 @@ class MachineEdge(AbstractEdge):
         "_traffic_weight",
 
         # The label of the edge
-        "_label"
+        "_label",
+
+        # The originating application edge
+        "_app_edge"
     ]
 
     def __init__(
             self, pre_vertex, post_vertex,
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
-            traffic_weight=1):
+            traffic_weight=1, app_edge=None):
         """
         :param pre_vertex: the vertex at the start of the edge
         :type pre_vertex:\
@@ -59,12 +62,14 @@ class MachineEdge(AbstractEdge):
             the optional weight of traffic expected to travel down this edge\
             relative to other edges (default is 1)
         :type traffic_weight: int
+        :param app_edge: The application edge from which this was created
         """
         self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
         self._traffic_weight = traffic_weight
+        self._app_edge = app_edge
 
     @property
     @overrides(AbstractEdge.label)
@@ -85,6 +90,10 @@ class MachineEdge(AbstractEdge):
     @overrides(AbstractEdge.traffic_type)
     def traffic_type(self):
         return self._traffic_type
+
+    @property
+    def app_edge(self):
+        return self._app_edge
 
     @property
     def traffic_weight(self):

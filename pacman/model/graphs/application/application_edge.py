@@ -84,7 +84,8 @@ class ApplicationEdge(AbstractEdge):
             :py:class:`pacman.model.graphs.machine.MachineEdge`
         """
         return self._machine_edge_type(
-            pre_vertex, post_vertex, self._traffic_type, label=label)
+            pre_vertex, post_vertex, self._traffic_type, label=label,
+            app_edge=self)
 
     @property
     @overrides(AbstractEdge.pre_vertex)
