@@ -32,9 +32,9 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGAVertex):
 
     def __init__(
             self, fpga_id, fpga_link_id, board_address=None, label=None,
-            constraints=None):
+            constraints=None, app_vertex=None):
         super(MachineFPGAVertex, self).__init__(
-            label=label, constraints=constraints)
+            label=label, constraints=constraints, app_vertex=app_vertex)
 
         self._fpga_id = fpga_id
         self._fpga_link_id = fpga_link_id

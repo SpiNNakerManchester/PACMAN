@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from deprecated import deprecated
 from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanValueError
@@ -23,10 +24,6 @@ class GraphMapper(object):
     """
 
     __slots__ = [
-
-        # dict of machine vertex -> application vertex
-        "_application_vertex_by_machine_vertex",
-
         # dict of machine edge -> application edge
         "_application_edge_by_machine_edge",
 
@@ -48,7 +45,6 @@ class GraphMapper(object):
     ]
 
     def __init__(self):
-        self._application_vertex_by_machine_vertex = dict()
         self._application_edge_by_machine_edge = dict()
 
         self._machine_vertices_by_application_vertex = \
@@ -78,8 +74,6 @@ class GraphMapper(object):
                 "hi_atom {:d} >= maximum {:d}".format(
                     vertex_slice.hi_atom, application_vertex.n_atoms))
 
-        self._application_vertex_by_machine_vertex[machine_vertex] = \
-            application_vertex
         machine_vertices = self._machine_vertices_by_application_vertex[
             application_vertex]
         self._index_by_machine_vertex[machine_vertex] = len(machine_vertices)
@@ -122,14 +116,16 @@ class GraphMapper(object):
         return self._machine_edges_by_application_edge.get(
             application_edge, None)
 
+    @deprecated("just do machine_vertex.app_vertex")
     def get_application_vertex(self, machine_vertex):
         """ Get the application vertex mapped to a machine vertex
+
+        DEPRECATED
 
         :param machine_vertex: A vertex from a Machine Graph
         :return: an application vertex, or None if none
         """
-        return self._application_vertex_by_machine_vertex.get(
-            machine_vertex, None)
+        return machine_vertex.app_vertex
 
     def get_application_edge(self, machine_edge):
         """ Get the application edge mapped to a machine edge

@@ -47,8 +47,8 @@ class Vertex(ApplicationVertex):
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         return 200 * (hi_atom - lo_atom)
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        return 4000 + 50 * (vertex_slice.hi_atom - vertex_slice.lo_atom)
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, graph):
+        return 4000 + 50 * (hi_atom - lo_atom)
 
 
 class MachineVertex(SimpleMachineVertex):

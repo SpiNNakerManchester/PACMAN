@@ -484,7 +484,7 @@ def _write_one_chip_application_placement(f, chip, placements, graph_mapper):
             pro_id = processor.processor_id
             vertex = placements.get_vertex_on_processor(
                 chip.x, chip.y, processor.processor_id)
-            app_vertex = graph_mapper.get_application_vertex(vertex)
+            app_vertex = vertex.app_vertex
             vertex_label = app_vertex.label
             vertex_model = app_vertex.__class__.__name__
             vertex_atoms = app_vertex.n_atoms

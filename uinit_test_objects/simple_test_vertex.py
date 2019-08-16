@@ -84,7 +84,8 @@ class SimpleTestVertex(ApplicationVertex):
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        return SimpleMachineVertex(resources_required, label, constraints)
+        return SimpleMachineVertex(
+            resources_required, label, constraints, self)
 
     @property
     @overrides(ApplicationVertex.n_atoms)

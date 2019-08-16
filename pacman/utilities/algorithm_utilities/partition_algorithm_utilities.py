@@ -48,7 +48,7 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     for source_vertex in progress.over(machine_graph.vertices):
 
         # For each out edge of the parent vertex...
-        vertex = graph_mapper.get_application_vertex(source_vertex)
+        vertex = source_vertex.app_vertex
         application_outgoing_partitions = application_graph.\
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
         for application_partition in application_outgoing_partitions:

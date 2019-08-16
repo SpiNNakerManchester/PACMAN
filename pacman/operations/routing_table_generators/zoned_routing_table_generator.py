@@ -49,7 +49,7 @@ class ZonedRoutingTableGenerator(object):
 
     def __call__(
             self, routing_infos, routing_table_by_partitions, machine,
-            graph_mapper, info_by_app_vertex):
+            info_by_app_vertex):
         """
         :param routing_infos:
         :param routing_table_by_partitions:
@@ -62,18 +62,18 @@ class ZonedRoutingTableGenerator(object):
                 get_entries_for_router(chip.x, chip.y)
             if partitions_in_table:
                 routing_tables.add_routing_table(self._create_routing_table(
-                    chip, partitions_in_table, routing_infos, graph_mapper,
+                    chip, partitions_in_table, routing_infos,
                     info_by_app_vertex))
 
         return routing_tables
 
     def _create_routing_table(self, chip, partitions_in_table, routing_infos,
-                              graph_mapper, info_by_app_vertex):
+                              info_by_app_vertex):
         table = MulticastRoutingTable(chip.x, chip.y)
         partitions_by_app_vertex = DefaultOrderedDict(set)
         for partition in partitions_in_table:
             machine_vertex = partition.pre_vertex
-            app_vertex = graph_mapper.get_application_vertex(machine_vertex)
+            app_vertex = machine_vertex.app_vertex
             partitions_by_app_vertex[app_vertex].add(partition)
         for app_vertex in partitions_by_app_vertex:
             if app_vertex in info_by_app_vertex:

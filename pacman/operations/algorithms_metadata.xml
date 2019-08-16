@@ -540,10 +540,6 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
                 <param_name>info_by_app_vertex</param_name>
                 <param_type>ApplicationRoutingInfos</param_type>
             </parameter>
@@ -552,7 +548,6 @@
             <param_name>routing_infos</param_name>
             <param_name>routing_table_by_partitions</param_name>
             <param_name>machine</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>info_by_app_vertex</param_name>
         </required_inputs>
         <outputs>

@@ -18,6 +18,8 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 @add_metaclass(AbstractBase)
@@ -25,15 +27,17 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
     """ A machine graph vertex.
     """
 
-    __slots__ = ["_label"]
+    __slots__ = ["_app_vertex", "_label"]
 
-    def __init__(self, label=None, constraints=None):
+    def __init__(self, label=None, constraints=None, app_vertex=None):
         """
         :param label: The optional name of the vertex
         :type label: str
         :param constraints: The optional initial constraints of the vertex
         :type constraints: \
             iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
+        :param app_vertex: The application vertex that caused this machine\
+            vertex to be created. If None, there is no such application vertex.
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
@@ -42,11 +46,21 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
             self._label = label
         else:
             self._label = str(type(self))
+        self._app_vertex = app_vertex
+        if app_vertex is not None and not isinstance(
+                app_vertex, ApplicationVertex):
+            raise PacmanInvalidParameterException(
+                "app_vertex", app_vertex,
+                "must be an application vertex")
 
     @property
     @overrides(AbstractVertex.label)
     def label(self):
         return self._label
+
+    @property
+    def app_vertex(self):
+        return self._app_vertex
 
     def __str__(self):
         _l = self.label

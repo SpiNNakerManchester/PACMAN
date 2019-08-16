@@ -21,9 +21,10 @@ class SimpleMachineVertex(MachineVertex):
     """ A MachineVertex that stores its own resources.
     """
 
-    def __init__(self, resources, label=None, constraints=None):
+    def __init__(self, resources, label=None, constraints=None,
+                 app_vertex=None):
         super(SimpleMachineVertex, self).__init__(
-            label=label, constraints=constraints)
+            label=label, constraints=constraints, app_vertex=app_vertex)
         self._resources = resources
 
     @property
