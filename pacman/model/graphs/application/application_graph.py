@@ -15,11 +15,10 @@
 
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
-from pacman.model.graphs import AbstractOutgoingEdgePartition
-from pacman.model.graphs.impl import Graph
+from pacman.model.graphs import AbstractGraph
 
 
-class ApplicationGraph(Graph):
+class ApplicationGraph(AbstractGraph):
     """ An application-level abstraction of a graph.
     """
 
@@ -27,5 +26,4 @@ class ApplicationGraph(Graph):
 
     def __init__(self, label):
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, AbstractOutgoingEdgePartition,
-            label)
+            ApplicationVertex, ApplicationEdge, label)

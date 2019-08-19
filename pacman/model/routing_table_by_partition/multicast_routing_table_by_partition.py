@@ -42,7 +42,7 @@ class MulticastRoutingTableByPartition(object):
         :param router_y: the y coord of the router
         :param partition: the partition containing the machine edge
         :type partition: \
-            :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
         """
 
         # update router_to_entries_map

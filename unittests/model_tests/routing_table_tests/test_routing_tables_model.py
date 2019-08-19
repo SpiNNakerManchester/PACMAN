@@ -15,7 +15,7 @@
 
 import unittest
 from spinn_machine import MulticastRoutingEntry
-from pacman.model.graphs.impl import OutgoingEdgePartition
+from pacman.model.graphs import OutgoingEdgePartition
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.routing_tables.multicast_routing_tables import (

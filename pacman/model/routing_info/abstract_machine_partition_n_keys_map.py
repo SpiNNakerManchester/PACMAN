@@ -30,7 +30,7 @@ class AbstractMachinePartitionNKeysMap(object):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-            :py:class:`pacman.model.graphs.impl.OutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
         :return: The number of keys required by the partition
         :rtype: int
         """

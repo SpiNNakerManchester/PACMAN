@@ -37,7 +37,7 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
 
         :param partition: The partition to set the number of keys for
         :type partition:\
-            :py:class:`pacman.model.graphs.impl.OutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
         :param n_keys: The number of keys required by the edge
         :type n_keys: int
         """
