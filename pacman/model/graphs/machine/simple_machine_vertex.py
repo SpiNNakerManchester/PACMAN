@@ -22,9 +22,10 @@ class SimpleMachineVertex(MachineVertex):
     """
 
     def __init__(self, resources, label=None, constraints=None,
-                 app_vertex=None):
+                 app_vertex=None, vertex_slice=None):
         super(SimpleMachineVertex, self).__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex)
+            label=label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
         self._resources = resources
 
     @property

@@ -291,12 +291,11 @@ def _write_one_vertex_partition(f, vertex, graph_mapper):
     machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
                               key=lambda x: x.label)
     machine_vertices = sorted(machine_vertices,
-                              key=lambda x: graph_mapper.get_slice(x).lo_atom)
+                              key=lambda x: x.vertex_slice.lo_atom)
     for sv in machine_vertices:
-        lo_atom = graph_mapper.get_slice(sv).lo_atom
-        hi_atom = graph_mapper.get_slice(sv).hi_atom
         f.write("  Slice {}:{} ({} atoms) \n".format(
-            lo_atom, hi_atom, hi_atom - lo_atom + 1))
+            sv.vertex_slice.lo_atom, sv.vertex_slice.hi_atom,
+            sv.vertex_slice.n_atoms))
     f.write("\n")
 
 
@@ -353,12 +352,11 @@ def _write_one_vertex_application_placement(
     machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
                               key=lambda vert: vert.label)
     machine_vertices = sorted(machine_vertices,
-                              key=lambda vert:
-                              graph_mapper.get_slice(vert).lo_atom)
+                              key=lambda vert: vert.vertex_slice.lo_atom)
     for sv in machine_vertices:
-        lo_atom = graph_mapper.get_slice(sv).lo_atom
-        hi_atom = graph_mapper.get_slice(sv).hi_atom
-        num_atoms = hi_atom - lo_atom + 1
+        lo_atom = sv.vertex_slice.lo_atom
+        hi_atom = sv.vertex_slice.hi_atom
+        num_atoms = sv.vertex_slice.n_atoms
         cur_placement = placements.get_placement_of_vertex(sv)
         x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
         key = "{},{}".format(x, y)
@@ -464,14 +462,13 @@ def placement_report_with_application_graph_by_core(
                 time_date_string, hostname))
 
             for chip in progress.over(machine.chips):
-                _write_one_chip_application_placement(
-                    f, chip, placements, graph_mapper)
+                _write_one_chip_application_placement(f, chip, placements)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for "
                          "writing.", file_name)
 
 
-def _write_one_chip_application_placement(f, chip, placements, graph_mapper):
+def _write_one_chip_application_placement(f, chip, placements):
     written_header = False
     for processor in chip.processors:
         if placements.is_processor_occupied(
@@ -488,9 +485,9 @@ def _write_one_chip_application_placement(f, chip, placements, graph_mapper):
             vertex_label = app_vertex.label
             vertex_model = app_vertex.__class__.__name__
             vertex_atoms = app_vertex.n_atoms
-            lo_atom = graph_mapper.get_slice(vertex).lo_atom
-            hi_atom = graph_mapper.get_slice(vertex).hi_atom
-            num_atoms = hi_atom - lo_atom + 1
+            lo_atom = vertex.vertex_slice.lo_atom
+            hi_atom = vertex.vertex_slice.hi_atom
+            num_atoms = vertex.vertex_slice.n_atoms
             f.write("  Processor {}: Vertex: '{}', pop size: {}\n".format(
                 pro_id, vertex_label, vertex_atoms))
             f.write("              Slice on this core: {}:{} ({} atoms)\n"

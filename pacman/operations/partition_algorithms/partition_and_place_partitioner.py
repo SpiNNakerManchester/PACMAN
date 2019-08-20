@@ -236,8 +236,7 @@ class PartitionAndPlacePartitioner(object):
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
-                graph_mapper.add_vertex_mapping(
-                    machine_vertex, vertex_slice, vertex)
+                graph_mapper.add_vertex_mapping(machine_vertex, vertex)
 
                 progress.update(vertex_slice.n_atoms)
 

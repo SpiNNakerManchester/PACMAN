@@ -62,8 +62,8 @@ class TestGraphMapper(unittest.TestCase):
         vertices = list()
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
-        vertex1 = SimpleMachineVertex(None, "")
-        vertex2 = SimpleMachineVertex(None, "")
+        vertex1 = SimpleMachineVertex(None, "", vertex_slice=Slice(0, 1))
+        vertex2 = SimpleMachineVertex(None, "", vertex_slice=Slice(2, 3))
 
         edges = list()
         edges.append(MachineEdge(vertices[0], vertices[1]))
@@ -72,10 +72,8 @@ class TestGraphMapper(unittest.TestCase):
         graph_mapper = GraphMapper()
         vert = SimpleTestVertex(4, "Some testing vertex")
 
-        vertex_slice = Slice(0, 1)
-        graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
-        vertex_slice = Slice(2, 3)
-        graph_mapper.add_vertex_mapping(vertex2, vertex_slice, vert)
+        graph_mapper.add_vertex_mapping(vertex1, vert)
+        graph_mapper.add_vertex_mapping(vertex2, vert)
 
         returned_vertices = graph_mapper.get_machine_vertices(vert)
 
@@ -92,16 +90,14 @@ class TestGraphMapper(unittest.TestCase):
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
 
-        vertex1 = SimpleMachineVertex(None, "")
-        vertex2 = SimpleMachineVertex(None, "")
+        vertex1 = SimpleMachineVertex(None, "", vertex_slice=Slice(0, 1))
+        vertex2 = SimpleMachineVertex(None, "", vertex_slice=Slice(2, 3))
 
         graph_mapper = GraphMapper()
         vert = SimpleTestVertex(10, "Some testing vertex")
 
-        vertex_slice = Slice(0, 1)
-        graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
-        vertex_slice = Slice(2, 3)
-        graph_mapper.add_vertex_mapping(vertex2, vertex_slice, vert)
+        graph_mapper.add_vertex_mapping(vertex1, vert)
+        graph_mapper.add_vertex_mapping(vertex2, vert)
 
         self.assertEqual(
             vert, graph_mapper.get_application_vertex(vertex1))

@@ -96,7 +96,7 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGAVertex):
             constraints=None):
         vertex = MachineFPGAVertex(
             self._fpga_id, self._fpga_link_id, self._board_address,
-            label, constraints)
+            label, constraints, self, vertex_slice)
         vertex.set_virtual_chip_coordinates(
             self._virtual_chip_x, self._virtual_chip_y)
         return vertex

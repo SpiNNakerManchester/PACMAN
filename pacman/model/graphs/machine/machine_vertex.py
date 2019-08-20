@@ -17,7 +17,7 @@ from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import ConstrainedObject
+from pacman.model.graphs.common import ConstrainedObject, Slice
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
 
@@ -27,9 +27,11 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
     """ A machine graph vertex.
     """
 
-    __slots__ = ["_app_vertex", "_label"]
+    __slots__ = ["_app_vertex", "_index", "_label", "_vertex_slice"]
+    _DEFAULT_SLICE = Slice(0, 0)
 
-    def __init__(self, label=None, constraints=None, app_vertex=None):
+    def __init__(self, label=None, constraints=None, app_vertex=None,
+                 vertex_slice=None):
         """
         :param label: The optional name of the vertex
         :type label: str
@@ -38,6 +40,8 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
             iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
         :param app_vertex: The application vertex that caused this machine\
             vertex to be created. If None, there is no such application vertex.
+        :param vertex_slice: The slice of the application vertex that this\
+            machine vertex implements.
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
@@ -47,11 +51,16 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         else:
             self._label = str(type(self))
         self._app_vertex = app_vertex
+        self._index = None
         if app_vertex is not None and not isinstance(
                 app_vertex, ApplicationVertex):
             raise PacmanInvalidParameterException(
                 "app_vertex", app_vertex,
                 "must be an application vertex")
+        if vertex_slice is not None:
+            self._vertex_slice = vertex_slice
+        else:
+            self._vertex_slice = self._DEFAULT_SLICE
 
     @property
     @overrides(AbstractVertex.label)
@@ -60,7 +69,34 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
 
     @property
     def app_vertex(self):
+        """ The application vertex that caused this machine vertex to be\
+            created. If None, there is no such application vertex.
+        """
         return self._app_vertex
+
+    @property
+    def vertex_slice(self):
+        """ The slice of the application vertex that this machine vertex\
+            implements.
+        """
+        return self._vertex_slice
+
+    @property
+    def index(self):
+        """ The index into the collection of machine vertices for an\
+            application vertex.
+        """
+        return self._index if self._index is not None else 0
+
+    @index.setter
+    def index(self, value):
+        """ The index into the collection of machine vertices for an\
+            application vertex.
+        """
+        if self._index is not None:
+            # TODO: Should we error or warn about this?
+            pass
+        self._index = value
 
     def __str__(self):
         _l = self.label

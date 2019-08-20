@@ -34,6 +34,7 @@ class TestBasicPartitioner(unittest.TestCase):
     """
     test for basic partitioning algorithm
     """
+    # pylint: disable=attribute-defined-outside-init
 
     TheTestAddress = "192.162.240.253"
 
@@ -92,7 +93,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test a partitioning with a graph with no extra constraints
         """
         self.setup()
-        graph, mapper, _ = self.bp(
+        graph, _1, _2 = self.bp(
             self.graph, self.machine, plan_n_timesteps=None)
         self.assertEqual(len(list(graph.vertices)), 3)
         vert_sizes = []
@@ -100,7 +101,7 @@ class TestBasicPartitioner(unittest.TestCase):
             vert_sizes.append(vert.n_atoms)
         self.assertEqual(len(list(graph.edges)), 3)
         for vertex in graph.vertices:
-            self.assertIn(mapper.get_slice(vertex).n_atoms, vert_sizes)
+            self.assertIn(vertex.vertex_slice.n_atoms, vert_sizes)
 
     def test_partition_with_no_additional_constraints_extra_edge(self):
         """
@@ -157,7 +158,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         flops = 20000000
-        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -202,7 +202,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         flops = 1000
-        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -246,7 +245,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         flops = 20000000
-        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -284,7 +282,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         flops = 20000000
-        (e, _, n, w, _, s) = range(6)
 
         processors = list()
         for i in range(18):
@@ -395,7 +392,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = BasicPartitioner()
         machine_graph, _, _ = partitioner(
             app_graph, machine, plan_n_timesteps=None)
-        self.assert_(len(machine_graph.vertices) == 4)
+        self.assertEqual(len(machine_graph.vertices), 4)
 
 
 if __name__ == '__main__':

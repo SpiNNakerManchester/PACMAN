@@ -90,15 +90,15 @@ class TestBasicPartitioner(unittest.TestCase):
         """test a partitioning with a graph with no extra constraints
         """
         self.setup()
-        graph, mapper, _ = self.bp(self.graph, self.machine,
-                                   PreAllocatedResourceContainer())
+        graph, _1, _2 = self.bp(self.graph, self.machine,
+                                PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 3)
         vert_sizes = []
         for vert in self.verts:
             vert_sizes.append(vert.n_atoms)
         self.assertEqual(len(list(graph.edges)), 3)
         for vertex in graph.vertices:
-            self.assertIn(mapper.get_slice(vertex).n_atoms, vert_sizes)
+            self.assertIn(vertex.vertex_slice.n_atoms, vert_sizes)
 
     def test_partition_with_no_additional_constraints_extra_edge(self):
         """test that the basic form with an extra edge works

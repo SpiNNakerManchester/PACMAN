@@ -72,7 +72,7 @@ def validate_routes(machine_graph, placements, routing_infos,
             get_outgoing_edge_partitions_starting_at_vertex(placement.vertex)
 
         if graph_mapper is not None:
-            n_atoms = graph_mapper.get_slice(placement.vertex).n_atoms
+            n_atoms = placement.vertex.vertex_slice.n_atoms
         else:
             n_atoms = 0
 
@@ -97,7 +97,7 @@ def validate_routes(machine_graph, placements, routing_infos,
             for outgoing_edge in out_going_edges:
                 dest_placement = placements.get_placement_of_vertex(
                     outgoing_edge.post_vertex)
-                destination_placements.append(
+                destination_placements.add(
                     PlacementTuple(x=dest_placement.x,
                                    y=dest_placement.y,
                                    p=dest_placement.p))
