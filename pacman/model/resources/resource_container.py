@@ -61,13 +61,13 @@ class ResourceContainer(object):
         :type dtcm: None or \
             :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
         :type sdram: None or \
-            :py:class:`pacman.models.resources.sdram_resource.SDRAMResource`
+            :py:class:`pacman.models.resources.AbstractSDRAM`
         :type cpu_cycles: None or \
-            :py:class:`pacman.models.resources.cpu_cycles_per_tick_resource.CPUCyclesPerTickResource`
+            :py:class:`pacman.models.resources.CPUCyclesPerTickResource`
         :type iptags: None or \
             list(:py:class:`pacman.models.resources.iptag_resource.IPtagResource`)
         :type reverse_iptags: None or \
-            list(:py:class:`pacman.models.resources.reverse_iptag_resource.ReverseIPtagResource`)
+            list(:py:class:`pacman.models.resources.SpecificBoardReverseIPtagResource`)
         :rtype: pacman.models.resources.resource_container.ResourceContainer
         :raise None: does not raise any known exception
         """
@@ -110,12 +110,7 @@ class ResourceContainer(object):
     def reverse_iptags(self):
         return self._reverse_iptags
 
-    @property
-    def sdram_tags(self):
-        return self._sdram_tags
-
     def extend(self, other):
-
         # added CPU stuff
         self._cpu_cycles = CPUCyclesPerTickResource(
             self._cpu_cycles.get_value() + other.cpu_cycles.get_value())

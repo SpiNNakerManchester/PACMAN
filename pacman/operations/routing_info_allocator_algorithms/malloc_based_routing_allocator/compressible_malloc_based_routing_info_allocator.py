@@ -83,8 +83,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
         # Even non-continuous keys will be continuous
-        for group in noncontinuous:
-            continuous.add(group)
+        continuous.extend(noncontinuous)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(

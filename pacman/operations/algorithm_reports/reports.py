@@ -87,7 +87,7 @@ def placer_reports_with_application_graph(
     placement_report_with_application_graph_by_vertex(
         report_folder, hostname, graph, graph_mapper, placements)
     placement_report_with_application_graph_by_core(
-        report_folder, hostname, placements, machine, graph_mapper)
+        report_folder, hostname, placements, machine)
 
 
 def placer_reports_without_application_graph(
@@ -435,13 +435,11 @@ def _write_one_vertex_machine_placement(
 
 
 def placement_report_with_application_graph_by_core(
-        report_folder, hostname, placements, machine, graph_mapper):
+        report_folder, hostname, placements, machine):
     """ Generate report on the placement of vertices onto cores by core.
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
-    :param graph_mapper: \
-        the mapping between application and machine graphs
     :param machine: the SpiNNaker machine object
     :param placements: the placements objects built by the placer.
     """

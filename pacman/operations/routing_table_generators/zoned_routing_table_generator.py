@@ -72,9 +72,8 @@ class ZonedRoutingTableGenerator(object):
         table = MulticastRoutingTable(chip.x, chip.y)
         partitions_by_app_vertex = DefaultOrderedDict(set)
         for partition in partitions_in_table:
-            machine_vertex = partition.pre_vertex
-            app_vertex = machine_vertex.app_vertex
-            partitions_by_app_vertex[app_vertex].add(partition)
+            partitions_by_app_vertex[partition.pre_vertex.app_vertex].add(
+                partition)
         for app_vertex in partitions_by_app_vertex:
             if app_vertex in info_by_app_vertex:
                 shared_entry = self._find_shared_entry(
