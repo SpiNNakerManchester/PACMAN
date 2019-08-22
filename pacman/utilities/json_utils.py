@@ -36,6 +36,12 @@ from pacman.model.graphs.machine import (
 
 
 def json_to_object(json_object):
+    """
+    Makes sure this is a json object reading in a file if reguired
+
+    :param json_object: Either a json Objet or a string pointing to a file
+    :return: a jsnon object
+    """
     if isinstance(json_object, str):
         if json_object.endswith(".gz"):
             with gzip.open(json_object) as j_file:
@@ -47,6 +53,19 @@ def json_to_object(json_object):
 
 
 def constraint_to_json(constraint):
+    """
+    Converts a constraint to json.
+
+    Note: Vertexes are represented by just thier label
+
+    Note: If an unexpected constraint is received the str() and repr() values
+    are saved
+
+    If an Exception occurs that is caught and added to the json object
+
+    :param constraint:
+    :return: A dict describing the constraint
+    """
     json_dict = OrderedDict()
     try:
         json_dict["class"] = constraint.__class__.__name__
@@ -74,7 +93,7 @@ def constraint_to_json(constraint):
         elif isinstance(constraint, FixedMaskConstraint):
             json_dict["mask"] = constraint.mask
         elif isinstance(constraint, "ContiguousKeyRangeContraint"):
-             # No extra parameters
+            # No extra parameters
             pass
         else:
             # Oops an unexpected class
@@ -253,10 +272,12 @@ def vertex_from_json(json_dict, convert_constraints=True):
     return SimpleMachineVertex(
         resources, label=json_dict["label"], constraints=constraints)
 
+
 def vertex_add_contstraints_from_json(json_dict, graph):
     vertex = vertex_lookup(json_dict["label"], graph)
     constraints = constraints_from_json(json_dict["constraints"], graph)
     vertex.add_constraints(constraints)
+
 
 def edge_to_json(edge):
     json_dict = OrderedDict()
@@ -302,7 +323,7 @@ def graph_to_json(graph):
 def graph_from_json(json_dict):
     graph = MachineGraph(json_dict.get("label"))
     for j_vertex in json_dict["vertices"]:
-        graph.add_vertex(vertex_from_json(j_vertex,convert_constraints=False))
+        graph.add_vertex(vertex_from_json(j_vertex, convert_constraints=False))
     # Only do constraints when we have all the vertexes to link to
     for j_vertex in json_dict["vertices"]:
         vertex_add_contstraints_from_json(j_vertex, graph)
@@ -310,15 +331,6 @@ def graph_from_json(json_dict):
         edge = edge_from_json(j_edge, graph)
         graph.add_edge(edge, "JSON_MOCK")
     return graph
-
-
-def bacon_to_json(bacon):
-    json_dict = OrderedDict()
-    try:
-        alan_likes_eggs_too = 1/0
-    except Exception as ex:
-            json_dict["exception"] = str(ex)
-    return json_dict
 
 
 def vertex_lookup(label, graph=None):

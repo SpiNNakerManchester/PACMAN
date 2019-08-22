@@ -17,7 +17,7 @@ import unittest
 import json
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
-    FixedMaskConstraint, ShareKeyConstraint)
+    FixedMaskConstraint)
 from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
@@ -26,7 +26,7 @@ from pacman.model.constraints.partitioner_constraints import (
     FixedVertexAtomsConstraint)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
-    ResourceContainer, VariableSDRAM)
+    ResourceContainer)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.json_utils import (
     constraint_to_json, constraint_from_json,
@@ -55,7 +55,7 @@ class TestJsonUtils(unittest.TestCase):
         self.assertEqual(v1.resources_required, v2.resources_required)
         self.assertEquals(len(v1.constraints), len(v2.constraints))
         seen.append(v1.label)
-        for c1, c2 in zip(v1.constraints, v2.constraints) :
+        for c1, c2 in zip(v1.constraints, v2.constraints):
             self.compare_constraint(c1, c2, seen)
 
     def constraint_there_and_back(self, there):
@@ -162,7 +162,6 @@ class TestJsonUtils(unittest.TestCase):
         cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
         r1 = ResourceContainer(dtcm, sdram1, cpu)
         self.resource_there_and_back(r1)
-        sdram2 = VariableSDRAM(10, 20)
         t1 = IPtagResource("1", 2, True)  # Minimal args
         t2 = IPtagResource("1.2.3.4", 2, False, 4, 5)
         r2 = r1 = ResourceContainer(dtcm, sdram1, cpu, iptags=[t1, t2])
@@ -220,4 +219,3 @@ class TestJsonUtils(unittest.TestCase):
         graph.add_vertices(vertices)
         graph.add_edges(edges, "bar")
         self.graph_there_and_back(graph)
-
