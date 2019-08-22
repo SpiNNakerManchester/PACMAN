@@ -89,7 +89,7 @@ def constraint_to_json(constraint):
     return json_dict
 
 
-def constraint_from_json(json_dict):
+def constraint_from_json(json_dict, graph=None):
     if json_dict["class"] == "BoardConstraint":
         return BoardConstraint(json_dict["board_address"])
     if json_dict["class"] == "ChipAndCoreConstraint":
@@ -116,10 +116,10 @@ def constraint_from_json(json_dict):
         return RadialPlacementFromChipConstraint(
             json_dict["x"], json_dict["y"])
     if json_dict["class"] == "SameChipAsConstraint":
-        return SameChipAsConstraint(vertex_lookup(json_dict["vertex"]))
+        return SameChipAsConstraint(vertex_lookup(json_dict["vertex"], graph))
     if json_dict["class"] == "SameAtomsAsVertexConstraint":
         return SameAtomsAsVertexConstraint(
-            vertex_lookup(json_dict["vertex"]))
+            vertex_lookup(json_dict["vertex"], graph))
     raise NotImplementedError("contraint {}".format(json_dict["class"]))
 
 
@@ -130,10 +130,10 @@ def constraints_to_json(constraints):
     return json_list
 
 
-def constraints_from_json(json_list):
+def constraints_from_json(json_list, graph):
     constraints = []
     for sub in json_list:
-        constraints.append(constraint_from_json(sub))
+        constraints.append(constraint_from_json(sub, graph))
     return constraints
 
 
@@ -243,12 +243,20 @@ def vertex_to_json(vertex):
     return json_dict
 
 
-def vertex_from_json(json_dict):
-    constraints = constraints_from_json(json_dict["constraints"])
+def vertex_from_json(json_dict, convert_constraints=True):
+    if convert_constraints:
+        constraints = constraints_from_json(
+            json_dict["constraints"], graph=None)
+    else:
+        constraints = []
     resources = resource_container_from_json(json_dict.get("resources"))
     return SimpleMachineVertex(
         resources, label=json_dict["label"], constraints=constraints)
 
+def vertex_add_contstraints_from_json(json_dict, graph):
+    vertex = vertex_lookup(json_dict["label"], graph)
+    constraints = constraints_from_json(json_dict["constraints"], graph)
+    vertex.add_constraints(constraints)
 
 def edge_to_json(edge):
     json_dict = OrderedDict()
@@ -294,7 +302,10 @@ def graph_to_json(graph):
 def graph_from_json(json_dict):
     graph = MachineGraph(json_dict.get("label"))
     for j_vertex in json_dict["vertices"]:
-        graph.add_vertex(vertex_from_json(j_vertex))
+        graph.add_vertex(vertex_from_json(j_vertex,convert_constraints=False))
+    # Only do constraints when we have all the vertexes to link to
+    for j_vertex in json_dict["vertices"]:
+        vertex_add_contstraints_from_json(j_vertex, graph)
     for j_edge in json_dict["edges"]:
         edge = edge_from_json(j_edge, graph)
         graph.add_edge(edge, "JSON_MOCK")

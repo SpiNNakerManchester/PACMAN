@@ -39,18 +39,28 @@ from pacman.model.graphs.machine import (
 
 class TestJsonUtils(unittest.TestCase):
 
-    def compare_constraint(self, c1, c2):
+    def compare_constraint(self, c1, c2, seen):
         if c1 == c2:
             return
         if c1.__class__ != c2.__class__:
             raise AssertionError("{} != {}".format(
                 c1.__class__, c2.__class__))
-        self.assertEqual(c1.vertex.label, c2.vertex.label)
+        self.compare_vertex(c1.vertex, c2.vertex, seen)
+
+    def compare_vertex(self, v1, v2, seen):
+        self.assertEqual(v1.label, v2.label)
+        if v1.label in seen:
+            return
+        self.assertEqual(v1.resources_required, v2.resources_required)
+        self.assertEquals(len(v1.constraints), len(v2.constraints))
+        seen.append(v1.label)
+        for c1, c2 in zip(v1.constraints, v2.constraints) :
+            self.compare_constraint(c1, c2, seen)
 
     def constraint_there_and_back(self, there):
         j_object = constraint_to_json(there)
         back = constraint_from_json(j_object)
-        self.compare_constraint(there, back)
+        self.compare_constraint(there, back, [])
 
     def resource_there_and_back(self, there):
         j_object = resource_container_to_json(there)
@@ -60,18 +70,14 @@ class TestJsonUtils(unittest.TestCase):
     def vertext_there_and_back(self, there):
         j_object = vertex_to_json(there)
         back = vertex_from_json(j_object)
-        self.assertEqual(there.label, back.label)
-        self.assertEqual(there.resources_required, back.resources_required)
-        self.assertCountEqual(there.constraints, back.constraints)
-        for c1, c2 in zip(there.constraints, back.constraints) :
-            self.compare_constraint(c1, c2)
+        self.compare_vertex(there, back, [])
 
     def edge_there_and_back(self, there):
         j_object = edge_to_json(there)
         back = edge_from_json(j_object)
         self.assertEqual(there.label, back.label)
-        self.assertEqual(there.pre_vertex.label, back.pre_vertex.label)
-        self.assertEqual(there.post_vertex.label, back.post_vertex.label)
+        self.compare_vertex(there.pre_vertex, back.pre_vertex, [])
+        self.compare_vertex(there.post_vertex, back.post_vertex, [])
         self.assertEqual(there.traffic_type, back.traffic_type)
         self.assertEqual(there.traffic_weight, back.traffic_weight)
 
@@ -79,6 +85,10 @@ class TestJsonUtils(unittest.TestCase):
         j_object = graph_to_json(there)
         print(j_object)
         back = graph_from_json(j_object)
+        self.assertEqual(there.n_vertices, back.n_vertices)
+        for vertex in there.vertices:
+            b_vertex = back. vertex_by_label(vertex.label)
+            self.compare_vertex(vertex, b_vertex, [])
 
     def test_board_constraint(self):
         c1 = BoardConstraint("1.2.3.4")
@@ -190,6 +200,7 @@ class TestJsonUtils(unittest.TestCase):
         edges = list()
         for i in range(10):
             vertices.append(SimpleMachineVertex(None, "V{}".format(i)))
+        vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
         for i in range(5):
             edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
         for i in range(5, 10):
