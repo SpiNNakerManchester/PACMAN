@@ -74,6 +74,4 @@ class AbstractVertex(ConstrainedObject):
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once
         """
-        if self._added_to_graph:
-            raise PacmanConfigurationException("Already added to a graph")
         self._added_to_graph = True
