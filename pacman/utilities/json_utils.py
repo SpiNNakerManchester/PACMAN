@@ -170,8 +170,8 @@ def resource_container_to_json(container):
     try:
         json_dict["dtcm"] = container.dtcm.get_value()
         json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
-        json_dict["fixed_sdram"] = container.sdram.fixed
-        json_dict["per_timestep_sdram"] = container.sdram.per_timestep
+        json_dict["fixed_sdram"] = int(container.sdram.fixed)
+        json_dict["per_timestep_sdram"] = int(container.sdram.per_timestep)
         json_dict["iptag"] = iptag_resources_to_json(container.iptags)
         json_dict["reverse_iptags"] = iptag_resources_to_json(
             container.reverse_iptags)
@@ -263,7 +263,7 @@ def edge_to_json(edge):
     try:
         json_dict["pre_vertex"] = edge.pre_vertex.label
         json_dict["post_vertex"] = edge.post_vertex.label
-        json_dict["traffic_type"] = edge.traffic_type
+        json_dict["traffic_type"] = int(edge.traffic_type)
         if edge.label is not None:
             json_dict["label"] = edge.label
         json_dict["traffic_weight"] = edge.traffic_weight

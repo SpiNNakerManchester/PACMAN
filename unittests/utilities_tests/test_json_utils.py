@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 
+import json
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
     FixedMaskConstraint, ShareKeyConstraint)
@@ -59,22 +60,30 @@ class TestJsonUtils(unittest.TestCase):
 
     def constraint_there_and_back(self, there):
         j_object = constraint_to_json(there)
-        back = constraint_from_json(j_object)
+        j_str = json.dumps(j_object)
+        j_object2 = json.loads(j_str)
+        back = constraint_from_json(j_object2)
         self.compare_constraint(there, back, [])
 
     def resource_there_and_back(self, there):
         j_object = resource_container_to_json(there)
-        back = resource_container_from_json(j_object)
+        j_str = json.dumps(j_object)
+        j_object2 = json.loads(j_str)
+        back = resource_container_from_json(j_object2)
         self.assertEqual(there, back)
 
     def vertext_there_and_back(self, there):
         j_object = vertex_to_json(there)
-        back = vertex_from_json(j_object)
+        j_str = json.dumps(j_object)
+        j_object2 = json.loads(j_str)
+        back = vertex_from_json(j_object2)
         self.compare_vertex(there, back, [])
 
     def edge_there_and_back(self, there):
         j_object = edge_to_json(there)
-        back = edge_from_json(j_object)
+        j_str = json.dumps(j_object)
+        j_object2 = json.loads(j_str)
+        back = edge_from_json(j_object2)
         self.assertEqual(there.label, back.label)
         self.compare_vertex(there.pre_vertex, back.pre_vertex, [])
         self.compare_vertex(there.post_vertex, back.post_vertex, [])

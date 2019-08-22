@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "A limited description of the machine graph.",
+    
+    "type": "object",
+    "properties": {
+        "vertices_resources": {
+            "type": "object",
+            "additionalProperties": {"$ref": "#/resources/resourceSet"}
+        },
+        "edges": {
+            "type": "object",
+            "additionalProperties": {
+                "description": "A definition of a 1:N connection (an edge).",
+                "type": "object",
+                "properties": {
+                    "source": {
+                        "description": "The vertex identifier of the source of the edge.",
+                        "type": "string"
+                    },
+                    "sinks": {
+                        "description": "The vertex identifiers of the sinks of the edge.",
+                        "type": "array",
+                        "items": {
+                            "description": "A sink vertices' identifier",
+                            "type": "string"
+                        },
+                        "uniqueItems": true
+                    },
+                    "weight": {
+                        "description": "The weight hint for this edge.",
+                        "type": "number",
+                        "minimum": 0.0
+                    },
+                    "type": {
+                        "description": "An application defined label indicating the type of this edge.",
+                        "type": "string"
+                    }
+                },
+                "required": ["source", "sinks", "weight", "type"],
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false,
+    
+}
