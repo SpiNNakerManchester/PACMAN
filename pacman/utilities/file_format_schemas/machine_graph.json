@@ -1,48 +1,137 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    
     "title": "A limited description of the machine graph.",
-    
     "type": "object",
+    "additionalProperties": false,
+    "required": ["vertices", "edges"],
     "properties": {
-        "vertices_resources": {
-            "type": "object",
-            "additionalProperties": {"$ref": "#/resources/resourceSet"}
+        "label": {
+            "description": "Label for the graph",
+            "type": "string"
         },
-        "edges": {
-            "type": "object",
-            "additionalProperties": {
-                "description": "A definition of a 1:N connection (an edge).",
+        "vertices": {
+            "type": "array",
+            "items": {
                 "type": "object",
+                "additionalProperties": false,
+                "required": ["class", "label", "constraints", "resources"],
                 "properties": {
-                    "source": {
-                        "description": "The vertex identifier of the source of the edge.",
+                    "class": {
+                        "description": "Class of the Vertex",
                         "type": "string"
                     },
-                    "sinks": {
-                        "description": "The vertex identifiers of the sinks of the edge.",
+                    "label": {
+                        "description": "Unique label for this Vertex",
+                        "type": "string"
+                    },
+                    "constraints": {
+                        "description": "Any Constrainst added to the vertex",
                         "type": "array",
                         "items": {
-                            "description": "A sink vertices' identifier",
-                            "type": "string"
-                        },
-                        "uniqueItems": true
+                            "type": "object",
+                            "additionalProperties": true,
+                            "required": [
+                                "class"
+                            ],
+                            "properties": {
+                                "class": {
+                                    "description": "Class of the Constraint",
+                                    "type": "string"
+                                },
+                                "board_address": {
+                                    "description": "board_address defined by this Constraint ",
+                                    "type": "string"
+                                },
+                                "x": {
+                                    "description": "Chip X defined by this Constraint ",
+                                    "type": "integer"
+                                },
+                                "y": {
+                                    "description": "Chip Y defined by this Constraint ",
+                                    "type": "integer"
+                                },
+                                "p": {
+                                    "description": "Core defined by this Constraint ",
+                                    "type": "integer"
+                                },
+                                "size": {
+                                    "description": "size property of this Constraint ",
+                                    "type": "integer"
+                                },
+                                "keys_and_masks": {
+                                    "description": "key and property of this Constraint ",
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "key",
+                                        "mask"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "description": "key value of the Constraint",
+                                            "type": "integer"
+                                        },
+                                        "board_address": {
+                                            "description": "mask value of the Constraint ",
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "weight": {
-                        "description": "The weight hint for this edge.",
-                        "type": "number",
-                        "minimum": 0.0
-                    },
-                    "type": {
-                        "description": "An application defined label indicating the type of this edge.",
-                        "type": "string"
+                    "resources": {
+                        "description": "The resources used by this vertex",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "dtcm",
+                            "cpu_cycles",
+                            "fixed_sdram",
+                            "per_timestep_sdram",
+                            "iptag",
+                            "reverse_iptags"
+                        ],
+                        "properties": {
+                            "dtcm": {
+                                "description": "Dtcm required",
+                                "type": "integer"
+                            },
+                            "cpu_cycles": {
+                                "description": "cpu_cycles required",
+                                "type": "integer"
+                            },
+                            "fixed_sdram": {
+                                "description": "fixed part of sdram required",
+                                "type": "integer"
+                            },
+                            "per_timestep_sdram": {
+                                "description": "per timestep part of sdram required. May be zero",
+                                "type": "integer"
+                            },
+                            "cpu_cycles": {
+                                "description": "cpu_cycles required",
+                                "type": "integer"
+                            },
+                            "cpu_cycles": {
+                                "description": "cpu_cycles required",
+                                "type": "integer"
+                            },
+                            "iptag": {
+                                "description": "Any iptag added",
+                                "type": "array"
+                            },
+                            "reverse_iptags": {
+                                "description": "Any reverse_iptags added",
+                                "type": "array"
+                            }
+                        }
                     }
-                },
-                "required": ["source", "sinks", "weight", "type"],
-                "additionalProperties": false
+                }
             }
+         },
+        "edges": {
+            "type": "array"
         }
-    },
-    "additionalProperties": false,
-    
+    }
 }
