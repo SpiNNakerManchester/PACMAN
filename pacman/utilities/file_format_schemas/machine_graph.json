@@ -58,6 +58,10 @@
                                     "description": "size property of this Constraint ",
                                     "type": "integer"
                                 },
+                                "vertex": {
+                                    "description": "Label of the vertex of this Constraint",
+                                    "type": "string"
+                                },
                                 "keys_and_masks": {
                                     "description": "key and property of this Constraint ",
                                     "type": "object",
@@ -131,7 +135,40 @@
             }
          },
         "edges": {
-            "type": "array"
+            "description": "The Edges in this graph",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "pre_vertex",
+                    "post_vertex",
+                    "traffic_type",
+                    "traffic_weight"
+                ],
+                "properties": {
+                    "pre_vertex": {
+                        "description": "Label of the pre_vertex of this edge",
+                        "type": "string"
+                    },
+                    "post_vertex": {
+                        "description": "Label of the post_vertex of this edge",
+                        "type": "string"
+                    },
+                    "label": {
+                        "description": "Label for this edge",
+                        "type": "string"
+                    },
+                    "traffic_type": {
+                        "description": "Int value of the EdgeTrafficType for this edge",
+                        "type": "integer"
+                    },
+                    "traffic_weight": {
+                        "description": "traffic_weight for this edge",
+                        "type": "integer"
+                    }
+                }
+            }
         }
     }
 }
