@@ -81,8 +81,9 @@ def constraint_to_json(constraint):
         elif isinstance(constraint,
                         (SameChipAsConstraint, SameAtomsAsVertexConstraint)):
             json_dict["vertex"] = constraint.vertex.label
-        elif isinstance(constraint,
-                        (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)):
+        elif isinstance(
+                constraint,
+                (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)):
             json_dict["size"] = constraint.size
         elif isinstance(constraint, FixedKeyAndMaskConstraint):
             json_dict["keys_and_masks"] = key_masks_to_json(
@@ -258,7 +259,7 @@ def vertex_to_json(vertex):
             json_dict["resources"] = resource_container_to_json(
                 vertex.resources_required)
     except Exception as ex:
-            json_dict["exception"] = str(ex)
+        json_dict["exception"] = str(ex)
     return json_dict
 
 
@@ -289,7 +290,7 @@ def edge_to_json(edge):
             json_dict["label"] = edge.label
         json_dict["traffic_weight"] = edge.traffic_weight
     except Exception as ex:
-            json_dict["exception"] = str(ex)
+        json_dict["exception"] = str(ex)
     return json_dict
 
 
@@ -316,11 +317,12 @@ def graph_to_json(graph):
         json_dict["edges"] = json_list
 
     except Exception as ex:
-            json_dict["exception"] = str(ex)
+        json_dict["exception"] = str(ex)
     return json_dict
 
 
 def graph_from_json(json_dict):
+    json_dict = json_to_object(json_dict)
     graph = MachineGraph(json_dict.get("label"))
     for j_vertex in json_dict["vertices"]:
         graph.add_vertex(vertex_from_json(j_vertex, convert_constraints=False))
