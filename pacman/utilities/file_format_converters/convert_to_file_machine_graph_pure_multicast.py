@@ -64,7 +64,7 @@ class ConvertToFileMachineGraphPureMulticast(object):
             json.dump(json_graph, file_to_write)
         progress.update()
 
-        file_format_schemas.validate(json_graph, "machine_graph.json")
+        file_format_schemas.validate(json_graph, "rig_machine_graph.json")
 
         progress.end()
 
