@@ -110,7 +110,6 @@ class Graph(ConstrainedObject, AbstractGraph):
             vertex.set_label(
                 vertex.__class__.__name__ + "_" + self._label_postfix())
         elif vertex.label in self._vertex_by_label:
-            v1 = self._vertex_by_label[vertex.label]
             if self._vertex_by_label[vertex.label] == vertex:
                 raise PacmanAlreadyExistsException("vertex", vertex.label)
             vertex.set_label(vertex.label + self._label_postfix())
