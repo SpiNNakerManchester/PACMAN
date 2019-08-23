@@ -285,6 +285,7 @@ class SDRAMEdgeSizeException(PacmanException):
     inconsistent size requests
     """
 
+
 class MinimisationFailedError(PacmanException):
     """Raised when a routing table could not be minimised to reach a specified
     target.

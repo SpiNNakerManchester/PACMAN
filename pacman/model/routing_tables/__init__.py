@@ -15,6 +15,9 @@
 
 from .uncompressed_multicast_routing_table import \
     UnCompressedMulticastRoutingTable
+from .compressed_multicast_routing_table import \
+    CompressedMulticastRoutingTable
 from .multicast_routing_tables import MulticastRoutingTables
 
-__all__ = ["UnCompressedMulticastRoutingTable", "MulticastRoutingTables"]
+__all__ = ["UnCompressedMulticastRoutingTable", "MulticastRoutingTables",
+           "CompressedMulticastRoutingTable"]
