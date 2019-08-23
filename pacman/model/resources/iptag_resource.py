@@ -129,7 +129,7 @@ class IPtagResource(object):
         For unit tests ONLY so __hash__ and __eq__ pairing not done!
         """
         return (self._ip_address == other._ip_address and
-            self._port == other._port and
-            self._strip_sdp == other._strip_sdp and
-            self._tag == other._tag and
-            self._traffic_identifier == other._traffic_identifier)
+                self._port == other._port and
+                self._strip_sdp == other._strip_sdp and
+                self._tag == other._tag and
+                self._traffic_identifier == other._traffic_identifier)

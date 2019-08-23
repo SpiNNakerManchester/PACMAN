@@ -148,4 +148,3 @@ class ResourceContainer(object):
         if self._iptags != other._iptags:
             return False
         return self._reverse_iptags == other._reverse_iptags
-
