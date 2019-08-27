@@ -14,8 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from .convert_to_java_machine import ConvertToJavaMachine
 
 converter_algorithms_metadata_file = os.path.join(
     os.path.dirname(__file__), "converter_algorithms_metadata.xml")
 
-__all__ = [ "converter_algorithms_metadata_file"]
+__all__ = ["ConvertToJavaMachine", "converter_algorithms_metadata_file"]
