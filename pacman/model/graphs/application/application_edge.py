@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.graphs import AbstractEdge
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import MachineEdge
@@ -37,7 +38,8 @@ class ApplicationEdge(AbstractEdge):
         "_machine_edge_type",
 
         # The label
-        "_label"
+        "_label",
+        "__machine_edges"
     ]
 
     def __init__(
@@ -62,6 +64,7 @@ class ApplicationEdge(AbstractEdge):
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
         self._machine_edge_type = machine_edge_type
+        self.__machine_edges = OrderedSet()
 
     @property
     @overrides(AbstractEdge.label)
@@ -101,3 +104,13 @@ class ApplicationEdge(AbstractEdge):
     @overrides(AbstractEdge.traffic_type)
     def traffic_type(self):
         return self._traffic_type
+
+    @property
+    def machine_edges(self):
+        return self.__machine_edges
+
+    def remember_associated_machine_edge(self, machine_edge):
+        self.__machine_edges.add(machine_edge)
+
+    def forget_machine_edges(self):
+        self.__machine_edges = OrderedSet()

@@ -19,7 +19,8 @@ from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
     FixedVertexAtomsConstraint)
-from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.common.graph_mapper import GraphMapper
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
@@ -70,21 +71,19 @@ class BasicPartitioner(object):
         # start progress bar
         progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
         machine_graph = MachineGraph("Machine graph for " + graph.label)
-        graph_mapper = GraphMapper()
         resource_tracker = ResourceTracker(machine, plan_n_timesteps)
 
         # Partition one vertex at a time
         for vertex in progress.over(graph.vertices):
             self._partition_one_application_vertex(
-                vertex, resource_tracker, machine_graph, graph_mapper,
-                plan_n_timesteps)
+                vertex, resource_tracker, machine_graph, plan_n_timesteps)
 
-        generate_machine_edges(machine_graph, graph_mapper, graph)
+        generate_machine_edges(machine_graph, graph)
 
-        return machine_graph, graph_mapper, resource_tracker.chips_used
+        return machine_graph, GraphMapper(), resource_tracker.chips_used
 
     def _partition_one_application_vertex(
-            self, vertex, res_tracker, m_graph, mapper, plan_n_timesteps):
+            self, vertex, res_tracker, m_graph, plan_n_timesteps):
         """ Partitions a single application vertex.
         """
         # Compute how many atoms of this vertex we can put on one core
@@ -111,7 +110,7 @@ class BasicPartitioner(object):
                 "{}:{}:{}".format(vertex.label, first, last),
                 get_remaining_constraints(vertex))
             m_graph.add_vertex(m_vertex)
-            mapper.add_vertex_mapping(m_vertex, vertex)
+            vertex.remember_associated_machine_vertex(m_vertex)
 
             # update allocated resources
             res_tracker.allocate_constrained_resources(

@@ -71,21 +71,19 @@ def tag_allocator_report(report_folder, tag_infos):
 
 
 def placer_reports_with_application_graph(
-        report_folder, hostname, graph, graph_mapper, placements, machine):
+        report_folder, hostname, graph, placements, machine):
     """ Reports that can be produced from placement given a application\
         graph's existence
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param graph: the application graph to which placements were built
-    :param graph_mapper: \
-        the mapping between application and machine graphs
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
     :rtype: None
     """
     placement_report_with_application_graph_by_vertex(
-        report_folder, hostname, graph, graph_mapper, placements)
+        report_folder, hostname, graph, placements)
     placement_report_with_application_graph_by_core(
         report_folder, hostname, placements, machine)
 
@@ -252,7 +250,7 @@ def _write_one_router_partition_report(f, partition, machine, placements,
         f.write("\n")
 
 
-def partitioner_report(report_folder, hostname, graph, graph_mapper):
+def partitioner_report(report_folder, hostname, graph):
     """ Generate report on the placement of vertices onto cores.
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
@@ -273,13 +271,13 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
                 time_date_string, hostname))
 
             for vertex in progress.over(graph.vertices):
-                _write_one_vertex_partition(f, vertex, graph_mapper)
+                _write_one_vertex_partition(f, vertex)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for"
                          " writing.", file_name)
 
 
-def _write_one_vertex_partition(f, vertex, graph_mapper):
+def _write_one_vertex_partition(f, vertex):
     vertex_name = vertex.label
     vertex_model = vertex.__class__.__name__
     num_atoms = vertex.n_atoms
@@ -288,7 +286,7 @@ def _write_one_vertex_partition(f, vertex, graph_mapper):
     f.write("Pop size: {}\n".format(num_atoms))
     f.write("Machine Vertices: \n")
 
-    machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
+    machine_vertices = sorted(vertex.machine_vertices,
                               key=lambda x: x.label)
     machine_vertices = sorted(machine_vertices,
                               key=lambda x: x.vertex_slice.lo_atom)
@@ -300,13 +298,12 @@ def _write_one_vertex_partition(f, vertex, graph_mapper):
 
 
 def placement_report_with_application_graph_by_vertex(
-        report_folder, hostname, graph, graph_mapper, placements):
+        report_folder, hostname, graph, placements):
     """ Generate report on the placement of vertices onto cores by vertex.
 
     :param report_folder: the folder to which the reports are being written
     :param hostname: the machine's hostname to which the placer worked on
     :param graph: the graph to which placements were built
-    :param graph_mapper: the mapping between graphs
     :param placements: the placements objects built by the placer.
     """
 
@@ -330,17 +327,16 @@ def placement_report_with_application_graph_by_vertex(
 
             for vertex in progress.over(graph.vertices):
                 _write_one_vertex_application_placement(
-                    f, vertex, placements, graph_mapper,
-                    used_processors_by_chip, used_sdram_by_chip,
-                    vertex_by_processor)
+                    f, vertex, placements, used_processors_by_chip,
+                    used_sdram_by_chip, vertex_by_processor)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for"
                          " writing.", file_name)
 
 
 def _write_one_vertex_application_placement(
-        f, vertex, placements, graph_mapper,
-        used_processors_by_chip, used_sdram_by_chip, vertex_by_processor):
+        f, vertex, placements, used_processors_by_chip, used_sdram_by_chip,
+        vertex_by_processor):
     vertex_name = vertex.label
     vertex_model = vertex.__class__.__name__
     num_atoms = vertex.n_atoms
@@ -349,7 +345,7 @@ def _write_one_vertex_application_placement(
     f.write("Pop size: {}\n".format(num_atoms))
     f.write("Machine Vertices: \n")
 
-    machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
+    machine_vertices = sorted(vertex.machine_vertices,
                               key=lambda vert: vert.label)
     machine_vertices = sorted(machine_vertices,
                               key=lambda vert: vert.vertex_slice.lo_atom)

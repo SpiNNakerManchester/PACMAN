@@ -14,73 +14,52 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from deprecated import deprecated
-from spinn_utilities.ordered_default_dict import DefaultOrderedDict
-from spinn_utilities.ordered_set import OrderedSet
-from pacman.exceptions import PacmanValueError
 
 
 class GraphMapper(object):
     """ A mapping between an Application Graph and a Machine Graph.
     """
 
-    __slots__ = [
-        # dict of application vertex -> set of machine vertices
-        "_machine_vertices_by_application_vertex",
-
-        # dict of application edge -> set of machine edges
-        "_machine_edges_by_application_edge",
-
-        # dict of application vertex -> list of slices of application vertex
-        "_slices_by_application_vertex"
-    ]
+    __slots__ = []
 
     def __init__(self):
-        self._machine_vertices_by_application_vertex = \
-            DefaultOrderedDict(OrderedSet)
-        self._machine_edges_by_application_edge = \
-            DefaultOrderedDict(OrderedSet)
+        pass
 
-        self._slices_by_application_vertex = DefaultOrderedDict(list)
-
+    @deprecated("just do application_vertex." +
+                "remember_associated_machine_vertex(machine_vertex)")
     def add_vertex_mapping(
             self, machine_vertex, application_vertex):
         """ Add a mapping between application and machine vertices
+
+        DEPRECATED
 
         :param machine_vertex: A vertex from a Machine Graph
         :param application_vertex: A vertex from an Application Graph
         :raise pacman.exceptions.PacmanValueError:\
             If atom selection is out of bounds.
         """
-        if machine_vertex.vertex_slice.hi_atom >= application_vertex.n_atoms:
-            raise PacmanValueError(
-                "hi_atom {:d} >= maximum {:d}".format(
-                    machine_vertex.vertex_slice.hi_atom,
-                    application_vertex.n_atoms))
+        application_vertex.remember_associated_machine_vertex(machine_vertex)
 
-        machine_vertices = self._machine_vertices_by_application_vertex[
-            application_vertex]
-        machine_vertex.index = len(machine_vertices)
-        machine_vertices.add(machine_vertex)
-        self._slices_by_application_vertex[application_vertex].append(
-            machine_vertex.vertex_slice)
-
+    @deprecated("just do \
+        application_edge.remember_associated_machine_edge(machine_edge)")
     def add_edge_mapping(self, machine_edge, application_edge):
         """ Add a mapping between a machine edge and an application edge
+
+        DEPRECATED
 
         :param machine_edge: An edge from a Machine Graph
         :param application_edge: An edge from an Application Graph
         """
-        self._machine_edges_by_application_edge[application_edge].add(
-            machine_edge)
+        application_edge.remember_associated_machine_edge(machine_edge)
 
+    @deprecated("just do application_vertex.machine_vertices")
     def get_machine_vertices(self, application_vertex):
         """ Get all machine vertices mapped to a given application vertex
 
         :param application_vertex: A vertex from an Application Graph
         :return: An iterable of machine vertices or None if none
         """
-        return self._machine_vertices_by_application_vertex.get(
-            application_vertex, None)
+        return application_vertex.machine_vertices
 
     @deprecated("just do machine_vertex.index")
     def get_machine_vertex_index(self, machine_vertex):
@@ -93,14 +72,16 @@ class GraphMapper(object):
         """
         return machine_vertex.index
 
+    @deprecated("just do application_edge.machine_edges")
     def get_machine_edges(self, application_edge):
         """ Get all machine edges mapped to a given application edge
+
+        DEPRECATED
 
         :param application_edge: An edge from an Application Graph
         :return: An iterable of machine edges or None if none
         """
-        return self._machine_edges_by_application_edge.get(
-            application_edge, None)
+        return application_edge.machine_edges
 
     @deprecated("just do machine_vertex.app_vertex")
     def get_application_vertex(self, machine_vertex):
@@ -135,7 +116,10 @@ class GraphMapper(object):
         """
         return machine_vertex.vertex_slice
 
+    @deprecated("just do application_vertex.vertex_slices")
     def get_slices(self, application_vertex):
         """ Get all the slices mapped to an application vertex
+
+        DEPRECATED
         """
-        return self._slices_by_application_vertex.get(application_vertex, None)
+        return application_vertex.vertex_slices

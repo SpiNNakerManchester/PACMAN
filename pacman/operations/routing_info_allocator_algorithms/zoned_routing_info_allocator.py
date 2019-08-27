@@ -42,7 +42,6 @@ class ZonedRoutingInfoAllocator(object):
     __slots__ = [
         # Passed in paramateres
         "_application_graph",
-        "_graph_mapper",
         "_machine_graph",
         "_placements",
         "_n_keys_map",
@@ -51,8 +50,8 @@ class ZonedRoutingInfoAllocator(object):
         "_key_bytes_per_app"
     ]
 
-    def __call__(self, application_graph, graph_mapper, machine_graph,
-                 placements, n_keys_map):
+    def __call__(self, application_graph, machine_graph, placements,
+                 n_keys_map):
         """
         :param machine_graph:\
             The machine graph to allocate the routing info for
@@ -76,7 +75,6 @@ class ZonedRoutingInfoAllocator(object):
         # check that this algorithm supports the constraints put onto the
         # partitions
         self._application_graph = application_graph
-        self._graph_mapper = graph_mapper
         self._machine_graph = machine_graph
         self._placements = placements
         self._n_keys_map = n_keys_map
@@ -97,9 +95,6 @@ class ZonedRoutingInfoAllocator(object):
 
         raise NotImplementedError()
 
-    def __machine_vertices(self, app_vertex):
-        return self._graph_mapper.get_machine_vertices(app_vertex)
-
     def __partitions(self, machine_vertex):
         return self._machine_graph.\
             get_outgoing_edge_partitions_starting_at_vertex(machine_vertex)
@@ -110,7 +105,7 @@ class ZonedRoutingInfoAllocator(object):
         source_zones = 0
         for app_vertex in progress.over(self._application_graph.vertices):
             app_max_partions = 0
-            machine_vertices = self.__machine_vertices(app_vertex)
+            machine_vertices = app_vertex.machine_vertices
             max_keys = 0
             for vertex in machine_vertices:
                 partitions = self.__partitions(vertex)
@@ -148,7 +143,7 @@ class ZonedRoutingInfoAllocator(object):
         for app_vertex in progress.over(self._application_graph.vertices):
             if app_vertex in self._key_bytes_per_app:
                 key_bytes = self._key_bytes_per_app[app_vertex]
-                for vertex in self.__machine_vertices(app_vertex):
+                for vertex in app_vertex.machine_vertices:
                     machine_index = vertex.index
                     partitions = self.__partitions(vertex)
                     partition = partitions.peek()

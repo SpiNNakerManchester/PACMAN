@@ -22,7 +22,8 @@ from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
     FixedVertexAtomsConstraint, SameAtomsAsVertexConstraint)
-from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.common.graph_mapper import GraphMapper
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls as utils
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
@@ -74,7 +75,6 @@ class PartitionAndPlacePartitioner(object):
         # Load the vertices and create the machine_graph to fill
         machine_graph = MachineGraph(
             label="partitioned graph for {}".format(graph.label))
-        graph_mapper = GraphMapper()
 
         # sort out vertex's by placement constraints
         vertices = sort_vertices_by_known_constraints(graph.vertices)
@@ -94,23 +94,19 @@ class PartitionAndPlacePartitioner(object):
 
         # Partition one vertex at a time
         for vertex in vertices:
-
-            # check that the vertex hasn't already been partitioned
-            machine_vertices = graph_mapper.get_machine_vertices(vertex)
-
-            # if not, partition
-            if machine_vertices is None:
+            # if no existing machine vertices, partition
+            if not vertex.machine_vertices:
                 self._partition_vertex(
-                    vertex, plan_n_timesteps, machine_graph, graph_mapper,
+                    vertex, plan_n_timesteps, machine_graph,
                     resource_tracker, progress, vertex_groups)
         progress.end()
 
-        generate_machine_edges(machine_graph, graph_mapper, graph)
+        generate_machine_edges(machine_graph, graph)
 
-        return machine_graph, graph_mapper, resource_tracker.chips_used
+        return machine_graph, GraphMapper(), resource_tracker.chips_used
 
     def _partition_vertex(
-            self, vertex, plan_n_timesteps, machine_graph, graph_mapper,
+            self, vertex, plan_n_timesteps, machine_graph,
             resource_tracker, progress, vertex_groups):
         """ Partition a single vertex
 
@@ -122,9 +118,6 @@ class PartitionAndPlacePartitioner(object):
         :param machine_graph: the graph to add vertices to
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param graph_mapper: the mappings between graphs
-        :type graph_mapper:\
-            :py:class:`pacman.model.graphs.common.GraphMapper'
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
             :py:class:`pacman.utilities.ResourceTracker`
@@ -172,13 +165,12 @@ class PartitionAndPlacePartitioner(object):
         # partition by atoms
         self._partition_by_atoms(
             partition_together_vertices, plan_n_timesteps, vertex.n_atoms,
-            max_atoms_per_core, machine_graph, graph_mapper, resource_tracker,
+            max_atoms_per_core, machine_graph, resource_tracker,
             progress, n_atoms is not None)
 
     def _partition_by_atoms(
             self, vertices, plan_n_timesteps, n_atoms, max_atoms_per_core,
-            machine_graph, graph_mapper, resource_tracker, progress,
-            fixed_n_atoms=False):
+            machine_graph, resource_tracker, progress, fixed_n_atoms=False):
         """ Try to partition vertices on how many atoms it can fit on\
             each vertex
 
@@ -199,9 +191,6 @@ class PartitionAndPlacePartitioner(object):
         :param machine_graph: the machine graph
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param graph_mapper: the mapper between graphs
-        :type graph_mapper:\
-            :py:class:`pacman.model.graphs.common.GraphMapper'
         :param resource_tracker: A tracker of assigned resources
         :type resource_tracker:\
             :py:class:`pacman.utilities.ResourceTracker`
@@ -236,7 +225,7 @@ class PartitionAndPlacePartitioner(object):
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
-                graph_mapper.add_vertex_mapping(machine_vertex, vertex)
+                vertex.remember_associated_machine_vertex(machine_vertex)
 
                 progress.update(vertex_slice.n_atoms)
 

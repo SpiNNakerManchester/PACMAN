@@ -18,7 +18,8 @@ import unittest
 from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
-from pacman.model.graphs.common import Slice, GraphMapper
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.common.graph_mapper import GraphMapper
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer

@@ -35,10 +35,6 @@
                 <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
             </parameter>
@@ -51,7 +47,6 @@
             <param_name>report_folder</param_name>
             <param_name>hostname</param_name>
             <param_name>graph</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
         </required_inputs>
@@ -347,16 +342,11 @@
                 <param_name>graph</param_name>
                 <param_type>MemoryApplicationGraph</param_type>
             </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>report_folder</param_name>
             <param_name>hostname</param_name>
             <param_name>graph</param_name>
-            <param_name>graph_mapper</param_name>
         </required_inputs>
     </algorithm>
     <algorithm name="TagReport">

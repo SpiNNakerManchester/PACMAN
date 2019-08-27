@@ -15,6 +15,7 @@
 
 import sys
 from six import add_metaclass
+from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import (
     abstractmethod, abstractproperty, AbstractBase)
@@ -22,6 +23,7 @@ from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
+from pacman.exceptions import PacmanValueError
 
 
 @add_metaclass(AbstractBase)
@@ -30,7 +32,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         based on the resources that the vertex requires.
     """
 
-    __slots__ = ["_label"]
+    __slots__ = ["_label", "__machine_vertices", "__slices"]
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
@@ -49,6 +51,8 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
 
         super(ApplicationVertex, self).__init__(constraints)
         self._label = label
+        self.__machine_vertices = OrderedSet()
+        self.__slices = list()
 
         # add a constraint for max partitioning
         self.add_constraint(
@@ -91,6 +95,16 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :param constraints: Constraints to be passed on to the machine vertex
         """
 
+    def remember_associated_machine_vertex(self, machine_vertex):
+        if machine_vertex.vertex_slice.hi_atom >= self.n_atoms:
+            raise PacmanValueError(
+                "hi_atom {:d} >= maximum {:d}".format(
+                    machine_vertex.vertex_slice.hi_atom, self.n_atoms))
+
+        machine_vertex.index = len(self.__machine_vertices)
+        self.__machine_vertices.add(machine_vertex)
+        self.__slices.append(machine_vertex.vertex_slice)
+
     @abstractproperty
     def n_atoms(self):
         """ The number of atoms in the vertex
@@ -99,8 +113,20 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         :rtype: int
         """
 
+    @property
+    def machine_vertices(self):
+        return self.__machine_vertices
+
+    @property
+    def vertex_slices(self):
+        return self.__slices
+
     def get_max_atoms_per_core(self):
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
         return self.n_atoms
+
+    def forget_machine_vertices(self):
+        self.__machine_vertices = OrderedSet()
+        self.__slices = list()

@@ -22,7 +22,7 @@ from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from pacman.model.graphs.common import GraphMapper
+from pacman.model.graphs.common.graph_mapper import GraphMapper
 from pacman.operations.placer_algorithms import RadialPlacer
 from uinit_test_objects import (
     get_resources_used_by_atoms, T_MachineVertex, T_AppVertex)

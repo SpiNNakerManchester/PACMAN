@@ -16,14 +16,31 @@
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractGraph
+from pacman.model.graphs.machine.machine_graph import MachineGraph
 
 
 class ApplicationGraph(AbstractGraph):
     """ An application-level abstraction of a graph.
     """
 
-    __slots__ = []
+    __slots__ = ["__machine_graph"]
 
     def __init__(self, label):
         super(ApplicationGraph, self).__init__(
             ApplicationVertex, ApplicationEdge, label)
+        self.__machine_graph = None
+
+    @property
+    def machine_graph(self):
+        return self.__machine_graph
+
+    @machine_graph.setter
+    def machine_graph(self, machine_graph):
+        self.__machine_graph = machine_graph
+
+    def forget_machine_graph(self):
+        for v in self.vertices:
+            v.forget_machine_vertices()
+        for e in self.edges:
+            e.forget_machine_edges()
+        self.__machine_graph = None

@@ -414,17 +414,15 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex_1 = SimpleTestVertex(10, "Vertex_1", 5)
         vertex_2 = SimpleTestVertex(10, "Vertex_2", 4)
         vertex_3 = SimpleTestVertex(10, "Vertex_3", 2)
-        vertex_3.add_constraint(SameAtomsAsVertexConstraint(
-            vertex_2))
-        vertex_2.add_constraint(SameAtomsAsVertexConstraint(
-            vertex_1))
+        vertex_3.add_constraint(SameAtomsAsVertexConstraint(vertex_2))
+        vertex_2.add_constraint(SameAtomsAsVertexConstraint(vertex_1))
         graph.add_vertices([vertex_1, vertex_2, vertex_3])
         machine = virtual_machine(version=3)
         partitioner = PartitionAndPlacePartitioner()
-        _, graph_mapper, _ = partitioner(graph, machine, plan_n_timesteps=None)
-        subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
-        subvertices_2 = list(graph_mapper.get_machine_vertices(vertex_2))
-        subvertices_3 = list(graph_mapper.get_machine_vertices(vertex_3))
+        partitioner(graph, machine, plan_n_timesteps=None)
+        subvertices_1 = list(vertex_1.machine_vertices)
+        subvertices_2 = list(vertex_2.machine_vertices)
+        subvertices_3 = list(vertex_3.machine_vertices)
         self.assertEqual(len(subvertices_1), len(subvertices_2))
         self.assertEqual(len(subvertices_2), len(subvertices_3))
 
