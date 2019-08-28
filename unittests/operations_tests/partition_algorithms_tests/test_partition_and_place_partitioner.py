@@ -72,7 +72,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(0, 1, 1, 1, 0))
         links.append(Link(1, 1, 2, 0, 0))
         links.append(Link(1, 0, 3, 0, 1))
-        r = Router(links, False, 100, 1024)
+        r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
         chips = list()
@@ -175,7 +175,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(0, 1, 1, 1, 0))
         links.append(Link(1, 1, 2, 0, 0))
         links.append(Link(1, 0, 3, 0, 1))
-        r = Router(links, False, 100, 1024)
+        r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
         chips = list()
@@ -221,7 +221,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(0, 1, 1, 1, 0))
         links.append(Link(1, 1, 2, 0, 0))
         links.append(Link(1, 0, 3, 0, 1))
-        r = Router(links, False, 100, 1024)
+        r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
         chips = list()
@@ -265,7 +265,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(0, 1, 1, 1, 0))
         links.append(Link(1, 1, 2, 0, 0))
         links.append(Link(1, 0, 3, 0, 1))
-        r = Router(links, False, 100, 1024)
+        r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
         chips = list()
@@ -303,7 +303,7 @@ class TestBasicPartitioner(unittest.TestCase):
         links.append(Link(0, 1, 1, 1, 0))
         links.append(Link(1, 1, 2, 0, 0))
         links.append(Link(1, 0, 3, 0, 1))
-        r = Router(links, False, 100, 1024)
+        r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
         chips = list()
