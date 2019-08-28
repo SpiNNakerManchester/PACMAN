@@ -81,7 +81,7 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:\
             If two placements are made to the same processor.
         """
-        placement_id = (placement.x, placement.y, placement.p)
+        placement_id = placement.location
         if placement_id in self._placements:
             raise PacmanProcessorAlreadyOccupiedError(placement_id)
         if placement.vertex in self._machine_vertices:

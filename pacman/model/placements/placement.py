@@ -91,6 +91,12 @@ class Placement(object):
         """
         return self._p
 
+    @property
+    def location(self):
+        """ The (x,y,p) tuple that represents the location of this placement.
+        """
+        return (self._x, self._y, self._p)
+
     def __eq__(self, other):
         if not isinstance(other, Placement):
             return False

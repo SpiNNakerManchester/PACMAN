@@ -18,6 +18,8 @@ from deprecated import deprecated
 
 class GraphMapper(object):
     """ A mapping between an Application Graph and a Machine Graph.
+
+        DEPRECATED
     """
 
     __slots__ = []
@@ -56,6 +58,8 @@ class GraphMapper(object):
     @deprecated("just do application_vertex.machine_vertices")
     def get_machine_vertices(self, application_vertex):
         """ Get all machine vertices mapped to a given application vertex
+
+        DEPRECATED
 
         :param application_vertex: A vertex from an Application Graph
         :return: An iterable of machine vertices or None if none
