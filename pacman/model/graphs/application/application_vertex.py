@@ -32,7 +32,7 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         based on the resources that the vertex requires.
     """
 
-    __slots__ = ["_label", "__machine_vertices", "__slices"]
+    __slots__ = ["_label", "_machine_vertices", "_slices"]
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
@@ -51,8 +51,8 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
 
         super(ApplicationVertex, self).__init__(constraints)
         self._label = label
-        self.__machine_vertices = OrderedSet()
-        self.__slices = list()
+        self._machine_vertices = OrderedSet()
+        self._slices = list()
 
         # add a constraint for max partitioning
         self.add_constraint(
@@ -101,9 +101,9 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
                 "hi_atom {:d} >= maximum {:d}".format(
                     machine_vertex.vertex_slice.hi_atom, self.n_atoms))
 
-        machine_vertex.index = len(self.__machine_vertices)
-        self.__machine_vertices.add(machine_vertex)
-        self.__slices.append(machine_vertex.vertex_slice)
+        machine_vertex.index = len(self._machine_vertices)
+        self._machine_vertices.add(machine_vertex)
+        self._slices.append(machine_vertex.vertex_slice)
 
     @abstractproperty
     def n_atoms(self):
@@ -115,11 +115,11 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
 
     @property
     def machine_vertices(self):
-        return self.__machine_vertices
+        return self._machine_vertices
 
     @property
     def vertex_slices(self):
-        return self.__slices
+        return self._slices
 
     def get_max_atoms_per_core(self):
         for constraint in self.constraints:
@@ -128,5 +128,5 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
         return self.n_atoms
 
     def forget_machine_vertices(self):
-        self.__machine_vertices = OrderedSet()
-        self.__slices = list()
+        self._machine_vertices = OrderedSet()
+        self._slices = list()

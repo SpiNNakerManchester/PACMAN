@@ -24,6 +24,8 @@ class TestPythonFunctionAlgorithm(unittest.TestCase):
 
     def test_python_module(self):
         python_module = "Foo"
-        alg = PythonFunctionAlgorithm("algorithm_id", [], [], [],
-                                      python_module, "python_function")
+        python_function = "bar"
+        alg = PythonFunctionAlgorithm("algorithm_id", [], [], [], [], [], [],
+                                      python_module, python_function)
         self.assertEqual(python_module, alg._python_module)
+        self.assertEqual(python_function, alg._python_function)

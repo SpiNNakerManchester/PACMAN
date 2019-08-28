@@ -21,7 +21,6 @@ from .application_vertex import ApplicationVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs import (
     AbstractVirtualVertex, AbstractSpiNNakerLinkVertex)
-from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
 
 
 class ApplicationSpiNNakerLinkVertex(
@@ -88,6 +87,7 @@ class ApplicationSpiNNakerLinkVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
+        from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
         vertex = MachineSpiNNakerLinkVertex(
             self._spinnaker_link_id, self._board_address, label, constraints,
             self, vertex_slice)

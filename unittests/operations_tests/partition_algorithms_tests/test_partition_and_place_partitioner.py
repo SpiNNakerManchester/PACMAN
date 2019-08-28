@@ -523,7 +523,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         machine_graph, _, _ = partitioner(
             app_graph, machine, plan_n_timesteps=None)
-        self.assert_(len(machine_graph.vertices) == 4)
+        self.assertEqual(4, len(machine_graph.vertices))
 
 
 if __name__ == '__main__':

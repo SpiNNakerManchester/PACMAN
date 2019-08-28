@@ -16,7 +16,6 @@
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractGraph
-from pacman.model.graphs.machine.machine_graph import MachineGraph
 
 
 class ApplicationGraph(AbstractGraph):
