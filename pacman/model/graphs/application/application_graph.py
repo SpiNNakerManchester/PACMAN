@@ -36,6 +36,7 @@ class ApplicationGraph(AbstractGraph):
     @machine_graph.setter
     def machine_graph(self, machine_graph):
         self.__machine_graph = machine_graph
+        machine_graph.application_graph = self
 
     def forget_machine_graph(self):
         for v in self.vertices:
@@ -43,3 +44,7 @@ class ApplicationGraph(AbstractGraph):
         for e in self.edges:
             e.forget_machine_edges()
         self.__machine_graph = None
+
+    def forget_machine_edges(self):
+        for e in self.edges:
+            e.forget_machine_edges()

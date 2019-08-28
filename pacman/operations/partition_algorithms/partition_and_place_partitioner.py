@@ -22,7 +22,6 @@ from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
     FixedVertexAtomsConstraint, SameAtomsAsVertexConstraint)
-from pacman.model.graphs.common.graph_mapper import GraphMapper
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls as utils
@@ -103,7 +102,10 @@ class PartitionAndPlacePartitioner(object):
 
         generate_machine_edges(machine_graph, graph)
 
-        return machine_graph, GraphMapper(), resource_tracker.chips_used
+        # Remember that we've done the partitioning
+        graph.machine_graph = machine_graph
+
+        return machine_graph, resource_tracker.chips_used
 
     def _partition_vertex(
             self, vertex, plan_n_timesteps, machine_graph,

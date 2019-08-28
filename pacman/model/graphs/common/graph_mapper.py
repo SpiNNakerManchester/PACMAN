@@ -22,6 +22,7 @@ class GraphMapper(object):
 
     __slots__ = []
 
+    @deprecated("Nothing in the GraphMapper class is useful any more")
     def __init__(self):
         pass
 

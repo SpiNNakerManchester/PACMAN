@@ -22,8 +22,17 @@ class MachineGraph(AbstractGraph):
     """ A graph whose vertices can fit on the chips of a machine.
     """
 
-    __slots__ = []
+    __slots__ = ["_app_graph"]
 
-    def __init__(self, label):
+    def __init__(self, label, application_graph=None):
         super(MachineGraph, self).__init__(
             MachineVertex, MachineEdge, label)
+        self._app_graph = application_graph
+
+    @property
+    def application_graph(self):
+        return self._app_graph
+
+    @application_graph.setter
+    def application_graph(self, application_graph):
+        self._app_graph = application_graph

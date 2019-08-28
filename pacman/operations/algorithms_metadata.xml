@@ -74,7 +74,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
-            <param_type>MemoryGraphMapper</param_type>
             <param_type>NChipsRequired</param_type>
         </outputs>
     </algorithm>
@@ -111,7 +110,6 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
-            <param_type>MemoryGraphMapper</param_type>
             <param_type>NChipsRequired</param_type>
         </outputs>
     </algorithm>

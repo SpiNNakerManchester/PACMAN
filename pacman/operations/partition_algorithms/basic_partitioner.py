@@ -19,7 +19,6 @@ from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
     FixedVertexAtomsConstraint)
-from pacman.model.graphs.common.graph_mapper import GraphMapper
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
@@ -80,7 +79,10 @@ class BasicPartitioner(object):
 
         generate_machine_edges(machine_graph, graph)
 
-        return machine_graph, GraphMapper(), resource_tracker.chips_used
+        # Remember that we've done the partitioning
+        graph.machine_graph = machine_graph
+
+        return machine_graph, resource_tracker.chips_used
 
     def _partition_one_application_vertex(
             self, vertex, res_tracker, m_graph, plan_n_timesteps):
