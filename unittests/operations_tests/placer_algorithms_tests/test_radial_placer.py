@@ -68,7 +68,7 @@ class TestRadialPlacer(unittest.TestCase):
                 links.append(Link(x, y, 4, (x - 1) % 10, (y - 1) % 10))
                 links.append(Link(x, y, 5, x, (y - 1) % 10))
 
-                r = Router(links, False, 100, 1024)
+                r = Router(links, False, 1024)
                 chips.append(Chip(x, y, processors, r, _sdram, ip))
 
         self.machine = Machine(chips)
