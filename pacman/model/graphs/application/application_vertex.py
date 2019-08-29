@@ -16,8 +16,7 @@
 import sys
 from six import add_metaclass
 from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import (
-    abstractmethod, abstractproperty, AbstractBase)
+from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex

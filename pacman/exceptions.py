@@ -281,7 +281,7 @@ class MachineHasDisconnectedSubRegion(PacmanException):
 
 
 class SDRAMEdgeSizeException(PacmanException):
-    """ raised when a constant SDRAM partition discovers its edges have 
+    """ raised when a constant SDRAM partition discovers its edges have\
     inconsistent size requests
     """
 

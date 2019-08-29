@@ -26,7 +26,8 @@ class AbstractTrafficTypeSecureOutgoingPartition(OutgoingEdgePartition):
     def add_edge(self, edge):
         if self._traffic_type == edge.traffic_type:
             super(
-                AbstractTrafficTypeSecureOutgoingPartition, self).add_edge(edge)
+                AbstractTrafficTypeSecureOutgoingPartition, self).add_edge(
+                    edge)
         else:
             raise Exception(
                 "Not support edge traffic type was attempted to be added to "

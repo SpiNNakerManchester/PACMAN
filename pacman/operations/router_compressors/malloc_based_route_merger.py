@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
-
 from pacman.model.routing_tables.compressed_multicast_routing_table import \
     CompressedMulticastRoutingTable
 from spinn_utilities.progress_bar import ProgressBar

@@ -376,7 +376,7 @@ def _write_one_vertex_application_placement(
         used_pros.append(new_pro)
         used_processors_by_chip.update({key: used_pros})
         f.write("type: {}  Slice {}:{} ({} atoms) on core ({}, {}, {}) \n"
-                .format(sv.label ,lo_atom, hi_atom, num_atoms, x, y, p))
+                .format(sv.label, lo_atom, hi_atom, num_atoms, x, y, p))
     f.write("\n")
 
 

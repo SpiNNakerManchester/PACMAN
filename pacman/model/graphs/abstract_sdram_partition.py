@@ -10,7 +10,6 @@ class AbstractSDRAMPartition(object):
 
     @abstractmethod
     def total_sdram_requirements(self):
-        """
-        
-        :return: 
+        """ returns the total sdram required by this outgoing partition
+        :return: int
         """
