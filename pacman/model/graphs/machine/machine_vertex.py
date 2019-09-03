@@ -15,17 +15,15 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
-from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import ConstrainedObject
 
 
 @add_metaclass(AbstractBase)
-class MachineVertex(ConstrainedObject, AbstractVertex):
+class MachineVertex(AbstractVertex):
     """ A machine graph vertex.
     """
 
-    __slots__ = ["_label"]
+    __slots__ = []
 
     def __init__(self, label=None, constraints=None):
         """
@@ -37,16 +35,10 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
-        super(MachineVertex, self).__init__(constraints)
-        if label:
-            self._label = label
-        else:
-            self._label = str(type(self))
-
-    @property
-    @overrides(AbstractVertex.label)
-    def label(self):
-        return self._label
+        if label is None:
+            label = str(type(self))
+        super(MachineVertex, self).__init__(label, constraints)
+        self._added_to_graph = False
 
     def __str__(self):
         _l = self.label

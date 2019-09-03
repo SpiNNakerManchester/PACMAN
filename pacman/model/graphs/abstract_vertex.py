@@ -13,45 +13,65 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.common import ConstrainedObject
 
 
-@add_metaclass(AbstractBase)
-class AbstractVertex(object):
+class AbstractVertex(ConstrainedObject):
     """ A vertex in a graph.
     """
 
-    __slots__ = ()
+    # Because of diamond inheritance slots must be empty
+    __slots__ = [
+        # Indicates if the Vertex has been added to a graph
+        "_added_to_graph",
+        # Label for the vertex. Changable until added to graph
+        "_label"]
 
-    @abstractproperty
+    def __init__(self, label=None, constraints=None):
+        """
+        :param label: The optional name of the vertex
+        :type label: str
+        :param constraints: The optional initial constraints of the vertex
+        :type constraints: \
+            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
+        :raise pacman.exceptions.PacmanInvalidParameterException:\
+            * If one of the constraints is not valid
+        """
+
+        super(AbstractVertex, self).__init__(constraints)
+        self._label = label
+        self._added_to_graph = False
+
+    @property
     def label(self):
-        """ The label of the vertex.
+        """
+        Returns the current label to the vertex.
 
+        This label could change when the vertex is added to the graph.
+        :return: The label
         :rtype: str
         """
+        return self._label
 
-    @abstractproperty
-    def constraints(self):
-        """ The constraints of the vertex.
-
-        :rtype: iterable(:py:class:`AbstractConstraint`)
+    def set_label(self, label):
         """
+        Changes the label for a vertex NOT yet ADDED to a graph
 
-    @abstractmethod
-    def add_constraint(self, constraint):
-        """ Add a constraint to the vertex.
-
-        :param constraint: The constraint to add
-        :type constraint: :py:class:`AbstractConstraint`
+        :param label: new value for the label
+        :raises PacmanConfigurationException:
+            If there is an attempt to change the label once the vertex has
+            been added to a graph
         """
+        if self._added_to_graph:
+            raise PacmanConfigurationException(
+                "As Labels are also IDs they can not be changed.")
+        self._label = label
 
-    def add_constraints(self, constraints):
-        """ Add a list of constraints to the vertex.
-
-        :param constraints: The list of constraints to add
-        :type constraints: list(:py:class:`AbstractConstraint`)
+    def addedToGraph(self):
         """
-        for constraint in constraints:
-            self.add_constraint(constraint)
+        Records that the vertex has been added to a graph
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
+        """
+        self._added_to_graph = True
