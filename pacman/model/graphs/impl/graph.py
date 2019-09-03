@@ -55,7 +55,12 @@ class Graph(ConstrainedObject, AbstractGraph):
         # the outgoing partitions by edge
         "_outgoing_edge_partition_by_edge",
         # The label of the graph
-        "_label"]
+        "_label",
+        # map between labels and vertex
+        "_vertex_by_label",
+        # count of vertex which had a None or already used label
+        "_none_labelled_vertex_count",
+    ]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types,
                  allowed_partition_types, label):
@@ -73,7 +78,9 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
 
-        self._vertices = OrderedSet()
+        self._vertices = []
+        self._vertex_by_label = dict()
+        self._none_labelled_vertex_count = 0
         self._outgoing_edge_partitions_by_name = OrderedDict()
         self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
@@ -88,6 +95,10 @@ class Graph(ConstrainedObject, AbstractGraph):
     def label(self):
         return self._label
 
+    def _label_postfix(self):
+        self._none_labelled_vertex_count += 1
+        return str(self._none_labelled_vertex_count)
+
     @overrides(AbstractGraph.add_vertex)
     def add_vertex(self, vertex):
         if not isinstance(vertex, self._allowed_vertex_types):
@@ -95,7 +106,16 @@ class Graph(ConstrainedObject, AbstractGraph):
                 "vertex", vertex.__class__,
                 "Vertices of this graph must be one of the following types:"
                 " {}".format(self._allowed_vertex_types))
-        self._vertices.add(vertex)
+        if not vertex.label:
+            vertex.set_label(
+                vertex.__class__.__name__ + "_" + self._label_postfix())
+        elif vertex.label in self._vertex_by_label:
+            if self._vertex_by_label[vertex.label] == vertex:
+                raise PacmanAlreadyExistsException("vertex", vertex.label)
+            vertex.set_label(vertex.label + self._label_postfix())
+        vertex.addedToGraph()
+        self._vertices.append(vertex)
+        self._vertex_by_label[vertex.label] = vertex
 
     @overrides(AbstractGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
@@ -166,11 +186,8 @@ class Graph(ConstrainedObject, AbstractGraph):
     def vertices(self):
         return self._vertices
 
-    # TEMP method until another PR does this better
     def vertex_by_label(self, label):
-        for vertex in self._vertices:
-            if vertex.label == label:
-                return vertex
+        return self._vertex_by_label[label]
 
     @property
     @overrides(AbstractGraph.n_vertices)
