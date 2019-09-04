@@ -44,7 +44,6 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGA):
         "_virtual_chip_y",
         "_n_atoms"]
 
-
     def __init__(
             self, n_atoms, fpga_id, fpga_link_id, board_address=None,
             label=None, constraints=None, max_atoms_per_core=sys.maxsize):

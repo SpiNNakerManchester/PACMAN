@@ -17,7 +17,16 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.graphs import AbstractEdge
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.graphs.machine import MachineEdge
+
+_MachineEdge = None
+
+
+def _machine_edge_class():
+    global _MachineEdge  # pylint: disable=global-statement
+    if _MachineEdge is None:
+        from pacman.model.graphs.machine import MachineEdge
+        _MachineEdge = MachineEdge
+    return _MachineEdge
 
 
 class ApplicationEdge(AbstractEdge):
@@ -45,7 +54,7 @@ class ApplicationEdge(AbstractEdge):
     def __init__(
             self, pre_vertex, post_vertex,
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
-            machine_edge_type=MachineEdge):
+            machine_edge_type=None):
         """
         :param pre_vertex: the application vertex at the start of the edge
         :type pre_vertex: \
@@ -63,6 +72,8 @@ class ApplicationEdge(AbstractEdge):
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
+        if machine_edge_type is None:
+            machine_edge_type = _machine_edge_class()
         self._machine_edge_type = machine_edge_type
         self.__machine_edges = OrderedSet()
 
