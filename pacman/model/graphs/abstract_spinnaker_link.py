@@ -20,8 +20,8 @@ from .abstract_virtual import AbstractVirtual
 class AbstractSpiNNakerLink(AbstractVirtual):
     """ A An Object (most likely a vertex)  connected to a SpiNNaker Link.
 
-        Note: It is expected that everything that is an instance of
-        AbstractSpiNNakerLink is also an instance of AbstractVertex,
+        Note: It is expected that everything that is an instance of \
+        AbstractSpiNNakerLink is also an instance of AbstractVertex, \
         This is not enforced to avoid diamond inheritance.
     """
 
@@ -30,5 +30,6 @@ class AbstractSpiNNakerLink(AbstractVirtual):
     @abstractproperty
     def spinnaker_link_id(self):
         """ The SpiNNaker Link that the vertex is connected to.
+
+        :rtype: int
         """
-        return self._spinnaker_link_id

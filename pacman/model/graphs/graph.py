@@ -21,7 +21,7 @@ from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from pacman.model.graphs import OutgoingEdgePartition
+from .outgoing_edge_partition import OutgoingEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 
 
