@@ -49,7 +49,11 @@ class AbstractGraph(ConstrainedObject):
         # the outgoing partitions by edge
         "_outgoing_edge_partition_by_edge",
         # The label of the graph
-        "_label"]
+        "_label",
+        # map between labels and vertex
+        "_vertex_by_label",
+        # count of vertex which had a None or already used label
+        "_unlabelled_vertex_count"]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types, label):
         """
@@ -63,7 +67,9 @@ class AbstractGraph(ConstrainedObject):
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
 
-        self._vertices = OrderedSet()
+        self._vertices = []
+        self._vertex_by_label = dict()
+        self._unlabelled_vertex_count = 0
         self._outgoing_edge_partitions_by_name = OrderedDict()
         self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
@@ -83,6 +89,10 @@ class AbstractGraph(ConstrainedObject):
         """
         return self._label
 
+    def _label_postfix(self):
+        self._unlabelled_vertex_count += 1
+        return str(self._unlabelled_vertex_count)
+
     def add_vertex(self, vertex):
         """ Add a vertex to the graph.
 
@@ -98,7 +108,16 @@ class AbstractGraph(ConstrainedObject):
                 "vertex", vertex.__class__,
                 "Vertices of this graph must be one of the following types:"
                 " {}".format(self._allowed_vertex_types))
-        self._vertices.add(vertex)
+        if not vertex.label:
+            vertex.set_label(
+                vertex.__class__.__name__ + "_" + self._label_postfix())
+        elif vertex.label in self._vertex_by_label:
+            if self._vertex_by_label[vertex.label] == vertex:
+                raise PacmanAlreadyExistsException("vertex", vertex.label)
+            vertex.set_label(vertex.label + self._label_postfix())
+        vertex.addedToGraph()
+        self._vertices.append(vertex)
+        self._vertex_by_label[vertex.label] = vertex
 
     def add_vertices(self, vertices):
         """ Add a collection of vertices to the graph.
@@ -220,6 +239,9 @@ class AbstractGraph(ConstrainedObject):
         :rtype: iterable(:py:class:`pacman.model.graphs.AbstractVertex`)
         """
         return self._vertices
+
+    def vertex_by_label(self, label):
+        return self._vertex_by_label[label]
 
     @property
     def n_vertices(self):
