@@ -15,10 +15,10 @@
 
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
-from pacman.model.graphs import AbstractGraph
+from pacman.model.graphs.graph import Graph
 
 
-class MachineGraph(AbstractGraph):
+class MachineGraph(Graph):
     """ A graph whose vertices can fit on the chips of a machine.
     """
 

@@ -18,9 +18,8 @@ from .abstract_fpga import AbstractFPGA
 from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
-from .graph import AbstractGraph
 from .outgoing_edge_partition import OutgoingEdgePartition
 
-__all__ = ["AbstractEdge", "AbstractFPGA", "AbstractGraph",
+__all__ = ["AbstractEdge", "AbstractFPGA",
            "OutgoingEdgePartition", "AbstractSpiNNakerLink",
            "AbstractVertex", "AbstractVirtual"]

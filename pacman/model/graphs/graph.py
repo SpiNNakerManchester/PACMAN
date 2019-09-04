@@ -25,7 +25,7 @@ from .outgoing_edge_partition import OutgoingEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 
 
-class AbstractGraph(ConstrainedObject):
+class Graph(ConstrainedObject):
     """ A graph that specifies the allowed types of the vertices and edges.
     """
 
@@ -63,7 +63,7 @@ class AbstractGraph(ConstrainedObject):
             A single or tuple of types of edges to be allowed in the graph
         :param label: The label on the graph, or None
         """
-        super(AbstractGraph, self).__init__(None)
+        super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
 

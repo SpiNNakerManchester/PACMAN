@@ -15,10 +15,10 @@
 
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
-from pacman.model.graphs import AbstractGraph
+from pacman.model.graphs.graph import Graph
 
 
-class ApplicationGraph(AbstractGraph):
+class ApplicationGraph(Graph):
     """ An application-level abstraction of a graph.
     """
 
