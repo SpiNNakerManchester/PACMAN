@@ -14,11 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import abstractproperty
-from .abstract_virtual_vertex import AbstractVirtualVertex
+from .abstract_virtual import AbstractVirtual
 
 
-class AbstractFPGAVertex(AbstractVirtualVertex):
-    """ A vertex connected to an FPGA.
+class AbstractFPGA(AbstractVirtual):
+    """ A An Object (most likely a vertex) connected to an FPGA.
+
+        Note: It is expected that everything that is an instance of
+        AbstractFPGA is also an instance of AbstractVertex,
+        This is not enforced to avoid diamond inheritance.
     """
 
     __slots__ = ()

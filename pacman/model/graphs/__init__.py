@@ -14,13 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_edge import AbstractEdge
-from .abstract_fpga_vertex import AbstractFPGAVertex
-from .abstract_spinnaker_link_vertex import AbstractSpiNNakerLinkVertex
+from .abstract_fpga import AbstractFPGA
+from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_vertex import AbstractVertex
-from .abstract_virtual_vertex import AbstractVirtualVertex
-from .outgoing_edge_partition import OutgoingEdgePartition
+from .abstract_virtual import AbstractVirtual
 from .graph import AbstractGraph
+from .outgoing_edge_partition import OutgoingEdgePartition
 
-__all__ = ["AbstractEdge", "AbstractFPGAVertex", "AbstractGraph",
-           "AbstractSpiNNakerLinkVertex", "AbstractVertex",
-           "AbstractVirtualVertex", "OutgoingEdgePartition"]
+__all__ = ["AbstractEdge", "AbstractFPGA", "AbstractGraph",
+           "OutgoingEdgePartition", "AbstractSpiNNakerLink",
+           "AbstractVertex", "AbstractVirtual"]

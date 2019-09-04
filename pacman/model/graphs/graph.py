@@ -90,6 +90,8 @@ class AbstractGraph(ConstrainedObject):
         :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
         :raises PacmanInvalidParameterException:\
             If the vertex is not of a valid type
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
         """
         if not isinstance(vertex, self._allowed_vertex_types):
             raise PacmanInvalidParameterException(
@@ -106,6 +108,8 @@ class AbstractGraph(ConstrainedObject):
             iterable(:py:class:`pacman.model.graphs.AbstractVertex`)
         :raises PacmanInvalidParameterException:\
             If any vertex is not of a valid type
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
         """
         for v in vertices:
             self.add_vertex(v)

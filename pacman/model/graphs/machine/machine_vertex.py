@@ -15,19 +15,18 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
-from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import ConstrainedObject, Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
 
 
 @add_metaclass(AbstractBase)
-class MachineVertex(ConstrainedObject, AbstractVertex):
+class MachineVertex(AbstractVertex):
     """ A machine graph vertex.
     """
 
-    __slots__ = ["_app_vertex", "_index", "_label", "_vertex_slice"]
+    __slots__ = ["_app_vertex", "_index", "_vertex_slice"]
     _DEFAULT_SLICE = Slice(0, 0)
 
     def __init__(self, label=None, constraints=None, app_vertex=None,
@@ -45,11 +44,10 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
-        super(MachineVertex, self).__init__(constraints)
-        if label:
-            self._label = label
-        else:
-            self._label = str(type(self))
+        if label is None:
+            label = str(type(self))
+        super(MachineVertex, self).__init__(label, constraints)
+        self._added_to_graph = False
         self._app_vertex = app_vertex
         self._index = None
         if app_vertex is not None and not isinstance(
@@ -61,11 +59,6 @@ class MachineVertex(ConstrainedObject, AbstractVertex):
             self._vertex_slice = vertex_slice
         else:
             self._vertex_slice = self._DEFAULT_SLICE
-
-    @property
-    @overrides(AbstractVertex.label)
-    def label(self):
-        return self._label
 
     @property
     def app_vertex(self):

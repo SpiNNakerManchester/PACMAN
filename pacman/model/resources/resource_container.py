@@ -127,3 +127,19 @@ class ResourceContainer(object):
 
         # add reverse IPtags
         self._reverse_iptags.extend(other.reverse_iptags)
+
+    def __eq__(self, other):
+        """
+        For unit tests ONLY so __hash__ and __eq__ pairing not done!
+        """
+        if self._dtcm_usage.get_value() != other.dtcm.get_value():
+            return False
+        if self._sdram_usage.fixed != other._sdram_usage.fixed:
+            return False
+        if self._sdram_usage.per_timestep != other._sdram_usage.per_timestep:
+            return False
+        if self._cpu_cycles.get_value() != other.cpu_cycles.get_value():
+            return False
+        if self._iptags != other._iptags:
+            return False
+        return self._reverse_iptags == other._reverse_iptags

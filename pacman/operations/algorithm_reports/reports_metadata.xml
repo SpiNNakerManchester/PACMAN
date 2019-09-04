@@ -407,4 +407,25 @@
             <param_type>JsonRoutingTablesPath</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="ConvertToJsonMachineGraph">
+        <python_module>pacman.operations.algorithm_reports.convert_to_json_machine_graph</python_module>
+        <python_class>ConvertToJsonMachineGraph</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>report_folder</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>JsonMachineGraphPath</param_type>
+        </outputs>
+    </algorithm>
 </algorithms>

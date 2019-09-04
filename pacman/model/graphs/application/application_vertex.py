@@ -16,23 +16,21 @@
 import sys
 from six import add_metaclass
 from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import (
     abstractmethod, abstractproperty, AbstractBase)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import ConstrainedObject
 from pacman.exceptions import PacmanValueError
 
 
 @add_metaclass(AbstractBase)
-class ApplicationVertex(ConstrainedObject, AbstractVertex):
+class ApplicationVertex(AbstractVertex):
     """ A vertex that can be broken down into a number of smaller vertices
         based on the resources that the vertex requires.
     """
 
-    __slots__ = ["_label", "_machine_vertices", "_slices"]
+    __slots__ = ["_machine_vertices", "_slices"]
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
@@ -49,19 +47,13 @@ class ApplicationVertex(ConstrainedObject, AbstractVertex):
             * If one of the constraints is not valid
         """
 
-        super(ApplicationVertex, self).__init__(constraints)
-        self._label = label
+        super(ApplicationVertex, self).__init__(label, constraints)
         self._machine_vertices = OrderedSet()
         self._slices = list()
 
         # add a constraint for max partitioning
         self.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
-
-    @property
-    @overrides(AbstractVertex.label)
-    def label(self):
-        return self._label
 
     def __str__(self):
         return self.label
