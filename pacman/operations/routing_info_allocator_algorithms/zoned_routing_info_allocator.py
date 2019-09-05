@@ -143,9 +143,7 @@ class ZonedRoutingInfoAllocator(object):
                 app_vertex)
             if app_vertex in self._key_bites_per_app:
                 key_bites = self._key_bites_per_app[app_vertex]
-                for vertex in machine_vertices:
-                    machine_index = self._graph_mapper.\
-                        get_machine_vertex_index(vertex)
+                for machine_index, vertex in enumerate(machine_vertices):
                     partitions = self._machine_graph. \
                         get_outgoing_edge_partitions_starting_at_vertex(vertex)
                     partition = partitions.peek()

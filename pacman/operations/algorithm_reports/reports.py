@@ -20,7 +20,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import Router
 from pacman import exceptions
-from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
+from pacman.model.graphs import AbstractSpiNNakerLink, AbstractFPGA
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.operations.algorithm_reports.router_summary import RouterSummary
 
@@ -840,9 +840,9 @@ def _search_route(
     # Create text for starting point
     source_vertex = source_placement.vertex
     text = ""
-    if isinstance(source_vertex, AbstractSpiNNakerLinkVertex):
+    if isinstance(source_vertex, AbstractSpiNNakerLink):
         text += "Virtual SpiNNaker Link "
-    if isinstance(source_vertex, AbstractFPGAVertex):
+    if isinstance(source_vertex, AbstractFPGA):
         text += "Virtual FPGA Link "
     text += "{}:{}:{} -> ".format(
         source_placement.x, source_placement.y, source_placement.p)
