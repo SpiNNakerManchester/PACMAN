@@ -15,6 +15,7 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.constraints import AbstractConstraint
 
@@ -29,7 +30,6 @@ class ConstrainedObject(object):
     """
 
     __slots__ = [
-
         # The constraints of the object
         "_constraints"
     ]
@@ -41,7 +41,7 @@ class ConstrainedObject(object):
 
         # safety point for diamond inheritance
         if not hasattr(self, '_constraints') or self._constraints is None:
-            self._constraints = set()
+            self._constraints = OrderedSet()
 
         # add new constraints to the set
         self.add_constraints(constraints)
@@ -67,7 +67,7 @@ class ConstrainedObject(object):
         try:
             self._constraints.add(constraint)
         except Exception:
-            self._constraints = set()
+            self._constraints = OrderedSet()
             self._constraints.add(constraint)
 
     def add_constraints(self, constraints):
@@ -96,4 +96,4 @@ class ConstrainedObject(object):
         try:
             return self._constraints
         except Exception:
-            return set()
+            return OrderedSet()
