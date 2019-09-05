@@ -118,7 +118,7 @@ def _ner_net(source, destinations, machine):
      {(x,y): :py:class:`RoutingTree`, ...})
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc. For
-        convenience, a dictionarry mapping from destination (x, y) coordinates
+        convenience, a dictionary mapping from destination (x, y) coordinates
         to the associated RoutingTree is provided to allow the caller to insert
         these items.
 
@@ -459,8 +459,8 @@ def _avoid_dead_links(root, machine):
     :param machine: The machine in which the routes exist.
     :return: (:py:class:`~.RoutingTree`,
      {(x,y): :py:class:`~.routing_tree.RoutingTree`, ...})
-        A new RoutingTree is produced rooted as before. A dictionarry mapping
-        from (x, y) to the associated RoutingTree is provided for convenienc
+        A new RoutingTree is produced rooted as before. A dictionary mapping
+        from (x, y) to the associated RoutingTree is provided for convenience
     """
     # Make a copy of the RoutingTree with all broken parts disconnected
     root, lookup, broken_links = _copy_and_disconnect_tree(root, machine)
