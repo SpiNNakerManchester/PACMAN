@@ -1,5 +1,24 @@
-from collections import defaultdict, OrderedDict
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
@@ -36,7 +55,12 @@ class Graph(ConstrainedObject, AbstractGraph):
         # the outgoing partitions by edge
         "_outgoing_edge_partition_by_edge",
         # The label of the graph
-        "_label"]
+        "_label",
+        # map between labels and vertex
+        "_vertex_by_label",
+        # count of vertex which had a None or already used label
+        "_none_labelled_vertex_count",
+    ]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types,
                  allowed_partition_types, label):
@@ -54,12 +78,15 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
 
-        self._vertices = OrderedSet()
+        self._vertices = []
+        self._vertex_by_label = dict()
+        self._none_labelled_vertex_count = 0
         self._outgoing_edge_partitions_by_name = OrderedDict()
-        self._outgoing_edges = defaultdict(OrderedSet)
-        self._incoming_edges = defaultdict(OrderedSet)
-        self._incoming_edges_by_partition_name = defaultdict(list)
-        self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
+        self._outgoing_edges = DefaultOrderedDict(OrderedSet)
+        self._incoming_edges = DefaultOrderedDict(OrderedSet)
+        self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
+        self._outgoing_edge_partitions_by_pre_vertex = \
+            DefaultOrderedDict(OrderedSet)
         self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
 
@@ -68,6 +95,10 @@ class Graph(ConstrainedObject, AbstractGraph):
     def label(self):
         return self._label
 
+    def _label_postfix(self):
+        self._none_labelled_vertex_count += 1
+        return str(self._none_labelled_vertex_count)
+
     @overrides(AbstractGraph.add_vertex)
     def add_vertex(self, vertex):
         if not isinstance(vertex, self._allowed_vertex_types):
@@ -75,7 +106,16 @@ class Graph(ConstrainedObject, AbstractGraph):
                 "vertex", vertex.__class__,
                 "Vertices of this graph must be one of the following types:"
                 " {}".format(self._allowed_vertex_types))
-        self._vertices.add(vertex)
+        if not vertex.label:
+            vertex.set_label(
+                vertex.__class__.__name__ + "_" + self._label_postfix())
+        elif vertex.label in self._vertex_by_label:
+            if self._vertex_by_label[vertex.label] == vertex:
+                raise PacmanAlreadyExistsException("vertex", vertex.label)
+            vertex.set_label(vertex.label + self._label_postfix())
+        vertex.addedToGraph()
+        self._vertices.append(vertex)
+        self._vertex_by_label[vertex.label] = vertex
 
     @overrides(AbstractGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
@@ -145,6 +185,9 @@ class Graph(ConstrainedObject, AbstractGraph):
     @overrides(AbstractGraph.vertices)
     def vertices(self):
         return self._vertices
+
+    def vertex_by_label(self, label):
+        return self._vertex_by_label[label]
 
     @property
     @overrides(AbstractGraph.n_vertices)

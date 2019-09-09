@@ -1,3 +1,19 @@
+<!--
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
@@ -46,10 +62,15 @@
                 <param_type>MemoryExtendedVirtualMachine</param_type>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
@@ -71,6 +92,10 @@
                 <param_type>MemoryMachine</param_type>
             </parameter>
             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+            <parameter>
                 <param_name>preallocated_resources</param_name>
                 <param_type>MemoryPreAllocatedResources</param_type>
             </parameter>
@@ -78,6 +103,7 @@
         <required_inputs>
             <param_name>graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <optional_inputs>
             <token>GeneratedPreAllocatedResources</token>
@@ -101,10 +127,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -122,10 +153,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -143,10 +179,46 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryPlacements</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="SpreaderPlacer">
+        <python_module>pacman.operations.placer_algorithms.spreader_placer</python_module>
+        <python_class>SpreaderPlacer</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>n_keys_map</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -164,10 +236,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
-        </input_definitions>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+       </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -185,10 +262,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -206,10 +288,15 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
+            <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
             <param_name>machine</param_name>
+            <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryPlacements</param_type>
@@ -290,6 +377,43 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="ZonedRoutingInfoAllocator">
+        <python_module>pacman.operations.routing_info_allocator_algorithms.zoned_routing_info_allocator</python_module>
+        <python_class>ZonedRoutingInfoAllocator</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>application_graph</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>n_keys_map</param_name>
+            <param_name>placements</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>ApplicationRoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="DestinationBasedRoutingInfoAllocator">
@@ -373,38 +497,6 @@
             <param_type>MemoryRoutingInfos</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="VertexBasedRoutingInfoAllocator">
-        <python_module>pacman.operations.routing_info_allocator_algorithms.field_based_routing_allocator.vertex_based_routing_info_allocator</python_module>
-        <python_class>VertexBasedRoutingInfoAllocator</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachinePartitionNKeysMap</param_type>
-            </parameter>
-            <parameter>
-                <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>n_keys_map</param_name>
-            <param_name>application_graph</param_name>
-            <param_name>graph_mapper</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
-            <param_type>MemoryFields</param_type>
-        </outputs>
-    </algorithm>
     <algorithm name="BasicRoutingTableGenerator">
         <python_module>pacman.operations.routing_table_generators.basic_routing_table_generator</python_module>
         <python_class>BasicRoutingTableGenerator</python_class>
@@ -431,9 +523,92 @@
             <param_type>MemoryRoutingTables</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="ZonedRoutingTableGenerator">
+        <python_module>pacman.operations.routing_table_generators.zoned_routing_table_generator</python_module>
+        <python_class>ZonedRoutingTableGenerator</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_table_by_partitions</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>info_by_app_vertex</param_name>
+                <param_type>ApplicationRoutingInfos</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>routing_infos</param_name>
+            <param_name>routing_table_by_partitions</param_name>
+            <param_name>machine</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>info_by_app_vertex</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryRoutingTables</param_type>
+        </outputs>
+    </algorithm>
     <algorithm name="MundyRouterCompressor">
         <python_module>pacman.operations.router_compressors.mundys_router_compressor.routing_table_condenser</python_module>
         <python_class>MundyRouterCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+            <param_name>target_length</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryCompressedRoutingTables</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="UnorderedCompressor">
+        <python_module>pacman.operations.router_compressors.checked_unordered_compressor</python_module>
+        <python_class>CheckedUnorderedCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>target_length</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryCompressedRoutingTables</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="PairCompressor">
+        <python_module>pacman.operations.router_compressors.pair_compressor</python_module>
+        <python_class>PairCompressor</python_class>
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
@@ -466,6 +641,9 @@
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
@@ -482,6 +660,9 @@
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
@@ -496,7 +677,6 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
         </input_definitions>
@@ -546,11 +726,16 @@
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
-        </input_definitions>
+             <parameter>
+                <param_name>plan_n_timesteps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+       </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
-        </required_inputs>
+            <param_name>plan_n_timesteps</param_name>
+         </required_inputs>
         <outputs>
             <param_type>MemoryIpTags</param_type>
             <param_type>MemoryReverseIpTags</param_type>
@@ -598,78 +783,9 @@
             <param_name>graph_mapper</param_name>
         </optional_inputs>
     </algorithm>
-    <algorithm name="RigPlaceAndRoute">
-        <python_module>pacman.operations.rig_algorithms.rig_place_and_route</python_module>
-        <python_class>RigPlaceAndRoute</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>machine</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryPlacements</param_type>
-            <param_type>MemoryRoutingTableByPartition</param_type>
-        </outputs>
-    </algorithm>
-    <algorithm name="RigPlace">
-        <python_module>pacman.operations.rig_algorithms.rig_place</python_module>
-        <python_class>RigPlace</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>machine</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryPlacements</param_type>
-        </outputs>
-    </algorithm>
-    <algorithm name="RigRoute">
-        <python_module>pacman.operations.rig_algorithms.rig_route</python_module>
-        <python_class>RigRoute</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
-            </parameter>
-            <parameter>
-                <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>machine</param_name>
-            <param_name>placements</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryRoutingTableByPartition</param_type>
-        </outputs>
-    </algorithm>
-    <algorithm name="RigMCRoute">
-        <python_module>pacman.operations.rig_algorithms.rig_mc_route</python_module>
-        <python_class>RigMCRoute</python_class>
+    <algorithm name="NerRoute">
+        <python_module>pacman.operations.router_algorithms</python_module>
+        <python_class>NerRoute</python_class>
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>

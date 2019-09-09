@@ -1,7 +1,22 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import (
-    ResourceContainer, CPUCyclesPerTickResource, DTCMResource, SDRAMResource)
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 
 
 def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
@@ -13,7 +28,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     return ResourceContainer(
         cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
         dtcm=DTCMResource(dtcm_requirement),
-        sdram=SDRAMResource(sdram_requirement))
+        sdram=ConstantSDRAM(sdram_requirement))
 
 
 class Vertex(ApplicationVertex):

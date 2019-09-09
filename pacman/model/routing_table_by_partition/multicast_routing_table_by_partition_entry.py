@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from pacman.exceptions import PacmanInvalidParameterException
 
 
@@ -74,7 +89,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             None if incoming_link is None else int(incoming_link))
 
     @property
-    def out_going_processors(self):
+    def processor_ids(self):
         """ The destination processors of the entry
 
         :rtype: set(int)
@@ -82,7 +97,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         return self._out_going_processors
 
     @property
-    def out_going_links(self):
+    def link_ids(self):
         """ The destination links of the entry
 
         :rtype: set(int)
@@ -176,9 +191,9 @@ class MulticastRoutingTableByPartitionEntry(object):
         valid_incoming_link = self.__merge_noneables(
             self._incoming_link, other.incoming_link, "incoming_link")
         merged_outgoing_processors = self._out_going_processors.union(
-            other.out_going_processors)
+            other.processor_ids)
         merged_outgoing_links = self._out_going_links.union(
-            other.out_going_links)
+            other.link_ids)
 
         return MulticastRoutingTableByPartitionEntry(
             merged_outgoing_links, merged_outgoing_processors,

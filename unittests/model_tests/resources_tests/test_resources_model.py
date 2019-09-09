@@ -1,11 +1,26 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 test for the resources model
 """
 import unittest
 from pacman.model.resources import (
-    SDRAMResource, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
     IPtagResource, ReverseIPtagResource, SpecificBoardIPtagResource,
-    SpecificBoardReverseIPtagResource)
+    SpecificBoardReverseIPtagResource, VariableSDRAM)
 
 
 class TestResourceModels(unittest.TestCase):
@@ -18,12 +33,33 @@ class TestResourceModels(unittest.TestCase):
         test that adding a SDRAM resource to a resource container works
         correctly
         """
-        sdram = SDRAMResource(128 * (2**20))
-        self.assertEqual(sdram.get_value(), 128 * (2**20))
-        sdram = SDRAMResource(128 * (2**19))
-        self.assertEqual(sdram.get_value(), 128 * (2**19))
-        sdram = SDRAMResource(128 * (2**21))
-        self.assertEqual(sdram.get_value(), 128 * (2**21))
+        const1 = ConstantSDRAM(128)
+        self.assertEqual(const1.get_total_sdram(None), 128)
+        const2 = ConstantSDRAM(256)
+        combo = const1 + const2
+        self.assertEqual(combo.get_total_sdram(None), 128+256)
+        combo = const1 - const2
+        self.assertEqual(combo.get_total_sdram(None), 128-256)
+        combo = const2 + const1
+        self.assertEqual(combo.get_total_sdram(None), 256+128)
+        combo = const2 - const1
+        self.assertEqual(combo.get_total_sdram(None), 256-128)
+
+        var1 = VariableSDRAM(124, 8)
+        self.assertEqual(var1.get_total_sdram(100), 124 + 8 * 100)
+        combo = var1 + const1
+        self.assertEqual(combo.get_total_sdram(100), 124 + 8 * 100 + 128)
+        combo = var1 - const1
+        self.assertEqual(combo.get_total_sdram(100), 124 + 8 * 100 - 128)
+        combo = const1 + var1
+        self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
+        combo = const1 - var1
+        self.assertEqual(combo.get_total_sdram(100), 128 - (124 + 8 * 100))
+        var2 = VariableSDRAM(234, 6)
+        combo = var2 + var1
+        self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (6 + 8) * 150)
+        combo = var2 - var1
+        self.assertEqual(combo.get_total_sdram(150), 234 - 124 + (6 - 8) * 150)
 
     def test_dtcm(self):
         """
@@ -53,30 +89,30 @@ class TestResourceModels(unittest.TestCase):
         """
         tests that creating multiple resource containers doesn't cause issues.
         """
-        sdram = SDRAMResource(128 * (2**20))
+        sdram = ConstantSDRAM(128 * (2**20))
         dtcm = DTCMResource(128 * (2**20) + 1)
         cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_value(), 128 * (2**20))
+        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**20))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**20) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**20) + 2)
 
-        sdram = SDRAMResource(128 * (2**19))
+        sdram = ConstantSDRAM(128 * (2**19))
         dtcm = DTCMResource(128 * (2**19) + 1)
         cpu = CPUCyclesPerTickResource(128 * (2**19) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_value(), 128 * (2**19))
+        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**19))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**19) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**19) + 2)
 
-        sdram = SDRAMResource(128 * (2**21))
+        sdram = ConstantSDRAM(128 * (2**21))
         dtcm = DTCMResource(128 * (2**21) + 1)
         cpu = CPUCyclesPerTickResource(128 * (2**21) + 2)
 
         container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_value(), 128 * (2**21))
+        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**21))
         self.assertEqual(container.dtcm.get_value(), 128 * (2**21) + 1)
         self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**21) + 2)
 

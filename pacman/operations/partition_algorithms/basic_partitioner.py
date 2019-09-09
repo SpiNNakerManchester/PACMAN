@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPartitionException
@@ -28,7 +43,7 @@ class BasicPartitioner(object):
         return top / bottom
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine):
+    def __call__(self, graph, machine, plan_n_timesteps):
         """
         :param graph: The application_graph to partition
         :type graph:\
@@ -37,6 +52,8 @@ class BasicPartitioner(object):
             The machine with respect to which to partition the application\
             graph
         :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
         :return: A machine graph
         :rtype:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
@@ -54,23 +71,25 @@ class BasicPartitioner(object):
         progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
         machine_graph = MachineGraph("Machine graph for " + graph.label)
         graph_mapper = GraphMapper()
-        resource_tracker = ResourceTracker(machine)
+        resource_tracker = ResourceTracker(machine, plan_n_timesteps)
 
         # Partition one vertex at a time
         for vertex in progress.over(graph.vertices):
             self._partition_one_application_vertex(
-                vertex, resource_tracker, machine_graph, graph_mapper)
+                vertex, resource_tracker, machine_graph, graph_mapper,
+                plan_n_timesteps)
 
         generate_machine_edges(machine_graph, graph_mapper, graph)
 
         return machine_graph, graph_mapper, resource_tracker.chips_used
 
     def _partition_one_application_vertex(
-            self, vertex, res_tracker, m_graph, mapper):
+            self, vertex, res_tracker, m_graph, mapper, plan_n_timesteps):
         """ Partitions a single application vertex.
         """
         # Compute how many atoms of this vertex we can put on one core
-        atoms_per_core = self._compute_atoms_per_core(vertex, res_tracker)
+        atoms_per_core = self._compute_atoms_per_core(
+            vertex, res_tracker, plan_n_timesteps)
         if atoms_per_core < 1.0:
             raise PacmanPartitionException(
                 "Not enough resources available to create vertex")
@@ -98,7 +117,7 @@ class BasicPartitioner(object):
             res_tracker.allocate_constrained_resources(
                 resources, vertex.constraints)
 
-    def _compute_atoms_per_core(self, vertex, res_tracker):
+    def _compute_atoms_per_core(self, vertex, res_tracker, plan_n_timesteps):
         """ Work out how many atoms per core are required for the given\
             vertex. Assumes that the first atom of the vertex is fully\
             representative.
@@ -116,7 +135,8 @@ class BasicPartitioner(object):
         # Find the ratio of each of the resources - if 0 is required,
         # assume the ratio is the max available
         atoms_per_sdram = self._get_ratio(
-            limits.sdram.get_value(), requirements.sdram.get_value())
+            limits.sdram.get_total_sdram(plan_n_timesteps),
+            requirements.sdram.get_total_sdram(plan_n_timesteps))
         atoms_per_dtcm = self._get_ratio(
             limits.dtcm.get_value(), requirements.dtcm.get_value())
         atoms_per_cpu = self._get_ratio(

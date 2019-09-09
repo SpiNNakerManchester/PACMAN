@@ -1,6 +1,21 @@
-from collections import defaultdict
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 from six import itervalues
+from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 
 
 class ConstraintOrder(object):
@@ -77,7 +92,7 @@ class VertexSorter(object):
         """
 
         # Group constraints based on the class
-        self._constraints = defaultdict(list)
+        self._constraints = DefaultOrderedDict(list)
         for c in constraint_order:
             self._constraints[c.constraint_class].append(
                 (c.relative_order, c.required_optional_properties))
@@ -114,7 +129,8 @@ class VertexSorter(object):
         # Sort the vertices - because ranks is a list, things with the same
         # min rank will be sorted by the next highest rank and so on
         vertices_with_rank.sort(key=lambda thing: thing[1])
-        return [vertex for vertex, _ in vertices_with_rank]
+        results = [vertex for vertex, _ in vertices_with_rank]
+        return results
 
     @staticmethod
     def _matches(constraint, opts):

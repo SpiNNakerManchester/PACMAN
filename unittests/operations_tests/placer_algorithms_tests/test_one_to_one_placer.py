@@ -1,13 +1,27 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.common import EdgeTrafficType
-from spinn_machine.virtual_machine import VirtualMachine
-
+from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge)
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from pacman.operations.chip_id_allocator_algorithms \
-    import MallocBasedChipIdAllocator
+from pacman.operations.chip_id_allocator_algorithms import (
+    MallocBasedChipIdAllocator)
 from pacman.operations.placer_algorithms import OneToOnePlacer
 
 
@@ -43,11 +57,12 @@ def test_virtual_vertices_one_to_one():
         one_to_one_vertices.append(one_to_one_vertex)
 
     # Get and extend the machine for the virtual chip
-    machine = VirtualMachine(version=5)
+    machine = virtual_machine(version=5)
     extended_machine = MallocBasedChipIdAllocator()(machine, machine_graph)
 
     # Do placements
-    placements = OneToOnePlacer()(machine_graph, extended_machine)
+    placements = OneToOnePlacer()(
+        machine_graph, extended_machine, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -102,8 +117,9 @@ def test_one_to_one():
         last_vertex = vertex
 
     # Do placements
-    machine = VirtualMachine(version=5)
-    placements = OneToOnePlacer()(machine_graph, machine)
+    machine = virtual_machine(version=5)
+    placements = OneToOnePlacer()(
+        machine_graph, machine, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -143,9 +159,9 @@ def test_sdram_links():
         machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements
-    machine = VirtualMachine(version=5)
+    machine = virtual_machine(version=5)
     try:
-        OneToOnePlacer()(machine_graph, machine)
+        OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
         raise Exception("should blow up here")
     except PacmanException:
         pass

@@ -1,4 +1,18 @@
-import math
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
@@ -17,6 +31,7 @@ from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
             generate_key_ranges_from_mask)
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanRouteInfoAllocationException)
+from .utils import get_possible_masks
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -54,10 +69,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
          continuous, noncontinuous) = get_edge_groups(
              machine_graph, EdgeTrafficType.MULTICAST)
 
-        # Even non-continuous keys will be continuous
-        for group in noncontinuous:
-            continuous.append(group)
-
         # Go through the groups and allocate keys
         progress = ProgressBar(
             machine_graph.n_outgoing_edge_partitions,
@@ -81,7 +92,12 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._allocate_share_key(group, routing_infos, n_keys_map)
 
         for group in continuous:
-            self._allocate_continuous_groups(group, routing_infos, n_keys_map)
+            self._allocate_other_groups(group, routing_infos, n_keys_map,
+                                        continuous=True)
+
+        for group in noncontinuous:
+            self._allocate_other_groups(group, routing_infos, n_keys_map,
+                                        continuous=False)
 
         progress.end()
         return routing_infos
@@ -90,9 +106,11 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return max(
             n_keys_map.n_keys_for_partition(partition) for partition in group)
 
-    def _allocate_continuous_groups(self, group, routing_infos, n_keys_map):
+    def _allocate_other_groups(
+            self, group, routing_infos, n_keys_map, continuous):
         keys_and_masks = self._allocate_keys_and_masks(
-            None, None, self._get_n_keys(group, n_keys_map))
+            None, None, self._get_n_keys(group, n_keys_map),
+            contiguous_keys=continuous)
         for partition in group:
             self._update_routing_objects(
                 keys_and_masks, routing_infos, partition)
@@ -154,19 +172,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         partition_info = PartitionRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)
 
-    @staticmethod
-    def _get_possible_masks(n_keys):
-        """ Get the possible masks given the number of keys
-
-        :param n_keys: The number of keys to generate a mask for
-        """
-        # TODO: Generate all the masks. Currently only the obvious mask with
-        # the zeros at the bottom is generated but the zeros could actually be
-        # anywhere
-        n_zeros = int(math.ceil(math.log(n_keys, 2)))
-        n_ones = 32 - n_zeros
-        return [(((1 << n_ones) - 1) << n_zeros)]
-
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
         """ Allocate fixed keys and masks
 
@@ -187,12 +192,14 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                     key_and_mask.key, key_and_mask.mask):
                 self.allocate_elements(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys):
+    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys,
+                                 contiguous_keys=True):
         # If there isn't a fixed mask, generate a fixed mask based
         # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = self._get_possible_masks(partition_n_keys)
+            masks_available = get_possible_masks(
+                partition_n_keys, contiguous_keys=contiguous_keys)
 
         # For each usable mask, try all of the possible keys and
         # see if a match is possible

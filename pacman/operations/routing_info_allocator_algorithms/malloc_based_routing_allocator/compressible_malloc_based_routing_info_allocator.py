@@ -1,5 +1,22 @@
-from collections import defaultdict, OrderedDict
-import math
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+try:
+    from collections.abc import defaultdict, OrderedDict
+except ImportError:
+    from collections import defaultdict, OrderedDict
 import logging
 from six import iteritems, itervalues
 from spinn_utilities.log import FormatAdapter
@@ -22,6 +39,7 @@ from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
         generate_key_ranges_from_mask)
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanRouteInfoAllocationException)
+from .utils import get_possible_masks
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -56,8 +74,8 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Get the edges grouped by those that require the same key
         (fixed_keys, _shared_keys, fixed_masks, fixed_fields, flexi_fields,
-         continuous, noncontinuous) = \
-            get_edge_groups(machine_graph, EdgeTrafficType.MULTICAST)
+         continuous, noncontinuous) = get_edge_groups(
+             machine_graph, EdgeTrafficType.MULTICAST)
         if flexi_fields:
             raise PacmanConfigurationException(
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
@@ -134,18 +152,16 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             for partition, entry in iteritems(routing_table):
                 if partition in continuous:
                     entry_hash = sum(
-                        1 << i
-                        for i in entry.out_going_links)
+                        1 << i for i in entry.link_ids)
                     entry_hash += sum(
-                        1 << (i + 6)
-                        for i in entry.out_going_processors)
+                        1 << (i + 6) for i in entry.processor_ids)
                     partitions_by_route[entry_hash].add(partition)
 
             for entry_hash, partitions in iteritems(partitions_by_route):
-                found_groups = list()
-                for partition in partitions:
-                    if partition in partition_groups:
-                        found_groups.append(partition_groups[partition])
+                found_groups = [
+                    partition_groups[partition]
+                    for partition in partitions
+                    if partition in partition_groups]
 
                 if not found_groups:
                     # If no group was found, create a new one
@@ -184,49 +200,35 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return routing_infos
 
     @staticmethod
-    def _update_routing_objects(
-            keys_and_masks, routing_infos, group):
+    def _update_routing_objects(keys_and_masks, routing_infos, group):
         # Allocate the routing information
-        partition_info = PartitionRoutingInfo(keys_and_masks, group)
-        routing_infos.add_partition_info(partition_info)
-
-    @staticmethod
-    def _get_possible_masks(n_keys):
-        """ Get the possible masks given the number of keys
-
-        :param n_keys: The number of keys to generate a mask for
-        """
-
-        # TODO: Generate all the masks. Currently only the obvious mask with
-        # the zeros at the bottom is generated but the zeros could actually be
-        # anywhere.
-        n_zeros = int(math.ceil(math.log(n_keys, 2)))
-        n_ones = 32 - n_zeros
-        return [((1 << n_ones) - 1) << n_zeros]
+        routing_infos.add_partition_info(PartitionRoutingInfo(
+            keys_and_masks, group))
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks):
-        """ allocate fixed keys and masks
+        """ Allocate fixed keys and masks
 
         :param keys_and_masks: set of keys and masks
         :rtype: None
         """
         # If there are fixed keys and masks, allocate them
         for key_and_mask in keys_and_masks:
-
             # Go through the mask sets and allocate
             for key, n_keys in generate_key_ranges_from_mask(
                     key_and_mask.key, key_and_mask.mask):
                 self.allocate_elements(key, n_keys)
 
-    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys):
-        # If there isn't a fixed mask, generate a fixed mask based on the
-        # number of keys required
+    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys,
+                                 contiguous_keys=True):
+        # If there isn't a fixed mask, generate a fixed mask based
+        # on the number of keys required
         masks_available = [fixed_mask]
         if fixed_mask is None:
-            masks_available = self._get_possible_masks(partition_n_keys)
+            masks_available = get_possible_masks(
+                partition_n_keys, contiguous_keys=contiguous_keys)
 
-        # For each usable mask, try all of the possible keys and see if a
-        # match is possible
+        # For each usable mask, try all of the possible keys and
+        # see if a match is possible
         mask_found = None
         key_found = None
         mask = None
@@ -235,29 +237,13 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                          hex(mask), partition_n_keys)
 
             key_found = None
-            for key in KeyFieldGenerator(
-                    mask, fields, self._free_space_tracker):
+            key_generator = KeyFieldGenerator(
+                mask, fields, self._free_space_tracker)
+            for key in key_generator:
                 logger.debug("Trying key {}", hex(key))
 
                 # Check if all the key ranges can be allocated
-                matched_all = True
-                index = 0
-                for (base_key, n_keys) in \
-                        generate_key_ranges_from_mask(key, mask):
-                    logger.debug("Finding slot for {}, n_keys={}",
-                                 hex(base_key), n_keys)
-                    index = self._find_slot(base_key, lo=index)
-                    logger.debug("Slot for {} is {}", hex(base_key), index)
-                    if index is None:
-                        matched_all = False
-                        break
-                    space = self._check_allocation(index, base_key, n_keys)
-                    logger.debug("Space for {} is {}", hex(base_key), space)
-                    if space is None:
-                        matched_all = False
-                        break
-
-                if matched_all:
+                if self.__check_match(key, mask):
                     logger.debug("Matched key {}", hex(key))
                     key_found = key
                     break
@@ -269,13 +255,28 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 break
 
         # If we found a working key and mask that can be assigned,
-        # allocate them. Otherwise raise an exception
-        if key_found is None or mask_found is None:
-            raise PacmanRouteInfoAllocationException(
-                "Could not find space to allocate keys")
+        # Allocate them
+        if key_found is not None and mask_found is not None:
+            for (base_key, n_keys) in generate_key_ranges_from_mask(
+                    key_found, mask):
+                self.allocate_elements(base_key, n_keys)
+            # If we get here, we can assign the keys to the edges
+            return [BaseKeyAndMask(base_key=key_found, mask=mask)]
 
-        for (base_key, n_keys) in generate_key_ranges_from_mask(
-                key_found, mask):
-            self.allocate_elements(base_key, n_keys)
-        # If we get here, we can assign the keys to the edges
-        return [BaseKeyAndMask(base_key=key_found, mask=mask)]
+        raise PacmanRouteInfoAllocationException(
+            "Could not find space to allocate keys")
+
+    def __check_match(self, key, mask):
+        index = 0
+        for (base_key, n_keys) in generate_key_ranges_from_mask(key, mask):
+            logger.debug("Finding slot for {}, n_keys={}",
+                         hex(base_key), n_keys)
+            index = self._find_slot(base_key, lo=index)
+            logger.debug("Slot for {} is {}", hex(base_key), index)
+            if index is None:
+                return False
+            space = self._check_allocation(index, base_key, n_keys)
+            logger.debug("Space for {} is {}", hex(base_key), space)
+            if space is None:
+                return False
+        return True

@@ -1,6 +1,24 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import unittest
-from collections import deque
-from spinn_machine.virtual_machine import VirtualMachine
+try:
+    from collections.abc import deque
+except ImportError:
+    from collections import deque
+from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
 from pacman.operations.router_algorithms import BasicDijkstraRouting
@@ -12,22 +30,18 @@ class MyTestCase(unittest.TestCase):
 
     def test_routing(self):
         graph = MachineGraph("Test")
-        machine = VirtualMachine(2, 2)
+        machine = virtual_machine(2, 2)
         placements = Placements()
         vertices = list()
 
-        for x in range(machine.max_chip_x + 1):
-            for y in range(machine.max_chip_y + 1):
-                chip = machine.get_chip_at(x, y)
-                if chip is not None:
-                    for processor in chip.processors:
-                        if not processor.is_monitor:
-                            vertex = SimpleMachineVertex(
-                                resources=ResourceContainer())
-                            graph.add_vertex(vertex)
-                            placements.add_placement(Placement(
-                                vertex, x, y, processor.processor_id))
-                            vertices.append(vertex)
+        for chip in machine.chips:
+            for processor in chip.processors:
+                if not processor.is_monitor:
+                    vertex = SimpleMachineVertex(resources=ResourceContainer())
+                    graph.add_vertex(vertex)
+                    placements.add_placement(Placement(
+                        vertex, chip.x, chip.y, processor.processor_id))
+                    vertices.append(vertex)
 
         for vertex in vertices:
             for vertex_to in vertices:
@@ -54,12 +68,12 @@ class MyTestCase(unittest.TestCase):
                     partition, x, y)
                 self.assertIsNotNone(entry)
                 chip = machine.get_chip_at(x, y)
-                for p in entry.out_going_processors:
+                for p in entry.processor_ids:
                     self.assertIsNotNone(chip.get_processor_with_id(p))
                     vertex_found = placements.get_vertex_on_processor(x, y, p)
                     vertices_reached.add(vertex_found)
                 seen_entries.add((x, y))
-                for link_id in entry.out_going_links:
+                for link_id in entry.link_ids:
                     link = chip.router.get_link(link_id)
                     self.assertIsNotNone(link)
                     dest_x, dest_y = link.destination_x, link.destination_y

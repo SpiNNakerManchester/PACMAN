@@ -1,12 +1,30 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import unittest
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.graphs.impl import OutgoingEdgePartition
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
+from pacman.model.routing_tables.multicast_routing_tables import (
+    to_json, from_json)
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from pacman.utilities import file_format_schemas
 
 
 class TestRoutingTable(unittest.TestCase):
@@ -132,6 +150,13 @@ class TestRoutingTable(unittest.TestCase):
         self.assertEqual(tables.get_routing_table_for_chip(0, 0), t1)
         self.assertEqual(tables.get_routing_table_for_chip(1, 0), t2)
         self.assertEqual(tables.get_routing_table_for_chip(2, 0), None)
+
+        json_obj = to_json(tables)
+        file_format_schemas.validate(json_obj, "router.json")
+        new_tables = from_json(json_obj)
+        self.assertEqual(new_tables.get_routing_table_for_chip(0, 0), t1)
+        self.assertEqual(new_tables.get_routing_table_for_chip(1, 0), t2)
+        self.assertEqual(new_tables.get_routing_table_for_chip(2, 0), None)
 
     def test_new_multicast_routing_tables_empty(self):
         MulticastRoutingTables()

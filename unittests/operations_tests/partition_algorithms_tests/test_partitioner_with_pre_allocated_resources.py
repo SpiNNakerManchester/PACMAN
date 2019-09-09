@@ -1,4 +1,21 @@
-from spinn_machine import VirtualMachine
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import six
+import sys
+from spinn_machine import virtual_machine
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError,
     PacmanPartitionException)
@@ -6,8 +23,8 @@ from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.resources import (
-    CoreResource, SpecificCoreResource, SpecificChipSDRAMResource,
-    PreAllocatedResourceContainer)
+    CoreResource, ConstantSDRAM, SpecificCoreResource,
+    SpecificChipSDRAMResource, PreAllocatedResourceContainer)
 from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from uinit_test_objects import SimpleTestVertex
 
@@ -18,7 +35,7 @@ class TestPartitionerWithPreAllocatedResources(object):
     """
 
     def test_1_chip_over_pre_allocated(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -35,13 +52,14 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, pre_allocated_res)
+            partitioner(graph, machine, plan_n_timesteps=None,
+                        preallocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanInvalidParameterException:
             pass
 
     def test_1_chip_under_pre_allocated(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -58,12 +76,13 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, pre_allocated_res)
+            partitioner(graph, machine, plan_n_timesteps=None,
+                        preallocated_resources=pre_allocated_res)
         except Exception:
             raise Exception("should have blown up here")
 
     def test_1_chip_pre_allocated_same_core(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -81,7 +100,8 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, pre_allocated_res)
+            partitioner(graph, machine, plan_n_timesteps=None,
+                        preallocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanValueError:
             pass
@@ -89,7 +109,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             raise Exception("should have blown up here")
 
     def test_1_chip_pre_allocated_too_much_sdram(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 
@@ -103,7 +123,7 @@ class TestPartitionerWithPreAllocatedResources(object):
                 fixed_sdram_value=eight_meg))
 
         # add pre-allocated resources for cores on 0,0
-        twenty_meg = 20 * 1024 * 1024
+        twenty_meg = ConstantSDRAM(20 * 1024 * 1024)
         core_pre = SpecificChipSDRAMResource(
             chip=machine.get_chip_at(0, 0), sdram_usage=twenty_meg)
         pre_allocated_res = PreAllocatedResourceContainer(
@@ -111,15 +131,17 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, pre_allocated_res)
+            partitioner(graph, machine, plan_n_timesteps=None,
+                        preallocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanPartitionException:
             pass
         except Exception:
-            raise Exception("should have blown up here")
+            exc_info = sys.exc_info()
+            six.reraise(*exc_info)
 
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
-        machine = VirtualMachine(width=8, height=8)
+        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = PartitionAndPlacePartitioner()
 

@@ -1,4 +1,22 @@
-from collections import deque
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+try:
+    from collections.abc import deque
+except ImportError:
+    from collections import deque
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import (
@@ -6,7 +24,6 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
 from pacman.model.placements import Placement, Placements
-from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
@@ -18,7 +35,23 @@ class RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    def __call__(self, machine_graph, machine):
+    def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+
+        :param machine_graph: The machine_graph to place
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
+        :param machine:\
+            The machine with respect to which to partition the application\
+            graph
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :return: A set of placements
+        :rtype: :py:class:`pacman.model.placements.Placements`
+        :raise pacman.exceptions.PacmanPlaceException: \
+            If something goes wrong with the placement
+        """
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 
@@ -29,7 +62,7 @@ class RadialPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, self._generate_radial_chips(machine))
+            machine, plan_n_timesteps, self._generate_radial_chips(machine))
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
@@ -56,8 +89,8 @@ class RadialPlacer(object):
         vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
-        radial_constraints = locate_constraints_of_type(
-            vertices, RadialPlacementFromChipConstraint)
+        radial_constraints = [c for v in vertices for c in v.constraints if
+                              isinstance(c, RadialPlacementFromChipConstraint)]
         start_x, start_y = self._get_start(radial_constraints)
         chips = None
         if start_x is not None and start_y is not None:

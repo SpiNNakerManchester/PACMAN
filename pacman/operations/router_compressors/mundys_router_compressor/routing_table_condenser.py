@@ -1,112 +1,43 @@
-import collections
-import logging
-import itertools
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import MulticastRoutingEntry
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
-from pacman.exceptions import PacmanElementAllocationException
-from rig import routing_table as rig_routing_table
-from rig.routing_table import ordered_covering as rigs_compressor
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-logger = logging.getLogger(__name__)
+from pacman.operations.router_compressors import (AbstractCompressor, Entry)
+from pacman.operations.router_compressors.mundys_router_compressor import \
+    ordered_covering as rigs_compressor
 
 
-class MundyRouterCompressor(object):
+class MundyRouterCompressor(AbstractCompressor):
     """ Compressor from rig that has been tied into the main tool chain stack.
     """
 
     __slots__ = []
 
-    KeyMask = collections.namedtuple('KeyMask', 'key mask')
-    RoutingEntry = collections.namedtuple('RoutingEntry',
-                                          'key mask route defaultable')
-    max_supported_length = 1023
+    def __init__(self):
+        self._ordered = True
 
-    def __call__(self, router_tables, target_length=None):
-        # build storage
-        compressed_pacman_router_tables = MulticastRoutingTables()
-
-        # create progress bar
-        progress = ProgressBar(
-            router_tables.routing_tables, "Compressing routing Tables")
-
-        # compress each router
-        for router_table in progress.over(router_tables.routing_tables):
-            # convert to rig format
-            entries = self._convert_to_mundy_format(router_table)
-
-            # compress the router entries
-            compressed_router_table_entries = \
-                rigs_compressor.minimise(entries, target_length)
-
-            # convert back to pacman model
-            compressed_pacman_table = self._convert_to_pacman_router_table(
-                compressed_router_table_entries, router_table.x,
-                router_table.y)
-
-            # add to new compressed routing tables
-            compressed_pacman_router_tables.add_routing_table(
-                compressed_pacman_table)
-
-        # return
-        return compressed_pacman_router_tables
-
-    @staticmethod
-    def _convert_to_mundy_format(pacman_router_table):
-        """
-        :param pacman_router_table: pacman version of the routing table
-        :return: rig version of the router table
-        """
+    def compress_table(self, router_table):
+        # convert to rig inspired format
         entries = list()
 
         # handle entries
-        for router_entry in pacman_router_table.multicast_routing_entries:
-            # Get the route for the entry
-            new_processor_ids = list()
-            for processor_id in router_entry.processor_ids:
-                new_processor_ids.append(processor_id + 6)
-
-            route = set(rig_routing_table.Routes(i) for i in
-                        itertools.chain(router_entry.link_ids,
-                                        new_processor_ids))
-
-            # Get the source for the entry
-            if router_entry.defaultable:
-                source = {next(iter(route)).opposite}
-            else:
-                source = {None}
-
+        for router_entry in router_table.multicast_routing_entries:
             # Add the new entry
-            entries.append(rig_routing_table.RoutingTableEntry(
-                route, router_entry.routing_entry_key, router_entry.mask,
-                source))
+            entries.append(Entry.from_MulticastRoutingEntry(router_entry))
 
-        return entries
+        compressed_router_table_entries = \
+            rigs_compressor.minimise(entries, self._target_length)
 
-    def _convert_to_pacman_router_table(
-            self, mundy_compressed_router_table_entries, router_x_coord,
-            router_y_coord):
-        """
-        :param mundy_compressed_router_table_entries: rig version of the table
-        :param router_x_coord: the x coord of this routing table
-        :param router_y_coord: the y coord of this routing table
-        :return: pacman version of the table
-        """
-
-        table = MulticastRoutingTable(router_x_coord, router_y_coord)
-        if (len(mundy_compressed_router_table_entries) >
-                self.max_supported_length):
-            raise PacmanElementAllocationException(
-                "The routing table {}:{} after compression will still not fit"
-                " within the machines router ({} entries)".format(
-                    router_x_coord, router_y_coord,
-                    len(mundy_compressed_router_table_entries)))
-
-        for entry in mundy_compressed_router_table_entries:
-            table.add_multicast_routing_entry(MulticastRoutingEntry(
-                entry.key, entry.mask,  # Key and mask
-                ((int(c) - 6) for c in entry.route if c.is_core),  # Cores
-                (int(l) for l in entry.route if l.is_link),  # Links
-                False))  # NOT defaultable
-        return table
+        # compress the router entries
+        return compressed_router_table_entries

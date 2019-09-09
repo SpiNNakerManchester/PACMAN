@@ -1,4 +1,19 @@
-from collections import defaultdict
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanValueError
 
@@ -36,12 +51,14 @@ class GraphMapper(object):
         self._application_vertex_by_machine_vertex = dict()
         self._application_edge_by_machine_edge = dict()
 
-        self._machine_vertices_by_application_vertex = defaultdict(OrderedSet)
-        self._machine_edges_by_application_edge = defaultdict(OrderedSet)
+        self._machine_vertices_by_application_vertex = \
+            DefaultOrderedDict(OrderedSet)
+        self._machine_edges_by_application_edge = \
+            DefaultOrderedDict(OrderedSet)
 
         self._index_by_machine_vertex = dict()
         self._slice_by_machine_vertex = dict()
-        self._slices_by_application_vertex = defaultdict(list)
+        self._slices_by_application_vertex = DefaultOrderedDict(list)
 
     def add_vertex_mapping(
             self, machine_vertex, vertex_slice, application_vertex):

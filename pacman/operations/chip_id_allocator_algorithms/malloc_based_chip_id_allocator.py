@@ -1,8 +1,23 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
-    AbstractFPGAVertex, AbstractSpiNNakerLinkVertex, AbstractVirtualVertex)
+    AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
 from pacman.utilities.algorithm_utilities import (
     machine_algorithm_utilities, ElementAllocatorAlgorithm)
 
@@ -61,20 +76,20 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
 
         # allocate IDs for virtual chips
         for vertex in progress.over(graph.vertices):
-            if isinstance(vertex, AbstractVirtualVertex):
+            if isinstance(vertex, AbstractVirtual):
                 x, y = self._assign_virtual_chip_info(
                     machine, self._get_link_data(machine, vertex))
                 vertex.set_virtual_chip_coordinates(x, y)
 
     @staticmethod
     def _get_link_data(machine, vertex):
-        if isinstance(vertex, AbstractFPGAVertex):
+        if isinstance(vertex, AbstractFPGA):
             link_data = machine.get_fpga_link_with_id(
                 vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
             if link_data is None:
                 raise NoFPGALink(vertex)
             return link_data
-        elif isinstance(vertex, AbstractSpiNNakerLinkVertex):
+        elif isinstance(vertex, AbstractSpiNNakerLink):
             link_data = machine.get_spinnaker_link_with_id(
                 vertex.spinnaker_link_id, vertex.board_address)
             if link_data is None:

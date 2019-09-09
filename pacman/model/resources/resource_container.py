@@ -1,6 +1,21 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from .constant_sdram import ConstantSDRAM
 from .cpu_cycles_per_tick_resource import CPUCyclesPerTickResource
 from .dtcm_resource import DTCMResource
-from .sdram_resource import SDRAMResource
 
 
 class ResourceContainer(object):
@@ -67,7 +82,7 @@ class ResourceContainer(object):
         if self._dtcm_usage is None:
             self._dtcm_usage = DTCMResource(0)
         if self._sdram_usage is None:
-            self._sdram_usage = SDRAMResource(0)
+            self._sdram_usage = ConstantSDRAM(0)
         if self._cpu_cycles is None:
             self._cpu_cycles = CPUCyclesPerTickResource(0)
         if self._reverse_iptags is None:
@@ -110,11 +125,26 @@ class ResourceContainer(object):
             self._dtcm_usage.get_value() + other.dtcm.get_value())
 
         # add SDRAM usage
-        self._sdram_usage = SDRAMResource(
-            self._sdram_usage.get_value() + other.sdram.get_value())
+        self._sdram_usage = self._sdram_usage + other._sdram_usage
 
         # add IPtags
         self._iptags.extend(other.iptags)
 
         # add reverse IPtags
         self._reverse_iptags.extend(other.reverse_iptags)
+
+    def __eq__(self, other):
+        """
+        For unit tests ONLY so __hash__ and __eq__ pairing not done!
+        """
+        if self._dtcm_usage.get_value() != other.dtcm.get_value():
+            return False
+        if self._sdram_usage.fixed != other._sdram_usage.fixed:
+            return False
+        if self._sdram_usage.per_timestep != other._sdram_usage.per_timestep:
+            return False
+        if self._cpu_cycles.get_value() != other.cpu_cycles.get_value():
+            return False
+        if self._iptags != other._iptags:
+            return False
+        return self._reverse_iptags == other._reverse_iptags

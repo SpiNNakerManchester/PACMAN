@@ -1,3 +1,19 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 class IPtagResource(object):
     """ Represents the ability to have a SpiNNaker machine send messages to\
         you during execution.
@@ -107,3 +123,13 @@ class IPtagResource(object):
             "traffic_identifier={})".format(
                 self._ip_address, self._port, self._strip_sdp, self._tag,
                 self._traffic_identifier))
+
+    def __eq__(self, other):
+        """
+        For unit tests ONLY so __hash__ and __eq__ pairing not done!
+        """
+        return (self._ip_address == other._ip_address and
+                self._port == other._port and
+                self._strip_sdp == other._strip_sdp and
+                self._tag == other._tag and
+                self._traffic_identifier == other._traffic_identifier)

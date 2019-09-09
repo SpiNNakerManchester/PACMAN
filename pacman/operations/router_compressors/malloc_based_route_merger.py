@@ -1,4 +1,18 @@
-import math
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
@@ -92,9 +106,7 @@ class MallocBasedRouteMerger(object):
                 last_key = (
                     entries[next_pos].routing_entry_key +
                     (~entries[next_pos].mask & _32_BITS))
-                n_keys = (last_key - base_key) + 1
-                next_log_n_keys = int(math.ceil(math.log(n_keys, 2)))
-                n_keys = (1 << next_log_n_keys) - 1
+                n_keys = (1 << (last_key - base_key).bit_length()) - 1
                 n_keys_mask = ~n_keys & _32_BITS
                 base_key = base_key & n_keys_mask
                 if ((base_key + n_keys) >= last_key and

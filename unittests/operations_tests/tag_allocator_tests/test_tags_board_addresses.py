@@ -1,7 +1,25 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from __future__ import absolute_import, print_function
 import unittest
-from collections import defaultdict
-from spinn_machine import VirtualMachine
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
+from spinn_machine import virtual_machine
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, IPtagResource
@@ -13,7 +31,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """
 
     def test_ip_tags(self):
-        machine = VirtualMachine(12, 12, with_wrap_arounds=True)
+        machine = virtual_machine(12, 12)
         eth_chips = machine.ethernet_connected_chips
         vertices = [
             SimpleMachineVertex(
@@ -26,7 +44,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
         allocator = BasicTagAllocator()
-        _, _, tags = allocator(machine, placements)
+        _, _, tags = allocator(
+            machine, plan_n_timesteps=None, placements=placements)
 
         for vertex, chip in zip(vertices, eth_chips):
             iptags = tags.get_ip_tags_for_vertex(vertex)
@@ -43,7 +62,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
     def test_too_many_ip_tags_for_1_board(self):
         n_extra_vertices = 3
-        machine = VirtualMachine(12, 12, with_wrap_arounds=True)
+        machine = virtual_machine(12, 12)
         eth_chips = machine.ethernet_connected_chips
         eth_chip = eth_chips[0]
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
@@ -72,7 +91,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
             for proc, vertex in zip(eth2_procs, eth2_vertices))
         allocator = BasicTagAllocator()
-        _, _, tags = allocator(machine, placements)
+        _, _, tags = allocator(
+            machine, plan_n_timesteps=None, placements=placements)
 
         tags_by_board = defaultdict(set)
         for vertices in (eth_vertices, eth2_vertices):

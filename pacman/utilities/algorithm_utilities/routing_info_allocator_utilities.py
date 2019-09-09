@@ -1,7 +1,27 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 import logging
+import numpy
 from six import itervalues
 from six.moves import xrange
-import numpy
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyFieldConstraint, FlexiKeyFieldConstraint,
     ContiguousKeyRangeContraint, FixedMaskConstraint,
@@ -35,6 +55,9 @@ class ConstraintGroup(list):
     def __eq__(self, other):
         return id(other) == id(self)
 
+    def __ne__(self, other):
+        return id(other) != id(self)
+
 
 def get_edge_groups(machine_graph, traffic_type):
     """ Utility method to get groups of edges using any\
@@ -47,7 +70,7 @@ def get_edge_groups(machine_graph, traffic_type):
     """
 
     # mapping between partition and shared key group it is in
-    partition_groups = dict()
+    partition_groups = OrderedDict()
 
     # process each partition one by one in a bubble sort kinda way
     for vertex in machine_graph.vertices:
@@ -89,7 +112,7 @@ def get_edge_groups(machine_graph, traffic_type):
         FixedKeyFieldConstraint: fixed_field_groups,
         FlexiKeyFieldConstraint: flexi_field_groups,
     }
-    groups = set(itervalues(partition_groups))
+    groups = OrderedSet(itervalues(partition_groups))
     for group in groups:
 
         # Get all expected constraints in the group
