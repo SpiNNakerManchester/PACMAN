@@ -101,8 +101,6 @@ def _ner_net(source, destinations, machine):
         these items.
 
     """
-    width = machine.max_chip_x + 1
-    height = machine.max_chip_y + 1
     radius = 20
     # Map from (x, y) to RoutingTree objects
     route = {source: RoutingTree(source)}
