@@ -13,6 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_router_constraint import AbstractRouterConstraint
+from .pair_compressor import PairCompressor
 
-__all__ = ["AbstractRouterConstraint"]
+
+class UnorderedCompressor(PairCompressor):
+
+    def __init__(self):
+        self._ordered = False

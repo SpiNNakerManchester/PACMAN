@@ -587,6 +587,53 @@
             <param_name>use_timer_cut_off</param_name>
         </required_inputs>
         <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+            <param_name>target_length</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryCompressedRoutingTables</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="UnorderedCompressor">
+        <python_module>pacman.operations.router_compressors.checked_unordered_compressor</python_module>
+        <python_class>CheckedUnorderedCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>target_length</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryCompressedRoutingTables</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="PairCompressor">
+        <python_module>pacman.operations.router_compressors.pair_compressor</python_module>
+        <python_class>PairCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+        </required_inputs>
+        <optional_inputs>
             <param_name>target_length</param_name>
         </optional_inputs>
         <outputs>
@@ -606,6 +653,9 @@
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
@@ -622,6 +672,9 @@
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>

@@ -66,6 +66,8 @@ class AbstractGraph(object):
         :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
         :raises PacmanInvalidParameterException:\
             If the vertex is not of a valid type
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
         """
 
     def add_vertices(self, vertices):
@@ -76,6 +78,8 @@ class AbstractGraph(object):
             iterable(:py:class:`pacman.model.graphs.AbstractVertex`)
         :raises PacmanInvalidParameterException:\
             If any vertex is not of a valid type
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
         """
         for v in vertices:
             self.add_vertex(v)

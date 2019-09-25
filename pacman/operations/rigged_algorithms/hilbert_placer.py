@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from math import log, ceil
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
@@ -106,10 +105,7 @@ class HilbertPlacer(object):
 
         # set size of curve based on number of chips on machine
         max_dimen = max(machine.max_chip_x, machine.max_chip_y)
-        if max_dimen >= 1:
-            hilbert_levels = int(ceil(log(max_dimen, 2.0)))
-        else:
-            hilbert_levels = 0
+        hilbert_levels = (max_dimen.bit_length() if max_dimen >= 1 else 0)
 
         for x, y in self._hilbert_curve(hilbert_levels):
             if machine.is_chip_at(x, y):

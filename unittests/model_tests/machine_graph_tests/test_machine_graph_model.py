@@ -16,7 +16,8 @@
 import unittest
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanInvalidParameterException)
 
 
 class TestMachineGraphModel(unittest.TestCase):
@@ -72,6 +73,8 @@ class TestMachineGraphModel(unittest.TestCase):
         vertices_from_graph = list(graph.vertices)
         for vert in vertices_from_graph:
             self.assertIn(vert, vertices)
+        for vert in vertices:
+            self.assertEqual(vert, graph.vertex_by_label(vert.label))
         edges_from_graph = list(graph.edges)
         for edge in edges_from_graph:
             self.assertIn(edge, edges)
@@ -90,7 +93,8 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(MachineEdge(vertices[0], vertices[1]))
         edges.append(MachineEdge(vertices[1], vertices[0]))
         graph = MachineGraph("foo")
-        graph.add_vertices(vertices)
+        with self.assertRaises(PacmanAlreadyExistsException):
+            graph.add_vertices(vertices)
         graph.add_edges(edges, "bar")
 
     def test_add_duplicate_edge(self):

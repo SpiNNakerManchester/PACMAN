@@ -17,7 +17,7 @@ import pytest
 from spinn_machine import virtual_machine
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import FixedRouteRouter
-# pylint: disable=protected-access
+from pacman.exceptions import PacmanRoutingException
 
 
 class DestinationVertex(object):
@@ -43,57 +43,19 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
     return destinations
 
 
-@pytest.mark.parametrize(
-    "width,height,version,board_version",
-    [(2, 2, None, 3),
-     (2, 2, None, 3),
-     (None, None, 3, 3),
-     (8, 8, None, 5),
-     (None, None, 5, 5),
-     (12, 12, None, 5),
-     (16, 16, None, 5)])
-@pytest.mark.parametrize(
-    "with_down_links,with_down_chips",
-    [(False, False),
-     (True, False),
-     (False, True)])
-def test_all_working(
-        width, height, version, board_version,
-        with_down_links, with_down_chips):
+def _check_setup(width, height, down_chips, down_links):
     router = FixedRouteRouter()
-    router._board_version = board_version
-
-    joins, _ = router._get_joins_paths()
-    temp_machine = virtual_machine(
-        width=width, height=height, version=version)
-    down_links = None
-    if with_down_links:
-        down_links = set()
-        for ethernet_chip in temp_machine.ethernet_connected_chips:
-            down_links.add((ethernet_chip.x + 1, ethernet_chip.y, joins[1, 0]))
-            down_links.add((ethernet_chip.x, ethernet_chip.y + 1, joins[0, 1]))
-    down_chips = None
-    if with_down_chips:
-        down_chips = set(
-            (ethernet_chip.x + 1, ethernet_chip.y + 1)
-            for ethernet_chip in temp_machine.ethernet_connected_chips)
     machine = virtual_machine(
-        width=width, height=height, version=version,
+        width=width, height=height,
         down_links=down_links, down_chips=down_chips)
-    router._machine = machine
 
     ethernet_chips = machine.ethernet_connected_chips
     placements = Placements(
         Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
         for ethernet_chip in ethernet_chips)
 
-    for ethernet_chip in ethernet_chips:
-        uses_simple_routes = router._detect_failed_chips_on_board(
-            ethernet_chip)
-        assert((with_down_chips or with_down_links) != uses_simple_routes)
-
     fixed_route_tables = router(
-        machine, placements, board_version, DestinationVertex)
+        machine, placements, "bacon", DestinationVertex)
 
     for x, y in machine.chip_coordinates:
         assert (x, y) in fixed_route_tables
@@ -103,6 +65,44 @@ def test_all_working(
         assert (
             (chip.nearest_ethernet_x, chip.nearest_ethernet_y, 1)
             in destinations)
+
+
+@pytest.mark.parametrize(
+    "width,height",
+    [(2, 2),
+     (8, 8),
+     (12, 12),
+     (16, 16)])
+@pytest.mark.parametrize(
+    "with_down_links,with_down_chips",
+    [(False, False),
+     (True, False),
+     (False, True),
+     (True, True)])
+def test_all_working(width, height,  with_down_links, with_down_chips):
+
+    temp_machine = virtual_machine(
+        width=width, height=height)
+    down_links = None
+    if with_down_links:
+        down_links = set()
+        for ethernet_chip in temp_machine.ethernet_connected_chips:
+            down_links.add((ethernet_chip.x + 1, ethernet_chip.y, 5))
+            down_links.add((ethernet_chip.x, ethernet_chip.y + 1, 3))
+    down_chips = None
+    if with_down_chips:
+        down_chips = set(
+            (ethernet_chip.x + 1, ethernet_chip.y + 1)
+            for ethernet_chip in temp_machine.ethernet_connected_chips)
+    _check_setup(width, height, down_chips, down_links)
+
+
+def test_unreachable():
+    try:
+        _check_setup(8, 8, [(0, 2), (1, 3), (1, 4)], None)
+        raise Exception("That should not have worked")
+    except PacmanRoutingException:
+        pass
 
 
 if __name__ == '__main__':

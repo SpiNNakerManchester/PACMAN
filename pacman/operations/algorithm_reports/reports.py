@@ -20,7 +20,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import Router
 from pacman import exceptions
-from pacman.model.graphs import AbstractSpiNNakerLinkVertex, AbstractFPGAVertex
+from pacman.model.graphs import AbstractSpiNNakerLink, AbstractFPGA
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.operations.algorithm_reports.router_summary import RouterSummary
 
@@ -735,6 +735,12 @@ def generate_routing_table(routing_table, top_level_folder):
                          " {} for writing.", file_path)
 
 
+def _compression_ratio(uncompressed, compressed):
+    """ Get the compression ratio, as a percentage.
+    """
+    return (uncompressed - compressed) / float(uncompressed) * 100
+
+
 def generate_comparison_router_report(
         report_folder, routing_tables, compressed_routing_tables):
     """ Make a report on comparison of the compressed and uncompressed \
@@ -751,26 +757,46 @@ def generate_comparison_router_report(
             progress = ProgressBar(
                 routing_tables.routing_tables,
                 "Generating comparison of router table report")
+            total_uncompressed = 0
+            total_compressed = 0
+            max_compressed = 0
+            uncompressed_for_max = 0
             for table in progress.over(routing_tables.routing_tables):
-                _write_one_router_table_comparison(
-                    f, table, compressed_routing_tables)
+                x = table.x
+                y = table.y
+                compressed_table = compressed_routing_tables.\
+                    get_routing_table_for_chip(x, y)
+                n_entries_uncompressed = table.number_of_entries
+                total_uncompressed += n_entries_uncompressed
+                n_entries_compressed = compressed_table.number_of_entries
+                total_compressed += n_entries_compressed
+                f.write(
+                    "Uncompressed table at {}:{} has {} entries "
+                    "whereas compressed table has {} entries. "
+                    "This is a decrease of {}%\n".format(
+                        x, y, n_entries_uncompressed, n_entries_compressed,
+                        _compression_ratio(
+                            n_entries_uncompressed, n_entries_compressed)))
+                if max_compressed < n_entries_compressed:
+                    max_compressed = n_entries_compressed
+                    uncompressed_for_max = n_entries_uncompressed
+            if total_uncompressed > 0:
+                f.write(
+                    "\nTotal has {} entries whereas compressed tables "
+                    "have {} entries. This is an average decrease of {}%\n"
+                    "".format(
+                        total_uncompressed, total_compressed,
+                        _compression_ratio(
+                            total_uncompressed, total_compressed)))
+                f.write(
+                    "Worst case has {} entries whereas compressed tables "
+                    "have {} entries. This is a decrease of {}%\n".format(
+                        uncompressed_for_max, max_compressed,
+                        _compression_ratio(
+                            uncompressed_for_max, max_compressed)))
     except IOError:
         logger.exception("Generate_router_comparison_reports: Can't open file"
                          " {} for writing.", file_name)
-
-
-def _write_one_router_table_comparison(f, table, compressed_tables):
-    x = table.x
-    y = table.y
-    compressed_table = compressed_tables.get_routing_table_for_chip(x, y)
-    n_entries_uncompressed = table.number_of_entries
-    n_entries_compressed = compressed_table.number_of_entries
-    ratio = ((n_entries_uncompressed - n_entries_compressed) /
-             float(n_entries_uncompressed))
-    f.write(
-        "Uncompressed table at {}:{} has {} entries whereas compressed table "
-        "has {} entries. This is a decrease of {} %\n".format(
-            x, y, n_entries_uncompressed, n_entries_compressed, ratio * 100))
 
 
 def _reduce_route_value(processors_ids, link_ids):
@@ -814,9 +840,9 @@ def _search_route(
     # Create text for starting point
     source_vertex = source_placement.vertex
     text = ""
-    if isinstance(source_vertex, AbstractSpiNNakerLinkVertex):
+    if isinstance(source_vertex, AbstractSpiNNakerLink):
         text += "Virtual SpiNNaker Link "
-    if isinstance(source_vertex, AbstractFPGAVertex):
+    if isinstance(source_vertex, AbstractFPGA):
         text += "Virtual FPGA Link "
     text += "{}:{}:{} -> ".format(
         source_placement.x, source_placement.y, source_placement.p)
