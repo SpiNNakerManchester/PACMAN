@@ -39,11 +39,6 @@ from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from .routing_tree import RoutingTree
 
-_concentric_hexagons = {}
-"""Memoized concentric_hexagons outputs, as lists.  Access via
-:py:func:`.memoized_concentric_hexagons`.
-"""
-
 
 def _convert_a_route(
         routing_tables, partition, incoming_processor, incoming_link,
@@ -86,23 +81,6 @@ def _convert_a_route(
             routing_tables, partition, None, next_incoming_link, next_hop)
 
 
-def _memoized_concentric_hexagons(radius):
-    """A memoized wrapper around concentric_hexagons`
-    which memoizes the coordinates and stores them as a tuple. Note that the
-    caller must manually offset the coordinates as required.
-
-    This wrapper is used to avoid the need to repeatedly call
-    concentric_hexagons` for every sink in a network.
-    This results in a relatively minor speedup (but at equally minor cost) in
-    large networks.
-    """
-    out = _concentric_hexagons.get(radius)
-    if out is None:
-        out = tuple(_get_concentric_hexagons(radius))
-        _concentric_hexagons[radius] = out
-    return out
-
-
 def _ner_net(source, destinations, machine):
     """ Produce a shortest path tree for a given net using NER.
 
@@ -123,8 +101,6 @@ def _ner_net(source, destinations, machine):
         these items.
 
     """
-    width = machine.max_chip_x + 1
-    height = machine.max_chip_y + 1
     radius = 20
     # Map from (x, y) to RoutingTree objects
     route = {source: RoutingTree(source)}
@@ -141,81 +117,19 @@ def _ner_net(source, destinations, machine):
         # Try to find a nearby (within radius hops) node in the routing tree
         # that we can route to (falling back on just routing to the source).
         #
-        # In an implementation according to the algorithm's original
-        # specification looks for nodes at each point in a growing set of rings
-        # of concentric hexagons. If it doesn't find any destinations this
-        # means an awful lot of checks: 1261 for the default radius of 20.
-        #
-        # An alternative (but behaviourally identical) implementation scans the
-        # list of all route nodes created so far and finds the closest node
-        # which is < radius hops (falling back on the origin if no node is
-        # closer than radius hops).  This implementation requires one check per
-        # existing route node. In most routes this is probably a lot less than
-        # 1261 since most routes will probably have at most a few hundred route
-        # nodes by the time the last destination is being routed.
-        #
-        # Which implementation is best is a difficult question to answer:
-        # * In principle nets with quite localised connections (e.g.
-        #   nearest-neighbour or centroids traffic) may route slightly more
-        #   quickly with the original algorithm since it may very quickly find
-        #   a neighbour.
-        # * In nets which connect very spaced-out destinations the second
-        #   implementation may be quicker since in such a scenario it is
-        #   unlikely that a neighbour will be found.
-        # * In extremely high-fan-out nets (e.g. broadcasts), the original
-        #   method is very likely to perform *far* better than the alternative
-        #   method since most iterations will complete immediately while the
-        #   alternative method must scan *all* the route vertices.
-        # As such, it should be clear that neither method alone is 'best' and
-        # both have degenerate performance in certain completely reasonable
-        # styles of net. As a result, a simple heuristic is used to decide
-        # which technique to use.
-        #
-        # The following micro-benchmarks are crude estimate of the
-        # runtime-per-iteration of each approach (at least in the case of a
-        # torus topology)::
-        #
-        #     $ # Original approach
-        #     $ python -m timeit --setup 'x, y, w, h, r = 1, 2, 5, 10, \
-        #                                     {x:None for x in range(10)}' \
-        #                        'x += 1; y += 1; x %= w; y %= h; (x, y) in r'
-        #     1000000 loops, best of 3: 0.207 usec per loop
-        #     $ # Alternative approach
-        #     $ python -m timeit --setup 'from rig.geometry import \
-        #                                 shortest_torus_path_length' \
-        #                        'shortest_torus_path_length( \
-        #                             (0, 1, 2), (3, 2, 1), 10, 10)'
-        #     1000000 loops, best of 3: 0.666 usec per loop
-        #
-        # From this we can approximately suggest that the alternative approach
-        # is 3x more expensive per iteration. A very crude heuristic is to use
-        # the original approach when the number of route nodes is more than
-        # 1/3rd of the number of routes checked by the original method.
-        concentric_hexagons = _memoized_concentric_hexagons(radius)
-        if len(concentric_hexagons) < len(route) / 3:
-            # Original approach: Start looking for route nodes in a concentric
-            # spiral pattern out from the destination node.
-            for x, y in concentric_hexagons:
-                x += destination[0]
-                y += destination[1]
-                if machine.has_wrap_arounds:
-                    x %= width
-                    y %= height
-                if (x, y) in route:
-                    neighbour = (x, y)
-                    break
-        else:
-            # Alternative approach: Scan over every route node and check to see
-            # if any are < radius, picking the closest one if so.
-            neighbour = None
-            neighbour_distance = None
-            for candidate_neighbour in route:
-                distance = machine.get_vector_length(
-                        candidate_neighbour, destination)
-                if distance <= radius and (neighbour is None or
-                                           distance < neighbour_distance):
-                    neighbour = candidate_neighbour
-                    neighbour_distance = distance
+        # This implementation scans the list of all route nodes created so far
+        # and finds the closest node which is < radius hops
+        # (falling back on the origin if no node is closer than radius hops).
+
+        neighbour = None
+        neighbour_distance = None
+        for candidate_neighbour in route:
+            distance = machine.get_vector_length(
+                candidate_neighbour, destination)
+            if distance <= radius and (
+                    neighbour is None or distance < neighbour_distance):
+                neighbour = candidate_neighbour
+                neighbour_distance = distance
 
         # Fall back on routing directly to the source if no nodes within radius
         # hops of the destination was found.
@@ -586,28 +500,6 @@ def _route_to_endpoint(vertex, machine):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return link_data.connected_link
-
-
-def _get_concentric_hexagons(radius, start=(0, 0)):
-    """
-    A generator which produces coordinates of concentric rings of hexagons.
-
-    :param radius:  Number of layers to produce (0 is just one hexagon)
-    :param start:  (x, y)
-        The coordinate of the central hexagon.
-    :return:
-    """
-    x, y = start
-    yield (x, y)
-    for r in range(1, radius + 1):
-        # Move to the next layer
-        y -= 1
-        # Walk around the hexagon of this radius
-        for dx, dy in [(1, 1), (0, 1), (-1, 0), (-1, -1), (0, -1), (1, 0)]:
-            for _ in range(r):
-                yield (x, y)
-                x += dx
-                y += dy
 
 
 def _longest_dimension_first(vector, start, machine):
