@@ -152,8 +152,8 @@ from spinn_utilities.timer import Timer
 
 
 def minimise(
-        routing_table, target_length, time_to_run_for_before_raising_exception,
-        use_timer_cut_off):
+        routing_table, target_length, use_timer_cut_off=False,
+        time_to_run_for_before_raising_exception=None):
     """Reduce the size of a routing table by merging together entries where
     possible and by removing any remaining default routes.
 
@@ -197,14 +197,14 @@ def minimise(
     """
     table, _ = ordered_covering(
         routing_table=routing_table, target_length=target_length,
-        no_raise=True,  use_timer_cut_off=use_timer_cut_off,
+        no_raise=True, use_timer_cut_off=use_timer_cut_off,
         time_to_run_for=time_to_run_for_before_raising_exception)
     return remove_default_routes(table, target_length)
 
 
 def ordered_covering(
-        routing_table, target_length, time_to_run_for,
-        aliases=None, no_raise=False, use_timer_cut_off=False):
+        routing_table, target_length, aliases=None, no_raise=False,
+        use_timer_cut_off=False, time_to_run_for=None):
     """Reduce the size of a routing table by merging together entries where
     possible.
 
