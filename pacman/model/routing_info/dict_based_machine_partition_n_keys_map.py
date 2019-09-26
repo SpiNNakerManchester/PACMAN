@@ -45,4 +45,5 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
 
     @overrides(AbstractMachinePartitionNKeysMap.n_keys_for_partition)
     def n_keys_for_partition(self, partition):
-        return self._n_keys_map[partition]
+        if partition in self._n_keys_map:
+            return self._n_keys_map[partition]
