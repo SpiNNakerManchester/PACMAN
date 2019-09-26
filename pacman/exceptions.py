@@ -280,6 +280,12 @@ class MachineHasDisconnectedSubRegion(PacmanException):
     pass
 
 
+class SDRAMEdgeSizeException(PacmanException):
+    """ raised when a constant SDRAM partition discovers its edges have\
+    inconsistent size requests
+    """
+
+
 class MinimisationFailedError(PacmanException):
     """Raised when a routing table could not be minimised to reach a specified
     target.
