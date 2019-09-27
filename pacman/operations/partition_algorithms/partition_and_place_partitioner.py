@@ -16,6 +16,11 @@
 from __future__ import division
 import logging
 from six import raise_from
+
+from pacman.model.partitioner_interfaces.hand_over_to_vertex import \
+    HandOverToVertex
+from pacman.model.partitioner_interfaces.splitter_by_atoms import \
+    SplitterByAtoms
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.graphs.abstract_virtual import AbstractVirtual
@@ -100,9 +105,14 @@ class PartitionAndPlacePartitioner(object):
 
             # if not, partition
             if machine_vertices is None:
-                self._partition_vertex(
-                    vertex, plan_n_timesteps, machine_graph, graph_mapper,
-                    resource_tracker, progress, vertex_groups)
+                if isinstance(vertex, SplitterByAtoms):
+                    self._partition_vertex(
+                        vertex, plan_n_timesteps, machine_graph, graph_mapper,
+                        resource_tracker, progress, vertex_groups)
+                elif isinstance(vertex, HandOverToVertex):
+                    vertex.create_and_add_to_graphs_and_resources(
+                        resource_tracker, machine_graph, graph_mapper)
+                    progress.update(vertex.n_atoms)
         progress.end()
 
         generate_machine_edges(machine_graph, graph_mapper, graph)
