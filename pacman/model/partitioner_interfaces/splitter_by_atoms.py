@@ -27,6 +27,7 @@ class SplitterByAtoms(object):
         :param vertex_slice:\
             The slice of atoms that the machine vertex will cover
         :param resources_required: the resources used by the machine vertex
+        :param label: the label for the machine vertex to add to.
         :param constraints: Constraints to be passed on to the machine vertex
         """
 
