@@ -15,8 +15,7 @@
 
 import sys
 
-from pacman.model.partitioner_interfaces.splitter_by_atoms import \
-    SplitterByAtoms
+from pacman.model.partitioner_interfaces import SplitterByAtoms
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
