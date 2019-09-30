@@ -18,7 +18,7 @@ from .abstract_virtual import AbstractVirtual
 
 
 class AbstractSpiNNakerLink(AbstractVirtual):
-    """ A An Object (most likely a vertex)  connected to a SpiNNaker Link.
+    """ An Object (most likely a vertex) connected to a SpiNNaker Link.
 
         Note: It is expected that everything that is an instance of
         AbstractSpiNNakerLink is also an instance of AbstractVertex,
