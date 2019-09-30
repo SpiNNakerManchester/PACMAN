@@ -15,5 +15,8 @@
 
 from .graph import Graph
 from .outgoing_edge_partition import OutgoingEdgePartition
+from .constant_sdram_machine_partition import ConstantSDRAMMachinePartition
+from .segmented_sdram_machine_partition import SegmentedSDRAMMachinePartition
 
-__all__ = ["Graph", "OutgoingEdgePartition"]
+__all__ = ["Graph", "OutgoingEdgePartition", "ConstantSDRAMMachinePartition",
+           "SegmentedSDRAMMachinePartition"]
