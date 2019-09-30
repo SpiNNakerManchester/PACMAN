@@ -15,6 +15,8 @@
 
 """ test vertex used in many unit tests
 """
+from pacman.model.partitioner_interfaces.splitter_by_atoms import \
+    SplitterByAtoms
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
@@ -22,7 +24,7 @@ from pacman.model.resources import (
     ConstantSDRAM, DTCMResource, ResourceContainer, CPUCyclesPerTickResource)
 
 
-class SimpleTestVertex(ApplicationVertex):
+class SimpleTestVertex(ApplicationVertex, SplitterByAtoms):
     """
     test vertex
     """
@@ -80,13 +82,13 @@ class SimpleTestVertex(ApplicationVertex):
             return 1 * vertex_slice.n_atoms
         return self._fixed_sdram_value
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(SplitterByAtoms.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         return SimpleMachineVertex(resources_required, label, constraints)
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(SplitterByAtoms.n_atoms)
     def n_atoms(self):
         return self._n_atoms
