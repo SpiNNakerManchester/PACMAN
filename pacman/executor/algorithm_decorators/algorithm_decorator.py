@@ -33,6 +33,7 @@ from .one_of_input import OneOfInput
 from .output import Output
 from .single_input import SingleInput
 from .all_of_input import AllOfInput
+# pylint: disable=redefined-outer-name, deprecated-method
 
 # The dict of algorithm name to algorithm description
 _algorithms = dict()
@@ -359,6 +360,7 @@ def scan_packages(packages, recursive=True):
     :return: A dict of algorithm name -> algorithm data
     """
     global _algorithms
+    # pylint: disable=broad-except
 
     with _algorithm_lock:
         current_algorithms = _algorithms
@@ -374,8 +376,8 @@ def scan_packages(packages, recursive=True):
                     __import__(package_name)
                     package = sys.modules[package_name]
                 except Exception as ex:  # pragma: no cover
-                    logger.warning("Failed to import {} : {}".format(
-                        package_name, str(ex)))
+                    logger.warning("Failed to import %s : %s",
+                        package_name, str(ex))
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -390,8 +392,8 @@ def scan_packages(packages, recursive=True):
                     try:
                         __import__(module)
                     except Exception as ex:  # pragma: no cover
-                        logger.warning("Failed to import {} : {}".format(
-                            module, str(ex)))
+                        logger.warning("Failed to import %s : %s",
+                            module, str(ex))
                         continue
 
         new_algorithms = _algorithms
