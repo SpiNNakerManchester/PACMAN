@@ -31,4 +31,3 @@ class AbstractSpiNNakerLink(AbstractVirtual):
     def spinnaker_link_id(self):
         """ The SpiNNaker Link that the vertex is connected to.
         """
-        return self._spinnaker_link_id
