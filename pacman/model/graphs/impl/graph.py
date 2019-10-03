@@ -114,7 +114,7 @@ class Graph(ConstrainedObject, AbstractGraph):
                 raise PacmanAlreadyExistsException("vertex", vertex.label)
             vertex.set_label(vertex.label + self._label_postfix())
         vertex.addedToGraph()
-        self._vertices.add(vertex)
+        self._vertices.append(vertex)
         self._vertex_by_label[vertex.label] = vertex
 
     @overrides(AbstractGraph.add_edge)
