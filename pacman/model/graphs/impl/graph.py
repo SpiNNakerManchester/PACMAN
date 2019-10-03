@@ -78,7 +78,7 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
 
-        self._vertices = []
+        self._vertices = OrderedSet()
         self._vertex_by_label = dict()
         self._none_labelled_vertex_count = 0
         self._outgoing_edge_partitions_by_name = OrderedDict()
@@ -114,7 +114,7 @@ class Graph(ConstrainedObject, AbstractGraph):
                 raise PacmanAlreadyExistsException("vertex", vertex.label)
             vertex.set_label(vertex.label + self._label_postfix())
         vertex.addedToGraph()
-        self._vertices.append(vertex)
+        self._vertices.add(vertex)
         self._vertex_by_label[vertex.label] = vertex
 
     @overrides(AbstractGraph.add_edge)
