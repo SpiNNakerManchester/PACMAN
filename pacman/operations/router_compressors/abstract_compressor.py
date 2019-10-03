@@ -40,6 +40,9 @@ class AbstractCompressor(object):
         "_ordered",
     ]
 
+    def __init__(self, ordered=True):
+        self._ordered = ordered
+
     def __call__(self, router_tables, target_length=None):
         if target_length is None:
             self._target_length = 0  # Compress as much as you can
@@ -149,3 +152,7 @@ class AbstractCompressor(object):
             else:
                 logger.warning(self._problems)
         return compressed_tables
+
+    @property
+    def ordered(self):
+        return self._ordered

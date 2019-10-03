@@ -185,7 +185,7 @@ def minimise(routing_table, target_length):
     return remove_default_routes(table, target_length)
 
 
-def ordered_covering(routing_table, target_length, aliases=dict(),
+def ordered_covering(routing_table, target_length, aliases=None,
                      no_raise=False):
     """
     Reduce the size of a routing table by merging together entries where
@@ -232,8 +232,8 @@ def ordered_covering(routing_table, target_length, aliases=dict(),
         If the smallest table that can be produced is larger than
         `target_length`.
     """
-    # Copy the aliases dictionary
-    aliases = dict(aliases)
+    # Copy the aliases dictionary, handle default
+    aliases = dict(aliases) if aliases is not None else {}
 
     # Perform an initial sort of the routing table in order of increasing
     # generality.
@@ -419,7 +419,7 @@ class _Merge(object):
         "defaultable"]
 
     """Represents a potential merge of routing table entries. """
-    def __init__(self, routing_table, entries=set()):
+    def __init__(self, routing_table, entries=tuple()):
         # Generate the new key, mask and sources
         any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
         all_ones = 0xffffffff  # ... 1 in *all* of the keys

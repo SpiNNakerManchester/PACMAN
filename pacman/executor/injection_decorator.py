@@ -24,7 +24,7 @@ except ImportError:
     from inspect import getargspec as getfullargspec
 from functools import wraps
 from six import iteritems, itervalues
-
+# pylint: disable=deprecated-method
 _instances = list()
 _methods = defaultdict(dict)
 _injectables = None
@@ -173,6 +173,7 @@ class _DictFacade(dict):
         """
         :param dicts: An iterable of dict objects to be used
         """
+        super(_DictFacade, self).__init__()
         self._dicts = dicts
 
     def get(self, key, default=None):
