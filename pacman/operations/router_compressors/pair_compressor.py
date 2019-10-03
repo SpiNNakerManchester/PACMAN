@@ -111,8 +111,8 @@ class PairCompressor(AbstractCompressor):
         "_routes_count",
     ]
 
-    def __init__(self):
-        self._ordered = True
+    def __init__(self, ordered=True):
+        self._ordered = ordered
 
     def _compare_routes(self, route_a, route_b):
         """

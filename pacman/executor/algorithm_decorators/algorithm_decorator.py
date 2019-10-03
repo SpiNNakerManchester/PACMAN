@@ -377,7 +377,7 @@ def scan_packages(packages, recursive=True):
                     package = sys.modules[package_name]
                 except Exception as ex:  # pragma: no cover
                     logger.warning("Failed to import %s : %s",
-                        package_name, str(ex))
+                                   package_name, str(ex))
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -393,7 +393,7 @@ def scan_packages(packages, recursive=True):
                         __import__(module)
                     except Exception as ex:  # pragma: no cover
                         logger.warning("Failed to import %s : %s",
-                            module, str(ex))
+                                       module, str(ex))
                         continue
 
         new_algorithms = _algorithms
