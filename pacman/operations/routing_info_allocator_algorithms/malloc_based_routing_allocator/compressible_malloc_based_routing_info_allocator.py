@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict, OrderedDict
-except ImportError:
-    from collections import defaultdict, OrderedDict
+from collections import defaultdict, OrderedDict
 import logging
 import numpy
 from past.builtins import xrange
