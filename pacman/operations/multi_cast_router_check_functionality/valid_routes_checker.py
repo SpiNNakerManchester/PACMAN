@@ -97,7 +97,7 @@ def validate_routes(machine_graph, placements, routing_infos,
             for outgoing_edge in out_going_edges:
                 dest_placement = placements.get_placement_of_vertex(
                     outgoing_edge.post_vertex)
-                destination_placements.append(
+                destination_placements.add(
                     PlacementTuple(x=dest_placement.x,
                                    y=dest_placement.y,
                                    p=dest_placement.p))

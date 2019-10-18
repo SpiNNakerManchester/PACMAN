@@ -36,7 +36,7 @@ from .variable_sdram import VariableSDRAM
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
            "CPUCyclesPerTickResource", "DTCMResource",
            "ElementFreeSpace", "IPtagResource", "ResourceContainer",
-           "ReverseIPtagResource", "SDRAMAvaiable",
+           "ReverseIPtagResource",
            "PreAllocatedResourceContainer", "SpecificChipSDRAMResource",
            "SpecificCoreResource", "SpecificBoardIPtagResource",
            "SpecificBoardReverseIPtagResource", "VariableSDRAM"]
