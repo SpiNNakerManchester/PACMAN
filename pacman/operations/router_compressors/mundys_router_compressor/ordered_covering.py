@@ -249,26 +249,23 @@ def ordered_covering(
         If the smallest table that can be produced is larger than
         `target_length`.
     """
+# Copy the aliases dictionary, handle default
+    aliases = dict(aliases) if aliases is not None else {}
 
     timer = Timer()
     timer.start_timing()
-
-    if aliases is None:
-        aliases = dict()
-
-    # Copy the aliases dictionary
-    aliases = dict(aliases)
 
     # Perform an initial sort of the routing table in order of increasing
     # generality.
     routing_table = sorted(
         routing_table,
-        key=lambda table_e: get_generality(table_e.key, table_e.mask)
+        key=lambda entry: get_generality(entry.key, entry.mask)
     )
 
     while target_length is None or len(routing_table) > target_length:
         # Get the best merge
         merge = _get_best_merge(routing_table, aliases)
+
         # If there is no merge then stop
         if merge.goodness <= 0:
             break
@@ -448,7 +445,7 @@ class _Merge(object):
         "defaultable"]
 
     """Represents a potential merge of routing table entries. """
-    def __init__(self, routing_table, entries=set()):
+    def __init__(self, routing_table, entries=tuple()):
         # Generate the new key, mask and sources
         any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
         all_ones = 0xffffffff  # ... 1 in *all* of the keys

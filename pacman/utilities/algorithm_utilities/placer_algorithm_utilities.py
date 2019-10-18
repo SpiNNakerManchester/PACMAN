@@ -54,10 +54,10 @@ def get_vertices_on_same_chip(vertex, graph):
         if isinstance(constraint, SameChipAsConstraint):
             same_chip_as_vertices.append(constraint.vertex)
 
-    for edge in filter(
-            lambda edge: edge.traffic_type == EdgeTrafficType.SDRAM,
-            graph.get_edges_starting_at_vertex(vertex)):
-        same_chip_as_vertices.append(edge.post_vertex)
+    same_chip_as_vertices.extend(
+        edge.post_vertex
+        for edge in graph.get_edges_starting_at_vertex(vertex)
+        if edge.traffic_type == EdgeTrafficType.SDRAM)
     return same_chip_as_vertices
 
 

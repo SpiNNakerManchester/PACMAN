@@ -771,7 +771,7 @@ class PACMANAlgorithmExecutor(object):
                         provenance_file, algorithm.generated_output_tokens)
 
                 provenance_file.write("\n")
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             logger.exception("Exception when attempting to write provenance")
 
     def _report_inputs(self, provenance_file, inputs):

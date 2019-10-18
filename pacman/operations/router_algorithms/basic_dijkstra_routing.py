@@ -115,9 +115,10 @@ class BasicDijkstraRouting(object):
 
     def _route(self, placement, placements, machine, graph, node_info, tables):
         # pylint: disable=too-many-arguments
-        out_going_edges = filter(
-            lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
-            graph.get_edges_starting_at_vertex(placement.vertex))
+        out_going_edges = (
+            edge
+            for edge in graph.get_edges_starting_at_vertex(placement.vertex)
+            if edge.traffic_type == EdgeTrafficType.MULTICAST)
 
         dest_chips = set()
         edges_to_route = list()

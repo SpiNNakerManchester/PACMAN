@@ -22,15 +22,15 @@ from pacman.utilities import utility_calls
 from pacman.utilities.utility_objs import Field
 from pacman.utilities.utility_objs.flexi_field import SUPPORTED_TAGS
 
-TYPES_OF_FIELDS = Enum(
-    value="TYPES_OF_FIELDS",
-    names=[("FIXED_MASK", 0),
-           ("FIXED_KEY", 1),
-           ("FIXED_FIELD", 2)])
-
 NUM_BITS_IN_ROUTING = 31
 ROUTING_MASK_BIT = 1
 START_OF_ROUTING_KEY_POSITION = 0
+
+
+class TYPES_OF_FIELDS(Enum):
+    FIXED_MASK = 0
+    FIXED_KEY = 1
+    FIXED_FIELD = 2
 
 
 def deduce_types(graph):

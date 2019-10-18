@@ -180,7 +180,7 @@ def md5(string):
     return hashlib.md5(string.encode()).hexdigest()
 
 
-def ident(object):  # @ReservedAssignment
+def ident(object):  # @ReservedAssignment pylint: disable=redefined-builtin
     """ Get the ID of the given object.
 
     :type object: object

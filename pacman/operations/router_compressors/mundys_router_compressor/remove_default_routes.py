@@ -19,6 +19,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_
 """
 
 from .utils import intersect
+from pacman.exceptions import MinimisationFailedError
 
 
 def minimise(table, target_length, check_for_aliases=True):
@@ -44,7 +45,7 @@ def minimise(table, target_length, check_for_aliases=True):
         contain any aliased entries.
 
     :return: list(RoutingTableEntry)
-    :raises MinimisationFailedError
+    :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         `target_length`.
     """
@@ -69,5 +70,8 @@ def minimise(table, target_length, check_for_aliases=True):
             if any(intersect(key, mask, d.key, d.mask) for
                     d in table[i + 1:]):
                 new_table.append(entry)
+
+    if target_length and len(new_table) > target_length:
+        raise MinimisationFailedError(target_length, len(new_table))
 
     return new_table
