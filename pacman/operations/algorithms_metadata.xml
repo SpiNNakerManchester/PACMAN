@@ -34,15 +34,10 @@
                 <param_name>destination_class</param_name>
                 <param_type>FixedRouteDestinationClass</param_type>
             </parameter>
-            <parameter>
-                <param_name>board_version</param_name>
-                <param_type>BoardVersion</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
             <param_name>machine</param_name>
-            <param_name>board_version</param_name>
             <param_name>destination_class</param_name>
         </required_inputs>
         <outputs>
@@ -393,16 +388,11 @@
                 <param_name>n_keys_map</param_name>
                 <param_type>MemoryMachinePartitionNKeysMap</param_type>
             </parameter>
-            <parameter>
-                <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>application_graph</param_name>
             <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
-            <param_name>placements</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>

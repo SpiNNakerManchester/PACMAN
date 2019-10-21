@@ -15,10 +15,10 @@
 
 from enum import Enum
 
-SUPPORTED_TAGS = Enum(
-    value="SUPPORTED_TAGS",
-    names=[("APPLICATION", 0),
-           ("ROUTING", 1)])
+
+class SUPPORTED_TAGS(Enum):
+    APPLICATION = 0
+    ROUTING = 1
 
 
 class FlexiField(object):

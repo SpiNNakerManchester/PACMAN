@@ -25,12 +25,11 @@ class FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine", "_placements"]
 
-    def __call__(self, machine, placements, board_version, destination_class):
+    def __call__(self, machine, placements, destination_class):
         """ Runs the fixed route generator for all boards on machine
 
         :param machine: SpiNNMachine object
         :param placements: placements object
-        :param board_version: to be nuked
         :param destination_class: the destination class to route packets to
         :return: router tables for fixed route paths
         """

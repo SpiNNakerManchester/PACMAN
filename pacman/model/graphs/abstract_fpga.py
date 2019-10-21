@@ -18,7 +18,7 @@ from .abstract_virtual import AbstractVirtual
 
 
 class AbstractFPGA(AbstractVirtual):
-    """ A An Object (most likely a vertex) connected to an FPGA.
+    """ An Object (most likely a vertex) connected to an FPGA.
 
         Note: It is expected that everything that is an instance of \
         AbstractFPGA is also an instance of AbstractVertex, \

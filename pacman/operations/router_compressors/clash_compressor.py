@@ -46,8 +46,7 @@ class ClashCompressor(AbstractCompressor):
             if len(clashers) == 0:
                 route_entries.remove(another)
                 return Entry(
-                    m_key, m_mask, defaultable, an_entry.spinnaker_route,
-                    -10000000)
+                    m_key, m_mask, defaultable, an_entry.spinnaker_route)
             if len(clashers) <= self._max_clashes:
                 for entry in clashers:
                     entry.clashes += 1
@@ -128,7 +127,7 @@ class ClashCompressor(AbstractCompressor):
         try:
             results = self.compress_ignore_clashers(router_table, [])
             return results
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             print(ex)
             self._problems += "(x:{},y:{})={} ".format(
                 router_table.x, router_table.y, len(results))

@@ -111,9 +111,6 @@ class PairCompressor(AbstractCompressor):
         "_routes_count",
     ]
 
-    def __init__(self):
-        self._ordered = True
-
     def _compare_routes(self, route_a, route_b):
         """
         Compares two routes for sorting based on the frequency of each route.
@@ -242,7 +239,7 @@ class PairCompressor(AbstractCompressor):
         """
         m_key, m_mask, defaultable = self.merge(
             self._all_entries[left], self._all_entries[index])
-        if not self._ordered:
+        if not self.ordered:
             for check in range(self._previous_index):
                 if self.intersect(
                         self._all_entries[check].key,

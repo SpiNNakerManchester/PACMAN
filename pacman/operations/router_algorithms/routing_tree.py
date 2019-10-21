@@ -42,8 +42,8 @@ class RoutingTree(object):
 
         .. note::
 
-            Up until Rig 1.5.1 this structure used :py:class:`set`\ s to store
-            children. This was changed to :py:class:`list`\ s since sets incur
+            Up until Rig 1.5.1 this structure used :py:class:`set`s to store
+            children. This was changed to :py:class:`list`s since sets incur
             a large memory overhead and in practice the set-like behaviour of
             the list of children is not useful.
 
@@ -52,7 +52,7 @@ class RoutingTree(object):
 
         * :py:class:`RoutingTree`
           representing the continuation of the routing tree after following a
-          given link. 
+          given link.
         * A vertex (i.e. some other Python object) when the route terminates at
           the supplied vertex. Note that the direction may be None and so
           additional logic may be required to determine what core to target to
@@ -99,7 +99,7 @@ class RoutingTree(object):
         """
         yield self
 
-        for route, obj in self._children:
+        for _route, obj in self._children:
             if isinstance(obj, RoutingTree):
                 for subchild in obj:
                     yield subchild
