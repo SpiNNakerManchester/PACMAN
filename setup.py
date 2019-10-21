@@ -17,10 +17,7 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 import os
 
 __version__ = None
