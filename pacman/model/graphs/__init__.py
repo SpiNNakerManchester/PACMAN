@@ -16,11 +16,18 @@
 from .abstract_edge import AbstractEdge
 from .abstract_fpga import AbstractFPGA
 from .abstract_graph import AbstractGraph
-from .abstract_outgoing_edge_partition import AbstractOutgoingEdgePartition
+from .abstract_edge_partition import AbstractOutgoingEdgePartition
 from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
+from .abstract_basic_edge_partition import AbstractBasicEdgePartition
+from .abstract_costed_partition import AbstractCostedPartition
+from .abstract_multiple_partition import AbstractMultiplePartition
+from .abstract_single_source_partition import AbstractSingleSourcePartition
 
-__all__ = ["AbstractEdge", "AbstractFPGA", "AbstractGraph",
-           "AbstractOutgoingEdgePartition", "AbstractSpiNNakerLink",
-           "AbstractVertex", "AbstractVirtual"]
+__all__ = [
+    "AbstractEdge", "AbstractFPGA", "AbstractGraph",
+    "AbstractOutgoingEdgePartition", "AbstractSpiNNakerLink",
+    "AbstractVertex", "AbstractVirtual", "AbstractBasicEdgePartition",
+    "AbstractCostedPartition", "AbstractMultiplePartition",
+    "AbstractSingleSourcePartition"]

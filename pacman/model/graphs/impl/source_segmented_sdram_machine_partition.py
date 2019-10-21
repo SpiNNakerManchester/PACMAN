@@ -13,48 +13,58 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.exceptions import SDRAMEdgeSizeException
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.abstract_multiple_partition import \
+    AbstractMultiplePartition
 from pacman.model.graphs.abstract_sdram_partition import AbstractSDRAMPartition
-from pacman.model.graphs.abstract_single_source_partition import \
-    AbstractSingleSourcePartition
 from spinn_utilities.overrides import overrides
 
 
-class ConstantSDRAMMachinePartition(
-        AbstractSDRAMPartition, AbstractSingleSourcePartition):
+class SourceSegmentedSDRAMMachinePartition(
+        AbstractMultiplePartition, AbstractSDRAMPartition):
 
     __slots__ = [
         "_sdram_base_address",
     ]
 
-    def __init__(self, identifier, pre_vertex, label):
+    def __init__(self, identifier, label, pre_vertices):
+        AbstractMultiplePartition.__init__(self, pre_vertices)
         AbstractSDRAMPartition.__init__(self, identifier, label)
-        AbstractSingleSourcePartition.__init__(self)
         self._sdram_base_address = None
-        self._pre_vertex = pre_vertex
 
-    @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):
-        expected_size = self.edges.peek().sdram_size
+        total = 0
         for edge in self.edges:
-            if edge.sdram_size != expected_size:
-                raise SDRAMEdgeSizeException(
-                    "The edges within the constant sdram partition {} have "
-                    "inconsistent memory size requests. ")
-        return expected_size
-
-    @overrides(AbstractSDRAMPartition.add_edge)
-    def add_edge(self, edge):
-        # add
-        AbstractSingleSourcePartition.add_edge(self, edge)
-        AbstractSDRAMPartition.add_edge(self, edge)
+            total += edge.sdram_size
+        return total
 
     @property
     def sdram_base_address(self):
         return self._sdram_base_address
 
+    @overrides(AbstractSDRAMPartition.add_edge)
+    def add_edge(self, edge):
+        # add
+        AbstractMultiplePartition.add_edge(self, edge)
+        AbstractSDRAMPartition.add_edge(self, edge)
+
+        # check
+        if len(self._destinations.keys()) != 1:
+            raise PacmanConfigurationException(
+                "The MultiSourcePartition can only support 1 destination "
+                "vertex")
+        if len(self._pre_vertices[edge.pre_vertex]) != 1:
+            raise PacmanConfigurationException(
+                "The multiple source partition only supports 1 edge from a "
+                "given pre vertex.")
+
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
         self._sdram_base_address = new_value
-        for edge in self.edges:
-            edge.sdram_base_address = self._sdram_base_address
+
+        for pre_vertex in self._pre_vertices.keys():
+
+            # allocate for the pre_vertex
+            edge = self._pre_vertices[pre_vertex][0]
+            edge.sdram_base_address = new_value
+            new_value += edge.sdram_size

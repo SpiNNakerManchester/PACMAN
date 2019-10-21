@@ -14,14 +14,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
+
+from pacman.model.graphs.abstract_basic_edge_partition import \
+    AbstractBasicEdgePartition
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.graphs.machine.machine_sdram_edge import SDRAMMachineEdge
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
 @add_metaclass(AbstractBase)
-class AbstractSDRAMPartition(object):
+class AbstractSDRAMPartition(AbstractBasicEdgePartition):
 
-    def __init__(self):
-        pass
+    def __init__(self, identifier, label):
+        AbstractBasicEdgePartition.__init__(
+            self, identifier=identifier, allowed_edge_types=SDRAMMachineEdge,
+            label=label)
+        self._traffic_type = EdgeTrafficType.SDRAM
 
     @abstractmethod
     def total_sdram_requirements(self):

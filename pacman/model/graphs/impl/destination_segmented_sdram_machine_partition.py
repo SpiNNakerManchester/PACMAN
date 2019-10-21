@@ -14,17 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.abstract_sdram_partition import AbstractSDRAMPartition
-from pacman.model.graphs.\
-    abstract_traffic_type_secure_outgoing_partition import \
-    AbstractTrafficTypeSecureOutgoingPartition
-from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.graphs.machine.machine_sdram_edge import SDRAMMachineEdge
-from pacman.utilities import constants
+from pacman.model.graphs.abstract_single_source_partition import \
+    AbstractSingleSourcePartition
 from spinn_utilities.overrides import overrides
 
 
-class SegmentedSDRAMMachinePartition(
-        AbstractTrafficTypeSecureOutgoingPartition, AbstractSDRAMPartition):
+class DestinationSegmentedSDRAMMachinePartition(
+        AbstractSingleSourcePartition, AbstractSDRAMPartition):
 
     __slots__ = [
         "_sdram_base_address",
@@ -32,11 +28,8 @@ class SegmentedSDRAMMachinePartition(
     ]
 
     def __init__(self, identifier, pre_vertex, label):
-        AbstractTrafficTypeSecureOutgoingPartition.__init__(
-            self,  identifier=identifier,
-            allowed_edge_types=SDRAMMachineEdge,
-            label=label, traffic_type=EdgeTrafficType.SDRAM)
-        AbstractSDRAMPartition.__init__(self)
+        AbstractSDRAMPartition.__init__(self,  identifier, label)
+        AbstractSingleSourcePartition.__init__(self)
         self._sdram_base_address = None
         self._pre_vertex = pre_vertex
 
@@ -48,10 +41,6 @@ class SegmentedSDRAMMachinePartition(
         return total
 
     @property
-    def pre_vertex(self):
-        return self._pre_vertex
-
-    @property
     def sdram_base_address(self):
         return self._sdram_base_address
 
@@ -59,6 +48,4 @@ class SegmentedSDRAMMachinePartition(
     def sdram_base_address(self, new_value):
         self._sdram_base_address = new_value
         for edge in self.edges:
-            edge.sdram_base_address = (
-                new_value + (edge.pre_vertex.input_slice.lo_atom *
-                             constants.BYTE_TO_WORD_MULTIPLIER))
+            edge.sdram_base_address = new_value + edge.sdram_size

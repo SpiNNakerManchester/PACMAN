@@ -16,7 +16,17 @@
 from .graph import Graph
 from .outgoing_edge_partition import OutgoingEdgePartition
 from .constant_sdram_machine_partition import ConstantSDRAMMachinePartition
-from .segmented_sdram_machine_partition import SegmentedSDRAMMachinePartition
+from .destination_segmented_sdram_machine_partition import \
+    DestinationSegmentedSDRAMMachinePartition
+from .both_segmented_sdram_machine_partition import \
+    BothSegmentedSDRAMMachinePartition
+from .source_segmented_sdram_machine_partition import \
+    SourceSegmentedSDRAMMachinePartition
 
-__all__ = ["Graph", "OutgoingEdgePartition", "ConstantSDRAMMachinePartition",
-           "SegmentedSDRAMMachinePartition"]
+__all__ = [
+    "Graph",
+    "OutgoingEdgePartition",
+    "ConstantSDRAMMachinePartition",
+    "DestinationSegmentedSDRAMMachinePartition",
+    "SourceSegmentedSDRAMMachinePartition",
+    "BothSegmentedSDRAMMachinePartition"]

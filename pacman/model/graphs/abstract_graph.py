@@ -217,6 +217,17 @@ class AbstractGraph(object):
         """
 
     @abstractmethod
+    def get_costed_edge_partitions_starting_at_vertex(self, vertex):
+        """ Get all the costed edge partitions that start at the given vertex.
+
+        :param vertex: The vertex at which the costed edge partitions to find \
+        starts
+        :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
+        :rtype: \
+            iterable(:py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`)
+        """
+
+    @abstractmethod
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
         """ Get the given outgoing edge partition that starts at the\

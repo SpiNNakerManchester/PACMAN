@@ -92,14 +92,6 @@ class AbstractOutgoingEdgePartition(object):
         """
 
     @abstractproperty
-    def pre_vertex(self):
-        """ The vertex at which all edges in this outgoing edge partition\
-            start.
-
-        :rtype: :py:class:`pacman.model.graphs.AbstractVertex`
-        """
-
-    @abstractproperty
     def traffic_weight(self):
         """ The weight of the traffic in this outgoing edge partition compared\
             to other partitions.

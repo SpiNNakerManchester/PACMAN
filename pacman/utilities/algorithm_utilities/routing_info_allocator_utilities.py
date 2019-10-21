@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.common import EdgeTrafficType
 
 try:
     from collections.abc import OrderedDict
@@ -166,59 +167,61 @@ def check_types_of_edge_constraint(machine_graph):
     :rtype: None:
     """
     for partition in machine_graph.outgoing_edge_partitions:
-        fixed_key = locate_constraints_of_type(
-            partition.constraints, FixedKeyAndMaskConstraint)
+        if partition.traffic_type == EdgeTrafficType.MULTICAST:
+            fixed_key = locate_constraints_of_type(
+                partition.constraints, FixedKeyAndMaskConstraint)
 
-        fixed_mask = locate_constraints_of_type(
-            partition.constraints, FixedMaskConstraint)
+            fixed_mask = locate_constraints_of_type(
+                partition.constraints, FixedMaskConstraint)
 
-        fixed_field = locate_constraints_of_type(
-            partition.constraints, FixedKeyFieldConstraint)
+            fixed_field = locate_constraints_of_type(
+                partition.constraints, FixedKeyFieldConstraint)
 
-        flexi_field = locate_constraints_of_type(
-            partition.constraints, FlexiKeyFieldConstraint)
+            flexi_field = locate_constraints_of_type(
+                partition.constraints, FlexiKeyFieldConstraint)
 
-        if (len(fixed_key) > 1 or len(fixed_field) > 1 or
-                len(fixed_mask) > 1 or len(flexi_field) > 1):
-            raise PacmanConfigurationException(
-                "There are more than one of the same constraint type on "
-                "the partition {} starting at {}. Please fix and try again."
-                .format(partition.identifier, partition.pre_vertex))
+            if (len(fixed_key) > 1 or len(fixed_field) > 1 or
+                    len(fixed_mask) > 1 or len(flexi_field) > 1):
+                raise PacmanConfigurationException(
+                    "There are more than one of the same constraint type on "
+                    "the partition {} starting at {}. Please fix and try "
+                    "again.".format(
+                        partition.identifier, partition.pre_vertex))
 
-        fixed_key = len(fixed_key) == 1
-        fixed_mask = len(fixed_mask) == 1
-        fixed_field = len(fixed_field) == 1
-        flexi_field = len(flexi_field) == 1
+            fixed_key = len(fixed_key) == 1
+            fixed_mask = len(fixed_mask) == 1
+            fixed_field = len(fixed_field) == 1
+            flexi_field = len(flexi_field) == 1
 
-        # check for fixed key and a fixed mask. as these should have been
-        # merged before now
-        if fixed_key and fixed_mask:
-            raise PacmanConfigurationException(
-                "The partition {} starting at {} has a fixed key and fixed "
-                "mask constraint. These can be merged together, but is "
-                "deemed an error here"
-                .format(partition.identifer, partition.pre_vertex))
+            # check for fixed key and a fixed mask. as these should have been
+            # merged before now
+            if fixed_key and fixed_mask:
+                raise PacmanConfigurationException(
+                    "The partition {} starting at {} has a fixed key and "
+                    "fixed mask constraint. These can be merged together, but"
+                    " is deemed an error here".format(
+                        partition.identifer, partition.pre_vertex))
 
-        # check for a fixed key and fixed field, as these are incompatible
-        if fixed_key and fixed_field:
-            raise PacmanConfigurationException(
-                "The partition {} starting at {} has a fixed key and fixed "
-                "field constraint. These may be merge-able together, but "
-                "is deemed an error here"
-                .format(partition.identifer, partition.pre_vertex))
+            # check for a fixed key and fixed field, as these are incompatible
+            if fixed_key and fixed_field:
+                raise PacmanConfigurationException(
+                    "The partition {} starting at {} has a fixed key and "
+                    "fixed field constraint. These may be merge-able "
+                    "together, but is deemed an error here".format(
+                        partition.identifer, partition.pre_vertex))
 
-        # check that a fixed mask and fixed field have compatible masks
-        if fixed_mask and fixed_field:
-            _check_masks_are_correct(partition)
+            # check that a fixed mask and fixed field have compatible masks
+            if fixed_mask and fixed_field:
+                _check_masks_are_correct(partition)
 
-        # check that if there's a flexible field, and something else, throw
-        # error
-        if flexi_field and (fixed_mask or fixed_key or fixed_field):
-            raise PacmanConfigurationException(
-                "The partition {} starting at {} has a flexible field and "
-                "another fixed constraint. These maybe be merge-able, but "
-                "is deemed an error here"
-                .format(partition.identifer, partition.pre_vertex))
+            # check that if there's a flexible field, and something else, throw
+            # error
+            if flexi_field and (fixed_mask or fixed_key or fixed_field):
+                raise PacmanConfigurationException(
+                    "The partition {} starting at {} has a flexible field and "
+                    "another fixed constraint. These maybe be merge-able, but "
+                    "is deemed an error here"
+                    .format(partition.identifer, partition.pre_vertex))
 
 
 def _check_masks_are_correct(partition):
