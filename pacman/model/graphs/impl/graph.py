@@ -123,10 +123,10 @@ class Graph(ConstrainedObject, AbstractGraph):
                 "Edges of this graph must be one of the following types:"
                 " {}".format(self._allowed_edge_types))
 
-        if edge.pre_vertex not in self._vertices:
+        if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", edge.pre_vertex, "pre-vertex must be known in graph")
-        if edge.post_vertex not in self._vertices:
+        if edge.post_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", edge.post_vertex, "post-vertex must be known in graph")
 
