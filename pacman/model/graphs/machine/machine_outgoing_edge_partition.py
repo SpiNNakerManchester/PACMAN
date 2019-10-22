@@ -38,7 +38,6 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
             identifier, MachineEdge, pre_vertex, constraints, label,
             traffic_weight)
 
-        @overrides(OutgoingEdgePartition.clone_for_graph_move)
-        def clone_for_graph_move(self):
-            return MachineOutgoingEdgePartition(
-                self._identifier, self._pre_vertex, self._label)
+    def clone_for_graph_move(self):
+        return MachineOutgoingEdgePartition(
+            self._identifier, self._pre_vertex, self._label)

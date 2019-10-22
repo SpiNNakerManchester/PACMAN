@@ -17,6 +17,7 @@ from pacman.model.graphs.abstract_basic_edge_partition import \
 from pacman.model.graphs.abstract_single_source_partition import \
     AbstractSingleSourcePartition
 from pacman.model.graphs.common import EdgeTrafficType
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 
 _REPR_TEMPLATE = \
@@ -49,7 +50,9 @@ class OutgoingEdgePartition(
         AbstractSingleSourcePartition.add_edge(self, edge)
         AbstractBasicEdgePartition.add_edge(self, edge)
 
+    @abstractmethod
     def clone_for_graph_move(self):
-        return OutgoingEdgePartition(
-            self._identifier, self._allowed_edge_types, self._pre_vertex,
-            self._constraints, self._label, self._traffic_weight)
+        """ handle cloning this partition for moving between graphs.
+
+        :return: a clone of this partition with no edge data
+        """
