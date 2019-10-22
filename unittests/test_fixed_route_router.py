@@ -54,8 +54,7 @@ def _check_setup(width, height, down_chips, down_links):
         Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
         for ethernet_chip in ethernet_chips)
 
-    fixed_route_tables = router(
-        machine, placements, "bacon", DestinationVertex)
+    fixed_route_tables = router(machine, placements, DestinationVertex)
 
     for x, y in machine.chip_coordinates:
         assert (x, y) in fixed_route_tables
@@ -80,9 +79,7 @@ def _check_setup(width, height, down_chips, down_links):
      (False, True),
      (True, True)])
 def test_all_working(width, height,  with_down_links, with_down_chips):
-
-    temp_machine = virtual_machine(
-        width=width, height=height)
+    temp_machine = virtual_machine(width=width, height=height)
     down_links = None
     if with_down_links:
         down_links = set()
@@ -106,15 +103,11 @@ def test_unreachable():
 
 
 if __name__ == '__main__':
-    iterations = [
+    _iterations = [
         (False, False),
         (True, False),
         (False, True)]
-    for (_x, _y) in iterations:
-        test_all_working(2, 2, None, 3, _x, _y)
-        test_all_working(2, 2,  None, 3, _x, _y)
-        test_all_working(None, None, 3, 3, _x, _y)
-        test_all_working(8, 8, None, 5, _x, _y)
-        test_all_working(None, None, 5, 5, _x, _y)
-        test_all_working(12, 12, None, 5, _x, _y)
-        test_all_working(16, 16, None, 5, _x, _y)
+    _sizes = [2, 8, 12, 16]
+    for (_down_links, _down_chips) in _iterations:
+        for _size in _sizes:
+            test_all_working(_size, _size, _down_links, _down_chips)

@@ -14,10 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 from six import iterkeys
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
@@ -748,7 +745,7 @@ class PACMANAlgorithmExecutor(object):
                         provenance_file, algorithm.generated_output_tokens)
 
                 provenance_file.write("\n")
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             logger.exception("Exception when attempting to write provenance")
 
     def _report_inputs(self, provenance_file, inputs):

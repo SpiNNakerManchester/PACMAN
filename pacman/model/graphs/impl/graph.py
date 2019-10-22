@@ -16,10 +16,7 @@ from pacman.model.graphs.abstract_costed_partition import \
     AbstractCostedPartition
 from pacman.model.graphs.abstract_sdram_partition import AbstractSDRAMPartition
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
@@ -121,11 +118,11 @@ class Graph(ConstrainedObject, AbstractGraph):
     @overrides(AbstractGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
 
-        if edge.pre_vertex not in self._vertices:
+        if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", str(edge.pre_vertex),
                 "pre-vertex must be known in graph")
-        if edge.post_vertex not in self._vertices:
+        if edge.post_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", str(edge.post_vertex),
                 "post-vertex must be known in graph")

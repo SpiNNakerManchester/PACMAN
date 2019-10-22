@@ -20,6 +20,7 @@ from pacman.executor.algorithm_decorators import (
     AllOfInput, OneOfInput, Output, SingleInput, Token)
 from pacman.executor.algorithm_classes import (
     ExternalAlgorithm, PythonClassAlgorithm, PythonFunctionAlgorithm)
+# pylint: disable=c-extension-no-member
 
 
 def _check_allowed_elements(path, element, allowed):

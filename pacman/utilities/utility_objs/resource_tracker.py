@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
@@ -234,7 +231,7 @@ class ResourceTracker(object):
         for sdram_pre_allocated in preallocated_resources.specific_sdram_usage:
             chip = sdram_pre_allocated.chip
             sdram = sdram_pre_allocated.sdram_usage.get_total_sdram(
-                        self._plan_n_timesteps)
+                self._plan_n_timesteps)
             self._sdram_tracker[chip.x, chip.y] -= sdram
 
         # remove specific cores from the tracker
@@ -1369,8 +1366,7 @@ class ResourceTracker(object):
         :rtype: :py:class:`pacman.model.resources.ResourceContainer`
         """
         # Go through the chips in order of sdram
-        for ((chip_x, chip_y),
-                sdram_available) in self._sdram_tracker.items():
+        for ((chip_x, chip_y), sdram_available) in self._sdram_tracker.items():
             if self._chip_available(chip_x, chip_y) and (
                     area_code is None or (chip_x, chip_y) in area_code):
                 chip = self._machine.get_chip_at(chip_x, chip_y)
