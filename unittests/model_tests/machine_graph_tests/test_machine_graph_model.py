@@ -15,7 +15,8 @@
 
 import unittest
 from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, SimpleMachineVertex)
+    MachineEdge, MachineGraph, SimpleMachineVertex,
+    MachineOutgoingEdgePartition)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 
@@ -53,6 +54,10 @@ class TestMachineGraphModel(unittest.TestCase):
                 vertices[5], vertices[(i + 1) % 10]))
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition("bar", vertices[0]))
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition("bar", vertices[5]))
         graph.add_edges(edges, "bar")
         outgoing = set(graph.get_edges_starting_at_vertex(vertices[0]))
         for i in range(5):
@@ -95,6 +100,10 @@ class TestMachineGraphModel(unittest.TestCase):
         graph = MachineGraph("foo")
         with self.assertRaises(PacmanAlreadyExistsException):
             graph.add_vertices(vertices)
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition("bar", vertices[0]))
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition("bar", vertices[1]))
         graph.add_edges(edges, "bar")
 
     def test_add_duplicate_edge(self):
@@ -110,6 +119,8 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(edge)
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition("bar", vertices[0]))
         graph.add_edges(edges, "bar")
 
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
@@ -122,11 +133,15 @@ class TestMachineGraphModel(unittest.TestCase):
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
         edges.append(MachineEdge(vertices[0], vertices[1]))
-        edges.append(MachineEdge(
-            SimpleMachineVertex(None, ""), vertices[0]))
+        vertex_extra = SimpleMachineVertex(None, "")
+        edges.append(MachineEdge(vertex_extra, vertices[0]))
         with self.assertRaises(PacmanInvalidParameterException):
             graph = MachineGraph("foo")
             graph.add_vertices(vertices)
+            graph.add_outgoing_edge_partition(
+                MachineOutgoingEdgePartition("bar", vertices[0]))
+            graph.add_outgoing_edge_partition(
+                MachineOutgoingEdgePartition("bar", vertex_extra))
             graph.add_edges(edges, "bar")
 
     def test_add_edge_with_no_existing_post_vertex_in_graph(self):
@@ -139,11 +154,12 @@ class TestMachineGraphModel(unittest.TestCase):
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
         edges.append(MachineEdge(vertices[0], vertices[1]))
-        edges.append(MachineEdge(
-            vertices[0], SimpleMachineVertex(None, "")))
+        edges.append(MachineEdge(vertices[0], SimpleMachineVertex(None, "")))
         with self.assertRaises(PacmanInvalidParameterException):
             graph = MachineGraph("foo")
             graph.add_vertices(vertices)
+            graph.add_outgoing_edge_partition(
+                MachineOutgoingEdgePartition("bar", vertices[0]))
             graph.add_edges(edges, "bar")
 
 
