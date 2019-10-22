@@ -48,15 +48,15 @@ def test_virtual_vertices_one_to_one():
 
     # These vertices are 1-1 connected to the virtual vertex
     one_to_one_vertices = list()
+    machine_graph.add_outgoing_edge_partition(
+        MachineOutgoingEdgePartition(
+            identifier="SPIKES", pre_vertex=virtual_vertex))
     for i in range(16):
         one_to_one_vertex = SimpleMachineVertex(
             resources=ResourceContainer(),
             label="Vertex_{}".format(i))
         machine_graph.add_vertex(one_to_one_vertex)
         edge = MachineEdge(virtual_vertex, one_to_one_vertex)
-        machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="SPIKES", pre_vertex=virtual_vertex))
         machine_graph.add_edge(edge, "SPIKES")
         one_to_one_vertices.append(one_to_one_vertex)
 
@@ -163,12 +163,13 @@ def test_sdram_links():
         machine_graph.add_vertex(vertex)
         last_vertex = vertex
 
+    machine_graph.add_outgoing_edge_partition(
+        MachineOutgoingEdgePartition(
+            identifier="SDRAM", pre_vertex=last_vertex))
+
     for vertex in machine_graph.vertices:
         edge = MachineEdge(vertex, last_vertex,
                            traffic_type=EdgeTrafficType.SDRAM)
-        machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="SDRAM", pre_vertex=last_vertex))
         machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements
