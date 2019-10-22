@@ -17,7 +17,6 @@ import unittest
 from pacman.model.resources import ResourceContainer
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException)
-from pacman.model.graphs.impl import OutgoingEdgePartition
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo,
     DictBasedMachinePartitionNKeysMap)
@@ -117,8 +116,8 @@ class TestRoutingInfo(unittest.TestCase):
 
     def test_dict_based_machine_partition_n_keys_map(self):
         pmap = DictBasedMachinePartitionNKeysMap()
-        p1 = OutgoingEdgePartition("foo", None)
-        p2 = OutgoingEdgePartition("bar", None)
+        p1 = MachineOutgoingEdgePartition("foo", None)
+        p2 = MachineOutgoingEdgePartition("bar", None)
         pmap.set_n_keys_for_partition(p1, 1)
         pmap.set_n_keys_for_partition(p2, 2)
         assert pmap.n_keys_for_partition(p1) == 1
