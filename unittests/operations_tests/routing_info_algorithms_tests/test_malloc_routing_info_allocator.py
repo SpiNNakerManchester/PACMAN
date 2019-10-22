@@ -19,7 +19,8 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
 from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineEdge)
+    MachineGraph, SimpleMachineVertex, MachineEdge,
+    MachineOutgoingEdgePartition)
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
@@ -129,6 +130,16 @@ class MyTestCase(unittest.TestCase):
         e2 = MachineEdge(v1, v3, label="e2")
         e3 = MachineEdge(v2, v3, label="e3")
         e4 = MachineEdge(v1, v4, label="e4")
+
+        machine_graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="part1", pre_vertex=v1))
+        machine_graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="part2", pre_vertex=v2))
+        machine_graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="part2", pre_vertex=v1))
 
         machine_graph.add_edge(e1, "part1")
         machine_graph.add_edge(e2, "part1")
