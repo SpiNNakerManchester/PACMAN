@@ -113,3 +113,8 @@ class AbstractOutgoingEdgePartition(object):
         :param edge: The edge to check for the existence of
         :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
         """
+
+    @abstractmethod
+    def clone_for_graph_move(self):
+        """ allows a partition to clone itself, whilst removing any edge state.
+        used by the ASB for moving between graphs."""

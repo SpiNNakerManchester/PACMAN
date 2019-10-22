@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph, \
+    ApplicationOutgoingEdgePartition
 from uinit_test_objects import SimpleTestVertex
 
 
@@ -30,6 +31,8 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2", 256)
         vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3", 256)
+        outgoing_partition1 = ApplicationOutgoingEdgePartition("foo", vert2)
+        outgoing_partition2 = ApplicationOutgoingEdgePartition("foo", vert1)
         edge1 = ApplicationEdge(vert1, vert2, None, "First edge")
         edge2 = ApplicationEdge(vert2, vert1, None, "First edge")
         edge3 = ApplicationEdge(vert1, vert3, None, "First edge")
@@ -37,6 +40,8 @@ class TestApplicationGraphModel(unittest.TestCase):
         edges = [edge1, edge2, edge3]
         graph = ApplicationGraph("Graph")
         graph.add_vertices(verts)
+        graph.add_outgoing_edge_partition(outgoing_partition1)
+        graph.add_outgoing_edge_partition(outgoing_partition2)
         graph.add_edges(edges, "foo")  # Any old partition label
         assert frozenset(verts) == frozenset(graph.vertices)
         assert frozenset(edges) == frozenset(graph.edges)

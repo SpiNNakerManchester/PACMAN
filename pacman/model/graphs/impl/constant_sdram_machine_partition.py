@@ -29,12 +29,14 @@ class ConstantSDRAMMachinePartition(
 
     def __init__(self, identifier, pre_vertex, label):
         AbstractSDRAMPartition.__init__(self, identifier, label)
-        AbstractSingleSourcePartition.__init__(self)
+        AbstractSingleSourcePartition.__init__(self, pre_vertex)
         self._sdram_base_address = None
-        self._pre_vertex = pre_vertex
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):
+        if len(self.edges) == 0:
+            return 0
+
         expected_size = self.edges.peek().sdram_size
         for edge in self.edges:
             if edge.sdram_size != expected_size:
@@ -58,3 +60,15 @@ class ConstantSDRAMMachinePartition(
         self._sdram_base_address = new_value
         for edge in self.edges:
             edge.sdram_base_address = self._sdram_base_address
+
+    @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
+    def get_sdram_base_address_for(self, vertex, edge):
+        return self._sdram_base_address
+
+    @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
+    def get_sdram_size_of_region_for(self, vertex, edge):
+        return edge.sdram_size
+
+    def clone_for_graph_move(self):
+        return ConstantSDRAMMachinePartition(
+            self._identifier, self._pre_vertex, self._label)

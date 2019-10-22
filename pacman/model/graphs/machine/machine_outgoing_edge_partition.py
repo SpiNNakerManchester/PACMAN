@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.impl import OutgoingEdgePartition
+from spinn_utilities.overrides import overrides
 from .machine_edge import MachineEdge
 
 
@@ -23,14 +24,21 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
 
     __slots__ = []
 
-    def __init__(self, identifier, constraints=None, label=None,
+    def __init__(self, identifier, pre_vertex, constraints=None, label=None,
                  traffic_weight=1):
         """
         :param identifier: The identifier of the partition
         :param constraints: Any initial constraints
+        :param pre_vertex: the pre vertex for this partition
         :param label: An optional label of the partition
         :param traffic_weight: the weight of this partition in relation\
             to other partitions
         """
         super(MachineOutgoingEdgePartition, self).__init__(
-            identifier, MachineEdge, constraints, label, traffic_weight)
+            identifier, MachineEdge, pre_vertex, constraints, label,
+            traffic_weight)
+
+        @overrides(OutgoingEdgePartition.clone_for_graph_move)
+        def clone_for_graph_move(self):
+            return MachineOutgoingEdgePartition(
+                self._identifier, self._pre_vertex, self._label)

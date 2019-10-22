@@ -27,5 +27,4 @@ class ApplicationGraph(Graph):
 
     def __init__(self, label):
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, AbstractBasicEdgePartition,
-            label)
+            ApplicationVertex, AbstractBasicEdgePartition, label)

@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import (
     PacmanException, PacmanInvalidParameterException, PacmanValueError)
@@ -203,8 +203,8 @@ class OneToOnePlacer(RadialPlacer):
                     vertex.constraints, ChipAndCoreConstraint):
                 self._allocate_same_chip_as_group(
                     vertex, placements, resource_tracker,
-                    same_chip_vertex_groups,
-                    all_vertices_placed, progress)
+                    same_chip_vertex_groups, all_vertices_placed, progress,
+                    machine_graph)
 
         for grouped_vertices in one_to_one_groups:
             # Get unallocated vertices and placements of allocated vertices
@@ -231,7 +231,7 @@ class OneToOnePlacer(RadialPlacer):
                 self._allocate_same_chip_as_group(
                     vertex, placements, resource_tracker,
                     same_chip_vertex_groups, all_vertices_placed,
-                    progress)
+                    progress, machine_graph)
 
         progress.end()
         return placements
@@ -258,11 +258,32 @@ class OneToOnePlacer(RadialPlacer):
     @staticmethod
     def _allocate_same_chip_as_group(
             vertex, placements, tracker, same_chip_vertex_groups,
-            all_vertices_placed, progress):
+            all_vertices_placed, progress, machine_graph):
         if vertex not in all_vertices_placed:
+            # get vert's
             vertices = same_chip_vertex_groups[vertex]
-            resources = tracker.allocate_constrained_group_resources([
-                (v.resources_required, v.constraints) for v in vertices])
+
+            # get sdram edge costs as required
+            required_resources = list()
+            to_add_partitions = set()
+            for vertex in vertices:
+                required_resources.append(
+                    (vertex.resources_required, vertex.constraints))
+                costed_partitions = (
+                    machine_graph.get_costed_edge_partitions_starting_at_vertex(
+                        vertex))
+                for costed_partition in costed_partitions:
+                    to_add_partitions.add(costed_partition)
+
+            total_sdram = 0
+            for partition in to_add_partitions:
+                total_sdram += partition.total_sdram_requirements()
+            required_resources.append(
+                (ResourceContainer(sdram=ConstantSDRAM(total_sdram)), []))
+
+            resources = tracker.allocate_constrained_group_resources(
+                required_resources)
+
             for (x, y, p, _, _), v in progress.over(
                     zip(resources, vertices), False):
                 placements.add_placement(Placement(v, x, y, p))

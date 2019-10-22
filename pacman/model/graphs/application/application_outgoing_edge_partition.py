@@ -12,7 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from pacman.model.graphs.machine import MachineOutgoingEdgePartition
+from spinn_utilities.overrides import overrides
 from .application_edge import ApplicationEdge
 from pacman.model.graphs.impl import OutgoingEdgePartition
 
@@ -23,6 +24,16 @@ class ApplicationOutgoingEdgePartition(OutgoingEdgePartition):
 
     __slots__ = ()
 
-    def __init__(self, identifier, constraints=None, label=None):
+    def __init__(self, identifier, pre_vertex, constraints=None, label=None):
         super(ApplicationOutgoingEdgePartition, self).__init__(
-            identifier, ApplicationEdge, constraints, label)
+            identifier, ApplicationEdge, pre_vertex, constraints, label)
+
+    def convert_to_machine_out_going_partition(self, machine_pre_vertex):
+        return MachineOutgoingEdgePartition(
+            identifier=self._identifier, pre_vertex=machine_pre_vertex,
+            constraints=self._constraints)
+
+    @overrides(OutgoingEdgePartition.clone_for_graph_move)
+    def clone_for_graph_move(self):
+        return ApplicationOutgoingEdgePartition(
+            self._identifier, self._pre_vertex, self._label)

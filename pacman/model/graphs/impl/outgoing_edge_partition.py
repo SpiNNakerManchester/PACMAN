@@ -16,6 +16,7 @@ from pacman.model.graphs.abstract_basic_edge_partition import \
     AbstractBasicEdgePartition
 from pacman.model.graphs.abstract_single_source_partition import \
     AbstractSingleSourcePartition
+from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.overrides import overrides
 
 _REPR_TEMPLATE = \
@@ -29,7 +30,7 @@ class OutgoingEdgePartition(
     """
 
     def __init__(
-            self, identifier, allowed_edge_types, constraints=None,
+            self, identifier, allowed_edge_types, pre_vertex, constraints=None,
             label=None, traffic_weight=1):
         """
         :param identifier: The identifier of the partition
@@ -41,9 +42,14 @@ class OutgoingEdgePartition(
         AbstractBasicEdgePartition.__init__(
             self, identifier, allowed_edge_types, constraints, label,
             traffic_weight, "OutgoingEdgePartition")
-        AbstractSingleSourcePartition.__init__(self)
+        AbstractSingleSourcePartition.__init__(self, pre_vertex)
 
     @overrides(AbstractBasicEdgePartition.add_edge)
     def add_edge(self, edge):
         AbstractSingleSourcePartition.add_edge(self, edge)
         AbstractBasicEdgePartition.add_edge(self, edge)
+
+    def clone_for_graph_move(self):
+        return OutgoingEdgePartition(
+            self._identifier, self._allowed_edge_types, self._pre_vertex,
+            self._constraints, self._label, self._traffic_weight)

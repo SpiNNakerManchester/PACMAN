@@ -27,4 +27,4 @@ class MachineGraph(Graph):
 
     def __init__(self, label):
         super(MachineGraph, self).__init__(
-            MachineVertex, MachineEdge, AbstractBasicEdgePartition, label)
+            MachineVertex, AbstractBasicEdgePartition, label)

@@ -52,22 +52,24 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
         application_outgoing_partitions = application_graph.\
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
         for application_partition in application_outgoing_partitions:
+            # make new machine partition
+            machine_partition = (
+                application_partition.convert_to_machine_out_going_partition(
+                    source_vertex))
+            machine_graph.add_outgoing_edge_partition(machine_partition)
+
+            # add edges
             for application_edge in application_partition.edges:
-                # create new partitions
+
+                # create new edges
                 for dest_vertex in graph_mapper.get_machine_vertices(
                         application_edge.post_vertex):
                     machine_edge = application_edge.create_machine_edge(
                         source_vertex, dest_vertex,
                         "machine_edge_for{}".format(application_edge.label))
+
                     machine_graph.add_edge(
                         machine_edge, application_partition.identifier)
-
-                    # add constraints from the application partition
-                    machine_partition = machine_graph.\
-                        get_outgoing_edge_partition_starting_at_vertex(
-                            source_vertex, application_partition.identifier)
-                    machine_partition.add_constraints(
-                        application_partition.constraints)
 
                     # update mapping object
                     graph_mapper.add_edge_mapping(

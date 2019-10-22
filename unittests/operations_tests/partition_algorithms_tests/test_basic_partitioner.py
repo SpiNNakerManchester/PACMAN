@@ -20,7 +20,8 @@ test for partitioning
 import unittest
 from spinn_machine import (
     Processor, SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph, \
+    ApplicationOutgoingEdgePartition
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanPartitionException,
     PacmanValueError)
@@ -52,8 +53,16 @@ class TestBasicPartitioner(unittest.TestCase):
                                      "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
+
+        outgoing_partition1 = ApplicationOutgoingEdgePartition(
+            "foo", self.vert1)
+        outgoing_partition2 = ApplicationOutgoingEdgePartition(
+            "foo", self.vert2)
+
         self.graph = ApplicationGraph("Graph")
         self.graph.add_vertices(self.verts)
+        self.graph.add_outgoing_edge_partition(outgoing_partition1)
+        self.graph.add_outgoing_edge_partition(outgoing_partition2)
         self.graph.add_edges(self.edges, "foo")
 
         flops = 200000000
@@ -107,6 +116,9 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the basic form with an extra edge works
         """
         self.setup()
+        outgoing_partition = ApplicationOutgoingEdgePartition(
+            "TEST", self.vert3)
+        self.graph.add_outgoing_edge_partition(outgoing_partition)
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, None, "extra"), "TEST")
         graph, _, _ = self.bp(self.graph, self.machine, plan_n_timesteps=None)

@@ -25,14 +25,37 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 @add_metaclass(AbstractBase)
 class AbstractSDRAMPartition(AbstractBasicEdgePartition):
 
-    def __init__(self, identifier, label):
+    def __init__(self, identifier, label, needs_semaphore=False):
         AbstractBasicEdgePartition.__init__(
             self, identifier=identifier, allowed_edge_types=SDRAMMachineEdge,
             label=label)
         self._traffic_type = EdgeTrafficType.SDRAM
+        self._needs_semaphore = needs_semaphore
+        self._semaphore_id = None
+
+    @property
+    def needs_semaphore(self):
+        return self._needs_semaphore
+
+    @property
+    def semaphore_id(self):
+        return self._semaphore_id
+
+    @semaphore_id.setter
+    def semaphore_id(self, new_value):
+        self._semaphore_id = new_value
 
     @abstractmethod
     def total_sdram_requirements(self):
         """ returns the total sdram required by this outgoing partition
         :return: int
         """
+
+    @abstractmethod
+    def get_sdram_base_address_for(self, vertex, edge):
+        """ return the sdram base address for a edge given which side
+        the vertex is on"""
+
+    @abstractmethod
+    def get_sdram_size_of_region_for(self, vertex, edge):
+        """ returns the size of the region for a vertex given a edge """
