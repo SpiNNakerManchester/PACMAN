@@ -30,7 +30,7 @@ class TestRoutingInfo(unittest.TestCase):
 
     def test_routing_info(self):
         pre_vertex = SimpleMachineVertex(resources=ResourceContainer())
-        partition = MachineOutgoingEdgePartition("foo", pre_vertex)
+        partition = MachineOutgoingEdgePartition("Test", pre_vertex)
         post_vertex = SimpleMachineVertex(resources=ResourceContainer())
         edge = MachineEdge(pre_vertex, post_vertex)
         key = 12345
