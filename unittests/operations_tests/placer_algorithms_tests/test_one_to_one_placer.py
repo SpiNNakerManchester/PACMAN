@@ -17,7 +17,8 @@ from pacman.exceptions import PacmanException
 from pacman.model.graphs.common import EdgeTrafficType
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge)
+    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge,
+    MachineOutgoingEdgePartition)
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.chip_id_allocator_algorithms import (
@@ -53,6 +54,9 @@ def test_virtual_vertices_one_to_one():
             label="Vertex_{}".format(i))
         machine_graph.add_vertex(one_to_one_vertex)
         edge = MachineEdge(virtual_vertex, one_to_one_vertex)
+        machine_graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="SPIKES", pre_vertex=virtual_vertex))
         machine_graph.add_edge(edge, "SPIKES")
         one_to_one_vertices.append(one_to_one_vertex)
 
@@ -98,6 +102,9 @@ def test_one_to_one():
             machine_graph.add_vertex(vertex)
             if last_vertex is not None:
                 edge = MachineEdge(last_vertex, vertex)
+                machine_graph.add_outgoing_edge_partition(
+                    MachineOutgoingEdgePartition(
+                        identifier="SPIKES", pre_vertex=last_vertex))
                 machine_graph.add_edge(edge, "SPIKES")
             last_vertex = vertex
             chain.append(vertex)
@@ -112,6 +119,9 @@ def test_one_to_one():
         machine_graph.add_vertex(vertex)
         if last_vertex is not None:
             edge = MachineEdge(last_vertex, vertex)
+            machine_graph.add_outgoing_edge_partition(
+                MachineOutgoingEdgePartition(
+                    identifier="SPIKES", pre_vertex=last_vertex))
             machine_graph.add_edge(edge, "SPIKES")
         too_many_vertices.append(vertex)
         last_vertex = vertex
@@ -156,6 +166,9 @@ def test_sdram_links():
     for vertex in machine_graph.vertices:
         edge = MachineEdge(vertex, last_vertex,
                            traffic_type=EdgeTrafficType.SDRAM)
+        machine_graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="SDRAM", pre_vertex=last_vertex))
         machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements
