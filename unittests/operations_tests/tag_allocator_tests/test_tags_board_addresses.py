@@ -15,10 +15,7 @@
 
 from __future__ import absolute_import, print_function
 import unittest
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 from spinn_machine import virtual_machine
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex

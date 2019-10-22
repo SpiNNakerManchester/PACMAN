@@ -17,6 +17,5 @@ from .pair_compressor import PairCompressor
 
 
 class UnorderedCompressor(PairCompressor):
-
     def __init__(self):
-        self._ordered = False
+        super(UnorderedCompressor, self).__init__(False)

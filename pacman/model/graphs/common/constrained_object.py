@@ -66,7 +66,7 @@ class ConstrainedObject(object):
 
         try:
             self._constraints.add(constraint)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self._constraints = set()
             self._constraints.add(constraint)
 
@@ -95,5 +95,5 @@ class ConstrainedObject(object):
         """
         try:
             return self._constraints
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return set()

@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 try:
     from inspect import getfullargspec
 except ImportError:
@@ -24,7 +21,7 @@ except ImportError:
     from inspect import getargspec as getfullargspec
 from functools import wraps
 from six import iteritems, itervalues
-
+# pylint: disable=deprecated-method
 _instances = list()
 _methods = defaultdict(dict)
 _injectables = None
@@ -173,6 +170,7 @@ class _DictFacade(dict):
         """
         :param dicts: An iterable of dict objects to be used
         """
+        super(_DictFacade, self).__init__()
         self._dicts = dicts
 
     def get(self, key, default=None):

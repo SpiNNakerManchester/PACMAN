@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict, OrderedDict
-except ImportError:
-    from collections import defaultdict, OrderedDict
+from collections import defaultdict, OrderedDict
 import logging
 import numpy
 from past.builtins import xrange
@@ -83,8 +80,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
         # Even non-continuous keys will be continuous
-        for group in noncontinuous:
-            continuous.add(group)
+        continuous.extend(noncontinuous)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(

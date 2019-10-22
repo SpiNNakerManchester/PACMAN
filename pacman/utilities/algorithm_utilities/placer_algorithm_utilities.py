@@ -14,10 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import functools
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
@@ -54,10 +51,10 @@ def get_vertices_on_same_chip(vertex, graph):
         if isinstance(constraint, SameChipAsConstraint):
             same_chip_as_vertices.append(constraint.vertex)
 
-    for edge in filter(
-            lambda edge: edge.traffic_type == EdgeTrafficType.SDRAM,
-            graph.get_edges_starting_at_vertex(vertex)):
-        same_chip_as_vertices.append(edge.post_vertex)
+    same_chip_as_vertices.extend(
+        edge.post_vertex
+        for edge in graph.get_edges_starting_at_vertex(vertex)
+        if edge.traffic_type == EdgeTrafficType.SDRAM)
     return same_chip_as_vertices
 
 

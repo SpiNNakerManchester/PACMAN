@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 from pacman.exceptions import MinimisationFailedError
 
 from .abstract_compressor import AbstractCompressor
@@ -46,8 +43,7 @@ class ClashCompressor(AbstractCompressor):
             if len(clashers) == 0:
                 route_entries.remove(another)
                 return Entry(
-                    m_key, m_mask, defaultable, an_entry.spinnaker_route,
-                    -10000000)
+                    m_key, m_mask, defaultable, an_entry.spinnaker_route)
             if len(clashers) <= self._max_clashes:
                 for entry in clashers:
                     entry.clashes += 1
@@ -128,7 +124,7 @@ class ClashCompressor(AbstractCompressor):
         try:
             results = self.compress_ignore_clashers(router_table, [])
             return results
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             print(ex)
             self._problems += "(x:{},y:{})={} ".format(
                 router_table.x, router_table.y, len(results))

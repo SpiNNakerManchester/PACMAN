@@ -20,6 +20,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import graph_to_json
+from jsonschema.exceptions import ValidationError
 
 _ROUTING_FILENAME = "machine_graph.json"
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -64,9 +65,9 @@ class ConvertToJsonMachineGraph(object):
         # validate the schema
         try:
             file_format_schemas.validate(json_obj, "machine_graph.json")
-        except Exception as ex:
-            logger.error("json valiation exception:\n {} \n {} \n".format(
-                ex.message, ex.instance))
+        except ValidationError as ex:
+            logger.error("JSON validation exception: {}\n{}",
+                         ex.message, ex.instance)
 
         # update and complete progress bar
         if progress:
