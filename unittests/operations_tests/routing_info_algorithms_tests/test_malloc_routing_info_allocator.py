@@ -155,6 +155,10 @@ class MyTestCase(unittest.TestCase):
         machine_graph, n_keys_map, v1, v2, _v3, v4, e1, e2, e3, e4 = \
             self._integration_setup()
         e5 = MachineEdge(v4, v2, label="e1")
+        machine_graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="part3", pre_vertex=v4))
+
         machine_graph.add_edge(e5, "part3")
         partition2 = machine_graph.\
             get_outgoing_edge_partition_starting_at_vertex(v4, "part3")
