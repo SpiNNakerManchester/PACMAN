@@ -35,7 +35,8 @@ from pacman.utilities.json_utils import (
     resource_container_to_json, resource_container_from_json,
     vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, SimpleMachineVertex)
+    MachineEdge, MachineGraph, SimpleMachineVertex,
+    MachineOutgoingEdgePartition)
 
 
 class TestJsonUtils(unittest.TestCase):
@@ -237,5 +238,11 @@ class TestJsonUtils(unittest.TestCase):
                 vertices[5], vertices[(i + 1) % 10]))
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="bar", pre_vertex=vertices[0]))
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="bar", pre_vertex=vertices[5]))
         graph.add_edges(edges, "bar")
         self.graph_there_and_back(graph)
