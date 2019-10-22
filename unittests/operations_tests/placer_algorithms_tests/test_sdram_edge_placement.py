@@ -49,7 +49,7 @@ class TestSameChipConstraint(unittest.TestCase):
             graph.add_vertex(vertex)
             graph.add_outgoing_edge_partition(
                 MachineOutgoingEdgePartition(
-                    identifier="SDRAM", pre_vertex=vertex))
+                    identifier="Test", pre_vertex=vertex))
             for i in range(0, random.randint(1, 5)):
                 sdram_edge = MachineEdge(
                     vertex, vertices[random.randint(0, 99)],
