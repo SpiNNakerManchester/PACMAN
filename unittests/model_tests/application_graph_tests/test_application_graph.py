@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph, \
-    ApplicationOutgoingEdgePartition
+from pacman.model.graphs.application import (
+    ApplicationEdge, ApplicationGraph, ApplicationOutgoingEdgePartition)
 from uinit_test_objects import SimpleTestVertex
 
 

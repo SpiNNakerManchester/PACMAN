@@ -20,8 +20,8 @@ test for partitioning
 import unittest
 from spinn_machine import (
     Processor, SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph, \
-    ApplicationOutgoingEdgePartition
+from pacman.model.graphs.application import (
+    ApplicationEdge, ApplicationGraph, ApplicationOutgoingEdgePartition)
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanPartitionException,
     PacmanValueError)
