@@ -141,8 +141,8 @@ def create_requirement_collections(vertices, machine_graph):
     required_resources = list()
     to_add_partitions = set()
     for vertex in vertices:
-        required_resources.append(
-            (vertex.resources_required, vertex.constraints))
+        required_resources.append([
+            vertex.resources_required, vertex.constraints])
         costed_partitions = (
             machine_graph.get_costed_edge_partitions_starting_at_vertex(
                 vertex))
@@ -152,7 +152,7 @@ def create_requirement_collections(vertices, machine_graph):
     total_sdram = 0
     for partition in to_add_partitions:
         total_sdram += partition.total_sdram_requirements()
-    required_resources.append(
-        (ResourceContainer(sdram=ConstantSDRAM(total_sdram)), []))
+    required_resources[-1][0].extend(
+        ResourceContainer(sdram=ConstantSDRAM(total_sdram)))
 
     return required_resources

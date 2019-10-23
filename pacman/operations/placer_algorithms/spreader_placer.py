@@ -237,7 +237,7 @@ class SpreaderPlacer(OneToOnePlacer):
                     to_do_as_group = list()
                     for other_vert in same_chip_vertex_groups[vertex]:
                         if other_vert not in placed_vertices:
-                            to_do_as_group.append(
+                            to_do_as_group.extend(
                                 create_requirement_collections(
                                     [other_vert], machine_graph))
 

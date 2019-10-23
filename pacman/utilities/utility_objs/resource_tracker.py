@@ -1041,23 +1041,25 @@ class ResourceTracker(object):
         processor_ids = list()
         group_ip_tags = list()
         group_reverse_ip_tags = list()
-        for (resources, constraints) in resource_and_constraint_list:
-            this_board, this_ip_tags, this_reverse_ip_tags = \
-                self.get_ip_tag_info(resources, constraints)
-            this_x, this_y, this_p = self.get_chip_and_core(constraints, chips)
+        try:
+            for (resources, constraints) in resource_and_constraint_list:
+                this_board, this_ip_tags, this_reverse_ip_tags = \
+                    self.get_ip_tag_info(resources, constraints)
+                this_x, this_y, this_p = self.get_chip_and_core(constraints, chips)
 
-            if (self.__different(x, this_x) or self.__different(y, this_y) or
-                    (this_p is not None and this_p in processor_ids) or
-                    self.__different(board_address, this_board)):
-                raise PacmanException("Cannot merge conflicting constraints")
-            x = x if this_x is None else this_x
-            y = y if this_y is None else this_y
-            board_address = board_address if this_board is None else this_board
+                if (self.__different(x, this_x) or self.__different(y, this_y) or
+                        (this_p is not None and this_p in processor_ids) or
+                        self.__different(board_address, this_board)):
+                    raise PacmanException("Cannot merge conflicting constraints")
+                x = x if this_x is None else this_x
+                y = y if this_y is None else this_y
+                board_address = board_address if this_board is None else this_board
 
-            processor_ids.append(this_p)
-            group_ip_tags.append(this_ip_tags)
-            group_reverse_ip_tags.append(this_reverse_ip_tags)
-
+                processor_ids.append(this_p)
+                group_ip_tags.append(this_ip_tags)
+                group_reverse_ip_tags.append(this_reverse_ip_tags)
+        except Exception:
+            print ("HHHH")
         chips = None
         if x is not None and y is not None:
             chips = [(x, y)]
