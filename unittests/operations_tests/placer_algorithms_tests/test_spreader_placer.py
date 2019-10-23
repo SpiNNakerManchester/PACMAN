@@ -49,15 +49,17 @@ def test_virtual_vertices_spreader():
 
     # These vertices are 1-1 connected to the virtual vertex
     one_to_one_vertices = list()
+
+    machine_graph.add_outgoing_edge_partition(
+        MachineOutgoingEdgePartition(
+            identifier="SPIKES", pre_vertex=virtual_vertex))
+
     for i in range(16):
         one_to_one_vertex = SimpleMachineVertex(
             resources=ResourceContainer(),
             label="Vertex_{}".format(i))
         machine_graph.add_vertex(one_to_one_vertex)
         edge = MachineEdge(virtual_vertex, one_to_one_vertex)
-        machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="SPIKES", pre_vertex=virtual_vertex))
         machine_graph.add_edge(edge, "SPIKES")
         one_to_one_vertices.append(one_to_one_vertex)
 
