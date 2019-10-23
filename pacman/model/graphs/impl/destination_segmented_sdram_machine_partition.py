@@ -56,7 +56,7 @@ class DestinationSegmentedSDRAMMachinePartition(
             raise PacmanConfigurationException(
                 "The destination segmented sdram partition only accepts "
                 "1 pre vertex")
-        
+
         # add
         AbstractSingleSourcePartition.add_edge(self, edge)
         AbstractSDRAMPartition.add_edge(self, edge)

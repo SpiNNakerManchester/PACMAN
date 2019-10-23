@@ -16,7 +16,6 @@ from pacman.model.graphs.abstract_basic_edge_partition import \
     AbstractBasicEdgePartition
 from pacman.model.graphs.abstract_single_source_partition import \
     AbstractSingleSourcePartition
-from pacman.model.graphs.common import EdgeTrafficType
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 

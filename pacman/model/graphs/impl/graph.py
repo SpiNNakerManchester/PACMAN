@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.graphs.abstract_costed_partition import \
     AbstractCostedPartition
-from pacman.model.graphs.abstract_sdram_partition import AbstractSDRAMPartition
 
 from collections import OrderedDict
 from spinn_utilities.overrides import overrides

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import AbstractEdge

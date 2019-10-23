@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.impl import OutgoingEdgePartition
-from spinn_utilities.overrides import overrides
 from .machine_edge import MachineEdge
 
 

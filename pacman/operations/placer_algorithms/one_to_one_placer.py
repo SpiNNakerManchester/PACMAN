@@ -270,8 +270,8 @@ class OneToOnePlacer(RadialPlacer):
                 required_resources.append(
                     (vertex.resources_required, vertex.constraints))
                 costed_partitions = (
-                    machine_graph.get_costed_edge_partitions_starting_at_vertex(
-                        vertex))
+                    machine_graph.
+                    get_costed_edge_partitions_starting_at_vertex(vertex))
                 for costed_partition in costed_partitions:
                     to_add_partitions.add(costed_partition)
 
