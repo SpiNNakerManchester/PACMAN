@@ -15,10 +15,10 @@
 
 from .graph import Graph
 from .outgoing_edge_partition import OutgoingEdgePartition
-from .constant_sdram_machine_partition import ConstantSDRAMMachinePartition
-from .destination_segmented_sdram_machine_partition import \
+from pacman.model.graphs.machine.constant_sdram_machine_partition import ConstantSDRAMMachinePartition
+from pacman.model.graphs.machine.destination_segmented_sdram_machine_partition import \
     DestinationSegmentedSDRAMMachinePartition
-from .source_segmented_sdram_machine_partition import \
+from pacman.model.graphs.machine.source_segmented_sdram_machine_partition import \
     SourceSegmentedSDRAMMachinePartition
 
 __all__ = [

@@ -14,9 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.exceptions import SDRAMEdgeSizeException
-from pacman.model.graphs.abstract_sdram_partition import AbstractSDRAMPartition
-from pacman.model.graphs.abstract_single_source_partition import \
-    AbstractSingleSourcePartition
+from pacman.model.graphs import AbstractSDRAMPartition
+from pacman.model.graphs import AbstractSingleSourcePartition
 from spinn_utilities.overrides import overrides
 
 

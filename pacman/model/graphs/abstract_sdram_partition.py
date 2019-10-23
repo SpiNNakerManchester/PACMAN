@@ -18,7 +18,7 @@ from six import add_metaclass
 from pacman.model.graphs.abstract_basic_edge_partition import \
     AbstractBasicEdgePartition
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.graphs.machine.machine_sdram_edge import SDRAMMachineEdge
+from pacman.model.graphs.machine import SDRAMMachineEdge
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
