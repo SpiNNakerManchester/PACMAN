@@ -163,11 +163,10 @@ def test_sdram_links():
         machine_graph.add_vertex(vertex)
         last_vertex = vertex
 
-    machine_graph.add_outgoing_edge_partition(
-        MachineOutgoingEdgePartition(
-            identifier="SDRAM", pre_vertex=last_vertex))
-
     for vertex in machine_graph.vertices:
+        machine_graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(
+                identifier="SDRAM", pre_vertex=vertex))
         edge = MachineEdge(vertex, last_vertex,
                            traffic_type=EdgeTrafficType.SDRAM)
         machine_graph.add_edge(edge, "SDRAM")
