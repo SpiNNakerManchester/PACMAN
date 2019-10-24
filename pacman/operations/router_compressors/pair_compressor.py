@@ -18,8 +18,7 @@ from .entry import Entry
 
 
 class PairCompressor(AbstractCompressor):
-    """
-    Routing Table compressor based on brute force.
+    """ Routing Table compressor based on brute force. \
     Finds mergable pairs to replace.
 
     This algorithm assumes unordered routing tables and returns \
@@ -53,8 +52,7 @@ class PairCompressor(AbstractCompressor):
     A farther optimisation is to do the whole thing in place in a single list:
 
     #. Step 1 is sort the list by route in place
-
-    #. Step 2 do the compression route by route usings indexes into the array
+    #. Step 2 do the compression route by route using indexes into the array
        #. The array is split into 6 parts.
           #. 0 to _previous_pointer(-1): \
                     Entries in buckets that have already been compressed
@@ -68,7 +66,6 @@ class PairCompressor(AbstractCompressor):
                     Unused space due to previous merges
           #. _remaining_index to max_index(-1): \
                     Entries in buckets not yet compressed
-
     #. Step 3 use only the entries up to _write_pointer(-1)
 
     A farther optimisation is to uses order.
@@ -125,9 +122,10 @@ class PairCompressor(AbstractCompressor):
 
         For two different routes but with the same frequency order is based on
         the (currently arbitrary) order they are in the self._routes table
+
         :param route_a:
         :param route_b:
-        :return:
+        :return: ordering value (-1, 0, 1)
         """
         if route_a == route_b:
             return 0
@@ -143,6 +141,7 @@ class PairCompressor(AbstractCompressor):
         Partitions the entries between low and high into three parts
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
+
         :param low: Inclusive Lowest index to consider
         :param high: Inclusive Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
@@ -170,6 +169,7 @@ class PairCompressor(AbstractCompressor):
     def _quicksort_table(self, low, high):
         """
         Sorts the entries in place based on frequency of their route
+
         :param low: Inclusive lowest index to consider
         :param high: Inclusive highest index to consider
         """
@@ -195,9 +195,10 @@ class PairCompressor(AbstractCompressor):
 
     def _three_way_partition_routes(self, low, high):
         """
-        Partitions the routes and frequencties into three parts
+        Partitions the routes and frequencies into three parts
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
+
         :param low: Lowest index to consider
         :param high: Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
@@ -219,6 +220,7 @@ class PairCompressor(AbstractCompressor):
     def _quicksort_routes(self, low, high):
         """
         Sorts the routes in place based on frequency
+
         :param low: Inclusive lowest index to consider
         :param high: Inclusive highest index to consider
         """
@@ -231,7 +233,7 @@ class PairCompressor(AbstractCompressor):
         """
         Attempt to find a merge between the left entry and the index entry
 
-        Creates a merge and then checks it does not interesct with entries
+        Creates a merge and then checks it does not intersect with entries \
         with different routes.
 
         If no intersect detected entry[left] is replaced with the merge
@@ -303,13 +305,13 @@ class PairCompressor(AbstractCompressor):
         """
         Compresses all the entries for a single table.
 
-        Compressed the entries for this unordered table
+        Compressed the entries for this unordered table \
         returning a new table with possibly fewer entries but still unordered
 
         :param router_table: Original Routing table for a single chip
-        :type router_table:  MulticastRoutingTable
+        :type router_table: MulticastRoutingTable
         :return: Compressed routing table for the same chip
-        :rtype:  MulticastRoutingTable
+        :rtype: MulticastRoutingTable
         """
 
         # Split the entries into buckets based on spinnaker_route
