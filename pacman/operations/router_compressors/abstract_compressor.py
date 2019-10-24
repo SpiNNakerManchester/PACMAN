@@ -34,9 +34,9 @@ class AbstractCompressor(object):
     __slots__ = [
         # Max length below which the algorithm should stop compressing
         "_target_length",
-        # String of problems detected. Must be "" to finsih
+        # String of problems detected. Must be "" to finish
         "_problems",
-        # Flag to say if the results can be order dependant
+        # Flag to say if the results can be order dependent
         "_ordered",
     ]
 
@@ -59,16 +59,16 @@ class AbstractCompressor(object):
     def intersect(key_a, mask_a, key_b, mask_b):
         """
         Return if key-mask pairs intersect (i.e., would both match some of
-            the same keys).
+        the same keys).
 
         For example, the key-mask pairs ``00XX`` and ``001X`` both match the
-            keys``0010`` and ``0011`` (i.e., they do intersect)::
+        keys``0010`` and ``0011`` (i.e., they do intersect)::
 
             >>> intersect(0b0000, 0b1100, 0b0010, 0b1110)
             True
 
         But the key-mask pairs ``00XX`` and ``11XX`` do not match any of the
-            same keys (i.e., they do not intersect)::
+        same keys (i.e., they do not intersect)::
 
             >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
             False
