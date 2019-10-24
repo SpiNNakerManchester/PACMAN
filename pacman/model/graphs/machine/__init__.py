@@ -26,10 +26,11 @@ from .destination_segmented_sdram_machine_partition import (
     DestinationSegmentedSDRAMMachinePartition)
 from .source_segmented_sdram_machine_partition import (
     SourceSegmentedSDRAMMachinePartition)
+from .abstract_sdram_partition import AbstractSDRAMPartition
 
 __all__ = ["MachineEdge", "MachineFPGAVertex", "MachineGraph",
            "MachineOutgoingEdgePartition", "MachineSpiNNakerLinkVertex",
            "MachineVertex", "SimpleMachineVertex", "SDRAMMachineEdge",
-           "ConstantSDRAMMachinePartition",
+           "ConstantSDRAMMachinePartition", "AbstractSDRAMPartition",
            "DestinationSegmentedSDRAMMachinePartition",
            "SourceSegmentedSDRAMMachinePartition"]

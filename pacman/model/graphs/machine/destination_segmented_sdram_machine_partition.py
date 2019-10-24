@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.abstract_sdram_partition import AbstractSDRAMPartition
+from pacman.model.graphs.machine.abstract_sdram_partition import AbstractSDRAMPartition
 from pacman.model.graphs.abstract_single_source_partition import \
     AbstractSingleSourcePartition
 from spinn_utilities.overrides import overrides

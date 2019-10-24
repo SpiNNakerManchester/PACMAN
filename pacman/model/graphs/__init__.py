@@ -24,7 +24,6 @@ from .abstract_basic_edge_partition import AbstractBasicEdgePartition
 from .abstract_costed_partition import AbstractCostedPartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
-from .abstract_sdram_partition import AbstractSDRAMPartition
 from .abstract_application_outgoing_partition import (
     AbstractApplicationOutgoingPartition)
 
@@ -33,5 +32,4 @@ __all__ = [
     "AbstractOutgoingEdgePartition", "AbstractSpiNNakerLink",
     "AbstractVertex", "AbstractVirtual", "AbstractBasicEdgePartition",
     "AbstractCostedPartition", "AbstractMultiplePartition",
-    "AbstractSingleSourcePartition", "AbstractSDRAMPartition",
-    "AbstractApplicationOutgoingPartition"]
+    "AbstractSingleSourcePartition", "AbstractApplicationOutgoingPartition"]
