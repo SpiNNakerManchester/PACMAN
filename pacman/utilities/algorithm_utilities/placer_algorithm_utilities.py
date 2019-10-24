@@ -46,12 +46,12 @@ def get_vertices_on_same_chip(vertex, graph):
     # Virtual vertices can't be forced on different chips
     if isinstance(vertex, AbstractVirtual):
         return []
-    same_chip_as_vertices = list()
+    same_chip_as_vertices = OrderedSet()
     for constraint in vertex.constraints:
         if isinstance(constraint, SameChipAsConstraint):
-            same_chip_as_vertices.append(constraint.vertex)
+            same_chip_as_vertices.add(constraint.vertex)
 
-    same_chip_as_vertices.extend(
+    same_chip_as_vertices.update(
         edge.post_vertex
         for edge in graph.get_edges_starting_at_vertex(vertex)
         if edge.traffic_type == EdgeTrafficType.SDRAM)
