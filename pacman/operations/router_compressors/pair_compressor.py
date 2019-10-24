@@ -26,47 +26,50 @@ class PairCompressor(AbstractCompressor):
     a possibly ordered routing tables. If unordered it can be used \
     as a precompressor for another that makes use of order.
 
-    In the simplest format the algorithm is.
-        For every pair of entries in the table
-            If they have the same spinnaker_route
-                Create a merged entry
-                Check that does not intersect any entry with a different route
-                    Remove the two original entries
-                    Add the merged entry
-                    Start over
+    In the simplest format the algorithm is:
+
+    #. For every pair of entries in the table
+       #. If they have the same spinnaker_route
+          #. Create a merged entry
+          #. Check that does not intersect any entry with a different route
+             #. Remove the two original entries
+             #. Add the merged entry
+             #. Start over
 
     A slightly optimised algorithm is:
-        Split the entries into buckets based on spinnaker route
-        Process the buckets one at a time
-            For each entry in the buckets
-                For each other entry in the bucket
-                    Create a merge entry
-                    Make sure there is no clash with an entry in another bucket
-                    Replace the two entries and add the merge
-                    Start the bucket over
-                If no merge found move the entry from the bucket to the result\
-                    list
-            When the bucket is empty the result list becomes the bucket
 
-    A farther optimisation is to do the whole thing in place in a single list.
-        Step 1 is sort the list by route in place
+    #. Split the entries into buckets based on spinnaker route
+    #. Process the buckets one at a time
+       #. For each entry in the buckets
+          #. For each other entry in the bucket
+             #. Create a merge entry
+             #. Make sure there is no clash with an entry in another bucket
+             #. Replace the two entries and add the merge
+             #. Start the bucket over
+          #. If no merge found move the entry from the bucket to the result\
+             list
+       #. When the bucket is empty the result list becomes the bucket
 
-        Step 2 do the compression route by route usings indexes into the array
-            The array is split into 6 parts.
-                0 to _previous_pointer(-1):
+    A farther optimisation is to do the whole thing in place in a single list:
+
+    #. Step 1 is sort the list by route in place
+
+    #. Step 2 do the compression route by route usings indexes into the array
+       #. The array is split into 6 parts.
+          #. 0 to _previous_pointer(-1): \
                     Entries in buckets that have already been compressed
-                _previous_pointer to _write_pointer(-1):
+          #. _previous_pointer to _write_pointer(-1): \
                     Finished entries for the current bucket
-                _write_pointer to left(-1);
+          #. _write_pointer to left(-1): \
                     Unused space due to previous merges
-                left to right:
+          #. left to right: \
                     Not yet finished entries from the current bucket
-                right(+ 1) to _remaining_index(-1)
+          #. right(+ 1) to _remaining_index(-1): \
                     Unused space due to previous merges
-                _remaining_index to max_index(-1)
+          #. _remaining_index to max_index(-1): \
                     Entries in buckets not yet compressed
 
-        Step 3 use only the entries up to _write_pointer(-1)
+    #. Step 3 use only the entries up to _write_pointer(-1)
 
     A farther optimisation is to uses order.
     The entries are sorted by route frequency from low to high.
