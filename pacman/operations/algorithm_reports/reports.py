@@ -560,8 +560,8 @@ def sdram_usage_report_per_chip(
     :param machine: the python machine object
     :param plan_n_timesteps: The number of timesteps for which placer \
         reserved space.
-    :param data_n_timesteps: The number of timesteps for which data can be
-    saved on the machine.
+    :param data_n_timesteps: The number of timesteps for which data can be \
+        saved on the machine.
     :rtype: None
     """
 

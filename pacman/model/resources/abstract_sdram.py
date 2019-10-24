@@ -20,14 +20,13 @@ from spinn_utilities.abstract_base import (
 
 @add_metaclass(AbstractBase)
 class AbstractSDRAM(object):
-    """ Represents an amount of SDRAM used on a chip in the\
-        machine.
+    """ Represents an amount of SDRAM used on a chip in the machine.
     """
 
     @abstractmethod
     def get_total_sdram(self, n_timesteps):
         """
-        The total sdram.
+        The total SDRAM.
 
         :param n_timesteps: number of timesteps to cost for
         :type n_timesteps: int
@@ -36,22 +35,23 @@ class AbstractSDRAM(object):
 
     @abstractmethod
     def __add__(self, other):
-        """ Combines this SDRAM resource with the other one and creates a new one
+        """
+        Combines this SDRAM resource with the other one and creates a new one
 
-        :param other: another  SDRAM resource
+        :param other: another SDRAM resource
         :type other: AbstractSDRAM
         :return: a New AbstractSDRAM
-        :rtype AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractmethod
     def __sub__(self, other):
         """ Creates a new SDRAM which is this one less the other
 
-        :param other: another  SDRAM resource
+        :param other: another SDRAM resource
         :type other: AbstractSDRAM
         :return: a New AbstractSDRAM
-        :rtype AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractmethod
@@ -61,17 +61,17 @@ class AbstractSDRAM(object):
         :param other: another  SDRAM resource
         :type other: AbstractSDRAM
         :return: a New AbstractSDRAM
-        :rtype AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractproperty
     def fixed(self):
-        """ Returns the fixed sdram cost
+        """ Returns the fixed SDRAM cost
         """
 
     @abstractproperty
     def per_timestep(self):
-        """ Returns extra sdram cost for each additional timestep
+        """ Returns extra SDRAM cost for each additional timestep
 
         Warning may well be zero
         """

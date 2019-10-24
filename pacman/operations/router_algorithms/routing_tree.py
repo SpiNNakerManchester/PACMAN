@@ -32,12 +32,10 @@ class RoutingTree(object):
     Each instance represents a single hop in a route and recursively refers to
     following steps.
 
-    Attributes
-    ----------
-    chip : (x, y)
+    :ivar tuple(int,int) chip: \
         The chip the route is currently passing through.
-    children : list
-        A :py:class:`list` of the next steps in the route represented by a
+    :ivar list children: \
+        A :py:class:`list` of the next steps in the route represented by a\
         (route, object) tuple.
 
         .. note::
@@ -114,7 +112,7 @@ class RoutingTree(object):
 
     def traverse(self):
         """ Traverse the tree yielding the direction taken to a node, the
-        co-ordinates of that node and the directions leading from the Node.
+        coordinates of that node and the directions leading from the Node.
 
         :return: (direction, (x, y), set(route))
             Direction taken to reach a Node in the tree, the (x, y) co-ordinate
