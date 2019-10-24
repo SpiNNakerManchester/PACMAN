@@ -79,7 +79,7 @@ class SourceSegmentedSDRAMMachinePartition(
             return self._sdram_base_address
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
-    def get_sdram_size_of_region_for(self, vertex, edge):
+    def get_sdram_size_of_region_for(self, vertex):
         if vertex in self._pre_vertices:
             for edge in self._edges:
                 if edge.pre_vertex == vertex:
