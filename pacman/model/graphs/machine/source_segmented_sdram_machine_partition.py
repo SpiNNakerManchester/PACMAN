@@ -16,7 +16,7 @@
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.abstract_multiple_partition import \
     AbstractMultiplePartition
-from pacman.model.graphs.machine import AbstractSDRAMPartition
+from . import AbstractSDRAMPartition
 from spinn_utilities.overrides import overrides
 
 
