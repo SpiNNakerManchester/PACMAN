@@ -62,18 +62,22 @@ class DestinationSegmentedSDRAMMachinePartition(
         AbstractSDRAMPartition.add_edge(self, edge)
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
-    def get_sdram_base_address_for(self, vertex, edge):
+    def get_sdram_base_address_for(self, vertex):
         if self._pre_vertex == vertex:
             return self._sdram_base_address
         else:
-            return edge.sdram_base_address
+            for edge in self._edges:
+                if edge.post_vertex == vertex:
+                    return edge.sdram_base_address
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
-    def get_sdram_size_of_region_for(self, vertex, edge):
+    def get_sdram_size_of_region_for(self, vertex):
         if self._pre_vertex == vertex:
             return self.total_sdram_requirements
         else:
-            return edge.sdram_size
+            for edge in self._edges:
+                if edge.post_vertex == vertex:
+                    return edge.sdram_size
 
     def clone_for_graph_move(self):
         return DestinationSegmentedSDRAMMachinePartition(

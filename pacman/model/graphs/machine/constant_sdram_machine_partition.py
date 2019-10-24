@@ -61,12 +61,14 @@ class ConstantSDRAMMachinePartition(
             edge.sdram_base_address = self._sdram_base_address
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
-    def get_sdram_base_address_for(self, vertex, edge):
+    def get_sdram_base_address_for(self, vertex):
         return self._sdram_base_address
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
-    def get_sdram_size_of_region_for(self, vertex, edge):
-        return edge.sdram_size
+    def get_sdram_size_of_region_for(self, vertex):
+        if len(self._edges) == 0:
+            return 0
+        return self._edges[0].sdram_size
 
     def clone_for_graph_move(self):
         return ConstantSDRAMMachinePartition(
