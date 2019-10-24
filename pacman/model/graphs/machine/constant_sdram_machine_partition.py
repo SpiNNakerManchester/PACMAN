@@ -68,7 +68,7 @@ class ConstantSDRAMMachinePartition(
     def get_sdram_size_of_region_for(self, vertex):
         if len(self._edges) == 0:
             return 0
-        return self._edges[0].sdram_size
+        return self._edges.peek().sdram_size
 
     def clone_for_graph_move(self):
         return ConstantSDRAMMachinePartition(
