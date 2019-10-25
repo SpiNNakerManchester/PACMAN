@@ -19,7 +19,7 @@ from spinn_utilities.abstract_base import (
 
 
 @add_metaclass(AbstractBase)
-class AbstractOutgoingEdgePartition(object):
+class AbstractEdgePartition(object):
     """ A group of edges that start at the same vertex and share the same\
         semantics; used to group edges that can use the same multicast key.
     """

@@ -19,7 +19,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanConfigurationException)
-from pacman.model.graphs import AbstractOutgoingEdgePartition
+from pacman.model.graphs import AbstractEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 
 _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
@@ -27,7 +27,7 @@ _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
 
 @add_metaclass(AbstractBase)
 class AbstractBasicEdgePartition(
-        ConstrainedObject, AbstractOutgoingEdgePartition):
+        ConstrainedObject, AbstractEdgePartition):
     """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key.
     """
@@ -70,11 +70,11 @@ class AbstractBasicEdgePartition(
         self._class_name = class_name
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.label)
+    @overrides(AbstractEdgePartition.label)
     def label(self):
         return self._label
 
-    @overrides(AbstractOutgoingEdgePartition.add_edge)
+    @overrides(AbstractEdgePartition.add_edge)
     def add_edge(self, edge):
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
@@ -94,27 +94,27 @@ class AbstractBasicEdgePartition(
         self._edges.add(edge)
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.identifier)
+    @overrides(AbstractEdgePartition.identifier)
     def identifier(self):
         return self._identifier
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.edges)
+    @overrides(AbstractEdgePartition.edges)
     def edges(self):
         return self._edges
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.n_edges)
+    @overrides(AbstractEdgePartition.n_edges)
     def n_edges(self):
         return len(self._edges)
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.traffic_type)
+    @overrides(AbstractEdgePartition.traffic_type)
     def traffic_type(self):
         return self._traffic_type
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.traffic_weight)
+    @overrides(AbstractEdgePartition.traffic_weight)
     def traffic_weight(self):
         return self._traffic_weight
 
@@ -132,7 +132,7 @@ class AbstractBasicEdgePartition(
     def __str__(self):
         return self.__repr__()
 
-    @overrides(AbstractOutgoingEdgePartition.__contains__)
+    @overrides(AbstractEdgePartition.__contains__)
     def __contains__(self, edge):
         """ Check if the edge is contained within this partition
 
