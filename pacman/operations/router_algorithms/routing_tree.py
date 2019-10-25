@@ -34,16 +34,16 @@ class RoutingTree(object):
 
     :ivar tuple(int,int) chip: \
         The chip the route is currently passing through.
-    :ivar list children: \
+    :ivar list(tuple) children: \
         A :py:class:`list` of the next steps in the route represented by a\
         (route, object) tuple.
 
         .. note::
 
-            Up until Rig 1.5.1 this structure used :py:class:`set`s to store \
-            children. This was changed to :py:class:`list`s since sets incur \
-            a large memory overhead and in practice the set-like behaviour of \
-            the list of children is not useful.
+            Up until Rig 1.5.1, this structure used :py:class:`set`\\ s to \
+            store children. This was changed to :py:class:`list`\\ s since \
+            sets incur a large memory overhead and in practice the set-like \
+            behaviour of the list of children is not useful.
 
         The object indicates the intended destination of this step in the \
         route. It may be one of:

@@ -207,15 +207,18 @@ class MinimisationFailedError(PacmanException):
     """Raised when a routing table could not be minimised to reach a specified
     target.
 
-    :ivar int target_length: \
+    :var target_length: \
         The target number of routing entries.
-    :ivar int final_length: \
+    :vartype target_length: int
+    :var final_length: \
         The number of routing entries reached when the algorithm completed. \
         (final_length > target_length)
-    :ivar optional(tuple(int,int)) chip: \
+    :vartype final_length: int or None
+    :var chip: \
         The coordinates of the chip on which routing table minimisation first \
         failed. Only set when minimisation is performed across many chips \
         simultaneously.
+    :vartype chip: tuple(int, int) or None
     """
 
     def __init__(self, target_length, final_length=None, chip=None):
