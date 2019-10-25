@@ -74,14 +74,15 @@ class AbstractCompressor(object):
             False
 
         :param key_a: The key of first key-mask pair
-        :type key_a : int
+        :type key_a: int
         :param mask_a: The mask of first key-mask pair
         :type key_b: int
         :param key_b: The key of second key-mask pair
-        :type key_b : int
+        :type key_b: int
         :param mask_b: The mask of second key-mask pair
         :type key_b: int
         :return: True if the two key-mask pairs intersect otherwise False.
+        :rtype: bool
         """
         return (key_a & mask_b) == (key_b & mask_a)
 
