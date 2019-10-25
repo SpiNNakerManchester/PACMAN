@@ -15,6 +15,7 @@
 
 from six import add_metaclass
 
+from pacman.model.graphs import AbstractCostedPartition
 from pacman.model.graphs.abstract_basic_edge_partition import \
     AbstractBasicEdgePartition
 from pacman.model.graphs.common import EdgeTrafficType
@@ -23,12 +24,14 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
 @add_metaclass(AbstractBase)
-class AbstractSDRAMPartition(AbstractBasicEdgePartition):
+class AbstractSDRAMPartition(
+        AbstractBasicEdgePartition, AbstractCostedPartition):
 
     def __init__(self, identifier, label):
         AbstractBasicEdgePartition.__init__(
             self, identifier=identifier, allowed_edge_types=SDRAMMachineEdge,
             label=label)
+        AbstractCostedPartition.__init__(self)
         self._traffic_type = EdgeTrafficType.SDRAM
         self._semaphore_id = None
 

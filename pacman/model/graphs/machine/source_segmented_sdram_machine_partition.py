@@ -65,7 +65,7 @@ class SourceSegmentedSDRAMMachinePartition(
         for pre_vertex in self._pre_vertices.keys():
 
             # allocate for the pre_vertex
-            edge = self._pre_vertices[pre_vertex][0]
+            edge = self._pre_vertices[pre_vertex].peek()
             edge.sdram_base_address = new_value
             new_value += edge.sdram_size
 

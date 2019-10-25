@@ -73,7 +73,7 @@ class DestinationSegmentedSDRAMMachinePartition(
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex):
         if self._pre_vertex == vertex:
-            return self.total_sdram_requirements
+            return self.total_sdram_requirements()
         else:
             for edge in self._edges:
                 if edge.post_vertex == vertex:
