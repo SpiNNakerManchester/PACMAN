@@ -31,11 +31,41 @@ class RoutingTree(object):
 
     Each instance represents a single hop in a route and recursively refers to
     following steps.
+    """  # noqa W605
 
-    :ivar tuple(int,int) chip: \
-        The chip the route is currently passing through.
-    :ivar list(tuple) children: \
-        A :py:class:`list` of the next steps in the route represented by a\
+    # A *lot* of instances of this data structure are created and so its memory
+    # consumption is a sensitive matter. The following optimisations have been
+    # made:
+    # * Using __slots__ hugely reduces the size of instances of this class
+    #   object
+    # * Storing the chip coordinate as two values (_chip_x and _chip_y) rather
+    #   than a tuple saves 56 bytes per instance.
+    __slots__ = ["_chip_x", "_chip_y", "_children"]
+
+    def __init__(self, chip):
+        """
+        :param chip: The chip the route is currently passing through.
+        :type chip: tuple(int,int)
+        """
+        self.chip = chip
+        self._children = []
+
+    @property
+    def chip(self):
+        """The chip the route is currently passing through.
+
+        :rtype: tuple(int,int)
+        """
+        return (self._chip_x, self._chip_y)
+
+    @chip.setter
+    def chip(self, chip):
+        self._chip_x, self._chip_y = chip
+
+    @property
+    def children(self):
+        """
+        A :py:class:`iterable` of the next steps in the route represented by a\
         (route, object) tuple.
 
         .. note::
@@ -55,31 +85,9 @@ class RoutingTree(object):
           at the supplied vertex. Note that the direction may be None and so \
           additional logic may be required to determine what core to target to\
           reach the vertex.
-    """  # noqa W605
 
-    # A *lot* of instances of this data structure are created and so its memory
-    # consumption is a sensitive matter. The following optimisations have been
-    # made:
-    # * Using __slots__ hugely reduces the size of instances of this class
-    #   object
-    # * Storing the chip coordinate as two values (_chip_x and _chip_y) rather
-    #   than a tuple saves 56 bytes per instance.
-    __slots__ = ["_chip_x", "_chip_y", "_children"]
-
-    def __init__(self, chip):
-        self.chip = chip
-        self._children = []
-
-    @property
-    def chip(self):
-        return (self._chip_x, self._chip_y)
-
-    @chip.setter
-    def chip(self, chip):
-        self._chip_x, self._chip_y = chip
-
-    @property
-    def children(self):
+        :rtype: iterable
+        """
         for child in self._children:
             yield child
 

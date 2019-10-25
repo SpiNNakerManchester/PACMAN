@@ -169,7 +169,7 @@ def minimise(routing_table, target_length):
 
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: Entry
+    :type routing_table: ~pacman.operations.router_compressors.Entry
     :param target_length: \
         Target length of the routing table; the minimisation procedure will \
         halt once either this target is reached or no further minimisation is \
@@ -206,7 +206,7 @@ def ordered_covering(routing_table, target_length, aliases=None,
         the same key) and reorderable.
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: Entry
+    :type routing_table: ~pacman.operations.router_compressors.Entry
     :param target_length: \
         Target length of the routing table; the minimisation procedure will \
         halt once either this target is reached or no further minimisation is \

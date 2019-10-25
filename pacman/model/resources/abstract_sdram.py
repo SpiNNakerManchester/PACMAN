@@ -39,9 +39,9 @@ class AbstractSDRAM(object):
         Combines this SDRAM resource with the other one and creates a new one
 
         :param other: another SDRAM resource
-        :type other: AbstractSDRAM
+        :type other: ~.AbstractSDRAM
         :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
+        :rtype: ~.AbstractSDRAM
         """
 
     @abstractmethod
@@ -49,9 +49,9 @@ class AbstractSDRAM(object):
         """ Creates a new SDRAM which is this one less the other
 
         :param other: another SDRAM resource
-        :type other: AbstractSDRAM
+        :type other: ~.AbstractSDRAM
         :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
+        :rtype: ~.AbstractSDRAM
         """
 
     @abstractmethod
@@ -59,9 +59,9 @@ class AbstractSDRAM(object):
         """ Creates a new SDRAM which is the other less this one
 
         :param other: another  SDRAM resource
-        :type other: AbstractSDRAM
+        :type other: ~.AbstractSDRAM
         :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
+        :rtype: ~.AbstractSDRAM
         """
 
     @abstractproperty

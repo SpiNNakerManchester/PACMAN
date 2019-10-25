@@ -320,9 +320,9 @@ class PairCompressor(AbstractCompressor):
         returning a new table with possibly fewer entries but still unordered
 
         :param router_table: Original Routing table for a single chip
-        :type router_table: MulticastRoutingTable
+        :type router_table: ~pacman.model.routing_tables.MulticastRoutingTable
         :return: Compressed routing table for the same chip
-        :rtype: MulticastRoutingTable
+        :rtype: ~pacman.model.routing_tables.MulticastRoutingTable
         """
 
         # Split the entries into buckets based on spinnaker_route

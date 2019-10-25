@@ -93,9 +93,9 @@ class AbstractCompressor(object):
         The assumption is that they both have the same known spinnaker_route
 
         :param entry1: Key, Mask, defaultable from the first entry
-        :type entry1: Entry
+        :type entry1: ~pacman.operations.router_compressors.Entry
         :param entry2: Key, Mask, defaultable from the second entry
-        :type entry2: Entry
+        :type entry2: ~pacman.operations.router_compressors.Entry
         :return: Key, Mask, defaultable from merged entry
         :rtype: (int, int, bool)
         """
@@ -121,7 +121,7 @@ class AbstractCompressor(object):
         Tables who start of smaller than target_length are not compressed
 
         :param router_tables: Routing tables
-        :type router_tables: MulticastRoutingTables
+        :type router_tables: ~pacman.model.routing_tables.MulticastRoutingTable
         :param progress: Progress bar to show while working
         :tpye progress: ProgressBar
         :return: The compressed but still unordered routing tables
