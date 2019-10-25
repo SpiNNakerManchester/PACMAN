@@ -31,33 +31,6 @@ class RoutingTree(object):
 
     Each instance represents a single hop in a route and recursively refers to
     following steps.
-
-    Attributes
-    ----------
-    chip : (x, y)
-        The chip the route is currently passing through.
-    children : list
-        A :py:class:`list` of the next steps in the route represented by a
-        (route, object) tuple.
-
-        .. note::
-
-            Up until Rig 1.5.1 this structure used :py:class:`set`s to store
-            children. This was changed to :py:class:`list`s since sets incur
-            a large memory overhead and in practice the set-like behaviour of
-            the list of children is not useful.
-
-        The object indicates the intended destination of this step in the
-        route. It may be one of:
-
-        * :py:class:`RoutingTree`
-          representing the continuation of the routing tree after following a
-          given link.
-        * A vertex (i.e. some other Python object) when the route terminates at
-          the supplied vertex. Note that the direction may be None and so
-          additional logic may be required to determine what core to target to
-          reach the vertex.
-
     """  # noqa W605
 
     # A *lot* of instances of this data structure are created and so its memory
@@ -70,11 +43,19 @@ class RoutingTree(object):
     __slots__ = ["_chip_x", "_chip_y", "_children"]
 
     def __init__(self, chip):
+        """
+        :param chip: The chip the route is currently passing through.
+        :type chip: tuple(int,int)
+        """
         self.chip = chip
         self._children = []
 
     @property
     def chip(self):
+        """The chip the route is currently passing through.
+
+        :rtype: tuple(int,int)
+        """
         return (self._chip_x, self._chip_y)
 
     @chip.setter
@@ -83,6 +64,30 @@ class RoutingTree(object):
 
     @property
     def children(self):
+        """
+        A :py:class:`iterable` of the next steps in the route represented by a\
+        (route, object) tuple.
+
+        .. note::
+
+            Up until Rig 1.5.1, this structure used :py:class:`set`\\ s to \
+            store children. This was changed to :py:class:`list`\\ s since \
+            sets incur a large memory overhead and in practice the set-like \
+            behaviour of the list of children is not useful.
+
+        The object indicates the intended destination of this step in the \
+        route. It may be one of:
+
+        * :py:class:`RoutingTree` \
+          representing the continuation of the routing tree after following a \
+          given link.
+        * A vertex (i.e. some other Python object) when the route terminates \
+          at the supplied vertex. Note that the direction may be None and so \
+          additional logic may be required to determine what core to target to\
+          reach the vertex.
+
+        :rtype: iterable
+        """
         for child in self._children:
             yield child
 
@@ -114,10 +119,10 @@ class RoutingTree(object):
 
     def traverse(self):
         """ Traverse the tree yielding the direction taken to a node, the
-        co-ordinates of that node and the directions leading from the Node.
+        coordinates of that node and the directions leading from the Node.
 
-        :return: (direction, (x, y), set(route))
-            Direction taken to reach a Node in the tree, the (x, y) co-ordinate
+        :return: (direction, (x, y), set(route)) \
+            Direction taken to reach a Node in the tree, the (x, y) coordinate\
             of that Node and routes leading to children of the Node.
 
         """
