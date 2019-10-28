@@ -33,9 +33,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3", 256)
         outgoing_partition1 = ApplicationOutgoingEdgePartition("foo", vert2)
         outgoing_partition2 = ApplicationOutgoingEdgePartition("foo", vert1)
-        edge1 = ApplicationEdge(vert1, vert2, None, "First edge")
-        edge2 = ApplicationEdge(vert2, vert1, None, "First edge")
-        edge3 = ApplicationEdge(vert1, vert3, None, "First edge")
+        edge1 = ApplicationEdge(vert1, vert2, label="First edge")
+        edge2 = ApplicationEdge(vert2, vert1, label="First edge")
+        edge3 = ApplicationEdge(vert1, vert3, label="First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
         graph = ApplicationGraph("Graph")
