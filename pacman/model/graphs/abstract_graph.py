@@ -123,7 +123,7 @@ class AbstractGraph(object):
 
         :param outgoing_edge_partition: The outgoing edge partition to add
         :type outgoing_edge_partition:\
-            :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.AbstractBasicEdgePartition`
         :raises PacmanAlreadyExistsException:\
             If a partition already exists with the same pre_vertex and\
             identifier
@@ -155,7 +155,7 @@ class AbstractGraph(object):
         """ The outgoing edge partitions in the graph.
 
         :rtype: \
-            iterable(:py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`)
+            iterable(:py:class:`pacman.model.graphs.AbstractBasicEdgePartition`)
         """
 
     @abstractproperty
@@ -213,7 +213,7 @@ class AbstractGraph(object):
         :param vertex: The vertex at which the edge partitions to find starts
         :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
         :rtype: \
-            iterable(:py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`)
+            iterable(:py:class:`pacman.model.graphs.AbstractBasicEdgePartition`)
         """
 
     @abstractmethod
@@ -224,7 +224,7 @@ class AbstractGraph(object):
         starts
         :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
         :rtype: \
-            iterable(:py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`)
+            iterable(:py:class:`pacman.model.graphs.AbstractBasicEdgePartition`)
         """
 
     @abstractmethod
@@ -238,5 +238,5 @@ class AbstractGraph(object):
         :param outgoing_edge_partition_name: The name of the edge partition
         :type outgoing_edge_partition_name: str
         :rtype:\
-            :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
+            :py:class:`pacman.model.graphs.AbstractBasicEdgePartition`
         """
