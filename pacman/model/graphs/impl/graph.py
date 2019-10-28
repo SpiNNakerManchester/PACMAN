@@ -62,10 +62,12 @@ class Graph(ConstrainedObject, AbstractGraph):
         "_vertex_by_label",
         # count of vertex which had a None or already used label
         "_none_labelled_vertex_count",
+        # the default partition type
+        "_default_partition_type"
     ]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types,
-                 allowed_partition_types, label):
+                 allowed_partition_types, label, default_partition_type):
         """
         :param allowed_vertex_types:\
             A single or tuple of types of vertex to be allowed in the graph
@@ -79,6 +81,7 @@ class Graph(ConstrainedObject, AbstractGraph):
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
+        self._default_partition_type = default_partition_type
 
         self._vertices = []
         self._vertex_by_label = dict()
@@ -142,8 +145,8 @@ class Graph(ConstrainedObject, AbstractGraph):
         # Add the edge to the partition
         if ((edge.pre_vertex, outgoing_edge_partition_name) not in
                 self._outgoing_edge_partitions_by_name):
-            partition = OutgoingEdgePartition(
-                outgoing_edge_partition_name, self._allowed_edge_types,
+            partition = self._default_partition_type(
+                identifier=outgoing_edge_partition_name,
                 pre_vertex=edge.pre_vertex,
                 traffic_type=EdgeTrafficType.MULTICAST)
             self._outgoing_edge_partitions_by_pre_vertex[

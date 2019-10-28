@@ -12,7 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from .application_outgoing_edge_partition import (
+    ApplicationOutgoingEdgePartition)
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractEdgePartition
@@ -27,4 +28,5 @@ class ApplicationGraph(Graph):
 
     def __init__(self, label):
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, AbstractEdgePartition, label)
+            ApplicationVertex, ApplicationEdge, AbstractEdgePartition, label,
+            ApplicationOutgoingEdgePartition)
