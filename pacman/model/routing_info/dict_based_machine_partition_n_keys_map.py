@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from pacman.exceptions import PacmanNotExistException
 from spinn_utilities.overrides import overrides
 from .abstract_machine_partition_n_keys_map import (
     AbstractMachinePartitionNKeysMap)
@@ -47,3 +47,7 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     def n_keys_for_partition(self, partition):
         if partition in self._n_keys_map:
             return self._n_keys_map[partition]
+        else:
+            raise PacmanNotExistException(
+                "Partition {} does not exist in the mapping to n keys".format(
+                    partition))
