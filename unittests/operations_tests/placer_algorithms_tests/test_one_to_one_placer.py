@@ -157,7 +157,7 @@ def test_sdram_links():
     for vertex in machine_graph.vertices:
         machine_graph.add_outgoing_edge_partition(
             ConstantSDRAMMachinePartition(
-                identifier="Test", pre_vertex=vertex, label="ffff"))
+                identifier="SDRAM", pre_vertex=vertex, label="ffff"))
         edge = SDRAMMachineEdge(vertex, last_vertex, 20, "hhhh")
         machine_graph.add_edge(edge, "SDRAM")
 
