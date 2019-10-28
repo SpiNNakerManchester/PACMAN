@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.graphs.abstract_application_outgoing_partition import \
     AbstractApplicationOutgoingPartition
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import MachineOutgoingEdgePartition
 from .application_edge import ApplicationEdge
 from pacman.model.graphs.impl import OutgoingEdgePartition
@@ -26,9 +27,13 @@ class ApplicationOutgoingEdgePartition(
 
     __slots__ = ()
 
-    def __init__(self, identifier, pre_vertex, constraints=None, label=None):
+    def __init__(
+            self, identifier, pre_vertex,
+            traffic_type=EdgeTrafficType.MULTICAST, constraints=None,
+            label=None):
         OutgoingEdgePartition.__init__(
-            self, identifier, ApplicationEdge, pre_vertex, constraints, label)
+            self, identifier, ApplicationEdge, pre_vertex, traffic_type,
+            constraints, label)
         AbstractApplicationOutgoingPartition.__init__(self)
 
     def convert_to_machine_out_going_partition(self, machine_pre_vertex):

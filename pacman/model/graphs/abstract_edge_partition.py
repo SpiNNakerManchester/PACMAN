@@ -50,6 +50,7 @@ class AbstractEdgePartition(ConstrainedObject):
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1,
+            traffic_type=EdgeTrafficType.MULTICAST,
             class_name="AbstractBasicEdgePartition"):
         """
         :param identifier: The identifier of the partition
@@ -63,7 +64,7 @@ class AbstractEdgePartition(ConstrainedObject):
         self._identifier = identifier
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
-        self._traffic_type = EdgeTrafficType.MULTICAST
+        self._traffic_type = traffic_type
         self._traffic_weight = traffic_weight
         self._class_name = class_name
 

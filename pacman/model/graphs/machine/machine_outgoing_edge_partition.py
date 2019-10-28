@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.impl import OutgoingEdgePartition
 from .machine_edge import MachineEdge
 
@@ -24,7 +24,7 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
     __slots__ = []
 
     def __init__(self, identifier, pre_vertex, constraints=None, label=None,
-                 traffic_weight=1):
+                 traffic_weight=1, traffic_type=EdgeTrafficType.MULTICAST):
         """
         :param identifier: The identifier of the partition
         :param constraints: Any initial constraints
@@ -33,9 +33,9 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
         :param traffic_weight: the weight of this partition in relation\
             to other partitions
         """
-        super(MachineOutgoingEdgePartition, self).__init__(
-            identifier, MachineEdge, pre_vertex, constraints, label,
-            traffic_weight)
+        OutgoingEdgePartition.__init__(
+            self, identifier, MachineEdge, pre_vertex, traffic_type,
+            constraints, label, traffic_weight)
 
     def clone_for_graph_move(self):
         return MachineOutgoingEdgePartition(

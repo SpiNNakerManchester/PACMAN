@@ -33,10 +33,9 @@ class SourceSegmentedSDRAMMachinePartition(
         AbstractMultiplePartition.__init__(
             self, pre_vertices, identifier,
             allowed_edge_types=SDRAMMachineEdge, constraints=None,
-            label=label, traffic_weight=1,
+            label=label, traffic_weight=1, traffic_type=EdgeTrafficType.SDRAM,
             class_name="ConstantSdramMachinePartition")
         AbstractSDRAMPartition.__init__(self)
-        self._traffic_type = EdgeTrafficType.SDRAM
         self._sdram_base_address = None
 
     def total_sdram_requirements(self):

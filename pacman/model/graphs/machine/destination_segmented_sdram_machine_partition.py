@@ -33,8 +33,8 @@ class DestinationSegmentedSDRAMMachinePartition(
         AbstractSingleSourcePartition.__init__(
             self, pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
             constraints=None, label=label, traffic_weight=1,
+            traffic_type=EdgeTrafficType.SDRAM,
             class_name="ConstantSdramMachinePartition")
-        self._traffic_type = EdgeTrafficType.SDRAM
         self._sdram_base_address = None
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)

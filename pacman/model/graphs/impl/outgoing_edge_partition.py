@@ -28,7 +28,7 @@ class OutgoingEdgePartition(AbstractSingleSourcePartition):
     __slots__ = []
 
     def __init__(
-            self, identifier, allowed_edge_types, pre_vertex,
+            self, identifier, allowed_edge_types, pre_vertex, traffic_type,
             constraints=None, label=None, traffic_weight=1):
         """
         :param identifier: The identifier of the partition
@@ -39,7 +39,8 @@ class OutgoingEdgePartition(AbstractSingleSourcePartition):
         """
         AbstractSingleSourcePartition.__init__(
             self, pre_vertex, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, "OutgoingEdgePartition")
+            label, traffic_weight, "OutgoingEdgePartition",
+            traffic_type=traffic_type)
 
     @abstractmethod
     def clone_for_graph_move(self):
