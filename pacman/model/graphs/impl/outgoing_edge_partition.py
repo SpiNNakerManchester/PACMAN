@@ -12,8 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.abstract_basic_edge_partition import \
-    AbstractBasicEdgePartition
+from pacman.model.graphs.abstract_edge_partition import \
+    AbstractEdgePartition
 from pacman.model.graphs.abstract_single_source_partition import \
     AbstractSingleSourcePartition
 from spinn_utilities.abstract_base import abstractmethod
@@ -24,7 +24,7 @@ _REPR_TEMPLATE = \
 
 
 class OutgoingEdgePartition(
-        AbstractBasicEdgePartition, AbstractSingleSourcePartition):
+        AbstractEdgePartition, AbstractSingleSourcePartition):
     """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key.
     """
@@ -39,15 +39,15 @@ class OutgoingEdgePartition(
         :param label: An optional label of the partition
         :param traffic_weight: The weight of traffic going down this partition
         """
-        AbstractBasicEdgePartition.__init__(
+        AbstractEdgePartition.__init__(
             self, identifier, allowed_edge_types, constraints, label,
             traffic_weight, "OutgoingEdgePartition")
         AbstractSingleSourcePartition.__init__(self, pre_vertex)
 
-    @overrides(AbstractBasicEdgePartition.add_edge)
+    @overrides(AbstractEdgePartition.add_edge)
     def add_edge(self, edge):
         AbstractSingleSourcePartition.add_edge(self, edge)
-        AbstractBasicEdgePartition.add_edge(self, edge)
+        AbstractEdgePartition.add_edge(self, edge)
 
     @abstractmethod
     def clone_for_graph_move(self):

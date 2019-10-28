@@ -25,7 +25,7 @@ _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
 
 
 @add_metaclass(AbstractBase)
-class AbstractBasicEdgePartition(ConstrainedObject):
+class AbstractEdgePartition(ConstrainedObject):
     """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key.
     """

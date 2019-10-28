@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .machine_vertex import MachineVertex
-from pacman.model.graphs import AbstractBasicEdgePartition
+from pacman.model.graphs import AbstractEdgePartition
 from pacman.model.graphs.impl import Graph
 
 
@@ -26,4 +26,4 @@ class MachineGraph(Graph):
 
     def __init__(self, label):
         super(MachineGraph, self).__init__(
-            MachineVertex, AbstractBasicEdgePartition, label)
+            MachineVertex, AbstractEdgePartition, label)
