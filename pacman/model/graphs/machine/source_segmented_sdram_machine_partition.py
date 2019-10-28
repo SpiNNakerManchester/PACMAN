@@ -16,6 +16,8 @@
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.abstract_multiple_partition import \
     AbstractMultiplePartition
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.graphs.machine import SDRAMMachineEdge
 from . import AbstractSDRAMPartition
 from spinn_utilities.overrides import overrides
 
@@ -28,8 +30,13 @@ class SourceSegmentedSDRAMMachinePartition(
     ]
 
     def __init__(self, identifier, label, pre_vertices):
-        AbstractMultiplePartition.__init__(self, pre_vertices)
-        AbstractSDRAMPartition.__init__(self, identifier, label)
+        AbstractMultiplePartition.__init__(
+            self, pre_vertices, identifier,
+            allowed_edge_types=SDRAMMachineEdge, constraints=None,
+            label=label, traffic_weight=1,
+            class_name="ConstantSdramMachinePartition")
+        AbstractSDRAMPartition.__init__(self)
+        self._traffic_type = EdgeTrafficType.SDRAM
         self._sdram_base_address = None
 
     def total_sdram_requirements(self):

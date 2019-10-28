@@ -16,13 +16,25 @@
 from collections import OrderedDict
 
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs import AbstractEdgePartition
 from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 
 
-class AbstractMultiplePartition(object):
+class AbstractMultiplePartition(AbstractEdgePartition):
 
-    def __init__(self, pre_vertices):
+    __slots__ = [
+        "_pre_vertices", "_destinations"
+    ]
+
+    def __init__(
+            self, pre_vertices, identifier, allowed_edge_types, constraints,
+            label, traffic_weight, class_name):
+        AbstractEdgePartition.__init__(
+            self, identifier=identifier,
+            allowed_edge_types=allowed_edge_types, constraints=constraints,
+            label=label, traffic_weight=traffic_weight,
+            class_name=class_name)
         self._pre_vertices = OrderedDict()
         self._destinations = DefaultOrderedDict(OrderedSet)
 
@@ -45,6 +57,7 @@ class AbstractMultiplePartition(object):
         # update
         self._pre_vertices[edge.pre_vertex].add(edge)
         self._destinations[edge.post_vertex].add(edge)
+        AbstractEdgePartition.add_edge(self, edge)
 
     @property
     def pre_vertices(self):

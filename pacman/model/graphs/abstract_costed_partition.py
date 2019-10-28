@@ -19,6 +19,11 @@ from spinn_utilities.abstract_base import AbstractBase
 
 @add_metaclass(AbstractBase)
 class AbstractCostedPartition(object):
+    """ needed to ensure abstraction of machine vs application level code.
+
+    """
+
+    __slots__ = []
 
     def __init__(self):
         pass

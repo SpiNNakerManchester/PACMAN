@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.graphs.machine import SDRAMMachineEdge
 from . import AbstractSDRAMPartition
 from pacman.model.graphs.abstract_single_source_partition import \
     AbstractSingleSourcePartition
@@ -23,13 +25,16 @@ class DestinationSegmentedSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
 
     __slots__ = [
-        "_sdram_base_address",
-        "_pre_vertex"
+        "_sdram_base_address"
     ]
 
     def __init__(self, identifier, pre_vertex, label):
-        AbstractSDRAMPartition.__init__(self,  identifier, label)
-        AbstractSingleSourcePartition.__init__(self, pre_vertex)
+        AbstractSDRAMPartition.__init__(self)
+        AbstractSingleSourcePartition.__init__(
+            self, pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
+            constraints=None, label=label, traffic_weight=1,
+            class_name="ConstantSdramMachinePartition")
+        self._traffic_type = EdgeTrafficType.SDRAM
         self._sdram_base_address = None
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
