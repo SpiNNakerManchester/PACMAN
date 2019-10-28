@@ -17,8 +17,7 @@ from spinn_machine.virtual_machine import virtual_machine
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge,
-    MachineOutgoingEdgePartition)
+    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge)
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms import SpreaderPlacer
@@ -49,11 +48,6 @@ def test_virtual_vertices_spreader():
 
     # These vertices are 1-1 connected to the virtual vertex
     one_to_one_vertices = list()
-
-    machine_graph.add_outgoing_edge_partition(
-        MachineOutgoingEdgePartition(
-            identifier="SPIKES", pre_vertex=virtual_vertex))
-
     for i in range(16):
         one_to_one_vertex = SimpleMachineVertex(
             resources=ResourceContainer(),
@@ -111,9 +105,6 @@ def test_one_to_one():
             machine_graph.add_vertex(vertex)
             if last_vertex is not None:
                 edge = MachineEdge(last_vertex, vertex)
-                machine_graph.add_outgoing_edge_partition(
-                    MachineOutgoingEdgePartition(
-                        identifier="SPIKES", pre_vertex=last_vertex))
                 machine_graph.add_edge(edge, "SPIKES")
                 partition = machine_graph\
                     .get_outgoing_edge_partition_starting_at_vertex(
@@ -132,9 +123,6 @@ def test_one_to_one():
         machine_graph.add_vertex(vertex)
         if last_vertex is not None:
             edge = MachineEdge(last_vertex, vertex)
-            machine_graph.add_outgoing_edge_partition(
-                MachineOutgoingEdgePartition(
-                    identifier="SPIKES", pre_vertex=last_vertex))
             machine_graph.add_edge(edge, "SPIKES")
             partition = machine_graph\
                 .get_outgoing_edge_partition_starting_at_vertex(
@@ -183,9 +171,6 @@ def test_sdram_links():
     for vertex in machine_graph.vertices:
         edge = MachineEdge(vertex, last_vertex,
                            traffic_type=EdgeTrafficType.SDRAM)
-        machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="SDRAM", pre_vertex=vertex))
         machine_graph.add_edge(edge, "SDRAM")
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
