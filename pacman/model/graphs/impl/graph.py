@@ -23,7 +23,7 @@ from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractGraph, AbstractMultiplePartition, \
     AbstractSingleSourcePartition
-from pacman.model.graphs.common import ConstrainedObject
+from pacman.model.graphs.common import ConstrainedObject, EdgeTrafficType
 from .outgoing_edge_partition import OutgoingEdgePartition
 
 
@@ -35,6 +35,8 @@ class Graph(ConstrainedObject, AbstractGraph):
     __slots__ = [
         # The classes of vertex that are allowed in this graph
         "_allowed_vertex_types",
+        # The classes of edges that are allowed in this graph
+        "_allowed_edge_types",
         # The classes of outgoing edge partition that are allowed in this
         # graph
         "_allowed_partition_types",
@@ -62,17 +64,22 @@ class Graph(ConstrainedObject, AbstractGraph):
         "_none_labelled_vertex_count",
     ]
 
-    def __init__(self, allowed_vertex_types, allowed_partition_types, label):
+    def __init__(self, allowed_vertex_types, allowed_edge_types,
+                 allowed_partition_types, label):
         """
         :param allowed_vertex_types:\
             A single or tuple of types of vertex to be allowed in the graph
+        :param allowed_edge_types:\
+            A single or tuple of types of edges to be allowed in the graph
         :param allowed_partition_types:\
             A single or tuple of types of partitions to be allowed in the graph
         :param label: The label on the graph, or None
         """
         super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
+        self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
+
         self._vertices = []
         self._vertex_by_label = dict()
         self._none_labelled_vertex_count = 0
@@ -116,6 +123,12 @@ class Graph(ConstrainedObject, AbstractGraph):
 
     @overrides(AbstractGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
+        # verify that the edge is one suitable for this graph
+        if not isinstance(edge, self._allowed_edge_types):
+            raise PacmanInvalidParameterException(
+                "edge", edge.__class__,
+                "Edges of this graph must be one of the following types:"
+                " {}".format(self._allowed_edge_types))
 
         if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
@@ -129,12 +142,14 @@ class Graph(ConstrainedObject, AbstractGraph):
         # Add the edge to the partition
         if ((edge.pre_vertex, outgoing_edge_partition_name) not in
                 self._outgoing_edge_partitions_by_name):
-            raise PacmanInvalidParameterException(
-                "vertex and partition name",
-                str((edge.pre_vertex, outgoing_edge_partition_name)),
-                "No outgoing partition for vertex {} with name "
-                "{} exists".format(
-                    edge.pre_vertex, outgoing_edge_partition_name))
+            partition = OutgoingEdgePartition(
+                outgoing_edge_partition_name, self._allowed_edge_types,
+                pre_vertex=edge.pre_vertex,
+                traffic_type=EdgeTrafficType.MULTICAST)
+            self._outgoing_edge_partitions_by_pre_vertex[
+                edge.pre_vertex].add(partition)
+            self._outgoing_edge_partitions_by_name[
+                edge.pre_vertex, outgoing_edge_partition_name] = partition
         else:
             partition = self._outgoing_edge_partitions_by_name[
                 edge.pre_vertex, outgoing_edge_partition_name]
@@ -219,6 +234,7 @@ class Graph(ConstrainedObject, AbstractGraph):
     @property
     @overrides(AbstractGraph.outgoing_edge_partitions)
     def outgoing_edge_partitions(self):
+        # needed as possible duplicates due to multiple src partitions.
         data = OrderedSet()
         for element in self._outgoing_edge_partitions_by_name.values():
             data.add(element)
