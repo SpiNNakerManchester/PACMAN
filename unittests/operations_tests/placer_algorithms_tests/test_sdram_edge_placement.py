@@ -14,12 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_machine import virtual_machine
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex, \
-    MachineOutgoingEdgePartition, SDRAMMachineEdge, \
-    ConstantSDRAMMachinePartition
+from pacman.model.graphs.machine import (
+    MachineGraph, SimpleMachineVertex,
+    SDRAMMachineEdge, ConstantSDRAMMachinePartition)
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.machine.machine_edge import MachineEdge
-from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.executor.pacman_algorithm_executor import PACMANAlgorithmExecutor
 import random

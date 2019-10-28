@@ -15,7 +15,6 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanConfigurationException)

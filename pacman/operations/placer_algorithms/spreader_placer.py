@@ -29,7 +29,6 @@ from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 
 
-
 class SpreaderPlacer(OneToOnePlacer):
     # number of cycles over the machine graph (
     # 1. same chip,
