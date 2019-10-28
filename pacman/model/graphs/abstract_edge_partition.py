@@ -19,7 +19,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanConfigurationException)
-from pacman.model.graphs.common import ConstrainedObject
+from pacman.model.graphs.common import ConstrainedObject, EdgeTrafficType
 
 _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
 
@@ -63,7 +63,7 @@ class AbstractEdgePartition(ConstrainedObject):
         self._identifier = identifier
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
-        self._traffic_type = None
+        self._traffic_type = EdgeTrafficType.MULTICAST
         self._traffic_weight = traffic_weight
         self._class_name = class_name
 
@@ -80,9 +80,7 @@ class AbstractEdgePartition(ConstrainedObject):
                 " {}".format(self._allowed_edge_types))
 
         # Check for an incompatible traffic type
-        if self._traffic_type is None:
-            self._traffic_type = edge.traffic_type
-        elif edge.traffic_type != self._traffic_type:
+        if edge.traffic_type != self._traffic_type:
             raise PacmanConfigurationException(
                 "A partition can only contain edges with the same"
                 " traffic_type")

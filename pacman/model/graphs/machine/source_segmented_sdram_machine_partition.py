@@ -49,11 +49,10 @@ class SourceSegmentedSDRAMMachinePartition(
     def sdram_base_address(self):
         return self._sdram_base_address
 
-    @overrides(AbstractSDRAMPartition.add_edge)
+    @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge):
         # add
         AbstractMultiplePartition.add_edge(self, edge)
-        AbstractSDRAMPartition.add_edge(self, edge)
 
         # check
         if len(self._destinations.keys()) != 1:

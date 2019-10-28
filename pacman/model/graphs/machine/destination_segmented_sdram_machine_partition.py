@@ -54,7 +54,7 @@ class DestinationSegmentedSDRAMMachinePartition(
         for edge in self.edges:
             edge.sdram_base_address = new_value + edge.sdram_size
 
-    @overrides(AbstractSDRAMPartition.add_edge)
+    @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge):
         # safety check
         if self._pre_vertex != edge.pre_vertex:
@@ -64,7 +64,6 @@ class DestinationSegmentedSDRAMMachinePartition(
 
         # add
         AbstractSingleSourcePartition.add_edge(self, edge)
-        AbstractSDRAMPartition.add_edge(self, edge)
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):
