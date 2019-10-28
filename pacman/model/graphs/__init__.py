@@ -16,7 +16,6 @@
 from .abstract_edge import AbstractEdge
 from .abstract_fpga import AbstractFPGA
 from .abstract_graph import AbstractGraph
-from .abstract_edge_partition import AbstractOutgoingEdgePartition
 from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
@@ -28,8 +27,7 @@ from .abstract_application_outgoing_partition import (
     AbstractApplicationOutgoingPartition)
 
 __all__ = [
-    "AbstractEdge", "AbstractFPGA", "AbstractGraph",
-    "AbstractOutgoingEdgePartition", "AbstractSpiNNakerLink",
+    "AbstractEdge", "AbstractFPGA", "AbstractGraph", "AbstractSpiNNakerLink",
     "AbstractVertex", "AbstractVirtual", "AbstractBasicEdgePartition",
     "AbstractCostedPartition", "AbstractMultiplePartition",
     "AbstractSingleSourcePartition", "AbstractApplicationOutgoingPartition"]
