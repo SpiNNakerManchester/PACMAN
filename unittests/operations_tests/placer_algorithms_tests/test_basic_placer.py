@@ -47,11 +47,8 @@ class TestBasicPlacer(unittest.TestCase):
         #######################################################################
         # Setting up machine                                                  #
         #######################################################################
-        flops = 1000
 
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
 
         _sdram = SDRAM(128 * (2**20))
 
@@ -69,7 +66,7 @@ class TestBasicPlacer(unittest.TestCase):
                 links.append(Link(x, y, 5, x, (y - 1) % 10))
 
                 r = Router(links, False, 1024)
-                chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
 
         self.machine = Machine(chips)
         #######################################################################

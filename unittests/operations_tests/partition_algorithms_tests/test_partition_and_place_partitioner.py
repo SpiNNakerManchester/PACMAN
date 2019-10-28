@@ -55,11 +55,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertices(self.verts)
         self.graph.add_edges(self.edges, "foo")
 
-        flops = 200000000
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
 
         links = list()
         links.append(Link(0, 0, 0, 0, 1))
@@ -79,9 +75,9 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp = PartitionAndPlacePartitioner()
@@ -157,12 +153,8 @@ class TestBasicPartitioner(unittest.TestCase):
         test that partitioning will work when close to filling the machine
         """
         self.setup()
-        flops = 200000000
-        (e, _, n, w, _, s) = range(6)
 
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
 
         links = list()
         links.append(Link(0, 0, 0, 0, 1))
@@ -182,9 +174,9 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         singular_vertex = SimpleTestVertex(450, "Large vertex",
@@ -203,12 +195,7 @@ class TestBasicPartitioner(unittest.TestCase):
         raise an error
         """
         self.setup()
-        flops = 1000
-        (e, _, n, w, _, s) = range(6)
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
 
         links = list()
         links.append(Link(0, 0, 0, 0, 1))
@@ -228,9 +215,9 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
@@ -247,12 +234,8 @@ class TestBasicPartitioner(unittest.TestCase):
         in that it has less SDRAM available
         """
         self.setup()
-        flops = 200000000
-        (e, _, n, w, _, s) = range(6)
 
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
 
         links = list()
         links.append(Link(0, 0, 0, 0, 1))
@@ -272,9 +255,9 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
@@ -285,12 +268,8 @@ class TestBasicPartitioner(unittest.TestCase):
         in that it has more SDRAM available
         """
         self.setup()
-        flops = 200000000
-        (e, _, n, w, _, s) = range(6)
 
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
 
         links = list()
         links.append(Link(0, 0, 0, 0, 1))
@@ -310,9 +289,9 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
