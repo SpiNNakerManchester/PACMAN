@@ -14,6 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
+import functools
+import math
+import sys
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.placements import Placement, Placements
@@ -24,9 +27,7 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
-import functools
-import math
-import sys
+
 
 
 class SpreaderPlacer(OneToOnePlacer):
