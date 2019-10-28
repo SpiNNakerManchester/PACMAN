@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.exceptions import PacmanException
-from pacman.model.graphs.common import EdgeTrafficType
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge,
