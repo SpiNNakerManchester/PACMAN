@@ -44,22 +44,16 @@ class TestBasicPartitioner(unittest.TestCase):
         self.vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None,
-                                     "First edge")
-        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None,
-                                     "Second edge")
-        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None,
-                                     "Third edge")
-        outgoing_partition1 = ApplicationOutgoingEdgePartition(
-            "foo", self.vert1)
-        outgoing_partition2 = ApplicationOutgoingEdgePartition(
-            "foo", self.vert2)
+        self.edge1 = ApplicationEdge(
+            self.vert1, self.vert2, label="First edge")
+        self.edge2 = ApplicationEdge(
+            self.vert2, self.vert1, label="Second edge")
+        self.edge3 = ApplicationEdge(
+            self.vert1, self.vert3, label="Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph")
         self.graph.add_vertices(self.verts)
-        self.graph.add_outgoing_edge_partition(outgoing_partition1)
-        self.graph.add_outgoing_edge_partition(outgoing_partition2)
         self.graph.add_edges(self.edges, "foo")
 
         flops = 200000000

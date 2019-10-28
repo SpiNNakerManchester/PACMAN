@@ -15,7 +15,8 @@
 
 from spinn_machine import virtual_machine
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex, \
-    MachineOutgoingEdgePartition
+    MachineOutgoingEdgePartition, SDRAMMachineEdge, \
+    ConstantSDRAMMachinePartition
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
@@ -48,12 +49,12 @@ class TestSameChipConstraint(unittest.TestCase):
         for vertex in same_vertices:
             graph.add_vertex(vertex)
             graph.add_outgoing_edge_partition(
-                MachineOutgoingEdgePartition(
-                    identifier="Test", pre_vertex=vertex))
+                ConstantSDRAMMachinePartition(
+                    identifier="Test", pre_vertex=vertex, label="ffff"))
             for i in range(0, random.randint(1, 5)):
-                sdram_edge = MachineEdge(
-                    vertex, vertices[random.randint(0, 99)],
-                    traffic_type=EdgeTrafficType.SDRAM)
+                sdram_edge = SDRAMMachineEdge(
+                    vertex, vertices[random.randint(0, 99)], sdram_size=20,
+                    label="fffg")
                 sdram_edges.append(sdram_edge)
                 graph.add_edge(sdram_edge, "Test")
         n_keys_map = DictBasedMachinePartitionNKeysMap()

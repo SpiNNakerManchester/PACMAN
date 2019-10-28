@@ -45,12 +45,12 @@ class TestBasicPartitioner(unittest.TestCase):
         self.vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None,
-                                     "First edge")
-        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None,
-                                     "Second edge")
-        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None,
-                                     "Third edge")
+        self.edge1 = ApplicationEdge(
+            self.vert1, self.vert2, label="First edge")
+        self.edge2 = ApplicationEdge(
+            self.vert2, self.vert1, label="Second edge")
+        self.edge3 = ApplicationEdge(
+            self.vert1, self.vert3, label="Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
 
@@ -120,7 +120,7 @@ class TestBasicPartitioner(unittest.TestCase):
             "TEST", self.vert3)
         self.graph.add_outgoing_edge_partition(outgoing_partition)
         self.graph.add_edge(
-            ApplicationEdge(self.vert3, self.vert1, None, "extra"), "TEST")
+            ApplicationEdge(self.vert3, self.vert1, label="extra"), "TEST")
         graph, _, _ = self.bp(self.graph, self.machine, plan_n_timesteps=None)
         self.assertEqual(len(list(graph.vertices)), 3)
         self.assertEqual(len(list(graph.edges)), 4)
