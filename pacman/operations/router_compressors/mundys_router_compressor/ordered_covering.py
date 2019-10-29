@@ -173,25 +173,20 @@ def minimise(
 
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: iterable of RoutingTableEntry
-    :param target_length :
-        Target length of the routing table; the minimisation procedure will
-        halt once either this target is reached or no further minimisation is
+    :type routing_table: ~pacman.operations.router_compressors.Entry
+    :param target_length: \
+        Target length of the routing table; the minimisation procedure will \
+        halt once either this target is reached or no further minimisation is \
         possible. If None then the table will be made as small as possible.
-    :type target_length : int or None
-    :type time_to_run_for_before_raising_exception: int
-    :param time_to_run_for_before_raising_exception: the time to run for \
-        in seconds before raising an exception
-    :param use_timer_cut_off: bool flag for is timing cutoff is to be used.
+    :type target_length: int or None
+    :param use_timer_cut_off: Boolean flag for timing cutoff to be used.
     :type use_timer_cut_off: bool
-    :param default_report_folder: file path to where reports are stored
-    :type default_report_folder: file
-    :param x: x coord
-    :type x: int
-    :param y: y coord
-    :type y: int
+    :param time_to_run_for_before_raising_exception: The time to run for \
+        in seconds before raising an exception
+    :type time_to_run_for_before_raising_exception: int or None
+
     :return: list(RoutingTableEntry)
-    :raises MinimisationFailedError
+    :raises MinimisationFailedError: \
         If the smallest table that can be produced is larger than
         `target_length`.
     """
@@ -223,21 +218,21 @@ def ordered_covering(
         the same key) and reorderable.
 
     :param routing_table: Routing entries to be merged.
-    :type routing_table: iterable of RoutingTableEntry
-    :param target_length :
-        Target length of the routing table; the minimisation procedure will
-        halt once either this target is reached or no further minimisation is
+    :type routing_table: ~pacman.operations.router_compressors.Entry
+    :param target_length: \
+        Target length of the routing table; the minimisation procedure will \
+        halt once either this target is reached or no further minimisation is \
         possible. If None then the table will be made as small as possible.
-    :type target_length : int or None
-    :param aliases:
-        Dictionary of which keys and masks in the routing table are
-        combinations of other (now removed) keys and masks; this allows us to
-        consider only the keys and masks the user actually cares about when
-        determining if inserting a new entry will break the correctness of the
-        table. This should be supplied when using this method to update an
+    :type target_length: int or None
+    :param aliases: \
+        Dictionary of which keys and masks in the routing table are \
+        combinations of other (now removed) keys and masks; this allows us to \
+        consider only the keys and masks the user actually cares about when \
+        determining if inserting a new entry will break the correctness of the\
+        table. This should be supplied when using this method to update an \
         already minimised table.
     :type aliases: dict((int, int): set((int, int))
-    :param no_raise:
+    :param no_raise: \
         If False (the default) then an error will be raised if the table cannot
         be minimised to be smaller than `target_length` and `target_length` is
         not None. If True then a table will be returned regardless of the size
@@ -245,7 +240,7 @@ def ordered_covering(
     :type no_raise: bool
     :return: list(RoutingTableEntry) , {(key, mask): {(key, mask), ...}, ...}
         new routing table, A new aliases dictionary.
-    :raises MinimisationFailedError
+    :raises MinimisationFailedError: \
         If the smallest table that can be produced is larger than
         `target_length`.
     """
@@ -552,7 +547,7 @@ def _refine_merge(merge, aliases, min_goodness):
         table. This should be supplied when using this method to update an
         already minimised table.
     :type aliases: dict((int, int): set((int, int))
-    :param min_goodness:
+    :param min_goodness: \
         Reject merges which are worse than the minimum goodness.
     :return: Valid merge which may be applied to the routing table
     :rtype: _Merge
@@ -593,9 +588,9 @@ def _refine_upcheck(merge, min_goodness):
 
     :param merge:
     :param min_goodness:
-    :return:
-        New merge with entries possibly removed. If the goodness of the merge
-        ever drops below `min_goodness` then an empty merge will be returned.
+    :return: \
+        New merge with entries possibly removed. If the goodness of the merge \
+        ever drops below `min_goodness` then an empty merge will be returned. \
         (bool) If the merge has been changed at all
     """
     # Remove any entries which would be covered by entries above the merge
@@ -661,8 +656,8 @@ def _refine_downcheck(merge, aliases, min_goodness):
     :param merge:
     :param aliases:
     :param min_goodness:
-    :return:
-        New merge with entries possibly removed. If the goodness of the merge
+    :return: \
+        New merge with entries possibly removed. If the goodness of the merge \
         ever drops below `min_goodness` then an empty merge will be returned.
     :rtype: _Merge
     """

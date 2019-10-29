@@ -15,10 +15,7 @@
 
 import json
 import gzip
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from pacman.exceptions import PacmanAlreadyExistsException
 from .uncompressed_multicast_routing_table import \
     UnCompressedMulticastRoutingTable

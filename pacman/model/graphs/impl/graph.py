@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
@@ -126,10 +123,10 @@ class Graph(ConstrainedObject, AbstractGraph):
                 "Edges of this graph must be one of the following types:"
                 " {}".format(self._allowed_edge_types))
 
-        if edge.pre_vertex not in self._vertices:
+        if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", edge.pre_vertex, "pre-vertex must be known in graph")
-        if edge.post_vertex not in self._vertices:
+        if edge.post_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", edge.post_vertex, "post-vertex must be known in graph")
 
