@@ -459,8 +459,7 @@ class TestBasicPartitioner(unittest.TestCase):
         n_cores_per_chip = 10
         sdram_per_chip = (n_cores_per_chip * 2) - 1
         machine = virtual_machine(
-            width=2, height=2, with_monitors=True,
-            n_cpus_per_chip=n_cores_per_chip,
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
 
         # Create a vertex where each atom requires 1MB (default) of SDRAM
@@ -489,8 +488,7 @@ class TestBasicPartitioner(unittest.TestCase):
         n_cores_per_chip = 2  # remember 1 is the monitor
         sdram_per_chip = 8
         machine = virtual_machine(
-            width=2, height=2, with_monitors=True,
-            n_cpus_per_chip=n_cores_per_chip,
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
 
         # Create a vertex which will need to be split perfectly into 4 cores
