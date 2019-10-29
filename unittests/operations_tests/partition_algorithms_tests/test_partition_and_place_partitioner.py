@@ -19,10 +19,10 @@ test for partitioning
 from __future__ import division
 import unittest
 from spinn_machine import (
-    Processor, SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
+    SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
-    PacmanPartitionException, PacmanInvalidParameterException,
+    PacmanException, PacmanPartitionException, PacmanInvalidParameterException,
     PacmanValueError)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
@@ -179,7 +179,8 @@ class TestBasicPartitioner(unittest.TestCase):
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
-        singular_vertex = SimpleTestVertex(450, "Large vertex",
+        n_neurons = 17 * 5 * 5
+        singular_vertex = SimpleTestVertex(n_neurons, "Large vertex",
                                            max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
@@ -187,7 +188,7 @@ class TestBasicPartitioner(unittest.TestCase):
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.assertEqual(len(list(graph.vertices)), 450)
+        self.assertEqual(len(list(graph.vertices)), n_neurons)
 
     def test_partition_with_insufficient_space(self):
         """
@@ -458,7 +459,7 @@ class TestBasicPartitioner(unittest.TestCase):
         n_cores_per_chip = 10
         sdram_per_chip = (n_cores_per_chip * 2) - 1
         machine = virtual_machine(
-            width=2, height=2, with_monitors=False,
+            width=2, height=2, with_monitors=True,
             n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
 
@@ -473,7 +474,7 @@ class TestBasicPartitioner(unittest.TestCase):
         app_graph.add_vertex(vertex)
 
         # Do the partitioning - this should result in an error
-        with self.assertRaises(PacmanPartitionException):
+        with self.assertRaises(PacmanException):
             partitioner = PartitionAndPlacePartitioner()
             partitioner(app_graph, machine, plan_n_timesteps=None)
 
@@ -485,10 +486,10 @@ class TestBasicPartitioner(unittest.TestCase):
 
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
         # and 8MB SDRAM per chip
-        n_cores_per_chip = 1
+        n_cores_per_chip = 2  # remember 1 is the monitor
         sdram_per_chip = 8
         machine = virtual_machine(
-            width=2, height=2, with_monitors=False,
+            width=2, height=2, with_monitors=True,
             n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
 
