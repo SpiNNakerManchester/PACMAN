@@ -77,7 +77,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp = PartitionAndPlacePartitioner()
@@ -176,7 +177,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         n_neurons = 17 * 5 * 5
@@ -218,7 +220,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
@@ -258,7 +261,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
@@ -292,7 +296,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())

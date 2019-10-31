@@ -15,7 +15,7 @@
 
 from __future__ import print_function
 import unittest
-from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
+from spinn_machine import Chip, Link, Machine, Router, SDRAM
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.graphs.common import Slice, GraphMapper

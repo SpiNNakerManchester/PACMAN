@@ -17,7 +17,7 @@ from __future__ import print_function
 from operator import itemgetter
 from pprint import pprint as pp
 import unittest
-from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
+from spinn_machine import Chip, Link, Machine, Router, SDRAM
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
