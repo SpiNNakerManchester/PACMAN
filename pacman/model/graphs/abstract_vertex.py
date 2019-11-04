@@ -59,8 +59,8 @@ class AbstractVertex(ConstrainedObject):
         Changes the label for a vertex NOT yet ADDED to a graph
 
         :param label: new value for the label
-        :raises PacmanConfigurationException:
-            If there is an attempt to change the label once the vertex has
+        :raises PacmanConfigurationException: \
+            If there is an attempt to change the label once the vertex has \
             been added to a graph
         """
         if self._added_to_graph:
@@ -71,7 +71,8 @@ class AbstractVertex(ConstrainedObject):
     def addedToGraph(self):
         """
         Records that the vertex has been added to a graph
-        :raises PacmanConfigurationException:
+
+        :raises PacmanConfigurationException: \
             If there is an attempt to add the same vertex more than once
         """
         self._added_to_graph = True
