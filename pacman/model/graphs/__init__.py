@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_sdram_partition import AbstractSDRAMPartition
 from .abstract_edge import AbstractEdge
 from .abstract_fpga import AbstractFPGA
 from .abstract_graph import AbstractGraph
@@ -22,6 +21,7 @@ from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_costed_partition import AbstractCostedPartition
+from .abstract_sdram_partition import AbstractSDRAMPartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_application_outgoing_partition import (
