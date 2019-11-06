@@ -17,7 +17,7 @@ import functools
 from collections import OrderedDict
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.common import AbstractSDRAMPartition
+from pacman.model.graphs import AbstractSDRAMPartition
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
