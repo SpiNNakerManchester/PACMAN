@@ -16,9 +16,9 @@
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.abstract_multiple_partition import \
     AbstractMultiplePartition
+from pacman.model.graphs import AbstractSDRAMPartition
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
-from . import AbstractSDRAMPartition
 from spinn_utilities.overrides import overrides
 
 

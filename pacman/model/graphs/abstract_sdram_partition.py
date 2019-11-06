@@ -25,7 +25,7 @@ class AbstractSDRAMPartition(AbstractCostedPartition):
     __slots__ = []
 
     def __init__(self):
-        AbstractCostedPartition.__init__(self)
+        pass
 
     @abstractmethod
     def total_sdram_requirements(self):

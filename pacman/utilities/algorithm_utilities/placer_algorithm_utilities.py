@@ -16,6 +16,8 @@
 import functools
 from collections import OrderedDict
 
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.common import AbstractSDRAMPartition
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
@@ -146,12 +148,16 @@ def create_requirement_collections(vertices, machine_graph):
         costed_partitions = (
             machine_graph.get_costed_edge_partitions_starting_at_vertex(
                 vertex))
-        for costed_partition in costed_partitions:
-            to_add_partitions.add(costed_partition)
+        to_add_partitions.update(costed_partitions)
 
     total_sdram = 0
     for partition in to_add_partitions:
-        total_sdram += partition.total_sdram_requirements()
+        if isinstance(partition, AbstractSDRAMPartition):
+            total_sdram += partition.total_sdram_requirements()
+        else:
+            raise PacmanConfigurationException(
+                "Currently the only costed partition type supported is "
+                "AbstractSDRAMPartition")
     required_resources[-1][0].extend(
         ResourceContainer(sdram=ConstantSDRAM(total_sdram)))
 

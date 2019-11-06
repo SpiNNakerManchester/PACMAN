@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .abstract_sdram_partition import AbstractSDRAMPartition
 from .abstract_edge import AbstractEdge
 from .abstract_fpga import AbstractFPGA
 from .abstract_graph import AbstractGraph
@@ -30,4 +31,5 @@ __all__ = [
     "AbstractEdge", "AbstractFPGA", "AbstractGraph", "AbstractSpiNNakerLink",
     "AbstractVertex", "AbstractVirtual", "AbstractEdgePartition",
     "AbstractCostedPartition", "AbstractMultiplePartition",
-    "AbstractSingleSourcePartition", "AbstractApplicationOutgoingPartition"]
+    "AbstractSDRAMPartition", "AbstractSingleSourcePartition",
+    "AbstractApplicationOutgoingPartition"]

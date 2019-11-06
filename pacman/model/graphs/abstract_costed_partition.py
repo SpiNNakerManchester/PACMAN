@@ -19,8 +19,7 @@ from spinn_utilities.abstract_base import AbstractBase
 
 @add_metaclass(AbstractBase)
 class AbstractCostedPartition(object):
-    """ needed to ensure abstraction of machine vs application level code.
-
+    """ needed for future proofing against other types of costed partitions.
     """
 
     __slots__ = []
