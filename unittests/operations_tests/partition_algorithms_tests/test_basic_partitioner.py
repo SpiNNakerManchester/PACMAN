@@ -237,7 +237,6 @@ class TestBasicPartitioner(unittest.TestCase):
         in that it has less SDRAM available
         """
         self.setup()
-        flops = 20000000
         (e, _, n, w, _, s) = range(6)
 
         n_processors = 18
