@@ -1225,6 +1225,16 @@ class ResourceTracker(object):
                         reverse_ip_tags_allocated)
 
         # If no chip is available, raise an exception
+        if chips is not None and processor_id is not None:
+            if len(chips) == 1:
+                (x, y) = chips[0]
+                raise PacmanValueError(
+                    "Core {}:{}:{} is not available.".format(
+                        x, y, processor_id))
+            else:
+                raise PacmanValueError(
+                    "Processor id is not available on any of the chips"
+                    "".format(processor_id))
         tried_chips = self._get_usable_chips(chips, board_address)
         n_cores, n_chips, max_sdram, n_tags = \
             self._available_resources(tried_chips)
