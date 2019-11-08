@@ -1233,7 +1233,7 @@ class ResourceTracker(object):
                         x, y, processor_id))
             else:
                 raise PacmanValueError(
-                    "Processor id is not available on any of the chips"
+                    "Processor id {} is not available on any of the chips"
                     "".format(processor_id))
         tried_chips = self._get_usable_chips(chips, board_address)
         n_cores, n_chips, max_sdram, n_tags = \
