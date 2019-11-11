@@ -57,7 +57,7 @@ def test_virtual_vertices_one_to_one():
         one_to_one_vertices.append(one_to_one_vertex)
 
     # Get and extend the machine for the virtual chip
-    machine = virtual_machine(version=5)
+    machine = virtual_machine(width=8, height=8)
     extended_machine = MallocBasedChipIdAllocator()(machine, machine_graph)
 
     # Do placements
@@ -117,7 +117,7 @@ def test_one_to_one():
         last_vertex = vertex
 
     # Do placements
-    machine = virtual_machine(version=5)
+    machine = virtual_machine(width=8, height=8)
     placements = OneToOnePlacer()(
         machine_graph, machine, plan_n_timesteps=1000)
 
@@ -159,7 +159,7 @@ def test_sdram_links():
         machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements
-    machine = virtual_machine(version=5)
+    machine = virtual_machine(width=8, height=8)
     try:
         OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
         raise Exception("should blow up here")
