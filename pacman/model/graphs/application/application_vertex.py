@@ -37,7 +37,7 @@ class ApplicationVertex(AbstractVertex):
         :type label: str
         :param constraints: The optional initial constraints of the vertex
         :type constraints: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
+            iterable(~pacman.model.constraints.AbstractConstraint)
         :param max_atoms_per_core: the max number of atoms that can be\
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
@@ -63,10 +63,10 @@ class ApplicationVertex(AbstractVertex):
         """ Get the separate resource requirements for a range of atoms
 
         :param vertex_slice: the low value of atoms to calculate resources from
-        :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
+        :type vertex_slice: ~pacman.model.graphs.common.Slice
         :return: a Resource container that contains a \
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
+        :rtype: ~pacman.model.resources.ResourceContainer
         :raise None: this method does not raise any known exception
         """
 
@@ -78,16 +78,20 @@ class ApplicationVertex(AbstractVertex):
 
         :param vertex_slice:\
             The slice of atoms that the machine vertex will cover
+        :type vertex_slice: ~pacman.model.graphs.common.Slice
         :param resources_required: the resources used by the machine vertex
+        :type resources_required: ~pacman.model.resources.ResourceContainer
         :param label: human readable label for the machine vertex
+        :type label: str or None
         :param constraints: Constraints to be passed on to the machine vertex
+        :type constraints: \
+            iterable(~pacman.model.constraints.AbstractConstraint)
         """
 
     @abstractproperty
     def n_atoms(self):
         """ The number of atoms in the vertex
 
-        :return: The number of atoms
         :rtype: int
         """
 
