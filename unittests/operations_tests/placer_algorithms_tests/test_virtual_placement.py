@@ -27,7 +27,7 @@ from pacman.executor import PACMANAlgorithmExecutor
     "placer",
     ["OneToOnePlacer", "BasicPlacer", "RadialPlacer", "SpreaderPlacer"])
 def test_virtual_placement(placer):
-    machine = virtual_machine(version=5)
+    machine = virtual_machine(width=8, height=8)
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)

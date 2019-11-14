@@ -63,7 +63,7 @@ def test_virtual_vertices_spreader():
     n_keys_map.set_n_keys_for_partition(partition, 1)
 
     # Get and extend the machine for the virtual chip
-    machine = virtual_machine(version=5)
+    machine = virtual_machine(width=8, height=8)
     extended_machine = MallocBasedChipIdAllocator()(machine, machine_graph)
 
     # Do placements
@@ -132,7 +132,7 @@ def test_one_to_one():
         last_vertex = vertex
 
     # Do placements
-    machine = virtual_machine(version=5)
+    machine = virtual_machine(width=8, height=8)
     placements = SpreaderPlacer()(
         machine_graph, machine, n_keys_map, plan_n_timesteps=1000)
 
@@ -175,7 +175,7 @@ def test_sdram_links():
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # Do placements
-    machine = virtual_machine(version=5)
+    machine = virtual_machine(width=8, height=8)
     try:
         SpreaderPlacer()(machine_graph, machine, n_keys_map,
                          plan_n_timesteps=1000)
