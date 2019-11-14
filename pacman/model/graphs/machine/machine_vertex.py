@@ -45,8 +45,10 @@ class MachineVertex(AbstractVertex):
         return self.__repr__() if _l is None else _l
 
     def __repr__(self):
-        return "MachineVertex(label={}, constraints={}".format(
-            self.label, self.constraints)
+        if self.constraints:
+            return "MachineVertex(label={}, constraints={})".format(
+                self.label, self.constraints)
+        return "MachineVertex(label={})".format(self.label)
 
     @abstractproperty
     def resources_required(self):

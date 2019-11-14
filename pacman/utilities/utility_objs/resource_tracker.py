@@ -186,7 +186,7 @@ class ResourceTracker(object):
 
         # update tracker for n cores available per chip
         self._real_chips_with_n_cores_available = \
-            [0] * (machine.MAX_CORES_PER_CHIP + 1)
+            [0] * (machine.max_cores_per_chip() + 1)
         self._virtual_chips_with_n_cores_available = \
             [0] * (constants.CORES_PER_VIRTUAL_CHIP + 1)
 
