@@ -17,7 +17,7 @@ from __future__ import print_function
 from operator import itemgetter
 from pprint import pprint as pp
 import unittest
-from spinn_machine import virtual_machine
+from spinn_machine import Chip, Link, Machine, Processor, Router, SDRAM
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.exceptions import PacmanPlaceException
@@ -41,9 +41,37 @@ class TestRadialPlacer(unittest.TestCase):
         self.edge3 = ApplicationEdge(self.vert1, self.vert3, "Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
-        self.app_graph = ApplicationGraph("Graph")
+        self.graph = ApplicationGraph("Graph", self.verts, self.edges)
 
-        self.machine = virtual_machine(8, 8)
+        #######################################################################
+        # Setting up machine                                                  #
+        #######################################################################
+        flops = 1000
+        (_, _, n, _, _, s) = range(6)
+
+        processors = list()
+        for i in range(18):
+            processors.append(Processor(i, flops))
+
+        _sdram = SDRAM(128*(2**20))
+
+        ip = "192.168.240.253"
+        chips = list()
+        for x in range(10):
+            for y in range(10):
+                links = list()
+
+                links.append(Link(x, y, 0, (x + 1) % 10, y))
+                links.append(Link(x, y, 1, (x + 1) % 10, (y + 1) % 10))
+                links.append(Link(x, y, 2, x, (y + 1) % 10))
+                links.append(Link(x, y, 3, (x - 1) % 10, y))
+                links.append(Link(x, y, 4, (x - 1) % 10, (y - 1) % 10))
+                links.append(Link(x, y, 5, x, (y - 1) % 10))
+
+                r = Router(links, False, 1024)
+                chips.append(Chip(x, y, processors, r, _sdram, ip))
+
+        self.machine = Machine(chips)
         #######################################################################
         # Setting up graph and graph_mapper                                   #
         #######################################################################
@@ -62,12 +90,21 @@ class TestRadialPlacer(unittest.TestCase):
         self.vertices.append(self.vertex3)
         self.vertices.append(self.vertex4)
         self.edges = list()
-        self.mach_graph = MachineGraph("machine")
-        self.plan_n_timesteps = 100
+        self.graph = MachineGraph(self.vertices, self.edges)
+        self.graph_mapper = GraphMapper()
+        self.graph_mapper.add_vertices(self.vertices)
 
+    @unittest.skip("demonstrating skipping")
+    def test_new_basic_placer(self):
+        self.bp = RadialPlacer(self.machine, self.graph)
+        self.assertEqual(self.bp._machine, self.machine)
+        self.assertEqual(self.bp._graph, self.graph)
+
+    @unittest.skip("demonstrating skipping")
     def test_place_where_vertices_dont_have_vertex(self):
-       placements = RadialPlacer()(self.mach_graph, self.machine, 100)
-       for placement in placements.placements:
+        self.bp = RadialPlacer(self.machine, self.graph)
+        placements = self.bp.place(self.graph, self.graph_mapper)
+        for placement in placements.placements:
             print(placement.vertex.label, placement.vertex.n_atoms,
                   'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
 
