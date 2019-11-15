@@ -14,21 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
-from operator import itemgetter
-from pprint import pprint as pp
 import unittest
 from spinn_machine import virtual_machine
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.graphs.machine import MachineGraph
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
-from pacman.exceptions import PacmanPlaceException, PacmanValueError
+from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
-from pacman.model.graphs.common import GraphMapper
 from pacman.operations.placer_algorithms import RadialPlacer
 from uinit_test_objects import (
-    get_resources_used_by_atoms, T_MachineVertex, T_AppVertex)
+    get_resources_used_by_atoms, T_MachineVertex,)
 
 
 class TestRadialPlacer(unittest.TestCase):
