@@ -20,8 +20,11 @@ import unittest
 from spinn_machine import virtual_machine
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
-from pacman.exceptions import PacmanPlaceException
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.resources import (
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.exceptions import PacmanPlaceException, PacmanValueError
+from pacman.model.constraints.placer_constraints import (
+    ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
 from pacman.model.graphs.common import GraphMapper
 from pacman.operations.placer_algorithms import RadialPlacer
 from uinit_test_objects import (
@@ -30,23 +33,9 @@ from uinit_test_objects import (
 
 class TestRadialPlacer(unittest.TestCase):
     def setUp(self):
-        #######################################################################
-        # Setting up vertices, edges and graph                                #
-        #######################################################################
-        self.vert1 = T_AppVertex(100, "New AbstractConstrainedVertex 1")
-        self.vert2 = T_AppVertex(5, "New AbstractConstrainedVertex 2")
-        self.vert3 = T_AppVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = ApplicationEdge(self.vert1, self.vert2, "First edge")
-        self.edge2 = ApplicationEdge(self.vert2, self.vert1, "Second edge")
-        self.edge3 = ApplicationEdge(self.vert1, self.vert3, "Third edge")
-        self.verts = [self.vert1, self.vert2, self.vert3]
-        self.edges = [self.edge1, self.edge2, self.edge3]
-        self.app_graph = ApplicationGraph("Graph")
 
         self.machine = virtual_machine(8, 8)
-        #######################################################################
-        # Setting up graph and graph_mapper                                   #
-        #######################################################################
+        self.mach_graph = MachineGraph("machine")
         self.vertices = list()
         self.vertex1 = T_MachineVertex(
             0, 1, get_resources_used_by_atoms(0, 1, []), "First vertex")
@@ -58,165 +47,64 @@ class TestRadialPlacer(unittest.TestCase):
             10, 100, get_resources_used_by_atoms(10, 100, []),
             "Fourth vertex")
         self.vertices.append(self.vertex1)
+        self.mach_graph.add_vertex(self.vertex1)
         self.vertices.append(self.vertex2)
+        self.mach_graph.add_vertex(self.vertex2)
         self.vertices.append(self.vertex3)
+        self.mach_graph.add_vertex(self.vertex3)
         self.vertices.append(self.vertex4)
+        self.mach_graph.add_vertex(self.vertex4)
         self.edges = list()
-        self.mach_graph = MachineGraph("machine")
+
         self.plan_n_timesteps = 100
 
-    def test_place_where_vertices_dont_have_vertex(self):
-       placements = RadialPlacer()(self.mach_graph, self.machine, 100)
-       for placement in placements.placements:
-            print(placement.vertex.label, placement.vertex.n_atoms,
-                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
+    def test_simple(self):
+        placements = RadialPlacer()(self.mach_graph, self.machine, 100)
+        self.assertEqual(len(self.vertices), len(placements))
 
-    @unittest.skip("demonstrating skipping")
-    def test_place_where_vertices_have_vertices(self):
-        self.bp = RadialPlacer(self.machine, self.graph)
-        self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices(self.vertices, self.vert1)
-        placements = self.bp.place(self.graph, self.graph_mapper)
-        for placement in placements.placements:
-            print(placement.vertex.label, placement.vertex.n_atoms,
-                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
-
-    @unittest.skip("demonstrating skipping")
     def test_place_vertex_too_big_with_vertex(self):
-        large_vertex = T_AppVertex(500, "Large vertex 500")
-        large_machine_vertex = large_vertex.create_machine_vertex(
-            0, 499, get_resources_used_by_atoms(0, 499, []))
-        self.graph.add_vertex(large_vertex)
-        self.graph = ApplicationGraph("Graph", [large_vertex])
-        self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices([large_machine_vertex], large_vertex)
-        self.bp = RadialPlacer(self.machine, self.graph)
-        self.graph = MachineGraph(vertices=[large_machine_vertex])
-        with self.assertRaises(PacmanPlaceException):
-            self.bp.place(self.graph, self.graph_mapper)
+        cpu_cycles = 1000
+        dtcm_requirement = 1000
+        sdram_requirement = self.machine.get_chip_at(0, 0).sdram.size * 20
+        rc = ResourceContainer(
+            cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
+            dtcm=DTCMResource(dtcm_requirement),
+            sdram=ConstantSDRAM(sdram_requirement))
 
-    @unittest.skip("demonstrating skipping")
-    def test_try_to_place(self):
-        self.assertEqual(True, False, "Test not implemented yet")
+        large_machine_vertex = T_MachineVertex(
+            0, 499, rc, "Second vertex")
+        self.mach_graph.add_vertex(large_machine_vertex)
+        with self.assertRaises(PacmanValueError):
+            RadialPlacer()(self.mach_graph, self.machine, 100)
 
-    @unittest.skip("demonstrating skipping")
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
-        self.bp = RadialPlacer(self.machine, self.graph)
-        self.vertex1.add_constraint(ChipAndCoreConstraint(8, 3, 2))
-        self.assertIsInstance(self.vertex1.constraints[0],
-                              ChipAndCoreConstraint)
         self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
-        self.vertex3.add_constraint(ChipAndCoreConstraint(2, 4, 6))
-        self.vertex4.add_constraint(ChipAndCoreConstraint(6, 4, 16))
-        self.vertices = list()
-        self.vertices.append(self.vertex1)
-        self.vertices.append(self.vertex2)
-        self.vertices.append(self.vertex3)
-        self.vertices.append(self.vertex4)
-        self.edges = list()
-        self.graph = MachineGraph(self.vertices, self.edges)
-        self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices(self.vertices)
-        placements = self.bp.place(self.graph, self.graph_mapper)
+        self.vertex3.add_constraint(RadialPlacementFromChipConstraint(2, 4))
+        placements = RadialPlacer()(self.mach_graph, self.machine, 100)
         for placement in placements.placements:
-            print(placement.vertex.label, placement.vertex.n_atoms,
-                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
+            if placement.vertex == self.vertex2:
+                self.assertEqual(placement.x, 3)
+                self.assertEqual(placement.y, 5)
+                self.assertEqual(placement.p, 7)
+            if placement.vertex == self.vertex3:
+                self.assertEqual(placement.x, 2)
+                self.assertEqual(placement.y, 4)
+        self.assertEqual(len(self.vertices), len(placements))
 
-    @unittest.skip("demonstrating skipping")
-    def test_deal_with_constraint_placement_vertices_have_vertices(self):
-        self.bp = RadialPlacer(self.machine, self.graph)
-        self.vertex1.add_constraint(ChipAndCoreConstraint(1, 5, 2))
-        self.assertIsInstance(self.vertex1.constraints[0],
-                              ChipAndCoreConstraint)
-        self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
-        self.vertex3.add_constraint(ChipAndCoreConstraint(2, 4, 6))
-        self.vertex4.add_constraint(ChipAndCoreConstraint(6, 7, 16))
-        self.vertices = list()
-        self.vertices.append(self.vertex1)
-        self.vertices.append(self.vertex2)
-        self.vertices.append(self.vertex3)
-        self.vertices.append(self.vertex4)
-        self.edges = list()
-        self.graph = MachineGraph(self.vertices, self.edges)
-        self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices(self.vertices, self.vert1)
-        placements = self.bp.place(self.graph, self.graph_mapper)
-        for placement in placements.placements:
-            print(placement.vertex.label, placement.vertex.n_atoms,
-                  'x:', placement.x, 'y:', placement.y, 'p:', placement.p)
-
-    @unittest.skip("demonstrating skipping")
-    def test_unsupported_non_placer_constraint(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("demonstrating skipping")
-    def test_unsupported_placer_constraint(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("demonstrating skipping")
-    def test_unsupported_placer_constraints(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("demonstrating skipping")
-    def test_many_vertices(self):
-        vertices = list()
-        for i in range(20 * 17):  # 51 atoms per each processor on 20 chips
-            vertices.append(SimpleMachineVertex(
-                0, 50, get_resources_used_by_atoms(0, 50, []),
-                "vertex " + str(i)))
-
-        self.graph = ApplicationGraph("Graph", vertices)
-        self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices(vertices)
-        self.bp = RadialPlacer(self.machine, self.graph)
-        self.graph = MachineGraph(vertices=vertices)
-        placements = self.bp.place(self.graph, self.graph_mapper)
-
-        unorderdered_info = list()
-        for placement in placements.placements:
-            unorderdered_info.append(
-                (placement.vertex.label.split(" ")[0],
-                 "{:<4}".format(placement.vertex.label.split(" ")[1]),
-                 placement.vertex.n_atoms, 'x: ',
-                 placement.x, 'y: ', placement.y, 'p: ', placement.p))
-
-        sorted_info = sorted(unorderdered_info, key=itemgetter(4, 6, 8))
-        pp(sorted_info)
-
-        pp("{}".format("=" * 50))
-        sorted_info = sorted(unorderdered_info, key=lambda x: int(x[1]))
-        pp(sorted_info)
-
-    @unittest.skip("demonstrating skipping")
-    def test_too_many_vertices(self):
-        vertices = list()
-        for i in range(100 * 17):  # 50 atoms per each processor on 20 chips
-            vertices.append(SimpleMachineVertex(
-                0, 50, get_resources_used_by_atoms(0, 50, []),
-                "vertex " + str(i)))
-
-        self.graph = ApplicationGraph("Graph", vertices)
-        self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices(vertices)
-        self.bp = RadialPlacer(self.machine, self.graph)
-        self.graph = MachineGraph(vertices=vertices)
-        with self.assertRaises(PacmanPlaceException):
-            self.bp.place(self.graph, self.graph_mapper)
-
-    @unittest.skip("demonstrating skipping")
     def test_fill_machine(self):
-        vertices = list()
-        for i in range(99 * 17):  # 50 atoms per each processor on 20 chips
-            vertices.append(SimpleMachineVertex(
+        graph = MachineGraph("machine")
+        cores = sum(chip.n_user_processors for chip in self.machine.chips)
+        for i in range(cores):  # 50 atoms per each processor on 20 chips
+            graph.add_vertex(T_MachineVertex(
                 0, 50, get_resources_used_by_atoms(0, 50, []),
                 "vertex " + str(i)))
-
-        self.graph = ApplicationGraph("Graph", vertices)
-        self.graph_mapper = GraphMapper()
-        self.graph_mapper.add_vertices(vertices)
-        self.bp = RadialPlacer(self.machine, self.graph)
-        self.graph = MachineGraph(vertices=vertices)
-        self.bp.place(self.graph, self.graph_mapper)
+        placements = RadialPlacer()(graph, self.machine, 100)
+        self.assertEqual(len(placements), cores)
+        # One more vertex should be too many
+        graph.add_vertex(T_MachineVertex(
+            0, 50, get_resources_used_by_atoms(0, 50, []), "toomany"))
+        with self.assertRaises(PacmanValueError):
+            RadialPlacer()(graph, self.machine, 100)
 
 
 if __name__ == '__main__':
