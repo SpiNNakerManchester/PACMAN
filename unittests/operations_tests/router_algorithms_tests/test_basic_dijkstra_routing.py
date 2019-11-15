@@ -23,7 +23,7 @@ from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
 
 
-class MyTestCase(unittest.TestCase):
+class TestBasicDijkstraRouting(unittest.TestCase):
 
     def test_routing(self):
         graph = MachineGraph("Test")
