@@ -20,5 +20,5 @@ lxml
 numpy >= 1.12, < 1.9999
 jsonschema
 sortedcollections
-SpiNNUtilities >= 1!5.1.0, < 1!6.0.0
-SpiNNMachine >= 1!5.1.0, < 1!6.0.0
+SpiNNUtilities >= 1!5.1.1, < 1!6.0.0
+SpiNNMachine >= 1!5.1.1, < 1!6.0.0
