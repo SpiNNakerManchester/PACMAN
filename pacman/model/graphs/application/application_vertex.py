@@ -37,7 +37,7 @@ class ApplicationVertex(AbstractVertex):
         :type label: str
         :param constraints: The optional initial constraints of the vertex
         :type constraints: \
-            iterable(~pacman.model.constraints.AbstractConstraint)
+            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
         :param max_atoms_per_core: the max number of atoms that can be\
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
@@ -100,3 +100,15 @@ class ApplicationVertex(AbstractVertex):
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
         return self.n_atoms
+
+    @abstractproperty
+    def timestep(self):
+        """ The timestep of this vertex in ms
+
+        Typically will default to the machine timestep
+
+        If the machine vertexes have different timestemps this method will\
+        return the lowest common multiple of these
+
+        :rtype: int
+        """
