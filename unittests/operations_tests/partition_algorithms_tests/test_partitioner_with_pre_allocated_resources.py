@@ -159,7 +159,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, pre_allocated_res)
+            partitioner(graph, machine, 1000, pre_allocated_res)
         except Exception:
             raise Exception("should have blown up here")
 
