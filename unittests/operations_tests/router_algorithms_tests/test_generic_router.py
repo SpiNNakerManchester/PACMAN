@@ -39,6 +39,9 @@ class Vertex(ApplicationVertex):
     def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         return 4000 + (50 * (hi_atom - lo_atom))
 
+    def timestep(self):
+        return 1000
+
 
 # noinspection PyProtectedMember
 class TestRouter(unittest.TestCase):

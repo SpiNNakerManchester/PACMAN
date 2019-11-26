@@ -90,3 +90,9 @@ class SimpleTestVertex(ApplicationVertex):
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
+
+    @property
+    @overrides(ApplicationVertex.timestep)
+    def timestep(self):
+        return 1000
+
