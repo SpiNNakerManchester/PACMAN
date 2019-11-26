@@ -26,7 +26,7 @@ from pacman.model.constraints.partitioner_constraints import (
     FixedVertexAtomsConstraint)
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
-    VariableSDRAM)
+    TimeBasedSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
@@ -189,7 +189,7 @@ def resource_container_to_json(container):
         json_dict["dtcm"] = container.dtcm.get_value()
         json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
         json_dict["fixed_sdram"] = int(container.sdram.fixed)
-        json_dict["per_timestep_sdram"] = int(container.sdram.per_timestep)
+        json_dict["per_simtime_ms"] = int(container.per_simtime_ms)
         json_dict["iptag"] = iptag_resources_to_json(container.iptags)
         json_dict["reverse_iptags"] = iptag_resources_to_json(
             container.reverse_iptags)
@@ -202,8 +202,8 @@ def resource_container_from_json(json_dict):
     if json_dict is None:
         return None
     dtcm = DTCMResource(json_dict["dtcm"])
-    sdram = VariableSDRAM(
-        json_dict["fixed_sdram"], json_dict["per_timestep_sdram"])
+    sdram = TimeBasedSDRAM(
+        json_dict["fixed_sdram"], json_dict["per_simtime_ms"])
     cpu_cycles = CPUCyclesPerTickResource(json_dict["cpu_cycles"])
     iptags = iptag_resources_from_json(json_dict["iptag"])
     reverse_iptags = iptag_resources_from_json(json_dict["reverse_iptags"])

@@ -31,7 +31,7 @@ from .specific_board_reverse_iptag_resource import (
     SpecificBoardReverseIPtagResource)
 from .specific_chip_sdram_resource import SpecificChipSDRAMResource
 from .specific_core_resource import SpecificCoreResource
-from .variable_sdram import VariableSDRAM
+from .time_based_sdram import TimeBasedSDRAM
 
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
            "CPUCyclesPerTickResource", "DTCMResource",
@@ -39,4 +39,4 @@ __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
            "ReverseIPtagResource",
            "PreAllocatedResourceContainer", "SpecificChipSDRAMResource",
            "SpecificCoreResource", "SpecificBoardIPtagResource",
-           "SpecificBoardReverseIPtagResource", "VariableSDRAM"]
+           "SpecificBoardReverseIPtagResource", "TimeBasedSDRAM"]

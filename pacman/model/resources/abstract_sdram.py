@@ -24,14 +24,32 @@ class AbstractSDRAM(object):
     """
 
     @abstractmethod
-    def get_total_sdram(self, n_timesteps):
+    def get_sdram_for_simtime(self, time_in_ms):
         """
-        The total SDRAM.
+        The total SDRAM need to run for this amount of time/simtime
 
-        :param n_timesteps: number of timesteps to cost for
-        :type n_timesteps: int
-        :return:
+        Warning: This method is guaranteed to produce accurate results if the\
+        time is a multiple of the timestep.  Best is to use a time_in_ms which
+        is a multple of all different timesteps used.
+
+        This allows costed elements like vertexes and graph to calculate their
+        per_ms_sdram as their per_timestep_sdram / their timestep.
+        The implementations of this method should round up to the nearest int.
+
+        :param time_in_ms The simulation time in ms for which space should
+        be saved. A None value will be considered run forever
+        :type time_in_ms: int or None
+        :rtype: int
+        raises: PacmanConfigurationException if a None time_in_ms (run forever)
+        is requested and there is a variable sdram requirement.,
         """
+
+    def get_total_sdram(self, n_timesteps):
+        # Hack to not brek to much at once
+        if n_timesteps is None:
+            return self.fixed
+        else:
+            return self.fixed + self.per_simtime_ms * 1000 * n_timesteps
 
     @abstractmethod
     def __add__(self, other):
@@ -70,8 +88,18 @@ class AbstractSDRAM(object):
         """
 
     @abstractproperty
-    def per_timestep(self):
-        """ Returns extra SDRAM cost for each additional timestep
+    def per_simtime_ms(self):
+        """ Returns extra SDRAM cost for each additional ms of simtime
 
-        Warning may well be zero
+        Warning: SDram required is only guaranteed to produce accurate results \
+        if the time is a multiple of the timestep.
+        Best is to use a time_in_ms which is a multple of all different \
+        timesteps used.
+
+        The value returned by this method may will probably just be the
+        per_timestep_sdram / timestep.
         """
+
+    def per_timestep(self):
+        # Hack to not break too much at once
+        return self.per_simtime_ms * 1000

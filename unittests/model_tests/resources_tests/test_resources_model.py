@@ -20,7 +20,7 @@ import unittest
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
     IPtagResource, ReverseIPtagResource, SpecificBoardIPtagResource,
-    SpecificBoardReverseIPtagResource, VariableSDRAM)
+    SpecificBoardReverseIPtagResource, TimeBasedSDRAM)
 
 
 class TestResourceModels(unittest.TestCase):
@@ -45,7 +45,7 @@ class TestResourceModels(unittest.TestCase):
         combo = const2 - const1
         self.assertEqual(combo.get_total_sdram(None), 256-128)
 
-        var1 = VariableSDRAM(124, 8)
+        var1 = TimeBasedSDRAM(124, 0.008)
         self.assertEqual(var1.get_total_sdram(100), 124 + 8 * 100)
         combo = var1 + const1
         self.assertEqual(combo.get_total_sdram(100), 124 + 8 * 100 + 128)
@@ -55,7 +55,7 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
         combo = const1 - var1
         self.assertEqual(combo.get_total_sdram(100), 128 - (124 + 8 * 100))
-        var2 = VariableSDRAM(234, 6)
+        var2 = TimeBasedSDRAM(234, 0.006)
         combo = var2 + var1
         self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (6 + 8) * 150)
         combo = var2 - var1

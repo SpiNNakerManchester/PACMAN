@@ -35,7 +35,7 @@ class ConstantSDRAM(AbstractSDRAM):
         """
         self._sdram = sdram
 
-    def get_total_sdram(self, n_timesteps):
+    def get_sdram_for_simtime(self, time_in_ms):
         return self._sdram
 
     @property
@@ -43,7 +43,7 @@ class ConstantSDRAM(AbstractSDRAM):
         return self._sdram
 
     @property
-    def per_timestep(self):
+    def per_simtime_ms(self):
         return 0
 
     def __add__(self, other):
