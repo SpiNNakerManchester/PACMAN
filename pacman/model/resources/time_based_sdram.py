@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import math
 from .abstract_sdram import AbstractSDRAM
-from .constant_sdram import ConstantSDRAM
 from pacman.exceptions import PacmanConfigurationException
 
 
@@ -48,7 +48,7 @@ class TimeBasedSDRAM(AbstractSDRAM):
     def get_sdram_for_simtime(self, time_in_ms):
         if time_in_ms is not None:
             return self._fixed_sdram + \
-                   (self._per_simtime_ms * time_in_ms)
+                   math.ceil(self._per_simtime_ms * time_in_ms)
         else:
             if self._per_simtime_ms == 0:
                 return self._fixed_sdram
