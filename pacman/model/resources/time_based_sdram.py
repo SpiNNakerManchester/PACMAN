@@ -32,25 +32,25 @@ class TimeBasedSDRAM(AbstractSDRAM):
     ]
 
     def __init__(
-            self, fixed_sdram, per_simtime_ms):
+            self, fixed_sdram, per_simtime_us):
         """
 
         :param fixed_sdram: The amount of SDRAM in bytes
         :type fixed_sdram: int
-        :param per_simtime_ms: The amount of extra sdram per simtime ms.
+        :param per_simtime_us: The amount of extra sdram per simtime us.
         Note: This needs only to be accurate at the timestep level.
         So may be simply per_timestep_sdram / timestep
         :type per_simtime_m: float
         """
         self._fixed_sdram = fixed_sdram
-        self._per_simtime_ms = per_simtime_ms
+        self._per_simtime_us = per_simtime_us
 
-    def get_sdram_for_simtime(self, time_in_ms):
-        if time_in_ms is not None:
+    def get_sdram_for_simtime(self, time_in_us):
+        if time_in_us is not None:
             return self._fixed_sdram + \
-                   math.ceil(self._per_simtime_ms * time_in_ms)
+                   math.ceil(self._per_simtime_us * time_in_us)
         else:
-            if self._per_simtime_ms == 0:
+            if self._per_simtime_us == 0:
                 return self._fixed_sdram
             else:
                 raise PacmanConfigurationException(
@@ -61,20 +61,20 @@ class TimeBasedSDRAM(AbstractSDRAM):
         return self._fixed_sdram
 
     @property
-    def per_simtime_ms(self):
-        return self._per_simtime_ms
+    def per_simtime_us(self):
+        return self._per_simtime_us
 
     def __add__(self, other):
         return TimeBasedSDRAM(
             self.fixed + other.fixed,
-            self.per_simtime_ms + other.per_simtime_ms)
+            self.per_simtime_us + other.per_simtime_us)
 
     def __sub__(self, other):
         return TimeBasedSDRAM(
             self.fixed - other.fixed,
-            self.per_simtime_ms - other.per_simtime_ms)
+            self.per_simtime_us - other.per_simtime_us)
 
     def sub_from(self, other):
         return TimeBasedSDRAM(
             other.fixed - self.fixed,
-            other.per_simtime_ms - self.per_simtime_ms)
+            other.per_simtime_us - self.per_simtime_us)

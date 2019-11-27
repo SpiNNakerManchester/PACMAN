@@ -189,7 +189,7 @@ def resource_container_to_json(container):
         json_dict["dtcm"] = container.dtcm.get_value()
         json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
         json_dict["fixed_sdram"] = int(container.sdram.fixed)
-        json_dict["per_simtime_ms"] = int(container.sdram.per_simtime_ms)
+        json_dict["per_simtime_us"] = int(container.sdram.per_simtime_us)
         json_dict["iptag"] = iptag_resources_to_json(container.iptags)
         json_dict["reverse_iptags"] = iptag_resources_to_json(
             container.reverse_iptags)
@@ -203,7 +203,7 @@ def resource_container_from_json(json_dict):
         return None
     dtcm = DTCMResource(json_dict["dtcm"])
     sdram = TimeBasedSDRAM(
-        json_dict["fixed_sdram"], json_dict["per_simtime_ms"])
+        json_dict["fixed_sdram"], json_dict["per_simtime_us"])
     cpu_cycles = CPUCyclesPerTickResource(json_dict["cpu_cycles"])
     iptags = iptag_resources_from_json(json_dict["iptag"])
     reverse_iptags = iptag_resources_from_json(json_dict["reverse_iptags"])
