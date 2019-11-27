@@ -137,7 +137,8 @@ class ResourceContainer(object):
             return False
         if self._sdram_usage.fixed != other._sdram_usage.fixed:
             return False
-        if self._sdram_usage.per_simtime_ms != other._sdram_usage.per_simtime_ms:
+        if self._sdram_usage.per_simtime_ms != \
+                other._sdram_usage.per_simtime_ms:
             return False
         if self._cpu_cycles.get_value() != other.cpu_cycles.get_value():
             return False

@@ -91,8 +91,8 @@ class AbstractSDRAM(object):
     def per_simtime_ms(self):
         """ Returns extra SDRAM cost for each additional ms of simtime
 
-        Warning: SDram required is only guaranteed to produce accurate results \
-        if the time is a multiple of the timestep.
+        Warning: SDram required is only guaranteed to produce accurate\
+        results if the time is a multiple of the timestep.
         Best is to use a time_in_ms which is a multple of all different \
         timesteps used.
 
