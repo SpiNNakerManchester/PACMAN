@@ -100,6 +100,7 @@ class AbstractSDRAM(object):
         per_timestep_sdram / timestep.
         """
 
+    @property
     def per_timestep(self):
         # Hack to not break too much at once
         return self.per_simtime_ms * 1000
