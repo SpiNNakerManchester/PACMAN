@@ -71,7 +71,7 @@ class BasicPartitioner(object):
         progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
         machine_graph = MachineGraph("Machine graph for " + graph.label)
         graph_mapper = GraphMapper()
-        resource_tracker = ResourceTracker(machine,minimum_simtime_in_us)
+        resource_tracker = ResourceTracker(machine, minimum_simtime_in_us)
 
         # Partition one vertex at a time
         for vertex in progress.over(graph.vertices):

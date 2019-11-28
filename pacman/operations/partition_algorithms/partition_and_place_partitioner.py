@@ -220,8 +220,8 @@ class PartitionAndPlacePartitioner(object):
 
             # Scale down the number of atoms to fit the available resources
             used_placements, hi_atom = self._scale_down_resources(
-                lo_atom, hi_atom, vertices, minimum_simtime_in_us, resource_tracker,
-                max_atoms_per_core, fixed_n_atoms)
+                lo_atom, hi_atom, vertices, minimum_simtime_in_us,
+                resource_tracker, max_atoms_per_core, fixed_n_atoms)
 
             # Update where we are
             n_atoms_placed = hi_atom + 1

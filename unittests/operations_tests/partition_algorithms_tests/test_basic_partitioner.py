@@ -106,7 +106,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, None, "extra"), "TEST")
-        graph, _, _ = self.bp(self.graph, self.machine, minimum_simtime_in_us=None)
+        graph, _, _ = self.bp(
+            self.graph, self.machine, minimum_simtime_in_us=None)
         self.assertEqual(len(list(graph.vertices)), 3)
         self.assertEqual(len(list(graph.edges)), 4)
 
@@ -132,7 +133,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        graph, _, _ = self.bp(self.graph, self.machine, minimum_simtime_in_us=None)
+        graph, _, _ = self.bp(
+            self.graph, self.machine, minimum_simtime_in_us=None)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
 
@@ -145,7 +147,8 @@ class TestBasicPartitioner(unittest.TestCase):
         large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        graph, _, _ = self.bp(self.graph, self.machine, minimum_simtime_in_us=None)
+        graph, _, _ = self.bp(
+            self.graph, self.machine, minimum_simtime_in_us=None)
         self.assertEqual(len(list(graph.vertices)), 100)
 
     def test_partition_with_barely_sufficient_space(self):

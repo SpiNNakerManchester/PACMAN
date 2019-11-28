@@ -46,7 +46,8 @@ class SpreaderPlacer(OneToOnePlacer):
     def __init__(self):
         OneToOnePlacer.__init__(self)
 
-    def __call__(self, machine_graph, machine, n_keys_map, minimum_simtime_in_us):
+    def __call__(
+            self, machine_graph, machine, n_keys_map, minimum_simtime_in_us):
         """ places vertices on as many chips as available with a effort to
         reduce the number of packets being received by the router in total.
 
