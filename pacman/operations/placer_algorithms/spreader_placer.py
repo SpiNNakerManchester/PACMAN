@@ -86,7 +86,7 @@ class SpreaderPlacer(OneToOnePlacer):
         # init data structs
         chips_in_order = self._determine_chip_list(machine)
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, chips=chips_in_order)
+            machine, 1000, chips=chips_in_order)
         placements = Placements()
         placed_vertices = set()
         cost_per_chip = defaultdict(int)

@@ -173,7 +173,7 @@ class OneToOnePlacer(RadialPlacer):
         placements = Placements()
 
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_radial_chips(machine))
+            machine, plan_n_timesteps*1000, self._generate_radial_chips(machine))
         all_vertices_placed = set()
 
         # RadialPlacementFromChipConstraint won't work here

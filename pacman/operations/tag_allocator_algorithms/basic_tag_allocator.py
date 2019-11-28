@@ -42,7 +42,7 @@ class BasicTagAllocator(object):
         :return:
         """
 
-        resource_tracker = ResourceTracker(machine, plan_n_timesteps)
+        resource_tracker = ResourceTracker(machine, plan_n_timesteps*1000)
 
         # Keep track of ports allocated to reverse IP tags and tags that still
         # need a port to be allocated

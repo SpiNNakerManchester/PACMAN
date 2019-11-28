@@ -56,7 +56,7 @@ class BasicPlacer(object):
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(vertices, "Placing graph vertices")
-        resource_tracker = ResourceTracker(machine, plan_n_timesteps)
+        resource_tracker = ResourceTracker(machine, plan_n_timesteps * 1000)
         for vertex in progress.over(vertices):
             # Create and store a new placement anywhere on the board
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(

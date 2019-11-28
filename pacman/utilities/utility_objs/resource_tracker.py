@@ -48,8 +48,8 @@ class ResourceTracker(object):
         # The machine object
         "_machine",
 
-        # the number of timesteps that should be planned for
-        "_plan_n_timesteps",
+        # the simtime in us that should be planned for
+        "_minimum_simtime_in_us",
 
         # Set of tags available indexed by board address
         # Note that entries are only added when a board is first used
@@ -104,13 +104,13 @@ class ResourceTracker(object):
 
     ]
 
-    def __init__(self, machine, plan_n_timesteps, chips=None,
+    def __init__(self, machine, minimum_simtime_in_us, chips=None,
                  preallocated_resources=None):
         """
         :param machine: The machine to track the usage of
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime time (in us) to plan for
+        :type  minimum_simtime_in_us: int
         :param chips: If specified, this list of chips will be used instead\
             of the list from the machine. Note that the order will be\
             maintained, so this can be used either to reduce the set of chips\
@@ -135,7 +135,7 @@ class ResourceTracker(object):
         self._machine = machine
 
         # The number of timesteps that should be planned for.
-        self._plan_n_timesteps = plan_n_timesteps
+        self._minimum_simtime_in_us = minimum_simtime_in_us
 
         # tracker for chips used
         self._chips_used = set()
@@ -230,8 +230,8 @@ class ResourceTracker(object):
         # remove SDRAM by removing from available SDRAM
         for sdram_pre_allocated in preallocated_resources.specific_sdram_usage:
             chip = sdram_pre_allocated.chip
-            sdram = sdram_pre_allocated.sdram_usage.get_total_sdram(
-                self._plan_n_timesteps)
+            sdram = sdram_pre_allocated.sdram_usage.get_sdram_for_simtime(
+                self._minimum_simtime_in_us)
             self._sdram_tracker[chip.x, chip.y] -= sdram
 
         # remove specific cores from the tracker
@@ -454,7 +454,8 @@ class ResourceTracker(object):
         :rtype: bool
         """
         return (self._sdram_tracker[chip.x, chip.y] >=
-                resources.sdram.get_total_sdram(self._plan_n_timesteps))
+                resources.sdram.get_sdram_for_simtime(
+                    self._minimum_simtime_in_us))
 
     def _sdram_available(self, chip):
         """ Return the amount of SDRAM available on a chip
@@ -773,7 +774,8 @@ class ResourceTracker(object):
             :py:class:`pacman.model.resources.ResourceContainer`
         """
         self._sdram_tracker[chip.x, chip.y] -= \
-            resources.sdram.get_total_sdram(self._plan_n_timesteps)
+            resources.sdram.get_sdram_for_simtime(
+                self._minimum_simtime_in_us)
 
     def _allocate_core(self, chip, key, processor_id):
         """ Allocates a core on the given chip
@@ -1115,8 +1117,8 @@ class ResourceTracker(object):
 
         total_sdram = 0
         for resources in group_resources:
-            total_sdram += resources.sdram.get_total_sdram(
-                self._plan_n_timesteps)
+            total_sdram += resources.sdram.get_sdram_for_simtime(
+                self._minimum_simtime_in_us)
 
         # Find the first usable chip which fits all the group resources
         tried_chips = list()
@@ -1245,17 +1247,17 @@ class ResourceTracker(object):
             "No resources available to allocate the given resources"
             " within the given constraints:\n"
             "    Request for CPU: {}, DTCM: {}, "
-            "SDRAM fixed: {} per_timestep: {}, IP TAGS: {}, {}\n"
-            "    Planning to run for {} timesteps.\n"
+            "SDRAM fixed: {} per_us: {}, IP TAGS: {}, {}\n"
+            "    Planning to run for {} us.\n"
             "    Resources available which meet constraints:\n"
             "      {} Cores and {} tags on {} chips, largest SDRAM space: {}\n"
             "    All resources available:\n"
             "      {} Cores and {} tags on {} chips, largest SDRAM space: {}\n"
             .format(
                 resources.cpu_cycles.get_value(), resources.dtcm.get_value(),
-                resources.sdram.fixed, resources.sdram.per_timestep,
+                resources.sdram.fixed, resources.sdram.per_simtime_us,
                 resources.iptags, resources.reverse_iptags,
-                self._plan_n_timesteps,
+                self._minimum_simtime_in_us,
                 n_cores, n_tags, n_chips, max_sdram,
                 all_n_cores, all_n_tags, all_n_chips, all_max_sdram))
 
@@ -1415,7 +1417,7 @@ class ResourceTracker(object):
 
         self._chips_available.add((chip_x, chip_y))
         self._sdram_tracker[chip_x, chip_y] += \
-            resources.sdram.get_total_sdram(self._plan_n_timesteps)
+            resources.sdram. get_sdram_for_simtime(self._minimum_simtime_in_us)
         # update number tracker
         if self._machine.get_chip_at(chip_x, chip_y).virtual:
             self._virtual_chips_with_n_cores_available[

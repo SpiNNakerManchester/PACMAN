@@ -56,7 +56,7 @@ class RandomPlacer(object):
         progress = ProgressBar(machine_graph.n_vertices,
                                "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_random_chips(machine))
+            machine, plan_n_timesteps*1000, self._generate_random_chips(machine))
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         vertices_placed = set()
         for vertex in progress.over(vertices):

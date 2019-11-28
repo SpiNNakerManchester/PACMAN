@@ -86,7 +86,7 @@ class PartitionAndPlacePartitioner(object):
         progress = ProgressBar(n_atoms, "Partitioning graph vertices")
 
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps,
+            machine, plan_n_timesteps * 1000,
             preallocated_resources=preallocated_resources)
 
         # Group vertices that are supposed to be the same size
