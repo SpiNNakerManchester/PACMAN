@@ -95,4 +95,3 @@ class SimpleTestVertex(ApplicationVertex):
     @overrides(ApplicationVertex.timestep)
     def timestep(self):
         return 1000
-
