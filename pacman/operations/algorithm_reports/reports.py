@@ -551,7 +551,7 @@ def _write_one_chip_machine_placement(f, c, placements):
 
 def sdram_usage_report_per_chip(
         report_folder, hostname, placements, machine, minimum_simtime_in_us,
-        data_n_timesteps):
+        data_simtime_in_us):
     """ Reports the SDRAM used per chip
 
     :param report_folder: the folder to which the reports are being written
@@ -560,7 +560,7 @@ def sdram_usage_report_per_chip(
     :param machine: the python machine object
     :param minimum_simtime_in_us: The simtime in us for which placer \
         reserved space.
-    :param data_n_timesteps: The number of timesteps for which data can be \
+    :param data_simtime_in_us: The simtime in us for which data can be \
         saved on the machine.
     :rtype: None
     """
@@ -582,21 +582,21 @@ def sdram_usage_report_per_chip(
             f.write("\nActual space reserved on the machine\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
-                f, placements, machine, data_n_timesteps, progress, True)
+                f, placements, machine, data_simtime_in_us, progress, True)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for "
                          "writing.", file_name)
 
 
 def _sdram_usage_report_per_chip_with_timesteps(
-        f, placements, machine, timesteps, progress, end_progress):
-    f.write("Based on {} timesteps\n\n".format(timesteps))
+        f, placements, machine, data_simtime_in_us, progress, end_progress):
+    f.write("Based on runtime of {}us\n\n".format(data_simtime_in_us))
     used_sdram_by_chip = dict()
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.get_total_sdram(
-            timesteps)
+        sdram = placement.vertex.resources_required.sdram.\
+            get_sdram_for_simtime(data_simtime_in_us)
         x, y, p = placement.x, placement.y, placement.p
         f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
                 "".format(x, y, p, int(sdram / 1024.0), sdram, placement))
