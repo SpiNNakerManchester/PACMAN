@@ -42,7 +42,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
             for vertex, chip in zip(vertices, eth_chips))
         allocator = BasicTagAllocator()
         _, _, tags = allocator(
-            machine, plan_n_timesteps=None, placements=placements)
+            machine, minimum_simtime_in_us=None, placements=placements)
 
         for vertex, chip in zip(vertices, eth_chips):
             iptags = tags.get_ip_tags_for_vertex(vertex)
@@ -89,7 +89,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
             for proc, vertex in zip(eth2_procs, eth2_vertices))
         allocator = BasicTagAllocator()
         _, _, tags = allocator(
-            machine, plan_n_timesteps=None, placements=placements)
+            machine, minimum_simtime_in_us=None, placements=placements)
 
         tags_by_board = defaultdict(set)
         for vertices in (eth_vertices, eth2_vertices):

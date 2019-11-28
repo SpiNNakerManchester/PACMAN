@@ -62,7 +62,7 @@ def test_virtual_vertices_one_to_one():
 
     # Do placements
     placements = OneToOnePlacer()(
-        machine_graph, extended_machine, plan_n_timesteps=1000)
+        machine_graph, extended_machine, minimum_simtime_in_us=1000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -119,7 +119,7 @@ def test_one_to_one():
     # Do placements
     machine = virtual_machine(width=8, height=8)
     placements = OneToOnePlacer()(
-        machine_graph, machine, plan_n_timesteps=1000)
+        machine_graph, machine, minimum_simtime_in_us=1000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -161,7 +161,7 @@ def test_sdram_links():
     # Do placements
     machine = virtual_machine(width=8, height=8)
     try:
-        OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
+        OneToOnePlacer()(machine_graph, machine, minimum_simtime_in_us=1000)
         raise Exception("should blow up here")
     except PacmanException:
         pass

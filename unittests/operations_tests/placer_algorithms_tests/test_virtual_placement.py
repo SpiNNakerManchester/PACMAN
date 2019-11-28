@@ -38,7 +38,7 @@ def test_virtual_placement(placer):
         "MemoryExtendedMachine": machine,
         "MemoryMachine": machine,
         "MemoryMachineGraph": graph,
-        "PlanNTimeSteps": 1000,
+        "MinimumSimtimeInUs": 1000000,
         "MemoryMachinePartitionNKeysMap": n_keys_map
     }
     algorithms = [placer]

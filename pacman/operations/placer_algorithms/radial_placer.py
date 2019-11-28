@@ -32,7 +32,7 @@ class RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def __call__(self, machine_graph, machine, minimum_simtime_in_us):
         """
 
         :param machine_graph: The machine_graph to place
@@ -42,8 +42,8 @@ class RadialPlacer(object):
             The machine with respect to which to partition the application\
             graph
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type minimum_simtime_in_us: int
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: \
@@ -59,7 +59,7 @@ class RadialPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps*1000, self._generate_radial_chips(machine))
+            machine, minimum_simtime_in_us, self._generate_radial_chips(machine))
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):

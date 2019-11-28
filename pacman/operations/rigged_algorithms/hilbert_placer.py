@@ -30,7 +30,7 @@ class HilbertPlacer(object):
         translated from RIG.
     """
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def __call__(self, machine_graph, machine, minimum_simtime_in_us):
         """ Place each vertex in a machine graph on a core in the machine.
 
         :param machine_graph: The machine_graph to place
@@ -38,8 +38,8 @@ class HilbertPlacer(object):
             :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param machine: A SpiNNaker machine object.
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime to plan for
+        :type minimum_simtime_in_us: int
         :return placements: Placements of vertices on the machine
         :rtype :py:class:`pacman.model.placements.Placements`
         """
@@ -57,7 +57,7 @@ class HilbertPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps*1000, self._generate_hilbert_chips(machine))
+            machine, minimum_simtime_in_us, self._generate_hilbert_chips(machine))
 
         # get vertices which must be placed on the same chip
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)

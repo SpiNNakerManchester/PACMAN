@@ -45,7 +45,7 @@ class PartitionAndPlacePartitioner(object):
 
     # inherited from AbstractPartitionAlgorithm
     def __call__(
-            self, graph, machine, plan_n_timesteps,
+            self, graph, machine, minimum_simtime_in_us,
             preallocated_resources=None):
         """
         :param graph: The application_graph to partition
@@ -54,8 +54,8 @@ class PartitionAndPlacePartitioner(object):
         :param machine: The machine with respect to which to partition the\
             application_graph
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type  minimum_simtime_in_us: int
         :return: \
             A machine_graph of partitioned vertices and partitioned edges
         :rtype:\
@@ -86,7 +86,7 @@ class PartitionAndPlacePartitioner(object):
         progress = ProgressBar(n_atoms, "Partitioning graph vertices")
 
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps * 1000,
+            machine, minimum_simtime_in_us,
             preallocated_resources=preallocated_resources)
 
         # Group vertices that are supposed to be the same size
@@ -101,7 +101,7 @@ class PartitionAndPlacePartitioner(object):
             # if not, partition
             if machine_vertices is None:
                 self._partition_vertex(
-                    vertex, plan_n_timesteps, machine_graph, graph_mapper,
+                    vertex, minimum_simtime_in_us, machine_graph, graph_mapper,
                     resource_tracker, progress, vertex_groups)
         progress.end()
 
@@ -110,15 +110,15 @@ class PartitionAndPlacePartitioner(object):
         return machine_graph, graph_mapper, resource_tracker.chips_used
 
     def _partition_vertex(
-            self, vertex, plan_n_timesteps, machine_graph, graph_mapper,
+            self, vertex, minimum_simtime_in_us, machine_graph, graph_mapper,
             resource_tracker, progress, vertex_groups):
         """ Partition a single vertex
 
         :param vertex: the vertex to partition
         :type vertex:\
             :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type  minimum_simtime_in_us: int
         :param machine_graph: the graph to add vertices to
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
@@ -171,12 +171,12 @@ class PartitionAndPlacePartitioner(object):
 
         # partition by atoms
         self._partition_by_atoms(
-            partition_together_vertices, plan_n_timesteps, vertex.n_atoms,
+            partition_together_vertices, minimum_simtime_in_us, vertex.n_atoms,
             max_atoms_per_core, machine_graph, graph_mapper, resource_tracker,
             progress, n_atoms is not None)
 
     def _partition_by_atoms(
-            self, vertices, plan_n_timesteps, n_atoms, max_atoms_per_core,
+            self, vertices, minimum_simtime_in_us, n_atoms, max_atoms_per_core,
             machine_graph, graph_mapper, resource_tracker, progress,
             fixed_n_atoms=False):
         """ Try to partition vertices on how many atoms it can fit on\
@@ -187,8 +187,8 @@ class PartitionAndPlacePartitioner(object):
         :type vertices:\
             iterable list of\
             :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime to plan for
+        :type minimum_simtime_in_us: int
             iterable(:py:class:`pacman.model.graphs.application.ApplicationVertex`)
         :param n_atoms: the atoms of the first vertex
         :type n_atoms: int
@@ -220,7 +220,7 @@ class PartitionAndPlacePartitioner(object):
 
             # Scale down the number of atoms to fit the available resources
             used_placements, hi_atom = self._scale_down_resources(
-                lo_atom, hi_atom, vertices, plan_n_timesteps, resource_tracker,
+                lo_atom, hi_atom, vertices, minimum_simtime_in_us, resource_tracker,
                 max_atoms_per_core, fixed_n_atoms)
 
             # Update where we are
@@ -287,7 +287,7 @@ class PartitionAndPlacePartitioner(object):
 
     # noinspection PyUnusedLocal
     def _scale_down_resources(
-            self, lo_atom, hi_atom, vertices, plan_n_timesteps,
+            self, lo_atom, hi_atom, vertices, minimum_simtime_in_us,
             resource_tracker, max_atoms_per_core, fixed_n_atoms=False):
         """ Reduce the number of atoms on a core so that it fits within the
             resources available.
@@ -301,8 +301,8 @@ class PartitionAndPlacePartitioner(object):
         :type vertices:\
             iterable of\
             :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type minimum_simtime_in_us: int
             iterable(:py:class:`pacman.model.graphs.application.ApplicationVertex`)
         :param max_atoms_per_core:\
             the max atoms from all the vertexes considered that have max_atom\
@@ -344,7 +344,7 @@ class PartitionAndPlacePartitioner(object):
 
                 # Work out the ratio of used to available resources
                 ratio = self._find_max_ratio(
-                    used_resources, resources_available, plan_n_timesteps)
+                    used_resources, resources_available, minimum_simtime_in_us)
 
                 if fixed_n_atoms and ratio > 1.0:
                     raise PacmanPartitionException(
@@ -353,10 +353,10 @@ class PartitionAndPlacePartitioner(object):
                         "    Request for SDRAM: {}\n"
                         "    Largest SDRAM space: {}".format(
                             vertex, lo_atom - 1,
-                            used_resources.sdram.get_total_sdram(
-                                plan_n_timesteps),
-                            resources_available.sdram.get_total_sdram(
-                                plan_n_timesteps)))
+                            used_resources.sdram.get_sdram_for_simtime(
+                                minimum_simtime_in_us),
+                            resources_available.sdram.get_sdram_for_simtime(
+                                minimum_simtime_in_us)))
 
                 while ratio > 1.0 and hi_atom >= lo_atom:
                     # Scale the resources available by the ratio
@@ -375,7 +375,7 @@ class PartitionAndPlacePartitioner(object):
                             vertex.get_resources_used_by_atoms(vertex_slice)
                         ratio = self._find_max_ratio(
                             used_resources, resources_available,
-                            plan_n_timesteps)
+                            minimum_simtime_in_us)
 
                 # If we couldn't partition, raise an exception
                 if hi_atom < lo_atom:
@@ -385,15 +385,15 @@ class PartitionAndPlacePartitioner(object):
                         "    Request for SDRAM: {}\n"
                         "    Largest SDRAM space: {}".format(
                             vertex, lo_atom - 1,
-                            used_resources.sdram.get_total_sdram(
-                                plan_n_timesteps),
-                            resources_available.sdram.get_total_sdram(
-                                plan_n_timesteps)))
+                            used_resources.sdram.get_sdram_for_simtime(
+                                minimum_simtime_in_us),
+                            resources_available.sdram.get_sdram_for_simtime(
+                                minimum_simtime_in_us)))
 
                 # Try to scale up until just below the resource usage
                 used_resources, hi_atom = self._scale_up_resource_usage(
                     used_resources, hi_atom, lo_atom, max_atoms_per_core,
-                    vertex, plan_n_timesteps, resources_available, ratio)
+                    vertex, minimum_simtime_in_us, resources_available, ratio)
 
                 # If this hi_atom is smaller than the current minimum, update
                 # the other placements to use (hopefully) less
@@ -426,7 +426,7 @@ class PartitionAndPlacePartitioner(object):
 
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, max_atoms_per_core, vertex,
-            plan_n_timesteps, resources, ratio):
+            minimum_simtime_in_us, resources, ratio):
         """ Try to push up the number of atoms in a vertex to be as close\
             to the available resources as possible
 
@@ -443,8 +443,8 @@ class PartitionAndPlacePartitioner(object):
         :param vertex: the vertexes to scale up the num atoms per core for
         :type vertex:\
             :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type  minimum_simtime_in_us: int
         :param resources: the resource estimate for the vertex for a given\
             number of atoms
         :type resources:\
@@ -475,7 +475,7 @@ class PartitionAndPlacePartitioner(object):
             vertex_slice = Slice(lo_atom, hi_atom)
             used_resources = vertex.get_resources_used_by_atoms(vertex_slice)
             ratio = self._find_max_ratio(
-                used_resources, resources, plan_n_timesteps)
+                used_resources, resources, minimum_simtime_in_us)
 
         # If we have managed to fit everything exactly (unlikely but possible),
         # return the matched resources and high atom count
@@ -522,7 +522,7 @@ class PartitionAndPlacePartitioner(object):
         return numerator / denominator
 
     @staticmethod
-    def _find_max_ratio(required, available, plan_n_timesteps):
+    def _find_max_ratio(required, available, minimum_simtime_in_us):
         """ Find the max ratio between the resources
 
         :param required: the resources used by the vertex
@@ -532,8 +532,8 @@ class PartitionAndPlacePartitioner(object):
         :type available: \
             :py:class:`pacman.model.resources.ResourceContainer`
         :return: the largest ratio of resources
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: timetime in us to plan for
+        :type  minimum_simtime_in_us: int
         :rtype: int
         :raise None: this method does not raise any known exceptions
 
@@ -543,6 +543,6 @@ class PartitionAndPlacePartitioner(object):
         dtcm_ratio = PartitionAndPlacePartitioner._ratio(
             required.dtcm.get_value(), available.dtcm.get_value())
         sdram_ratio = PartitionAndPlacePartitioner._ratio(
-            required.sdram.get_total_sdram(plan_n_timesteps),
-            available.sdram.get_total_sdram(plan_n_timesteps))
+            required.sdram.get_sdram_for_simtime(minimum_simtime_in_us),
+            available.sdram.get_sdram_for_simtime(minimum_simtime_in_us))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))

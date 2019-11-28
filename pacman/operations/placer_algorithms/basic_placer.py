@@ -30,7 +30,7 @@ class BasicPlacer(object):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def __call__(self, machine_graph, machine, minimum_simtime_in_us):
         """ Place a machine_graph so that each vertex is placed on a core
 
         :param machine_graph: The machine_graph to place
@@ -40,8 +40,8 @@ class BasicPlacer(object):
             The machine with respect to which to partition the application\
             graph
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type minimum_simtime_in_us: int
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: \
@@ -56,7 +56,7 @@ class BasicPlacer(object):
 
         # Iterate over vertices and generate placements
         progress = ProgressBar(vertices, "Placing graph vertices")
-        resource_tracker = ResourceTracker(machine, plan_n_timesteps * 1000)
+        resource_tracker = ResourceTracker(machine, minimum_simtime_in_us)
         for vertex in progress.over(vertices):
             # Create and store a new placement anywhere on the board
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(

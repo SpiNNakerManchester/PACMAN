@@ -49,7 +49,7 @@ class OneToOnePlacer(RadialPlacer):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def __call__(self, machine_graph, machine, minimum_simtime_in_us):
         """
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
@@ -58,8 +58,8 @@ class OneToOnePlacer(RadialPlacer):
             The machine with respect to which to partition the application\
             graph
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type  minimum_simtime_in_us: int
         :return: A set of placements
         :rtype: :py:class:`pacman.model.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: \
@@ -90,7 +90,7 @@ class OneToOnePlacer(RadialPlacer):
 
         return self._do_allocation(
             one_to_one_groups, same_chip_vertex_groups, machine,
-            plan_n_timesteps, machine_graph, progress)
+            minimum_simtime_in_us, machine_graph, progress)
 
     @staticmethod
     def _find_one_to_one_vertices(vertex, graph):
@@ -146,7 +146,7 @@ class OneToOnePlacer(RadialPlacer):
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
-            machine, plan_n_timesteps, machine_graph, progress):
+            machine, minimum_simtime_in_us, machine_graph, progress):
         """
 
         :param one_to_one_groups:
@@ -161,8 +161,8 @@ class OneToOnePlacer(RadialPlacer):
             The machine with respect to which to partition the application\
             graph
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: simtime in us to plan for
+        :type  minimum_simtime_in_us: int
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
@@ -173,7 +173,7 @@ class OneToOnePlacer(RadialPlacer):
         placements = Placements()
 
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps*1000, self._generate_radial_chips(machine))
+            machine, minimum_simtime_in_us, self._generate_radial_chips(machine))
         all_vertices_placed = set()
 
         # RadialPlacementFromChipConstraint won't work here

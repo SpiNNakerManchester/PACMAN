@@ -46,14 +46,14 @@ class SpreaderPlacer(OneToOnePlacer):
     def __init__(self):
         OneToOnePlacer.__init__(self)
 
-    def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
+    def __call__(self, machine_graph, machine, n_keys_map, minimum_simtime_in_us):
         """ places vertices on as many chips as available with a effort to
         reduce the number of packets being received by the router in total.
 
         :param machine_graph: the machine graph
         :param machine: the SpiNNaker machine
         :param n_keys_map: the n keys from partition map
-        :param plan_n_timesteps: number of timesteps to plan for
+        :param minimum_simtime_in_us: simtime in us to plan for
         :return: placements.
         """
 
@@ -86,7 +86,7 @@ class SpreaderPlacer(OneToOnePlacer):
         # init data structs
         chips_in_order = self._determine_chip_list(machine)
         resource_tracker = ResourceTracker(
-            machine, 1000, chips=chips_in_order)
+            machine, minimum_simtime_in_us, chips=chips_in_order)
         placements = Placements()
         placed_vertices = set()
         cost_per_chip = defaultdict(int)

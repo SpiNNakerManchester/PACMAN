@@ -43,7 +43,7 @@ class BasicPartitioner(object):
         return top / bottom
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, graph, machine, plan_n_timesteps):
+    def __call__(self, graph, machine, minimum_simtime_in_us):
         """
         :param graph: The application_graph to partition
         :type graph:\
@@ -52,8 +52,8 @@ class BasicPartitioner(object):
             The machine with respect to which to partition the application\
             graph
         :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param minimum_simtime_in_us: the simtime in us to plan for
+        :type  minimum_simtime_in_us: int
         :return: A machine graph
         :rtype:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
@@ -71,25 +71,25 @@ class BasicPartitioner(object):
         progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
         machine_graph = MachineGraph("Machine graph for " + graph.label)
         graph_mapper = GraphMapper()
-        resource_tracker = ResourceTracker(machine, plan_n_timesteps * 1000)
+        resource_tracker = ResourceTracker(machine,minimum_simtime_in_us)
 
         # Partition one vertex at a time
         for vertex in progress.over(graph.vertices):
             self._partition_one_application_vertex(
                 vertex, resource_tracker, machine_graph, graph_mapper,
-                plan_n_timesteps)
+                minimum_simtime_in_us)
 
         generate_machine_edges(machine_graph, graph_mapper, graph)
 
         return machine_graph, graph_mapper, resource_tracker.chips_used
 
     def _partition_one_application_vertex(
-            self, vertex, res_tracker, m_graph, mapper, plan_n_timesteps):
+            self, vertex, res_tracker, m_graph, mapper, minimum_simtime_in_us):
         """ Partitions a single application vertex.
         """
         # Compute how many atoms of this vertex we can put on one core
         atoms_per_core = self._compute_atoms_per_core(
-            vertex, res_tracker, plan_n_timesteps)
+            vertex, res_tracker, minimum_simtime_in_us)
         if atoms_per_core < 1.0:
             raise PacmanPartitionException(
                 "Not enough resources available to create vertex")
@@ -117,7 +117,8 @@ class BasicPartitioner(object):
             res_tracker.allocate_constrained_resources(
                 resources, vertex.constraints)
 
-    def _compute_atoms_per_core(self, vertex, res_tracker, plan_n_timesteps):
+    def _compute_atoms_per_core(
+            self, vertex, res_tracker, minimum_simtime_in_us):
         """ Work out how many atoms per core are required for the given\
             vertex. Assumes that the first atom of the vertex is fully\
             representative.
@@ -135,8 +136,8 @@ class BasicPartitioner(object):
         # Find the ratio of each of the resources - if 0 is required,
         # assume the ratio is the max available
         atoms_per_sdram = self._get_ratio(
-            limits.sdram.get_total_sdram(plan_n_timesteps),
-            requirements.sdram.get_total_sdram(plan_n_timesteps))
+            limits.sdram.get_sdram_for_simtime(minimum_simtime_in_us),
+            requirements.sdram.get_sdram_for_simtime(minimum_simtime_in_us))
         atoms_per_dtcm = self._get_ratio(
             limits.dtcm.get_value(), requirements.dtcm.get_value())
         atoms_per_cpu = self._get_ratio(

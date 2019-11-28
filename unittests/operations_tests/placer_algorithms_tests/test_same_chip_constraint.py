@@ -54,7 +54,7 @@ class TestSameChipConstraint(unittest.TestCase):
             "MemoryExtendedMachine": machine,
             "MemoryMachine": machine,
             "MemoryMachineGraph": graph,
-            "PlanNTimeSteps": None,
+            "MinimumSimtimeInUs": None,
             "MemoryMachinePartitionNKeysMap": n_keys_map
         }
         algorithms = [placer]

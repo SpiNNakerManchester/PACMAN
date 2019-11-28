@@ -29,7 +29,7 @@ class TestSameChipConstraint(unittest.TestCase):
     def _do_test(self, placer):
         machine = virtual_machine(width=8, height=8)
         graph = MachineGraph("Test")
-        plan_n_timesteps = 100
+        minimum_simtime_in_us = 100000
 
         vertices = [
             SimpleMachineVertex(ResourceContainer(), label="v{}".format(i))
@@ -58,7 +58,7 @@ class TestSameChipConstraint(unittest.TestCase):
             "MemoryExtendedMachine": machine,
             "MemoryMachine": machine,
             "MemoryMachineGraph": graph,
-            "PlanNTimeSteps": plan_n_timesteps,
+            "MinimumSimtimeInUs": minimum_simtime_in_us,
             "MemoryMachinePartitionNKeysMap": n_keys_map
         }
         algorithms = [placer]

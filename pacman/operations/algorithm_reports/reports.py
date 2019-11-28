@@ -550,7 +550,7 @@ def _write_one_chip_machine_placement(f, c, placements):
 
 
 def sdram_usage_report_per_chip(
-        report_folder, hostname, placements, machine, plan_n_timesteps,
+        report_folder, hostname, placements, machine, minimum_simtime_in_us,
         data_n_timesteps):
     """ Reports the SDRAM used per chip
 
@@ -558,7 +558,7 @@ def sdram_usage_report_per_chip(
     :param hostname: the machine's hostname to which the placer worked on
     :param placements: the placements objects built by the placer.
     :param machine: the python machine object
-    :param plan_n_timesteps: The number of timesteps for which placer \
+    :param minimum_simtime_in_us: The simtime in us for which placer \
         reserved space.
     :param data_n_timesteps: The number of timesteps for which data can be \
         saved on the machine.
@@ -578,7 +578,7 @@ def sdram_usage_report_per_chip(
             f.write("Planned by partitioner\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
-                f, placements, machine, plan_n_timesteps, progress, False)
+                f, placements, machine, minimum_simtime_in_us, progress, False)
             f.write("\nActual space reserved on the machine\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(

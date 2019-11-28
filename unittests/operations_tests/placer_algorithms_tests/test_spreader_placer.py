@@ -68,7 +68,8 @@ def test_virtual_vertices_spreader():
 
     # Do placements
     placements = SpreaderPlacer()(
-        machine_graph, extended_machine, n_keys_map, plan_n_timesteps=1000)
+        machine_graph, extended_machine, n_keys_map,
+        minimum_simtime_in_us=1000000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -134,7 +135,8 @@ def test_one_to_one():
     # Do placements
     machine = virtual_machine(width=8, height=8)
     placements = SpreaderPlacer()(
-        machine_graph, machine, n_keys_map, plan_n_timesteps=1000)
+        machine_graph, machine, n_keys_map,
+        minimum_simtime_in_us=1000000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -178,7 +180,7 @@ def test_sdram_links():
     machine = virtual_machine(width=8, height=8)
     try:
         SpreaderPlacer()(machine_graph, machine, n_keys_map,
-                         plan_n_timesteps=1000)
+                         minimum_simtime_in_us=1000000)
         raise Exception("should blow up here")
     except PacmanException:
         pass

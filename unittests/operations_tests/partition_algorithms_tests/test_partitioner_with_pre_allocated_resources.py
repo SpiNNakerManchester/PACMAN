@@ -52,7 +52,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
+            partitioner(graph, machine, minimum_simtime_in_us=None,
                         preallocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanInvalidParameterException:
@@ -76,7 +76,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
+            partitioner(graph, machine, minimum_simtime_in_us=None,
                         preallocated_resources=pre_allocated_res)
         except Exception:
             raise Exception("should have blown up here")
@@ -100,7 +100,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
+            partitioner(graph, machine, minimum_simtime_in_us=None,
                         preallocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanValueError:
@@ -131,7 +131,7 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
+            partitioner(graph, machine, minimum_simtime_in_us=None,
                         preallocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanPartitionException:
