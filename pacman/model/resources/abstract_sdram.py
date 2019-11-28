@@ -44,13 +44,6 @@ class AbstractSDRAM(object):
         is requested and there is a variable sdram requirement.,
         """
 
-    def get_total_sdram(self, n_timesteps):
-        # Hack to not brek to much at once
-        if n_timesteps is None:
-            return self.fixed
-        else:
-            return self.fixed + self.per_simtime_us * 1000 * n_timesteps
-
     @abstractmethod
     def __add__(self, other):
         """
@@ -99,8 +92,3 @@ class AbstractSDRAM(object):
         The value returned by this method may will probably just be the
         per_timestep_sdram / timestep.
         """
-
-    @property
-    def per_timestep(self):
-        # Hack to not break too much at once
-        return self.per_simtime_us * 1000
