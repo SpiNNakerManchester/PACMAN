@@ -92,6 +92,6 @@ class SimpleTestVertex(ApplicationVertex):
         return self._n_atoms
 
     @property
-    @overrides(ApplicationVertex.timestep)
-    def timestep(self):
+    @overrides(ApplicationVertex.timestep_in_us)
+    def timestep_in_us(self):
         return 1000

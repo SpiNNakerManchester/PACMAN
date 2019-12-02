@@ -102,8 +102,8 @@ class ApplicationVertex(AbstractVertex):
         return self.n_atoms
 
     @abstractproperty
-    def timestep(self):
-        """ The timestep of this vertex in ms
+    def timestep_in_us(self):
+        """ The timestep of this vertex in us
 
         Typically will default to the machine timestep
 

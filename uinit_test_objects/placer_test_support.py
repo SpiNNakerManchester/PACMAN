@@ -42,7 +42,7 @@ class Vertex(ApplicationVertex):
         return self._n_atoms
 
     @property
-    def timestep(self):
+    def timestep_in_us(self):
         return 1000
 
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
