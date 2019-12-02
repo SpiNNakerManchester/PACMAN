@@ -125,9 +125,10 @@ class ApplicationVertex(AbstractVertex):
         :rtype: int
         :raises ValueError: If the simtime is not a mutlple of the timestep
         """
-        n_timesteps = self.time_in_us // self._timestep_in_us
-        check = n_timesteps * self._timestep_in_us
+        n_timesteps = simtime_in_us // self.timestep_in_us
+        check = n_timesteps * self.timestep_in_us
         if check != simtime_in_us:
             raise ValueError(
                 "The requested time {} is not a multiple of the timestep {}"
-                "".format(simtime_in_us, self._timestep_in_us))
+                "".format(simtime_in_us, self.timestep_in_us))
+        return n_timesteps
