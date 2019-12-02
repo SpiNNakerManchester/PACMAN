@@ -111,6 +111,11 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
                          145 - 234 + (4 - 6) * 150)
 
+    def test_VariableSdram(self):
+        var1 = VariableSDRAM(124, 8, 1000)
+        self.assertEqual(124 + 8 * 5, var1.get_sdram_for_simtime(5000))
+        with self.assertRaises(Exception):
+            var1.get_sdram_for_simtime(5001)
 
     def test_dtcm(self):
         """
