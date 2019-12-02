@@ -23,6 +23,8 @@ class AbstractSDRAM(object):
     """ Represents an amount of SDRAM used on a chip in the machine.
     """
 
+    __slots__ = []
+
     @abstractmethod
     def get_sdram_for_simtime(self, time_in_us):
         """
@@ -40,8 +42,10 @@ class AbstractSDRAM(object):
         be saved. A None value will be considered run forever
         :type time_in_us: int or None
         :rtype: int
-        raises: PacmanConfigurationException if a None time_in_ms (run forever)
-        is requested and there is a variable sdram requirement.,
+        :raises PacmanConfigurationException if a None time_in_ms (run forever)
+        is requested and there is a variable sdram requirement.
+        :raise ValueError: If the time_in_us is not a multple of the costed\
+        item's timestep. Warning: Not all Implementations do this check.
         """
 
     @abstractmethod

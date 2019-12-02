@@ -20,7 +20,7 @@ import unittest
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
     IPtagResource, ReverseIPtagResource, SpecificBoardIPtagResource,
-    SpecificBoardReverseIPtagResource, TimeBasedSDRAM)
+    SpecificBoardReverseIPtagResource, TimeBasedSDRAM, VariableSDRAM)
 
 
 class TestResourceModels(unittest.TestCase):
@@ -45,7 +45,7 @@ class TestResourceModels(unittest.TestCase):
         combo = const2 - const1
         self.assertEqual(combo.get_sdram_for_simtime(None), 256-128)
 
-        var1 = TimeBasedSDRAM(124, 8 / 1000)
+        var1 = VariableSDRAM(124, 8, 1000)
         self.assertEqual(var1.get_sdram_for_simtime(100 * 1000),
                          124 + 8 * 100)
         combo = var1 + const1
@@ -60,13 +60,57 @@ class TestResourceModels(unittest.TestCase):
         combo = const1 - var1
         self.assertEqual(combo.get_sdram_for_simtime(100 * 1000),
                          128 - (124 + 8 * 100))
-        var2 = TimeBasedSDRAM(234, 6 / 1000)
+        var2 = VariableSDRAM(234, 6, 1000)
         combo = var2 + var1
         self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
                          234 + 124 + (6 + 8) * 150)
         combo = var2 - var1
         self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
                          234 - 124 + (6 - 8) * 150)
+        tb1 = TimeBasedSDRAM(124, 8 / 1000)
+        self.assertEqual(tb1.get_sdram_for_simtime(100 * 1000),
+                         124 + 8 * 100)
+        combo = tb1 + const1
+        self.assertEqual(combo.get_sdram_for_simtime(100 * 1000),
+                         124 + 8 * 100 + 128)
+        combo = tb1 - const1
+        self.assertEqual(combo.get_sdram_for_simtime(100 * 1000),
+                         124 + 8 * 100 - 128)
+        combo = const1 + tb1
+        self.assertEqual(combo.get_sdram_for_simtime(100 * 1000),
+                         128 + 124 + 8 * 100)
+        combo = const1 - tb1
+        self.assertEqual(combo.get_sdram_for_simtime(100 * 1000),
+                         128 - (124 + 8 * 100))
+        tb2 = TimeBasedSDRAM(234, 6 / 1000)
+        combo = tb2 + var1
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         234 + 124 + (6 + 8) * 150)
+        combo = tb2 - var1
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         234 - 124 + (6 - 8) * 150)
+
+        combo = var1 - tb2
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         124 - 234 + (8 - 6) * 150)
+
+        var3 = VariableSDRAM(145, 2, 500)
+        combo = var3 + var1
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         145 + 124 + (4 + 8) * 150)
+        combo = var3 - var1
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         145 - 124 + (4 - 8) * 150)
+        combo = tb2 + var3
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         234 + 145 + (6 + 4) * 150)
+        combo = tb2 - var3
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         234 - 145 + (6 - 4) * 150)
+        combo = var3 - tb2
+        self.assertEqual(combo.get_sdram_for_simtime(150 * 1000),
+                         145 - 234 + (4 - 6) * 150)
+
 
     def test_dtcm(self):
         """

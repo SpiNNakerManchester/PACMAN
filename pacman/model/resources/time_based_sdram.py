@@ -15,6 +15,7 @@
 
 import math
 from .abstract_sdram import AbstractSDRAM
+from .constant_sdram import ConstantSDRAM
 from pacman.exceptions import PacmanConfigurationException
 
 
@@ -26,9 +27,9 @@ class TimeBasedSDRAM(AbstractSDRAM):
 
     __slots__ = [
         # The amount of SDRAM in bytes used no matter what
-        "_fixed_sdram"
-        # The amount of extra SDRAm used for each simtime ms
-        "_per_simtime_ms"
+        "_fixed_sdram",
+        # The amount of extra SDRAm used for each simtime us
+        "_per_simtime_us"
     ]
 
     def __init__(
@@ -65,16 +66,25 @@ class TimeBasedSDRAM(AbstractSDRAM):
         return self._per_simtime_us
 
     def __add__(self, other):
-        return TimeBasedSDRAM(
-            self.fixed + other.fixed,
-            self.per_simtime_us + other.per_simtime_us)
+        if isinstance(other, (TimeBasedSDRAM, ConstantSDRAM)):
+            return TimeBasedSDRAM(
+                self.fixed + other.fixed,
+                self.per_simtime_us + other.per_simtime_us)
+        else:
+            # The other is more complex so delegate to it
+            return other.__add__(self)
 
     def __sub__(self, other):
-        return TimeBasedSDRAM(
-            self.fixed - other.fixed,
-            self.per_simtime_us - other.per_simtime_us)
+        if isinstance(other, (TimeBasedSDRAM, ConstantSDRAM)):
+            return TimeBasedSDRAM(
+                self.fixed - other.fixed,
+                self.per_simtime_us - other.per_simtime_us)
+        else:
+            # The other is more complex so delegate to it
+            return other.sub_from(self)
 
     def sub_from(self, other):
+        # Only Ever called from less complex so no type check required
         return TimeBasedSDRAM(
             other.fixed - self.fixed,
             other.per_simtime_us - self.per_simtime_us)
