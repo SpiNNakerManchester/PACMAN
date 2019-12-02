@@ -16,6 +16,7 @@
 """
 test for the resources model
 """
+from __future__ import division
 import unittest
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
