@@ -595,8 +595,8 @@ def _sdram_usage_report_per_chip_with_timesteps(
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.\
-            get_sdram_for_simtime(data_simtime_in_us)
+        sdram_rec = placement.vertex.resources_required.sdram
+        sdram = sdram_rec.get_sdram_for_simtime(data_simtime_in_us)
         x, y, p = placement.x, placement.y, placement.p
         f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
                 "".format(x, y, p, int(sdram / 1024.0), sdram, placement))
