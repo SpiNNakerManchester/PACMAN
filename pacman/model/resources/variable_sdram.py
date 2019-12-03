@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 from .abstract_sdram import AbstractSDRAM
 from spinn_utilities.overrides import overrides
+from spinn_utilities.helpful_functions import lcm
 from pacman.exceptions import PacmanConfigurationException
 
 
@@ -95,9 +95,7 @@ class VariableSDRAM(AbstractSDRAM):
             if self._timestep_in_us == other._timestep_in_us:
                 return (self._timestep_in_us, self._per_timestep_sdram,
                         other._per_timestep_sdram)
-            new_timestep = (
-                self._timestep_in_us * other._timestep_in_us) // \
-                math.gcd(self._timestep_in_us, other._timestep_in_us)
+            new_timestep = lcm(self._timestep_in_us, other._timestep_in_us)
             return (
                 new_timestep,
                 self._per_timestep_sdram * new_timestep / self._timestep_in_us,
