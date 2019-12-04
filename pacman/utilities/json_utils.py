@@ -256,6 +256,7 @@ def vertex_to_json(vertex):
         if vertex.resources_required is not None:
             json_dict["resources"] = resource_container_to_json(
                 vertex.resources_required)
+        json_dict["timestep_in_us"] = vertex.timestep_in_us
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
@@ -269,7 +270,8 @@ def vertex_from_json(json_dict, convert_constraints=True):
         constraints = []
     resources = resource_container_from_json(json_dict.get("resources"))
     return SimpleMachineVertex(
-        resources, label=json_dict["label"], constraints=constraints)
+        resources, label=json_dict["label"], constraints=constraints,
+        timestep_in_us=json_dict["timestep_in_us"])
 
 
 def vertex_add_contstraints_from_json(json_dict, graph):

@@ -15,18 +15,30 @@
 
 from .machine_vertex import MachineVertex
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs import AbstractVertex
 
 
 class SimpleMachineVertex(MachineVertex):
     """ A MachineVertex that stores its own resources.
     """
 
-    def __init__(self, resources, label=None, constraints=None):
+    def __init__(self, resources, label=None, constraints=None,
+                 timestep_in_us=None):
         super(SimpleMachineVertex, self).__init__(
             label=label, constraints=constraints)
         self._resources = resources
+        if timestep_in_us is None:
+            # Test mode so use standard value
+            self._timestep_in_us = 1000
+        else:
+            self._timestep_in_us = timestep_in_us
 
     @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources
+
+    @property
+    @overrides(AbstractVertex.timestep_in_us)
+    def timestep_in_us(self):
+        return self._timestep_in_us
