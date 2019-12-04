@@ -29,7 +29,8 @@ from pacman.executor import PACMANAlgorithmExecutor
 def test_virtual_placement(placer):
     machine = virtual_machine(width=8, height=8)
     graph = MachineGraph("Test")
-    virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
+    virtual_vertex = MachineSpiNNakerLinkVertex(
+        spinnaker_link_id=0, timestep=1000)
     graph.add_vertex(virtual_vertex)
     extended_machine = MallocBasedChipIdAllocator()(machine, graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()

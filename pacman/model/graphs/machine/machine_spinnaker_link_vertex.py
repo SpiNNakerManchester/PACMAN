@@ -17,7 +17,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
 from pacman.model.graphs import (
-    AbstractVirtual, AbstractSpiNNakerLink)
+    AbstractVertex, AbstractVirtual, AbstractSpiNNakerLink)
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 
@@ -29,10 +29,12 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         "_spinnaker_link_id",
         "_board_address",
         "_virtual_chip_x",
-        "_virtual_chip_y"]
+        "_virtual_chip_y",
+        "_timestep"
+    ]
 
     def __init__(
-            self, spinnaker_link_id, board_address=None, label=None,
+            self, spinnaker_link_id, timestep, board_address=None, label=None,
             constraints=None):
         super(MachineSpiNNakerLinkVertex, self).__init__(
             label=label, constraints=constraints)
@@ -40,6 +42,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         self._board_address = board_address
         self._virtual_chip_x = None
         self._virtual_chip_y = None
+        self._timestep = timestep
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -72,3 +75,8 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         self._virtual_chip_y = virtual_chip_y
         self.add_constraint(ChipAndCoreConstraint(
             self._virtual_chip_x, self._virtual_chip_y))
+
+    @property
+    @overrides(AbstractVertex.timestep_in_us)
+    def timestep_in_us(self):
+        return self._timestep
