@@ -32,7 +32,7 @@ def test_virtual_vertices_one_to_one():
     # Create a graph with a virtual vertex
     machine_graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(
-        spinnaker_link_id=0, timestep=1000, label="Virtual")
+        spinnaker_link_id=0, timestep_in_us=1000, label="Virtual")
     machine_graph.add_vertex(virtual_vertex)
 
     # These vertices are fixed on 0, 0

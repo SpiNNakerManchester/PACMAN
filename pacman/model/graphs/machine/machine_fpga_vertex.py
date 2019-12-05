@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs import AbstractFPGA, AbstractVirtual, AbstractVertex
+from pacman.model.graphs import AbstractFPGA, AbstractVirtual
 from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
 
@@ -28,13 +28,13 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         "_fpga_link_id",
         "_board_address",
         "_virtual_chip_x",
-        "_virtual_chip_y",
-        "_timestep"]
+        "_virtual_chip_y"]
 
     def __init__(
-            self, fpga_id, fpga_link_id, timestep, board_address=None, label=None,
+            self, fpga_id, fpga_link_id, timestep_in_us, board_address=None, label=None,
             constraints=None):
         super(MachineFPGAVertex, self).__init__(
+            timestep_in_us=timestep_in_us,
             label=label, constraints=constraints)
 
         self._fpga_id = fpga_id
@@ -42,7 +42,6 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         self._board_address = board_address
         self._virtual_chip_x = None
         self._virtual_chip_y = None
-        self._timestep = timestep
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -79,7 +78,3 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         self._virtual_chip_x = virtual_chip_x
         self._virtual_chip_y = virtual_chip_y
 
-    @property
-    @overrides(AbstractVertex.timestep_in_us)
-    def timestep_in_us(self):
-        return self._timestep

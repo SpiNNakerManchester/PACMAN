@@ -15,6 +15,7 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
 
 
@@ -23,10 +24,12 @@ class MachineVertex(AbstractVertex):
     """ A machine graph vertex.
     """
 
-    __slots__ = []
+    __slots__ = ["_timestep_in_us"]
 
-    def __init__(self, label=None, constraints=None):
+    def __init__(self, timestep_in_us, label=None, constraints=None):
         """
+        :param timestep_in_us: The timestep of this vertex in us
+        :type timestep_in_us: int
         :param label: The optional name of the vertex
         :type label: str
         :param constraints: The optional initial constraints of the vertex
@@ -38,6 +41,7 @@ class MachineVertex(AbstractVertex):
         if label is None:
             label = str(type(self))
         super(MachineVertex, self).__init__(label, constraints)
+        self._timestep_in_us = timestep_in_us
         self._added_to_graph = False
 
     def __str__(self):
@@ -56,3 +60,7 @@ class MachineVertex(AbstractVertex):
 
         :rtype: ~pacman.model.resources.ResourceContainer
         """
+    @property
+    @overrides(AbstractVertex.timestep_in_us)
+    def timestep_in_us(self):
+        return self._timestep_in_us
