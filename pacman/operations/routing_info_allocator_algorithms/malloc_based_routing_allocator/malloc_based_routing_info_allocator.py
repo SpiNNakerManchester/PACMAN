@@ -31,8 +31,7 @@ from pacman.utilities.utility_calls import (
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
     import (check_types_of_edge_constraint, get_edge_groups)
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanRouteInfoAllocationException)
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from .utils import get_possible_masks
 
 logger = FormatAdapter(logging.getLogger(__name__))
