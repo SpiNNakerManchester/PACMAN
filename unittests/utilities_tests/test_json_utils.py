@@ -39,31 +39,46 @@ from pacman.model.graphs.machine import (
 
 
 class TestJsonUtils(unittest.TestCase):
+    # ------------------------------------------------------------------
+    # Basic graph comparators
+    # ------------------------------------------------------------------
 
-    def compare_constraint(self, c1, c2, seen):
+    def _compare_constraint(self, c1, c2, seen=None):
+        if seen is None:
+            seen = []
         if c1 == c2:
             return
         if c1.__class__ != c2.__class__:
             raise AssertionError("{} != {}".format(
                 c1.__class__, c2.__class__))
-        self.compare_vertex(c1.vertex, c2.vertex, seen)
+        self._compare_vertex(c1.vertex, c2.vertex, seen)
 
-    def compare_vertex(self, v1, v2, seen):
+    @staticmethod
+    def __constraints(vertex):
+        return sorted(vertex.constraints, key=lambda c: c.__class__.__name__)
+
+    def _compare_vertex(self, v1, v2, seen=None):
+        if seen is None:
+            seen = []
         self.assertEqual(v1.label, v2.label)
         if v1.label in seen:
             return
         self.assertEqual(v1.resources_required, v2.resources_required)
-        self.assertEquals(len(v1.constraints), len(v2.constraints))
+        self.assertEqual(len(v1.constraints), len(v2.constraints))
         seen.append(v1.label)
-        for c1, c2 in zip(v1.constraints, v2.constraints):
-            self.compare_constraint(c1, c2, seen)
+        for c1, c2 in zip(self.__constraints(v1), self.__constraints(v2)):
+            self._compare_constraint(c1, c2, seen)
+
+    # ------------------------------------------------------------------
+    # Composite JSON round-trip testing schemes
+    # ------------------------------------------------------------------
 
     def constraint_there_and_back(self, there):
         j_object = constraint_to_json(there)
         j_str = json.dumps(j_object)
         j_object2 = json.loads(j_str)
         back = constraint_from_json(j_object2)
-        self.compare_constraint(there, back, [])
+        self._compare_constraint(there, back)
 
     def resource_there_and_back(self, there):
         j_object = resource_container_to_json(there)
@@ -72,12 +87,12 @@ class TestJsonUtils(unittest.TestCase):
         back = resource_container_from_json(j_object2)
         self.assertEqual(there, back)
 
-    def vertext_there_and_back(self, there):
+    def vertex_there_and_back(self, there):
         j_object = vertex_to_json(there)
         j_str = json.dumps(j_object)
         j_object2 = json.loads(j_str)
         back = vertex_from_json(j_object2)
-        self.compare_vertex(there, back, [])
+        self._compare_vertex(there, back)
 
     def edge_there_and_back(self, there):
         j_object = edge_to_json(there)
@@ -85,8 +100,8 @@ class TestJsonUtils(unittest.TestCase):
         j_object2 = json.loads(j_str)
         back = edge_from_json(j_object2)
         self.assertEqual(there.label, back.label)
-        self.compare_vertex(there.pre_vertex, back.pre_vertex, [])
-        self.compare_vertex(there.post_vertex, back.post_vertex, [])
+        self._compare_vertex(there.pre_vertex, back.pre_vertex)
+        self._compare_vertex(there.post_vertex, back.post_vertex)
         self.assertEqual(there.traffic_type, back.traffic_type)
         self.assertEqual(there.traffic_weight, back.traffic_weight)
 
@@ -96,8 +111,12 @@ class TestJsonUtils(unittest.TestCase):
         back = graph_from_json(j_object)
         self.assertEqual(there.n_vertices, back.n_vertices)
         for vertex in there.vertices:
-            b_vertex = back. vertex_by_label(vertex.label)
-            self.compare_vertex(vertex, b_vertex, [])
+            b_vertex = back.vertex_by_label(vertex.label)
+            self._compare_vertex(vertex, b_vertex)
+
+    # ------------------------------------------------------------------
+    # Test cases
+    # ------------------------------------------------------------------
 
     def test_board_constraint(self):
         c1 = BoardConstraint("1.2.3.4")
@@ -156,7 +175,7 @@ class TestJsonUtils(unittest.TestCase):
         r2 = ResourceContainer(reverse_iptags=[t2])
         self.resource_there_and_back(r2)
 
-    def test_resource_coontainer(self):
+    def test_resource_container(self):
         sdram1 = ConstantSDRAM(128 * (2**20))
         dtcm = DTCMResource(128 * (2**20) + 1)
         cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
@@ -171,15 +190,16 @@ class TestJsonUtils(unittest.TestCase):
         s1 = SimpleMachineVertex(ResourceContainer(iptags=[IPtagResource(
             "127.0.0.1", port=None, strip_sdp=True)]),
             label="Vertex")
-        self.vertext_there_and_back(s1)
+        self.vertex_there_and_back(s1)
 
     def test_vertex2(self):
+        """Like test_vertex, but with constraints."""
         c1 = ContiguousKeyRangeContraint()
         c2 = BoardConstraint("1.2.3.4")
         s1 = SimpleMachineVertex(ResourceContainer(iptags=[IPtagResource(
             "127.0.0.1", port=None, strip_sdp=True)]),
             label="Vertex", constraints=[c1, c2])
-        self.vertext_there_and_back(s1)
+        self.vertex_there_and_back(s1)
 
     def test_same_chip_as_constraint_plus(self):
         v1 = SimpleMachineVertex(None, "v1")

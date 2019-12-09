@@ -29,6 +29,8 @@
 
 # import sys
 import os
+import inspect
+import six
 from sphinx import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -50,6 +52,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx'
 ]
+
+root_package = "pacman"
 
 intersphinx_mapping = {'spinn_machine': (
     'http://spinnmachine.readthedocs.org/en/latest/', None)}
@@ -354,9 +358,24 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
+
+def maybe_skip(app, what, name, obj, skip, options):  # @UnusedVariable
+    # pylint: disable=unused-argument
+    if what == "module":
+        if isinstance(obj, six.class_types):
+            obj = inspect.getmodule(obj)
+        if inspect.ismodule(obj) and not obj.__name__.startswith(root_package):
+            skip = True
+    return skip
+
+
+def setup(app):
+    app.connect('autodoc-skip-member', maybe_skip)
+
+
 # Do the rst generation
 for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../pacman"])
+apidoc.main([None, '-o', ".", "../../" + root_package])

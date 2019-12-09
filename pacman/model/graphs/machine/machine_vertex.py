@@ -32,17 +32,20 @@ class MachineVertex(AbstractVertex):
     def __init__(self, label=None, constraints=None, app_vertex=None,
                  vertex_slice=None):
         """
-        :param label: The optional name of the vertex
+        :param str label: The optional name of the vertex
         :type label: str
-        :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :param app_vertex: The application vertex that caused this machine\
-            vertex to be created. If None, there is no such application vertex.
-        :param vertex_slice: The slice of the application vertex that this\
-            machine vertex implements.
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex
+        :param app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If None, there is no such application vertex.
+        :type app_vertex: ApplicationVertex or None
+        :param vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        :type vertex_slice: Slice or None
         :raise pacman.exceptions.PacmanInvalidParameterException:
-            * If one of the constraints is not valid
+            If one of the constraints is not valid
         """
         if label is None:
             label = str(type(self))
@@ -53,8 +56,7 @@ class MachineVertex(AbstractVertex):
         if app_vertex is not None and not isinstance(
                 app_vertex, ApplicationVertex):
             raise PacmanInvalidParameterException(
-                "app_vertex", app_vertex,
-                "must be an application vertex")
+                "app_vertex", app_vertex, "must be an application vertex")
         if vertex_slice is not None:
             self._vertex_slice = vertex_slice
         else:
@@ -62,28 +64,34 @@ class MachineVertex(AbstractVertex):
 
     @property
     def app_vertex(self):
-        """ The application vertex that caused this machine vertex to be\
+        """ The application vertex that caused this machine vertex to be
             created. If None, there is no such application vertex.
+
+        :rtype: ApplicationVertex or None
         """
         return self._app_vertex
 
     @property
     def vertex_slice(self):
-        """ The slice of the application vertex that this machine vertex\
+        """ The slice of the application vertex that this machine vertex
             implements.
+
+        :rtype: Slice
         """
         return self._vertex_slice
 
     @property
     def index(self):
-        """ The index into the collection of machine vertices for an\
+        """ The index into the collection of machine vertices for an
             application vertex.
+
+        :rtype: int
         """
         return self._index if self._index is not None else 0
 
     @index.setter
     def index(self, value):
-        """ The index into the collection of machine vertices for an\
+        """ The index into the collection of machine vertices for an
             application vertex.
         """
         if self._index is not None:
@@ -96,12 +104,14 @@ class MachineVertex(AbstractVertex):
         return self.__repr__() if _l is None else _l
 
     def __repr__(self):
-        return "MachineVertex(label={}, constraints={}".format(
-            self.label, self.constraints)
+        if self.constraints:
+            return "MachineVertex(label={}, constraints={})".format(
+                self.label, self.constraints)
+        return "MachineVertex(label={})".format(self.label)
 
     @abstractproperty
     def resources_required(self):
         """ The resources required by the vertex
 
-        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
+        :rtype: ResourceContainer
         """

@@ -206,21 +206,23 @@ class MachineHasDisconnectedSubRegion(PacmanException):
 class MinimisationFailedError(PacmanException):
     """Raised when a routing table could not be minimised to reach a specified
     target.
-
-    Attributes
-    ----------
-    target_length : int
-        The target number of routing entries.
-    final_length : int
-        The number of routing entries reached when the algorithm completed.
-        (final_length > target_length)
-    chip : (x, y) or None
-        The coordinates of the chip on which routing table minimisation first
-        failed. Only set when minimisation is performed across many chips
-        simultaneously.
     """
 
     def __init__(self, target_length, final_length=None, chip=None):
+        """
+        :param target_length: \
+            The target number of routing entries.
+        :type target_length: int
+        :param final_length: \
+            The number of routing entries reached when the algorithm \
+            completed. (`final_length > target_length`)
+        :type final_length: int or None
+        :param chip: \
+            The coordinates of the chip on which routing table minimisation \
+            first failed. Only set when minimisation is performed across many \
+            chips simultaneously.
+        :type chip: tuple(int, int) or None
+        """
         super(MinimisationFailedError, self).__init__()
         self.chip = chip
         self.target_length = target_length

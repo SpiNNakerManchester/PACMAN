@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from spinn_utilities.ordered_default_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
@@ -57,11 +54,14 @@ class Graph(ConstrainedObject):
 
     def __init__(self, allowed_vertex_types, allowed_edge_types, label):
         """
-        :param allowed_vertex_types:\
+        :param allowed_vertex_types:
             A single or tuple of types of vertex to be allowed in the graph
-        :param allowed_edge_types:\
+        :type allowed_vertex_types: type or tuple(type, ...)
+        :param allowed_edge_types:
             A single or tuple of types of edges to be allowed in the graph
+        :type allowed_edge_types: type or tuple(type, ...)
         :param label: The label on the graph, or None
+        :type label: str or None
         """
         super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
@@ -83,9 +83,7 @@ class Graph(ConstrainedObject):
     def label(self):
         """ The label of the graph.
 
-        :return: The label
         :rtype: str
-        :raise None: Raises no known exceptions
         """
         return self._label
 
@@ -96,8 +94,7 @@ class Graph(ConstrainedObject):
     def add_vertex(self, vertex):
         """ Add a vertex to the graph.
 
-        :param vertex: The vertex to add
-        :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
+        :param AbstractVertex vertex: The vertex to add
         :raises PacmanInvalidParameterException:\
             If the vertex is not of a valid type
         :raises PacmanConfigurationException:
@@ -122,10 +119,8 @@ class Graph(ConstrainedObject):
     def add_vertices(self, vertices):
         """ Add a collection of vertices to the graph.
 
-        :param vertices: The vertices to add
-        :type vertices: \
-            iterable(:py:class:`pacman.model.graphs.AbstractVertex`)
-        :raises PacmanInvalidParameterException:\
+        :param iterable(AbstractVertex) vertices: The vertices to add
+        :raises PacmanInvalidParameterException:
             If any vertex is not of a valid type
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once
@@ -136,15 +131,13 @@ class Graph(ConstrainedObject):
     def add_edge(self, edge, outgoing_edge_partition_name):
         """ Add an edge to the graph.
 
-        :param edge: The edge to add
-        :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
-        :param outgoing_edge_partition_name: \
-            The name of the edge partition to add the edge to; each edge\
+        :param AbstractEdge edge: The edge to add
+        :param str outgoing_edge_partition_name:
+            The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
-        :type outgoing_edge_partition_name: str
-        :raises PacmanInvalidParameterException:\
-            If the edge is not of a valid type or if edges have already been\
-            added to this partition that start at a different vertex to this\
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
             one
         """
         # verify that the edge is one suitable for this graph
@@ -154,10 +147,10 @@ class Graph(ConstrainedObject):
                 "Edges of this graph must be one of the following types:"
                 " {}".format(self._allowed_edge_types))
 
-        if edge.pre_vertex not in self._vertices:
+        if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", edge.pre_vertex, "pre-vertex must be known in graph")
-        if edge.post_vertex not in self._vertices:
+        if edge.post_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
                 "edge", edge.post_vertex, "post-vertex must be known in graph")
 
@@ -186,15 +179,13 @@ class Graph(ConstrainedObject):
     def add_edges(self, edges, outgoing_edge_partition_name):
         """ Add a collection of edges to the graph.
 
-        :param edges: The edges to add
-        :type edges: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
-        :param outgoing_edge_partition_name: \
-            The name of the edge partition to add the edges to; each edge\
+        :param iterable(AbstractEdge) edges: The edges to add
+        :param str outgoing_edge_partition_name:
+            The name of the edge partition to add the edges to; each edge
             partition is the partition of edges that start at the same vertex
-        :type outgoing_edge_partition_name: str
-        :raises PacmanInvalidParameterException:\
-            If any edge is not of a valid type or if edges have already been\
-            added to this partition that start at a different vertex to this\
+        :raises PacmanInvalidParameterException:
+            If any edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
             one
         """
         for e in edges:
@@ -203,9 +194,8 @@ class Graph(ConstrainedObject):
     def add_outgoing_edge_partition(self, outgoing_edge_partition):
         """ Add an outgoing edge partition to the graph.
 
-        :param outgoing_edge_partition: The outgoing edge partition to add
-        :type outgoing_edge_partition:\
-            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
+        :param OutgoingEdgePartition outgoing_edge_partition:
+            The outgoing edge partition to add
         :raises PacmanAlreadyExistsException:\
             If a partition already exists with the same pre_vertex and\
             identifier
@@ -236,7 +226,7 @@ class Graph(ConstrainedObject):
     def vertices(self):
         """ The vertices in the graph.
 
-        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractVertex`)
+        :rtype: iterable(AbstractVertex)
         """
         return self._vertices
 
@@ -266,7 +256,7 @@ class Graph(ConstrainedObject):
     def outgoing_edge_partitions(self):
         """ The outgoing edge partitions in the graph.
 
-        :rtype: iterable(:py:class:`pacman.model.graphs.OutgoingEdgePartition`)
+        :rtype: iterable(OutgoingEdgePartition)
         """
         return self._outgoing_edge_partitions_by_name.values()
 
@@ -281,28 +271,26 @@ class Graph(ConstrainedObject):
     def get_outgoing_partition_for_edge(self, edge):
         """ Gets the outgoing partition this edge is associated with.
 
-        :param edge: the edge to find associated partition
-        :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
-        :return: the outgoing partition
-        :rtype: :py:class:`pacman.model.graphs.OutgoingEdgePartition`
+        :param AbstractEdge edge: the edge to find associated partition
+        :rtype: OutgoingEdgePartition
         """
         return self._outgoing_edge_partition_by_edge[edge]
 
     def get_edges_starting_at_vertex(self, vertex):
         """ Get all the edges that start at the given vertex.
 
-        :param vertex: The vertex at which the edges to get start
-        :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
-        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
+        :param AbstractVertex vertex:
+            The vertex at which the edges to get start
+        :rtype: iterable(AbstractEdge)
         """
         return self._outgoing_edges[vertex]
 
     def get_edges_ending_at_vertex(self, vertex):
         """ Get all the edges that end at the given vertex.
 
-        :param vertex: The vertex at which the edges to get end
-        :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
-        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
+        :param AbstractVertex vertex:
+            The vertex at which the edges to get end
+        :rtype: iterable(AbstractEdge)
         """
         if vertex not in self._incoming_edges:
             return []
@@ -310,14 +298,12 @@ class Graph(ConstrainedObject):
 
     def get_edges_ending_at_vertex_with_partition_name(
             self, vertex, partition_name):
-        """ Get all the edges that end at the given vertex, and reside in the\
+        """ Get all the edges that end at the given vertex, and reside in the
             correct partition ID.
 
-        :param vertex:  The vertex at which the edges to get end
-        :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
-        :param partition_name: the label for the partition
-        :type partition_name: str
-        :return: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
+        :param AbstractVertex vertex: The vertex at which the edges to get end
+        :param str partition_name: the label for the partition
+        :return: iterable(AbstractEdge)
         """
         key = (vertex, partition_name)
         if key not in self._incoming_edges_by_partition_name:
@@ -327,9 +313,9 @@ class Graph(ConstrainedObject):
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the edge partitions that start at the given vertex.
 
-        :param vertex: The vertex at which the edge partitions to find starts
-        :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
-        :rtype: iterable(:py:class:`pacman.model.graphs.OutgoingEdgePartition`)
+        :param AbstractVertex vertex:
+            The vertex at which the edge partitions to find starts
+        :rtype: iterable(OutgoingEdgePartition)
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
@@ -338,11 +324,11 @@ class Graph(ConstrainedObject):
         """ Get the given outgoing edge partition that starts at the\
             given vertex, or None if no such edge partition exists.
 
-        :param vertex: The vertex at the start of the edges in the partition
-        :type vertex: :py:class:`pacman.model.graphs.AbstractVertex`
-        :param outgoing_edge_partition_name: The name of the edge partition
-        :type outgoing_edge_partition_name: str
-        :rtype: :py:class:`pacman.model.graphs.OutgoingEdgePartition`
+        :param AbstractVertex vertex:
+            The vertex at the start of the edges in the partition
+        :param str outgoing_edge_partition_name:
+            The name of the edge partition
+        :rtype: pacman.model.graphs.OutgoingEdgePartition
         """
         return self._outgoing_edge_partitions_by_name.get(
             (vertex, outgoing_edge_partition_name), None)
