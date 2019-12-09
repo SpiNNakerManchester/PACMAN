@@ -23,7 +23,7 @@ class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
     :attr int lo_atom: The lowest atom represented in the slice.
     :attr int hi_atom: The highest atom represented in the slice.
     :attr int n_atoms: The number of atoms represented by the slice.
-    :attr as_slice: This slice represented as a :py:func:`slice` object (for
+    :attr slice as_slice: This slice represented as a `slice` object (for
         use in indexing lists, arrays, etc.)
     """
     def __new__(cls, lo_atom, hi_atom):

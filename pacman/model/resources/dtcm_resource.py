@@ -27,9 +27,7 @@ class DTCMResource(object):
 
     def __init__(self, dtcm):
         """
-        :param dtcm: The amount of DTCM in bytes
-        :type dtcm: int
-        :raise None: No known exceptions are raised
+        :param int dtcm: The amount of DTCM in bytes
         """
         self._dtcm = dtcm
 

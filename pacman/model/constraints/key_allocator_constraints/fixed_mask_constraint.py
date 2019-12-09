@@ -27,8 +27,7 @@ class FixedMaskConstraint(AbstractKeyAllocatorConstraint):
 
     def __init__(self, mask):
         """
-        :param mask: the mask to be used during key allocation
-        :type mask: int
+        :param int mask: the mask to be used during key allocation
         """
         self._mask = mask
 
@@ -36,7 +35,6 @@ class FixedMaskConstraint(AbstractKeyAllocatorConstraint):
     def mask(self):
         """ The mask to be used
 
-        :return: The mask to be used
         :rtype: int
         """
         return self._mask

@@ -36,7 +36,7 @@ class TYPES_OF_FIELDS(Enum):
 def deduce_types(graph):
     """ Deducing the number of applications required for this key space.
 
-    :param graph:
+    :param AbstractGraph graph:
     """
     seen_fields = dict()
     known_fields = list()
@@ -76,9 +76,9 @@ def deduce_types(graph):
 
 def handle_flexi_field(constraint, seen_fields, known_fields):
     """
-    :param constraint:
-    :param seen_fields:
-    :param known_fields:
+    :param FlexiKeyFieldConstraint constraint:
+    :param dict(str,dict) seen_fields:
+    :param list(str) known_fields:
     :rtype: None:
     """
     # set the level of search
@@ -123,7 +123,7 @@ def handle_flexi_field(constraint, seen_fields, known_fields):
 
 def convert_mask_into_fields(entity):
     """
-    :param entity:
+    :param int entity:
     """
     results = list()
     expanded_mask = utility_calls.expand_to_bit_array(entity)

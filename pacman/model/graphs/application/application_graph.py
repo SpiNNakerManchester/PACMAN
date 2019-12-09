@@ -25,12 +25,19 @@ class ApplicationGraph(Graph):
     __slots__ = ["__machine_graph"]
 
     def __init__(self, label):
+        """
+        :param label: The label on the graph, or None
+        :type label: str or None
+        """
         super(ApplicationGraph, self).__init__(
             ApplicationVertex, ApplicationEdge, label)
         self.__machine_graph = None
 
     @property
     def machine_graph(self):
+        """
+        :rtype: MachineGraph
+        """
         return self.__machine_graph
 
     @machine_graph.setter
@@ -39,6 +46,8 @@ class ApplicationGraph(Graph):
         machine_graph.application_graph = self
 
     def forget_machine_graph(self):
+        """ Forget the whole mapping from this graph to an application graph.
+        """
         for v in self.vertices:
             v.forget_machine_vertices()
         for e in self.edges:
@@ -46,5 +55,8 @@ class ApplicationGraph(Graph):
         self.__machine_graph = None
 
     def forget_machine_edges(self):
+        """ Ensure that all application edges in this graph forget what
+            machine edges they map to. The mapping of vertices is unaffected.
+        """
         for e in self.edges:
             e.forget_machine_edges()

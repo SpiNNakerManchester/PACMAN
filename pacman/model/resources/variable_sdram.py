@@ -32,9 +32,11 @@ class VariableSDRAM(AbstractSDRAM):
 
     def __init__(self, fixed_sdram, per_timestep_sdram):
         """
-        :param sdram: The amount of SDRAM in bytes
-        :type sdram: int
-        :raise None: No known exceptions are raised
+        :param int fixed_sdram:
+            The amount of SDRAM (in bytes) that represents static overhead
+        :param int per_timestep_sdram:
+            The amount of SDRAM (in bytes) required per timestep.
+            Often represents the space to record a timestep.
         """
         self._fixed_sdram = fixed_sdram
         self._per_timestep_sdram = per_timestep_sdram

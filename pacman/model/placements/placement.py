@@ -38,15 +38,12 @@ class Placement(object):
 
     def __init__(self, vertex, x, y, p):
         """
-        :param vertex: The vertex that has been placed
-        :type vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :param x: the x-coordinate of the chip on which the vertex is placed
-        :type x: int
-        :param y: the y-coordinate of the chip on which the vertex is placed
-        :type y: int
-        :param p: the ID of the processor on which the vertex is placed
-        :type p: int or None
+        :param MachineVertex vertex: The vertex that has been placed
+        :param int x:
+            the x-coordinate of the chip on which the vertex is placed
+        :param int y:
+            the y-coordinate of the chip on which the vertex is placed
+        :param int p: the ID of the processor on which the vertex is placed
         """
         self._vertex = vertex
         self._x = x
@@ -57,10 +54,7 @@ class Placement(object):
     def vertex(self):
         """ The vertex that was placed
 
-        :return: a vertex
-        :rtype:\
-            :py:class:`pacman.model.graph.machine.MachineVertex`
-        :raise None: does not raise any known exceptions
+        :rtype: MachineVertex
         """
         return self._vertex
 
@@ -68,7 +62,6 @@ class Placement(object):
     def x(self):
         """ The x-coordinate of the chip where the vertex is placed
 
-        :return: The x-coordinate
         :rtype: int
         """
         return self._x
@@ -77,7 +70,6 @@ class Placement(object):
     def y(self):
         """ The y-coordinate of the chip where the vertex is placed
 
-        :return: The y-coordinate
         :rtype: int
         """
         return self._y
@@ -86,7 +78,6 @@ class Placement(object):
     def p(self):
         """ The ID of the processor of the chip where the vertex is placed
 
-        :return: The processor ID
         :rtype: int
         """
         return self._p
@@ -94,6 +85,8 @@ class Placement(object):
     @property
     def location(self):
         """ The (x,y,p) tuple that represents the location of this placement.
+
+        :rtype: tuple(int,int,int)
         """
         return (self._x, self._y, self._p)
 

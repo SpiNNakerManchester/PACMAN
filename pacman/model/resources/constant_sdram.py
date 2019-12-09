@@ -29,9 +29,7 @@ class ConstantSDRAM(AbstractSDRAM):
 
     def __init__(self, sdram):
         """
-        :param sdram: The amount of SDRAM in bytes
-        :type sdram: int
-        :raise None: No known exceptions are raised
+        :param int sdram: The amount of SDRAM in bytes
         """
         self._sdram = sdram
 

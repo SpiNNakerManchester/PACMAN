@@ -95,7 +95,7 @@ class Graph(ConstrainedObject):
         """ Add a vertex to the graph.
 
         :param AbstractVertex vertex: The vertex to add
-        :raises PacmanInvalidParameterException:\
+        :raises PacmanInvalidParameterException:
             If the vertex is not of a valid type
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once
@@ -196,8 +196,8 @@ class Graph(ConstrainedObject):
 
         :param OutgoingEdgePartition outgoing_edge_partition:
             The outgoing edge partition to add
-        :raises PacmanAlreadyExistsException:\
-            If a partition already exists with the same pre_vertex and\
+        :raises PacmanAlreadyExistsException:
+            If a partition already exists with the same pre_vertex and
             identifier
         """
         # verify that this partition is suitable for this graph
@@ -245,7 +245,7 @@ class Graph(ConstrainedObject):
     def edges(self):
         """ The edges in the graph
 
-        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
+        :rtype: iterable(AbstractEdge)
         """
         return [
             edge
@@ -321,7 +321,7 @@ class Graph(ConstrainedObject):
 
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
-        """ Get the given outgoing edge partition that starts at the\
+        """ Get the given outgoing edge partition that starts at the
             given vertex, or None if no such edge partition exists.
 
         :param AbstractVertex vertex:

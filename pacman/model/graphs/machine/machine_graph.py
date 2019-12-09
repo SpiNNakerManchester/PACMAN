@@ -25,12 +25,22 @@ class MachineGraph(Graph):
     __slots__ = ["_app_graph"]
 
     def __init__(self, label, application_graph=None):
+        """
+        :param label: The label for the graph
+        :type label: str or None
+        :param application_graph:
+            The application graph that this machine graph is derived from.
+        :type application_graph: ApplicationGraph or None
+        """
         super(MachineGraph, self).__init__(
             MachineVertex, MachineEdge, label)
         self._app_graph = application_graph
 
     @property
     def application_graph(self):
+        """
+        :rtype: ApplicationGraph or None
+        """
         return self._app_graph
 
     @application_graph.setter

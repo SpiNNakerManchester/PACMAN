@@ -32,8 +32,8 @@ class MachineVertex(AbstractVertex):
     def __init__(self, label=None, constraints=None, app_vertex=None,
                  vertex_slice=None):
         """
-        :param str label: The optional name of the vertex
-        :type label: str
+        :param label: The optional name of the vertex
+        :type label: str or None
         :param iterable(AbstractConstraint) constraints:
             The optional initial constraints of the vertex
         :param app_vertex:

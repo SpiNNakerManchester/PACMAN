@@ -48,11 +48,13 @@ class OutgoingEdgePartition(ConstrainedObject):
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
         """
-        :param identifier: The identifier of the partition
+        :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
-        :param constraints: Any initial constraints
-        :param label: An optional label of the partition
-        :param traffic_weight: The weight of traffic going down this partition
+        :type allowed_edge_types: type or tuple(type, ...)
+        :param list(AbstractConstraint) constraints: Any initial constraints
+        :param str label: An optional label of the partition
+        :param int traffic_weight:
+            The weight of traffic going down this partition
         """
         super(OutgoingEdgePartition, self).__init__(constraints)
         self._label = label
@@ -67,19 +69,16 @@ class OutgoingEdgePartition(ConstrainedObject):
     def label(self):
         """ The label of the outgoing edge partition.
 
-        :return: The label
         :rtype: str
-        :raise None: Raises no known exceptions
         """
         return self._label
 
     def add_edge(self, edge):
         """ Add an edge to the outgoing edge partition.
 
-        :param edge: the edge to add
-        :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
-        :raises pacman.exceptions.PacmanInvalidParameterException:\
-            If the starting vertex of the edge does not match that of the\
+        :param AbstractEdge edge: the edge to add
+        :raises PacmanInvalidParameterException:
+            If the starting vertex of the edge does not match that of the
             edges already in the partition
         """
         # Check for an incompatible edge
@@ -120,7 +119,7 @@ class OutgoingEdgePartition(ConstrainedObject):
     def edges(self):
         """ The edges in this outgoing edge partition.
 
-        :rtype: iterable(:py:class:`pacman.model.graphs.AbstractEdge`)
+        :rtype: iterable(AbstractEdge)
         """
         return self._edges
 
@@ -137,7 +136,7 @@ class OutgoingEdgePartition(ConstrainedObject):
         """ The vertex at which all edges in this outgoing edge partition\
             start.
 
-        :rtype: :py:class:`pacman.model.graphs.AbstractVertex`
+        :rtype: AbstractVertex
         """
         return self._pre_vertex
 
@@ -145,7 +144,7 @@ class OutgoingEdgePartition(ConstrainedObject):
     def traffic_type(self):
         """ The traffic type of all the edges in this outgoing edge partition.
 
-        :rtype: :py:class:`pacman.model.graphs.common.EdgeTrafficType`
+        :rtype: EdgeTrafficType
         """
         return self._traffic_type
 
@@ -174,8 +173,7 @@ class OutgoingEdgePartition(ConstrainedObject):
     def __contains__(self, edge):
         """ Check if the edge is contained within this partition
 
-        :param edge: the edge to search for.
-        :type edge: :py:class:`pacman.model.graphs.AbstractEdge`
-        :return: boolean of true of false otherwise
+        :param AbstractEdge edge: the edge to search for.
+        :rtype: bool
         """
         return edge in self._edges

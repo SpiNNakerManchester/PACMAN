@@ -35,14 +35,12 @@ class ReverseIPtagResource(object):
     def __init__(
             self, port=None, sdp_port=1, tag=None):
         """
-        :param port: The target port of the tag or None to assign elsewhere
-        :type port: int or None
         :param port: The UDP port to listen to on the board for this tag
-        :type port: int
-        :param sdp_port:\
-            The SDP port number to be used when constructing SDP packets from\
+            or None for a default
+        :type port: int or None
+        :param int sdp_port:
+            The SDP port number to be used when constructing SDP packets from
             the received UDP packets for this tag
-        :type sdp_port: int
         :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int or None
         """
@@ -54,7 +52,6 @@ class ReverseIPtagResource(object):
     def port(self):
         """ The port of the tag
 
-        :return: The port of the tag
         :rtype: int
         """
         return self._port
@@ -63,6 +60,8 @@ class ReverseIPtagResource(object):
     def sdp_port(self):
         """ The SDP port to use when constructing the SDP message from the\
             received UDP message
+
+        :rtype: int
         """
         return self._sdp_port
 
@@ -70,14 +69,14 @@ class ReverseIPtagResource(object):
     def tag(self):
         """ The tag required, or None if any tag is OK
 
-        :return: The tag or None
-        :rtype: int
+        :rtype: int or None
         """
         return self._tag
 
     def get_value(self):
         """
         :return: The description of the reverse IP tag.
+        :rtype: list
         """
         return [self._port, self._sdp_port, self._tag]
 

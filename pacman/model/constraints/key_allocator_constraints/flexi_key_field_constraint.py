@@ -27,6 +27,9 @@ class FlexiKeyFieldConstraint(AbstractKeyAllocatorConstraint):
     ]
 
     def __init__(self, fields):
+        """
+        :param list fields:
+        """
         self._fields = fields
 
     @property

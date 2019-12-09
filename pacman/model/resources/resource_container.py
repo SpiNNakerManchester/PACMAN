@@ -19,8 +19,8 @@ from .dtcm_resource import DTCMResource
 
 
 class ResourceContainer(object):
-    """ Container for the types of resources so that ordering is no\
-        longer a problem.
+    """ Container for the types of resources so that ordering is not\
+        a problem.
     """
 
     __slots__ = [
@@ -54,22 +54,16 @@ class ResourceContainer(object):
             reverse_iptags=None):
         """
         :param dtcm: the amount of dtcm used
+        :type dtcm: None or DTCMResource
         :param sdram: the amount of SDRAM used
+        :type sdram: None or AbstractSDRAM
         :param cpu_cycles: the amount of CPU used
+        :type cpu_cycles: None or CPUCyclesPerTickResource
         :param iptags: the IP tags required
+        :type iptags: None or list(IPtagResource)
         :param reverse_iptags: the reverse IP tags required
-        :type dtcm: None or \
-            :py:class:`pacman.models.resources.dtcm_resource.DTCMResource`
-        :type sdram: None or \
-            :py:class:`pacman.models.resources.AbstractSDRAM`
-        :type cpu_cycles: None or \
-            :py:class:`pacman.models.resources.CPUCyclesPerTickResource`
-        :type iptags: None or \
-            list(:py:class:`pacman.models.resources.iptag_resource.IPtagResource`)
         :type reverse_iptags: None or \
-            list(:py:class:`pacman.models.resources.SpecificBoardReverseIPtagResource`)
-        :rtype: pacman.models.resources.resource_container.ResourceContainer
-        :raise None: does not raise any known exception
+            list(SpecificBoardReverseIPtagResource)
         """
         # pylint: disable=too-many-arguments
         self._dtcm_usage = dtcm
@@ -111,6 +105,9 @@ class ResourceContainer(object):
         return self._reverse_iptags
 
     def extend(self, other):
+        """
+        :param ResourceContainer other:
+        """
         # added CPU stuff
         self._cpu_cycles = CPUCyclesPerTickResource(
             self._cpu_cycles.get_value() + other.cpu_cycles.get_value())

@@ -35,16 +35,13 @@ class ApplicationVertex(AbstractVertex):
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
         """
-        :param label: The optional name of the vertex
-        :type label: str
-        :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable(~pacman.model.constraints.AbstractConstraint)
-        :param max_atoms_per_core: the max number of atoms that can be\
+        :param str label: The optional name of the vertex
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex
+        :param int max_atoms_per_core: the max number of atoms that can be\
             placed on a core, used in partitioning
-        :type max_atoms_per_core: int
-        :raise pacman.exceptions.PacmanInvalidParameterException:\
-            * If one of the constraints is not valid
+        :raise PacmanInvalidParameterException:
+            If one of the constraints is not valid
         """
 
         super(ApplicationVertex, self).__init__(label, constraints)
@@ -66,12 +63,11 @@ class ApplicationVertex(AbstractVertex):
     def get_resources_used_by_atoms(self, vertex_slice):
         """ Get the separate resource requirements for a range of atoms
 
-        :param vertex_slice: the low value of atoms to calculate resources from
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param Slice vertex_slice:
+            the low value of atoms to calculate resources from
         :return: a Resource container that contains a \
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: ~pacman.model.resources.ResourceContainer
-        :raise None: this method does not raise any known exception
+        :rtype: ResourceContainer
         """
 
     @abstractmethod
@@ -80,16 +76,14 @@ class ApplicationVertex(AbstractVertex):
             constraints=None):
         """ Create a machine vertex from this application vertex
 
-        :param vertex_slice:\
+        :param Slice vertex_slice:
             The slice of atoms that the machine vertex will cover
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
-        :param resources_required: the resources used by the machine vertex
-        :type resources_required: ~pacman.model.resources.ResourceContainer
+        :param ResourceContainer resources_required:
+            the resources used by the machine vertex
         :param label: human readable label for the machine vertex
         :type label: str or None
-        :param constraints: Constraints to be passed on to the machine vertex
-        :type constraints: \
-            iterable(~pacman.model.constraints.AbstractConstraint)
+        :param iterable(AbstractConstraint) constraints:
+            Constraints to be passed on to the machine vertex
         """
 
     def remember_associated_machine_vertex(self, machine_vertex):
@@ -111,18 +105,34 @@ class ApplicationVertex(AbstractVertex):
 
     @property
     def machine_vertices(self):
+        """ The machine vertices that this application vertex maps to.
+            Will be the same length as :py:meth:`vertex_slices`.
+
+        :rtype: iterable(MachineVertex)
+        """
         return self._machine_vertices
 
     @property
     def vertex_slices(self):
+        """ The slices of this vertex that each machine vertex manages.
+            Will be the same length as :py:meth:`machine_vertices`.
+
+        :rtype: iterable(Slice)
+        """
         return self._slices
 
     def get_max_atoms_per_core(self):
+        """
+        :rtype: int
+        """
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
         return self.n_atoms
 
     def forget_machine_vertices(self):
+        """ Arrange to forget all machine vertices that this application
+            vertex maps to.
+        """
         self._machine_vertices = OrderedSet()
         self._slices = list()
