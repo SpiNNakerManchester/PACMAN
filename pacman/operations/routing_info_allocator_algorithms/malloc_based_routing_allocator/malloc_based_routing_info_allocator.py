@@ -66,8 +66,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_keys, shared_keys, fixed_masks, fixed_fields, flexi_fields,
-         continuous, noncontinuous) = get_edge_groups(
+        (fixed_keys, shared_keys, fixed_masks, fixed_fields, continuous,
+         noncontinuous) = get_edge_groups(
              machine_graph, EdgeTrafficType.MULTICAST)
 
         # Go through the groups and allocate keys
@@ -84,10 +84,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         for group in progress.over(fixed_fields, False):
             self._allocate_fixed_fields(group, n_keys_map, routing_infos)
-
-        if flexi_fields:
-            raise PacmanConfigurationException(
-                "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
         for group in progress.over(shared_keys, False):
             self._allocate_share_key(group, routing_infos, n_keys_map)

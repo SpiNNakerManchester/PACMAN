@@ -18,7 +18,7 @@ from six import itervalues
 import logging
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyFieldConstraint, FlexiKeyFieldConstraint,
+    FixedKeyFieldConstraint,
     ContiguousKeyRangeContraint, FixedMaskConstraint,
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
 from pacman.utilities.utility_calls import locate_constraints_of_type
@@ -30,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 class ConstraintGroup(list):
+    """ A list of edges that share a constraint.
+    """
 
     def __init__(self, values):
         super(ConstraintGroup, self).__init__(values)
@@ -38,6 +40,10 @@ class ConstraintGroup(list):
 
     @property
     def constraint(self):
+        """ The shared constraint.
+
+        :rtype: AbstractConstraint
+        """
         return self._constraint
 
     def _set_constraint(self, constraint):
@@ -54,13 +60,17 @@ class ConstraintGroup(list):
 
 
 def get_edge_groups(machine_graph, traffic_type):
-    """ Utility method to get groups of edges using any\
-        :py:class:`~pacman.model.constraints.key_allocator_constraints.KeyAllocatorSameKeyConstraint`\
-        constraints.  Note that no checking is done here about conflicts\
-        related to other constraints.
+    """ Utility method to get groups of edges using any
+        :py:class:`KeyAllocatorSameKeyConstraint` constraints.  Note that no
+        checking is done here about conflicts related to other constraints.
 
-    :param machine_graph: the machine graph
-    :param traffic_type: the traffic type to group
+    :param MachineGraph machine_graph: the machine graph
+    :param EdgeTrafficType traffic_type: the traffic type to group
+    :return: (fixed key groups, shared key groups, fixed mask groups,
+        fixed field groups, continuous groups, noncontinuous groups)
+    :rtype: tuple(list(ConstraintGroup), list(ConstraintGroup),
+        list(ConstraintGroup), list(ConstraintGroup), list(ConstraintGroup),
+        list(ConstraintGroup))
     """
 
     # mapping between partition and shared key group it is in
@@ -97,14 +107,12 @@ def get_edge_groups(machine_graph, traffic_type):
     shared_key_groups = list()
     fixed_mask_groups = list()
     fixed_field_groups = list()
-    flexi_field_groups = list()
     continuous_groups = list()
     noncontinuous_groups = list()
     groups_by_type = {
         FixedKeyAndMaskConstraint: fixed_key_groups,
         FixedMaskConstraint: fixed_mask_groups,
         FixedKeyFieldConstraint: fixed_field_groups,
-        FlexiKeyFieldConstraint: flexi_field_groups,
     }
     groups = OrderedSet(itervalues(partition_groups))
     for group in groups:
@@ -115,7 +123,7 @@ def get_edge_groups(machine_graph, traffic_type):
             for constraint in locate_constraints_of_type(
                 partition.constraints,
                 (FixedKeyAndMaskConstraint, FixedMaskConstraint,
-                 FlexiKeyFieldConstraint, FixedKeyFieldConstraint))]
+                 FixedKeyFieldConstraint))]
 
         # Check that the possibly conflicting constraints are equal
         if constraints and not all(
@@ -150,17 +158,16 @@ def get_edge_groups(machine_graph, traffic_type):
             groups_by_type[constraint_type].append(group)
 
     # return the set of groups
-    return (fixed_key_groups, shared_key_groups,
-            fixed_mask_groups, fixed_field_groups, flexi_field_groups,
-            continuous_groups, noncontinuous_groups)
+    return (fixed_key_groups, shared_key_groups, fixed_mask_groups,
+            fixed_field_groups, continuous_groups, noncontinuous_groups)
 
 
 def check_types_of_edge_constraint(machine_graph):
-    """ Go through the graph for operations and checks that the constraints\
+    """ Go through the graph for operations and checks that the constraints
         are compatible.
 
-    :param machine_graph: the graph to search through
-    :rtype: None:
+    :param MachineGraph machine_graph: the graph to search through
+    :raises PacmanConfigurationException: if a problem is found
     """
     for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = locate_constraints_of_type(
@@ -172,11 +179,7 @@ def check_types_of_edge_constraint(machine_graph):
         fixed_field = locate_constraints_of_type(
             partition.constraints, FixedKeyFieldConstraint)
 
-        flexi_field = locate_constraints_of_type(
-            partition.constraints, FlexiKeyFieldConstraint)
-
-        if (len(fixed_key) > 1 or len(fixed_field) > 1 or
-                len(fixed_mask) > 1 or len(flexi_field) > 1):
+        if len(fixed_key) > 1 or len(fixed_field) > 1 or len(fixed_mask) > 1:
             raise PacmanConfigurationException(
                 "There are more than one of the same constraint type on "
                 "the partition {} starting at {}. Please fix and try again."
@@ -185,7 +188,6 @@ def check_types_of_edge_constraint(machine_graph):
         fixed_key = len(fixed_key) == 1
         fixed_mask = len(fixed_mask) == 1
         fixed_field = len(fixed_field) == 1
-        flexi_field = len(flexi_field) == 1
 
         # check for fixed key and a fixed mask. as these should have been
         # merged before now
@@ -208,24 +210,14 @@ def check_types_of_edge_constraint(machine_graph):
         if fixed_mask and fixed_field:
             _check_masks_are_correct(partition)
 
-        # check that if there's a flexible field, and something else, throw
-        # error
-        if flexi_field and (fixed_mask or fixed_key or fixed_field):
-            raise PacmanConfigurationException(
-                "The partition {} starting at {} has a flexible field and "
-                "another fixed constraint. These maybe be merge-able, but "
-                "is deemed an error here"
-                .format(partition.identifer, partition.pre_vertex))
-
 
 def _check_masks_are_correct(partition):
-    """ Check that the masks between a fixed mask constraint\
-        and a fixed_field constraint. completes if its correct, raises error\
-        otherwise
+    """ Check that the masks between a fixed mask constraint and a fixed_field
+        constraint. Raises error if not.
 
-    :param partition: \
+    :param OutgoingEdgePartition partition:
         the outgoing_edge_partition to search for these constraints
-    :rtype: None:
+    :raise PacmanInvalidParameterException: if the masks are incompatible
     """
     fixed_mask = locate_constraints_of_type(
         partition.constraints, FixedMaskConstraint)[0]
@@ -250,14 +242,13 @@ def _check_masks_are_correct(partition):
 
 def get_fixed_mask(same_key_group):
     """ Get a fixed mask from a group of edges if a\
-        :py:class:`~pacman.model.constraints.key_allocator_constraints.FixedMaskConstraint`\
+        :py:class:`FixedMaskConstraint`\
         constraint exists in any of the edges in the group.
 
-    :param same_key_group: \
+    :param iterable(MachineEdge) same_key_group:
         Set of edges that are to be assigned the same keys and masks
-    :type same_key_group: \
-        iterable(:py:class:`pacman.model.graphs.machine.MachineEdge`)
     :return: The fixed mask if found, or None
+    :rtype: tuple(int or None, iterable(Field) or None)
     :raise PacmanValueError: If two edges conflict in their requirements
     """
     mask = None
