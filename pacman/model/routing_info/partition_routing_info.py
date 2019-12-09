@@ -31,12 +31,10 @@ class PartitionRoutingInfo(object):
 
     def __init__(self, keys_and_masks, partition):
         """
-        :param keys_and_masks: The keys allocated to the machine partition
-        :type keys_and_masks: \
-            iterable(:py:class:`pacman.model.routing_info.BaseKeyAndMask`)
-        :param partition: The partition to set the number of keys for
-        :type partition:\
-            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
+        :param iterable(BaseKeyAndMask) keys_and_masks:
+            The keys allocated to the machine partition
+        :param OutgoingEdgePartition partition:
+            The partition to set the number of keys for
         """
         self._keys_and_masks = keys_and_masks
         self._partition = partition
@@ -44,10 +42,9 @@ class PartitionRoutingInfo(object):
     def get_keys(self, n_keys=None):
         """ Get the ordered list of individual keys allocated to the edge
 
-        :param n_keys: Optional limit on the number of keys to return
-        :type n_keys: int
+        :param int n_keys: Optional limit on the number of keys to return
         :return: An array of keys
-        :rtype: array-like of int
+        :rtype: ~numpy.ndarray
         """
 
         max_n_keys = sum(km.n_keys for km in self._keys_and_masks)

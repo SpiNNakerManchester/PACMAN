@@ -32,6 +32,10 @@ class ElementAllocatorAlgorithm(object):
     ]
 
     def __init__(self, size_begin, size_end):
+        """
+        :param int size_begin:
+        :param int size_end:
+        """
         self._free_space_tracker = list()
         self._free_space_tracker.append(ElementFreeSpace(size_begin, size_end))
 
@@ -40,7 +44,7 @@ class ElementAllocatorAlgorithm(object):
 
         :param int base_element_id: the first element ID to allocate
         :param int n_elements: the number of elements to allocate
-        :raises: PacmanRouteInfoAllocationException:
+        :raises PacmanRouteInfoAllocationException:
             when the ID cannot be assigned due to the number of elements
         """
 
@@ -56,6 +60,8 @@ class ElementAllocatorAlgorithm(object):
     def _find_slot(self, base_element_id, lo=0):
         """ Find the free slot with the closest
             base element ID  <= base element using a binary search
+
+        :rtype: int or None
         """
         hi = len(self._free_space_tracker) - 1
         while lo < hi:
@@ -139,6 +145,7 @@ class ElementAllocatorAlgorithm(object):
             The element ID to start with; must be inside the slot
         :param int n_elements:
             The number of elements to be allocated; should be power of 2
+        :rtype: int
         """
         free_space_slot = self._free_space_tracker[index]
         space = (free_space_slot.size -

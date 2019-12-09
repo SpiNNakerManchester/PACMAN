@@ -37,10 +37,8 @@ class RoutingInfo(object):
     def __init__(self, partition_info_items=None):
         """
         :param partition_info_items: The partition information items to add
-        :type partition_info_items: \
-            iterable(:py:class:`pacman.model.routing_info.PartitionRoutingInfo`)\
-            or None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If there are \
+        :type partition_info_items: iterable(PartitionRoutingInfo) or None
+        :raise PacmanAlreadyExistsException: If there are \
             two partition information objects with the same partition
         """
 
@@ -61,11 +59,10 @@ class RoutingInfo(object):
     def add_partition_info(self, partition_info):
         """ Add a partition information item
 
-        :param partition_info: The partition information item to add
-        :type partition_info:\
-            :py:class:`pacman.model.routing_info.PartitionRoutingInfo`
+        :param PartitionRoutingInfo partition_info:
+            The partition information item to add
         :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException:\
+        :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
         """
         p = partition_info.partition
@@ -86,12 +83,10 @@ class RoutingInfo(object):
     def get_first_key_from_partition(self, partition):
         """ Get the first key associated with a particular partition
 
-        :param partition: The partition to get the first key of
-        :type partition:\
-            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
-        :return: The routing key or None if the partition does not exist
-        :rtype: int
-        :raise None: does not raise any known exceptions
+        :param OutgoingEdgePartition partition:
+            The partition to get the first key of
+        :return: The routing key, or None if the partition does not exist
+        :rtype: int or None
         """
         if partition in self._info_by_partition:
             return self._info_by_partition[
@@ -101,12 +96,10 @@ class RoutingInfo(object):
     def get_routing_info_from_partition(self, partition):
         """ Get the routing information for a given partition.
 
-        :param partition: The partition to obtain routing informaton about.
-        :type partition:\
-            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
+        :param OutgoingEdgePartition partition:
+            The partition to obtain routing information about.
         :return: the partition_routing_info for the partition, if any exists
-        :rtype: :py:class:`pacman.model.routing_info.PartitionRoutingInfo` \
-            or None
+        :rtype: PartitionRoutingInfo or None
         """
         if partition in self._info_by_partition:
             return self._info_by_partition[partition]
@@ -116,9 +109,9 @@ class RoutingInfo(object):
         """ Get routing information for edges with a given partition_id from\
             a prevertex
 
-        :param vertex: The prevertex to search for
-        :param partition_id: The ID of the partition for which to get\
-            the routing information
+        :param AbstractVertex vertex: The prevertex to search for
+        :param str partition_id:
+            The ID of the partition for which to get the routing information
         """
         if (vertex, partition_id) in self._info_by_prevertex:
             return self._info_by_prevertex[vertex, partition_id]
@@ -127,8 +120,8 @@ class RoutingInfo(object):
     def get_first_key_from_pre_vertex(self, vertex, partition_id):
         """ Get the first key for the partition starting at a (pre)vertex
 
-        :param vertex: The vertex which the partition starts at
-        :param partition_id: \
+        :param AbstractVertex vertex: The vertex which the partition starts at
+        :param str partition_id:
             The ID of the partition for which to get the routing information
         :return: The routing key of the partition
         :rtype: int
@@ -141,14 +134,14 @@ class RoutingInfo(object):
     def get_routing_info_for_edge(self, edge):
         """ Get routing information for an edge
 
-        :param edge: The edge to search for
+        :param AbstractEdge edge: The edge to search for
         """
         return self._info_by_edge.get(edge, None)
 
     def get_first_key_for_edge(self, edge):
         """ Get routing key for an edge
 
-        :param edge: The edge to search for
+        :param AbstractEdge edge: The edge to search for
         """
         if edge in self._info_by_edge:
             return self._info_by_edge[edge].keys_and_masks[0].key

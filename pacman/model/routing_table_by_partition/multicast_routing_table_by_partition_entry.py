@@ -37,18 +37,16 @@ class MulticastRoutingTableByPartitionEntry(object):
     def __init__(self, out_going_links, outgoing_processors,
                  incoming_processor=None, incoming_link=None):
         """
-        :param out_going_links: the edges this path entry goes down, each of\
-            which is between 0 and 5
-        :type out_going_links: iterable(int)
-        :param outgoing_processors: the processors this path entry goes to,\
-            each of which is between 0 and 17
-        :type outgoing_processors: iterable(int)
-        :param incoming_processor: \
+        :param iterable(int) out_going_links:
+            the edges this path entry goes down, each of which is between
+            0 and 5
+        :param iterable(int) outgoing_processors:
+            the processors this path entry goes to, each of which is between
+            0 and 17
+        :param int incoming_processor:
             the direction this entry came from (between 0 and 17)
-        :type incoming_processor: int
-        :param incoming_link: \
+        :param int incoming_link:
             the direction this entry came from in link (between 0 and 5)
-        :type incoming_link: int
         """
         if isinstance(out_going_links, int):
             self._out_going_links = set()
@@ -173,8 +171,8 @@ class MulticastRoutingTableByPartitionEntry(object):
         """ Merges the another entry with this one and returns a new\
             MulticastRoutingTableByPartitionEntry
 
-        :param other: \
-            the MulticastRoutingTableByPartitionEntry to merge into this one
+        :param MulticastRoutingTableByPartitionEntry other: \
+            the entry to merge into this one
         :return: a merged MulticastRoutingTableByPartitionEntry
         """
         if not isinstance(other, MulticastRoutingTableByPartitionEntry):

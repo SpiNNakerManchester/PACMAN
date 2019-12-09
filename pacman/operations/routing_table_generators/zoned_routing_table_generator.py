@@ -42,7 +42,13 @@ class SharedEntry(object):
 
 
 class ZonedRoutingTableGenerator(object):
-    """ An basic algorithm that can produce routing tables
+    """ An algorithm that can produce routing tables in zones
+
+    :param RoutingInfo routing_infos:
+    :param MulticastRoutingTableByPartition routing_table_by_partitions:
+    :param ~spinn_machine.Machine machine:
+    :param info_by_app_vertex:
+    :type info_by_app_vertex: dict(ApplicationVertex, BaseKeyAndMask)
     """
 
     __slots__ = []
@@ -50,11 +56,6 @@ class ZonedRoutingTableGenerator(object):
     def __call__(
             self, routing_infos, routing_table_by_partitions, machine,
             info_by_app_vertex):
-        """
-        :param routing_infos:
-        :param routing_table_by_partitions:
-        :param machine:
-        """
         progress = ProgressBar(machine.n_chips, "Generating routing tables")
         routing_tables = MulticastRoutingTables()
         for chip in progress.over(machine.chips):

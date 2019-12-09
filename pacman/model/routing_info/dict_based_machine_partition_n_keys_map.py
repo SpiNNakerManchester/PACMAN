@@ -20,7 +20,7 @@ from .abstract_machine_partition_n_keys_map import (
 
 class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     """ A python dict-based implementation of the\
-        :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
+        :py:class:`AbstractMachinePartitionNKeysMap`
     """
 
     __slots__ = [
@@ -35,11 +35,9 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
         """ Set the number of keys required by a machine outgoing edge\
             partition
 
-        :param partition: The partition to set the number of keys for
-        :type partition:\
-            :py:class:`pacman.model.graphs.OutgoingEdgePartition`
-        :param n_keys: The number of keys required by the edge
-        :type n_keys: int
+        :param OutgoingEdgePartition partition:
+            The partition to set the number of keys for
+        :param int n_keys: The number of keys required by the edge
         """
         self._n_keys_map[partition] = int(n_keys)
 

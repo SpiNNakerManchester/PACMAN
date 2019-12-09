@@ -21,17 +21,15 @@ from pacman.model.routing_tables import (
 
 class BasicRoutingTableGenerator(object):
     """ An basic algorithm that can produce routing tables
+
+    :param RoutingInfo routing_infos:
+    :param MulticastRoutingTableByPartition routing_table_by_partitions:
+    :param ~spinn_machine.Machine machine:
     """
 
     __slots__ = []
 
-    def __call__(
-            self, routing_infos, routing_table_by_partitions, machine):
-        """
-        :param routing_infos:
-        :param routing_table_by_partitions:
-        :param machine:
-        """
+    def __call__(self, routing_infos, routing_table_by_partitions, machine):
         progress = ProgressBar(machine.n_chips, "Generating routing tables")
         routing_tables = MulticastRoutingTables()
         for chip in progress.over(machine.chips):

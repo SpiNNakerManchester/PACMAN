@@ -36,6 +36,16 @@ class ZonedRoutingInfoAllocator(object):
         No constraints are supported, and that the number of keys\
         required by each edge must be 2048 or less, and that all edges coming\
         out of a vertex will be given the same key/mask assignment.
+
+    :param MachineGraph machine_graph:
+        The machine graph to allocate the routing info for
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the
+        edges
+    :return: The routing information
+    :rtype: PartitionRoutingInfo
+    :raise PacmanRouteInfoAllocationException:
+        If something goes wrong with the allocation
     """
 
     __slots__ = [
@@ -47,23 +57,6 @@ class ZonedRoutingInfoAllocator(object):
     # pylint: disable=attribute-defined-outside-init
 
     def __call__(self, application_graph, machine_graph, n_keys_map):
-        """
-        :param machine_graph:\
-            The machine graph to allocate the routing info for
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param n_keys_map:\
-            A map between the edges and the number of keys required by the\
-            edges
-        :type n_keys_map:\
-            :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
-        :return: The routing information
-        :rtype:\
-            :py:class:`pacman.model.routing_info.PartitionRoutingInfo`
-        :raise pacman.exceptions.PacmanRouteInfoAllocationException: \
-            If something goes wrong with the allocation
-        """
-
         # check that this algorithm supports the constraints put onto the
         # partitions
         self.__application_graph = application_graph
