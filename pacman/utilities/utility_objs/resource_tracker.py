@@ -277,7 +277,7 @@ class ResourceTracker(object):
     def check_constraints(
             vertices, additional_placement_constraints=None):
         """ Check that the constraints on the given vertices are supported\
-            by the resource tracker
+            by the resource tracker.
 
         :param list(AbstractVertex) vertices:
             The vertices to check the constraints of
@@ -443,8 +443,8 @@ class ResourceTracker(object):
             given resources.
 
         :param ~spinn_machine.Chip chip: The chip to check the resources of
-        :param resources: the resources containing the SDRAM required
-        :type resources: ResourceContainer
+        :param ResourceContainer resources:
+            the resources containing the SDRAM required
         :return: True if there is enough SDRAM available, or False otherwise
         :rtype: bool
         """
