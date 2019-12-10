@@ -24,30 +24,21 @@ logger = logging.getLogger(__name__)
 
 
 class BasicPlacer(object):
-    """ A basic placement algorithm that can place a machine graph onto\
-        a machine using the chips as they appear in the machine
+    """ A basic placement algorithm that can place a machine graph onto a
+        machine using the chips as they appear in the machine.
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param ~spinn_machine.Machine machine:
+        The machine with respect to which to partition the application graph
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: A set of placements
+    :rtype: Placements
+    :raise PacmanPlaceException: If something goes wrong with the placement
     """
 
     __slots__ = []
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
-        """ Place a machine_graph so that each vertex is placed on a core
-
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param machine:\
-            The machine with respect to which to partition the application\
-            graph
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :return: A set of placements
-        :rtype: :py:class:`pacman.model.placements.Placements`
-        :raise pacman.exceptions.PacmanPlaceException: \
-            If something goes wrong with the placement
-        """
-
         # check that the algorithm can handle the constraints
         ResourceTracker.check_constraints(machine_graph.vertices)
 

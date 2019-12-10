@@ -27,17 +27,16 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ConvertToJsonMachineGraph(object):
-    """ Converter from MulticastRoutingTables to json
+    """ Converter (:py:obj:`callable`) from :py:class:`MulticastRoutingTables`
+        to JSON.
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param str report_folder:
+        the folder to which the reports are being written
     """
 
     def __call__(self, machine_graph, report_folder):
         """ Runs the code to write the machine in Java readable JSON.
-
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param report_folder: the folder to which the reports are being written
-        :type report_folder: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON MachineGraph")
@@ -50,11 +49,9 @@ class ConvertToJsonMachineGraph(object):
     def do_convert(machine_graph, file_path, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param file_path: Location to write file to. Warning will overwrite!
-        :type file_path: str
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param str file_path:
+            Location to write file to. Warning will overwrite!
         """
 
         json_obj = graph_to_json(machine_graph)

@@ -39,6 +39,19 @@ logger = logging.getLogger(__name__)
 class PartitionAndPlacePartitioner(object):
     """ A partitioner that tries to ensure that SDRAM is not overloaded by\
         keeping track of the SDRAM usage on the various chips
+
+    :param ApplicationGraph graph: The application_graph to partition
+    :param ~spinn_machine.Machine machine:
+        The machine with respect to which to partition the application
+        graph
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :param preallocated_resources:
+    :type preallocated_resources: PreAllocatedResourceContainer or None
+    :return:
+        A machine_graph of partitioned vertices and partitioned edges
+    :rtype: MachineGraph
+    :raise PacmanPartitionException:
+        If something goes wrong with the partitioning
     """
 
     __slots__ = []
@@ -47,22 +60,6 @@ class PartitionAndPlacePartitioner(object):
     def __call__(
             self, graph, machine, plan_n_timesteps,
             preallocated_resources=None):
-        """
-        :param graph: The application_graph to partition
-        :type graph:\
-            :py:class:`pacman.model.graph.application.ApplicationGraph`
-        :param machine: The machine with respect to which to partition the\
-            application_graph
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :return: \
-            A machine_graph of partitioned vertices and partitioned edges
-        :rtype:\
-            :py:class:`pacman.model.graph.machine.MachineGraph`
-        :raise pacman.exceptions.PacmanPartitionException: \
-            If something goes wrong with the partitioning
-        """
         ResourceTracker.check_constraints(graph.vertices)
         utils.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
@@ -112,23 +109,19 @@ class PartitionAndPlacePartitioner(object):
             resource_tracker, progress, vertex_groups):
         """ Partition a single vertex
 
-        :param vertex: the vertex to partition
-        :type vertex:\
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :param machine_graph: the graph to add vertices to
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param resource_tracker: A tracker of assigned resources
-        :type resource_tracker:\
-            :py:class:`pacman.utilities.ResourceTracker`
-        :param progress: The progress bar
-        :param vertex_groups: Groups together vertices that are supposed to\
-            be the same size
+        :param ApplicationVertex vertex: the vertex to partition
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :param MachineGraph machine_graph: the graph to add vertices to
+        :param ResourceTracker resource_tracker:
+            A tracker of assigned resources
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+            The progress bar
+        :param vertex_groups:
+            Groups together vertices that are supposed to be the same size
+        :type vertex_groups: dict(ApplicationVertex, list(ApplicationVertex))
         :rtype: None
-        :raise pacman.exceptions.PacmanPartitionException: \
-            if the extra vertex for partitioning identically has a different\
+        :raise PacmanPartitionException:
+            if the extra vertex for partitioning identically has a different
             number of atoms than its counterpart.
         """
         partition_together_vertices = list(vertex_groups[vertex])
@@ -176,31 +169,21 @@ class PartitionAndPlacePartitioner(object):
         """ Try to partition vertices on how many atoms it can fit on\
             each vertex
 
-        :param vertices:\
+        :param iterable(ApplicationVertex) vertices:
             the vertexes that need to be partitioned at the same time
-        :type vertices:\
-            iterable list of\
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-            iterable(:py:class:`pacman.model.graphs.application.ApplicationVertex`)
-        :param n_atoms: the atoms of the first vertex
-        :type n_atoms: int
-        :param max_atoms_per_core:\
-            the max atoms from all the vertexes considered that have max_atom\
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :param int n_atoms: the atoms of the first vertex
+        :param int max_atoms_per_core:
+            the max atoms from all the vertexes considered that have max_atom
             constraints
-        :type max_atoms_per_core: int
-        :param machine_graph: the machine graph
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param resource_tracker: A tracker of assigned resources
-        :type resource_tracker:\
-            :py:class:`pacman.utilities.ResourceTracker`
-        :param progress: The progress bar
-        :param fixed_n_atoms:\
-            True if max_atoms_per_core is actually the fixed number of atoms\
+        :param MachineGraph machine_graph: the machine graph
+        :param ResourceTracker resource_tracker:
+            A tracker of assigned resources
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+            The progress bar
+        :param bool fixed_n_atoms:
+            True if `max_atoms_per_core` is actually the fixed number of atoms
             per core and cannot be reduced
-        :type fixed_n_atoms: bool
         """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
@@ -237,18 +220,18 @@ class PartitionAndPlacePartitioner(object):
         """ Readjusts resource allocation and updates the placement list to\
             take into account the new layout of the atoms
 
-        :param used_placements: \
+        :param used_placements:
             the original list of tuples containing placement data
-        :type used_placements: iterable(tuple(7 items))
-        :param resource_tracker: the tracker of resources
-        :type resource_tracker:\
-            :py:class:`pacman.utilities.ResourceTracker`
-        :param lo_atom: the low atom of a slice to be considered
-        :type lo_atom: int
-        :param hi_atom: the high atom of a slice to be considered
-        :type hi_atom: int
+        :type used_placements: list(tuple(
+            ApplicationVertex, int, int, int, ResourceContainer,
+            list(tuple(int, int)), list(tuple(int, int))))
+        :param ResourceTracker resource_tracker: the tracker of resources
+        :param int lo_atom: the low atom of a slice to be considered
+        :param int hi_atom: the high atom of a slice to be considered
         :return: the new list of tuples containing placement data
-        :rtype: iterable(tuple(7 items))
+        :rtype: list(tuple(
+            ApplicationVertex, int, int, int, ResourceContainer,
+            list(tuple(int, int)), list(tuple(int, int))))
         """
 
         new_used_placements = list()
@@ -262,8 +245,8 @@ class PartitionAndPlacePartitioner(object):
 
             # Get the new resource usage
             vertex_slice = Slice(lo_atom, hi_atom)
-            new_resources = \
-                placed_vertex.get_resources_used_by_atoms(vertex_slice)
+            new_resources = placed_vertex.get_resources_used_by_atoms(
+                vertex_slice)
 
             if not isinstance(placed_vertex, AbstractVirtual):
                 # Re-allocate the existing resources
@@ -282,31 +265,22 @@ class PartitionAndPlacePartitioner(object):
         """ Reduce the number of atoms on a core so that it fits within the
             resources available.
 
-        :param lo_atom: the number of atoms already partitioned
-        :type lo_atom: int
-        :param hi_atom: the total number of atoms to place for this vertex
-        :type hi_atom: int
-        :param vertices:\
+        :param int lo_atom: the number of atoms already partitioned
+        :param int hi_atom: the total number of atoms to place for this vertex
+        :param iterable(ApplicationVertex) vertices:
             the vertexes that need to be partitioned at the same time
-        :type vertices:\
-            iterable of\
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-            iterable(:py:class:`pacman.model.graphs.application.ApplicationVertex`)
-        :param max_atoms_per_core:\
-            the max atoms from all the vertexes considered that have max_atom\
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :param int max_atoms_per_core:
+            the max atoms from all the vertexes considered that have max_atom
             constraints
-        :type max_atoms_per_core: int
-        :param resource_tracker: Tracker of used resources
-        :type resource_tracker: :py:class:`spinn_machine.Machine`
-        :param fixed_n_atoms:\
-            True if max_atoms_per_core is actually the fixed number of atoms\
+        :param ResourceTracker resource_tracker: Tracker of used resources
+        :param bool fixed_n_atoms:
+            True if max_atoms_per_core is actually the fixed number of atoms
             per core
-        :type fixed_n_atoms: bool
         :return: the list of placements made by this method and the new amount\
             of atoms partitioned
-        :rtype: tuple(iterable(tuple(2 items)), int)
+        :rtype: tuple(iterable(tuple(ApplicationVertex, ResourceContainer)),
+            int)
         :raise PacmanPartitionException: when the vertex cannot be partitioned
         """
         used_placements = list()
@@ -420,31 +394,22 @@ class PartitionAndPlacePartitioner(object):
         """ Try to push up the number of atoms in a vertex to be as close\
             to the available resources as possible
 
-        :param used_resources: the resources used by the machine so far
-        :type used_resources:\
-            :py:class:`pacman.model.resources.Resource`
-        :param hi_atom: the total number of atoms to place for this vertex
-        :type hi_atom: int
-        :param lo_atom: the number of atoms already partitioned
-        :type lo_atom: int
-        :param max_atoms_per_core: the min max atoms from all the vertexes \
+        :param ResourceContainer used_resources:
+            the resources used by the machine so far
+        :param int hi_atom: the total number of atoms to place for this vertex
+        :param int lo_atom: the number of atoms already partitioned
+        :param int max_atoms_per_core: the min max atoms from all the vertexes
             considered that have max_atom constraints
-        :type max_atoms_per_core: int
-        :param vertex: the vertexes to scale up the num atoms per core for
-        :type vertex:\
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :param resources: the resource estimate for the vertex for a given\
-            number of atoms
-        :type resources:\
-            :py:class:`pacman.model.resources.Resource`
-        :param ratio: the ratio between max atoms and available resources
-        :type ratio: int
+        :param ApplicationVertex vertex:
+            the vertex to scale up the num atoms per core for
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :param ResourceContainer resources:
+            the resource estimate for the vertex for a given number of atoms
+        :param float ratio:
+            the ratio between max atoms and available resources
         :return: the new resources used and the new hi_atom
-        :rtype: tuple(:py:class:`pacman.model.resources.Resource`, int)
+        :rtype: tuple(ResourceContainer, int)
         """
-
         previous_used_resources = used_resources
         previous_hi_atom = hi_atom
 
@@ -480,9 +445,8 @@ class PartitionAndPlacePartitioner(object):
     def _get_max_atoms_per_core(vertices):
         """ Find the max atoms per core for a collection of vertices
 
-        :param vertices: a iterable list of vertices
-        :type vertices: \
-            iterable(:py:class:`pacman.model.graphs.application.ApplicationVertex`)
+        :param iterable(ApplicationVertex) vertices:
+            a iterable list of vertices
         :return: the minimum level of max atoms from all constraints
         :rtype: int
         :raise None: this method does not raise any known exceptions
@@ -504,29 +468,26 @@ class PartitionAndPlacePartitioner(object):
 
     @staticmethod
     def _ratio(numerator, denominator):
-        """Get the ratio between two values, with special\
-        handling for when the denominator is zero.
+        """ Get the ratio between two values, with special
+            handling for when the denominator is zero.
+
+        :rtype: float
         """
         if denominator == 0:
-            return 0
+            return 0.0
         return numerator / denominator
 
     @staticmethod
     def _find_max_ratio(required, available, plan_n_timesteps):
         """ Find the max ratio between the resources
 
-        :param required: the resources used by the vertex
-        :type required:\
-            :py:class:`pacman.model.resources.ResourceContainer`
-        :param available: the max resources available from the machine
-        :type available: \
-            :py:class:`pacman.model.resources.ResourceContainer`
+        :param ResourceContainer required: the resources used by the vertex
+        :param ResourceContainer available:
+            the max resources available from the machine
+        :param int plan_n_timesteps: number of timesteps to plan for
         :return: the largest ratio of resources
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :rtype: int
+        :rtype: float
         :raise None: this method does not raise any known exceptions
-
         """
         cpu_ratio = PartitionAndPlacePartitioner._ratio(
             required.cpu_cycles.get_value(), available.cpu_cycles.get_value())

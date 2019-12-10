@@ -23,17 +23,15 @@ _ROUTING_FILENAME = "routing_tables.json"
 
 
 class ConvertToJsonRoutingTables(object):
-    """ Converter from MulticastRoutingTables to json
+    """ Converter (:py:obj:`callable`) from MulticastRoutingTables to JSON
+
+    :param MulticastRoutingTables router_tables: Routing Tables to convert
+    :param str report_folder:
+        the folder to which the reports are being written
     """
 
     def __call__(self, router_tables, report_folder):
         """ Runs the code to write the machine in Java readable JSON.
-
-        :param router_tables: Routing Tables to convert
-        :type router_tables:
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTables`
-       :param report_folder: the folder to which the reports are being written
-       :type report_folder: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON RouterTables")
@@ -46,10 +44,9 @@ class ConvertToJsonRoutingTables(object):
     def do_convert(router_table, file_path, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param machine: Machine to convert
-        :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param file_path: Location to write file to. Warning will overwrite!
-        :type file_path: str
+        :param ~spinn_machine.machine.Machine machine: Machine to convert
+        :param str file_path:
+            Location to write file to. Warning will overwrite!
         """
 
         json_obj = to_json(router_table)
