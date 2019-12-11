@@ -43,7 +43,7 @@ class ZonedRoutingInfoAllocator(object):
         A map between the edges and the number of keys required by the
         edges
     :return: The routing information
-    :rtype: PartitionRoutingInfo
+    :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
         If something goes wrong with the allocation
     """
@@ -57,6 +57,17 @@ class ZonedRoutingInfoAllocator(object):
     # pylint: disable=attribute-defined-outside-init
 
     def __call__(self, application_graph, machine_graph, n_keys_map):
+        """
+        :param MachineGraph machine_graph:
+            The machine graph to allocate the routing info for
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            A map between the edges and the number of keys required by the
+            edges
+        :return: The routing information
+        :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
+        :raise PacmanRouteInfoAllocationException:
+            If something goes wrong with the allocation
+        """
         # check that this algorithm supports the constraints put onto the
         # partitions
         self.__application_graph = application_graph
@@ -76,6 +87,10 @@ class ZonedRoutingInfoAllocator(object):
         return self._simple_allocate(max_app_keys_bits, key_bits_per_app)
 
     def _caluculate_zones(self):
+        """
+        :rtype: tuple(int, int, dict(ApplicationVertex,int))
+        :raises PacmanRouteInfoAllocationException:
+        """
         progress = ProgressBar(
             self.__application_graph.n_vertices, "Calculating zones")
         max_app_keys_bits = 0
@@ -114,6 +129,11 @@ class ZonedRoutingInfoAllocator(object):
 
 
     def _simple_allocate(self, max_app_keys_bits, key_bits_map):
+        """
+        :param int max_app_keys_bits:
+        :param dict(ApplicationVertex,int) key_bits_map:
+        :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
+        """
         progress = ProgressBar(
             self.__application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
@@ -143,8 +163,16 @@ class ZonedRoutingInfoAllocator(object):
 
     @staticmethod
     def __mask(bits):
+        """
+        :param int bits:
+        :rtype int:
+        """
         return (2 ** 32) - (2 ** bits)
 
     @staticmethod
     def __bits_needed(size):
+        """
+        :param int size:
+        :rtype: int
+        """
         return math.ceil(math.log(size, 2))
