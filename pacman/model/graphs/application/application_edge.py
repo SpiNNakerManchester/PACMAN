@@ -67,7 +67,7 @@ class ApplicationEdge(AbstractEdge):
         :param machine_edge_type:
             The type of machine edges made from this app edge. If `None`,
             standard MachineEdges will be made.
-        :type machine_edge_type: type(MachineEdge or subclass) or None
+        :type machine_edge_type: type(MachineEdge) or None
         """
         self._label = label
         self._pre_vertex = pre_vertex

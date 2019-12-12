@@ -18,7 +18,8 @@ import functools
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
-    PacmanException, PacmanInvalidParameterException, PacmanValueError)
+    PacmanException, PacmanInvalidParameterException, PacmanValueError,
+    PacmanPlaceException)
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
@@ -31,7 +32,6 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.utilities.utility_calls import (
     is_single, locate_constraints_of_type)
 from pacman.model.graphs import AbstractVirtual
-from pacman.exceptions import PacmanPlaceException
 
 
 def _conflict(x, y, post_x, post_y):
@@ -48,8 +48,7 @@ class OneToOnePlacer(RadialPlacer):
 
     :param MachineGraph machine_graph: The machine_graph to place
     :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application
-        graph
+        The machine with respect to which to partition the application graph
     :param int plan_n_timesteps: number of timesteps to plan for
     :return: A set of placements
     :rtype: Placements
@@ -146,12 +145,12 @@ class OneToOnePlacer(RadialPlacer):
             self, one_to_one_groups, same_chip_vertex_groups,
             machine, plan_n_timesteps, machine_graph, progress):
         """
-        :param list(set(vertex)) one_to_one_groups:
+        :param list(set(MachineVertex)) one_to_one_groups:
             Groups of vertexes that would be nice on same chip
         :param same_chip_vertex_groups:
             Mapping of Vertex to the Vertex that must be on the same Chip
         :type same_chip_vertex_groups:
-            dict(vertex, collection(vertex))
+            dict(MachineVertex, collection(MachineVertex))
         :param ~spinn_machine.Machine machine:
             The machine with respect to which to partition the application
             graph

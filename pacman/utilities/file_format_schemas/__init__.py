@@ -27,9 +27,8 @@ def validate(json_obj, schema_filename):
 
     :param json_obj: The entity to validate
     :type json_obj: dict or list
-    :param schema_filename: \
+    :param str schema_filename:
         The name of the file containing the schema (e.g., "routes.json")
-    :type schema_filename: str
     :rtype: None
     :raises IOError: If the schema file doesn't exist.
     :raises ValidationError: If the JSON object isn't valid.

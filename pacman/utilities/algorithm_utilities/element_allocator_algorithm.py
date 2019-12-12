@@ -55,12 +55,14 @@ class ElementAllocatorAlgorithm(object):
                 "been allocated".format(n_elements, base_element_id))
 
         # base element should be >= slot element at this point
-        self._do_allocation(index, base_element_id, n_elements)
+        self.__do_allocation(index, base_element_id, n_elements)
 
     def _find_slot(self, base_element_id, lo=0):
         """ Find the free slot with the closest
             base element ID  <= base element using a binary search
 
+        :param int base_element_id:
+        :param int lo:
         :rtype: int or None
         """
         hi = len(self._free_space_tracker) - 1
@@ -79,7 +81,7 @@ class ElementAllocatorAlgorithm(object):
             return None
         return lo
 
-    def _do_allocation(self, index, base_element_id, n_elements):
+    def __do_allocation(self, index, base_element_id, n_elements):
         """ Allocate a given base element ID and number of elements into the\
             space at the given slot
 
@@ -88,6 +90,7 @@ class ElementAllocatorAlgorithm(object):
             The element ID to start with; must be inside the slot
         :param int n_elements:
             The number of elements to be allocated; should be power of 2
+        :raises PacmanElementAllocationException:
         """
 
         free_space_slot = self._free_space_tracker[index]
@@ -145,7 +148,8 @@ class ElementAllocatorAlgorithm(object):
             The element ID to start with; must be inside the slot
         :param int n_elements:
             The number of elements to be allocated; should be power of 2
-        :rtype: int
+        :rtype: int or None
+        :raises PacmanElementAllocationException:
         """
         free_space_slot = self._free_space_tracker[index]
         space = (free_space_slot.size -

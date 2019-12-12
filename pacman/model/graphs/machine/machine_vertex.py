@@ -44,7 +44,7 @@ class MachineVertex(AbstractVertex):
             The slice of the application vertex that this machine vertex
             implements.
         :type vertex_slice: Slice or None
-        :raise pacman.exceptions.PacmanInvalidParameterException:
+        :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
         if label is None:

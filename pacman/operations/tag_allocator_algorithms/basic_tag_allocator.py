@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import namedtuple
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_machine.tags import IPTag, ReverseIPTag
@@ -23,6 +24,9 @@ from pacman.utilities.utility_objs import ResourceTracker
 _BOARD_PORTS = range(17896, 18000)
 
 
+_Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
+
+
 class BasicTagAllocator(object):
     """ Basic tag allocator that goes though the boards available and applies\
         the IP tags and reverse IP tags as needed.
@@ -31,11 +35,21 @@ class BasicTagAllocator(object):
         The machine with respect to which to partition the application graph
     :param int plan_n_timesteps: number of timesteps to plan for
     :param Placements placements:
+    :return: list of IP Tags, list of Reverse IP Tags, tag allocation holder
+    :rtype: tuple(list(~spinn_machine.tags.IPTag),
+        list(~spinn_machine.tags.ReverseIPTag), Tags)
     """
 
     __slots__ = []
 
     def __call__(self, machine, plan_n_timesteps, placements):
+        """
+        :param ~spinn_machine.Machine machine:
+        :param int plan_n_timesteps:
+        :param Placements placements:
+        :rtype: tuple(list(~spinn_machine.tags.IPTag),
+            list(~spinn_machine.tags.ReverseIPTag), Tags)
+        """
         resource_tracker = ResourceTracker(machine, plan_n_timesteps)
 
         # Keep track of ports allocated to reverse IP tags and tags that still
@@ -63,15 +77,28 @@ class BasicTagAllocator(object):
 
         return list(tags.ip_tags), list(tags.reverse_ip_tags), tags
 
-    def _gather_placements_with_tags(self, placement, collector):
-        if (placement.vertex.resources_required.iptags or
-                placement.vertex.resources_required.reverse_iptags):
+    @staticmethod
+    def _gather_placements_with_tags(placement, collector):
+        """
+        :param Placement placement:
+        :param list(Placement) collector:
+        """
+        requires = placement.vertex.resources_required
+        if requires.iptags or requires.reverse_iptags:
             ResourceTracker.check_constraints([placement.vertex])
             collector.append(placement)
 
-    def _allocate_tags_for_placement(self, placement, resource_tracker,
-                                     tag_collector, ports_collector,
-                                     tag_port_tasks):
+    @staticmethod
+    def _allocate_tags_for_placement(
+            placement, resource_tracker, tag_collector, ports_collector,
+            tag_port_tasks):
+        """
+        :param Placement placement:
+        :param ResourceTracker resource_tracker:
+        :param Tags tag_collector:
+        :param dict(str,set(int)) ports_collector:
+        :param list(_Task) tag_port_tasks:
+        """
         vertex = placement.vertex
         resources = vertex.resources_required
 
@@ -117,16 +144,22 @@ class BasicTagAllocator(object):
 
                 ports_collector[board_address].discard(tag_constraint.port)
             else:
-                tag_port_tasks.append(
-                    (tag_constraint, board_address, tag, vertex, placement))
+                tag_port_tasks.append(_Task(
+                    tag_constraint, board_address, tag, vertex, placement))
 
-    def _allocate_ports_for_reverse_ip_tags(self, tasks, ports, tags):
-        for tag_constraint, board_address, tag, vertex, placement in tasks:
-            if board_address not in ports:
-                ports[board_address] = OrderedSet(_BOARD_PORTS)
-            port = ports[board_address].pop(last=False)
+    @staticmethod
+    def _allocate_ports_for_reverse_ip_tags(tasks, ports, tags):
+        """
+        :param list(_Task) tag_port_tasks:
+        :param dict(str,set(int)) ports:
+        :param Tags tags:
+        """
+        for task in tasks:
+            if task.board not in ports:
+                ports[task.board] = OrderedSet(_BOARD_PORTS)
+            port = ports[task.board].pop(last=False)
             reverse_ip_tag = ReverseIPTag(
-                board_address, tag, port,
-                placement.x, placement.y, placement.p,
-                tag_constraint.sdp_port)
-            tags.add_reverse_ip_tag(reverse_ip_tag, vertex)
+                task.board, task.tag, port,
+                task.placement.x, task.placement.y, task.placement.p,
+                task.constraint.sdp_port)
+            tags.add_reverse_ip_tag(reverse_ip_tag, task.vertex)

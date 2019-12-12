@@ -28,8 +28,7 @@ class AbstractSDRAM(object):
         """
         The total SDRAM.
 
-        :param n_timesteps: number of timesteps to cost for
-        :type n_timesteps: int
+        :param int n_timesteps: number of timesteps to cost for
         :return:
         """
 
@@ -38,30 +37,27 @@ class AbstractSDRAM(object):
         """
         Combines this SDRAM resource with the other one and creates a new one
 
-        :param other: another SDRAM resource
-        :type other: ~.AbstractSDRAM
+        :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
-        :rtype: ~.AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractmethod
     def __sub__(self, other):
         """ Creates a new SDRAM which is this one less the other
 
-        :param other: another SDRAM resource
-        :type other: ~.AbstractSDRAM
+        :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
-        :rtype: ~.AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractmethod
     def sub_from(self, other):
         """ Creates a new SDRAM which is the other less this one
 
-        :param other: another  SDRAM resource
-        :type other: ~.AbstractSDRAM
+        :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
-        :rtype: ~.AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractproperty
@@ -73,5 +69,6 @@ class AbstractSDRAM(object):
     def per_timestep(self):
         """ Returns extra SDRAM cost for each additional timestep
 
-        Warning: may well be zero
+        .. warn:
+            May well be zero.
         """

@@ -32,12 +32,18 @@ logger = logging.getLogger(__name__)
 class ConstraintGroup(list):
 
     def __init__(self, values):
+        """
+        :param iterable(OutgoingEdgePartition) values:
+        """
         super(ConstraintGroup, self).__init__(values)
         self._constraint = None
         self._n_keys = None
 
     @property
     def constraint(self):
+        """
+        :rtype: AbstractConstraint
+        """
         return self._constraint
 
     def _set_constraint(self, constraint):
@@ -62,6 +68,9 @@ def get_edge_groups(machine_graph, traffic_type):
     :param MachineGraph machine_graph: the machine graph
     :param EdgeTrafficType traffic_type: the traffic type to group
     :return: the various constraint groups, by type
+    :rtype: tuple(list(ConstraintGroup),list(ConstraintGroup),
+        list(ConstraintGroup),list(ConstraintGroup),list(ConstraintGroup),
+        list(ConstraintGroup))
     """
 
     # mapping between partition and shared key group it is in
@@ -161,6 +170,7 @@ def check_types_of_edge_constraint(machine_graph):
         are compatible.
 
     :param MachineGraph machine_graph: the graph to search through
+    :raises PacmanConfigurationException:
     """
     for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = locate_constraints_of_type(
