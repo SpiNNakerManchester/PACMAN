@@ -55,8 +55,9 @@ extensions = [
 
 root_package = "pacman"
 
-intersphinx_mapping = {'spinn_machine': (
-    'http://spinnmachine.readthedocs.org/en/latest/', None)}
+intersphinx_mapping = {
+    'spinn_utilities': ('https://spinnutils.readthedocs.org/en/latest/', None),
+    'spinn_machine': ('https://spinnmachine.readthedocs.org/en/latest/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -72,7 +73,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PACMAN'
-copyright = u'2014-2017'
+copyright = u'2014-2019'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -378,4 +379,19 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../" + root_package])
+base = "../../" + root_package
+apidoc.main([None, '-o', ".", base,
+             base + "/executor/a*/[a-z]*.py",
+             base + "/executor/*reader.py",
+             base + "/executor/[b-z]*.py",
+             base + "/model/*_constraints/[a-z]*.py",
+             base + "/model/constraints/abstract_constraint.py",
+             base + "/model/decorators/*",
+             base + "/model/graphs/*/[a-z]*.py",
+             base + "/model/graphs/[a-z]*.py",
+             base + "/model/placements/[a-z]*.py",
+             base + "/model/resources/[a-z]*.py",
+             base + "/model/routing_*/[a-z]*.py",
+             base + "/model/tags/[a-z]*.py",
+             base + "/utilities/utility_objs/[a-z]*.py",
+             ])

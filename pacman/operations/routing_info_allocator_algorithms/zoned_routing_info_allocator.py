@@ -127,7 +127,6 @@ class ZonedRoutingInfoAllocator(object):
                     source_bits, max_app_keys_bits))
         return max_partitions, max_app_keys_bits, key_bits_per_app
 
-
     def _simple_allocate(self, max_app_keys_bits, key_bits_map):
         """
         :param int max_app_keys_bits:
