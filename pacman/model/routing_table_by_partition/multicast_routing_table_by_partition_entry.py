@@ -47,6 +47,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             the direction this entry came from (between 0 and 17)
         :param int incoming_link:
             the direction this entry came from in link (between 0 and 5)
+        :raises PacmanInvalidParameterException:
         """
         if isinstance(out_going_links, int):
             self._out_going_links = set()
@@ -127,7 +128,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     def incoming_processor(self):
         """ The source processor
 
-        :rtype: int or Non
+        :rtype: int or None
         """
         return self._incoming_processor
 
@@ -171,9 +172,10 @@ class MulticastRoutingTableByPartitionEntry(object):
         """ Merges the another entry with this one and returns a new\
             MulticastRoutingTableByPartitionEntry
 
-        :param MulticastRoutingTableByPartitionEntry other: \
+        :param MulticastRoutingTableByPartitionEntry other:
             the entry to merge into this one
         :return: a merged MulticastRoutingTableByPartitionEntry
+        :raises PacmanInvalidParameterException:
         """
         if not isinstance(other, MulticastRoutingTableByPartitionEntry):
             raise PacmanInvalidParameterException(
