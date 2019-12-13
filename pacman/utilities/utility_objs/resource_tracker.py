@@ -1031,7 +1031,7 @@ class ResourceTracker(object):
             self, resource_and_constraint_list, chips=None):
         """ Allocates a group of cores on the same chip for these resources
 
-        :param list(tuple(ResourceContainer,AbstractConstraint))
+        :param list(tuple(ResourceContainer,AbstractConstraint)) \
                 resource_and_constraint_list:
             A list of tuples of (resources, list of constraints) to allocate
         :param iterable(tuple(int,int)) chips:

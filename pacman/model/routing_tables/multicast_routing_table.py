@@ -47,7 +47,7 @@ class MulticastRoutingTable(object):
             The x-coordinate of the chip for which this is the routing table
         :param int y:
             The y-coordinate of the chip for which this is the routing tables
-        :param iterable(~spinn_machine.MulticastRoutingEntry)
+        :param iterable(~spinn_machine.MulticastRoutingEntry) \
                 multicast_routing_entries:
             The routing entries to add to the table
         :raise PacmanAlreadyExistsException:

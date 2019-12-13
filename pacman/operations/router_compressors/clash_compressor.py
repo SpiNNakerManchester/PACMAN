@@ -29,9 +29,9 @@ class ClashCompressor(AbstractCompressor):
 
     def find_merge(self, an_entry, route_entries):
         """
-        :param Entry an_entry:
+        :param ~.Entry an_entry:
         :param list(Entry) route_entries:
-        :rtype: Entry or None
+        :rtype: ~.Entry or None
         """
         for another in route_entries:
             m_key, m_mask, defaultable = self.merge(an_entry, another)
@@ -55,8 +55,8 @@ class ClashCompressor(AbstractCompressor):
 
     def compress_by_route(self, route_entries):
         """
-        :param list(Entry) route_entres:
-        :rtype: list(Entry)
+        :param list(~.Entry) route_entres:
+        :rtype: list(~.Entry)
         """
         results = []
         while len(route_entries) > 1:
@@ -75,8 +75,8 @@ class ClashCompressor(AbstractCompressor):
     def compress_ignore_clashers(self, router_table, top_entries):
         """
         :param MulticastRoutingTable router_table:
-        :param list(Entry) top_entries:
-        :rtype: list(Entry)
+        :param list(~.Entry) top_entries:
+        :rtype: list(~.Entry)
         :raises MinimisationFailedError:
         """
         while True:
@@ -133,7 +133,7 @@ class ClashCompressor(AbstractCompressor):
     def compress_table(self, router_table):
         """
         :param MulticastRoutingTable router_table:
-        :rtype: list(Entry)
+        :rtype: list(~.Entry)
         """
         # Split the entries into buckets based on spinnaker_route
 
