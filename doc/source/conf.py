@@ -394,5 +394,6 @@ apidoc.main([None, '-o', ".", base,
              base + "/model/resources/[a-z]*.py",
              base + "/model/routing_*/[a-z]*.py",
              base + "/model/tags/[a-z]*.py",
+             base + "/operations/router_compressors/[a-z]*.py",
              base + "/utilities/utility_objs/[a-z]*.py",
              ])
