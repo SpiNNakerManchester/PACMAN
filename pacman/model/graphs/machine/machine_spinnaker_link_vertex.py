@@ -33,8 +33,8 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
     ]
 
     def __init__(
-            self, spinnaker_link_id, timestep_in_us, board_address=None, label=None,
-            constraints=None):
+            self, spinnaker_link_id, timestep_in_us, board_address=None,
+            label=None, constraints=None):
         super(MachineSpiNNakerLinkVertex, self).__init__(
             timestep_in_us=timestep_in_us,
             label=label, constraints=constraints)
