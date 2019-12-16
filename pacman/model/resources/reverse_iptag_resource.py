@@ -76,7 +76,7 @@ class ReverseIPtagResource(object):
     def get_value(self):
         """
         :return: The description of the reverse IP tag.
-        :rtype: list
+        :rtype: list(int, int, int)
         """
         return [self._port, self._sdp_port, self._tag]
 

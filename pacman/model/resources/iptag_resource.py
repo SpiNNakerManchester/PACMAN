@@ -104,6 +104,7 @@ class IPtagResource(object):
     def get_value(self):
         """
         :return: The description of the IP tag.
+        :rtype: list(str, int, bool, int, str)
         """
         return [
             self._ip_address, self._port, self._strip_sdp, self._tag,

@@ -47,5 +47,6 @@ class CoreResource(object):
     def get_value(self):
         """
         :return: The chip and the cores required on it.
+        :rtype: tuple(~spinn_machine.Chip, int)
         """
         return self._chip, self._n_cores

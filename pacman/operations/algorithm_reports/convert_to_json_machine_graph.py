@@ -33,6 +33,8 @@ class ConvertToJsonMachineGraph(object):
     :param MachineGraph machine_graph: The machine_graph to place
     :param str report_folder:
         the folder to which the reports are being written
+    :return: The name of the actual file that was written
+    :rtype: str
     """
 
     def __call__(self, machine_graph, report_folder):
@@ -51,9 +53,14 @@ class ConvertToJsonMachineGraph(object):
 
         :param MachineGraph machine_graph: The machine_graph to place
         :param str file_path:
-            Location to write file to. Warning will overwrite!
-        """
+            Location to write file to.
 
+            ..warning::
+                Will overwrite!
+
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :rtype: str
+        """
         json_obj = graph_to_json(machine_graph)
 
         if progress:

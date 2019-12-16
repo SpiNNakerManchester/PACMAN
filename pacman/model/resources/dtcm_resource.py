@@ -34,5 +34,6 @@ class DTCMResource(object):
     def get_value(self):
         """
         :return: The required amount of DTCM, in bytes.
+        :rtype: int
         """
         return self._dtcm

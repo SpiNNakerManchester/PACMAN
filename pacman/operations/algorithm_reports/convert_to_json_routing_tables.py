@@ -28,10 +28,16 @@ class ConvertToJsonRoutingTables(object):
     :param MulticastRoutingTables router_tables: Routing Tables to convert
     :param str report_folder:
         the folder to which the reports are being written
+    :return: the name of the file that was written
+    :rtype: str
     """
 
     def __call__(self, router_tables, report_folder):
         """ Runs the code to write the machine in Java readable JSON.
+
+        :param MulticastRoutingTables router_tables:
+        :param str report_folder:
+        :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON RouterTables")
@@ -41,15 +47,21 @@ class ConvertToJsonRoutingTables(object):
             router_tables, file_path, progress)
 
     @staticmethod
-    def do_convert(router_table, file_path, progress=None):
+    def do_convert(router_tables, file_path, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param ~spinn_machine.machine.Machine machine: Machine to convert
+        :param ~spinn_machine.MulticastRouterTables router_tables:
         :param str file_path:
-            Location to write file to. Warning will overwrite!
+            Location to write file to.
+
+            ..warning::
+                Will overwrite!
+
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :rtype: strå
         """
 
-        json_obj = to_json(router_table)
+        json_obj = to_json(router_tables)
 
         if progress:
             progress.update()

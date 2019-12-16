@@ -65,28 +65,40 @@ class PartitionRoutingInfo(object):
 
     @property
     def keys_and_masks(self):
+        """
+        :rtype: iterable(BaseKeyAndMask)
+        """
         return self._keys_and_masks
 
     @property
     def first_key_and_mask(self):
         """ The first key and mask (or only one if there is only one)
+
+        :rtype: BaseKeyAndMask
         """
         return self._keys_and_masks[0]
 
     @property
     def first_key(self):
         """ The first key (or only one if there is only one)
+
+        :rtype: int
         """
         return self._keys_and_masks[0].key
 
     @property
     def first_mask(self):
         """ The first mask (or only one if there is only one)
+
+        :rtype: mask
         """
         return self._keys_and_masks[0].mask
 
     @property
     def partition(self):
+        """
+        :rtype: OutgoingEdgePartition
+        """
         return self._partition
 
     def __repr__(self):

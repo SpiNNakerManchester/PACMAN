@@ -119,7 +119,7 @@ class SpecificBoardTagResource(object):
     def get_value(self):
         """
         :return: A description of the specific board's IP tag required.
-        :rtype: list
+        :rtype: list(str, str, int, bol, int, str)
         """
         return [
             self._board, self._ip_address, self._port, self._strip_sdp,
