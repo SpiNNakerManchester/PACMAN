@@ -66,8 +66,8 @@ class AlgorithmMetadataXmlReader(object):
         :param set(str) allowed:
         :raises PacmanConfigurationException:
         """
-        if any(sub.tag.split("}")[-1] not in allowed
-               for sub in element.iterchildren()):
+        if any(self.__name(sub) not in allowed
+               for sub in self.__child_elems(element)):
             raise PacmanConfigurationException(
                 "Error in XML starting at line {} of {}: Only"
                 " one of {} is allowed in {}".format(
@@ -249,8 +249,8 @@ class AlgorithmMetadataXmlReader(object):
         if allow_tokens:
             allowed_elements.add("token")
         self._check_allowed_elements(inputs_element, allowed_elements)
-        for alg_input in inputs_element.iterchildren():
-            tag = alg_input.tag.split("}")[-1]
+        for alg_input in self.__child_elems(inputs_element):
+            tag = self.__name(alg_input)
             if tag == "param_name":
                 name = alg_input.text.strip()
                 definition = definitions.get(name, None)
@@ -288,8 +288,8 @@ class AlgorithmMetadataXmlReader(object):
         if outputs_element is not None:
             self._check_allowed_elements(
                 outputs_element, {"param_type", "token"})
-            for alg_output in outputs_element.iterchildren():
-                tag = alg_output.tag.split("}")[-1]
+            for alg_output in self.__child_elems(outputs_element):
+                tag = self.__name(alg_output)
                 if tag == "param_type":
                     file_name_type = alg_output.get(
                         "file_name_type", default=None)
@@ -333,3 +333,24 @@ class AlgorithmMetadataXmlReader(object):
         :rtype: list(str)
         """
         return [e.text.strip() for e in element.findall(xpath)]
+
+    @staticmethod
+    def __child_elems(element):
+        """ Get the child *elements* of an element.
+
+        :param lxml.etree.ElementBase element:
+        :rtype: iterable(lxml.etree.ElementBase)
+        """
+        for sub in element.iterchildren():
+            if isinstance(sub, etree.ElementBase):
+                yield sub
+            # Comments and processing instructions are ignored.
+
+    @staticmethod
+    def __name(element):
+        """ Get the local name of an element.
+
+        :param lxml.etree.ElementBase element:
+        :rtype: str
+        """
+        return element.tag.split("}")[-1]
