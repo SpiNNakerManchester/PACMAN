@@ -144,8 +144,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_coverin
 """
 from pacman.operations.router_compressors import Entry
 from pacman.exceptions import MinimisationFailedError
-from .remove_default_routes import \
-    minimise as remove_default_routes
+from .remove_default_routes import minimise as remove_default_routes
 from .utils import intersect
 
 
@@ -179,12 +178,12 @@ def minimise(routing_table, target_length):
         If the smallest table that can be produced is larger than
         `target_length`.
     """
-    table, _ = ordered_covering(routing_table, target_length, no_raise=True)
+    table, _ = _ordered_covering(routing_table, target_length, no_raise=True)
     return remove_default_routes(table, target_length)
 
 
-def ordered_covering(routing_table, target_length, aliases=None,
-                     no_raise=False):
+def _ordered_covering(routing_table, target_length, aliases=None,
+                      no_raise=False):
     """
     Reduce the size of a routing table by merging together entries where
     possible.

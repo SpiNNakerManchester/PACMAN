@@ -20,6 +20,10 @@ from pacman.exceptions import PacmanConfigurationException
 
 class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
     """ Key allocator constraint that fixes the key and mask of an edge.
+
+    .. note::
+        Used for neuron-connected input ("sensory neurons") and output
+        ("motor neurons") devices.
     """
 
     __slots__ = [

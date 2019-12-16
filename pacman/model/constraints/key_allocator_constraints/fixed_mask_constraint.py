@@ -18,6 +18,9 @@ from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 class FixedMaskConstraint(AbstractKeyAllocatorConstraint):
     """ A key allocator that fixes the mask to be assigned to an edge.
+
+    .. note::
+        Used for some neuron-connected output devices.
     """
 
     __slots__ = [
