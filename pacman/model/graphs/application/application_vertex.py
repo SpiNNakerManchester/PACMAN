@@ -36,12 +36,11 @@ class ApplicationVertex(AbstractVertex):
         :param label: The optional name of the vertex
         :type label: str
         :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
+        :type constraints: iterable(AbstractConstraint)
         :param max_atoms_per_core: the max number of atoms that can be\
             placed on a core, used in partitioning
         :type max_atoms_per_core: int
-        :raise pacman.exceptions.PacmanInvalidParameterException:\
+        :raise PacmanInvalidParameterException:\
             * If one of the constraints is not valid
         """
 
