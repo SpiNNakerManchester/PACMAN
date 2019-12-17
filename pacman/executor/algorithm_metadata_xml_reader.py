@@ -56,13 +56,12 @@ class AlgorithmMetadataXmlReader(object):
     def __init__(self, xml_paths):
         """
         :param list(str) xml_paths: paths to extra metadata files
-        :rtype: None
         """
         self._xml_paths = xml_paths
 
     def _check_allowed_elements(self, element, allowed):
         """
-        :param lxml.etree.ElementBase element:
+        :param lxml.etree._Element element:
         :param set(str) allowed:
         :raises PacmanConfigurationException:
         """
@@ -99,7 +98,7 @@ class AlgorithmMetadataXmlReader(object):
     def _parse_algorithm(self, element):
         """ Translates XML elements into tuples for the AbstractAlgorithm object
 
-        :param lxml.etree.ElementBase element: the XML element to translate
+        :param lxml.etree._Element element: the XML element to translate
         :rtype: AbstractAlgorithm
         :raises PacmanConfigurationException:
         """
@@ -191,7 +190,7 @@ class AlgorithmMetadataXmlReader(object):
     def _translate_args(self, args_element):
         """ Convert an XML arg element into a list of args
 
-        :param lxml.etree.ElementBase args_element:
+        :param lxml.etree._Element args_element:
         :rtype: list(str)
         :raises PacmanConfigurationException:
         """
@@ -210,7 +209,7 @@ class AlgorithmMetadataXmlReader(object):
         """ Convert the XML input definitions section into a dict of
             name to AbstractInput
 
-        :param lxml.etree.ElementBase defs_element:
+        :param lxml.etree._Element defs_element:
         :rtype: dict(str, SingleInput)
         :raises PacmanConfigurationException:
         """
@@ -232,7 +231,7 @@ class AlgorithmMetadataXmlReader(object):
             of AbstractInput
 
         :param str algorithm_id:
-        :param lxml.etree.ElementBase inputs_element:
+        :param lxml.etree._Element inputs_element:
         :param dict(str,SingleInput) definitions:
         :param set(str) seen_names:
         :param bool allow_tokens:
@@ -277,7 +276,7 @@ class AlgorithmMetadataXmlReader(object):
     def _translate_outputs(self, outputs_element, is_external):
         """ Convert an XML outputs section into a list of str
 
-        :param lxml.etree.ElementBase outputs_element:
+        :param lxml.etree._Element outputs_element:
         :param bool is_external:
         :return: outputs, tokens
         :rtype: tuple(list(Output), set(Token))
@@ -308,7 +307,7 @@ class AlgorithmMetadataXmlReader(object):
     @staticmethod
     def _translate_token(token_element):
         """
-        :param lxml.etree.ElementBase token_element: The token element
+        :param lxml.etree._Element token_element: The token element
         :rtype: Token
         """
         part = token_element.get("part", default=None)
@@ -318,7 +317,7 @@ class AlgorithmMetadataXmlReader(object):
     @staticmethod
     def __text(element, xpath):
         """
-        :param lxml.etree.ElementBase element: the XML element to search from
+        :param lxml.etree._Element element: the XML element to search from
         :param str xpath:
         :rtype: str or None
         """
@@ -328,7 +327,7 @@ class AlgorithmMetadataXmlReader(object):
     @staticmethod
     def __all_text(element, xpath):
         """
-        :param lxml.etree.ElementBase element: the XML element to search from
+        :param lxml.etree._Element element: the XML element to search from
         :param str xpath:
         :rtype: list(str)
         """
@@ -338,19 +337,22 @@ class AlgorithmMetadataXmlReader(object):
     def __child_elems(element):
         """ Get the child *elements* of an element.
 
-        :param lxml.etree.ElementBase element:
-        :rtype: iterable(lxml.etree.ElementBase)
+        :param lxml.etree._Element element:
+        :rtype: iterable(lxml.etree._Element)
         """
-        for sub in element.iterchildren():
-            if isinstance(sub, etree.ElementBase):
+        # pylint: disable=unidiomatic-typecheck
+        for sub in element:
+            # because lxml is RETARDED and makes non-elements subtypes of
+            # elements! Seriously, what the literal living fuck was the
+            # developer smoking?
+            if type(sub) == etree._Element:
                 yield sub
-            # Comments and processing instructions are ignored.
 
     @staticmethod
     def __name(element):
         """ Get the local name of an element.
 
-        :param lxml.etree.ElementBase element:
+        :param lxml.etree._Element element:
         :rtype: str
         """
         return element.tag.split("}")[-1]
