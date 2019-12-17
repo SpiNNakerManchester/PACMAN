@@ -90,7 +90,7 @@ class PartitionRoutingInfo(object):
     def first_mask(self):
         """ The first mask (or only one if there is only one)
 
-        :rtype: mask
+        :rtype: int
         """
         return self._keys_and_masks[0].mask
 
