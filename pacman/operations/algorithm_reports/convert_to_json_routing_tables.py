@@ -58,7 +58,7 @@ class ConvertToJsonRoutingTables(object):
                 Will overwrite!
 
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
-        :rtype: strå
+        :rtype: str
         """
 
         json_obj = to_json(router_tables)
