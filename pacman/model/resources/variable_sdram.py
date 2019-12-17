@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from .abstract_sdram import AbstractSDRAM
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import lcm
