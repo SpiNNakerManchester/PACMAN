@@ -125,13 +125,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         subv_from_vert = vert.create_machine_vertex(Slice(0, 9), resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
 
-    def test_simtime_in_us_to_timesteps(self):
-        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        timestep = vert.timestep_in_us
-        self.assertEqual(10, vert.simtime_in_us_to_timesteps(10*timestep))
-        with self.assertRaises(Exception):
-            vert.simtime_in_us_to_timesteps(10 * timestep + 1)
-
     @unittest.skip("demonstrating skipping")
     def test_create_new_vertex_from_vertex_with_additional_constraints(
             self):
