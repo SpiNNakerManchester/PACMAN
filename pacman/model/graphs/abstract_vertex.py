@@ -80,35 +80,3 @@ class AbstractVertex(ConstrainedObject):
             If there is an attempt to add the same vertex more than once
         """
         self._added_to_graph = True
-
-    @abstractproperty
-    def timestep_in_us(self):
-        """ The timestep of this vertex in us
-
-        Typically will default to the machine timestep
-
-        If the machine vertexes have different timestemps this method will\
-        return the lowest common multiple of these
-
-        :rtype: int
-        """
-
-    def simtime_in_us_to_timesteps(self, simtime_in_us):
-        """
-        Helper function to convert simtime in us to whole timestep
-
-        This function verfies that the simtime is a multile of the timestep.
-
-        :param simtime_in_us: a simulation time in us
-        :type simtime_in_us: int
-        :return: the exact number of timeteps covered by this simtime
-        :rtype: int
-        :raises ValueError: If the simtime is not a mutlple of the timestep
-        """
-        n_timesteps = simtime_in_us // self.timestep_in_us
-        check = n_timesteps * self.timestep_in_us
-        if check != simtime_in_us:
-            raise ValueError(
-                "The requested time {} is not a multiple of the timestep {}"
-                "".format(simtime_in_us, self.timestep_in_us))
-        return n_timesteps

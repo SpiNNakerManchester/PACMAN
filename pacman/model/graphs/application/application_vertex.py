@@ -99,3 +99,16 @@ class ApplicationVertex(AbstractVertex):
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
         return self.n_atoms
+
+    def timesteps_in_us(self):
+        """ The timesteps of this vertex in us
+
+        Typically will be a singleton list of timestep set by the users.
+
+        Vertexes which do not use timestep may return an empty list.
+
+        If the machine vertexes have different timestemps this method will all
+        the different ones.
+
+        :rtype: set(int)
+        """
