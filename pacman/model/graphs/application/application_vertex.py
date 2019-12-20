@@ -100,6 +100,7 @@ class ApplicationVertex(AbstractVertex):
                 return constraint.size
         return self.n_atoms
 
+    @abstractproperty
     def timesteps_in_us(self):
         """ The timesteps of this vertex in us
 
