@@ -272,7 +272,7 @@ def vertex_from_json(json_dict, convert_constraints=True):
     resources = resource_container_from_json(json_dict.get("resources"))
     if "timestep_in_us" in json_dict:
         return SimpleMachineTimestepVertex(
-            timestep_in_us=json_dict["timestep_in_us"], resources= resources,
+            timestep_in_us=json_dict["timestep_in_us"], resources=resources,
             label=json_dict["label"], constraints=constraints)
     else:
         return SimpleMachineVertex(
