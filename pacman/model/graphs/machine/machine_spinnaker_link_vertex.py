@@ -32,11 +32,9 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         "_virtual_chip_y",
     ]
 
-    def __init__(
-            self, spinnaker_link_id, timestep_in_us, board_address=None,
-            label=None, constraints=None):
+    def __init__(self, spinnaker_link_id, board_address=None,
+                 label=None, constraints=None):
         super(MachineSpiNNakerLinkVertex, self).__init__(
-            timestep_in_us=timestep_in_us,
             label=label, constraints=constraints)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address

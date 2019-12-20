@@ -21,13 +21,8 @@ class SimpleMachineVertex(MachineVertex):
     """ A MachineVertex that stores its own resources.
     """
 
-    def __init__(self, resources, label=None, constraints=None,
-                 timestep_in_us=None):
-        if timestep_in_us is None:
-            # Test mode so use standard value
-            timestep_in_us = 1000
+    def __init__(self, resources, label=None, constraints=None):
         super(SimpleMachineVertex, self).__init__(
-            timestep_in_us=timestep_in_us,
             label=label, constraints=constraints)
         self._resources = resources
 

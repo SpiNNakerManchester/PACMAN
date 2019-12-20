@@ -29,7 +29,7 @@ from pacman.model.resources import (
     TimeBasedSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, SimpleMachineVertex)
+    MachineTimestepVertex, MachineEdge, MachineGraph, SimpleMachineVertex)
 
 
 def json_to_object(json_object):
@@ -269,9 +269,13 @@ def vertex_from_json(json_dict, convert_constraints=True):
     else:
         constraints = []
     resources = resource_container_from_json(json_dict.get("resources"))
-    return SimpleMachineVertex(
-        resources, label=json_dict["label"], constraints=constraints,
-        timestep_in_us=json_dict["timestep_in_us"])
+    if "timestep_in_us" in json_dict:
+        return SimpleMachineTimestepVertex(
+            resources, label=json_dict["label"], constraints=constraints,
+            timestep_in_us=json_dict["timestep_in_us"])
+    else:
+        return SimpleMachineVertex(
+            resources, label=json_dict["label"], constraints=constraints)
 
 
 def vertex_add_contstraints_from_json(json_dict, graph):

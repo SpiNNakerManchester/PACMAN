@@ -13,15 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .machine_edge import MachineEdge
-from .machine_fpga_vertex import MachineFPGAVertex
-from .machine_graph import MachineGraph
-from .machine_outgoing_edge_partition import MachineOutgoingEdgePartition
 from .machine_timestep_vertex import MachineTimestepVertex
-from .machine_spinnaker_link_vertex import MachineSpiNNakerLinkVertex
 from .machine_vertex import MachineVertex
-from .simple_machine_vertex import SimpleMachineVertex
+from spinn_utilities.overrides import overrides
 
-__all__ = ["MachineEdge", "MachineFPGAVertex", "MachineGraph",
-           "MachineOutgoingEdgePartition", "MachineSpiNNakerLinkVertex",
-           "MachineTimestepVertex", "MachineVertex", "SimpleMachineVertex"]
+
+class SimpleMachineVertex(MachineTimestepVertex):
+    """ A MachineVertex with timestep that stores its own resources.
+    """
+
+    def __init__(self, timestep, resources, label=None, constraints=None):
+        super(SimpleMachineVertex, self).__init__(
+            timestep_in_us=timestep, label=label, constraints=constraints)
+        self._resources = resources
+
+    @property
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        return self._resources
