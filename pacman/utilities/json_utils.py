@@ -29,7 +29,7 @@ from pacman.model.resources import (
     TimeBasedSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
-    MachineTimestepVertex, MachineEdge, MachineGraph, SimpleMachineVertex)
+    MachineEdge, MachineGraph, SimpleMachineTimestepVertex, SimpleMachineVertex)
 
 
 def json_to_object(json_object):

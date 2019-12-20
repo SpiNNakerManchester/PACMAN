@@ -18,12 +18,12 @@ from .machine_vertex import MachineVertex
 from spinn_utilities.overrides import overrides
 
 
-class SimpleMachineVertex(MachineTimestepVertex):
+class SimpleMachineTimestepVertex(MachineTimestepVertex):
     """ A MachineVertex with timestep that stores its own resources.
     """
 
     def __init__(self, timestep, resources, label=None, constraints=None):
-        super(SimpleMachineVertex, self).__init__(
+        super(SimpleMachineTimestepVertex, self).__init__(
             timestep_in_us=timestep, label=label, constraints=constraints)
         self._resources = resources
 
