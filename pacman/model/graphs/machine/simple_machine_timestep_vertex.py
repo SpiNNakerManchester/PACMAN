@@ -22,9 +22,11 @@ class SimpleMachineTimestepVertex(MachineTimestepVertex):
     """ A MachineVertex with timestep that stores its own resources.
     """
 
-    def __init__(self, timestep_in_us, resources, label=None, constraints=None):
+    def __init__(
+            self, timestep_in_us, resources, label=None, constraints=None):
         super(SimpleMachineTimestepVertex, self).__init__(
-            timestep_in_us=timestep_in_us, label=label, constraints=constraints)
+            timestep_in_us=timestep_in_us, label=label,
+            constraints=constraints)
         self._resources = resources
 
     @property
