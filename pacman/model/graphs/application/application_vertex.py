@@ -63,11 +63,11 @@ class ApplicationVertex(AbstractVertex):
     def get_resources_used_by_atoms(self, vertex_slice):
         """ Get the separate resource requirements for a range of atoms
 
-        :param Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
         :return: a Resource container that contains a \
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: ResourceContainer
+        :rtype: ~pacman.model.resources.ResourceContainer
         """
 
     @abstractmethod
@@ -76,13 +76,14 @@ class ApplicationVertex(AbstractVertex):
             constraints=None):
         """ Create a machine vertex from this application vertex
 
-        :param Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover
-        :param ResourceContainer resources_required:
+        :param ~pacman.model.resources.ResourceContainer resources_required:
             the resources used by the machine vertex
         :param label: human readable label for the machine vertex
         :type label: str or None
-        :param iterable(AbstractConstraint) constraints:
+        :param iterable(~pacman.model.constraints.AbstractConstraint) \
+                constraints:
             Constraints to be passed on to the machine vertex
         """
 

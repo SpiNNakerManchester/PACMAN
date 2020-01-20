@@ -113,5 +113,5 @@ class MachineVertex(AbstractVertex):
     def resources_required(self):
         """ The resources required by the vertex
 
-        :rtype: ResourceContainer
+        :rtype: ~pacman.model.resources.ResourceContainer
         """

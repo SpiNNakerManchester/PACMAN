@@ -107,26 +107,22 @@ class ElementAllocatorAlgorithm(object):
 
         if (free_space_slot.start_address == base_element_id and
                 free_space_slot.size == n_elements):
-
             # If the slot exactly matches the space, remove it
             del self._free_space_tracker[index]
 
         elif free_space_slot.start_address == base_element_id:
-
             # If the slot starts with the element ID, reduce the size
             self._free_space_tracker[index] = ElementFreeSpace(
                 free_space_slot.start_address + n_elements,
                 free_space_slot.size - n_elements)
 
         elif space == n_elements:
-
             # If the space at the end exactly matches the spot, reduce the size
             self._free_space_tracker[index] = ElementFreeSpace(
                 free_space_slot.start_address,
                 free_space_slot.size - n_elements)
 
         else:
-
             # Otherwise, the allocation lies in the middle of the region:
             # First, reduce the size of the space before the allocation
             self._free_space_tracker[index] = ElementFreeSpace(
