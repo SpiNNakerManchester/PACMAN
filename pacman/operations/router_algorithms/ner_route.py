@@ -536,7 +536,7 @@ def _least_busy_dimension_first(traffic, vector, start, machine):
     for _, (x, y) in min_route:
         traffic[x, y] += 1
 
-    return route
+    return min_route
 
 
 def _longest_dimension_first(vector, start, machine):
