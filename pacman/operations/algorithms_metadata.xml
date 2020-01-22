@@ -804,4 +804,30 @@
             <param_type>MemoryRoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="NerRouteTrafficAware">
+        <python_module>pacman.operations.router_algorithms</python_module>
+        <python_class>NerRouteTrafficAware</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>placements</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryRoutingTableByPartition</param_type>
+        </outputs>
+    </algorithm>
 </algorithms>

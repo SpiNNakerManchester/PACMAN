@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import functools
 """Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
 Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
@@ -27,8 +27,9 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.p
 """
 
 import heapq
+import itertools
 
-from collections import deque
+from collections import deque, defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import MachineHasDisconnectedSubRegion
@@ -81,7 +82,7 @@ def _convert_a_route(
             routing_tables, partition, None, next_incoming_link, next_hop)
 
 
-def _ner_net(source, destinations, machine):
+def _ner_net(source, destinations, machine, vector_to_nodes):
     """ Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
@@ -92,6 +93,9 @@ def _ner_net(source, destinations, machine):
     :param destinations:  iterable([(x, y), ...])
         The coordinates of destination vertices.
     :param machine: machine for which routes are being generated
+    :param vector_to_nodes:\
+        function that converts a vector to a list of nodes and links in order\
+        of the route to be taken
     :return: (:py:class:`RoutingTree`
      {(x,y): :py:class:`RoutingTree`, ...})
         A RoutingTree is produced rooted at the source and visiting all
@@ -139,14 +143,14 @@ def _ner_net(source, destinations, machine):
         # Find the shortest vector from the neighbour to this destination
         vector = machine.get_vector(neighbour, destination)
 
-        # The longest-dimension-first route may inadvertently pass through an
+        # The route may inadvertently pass through an
         # already connected node. If the route is allowed to pass through that
         # node it would create a cycle in the route which would be VeryBad(TM).
         # As a result, we work backward through the route and truncate it at
         # the first point where the route intersects with a connected node.
-        ldf = _longest_dimension_first(vector, neighbour, machine)
-        i = len(ldf)
-        for direction, (x, y) in reversed(ldf):
+        nodes = vector_to_nodes(vector, neighbour, machine)
+        i = len(nodes)
+        for direction, (x, y) in reversed(nodes):
             i -= 1
             if (x, y) in route:
                 # We've just bumped into a node which is already part of the
@@ -154,12 +158,12 @@ def _ner_net(source, destinations, machine):
                 # route. (Note ldf list is truncated just after the current
                 # position since it gives (direction, destination) pairs).
                 neighbour = (x, y)
-                ldf = ldf[i + 1:]
+                nodes = nodes[i + 1:]
                 break
 
         # Take the longest dimension first route.
         last_node = route[neighbour]
-        for direction, (x, y) in ldf:
+        for direction, (x, y) in nodes:
             this_node = RoutingTree((x, y))
             route[(x, y)] = this_node
 
@@ -428,7 +432,8 @@ def _avoid_dead_links(root, machine):
     return (root, lookup)
 
 
-def _do_route(source_vertex, post_vertexes, machine, placements):
+def _do_route(source_vertex, post_vertexes, machine, placements,
+              vector_to_nodes):
     """
     Routing algorithm based on Neighbour Exploring Routing (NER).
 
@@ -445,13 +450,14 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
     :param post_vertexes:
     :param machine:
     :param placements:
+    :param vector_to_nodes:
     :return:
     """
     source_xy = _vertex_xy(source_vertex, placements, machine)
     destinations = set(_vertex_xy(post_vertex, placements, machine)
                        for post_vertex in post_vertexes)
     # Generate routing tree (assuming a perfect machine)
-    root, lookup = _ner_net(source_xy, destinations, machine)
+    root, lookup = _ner_net(source_xy, destinations, machine, vector_to_nodes)
 
     # Fix routes to avoid dead chips/links
     if _route_has_dead_links(root, machine):
@@ -502,6 +508,37 @@ def _route_to_endpoint(vertex, machine):
     return link_data.connected_link
 
 
+def _least_busy_dimension_first(traffic, vector, start, machine):
+    """ List the (x, y) steps on a route that goes through the least busy\
+        routes first.
+
+    :param traffic: A dictionary of (x, y): count of routes
+    :param vector: (x, y, z)
+        The vector which the path should cover.
+    :param start: (x, y)
+        The coordinates from which the path should start (note this is a 2D
+        coordinate).
+    :param machine:
+    :return:
+    """
+
+    # Go through and find the sum of traffic depending on the route taken
+    min_sum = 0
+    min_route = None
+    for order in itertools.permutations([0, 1, 2]):
+        dm_vector = [(i, vector[i]) for i in order]
+        route = _get_route(dm_vector, start, machine)
+        sum_traffic = sum(traffic[x, y] for _, (x, y) in route)
+        if min_route is None or min_sum > sum_traffic:
+            min_sum = sum_traffic
+            min_route = route
+
+    for _, (x, y) in min_route:
+        traffic[x, y] += 1
+
+    return route
+
+
 def _longest_dimension_first(vector, start, machine):
     """
     List the (x, y) steps on a longest-dimension first route.
@@ -514,12 +551,17 @@ def _longest_dimension_first(vector, start, machine):
     :param machine:
     :return:
     """
+    return _get_route(
+        sorted(enumerate(vector), key=(lambda x: abs(x[1])), reverse=True),
+        start, machine)
+
+
+def _get_route(dm_vector, start, machine):
     x, y = start
 
     out = []
 
-    for dimension, magnitude in sorted(
-            enumerate(vector), key=(lambda x: abs(x[1])), reverse=True):
+    for dimension, magnitude in dm_vector:
         if magnitude == 0:
             break
 
@@ -559,6 +601,29 @@ def _longest_dimension_first(vector, start, machine):
     return out
 
 
+def _ner_route(machine_graph, machine, placements, vector_to_nodes):
+    routing_tables = MulticastRoutingTableByPartition()
+
+    progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
+
+    for source_vertex in progress_bar.over(machine_graph.vertices):
+        # handle the vertex edges
+        for partition in machine_graph.\
+                get_outgoing_edge_partitions_starting_at_vertex(
+                    source_vertex):
+            if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                post_vertexes = list(
+                    e.post_vertex for e in partition.edges)
+                routingtree = _do_route(
+                    source_vertex, post_vertexes, machine, placements)
+                _convert_a_route(routing_tables, partition, 0, None,
+                                 routingtree)
+
+    progress_bar.end()
+
+    return routing_tables
+
+
 class NerRoute(object):
     """ Performs routing using rig algorithm
     """
@@ -573,23 +638,24 @@ class NerRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        routing_tables = MulticastRoutingTableByPartition()
+        _ner_route(machine_graph, machine, placements,
+                   _longest_dimension_first)
 
-        progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
 
-        for source_vertex in progress_bar.over(machine_graph.vertices):
-            # handle the vertex edges
-            for partition in machine_graph.\
-                    get_outgoing_edge_partitions_starting_at_vertex(
-                        source_vertex):
-                if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                    post_vertexes = list(
-                        e.post_vertex for e in partition.edges)
-                    routingtree = _do_route(
-                        source_vertex, post_vertexes, machine, placements)
-                    _convert_a_route(routing_tables, partition, 0, None,
-                                     routingtree)
+class NerRouteTrafficAware(object):
+    """ Performs routing with traffic awareness
+    """
 
-        progress_bar.end()
+    __slots__ = []
 
-        return routing_tables
+    def __call__(self, machine_graph, machine, placements):
+        """
+
+        :param machine_graph:
+        :param machine:
+        :param placements:  pacman.model.placements.placements.py
+        :return:
+        """
+        traffic = defaultdict(lambda: 0)
+        _ner_route(machine_graph, machine, placements,
+                   functools.partial(_least_busy_dimension_first, traffic))
