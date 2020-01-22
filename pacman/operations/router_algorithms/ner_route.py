@@ -639,8 +639,8 @@ class NerRoute(object):
         :param placements:  pacman.model.placements.placements.py
         :return:
         """
-        _ner_route(machine_graph, machine, placements,
-                   _longest_dimension_first)
+        return _ner_route(
+            machine_graph, machine, placements, _longest_dimension_first)
 
 
 class NerRouteTrafficAware(object):
@@ -658,5 +658,6 @@ class NerRouteTrafficAware(object):
         :return:
         """
         traffic = defaultdict(lambda: 0)
-        _ner_route(machine_graph, machine, placements,
-                   functools.partial(_least_busy_dimension_first, traffic))
+        return _ner_route(
+            machine_graph, machine, placements,
+            functools.partial(_least_busy_dimension_first, traffic))
