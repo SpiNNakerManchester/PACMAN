@@ -615,7 +615,8 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
                 post_vertexes = list(
                     e.post_vertex for e in partition.edges)
                 routingtree = _do_route(
-                    source_vertex, post_vertexes, machine, placements)
+                    source_vertex, post_vertexes, machine, placements,
+                    vector_to_nodes)
                 _convert_a_route(routing_tables, partition, 0, None,
                                  routingtree)
 
