@@ -563,7 +563,7 @@ def _get_route(dm_vector, start, machine):
 
     for dimension, magnitude in dm_vector:
         if magnitude == 0:
-            break
+            continue
 
         if dimension == 0:  # x
             if magnitude > 0:
@@ -617,8 +617,10 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
                 routingtree = _do_route(
                     source_vertex, post_vertexes, machine, placements,
                     vector_to_nodes)
-                _convert_a_route(routing_tables, partition, 0, None,
-                                 routingtree)
+                incoming_processor = placements.get_placement_of_vertex(
+                    partition.pre_vertex).p
+                _convert_a_route(routing_tables, partition, incoming_processor,
+                                 None, routingtree)
 
     progress_bar.end()
 
