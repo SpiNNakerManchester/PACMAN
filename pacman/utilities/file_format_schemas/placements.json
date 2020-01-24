@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "Gives a set of placements of graph vertices on a machine.",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "vertex_label": {
+                "description": "The label of the vertex placed.",
+                "type": "string"
+            },
+            "x": {
+                "description": "The x coordinate of the chip of the placement.",
+                "type": "integer",
+                "minimum": 0
+            },
+            "y": {
+                "description": "The y coordinate of the chip of the placement.",
+                "type": "integer",
+                "minimum": 0
+            },
+            "p": {
+                "description": "The processor id of the placement.",
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "additionalProperties": false,
+        "required": ["vertex_label", "x", "y", "p"]
+    },
+}
+
