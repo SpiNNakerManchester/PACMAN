@@ -13,8 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from enum import Enum
 import uuid
-from .flexi_field import SUPPORTED_TAGS
+
+
+class SUPPORTED_TAGS(Enum):
+    APPLICATION = 0
+    ROUTING = 1
 
 
 class Field(object):

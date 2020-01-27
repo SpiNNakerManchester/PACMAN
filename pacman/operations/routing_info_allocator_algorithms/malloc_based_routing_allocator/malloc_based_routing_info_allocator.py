@@ -31,8 +31,7 @@ from pacman.utilities.utility_calls import (
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
     import (check_types_of_edge_constraint, get_edge_groups)
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanRouteInfoAllocationException)
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from .utils import get_possible_masks
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -79,8 +78,8 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_keys, shared_keys, fixed_masks, fixed_fields, flexi_fields,
-         continuous, noncontinuous) = get_edge_groups(
+        (fixed_keys, shared_keys, fixed_masks, fixed_fields, continuous,
+         noncontinuous) = get_edge_groups(
              machine_graph, EdgeTrafficType.MULTICAST)
 
         # Go through the groups and allocate keys
@@ -97,10 +96,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         for group in progress.over(fixed_fields, False):
             self._allocate_fixed_fields(group, routing_infos)
-
-        if flexi_fields:
-            raise PacmanConfigurationException(
-                "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
         for group in progress.over(shared_keys, False):
             self._allocate_share_key(group, routing_infos)
