@@ -27,7 +27,8 @@ class MyTestCase(unittest.TestCase):
 
     def test_routing(self):
         graph = MachineGraph("Test")
-        machine = virtual_machine(2, 2)
+        machine = virtual_machine(
+            8, 8, down_chips=[(1, 2), (5, 4), (3, 3)])
         placements = Placements()
         vertices = list()
 
@@ -42,8 +43,7 @@ class MyTestCase(unittest.TestCase):
 
         for vertex in vertices:
             for vertex_to in vertices:
-                if vertex != vertex_to:
-                    graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
+                graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
         router = NerRouteTrafficAware()
         routing_paths = router.__call__(graph, machine, placements)
@@ -78,8 +78,7 @@ class MyTestCase(unittest.TestCase):
                         queue.append((dest_x, dest_y))
 
             for vertex_to in vertices:
-                if vertex != vertex_to:
-                    self.assertIn(vertex_to, vertices_reached)
+                self.assertIn(vertex_to, vertices_reached)
 
 
 if __name__ == '__main__':
