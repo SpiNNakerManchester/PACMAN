@@ -43,10 +43,10 @@ class BaseKeyAndMask(object):
 
         if base_key & mask != base_key:
             raise PacmanConfigurationException(
-                "This routing info is invalid as the mask and key together "
+                "This routing info is invalid as the mask {} and key {} together "
                 "alters the key. This is deemed to be a error from "
                 "SpiNNaker's point of view and therefore please rectify and "
-                "try again")
+                "try again".format(hex(base_key), hex(mask)))
 
     @property
     def key(self):
