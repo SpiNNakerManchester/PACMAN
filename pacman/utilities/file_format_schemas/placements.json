@@ -28,6 +28,6 @@
         },
         "additionalProperties": false,
         "required": ["vertex_label", "x", "y", "p"]
-    },
+    }
 }
 
