@@ -141,7 +141,10 @@ class GlobalZonedRoutingInfoAllocator(object):
             self._application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
         by_app_vertex = dict()
-        app_mask = 0xFFFFFFFF - ((2 ** self._n_bits_atoms) - 1)
+        mask = 0xFFFFFFFF - ((2 ** self._n_bits_atoms) - 1)
+        app_bits = (
+            self._n_bits_atoms + self._n_bits_machine + self._n_bits_machine)
+        app_mask = 0xFFFFFFFF - ((2 ** app_bits) - 1)
         app_index = 0
         for app_vertex in progress.over(self._application_graph.vertices):
             machine_vertices = self._graph_mapper.get_machine_vertices(
@@ -157,7 +160,7 @@ class GlobalZonedRoutingInfoAllocator(object):
                         key = (key << self._n_bits_partition) | part_index
                         key = key << self._n_bits_atoms
                         key_and_mask = BaseKeyAndMask(
-                            base_key=key, mask=app_mask)
+                            base_key=key, mask=mask)
                         info = PartitionRoutingInfo([key_and_mask], partition)
                         routing_infos.add_partition_info(info)
                         part_index += 1
