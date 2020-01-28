@@ -411,6 +411,43 @@
             <param_type>ApplicationRoutingInfos</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="GlobalZonedRoutingInfoAllocator">
+        <python_module>pacman.operations.routing_info_allocator_algorithms.global_zoned_routing_info_allocator</python_module>
+        <python_class>GlobalZonedRoutingInfoAllocator</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>application_graph</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>n_keys_map</param_name>
+            <param_name>placements</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>ApplicationRoutingInfos</param_type>
+        </outputs>
+    </algorithm>
     <algorithm name="DestinationBasedRoutingInfoAllocator">
         <python_module>pacman.operations.routing_info_allocator_algorithms.destination_based_key_allocator</python_module>
         <python_class>DestinationBasedRoutingInfoAllocator</python_class>
