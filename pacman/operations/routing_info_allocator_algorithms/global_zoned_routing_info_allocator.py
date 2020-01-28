@@ -143,7 +143,7 @@ class GlobalZonedRoutingInfoAllocator(object):
         by_app_vertex = dict()
         mask = 0xFFFFFFFF - ((2 ** self._n_bits_atoms) - 1)
         app_bits = (
-            self._n_bits_atoms + self._n_bits_machine + self._n_bits_machine)
+            self._n_bits_atoms + self._n_bits_machine + self._n_bits_partition)
         app_mask = 0xFFFFFFFF - ((2 ** app_bits) - 1)
         app_index = 0
         for app_vertex in progress.over(self._application_graph.vertices):
