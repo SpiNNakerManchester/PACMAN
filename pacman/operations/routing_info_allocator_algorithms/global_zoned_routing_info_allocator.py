@@ -149,7 +149,8 @@ class GlobalZonedRoutingInfoAllocator(object):
             for machine_index, vertex in enumerate(machine_vertices):
                 partitions = self._machine_graph. \
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                for part_index, partition in enumerate(partitions):
+                part_index = 0
+                for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
                         key = app_index
                         key = (key << self._n_bits_machine) | machine_index
@@ -159,13 +160,14 @@ class GlobalZonedRoutingInfoAllocator(object):
                             base_key=key, mask=app_mask)
                         info = PartitionRoutingInfo([key_and_mask], partition)
                         routing_infos.add_partition_info(info)
+                        part_index += 1
 
-                app_key = app_index << (self._n_bits_machine +
-                                        self._n_bits_partition +
-                                        self._n_bits_atoms)
-                by_app_vertex[app_vertex] = BaseKeyAndMask(
-                    base_key=app_key, mask=app_mask)
-                app_index += 1
+            app_key = app_index << (self._n_bits_machine +
+                                    self._n_bits_partition +
+                                    self._n_bits_atoms)
+            by_app_vertex[app_vertex] = BaseKeyAndMask(
+                base_key=app_key, mask=app_mask)
+            app_index += 1
 
         return routing_infos, by_app_vertex
 
