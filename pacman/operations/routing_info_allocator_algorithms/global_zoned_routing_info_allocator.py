@@ -106,19 +106,21 @@ class GlobalZonedRoutingInfoAllocator(object):
                 partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 n_partitions = 0
+                local_max_keys = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
                         n_keys = self._n_keys_map.n_keys_for_partition(
                             partition)
-                        max_keys = max(max_keys, n_keys)
+                        local_max_keys = max(local_max_keys, n_keys)
                         n_partitions += 1
                 app_max_partitions = max(app_max_partitions, n_partitions)
                 n_machine_vertices += 1
-            if max_keys > 0:
+            if local_max_keys > 0:
                 max_partitions = max(max_partitions, app_max_partitions)
                 max_machine_vertices = max(
                     n_machine_vertices, max_machine_vertices)
-            n_app_vertices += 1
+                max_keys = max(local_max_keys, max_keys)
+                n_app_vertices += 1
 
         self._n_bits_machine = self._bites_needed(max_machine_vertices)
         self._n_bits_partition = self._bites_needed(max_partitions)
@@ -149,28 +151,35 @@ class GlobalZonedRoutingInfoAllocator(object):
         for app_vertex in progress.over(self._application_graph.vertices):
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
-            for machine_index, vertex in enumerate(machine_vertices):
+            machine_index = 0
+            for vertex in enumerate(machine_vertices):
                 partitions = self._machine_graph. \
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 part_index = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        key = app_index
-                        key = (key << self._n_bits_machine) | machine_index
-                        key = (key << self._n_bits_partition) | part_index
-                        key = key << self._n_bits_atoms
-                        key_and_mask = BaseKeyAndMask(
-                            base_key=key, mask=mask)
-                        info = PartitionRoutingInfo([key_and_mask], partition)
-                        routing_infos.add_partition_info(info)
-                        part_index += 1
-
-            app_key = app_index << (self._n_bits_machine +
-                                    self._n_bits_partition +
-                                    self._n_bits_atoms)
-            by_app_vertex[app_vertex] = BaseKeyAndMask(
-                base_key=app_key, mask=app_mask)
-            app_index += 1
+                        n_keys = self._n_keys_map.n_keys_for_partition(
+                            partition)
+                        if n_keys > 0:
+                            key = app_index
+                            key = (key << self._n_bits_machine) | machine_index
+                            key = (key << self._n_bits_partition) | part_index
+                            key = key << self._n_bits_atoms
+                            key_and_mask = BaseKeyAndMask(
+                                base_key=key, mask=mask)
+                            info = PartitionRoutingInfo(
+                                [key_and_mask], partition)
+                            routing_infos.add_partition_info(info)
+                            part_index += 1
+                if part_index > 0:
+                    machine_index += 1
+            if machine_index > 0:
+                app_key = app_index << (self._n_bits_machine +
+                                        self._n_bits_partition +
+                                        self._n_bits_atoms)
+                by_app_vertex[app_vertex] = BaseKeyAndMask(
+                    base_key=app_key, mask=app_mask)
+                app_index += 1
 
         return routing_infos, by_app_vertex
 
