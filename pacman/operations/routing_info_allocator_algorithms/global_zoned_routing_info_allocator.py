@@ -158,19 +158,16 @@ class GlobalZonedRoutingInfoAllocator(object):
                 part_index = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        n_keys = self._n_keys_map.n_keys_for_partition(
-                            partition)
-                        if n_keys > 0:
-                            key = app_index
-                            key = (key << self._n_bits_machine) | machine_index
-                            key = (key << self._n_bits_partition) | part_index
-                            key = key << self._n_bits_atoms
-                            key_and_mask = BaseKeyAndMask(
-                                base_key=key, mask=mask)
-                            info = PartitionRoutingInfo(
-                                [key_and_mask], partition)
-                            routing_infos.add_partition_info(info)
-                            part_index += 1
+                        key = app_index
+                        key = (key << self._n_bits_machine) | machine_index
+                        key = (key << self._n_bits_partition) | part_index
+                        key = key << self._n_bits_atoms
+                        key_and_mask = BaseKeyAndMask(
+                            base_key=key, mask=mask)
+                        info = PartitionRoutingInfo(
+                            [key_and_mask], partition)
+                        routing_infos.add_partition_info(info)
+                        part_index += 1
                 if part_index > 0:
                     machine_index += 1
             if machine_index > 0:
