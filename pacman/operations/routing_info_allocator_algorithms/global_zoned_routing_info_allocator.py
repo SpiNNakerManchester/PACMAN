@@ -152,8 +152,8 @@ class GlobalZonedRoutingInfoAllocator(object):
             machine_vertices = self._graph_mapper.get_machine_vertices(
                 app_vertex)
             machine_index = 0
-            for vertex in enumerate(machine_vertices):
-                partitions = self._machine_graph. \
+            for vertex in machine_vertices:
+                partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 part_index = 0
                 for partition in partitions:
