@@ -19,12 +19,14 @@ from spinn_machine.json_machine import to_json
 from pacman.utilities import file_format_schemas
 
 
-class ConvertToJavaMachine(object):
+class ConvertToJsonMachine(object):
     """ Converter from memory machine to java machine
     """
 
     def __call__(self, machine, file_path):
-        """ Runs the code to write the machine in Java readable JSON.
+        """ Runs the code to write the machine in readable JSON.
+
+        This is no longer the rig machine format
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
@@ -34,7 +36,7 @@ class ConvertToJavaMachine(object):
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON machine")
 
-        return ConvertToJavaMachine.do_convert(machine, file_path, progress)
+        return ConvertToJsonMachine.do_convert(machine, file_path, progress)
 
     @staticmethod
     def do_convert(machine, file_path, progress=None):
