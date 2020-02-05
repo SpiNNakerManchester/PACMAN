@@ -40,7 +40,7 @@ class ConvertToJsonPlacements(object):
         :type report_folder: str
         """
         # Steps are tojson, validate and writefile
-        progress = ProgressBar(3, "Converting to JSON MachineGraph")
+        progress = ProgressBar(3, "Converting to JSON Placements")
 
         file_path = os.path.join(report_folder, _FILENAME)
         return ConvertToJsonPlacements.do_convert(
