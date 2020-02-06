@@ -396,9 +396,9 @@
             <param_name>graph</param_name>
         </required_inputs>
     </algorithm>
-    <algorithm name="ConvertToJsonRoutingTables">
-        <python_module>pacman.operations.algorithm_reports.convert_to_json_routing_tables</python_module>
-        <python_class>ConvertToJsonRoutingTables</python_class>
+    <algorithm name="WriteJsonRoutingTables">
+        <python_module>pacman.operations.algorithm_reports.write_json_routing_tables</python_module>
+        <python_class>WriteJsonRoutingTables</python_class>
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
@@ -417,9 +417,9 @@
             <param_type>JsonRoutingTablesPath</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="ConvertToJsonMachineGraph">
-        <python_module>pacman.operations.algorithm_reports.convert_to_json_machine_graph</python_module>
-        <python_class>ConvertToJsonMachineGraph</python_class>
+    <algorithm name="WriteJsonMachineGraph">
+        <python_module>pacman.operations.algorithm_reports.write_json_machine_graph</python_module>
+        <python_class>WriteJsonMachineGraph</python_class>
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -438,9 +438,9 @@
             <param_type>JsonMachineGraphPath</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="ConvertToJsonPlacements">
-        <python_module>pacman.operations.algorithm_reports.convert_to_json_placements</python_module>
-        <python_class>ConvertToJsonPlacements</python_class>
+    <algorithm name="WriteJsonPlacements">
+        <python_module>pacman.operations.algorithm_reports.write_json_placements</python_module>
+        <python_class>WriteJsonPlacements</python_class>
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
@@ -459,9 +459,9 @@
             <param_type>JsonPlacementsPath</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="ConvertToJsonMachine">
-        <python_module>pacman.operations.algorithm_reports.convert_to_json_machine</python_module>
-        <python_class>ConvertToJsonMachine</python_class>
+    <algorithm name="WriteJsonMachine">
+        <python_module>pacman.operations.algorithm_reports.write_json_machine</python_module>
+        <python_class>WriteJsonMachine</python_class>
         <input_definitions>
             <parameter>
                 <param_name>machine</param_name>

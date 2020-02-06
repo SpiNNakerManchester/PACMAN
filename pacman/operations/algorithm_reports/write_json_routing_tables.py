@@ -22,7 +22,7 @@ from pacman.model.routing_tables.multicast_routing_tables import to_json
 _ROUTING_FILENAME = "routing_tables.json"
 
 
-class ConvertToJsonRoutingTables(object):
+class WriteJsonRoutingTables(object):
     """ Converter from MulticastRoutingTables to json
     """
 
@@ -39,7 +39,7 @@ class ConvertToJsonRoutingTables(object):
         progress = ProgressBar(3, "Converting to JSON RouterTables")
 
         file_path = os.path.join(report_folder, _ROUTING_FILENAME)
-        return ConvertToJsonRoutingTables.do_convert(
+        return WriteJsonRoutingTables.do_convert(
             router_tables, file_path, progress)
 
     @staticmethod

@@ -26,7 +26,7 @@ _ROUTING_FILENAME = "machine_graph.json"
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class ConvertToJsonMachineGraph(object):
+class WriteJsonMachineGraph(object):
     """ Converter from MulticastRoutingTables to json
     """
 
@@ -43,7 +43,7 @@ class ConvertToJsonMachineGraph(object):
         progress = ProgressBar(3, "Converting to JSON MachineGraph")
 
         file_path = os.path.join(report_folder, _ROUTING_FILENAME)
-        return ConvertToJsonMachineGraph.do_convert(
+        return WriteJsonMachineGraph.do_convert(
             machine_graph, file_path, progress)
 
     @staticmethod
@@ -63,11 +63,11 @@ class ConvertToJsonMachineGraph(object):
             progress.update()
 
         # validate the schema
-        try:
-            file_format_schemas.validate(json_obj, "machine_graph.json")
-        except ValidationError as ex:
-            logger.error("JSON validation exception: {}\n{}",
-                         ex.message, ex.instance)
+        #try:
+        #    file_format_schemas.validate(json_obj, "machine_graph.json")
+        #except ValidationError as ex:
+        #    logger.error("JSON validation exception: {}\n{}",
+        #                 ex.message, ex.instance)
 
         # update and complete progress bar
         if progress:

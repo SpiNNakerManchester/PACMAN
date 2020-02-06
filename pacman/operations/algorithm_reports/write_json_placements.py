@@ -13,62 +13,71 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 import json
 import os
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine.json_machine import to_json
 from pacman.utilities import file_format_schemas
+from pacman.utilities.json_utils import placements_to_json
+from jsonschema.exceptions import ValidationError
 
-MACHINE_FILENAME = "machine.json"
+_FILENAME = "placements.json"
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class ConvertToJsonMachine(object):
-    """ Converter from memory machine to java machine
+class WriteJsonPlacements(object):
+    """ Converter from Placements to json
     """
 
-    def __call__(self, machine, report_folder):
-        """ Runs the code to write the machine in readable JSON.
+    def __call__(self, placements, report_folder):
+        """ Runs the code to write the placements in JSON.
 
-        This is no longer the rig machine format
-
-        :param machine: Machine to convert
-        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param placements: The placements to write
+        :type placements:\
+            :py:class:`pacman.model.placements.Placements`
         :param report_folder: the folder to which the reports are being written
         :type report_folder: str
         """
         # Steps are tojson, validate and writefile
-        progress = ProgressBar(3, "Converting to JSON machine")
-        file_path = os.path.join(report_folder, MACHINE_FILENAME)
+        progress = ProgressBar(3, "Converting to JSON Placements")
 
-        return ConvertToJsonMachine.do_convert(machine, file_path, progress)
+        file_path = os.path.join(report_folder, _FILENAME)
+        return WriteJsonPlacements.do_convert(
+            placements, file_path, progress)
 
     @staticmethod
-    def do_convert(machine, file_path, progress=None):
+    def do_convert(placements, file_path, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param machine: Machine to convert
-        :type machine: :py:class:`spinn_machine.machine.Machine`
+        :param machine_graph: The machine_graph to place
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param file_path: Location to write file to. Warning will overwrite!
         :type file_path: str
         """
 
-        json_obj = to_json(machine)
+        json_obj = placements_to_json(placements)
 
         if progress:
             progress.update()
 
         # validate the schema
-        file_format_schemas.validate(json_obj, "jmachine.json")
+        try:
+            file_format_schemas.validate(json_obj, "placements.json")
+        except ValidationError as ex:
+            logger.error("JSON validation exception: {}\n{}",
+                         ex.message, ex.instance)
 
         # update and complete progress bar
         if progress:
-            progress.end()
+            progress.update()
 
         # dump to json file
         with open(file_path, "w") as f:
             json.dump(json_obj, f)
 
         if progress:
-            progress.update()
+            progress.end()
 
         return file_path
