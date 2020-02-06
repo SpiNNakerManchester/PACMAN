@@ -14,27 +14,31 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import os
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.json_machine import to_json
 from pacman.utilities import file_format_schemas
+
+MACHINE_FILENAME = "machine.json"
 
 
 class ConvertToJsonMachine(object):
     """ Converter from memory machine to java machine
     """
 
-    def __call__(self, machine, file_path):
+    def __call__(self, machine, report_folder):
         """ Runs the code to write the machine in readable JSON.
 
         This is no longer the rig machine format
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param file_path: Location to write file to. Warning will overwrite!
-        :type file_path: str
+        :param report_folder: the folder to which the reports are being written
+        :type report_folder: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON machine")
+        file_path = os.path.join(report_folder, MACHINE_FILENAME)
 
         return ConvertToJsonMachine.do_convert(machine, file_path, progress)
 
