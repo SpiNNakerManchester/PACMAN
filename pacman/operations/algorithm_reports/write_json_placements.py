@@ -64,7 +64,7 @@ class WriteJsonPlacements(object):
 
         # validate the schema
         try:
-            file_format_schemas.validate(json_obj, "placements.json")
+            file_format_schemas.validate(json_obj, _FILENAME)
         except ValidationError as ex:
             logger.error("JSON validation exception: {}\n{}",
                          ex.message, ex.instance)

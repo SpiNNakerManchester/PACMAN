@@ -58,7 +58,7 @@ class WriteJsonRoutingTables(object):
             progress.update()
 
         # validate the schema
-        file_format_schemas.validate(json_obj, "router.json")
+        file_format_schemas.validate(json_obj, _ROUTING_FILENAME)
 
         # update and complete progress bar
         if progress:
