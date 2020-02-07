@@ -63,11 +63,11 @@ class WriteJsonMachineGraph(object):
             progress.update()
 
         # validate the schema
-        #try:
-        #    file_format_schemas.validate(json_obj, "machine_graph.json")
-        #except ValidationError as ex:
-        #    logger.error("JSON validation exception: {}\n{}",
-        #                 ex.message, ex.instance)
+        try:
+            file_format_schemas.validate(json_obj, "machine_graph.json")
+        except ValidationError as ex:
+            logger.error("JSON validation exception: {}\n{}",
+                         ex.message, ex.instance)
 
         # update and complete progress bar
         if progress:

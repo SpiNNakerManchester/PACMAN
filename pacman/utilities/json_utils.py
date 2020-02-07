@@ -192,7 +192,7 @@ def resource_container_to_json(container):
         json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
         json_dict["fixed_sdram"] = int(container.sdram.fixed)
         json_dict["per_timestep_sdram"] = int(container.sdram.per_timestep)
-        json_dict["iptag"] = iptag_resources_to_json(container.iptags)
+        json_dict["iptags"] = iptag_resources_to_json(container.iptags)
         json_dict["reverse_iptags"] = iptag_resources_to_json(
             container.reverse_iptags)
     except Exception as ex:  # pylint: disable=broad-except
@@ -207,7 +207,7 @@ def resource_container_from_json(json_dict):
     sdram = VariableSDRAM(
         json_dict["fixed_sdram"], json_dict["per_timestep_sdram"])
     cpu_cycles = CPUCyclesPerTickResource(json_dict["cpu_cycles"])
-    iptags = iptag_resources_from_json(json_dict["iptag"])
+    iptags = iptag_resources_from_json(json_dict["iptags"])
     reverse_iptags = iptag_resources_from_json(json_dict["reverse_iptags"])
     return ResourceContainer(dtcm, sdram, cpu_cycles, iptags, reverse_iptags)
 
@@ -249,7 +249,7 @@ def iptag_resources_from_json(json_list):
     return iptags
 
 
-def vertex_to_json(vertex):
+def  vertex_to_json(vertex):
     json_dict = OrderedDict()
     try:
         json_dict["class"] = vertex.__class__.__name__
