@@ -22,7 +22,7 @@ from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import placements_to_json
 from jsonschema.exceptions import ValidationError
 
-_FILENAME = "placements.json"
+PLACEMENTS_FILENAME = "placements.json"
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -56,7 +56,7 @@ class WriteJsonPlacements(object):
         :type json_folder: str
         """
 
-        file_path = os.path.join(json_folder, _FILENAME)
+        file_path = os.path.join(json_folder, PLACEMENTS_FILENAME)
         json_obj = placements_to_json(placements)
 
         if progress:
@@ -64,7 +64,7 @@ class WriteJsonPlacements(object):
 
         # validate the schema
         try:
-            file_format_schemas.validate(json_obj, _FILENAME)
+            file_format_schemas.validate(json_obj, PLACEMENTS_FILENAME)
         except ValidationError as ex:
             logger.error("JSON validation exception: {}\n{}",
                          ex.message, ex.instance)

@@ -22,7 +22,7 @@ from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import graph_to_json
 from jsonschema.exceptions import ValidationError
 
-_MACHINE_GRAPH_FILENAME = "machine_graph.json"
+MACHINE_GRAPH_FILENAME = "machine_graph.json"
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -56,7 +56,7 @@ class WriteJsonMachineGraph(object):
         :type json_folder: str
         """
 
-        file_path = os.path.join(json_folder, _MACHINE_GRAPH_FILENAME)
+        file_path = os.path.join(json_folder, MACHINE_GRAPH_FILENAME)
         json_obj = graph_to_json(machine_graph)
 
         if progress:
@@ -64,7 +64,7 @@ class WriteJsonMachineGraph(object):
 
         # validate the schema
         try:
-            file_format_schemas.validate(json_obj, _MACHINE_GRAPH_FILENAME)
+            file_format_schemas.validate(json_obj, MACHINE_GRAPH_FILENAME)
         except ValidationError as ex:
             logger.error("JSON validation exception: {}\n{}",
                          ex.message, ex.instance)

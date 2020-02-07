@@ -19,7 +19,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
 from pacman.model.routing_tables.multicast_routing_tables import to_json
 
-_ROUTING_FILENAME = "routing_tables.json"
+ROUTING_TABLES_FILENAME = "routing_tables.json"
 
 
 class WriteJsonRoutingTables(object):
@@ -51,14 +51,14 @@ class WriteJsonRoutingTables(object):
         :type json_folder: str
         """
 
-        file_path = os.path.join(json_folder, _ROUTING_FILENAME)
+        file_path = os.path.join(json_folder, ROUTING_TABLES_FILENAME)
         json_obj = to_json(router_table)
 
         if progress:
             progress.update()
 
         # validate the schema
-        file_format_schemas.validate(json_obj, _ROUTING_FILENAME)
+        file_format_schemas.validate(json_obj, ROUTING_TABLES_FILENAME)
 
         # update and complete progress bar
         if progress:
