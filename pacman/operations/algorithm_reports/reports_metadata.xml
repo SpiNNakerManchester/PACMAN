@@ -405,13 +405,13 @@
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
-            <param_name>report_folder</param_name>
+            <param_name>json_folder</param_name>
         </required_inputs>
         <outputs>
             <param_type>JsonRoutingTablesPath</param_type>
@@ -426,13 +426,13 @@
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
-            <param_name>report_folder</param_name>
+            <param_name>json_folder</param_name>
         </required_inputs>
         <outputs>
             <param_type>JsonMachineGraphPath</param_type>
@@ -447,13 +447,13 @@
                 <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
-            <param_name>report_folder</param_name>
+            <param_name>json_folder</param_name>
         </required_inputs>
         <outputs>
             <param_type>JsonPlacementsPath</param_type>
@@ -468,13 +468,13 @@
                 <param_type>MemoryMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine</param_name>
-            <param_name>report_folder</param_name>
+            <param_name>json_folder</param_name>
         </required_inputs>
         <outputs>
             <param_type>JsonMachine</param_type>

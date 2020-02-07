@@ -26,49 +26,50 @@ class WriteJsonMachine(object):
     """ Converter from memory machine to java machine
     """
 
-    def __call__(self, machine, report_folder):
+    def __call__(self, machine, json_folder):
         """ Runs the code to write the machine in readable JSON.
 
         This is no longer the rig machine format
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param report_folder: the folder to which the reports are being written
-        :type report_folder: str
+        :param json_folder: the folder to which the json are being written
+        :type json_folder: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON machine")
 
-        return WriteJsonMachine.do_convert(machine, report_folder, progress)
+        return WriteJsonMachine.write_json(machine, json_folder, progress)
 
     @staticmethod
-    def do_convert(machine, report_folder, progress=None):
+    def write_json(machine, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param machine: Machine to convert
         :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param file_path: Location to write file to. Warning will overwrite!
-        :type file_path: str
+        :param json_folder: the folder to which the json are being written
+        :type json_folder: str
         """
 
-        json_obj = to_json(machine)
+        file_path = os.path.join(json_folder, MACHINE_FILENAME)
+        if not os.path.exists(file_path):
+            json_obj = to_json(machine)
 
-        if progress:
-            progress.update()
+            if progress:
+                progress.update()
 
-        # validate the schema
-        file_format_schemas.validate(json_obj, MACHINE_FILENAME)
+            # validate the schema
+            file_format_schemas.validate(json_obj, MACHINE_FILENAME)
 
-        # update and complete progress bar
+            # update and complete progress bar
+            if progress:
+                progress.end()
+
+            # dump to json file
+            with open(file_path, "w") as f:
+                json.dump(json_obj, f)
+
         if progress:
             progress.end()
-
-        # dump to json file
-        file_path = os.path.join(report_folder, MACHINE_FILENAME)
-        with open(file_path, "w") as f:
-            json.dump(json_obj, f)
-
-        if progress:
-            progress.update()
 
         return file_path

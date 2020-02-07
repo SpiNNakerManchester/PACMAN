@@ -30,33 +30,33 @@ class WriteJsonMachineGraph(object):
     """ Converter from MulticastRoutingTables to json
     """
 
-    def __call__(self, machine_graph, report_folder):
+    def __call__(self, machine_graph, json_folder):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param report_folder: the folder to which the reports are being written
-        :type report_folder: str
+        :param json_folder: the folder to which the json are being written
+        :type json_folder: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON MachineGraph")
 
-        file_path = os.path.join(report_folder, _MACHINE_GRAPH_FILENAME)
-        return WriteJsonMachineGraph.do_convert(
-            machine_graph, file_path, progress)
+        return WriteJsonMachineGraph.write_json(
+            machine_graph, json_folder, progress)
 
     @staticmethod
-    def do_convert(machine_graph, file_path, progress=None):
+    def write_json(machine_graph, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param file_path: Location to write file to. Warning will overwrite!
-        :type file_path: str
+        :param json_folder: the folder to which the json are being written
+        :type json_folder: str
         """
 
+        file_path = os.path.join(json_folder, _MACHINE_GRAPH_FILENAME)
         json_obj = graph_to_json(machine_graph)
 
         if progress:

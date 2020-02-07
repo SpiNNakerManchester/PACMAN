@@ -30,33 +30,33 @@ class WriteJsonPlacements(object):
     """ Converter from Placements to json
     """
 
-    def __call__(self, placements, report_folder):
+    def __call__(self, placements, json_folder):
         """ Runs the code to write the placements in JSON.
 
         :param placements: The placements to write
         :type placements:\
             :py:class:`pacman.model.placements.Placements`
-        :param report_folder: the folder to which the reports are being written
-        :type report_folder: str
+        :param json_folder: the folder to which the json are being written
+        :type json_folder: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON Placements")
 
-        file_path = os.path.join(report_folder, _FILENAME)
-        return WriteJsonPlacements.do_convert(
-            placements, file_path, progress)
+        return WriteJsonPlacements.write_json(
+            placements, json_folder, progress)
 
     @staticmethod
-    def do_convert(placements, file_path, progress=None):
+    def write_json(placements, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param file_path: Location to write file to. Warning will overwrite!
-        :type file_path: str
+        :param json_folder: the folder to which the json are being written
+        :type json_folder: str
         """
 
+        file_path = os.path.join(json_folder, _FILENAME)
         json_obj = placements_to_json(placements)
 
         if progress:
