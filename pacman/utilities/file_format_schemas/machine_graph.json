@@ -99,7 +99,7 @@
         },
       "additionalProperties": false,
       "anyOf": [
-        { "required": ["dtcm", "cpu_cycles", "fixed_sdram", "per_timestep_sdram", "iptag", "reverse_iptags"] },
+        { "required": ["dtcm", "cpu_cycles", "fixed_sdram", "per_timestep_sdram", "iptags", "reverse_iptags"] },
         { "required": [ "exception"] }
       ]
     },
