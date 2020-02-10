@@ -249,7 +249,7 @@ def iptag_resources_from_json(json_list):
     return iptags
 
 
-def  vertex_to_json(vertex):
+def vertex_to_json(vertex):
     json_dict = OrderedDict()
     try:
         json_dict["class"] = vertex.__class__.__name__
