@@ -371,3 +371,18 @@ def placements_from_json(json_list, graph=None):
     for json_placement in json_list:
         placements.add_placement(placement_from_json(json_placement))
     return placements
+
+
+def partition_to_n_keys_map_to_json(partition_to_n_keys_map):
+    json_list = []
+    for partition in partition_to_n_keys_map:
+        json_dict = OrderedDict()
+        try:
+            json_dict["pre_vertex_label"] = partition.pre_vertex.label
+            json_dict["identifier"] = partition.identifier
+            json_dict["n_keys"] = partition_to_n_keys_map.n_keys_for_partition(
+                partition)
+        except Exception as ex:  # pylint: disable=broad-except
+            json_dict["exception"] = str(ex)
+        json_list.append(json_dict)
+    return json_list
