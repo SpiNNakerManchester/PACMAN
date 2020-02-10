@@ -42,7 +42,7 @@ class WriteJsonPartitionNKeysMap(object):
         :type json_folder: str
         """
         # Steps are tojson, validate and writefile
-        progress = ProgressBar(3, "Converting to JSON MachineGraph")
+        progress = ProgressBar(3, "Converting to JSON partition n key map")
 
         return WriteJsonPartitionNKeysMap.write_json(
             partition_to_n_keys_map, json_folder, progress)
