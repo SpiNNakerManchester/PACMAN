@@ -27,11 +27,11 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class WriteJsonMachineGraph(object):
-    """ Converter from MulticastRoutingTables to json
+    """ Converter from MachineGraph to json
     """
 
     def __call__(self, machine_graph, json_folder):
-        """ Runs the code to write the machine in Java readable JSON.
+        """ Runs the code to write the machine graph in Java readable JSON.
 
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
@@ -47,7 +47,7 @@ class WriteJsonMachineGraph(object):
 
     @staticmethod
     def write_json(machine_graph, json_folder, progress=None):
-        """ Runs the code to write the machine in Java readable JSON.
+        """ Runs the code to write the machine graph in Java readable JSON.
 
         :param machine_graph: The machine_graph to place
         :type machine_graph:\
