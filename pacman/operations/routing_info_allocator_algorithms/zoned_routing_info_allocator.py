@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import math
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_info import (
@@ -134,30 +135,30 @@ class ZonedRoutingInfoAllocator(object):
             self._application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
         by_app_vertex = dict()
-        app_mask = 2 ** 32 - 2 ** self._max_app_keys_bites
-
-        for source_index, app_vertex in progress.over(
-                enumerate(self._application_graph.vertices)):
-            machine_vertices = self._graph_mapper.get_machine_vertices(
-                app_vertex)
+        app_mask = 0xFFFFFFFF - ((2 ** self._max_app_keys_bites) - 1)
+        source_index = 0
+        for app_vertex in progress.over(self._application_graph.vertices):
             if app_vertex in self._key_bites_per_app:
+                machine_vertices = self._graph_mapper.get_machine_vertices(
+                    app_vertex)
                 key_bites = self._key_bites_per_app[app_vertex]
                 for machine_index, vertex in enumerate(machine_vertices):
                     partitions = self._machine_graph. \
                         get_outgoing_edge_partitions_starting_at_vertex(vertex)
                     partition = partitions.peek()
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        mask = 2 ** 32 - 2 ** key_bites
+                        mask = 0xFFFFFFFF - ((2 ** key_bites) - 1)
                         key = source_index << self._max_app_keys_bites | \
                             machine_index << key_bites
                         key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
                         info = PartitionRoutingInfo([key_and_mask], partition)
                         routing_infos.add_partition_info(info)
-            app_key = source_index << self._max_app_keys_bites
-            by_app_vertex[app_vertex] = BaseKeyAndMask(
-                base_key=app_key, mask=app_mask)
+                app_key = source_index << self._max_app_keys_bites
+                by_app_vertex[app_vertex] = BaseKeyAndMask(
+                    base_key=app_key, mask=app_mask)
+                source_index += 1
 
         return routing_infos, by_app_vertex
 
     def _bites_needed(self, size):
-        return math.ceil(math.log(size, 2))
+        return int(math.ceil(math.log(size, 2)))
