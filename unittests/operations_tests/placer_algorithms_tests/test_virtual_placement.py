@@ -25,7 +25,7 @@ from pacman.executor import PACMANAlgorithmExecutor
 
 @pytest.mark.parametrize(
     "placer",
-    ["OneToOnePlacer", "BasicPlacer", "RadialPlacer", "SpreaderPlacer"])
+    ["OneToOnePlacer", "RadialPlacer", "SpreaderPlacer"])
 def test_virtual_placement(placer):
     machine = virtual_machine(width=8, height=8)
     graph = MachineGraph("Test")
