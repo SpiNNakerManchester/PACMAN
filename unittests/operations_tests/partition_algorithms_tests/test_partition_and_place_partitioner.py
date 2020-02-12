@@ -422,38 +422,6 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         partitioner(self.graph, self.machine, PreAllocatedResourceContainer())
 
-    @unittest.skip("Test not implemented yet")
-    def test_detect_subclass_hierarchy(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_partition_by_atoms(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_scale_down_resource_usage(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_scale_up_resource_usage(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_find_max_ratio(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_locate_vertices_to_partition_now(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_partition_with_supported_constraints_enough_space(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_partition_with_supported_constraints_not_enough_space(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
     def test_partition_with_fixed_atom_constraints(self):
         """
         test a partitioning with a graph with fixed atom constraint
