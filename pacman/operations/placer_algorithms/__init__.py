@@ -14,9 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .radial_placer import RadialPlacer
-from .basic_placer import BasicPlacer
 from .one_to_one_placer import OneToOnePlacer
 from .spreader_placer import SpreaderPlacer
 
-__all__ = ['RadialPlacer', 'BasicPlacer',
-           'OneToOnePlacer', "SpreaderPlacer"]
+__all__ = ['RadialPlacer', 'OneToOnePlacer', "SpreaderPlacer"]
