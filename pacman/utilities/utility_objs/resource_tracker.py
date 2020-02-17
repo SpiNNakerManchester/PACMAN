@@ -186,7 +186,7 @@ class ResourceTracker(object):
 
         # update tracker for n cores available per chip
         self._real_chips_with_n_cores_available = \
-            [0] * (machine.MAX_CORES_PER_CHIP + 1)
+            [0] * (machine.max_cores_per_chip() + 1)
         self._virtual_chips_with_n_cores_available = \
             [0] * (constants.CORES_PER_VIRTUAL_CHIP + 1)
 
@@ -1225,6 +1225,16 @@ class ResourceTracker(object):
                         reverse_ip_tags_allocated)
 
         # If no chip is available, raise an exception
+        if chips is not None and processor_id is not None:
+            if len(chips) == 1:
+                (x, y) = chips[0]
+                raise PacmanValueError(
+                    "Core {}:{}:{} is not available.".format(
+                        x, y, processor_id))
+            else:
+                raise PacmanValueError(
+                    "Processor id {} is not available on any of the chips"
+                    "".format(processor_id))
         tried_chips = self._get_usable_chips(chips, board_address)
         n_cores, n_chips, max_sdram, n_tags = \
             self._available_resources(tried_chips)

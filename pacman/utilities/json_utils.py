@@ -99,7 +99,6 @@ def constraint_to_json(constraint):
             # Oops an unexpected class
             # Classes Not covered include
             # FixedKeyFieldConstraint
-            # FlexiKeyFieldConstraint
             # ShareKeyConstraint
             json_dict["str"] = str(constraint)
             json_dict["repr"] = repr(constraint)
