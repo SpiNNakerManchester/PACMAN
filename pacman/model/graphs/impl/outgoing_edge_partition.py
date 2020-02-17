@@ -38,9 +38,10 @@ class OutgoingEdgePartition(AbstractSingleSourcePartition):
         :param traffic_weight: The weight of traffic going down this partition
         """
         AbstractSingleSourcePartition.__init__(
-            self, pre_vertex, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, "OutgoingEdgePartition",
-            traffic_type=traffic_type)
+            self, pre_vertex=pre_vertex, identifier=identifier,
+            allowed_edge_types=allowed_edge_types, constraints=constraints,
+            label=label, traffic_weight=traffic_weight,
+            class_name="OutgoingEdgePartition", traffic_type=traffic_type)
 
     @abstractmethod
     def clone_for_graph_move(self):

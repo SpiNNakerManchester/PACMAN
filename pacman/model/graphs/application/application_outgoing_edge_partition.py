@@ -32,8 +32,9 @@ class ApplicationOutgoingEdgePartition(
             traffic_type=EdgeTrafficType.MULTICAST, constraints=None,
             label=None):
         OutgoingEdgePartition.__init__(
-            self, identifier, ApplicationEdge, pre_vertex, traffic_type,
-            constraints, label)
+            self, identifier=identifier, allowed_edge_types=ApplicationEdge,
+            pre_vertex=pre_vertex, traffic_type=traffic_type,
+            constraints=constraints, label=label)
         AbstractApplicationOutgoingPartition.__init__(self)
 
     def convert_to_machine_out_going_partition(self, machine_pre_vertex):

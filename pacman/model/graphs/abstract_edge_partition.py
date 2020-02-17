@@ -64,6 +64,10 @@ class AbstractEdgePartition(ConstrainedObject):
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
         self._traffic_type = traffic_type
+        if not isinstance(traffic_type, EdgeTrafficType):
+            raise PacmanInvalidParameterException(
+                "traffic_type", traffic_type,
+                "crazy traffic type; must be of EdgeTrafficType")
         self._traffic_weight = traffic_weight
         self._class_name = class_name
 

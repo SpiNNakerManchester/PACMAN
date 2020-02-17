@@ -34,8 +34,10 @@ class MachineOutgoingEdgePartition(OutgoingEdgePartition):
             to other partitions
         """
         OutgoingEdgePartition.__init__(
-            self, identifier, MachineEdge, pre_vertex, traffic_type,
-            constraints, label, traffic_weight)
+            self, identifier=identifier, allowed_edge_types=MachineEdge,
+            pre_vertex=pre_vertex, traffic_type=traffic_type,
+            constraints=constraints, label=label,
+            traffic_weight=traffic_weight)
 
     def clone_for_graph_move(self):
         return MachineOutgoingEdgePartition(
