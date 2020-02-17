@@ -44,4 +44,6 @@ class ApplicationOutgoingEdgePartition(
 
     def clone_for_graph_move(self):
         return ApplicationOutgoingEdgePartition(
-            self._identifier, self._pre_vertex, self._label)
+            identifier=self._identifier, pre_vertex=self._pre_vertex,
+            traffic_type=self._traffic_type, label=self._label,
+            constraints=list(self._constraints))
