@@ -82,8 +82,9 @@ class AbstractEdgePartition(ConstrainedObject):
         # Check for an incompatible traffic type
         if edge.traffic_type != self._traffic_type:
             raise PacmanConfigurationException(
-                "A partition can only contain edges with the same"
-                " traffic_type")
+                "A partition can only contain edges with the same "
+                "traffic_type; trying to add a {} edge to a partition of "
+                "type {}".format(edge.traffic_type, self._traffic_type))
 
         self._edges.add(edge)
 
