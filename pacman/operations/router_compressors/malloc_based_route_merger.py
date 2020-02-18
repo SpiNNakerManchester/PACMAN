@@ -20,7 +20,6 @@ from pacman.model.routing_tables import (
 from pacman.exceptions import PacmanRoutingException
 
 
-
 class MallocBasedRouteMerger(object):
     """ Routing table entry merging function, that merges based off a\
         malloc memory style.
