@@ -113,6 +113,12 @@ class PartitionAndPlacePartitioner(object):
                     vertex.create_and_add_to_graphs_and_resources(
                         resource_tracker, machine_graph, graph_mapper)
                     progress.update(vertex.n_atoms)
+                else:
+                    raise Exception(
+                        "The vertex type {} is neither a SpillerByAtoms nor "
+                        "a HandOverToVertex vertex type. This partitioner "
+                        "does not know how to handle vertices which are not "
+                        "1 of these types. Please fix and try again")
         progress.end()
 
         generate_machine_edges(machine_graph, graph_mapper, graph)

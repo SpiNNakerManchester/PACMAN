@@ -110,10 +110,6 @@ class ResourceContainer(object):
     def reverse_iptags(self):
         return self._reverse_iptags
 
-    @property
-    def sdram_tags(self):
-        return self._sdram_tags
-
     def extend(self, other):
 
         # added CPU stuff

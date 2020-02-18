@@ -387,7 +387,7 @@ class SpreaderPlacer(OneToOnePlacer):
 
         # if middle chip don't exist. search for the closest chip.
         if chip is None:
-            distance_from_middle = sys.maxint
+            distance_from_middle = sys.maxsize
             closest_chip = None
 
             # compare each chip loc to the middle. don't need to be majorly

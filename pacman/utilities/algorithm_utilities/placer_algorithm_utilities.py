@@ -14,10 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import functools
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
@@ -49,15 +46,15 @@ def get_vertices_on_same_chip(vertex, graph):
     # Virtual vertices can't be forced on different chips
     if isinstance(vertex, AbstractVirtual):
         return []
-    same_chip_as_vertices = list()
+    same_chip_as_vertices = OrderedSet()
     for constraint in vertex.constraints:
         if isinstance(constraint, SameChipAsConstraint):
-            same_chip_as_vertices.append(constraint.vertex)
+            same_chip_as_vertices.add(constraint.vertex)
 
-    for edge in filter(
-            lambda edge: edge.traffic_type == EdgeTrafficType.SDRAM,
-            graph.get_edges_starting_at_vertex(vertex)):
-        same_chip_as_vertices.append(edge.post_vertex)
+    same_chip_as_vertices.update(
+        edge.post_vertex
+        for edge in graph.get_edges_starting_at_vertex(vertex)
+        if edge.traffic_type == EdgeTrafficType.SDRAM)
     return same_chip_as_vertices
 
 
@@ -102,9 +99,9 @@ def add_set(all_sets, new_set):
 
     If the new set does not overlap any existing sets it is added.
 
-    However if the new sets overlaps one or more existing sets a super set is
+    However if the new sets overlaps one or more existing sets, a superset is
     created combining all the overlapping sets.
-    Existing overlapping sets are removed and only the new super set is added.
+    Existing overlapping sets are removed and only the new superset is added.
 
     :param all_sets: List of Non overlapping sets
     :param new_set: A new set which may or may not overlap the previous sets.
@@ -113,25 +110,31 @@ def add_set(all_sets, new_set):
     union = OrderedSet()
     removes = []
     for a_set in all_sets:
-        intersection = new_set & a_set
-        if intersection:
+        if not new_set.isdisjoint(a_set):
             removes.append(a_set)
-            union = union | a_set
-    union = union | new_set
-    for a_set in removes:
-        all_sets.remove(a_set)
+            union |= a_set
+    union |= new_set
+    if removes:
+        for a_set in removes:
+            all_sets.remove(a_set)
     all_sets.append(union)
-    return
 
 
 def create_vertices_groups(vertices, same_group_as_function):
+    """
+    :type vertices: Iterable[Vertex]
+    :type same_group_as_function: Callable[[Vertex],Set[Vertex]]
+    """
     groups = list()
+    done = set()
     for vertex in vertices:
+        if vertex in done:
+            continue
         same_chip_as_vertices = same_group_as_function(vertex)
         if same_chip_as_vertices:
-            same_chip_as_vertices = OrderedSet(same_chip_as_vertices)
             same_chip_as_vertices.add(vertex)
             # Singletons on interesting and added later if needed
             if len(same_chip_as_vertices) > 1:
                 add_set(groups, same_chip_as_vertices)
+            done.update(same_chip_as_vertices)
     return groups

@@ -31,7 +31,6 @@ class MallocBasedRouteMerger(object):
 
     def __call__(self, router_tables):
         tables = MulticastRoutingTables()
-        previous_masks = dict()
 
         progress = ProgressBar(
             len(router_tables.routing_tables) * 2,
@@ -50,7 +49,7 @@ class MallocBasedRouteMerger(object):
                             hex(entry.mask)))
 
         for router_table in progress.over(router_tables.routing_tables):
-            new_table = self._merge_routes(router_table, previous_masks)
+            new_table = self._merge_routes(router_table)
             tables.add_routing_table(new_table)
             n_entries = len([
                 entry for entry in new_table.multicast_routing_entries
@@ -64,7 +63,7 @@ class MallocBasedRouteMerger(object):
                         n_entries))
         return tables
 
-    def _merge_routes(self, router_table, previous_masks):
+    def _merge_routes(self, router_table):
         merged_routes = MulticastRoutingTable(router_table.x, router_table.y)
 
         # Order the routes by key

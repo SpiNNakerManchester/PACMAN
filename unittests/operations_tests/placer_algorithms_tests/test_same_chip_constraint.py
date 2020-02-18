@@ -75,7 +75,7 @@ class TestSameChipConstraint(unittest.TestCase):
                 if isinstance(constraint, SameChipAsConstraint):
                     other_placement = placements.get_placement_of_vertex(
                         constraint.vertex)
-                    self.assert_(
+                    self.assertTrue(
                         other_placement.x == placement.x and
                         other_placement.y == placement.y,
                         "Vertex was not placed on the same chip as requested")

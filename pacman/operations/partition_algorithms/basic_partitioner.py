@@ -14,6 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+
+from pacman.model.partitioner_interfaces import SplitterByAtoms, \
+    HandOverToVertex
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
@@ -75,10 +78,19 @@ class BasicPartitioner(object):
 
         # Partition one vertex at a time
         for vertex in progress.over(graph.vertices):
-            self._partition_one_application_vertex(
-                vertex, resource_tracker, machine_graph, graph_mapper,
-                plan_n_timesteps)
-
+            if isinstance(vertex, SplitterByAtoms):
+                self._partition_one_application_vertex(
+                    vertex, resource_tracker, machine_graph, graph_mapper,
+                    plan_n_timesteps)
+            elif isinstance(vertex, HandOverToVertex):
+                vertex.create_and_add_to_graphs_and_resources(
+                    resource_tracker, machine_graph, graph_mapper)
+            else:
+                raise Exception(
+                    "The vertex type {} is neither a SpillerByAtoms nor a "
+                    "HandOverToVertex vertex type. This partitioner does not "
+                    "know how to handle vertices which are not 1 of these "
+                    "types. Please fix and try again")
         generate_machine_edges(machine_graph, graph_mapper, graph)
 
         return machine_graph, graph_mapper, resource_tracker.chips_used

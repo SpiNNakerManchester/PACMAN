@@ -17,10 +17,7 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 import os
 
 __version__ = None
@@ -75,8 +72,8 @@ setup(
     packages=packages,
     package_data=package_data,
     install_requires=[
-        'SpiNNUtilities >= 1!5.0.1, < 1!6.0.0',
-        'SpiNNMachine >= 1!5.0.1, < 1!6.0.0',
+        'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
+        'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
         'six',
         'enum34',
         'future',

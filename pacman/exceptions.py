@@ -34,8 +34,9 @@ class PacmanInvalidParameterException(PacmanException):
         :param problem: The problem with the value of the parameter
         :type problem: str
         """
-        super(PacmanInvalidParameterException, self).__init__(
-            parameter, value, problem)
+        super(PacmanInvalidParameterException, self).__init__(problem)
+        self.parameter = parameter
+        self.value = value
 
 
 class PacmanAlreadyExistsException(PacmanException):
@@ -50,43 +51,25 @@ class PacmanAlreadyExistsException(PacmanException):
         :param item_id: The ID of the item which is in conflict
         :type item_id: str
         """
-        super(PacmanAlreadyExistsException, self).__init__(item_type, item_id)
+        super(PacmanAlreadyExistsException, self).__init__(
+            "{}({}) already exists".format(item_type, item_id))
+        self.item_type = item_type
+        self.item_id = item_id
 
 
 class PacmanPartitionException(PacmanException):
     """ An exception that indicates that something went wrong with partitioning
     """
 
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the partitioning
-        :type problem: str
-        """
-        super(PacmanPartitionException, self).__init__(problem)
-
 
 class PacmanPlaceException(PacmanException):
     """ An exception that indicates that something went wrong with placement
     """
 
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the placement
-        :type problem: str
-        """
-        super(PacmanPlaceException, self).__init__(problem)
-
 
 class PacmanPruneException(PacmanException):
     """ An exception that indicates that something went wrong with pruning
     """
-
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the pruning
-        :type problem: str
-        """
-        super(PacmanPruneException, self).__init__(problem)
 
 
 class PacmanRouteInfoAllocationException(PacmanException):
@@ -94,63 +77,28 @@ class PacmanRouteInfoAllocationException(PacmanException):
         allocation.
     """
 
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the allocation
-        :type problem: str
-        """
-        super(PacmanRouteInfoAllocationException, self).__init__(problem)
-
 
 class PacmanElementAllocationException(PacmanException):
     """ An exception that indicates that something went wrong with element\
         allocation.
     """
 
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the allocation
-        :type problem: str
-        """
-        super(PacmanElementAllocationException, self).__init__(problem)
-
 
 class PacmanRoutingException(PacmanException):
     """ An exception that indicates that something went wrong with routing.
     """
 
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the routing
-        :type problem: str
-        """
-        super(PacmanRoutingException, self).__init__(problem)
-
 
 class PacmanConfigurationException(PacmanException):
     """ An exception that indicates that something went wrong with \
-        configuring some part of pacman.
+        configuring some part of PACMAN.
     """
-
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the routing
-        :type problem: str
-        """
-        super(PacmanConfigurationException, self).__init__(problem)
 
 
 class PacmanNotExistException(PacmanException):
     """ An exception that indicates that a routing table entry was attempted\
         to be removed from a routing table which didn't have such an entry.
     """
-
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the routing
-        :type problem: str
-        """
-        super(PacmanNotExistException, self).__init__(problem)
 
 
 class PacmanAlgorithmFailedToCompleteException(PacmanException):
@@ -168,27 +116,9 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
                 traceback.format_exc(tb)))
 
         super(PacmanAlgorithmFailedToCompleteException, self).__init__(problem)
-        self._exception = exception
-        self._algorithm = algorithm
-        self._traceback = tb
-
-    @property
-    def traceback(self):
-        """ The traceback of the exception that caused this exception
-        """
-        return self._traceback
-
-    @property
-    def exception(self):
-        """ The exception that caused this exception
-        """
-        return self._exception
-
-    @property
-    def algorithm(self):
-        """ The algorithm that raised the exception
-        """
-        return self._algorithm
+        self.exception = exception
+        self.algorithm = algorithm
+        self.traceback = tb
 
 
 class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
@@ -265,39 +195,35 @@ class PacmanNoMergeException(PacmanException):
 class PacmanCanNotFindChipException(PacmanException):
     """ An exception that indicates the chip was not in the list of chips.
     """
-    def __init__(self, problem):
-        """
-        :param problem: The problem with the partitioning
-        :type problem: str
-        """
-        super(PacmanCanNotFindChipException, self).__init__(problem)
 
 
 class MachineHasDisconnectedSubRegion(PacmanException):
-    """Some part of the machine has no paths connecting it to the rest of the
+    """Some part of the machine has no paths connecting it to the rest of the\
     machine.
     """
-    pass
 
 
 class MinimisationFailedError(PacmanException):
     """Raised when a routing table could not be minimised to reach a specified
     target.
-
-    Attributes
-    ----------
-    target_length : int
-        The target number of routing entries.
-    final_length : int
-        The number of routing entries reached when the algorithm completed.
-        (final_length > target_length)
-    chip : (x, y) or None
-        The coordinates of the chip on which routing table minimisation first
-        failed. Only set when minimisation is performed across many chips
-        simultaneously.
     """
 
     def __init__(self, target_length, final_length=None, chip=None):
+        """
+        :param target_length: \
+            The target number of routing entries.
+        :type target_length: int
+        :param final_length: \
+            The number of routing entries reached when the algorithm \
+            completed. (`final_length > target_length`)
+        :type final_length: int or None
+        :param chip: \
+            The coordinates of the chip on which routing table minimisation \
+            first failed. Only set when minimisation is performed across many \
+            chips simultaneously.
+        :type chip: tuple(int, int) or None
+        """
+        super(MinimisationFailedError, self).__init__()
         self.chip = chip
         self.target_length = target_length
         self.final_length = final_length

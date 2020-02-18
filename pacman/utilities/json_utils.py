@@ -12,10 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 import json
 import gzip
 from pacman.model.constraints.key_allocator_constraints import (
@@ -37,10 +34,10 @@ from pacman.model.graphs.machine import (
 
 def json_to_object(json_object):
     """
-    Makes sure this is a json object reading in a file if reguired
+    Makes sure this is a JSON object reading in a file if required
 
-    :param json_object: Either a json Objet or a string pointing to a file
-    :return: a jsnon object
+    :param json_object: Either a JSON Object or a string pointing to a file
+    :return: a JSON object
     """
     if isinstance(json_object, str):
         if json_object.endswith(".gz"):
@@ -52,18 +49,23 @@ def json_to_object(json_object):
     return json_object
 
 
+_LOCATION_CONSTRAINTS = (
+    ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
+_VERTEX_CONSTRAINTS = (SameChipAsConstraint, SameAtomsAsVertexConstraint)
+_SIZE_CONSTRAINTS = (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)
+
+
 def constraint_to_json(constraint):
-    """
-    Converts a constraint to json.
+    """ Converts a constraint to JSON.
 
-    Note: Vertexes are represented by just thier label
+    Note: Vertexes are represented by just their label.
 
-    Note: If an unexpected constraint is received the str() and repr() values
+    Note: If an unexpected constraint is received, the str() and repr() values
     are saved
 
-    If an Exception occurs that is caught and added to the json object
+    If an Exception occurs, that is caught and added to the JSON object.
 
-    :param constraint:
+    :param constraint: The constraint to describe
     :return: A dict describing the constraint
     """
     json_dict = OrderedDict()
@@ -71,19 +73,15 @@ def constraint_to_json(constraint):
         json_dict["class"] = constraint.__class__.__name__
         if isinstance(constraint, BoardConstraint):
             json_dict["board_address"] = constraint.board_address
-        elif isinstance(constraint, (
-                ChipAndCoreConstraint, RadialPlacementFromChipConstraint)):
+        elif isinstance(constraint, _LOCATION_CONSTRAINTS):
             json_dict["x"] = constraint.x
             json_dict["y"] = constraint.y
             if isinstance(constraint, ChipAndCoreConstraint):
                 if constraint.p is not None:
                     json_dict["p"] = constraint.p
-        elif isinstance(constraint,
-                        (SameChipAsConstraint, SameAtomsAsVertexConstraint)):
+        elif isinstance(constraint, _VERTEX_CONSTRAINTS):
             json_dict["vertex"] = constraint.vertex.label
-        elif isinstance(
-                constraint,
-                (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)):
+        elif isinstance(constraint, _SIZE_CONSTRAINTS):
             json_dict["size"] = constraint.size
         elif isinstance(constraint, FixedKeyAndMaskConstraint):
             json_dict["keys_and_masks"] = key_masks_to_json(
@@ -100,11 +98,10 @@ def constraint_to_json(constraint):
             # Oops an unexpected class
             # Classes Not covered include
             # FixedKeyFieldConstraint
-            # FlexiKeyFieldConstraint
             # ShareKeyConstraint
             json_dict["str"] = str(constraint)
             json_dict["repr"] = repr(constraint)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
 
@@ -140,7 +137,7 @@ def constraint_from_json(json_dict, graph=None):
     if json_dict["class"] == "SameAtomsAsVertexConstraint":
         return SameAtomsAsVertexConstraint(
             vertex_lookup(json_dict["vertex"], graph))
-    raise NotImplementedError("contraint {}".format(json_dict["class"]))
+    raise NotImplementedError("constraint {}".format(json_dict["class"]))
 
 
 def constraints_to_json(constraints):
@@ -162,7 +159,7 @@ def key_mask_to_json(key_mask):
         json_object = OrderedDict()
         json_object["key"] = key_mask.key
         json_object["mask"] = key_mask.mask
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         json_object["exception"] = str(ex)
     return json_object
 
@@ -195,7 +192,7 @@ def resource_container_to_json(container):
         json_dict["iptag"] = iptag_resources_to_json(container.iptags)
         json_dict["reverse_iptags"] = iptag_resources_to_json(
             container.reverse_iptags)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
 
@@ -222,7 +219,7 @@ def iptag_resource_to_json(iptag):
         if iptag.tag is not None:
             json_dict["tag"] = iptag.tag
         json_dict["traffic_identifier"] = iptag.traffic_identifier
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
 
@@ -258,7 +255,7 @@ def vertex_to_json(vertex):
         if vertex.resources_required is not None:
             json_dict["resources"] = resource_container_to_json(
                 vertex.resources_required)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
 
@@ -289,7 +286,7 @@ def edge_to_json(edge):
         if edge.label is not None:
             json_dict["label"] = edge.label
         json_dict["traffic_weight"] = edge.traffic_weight
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
 
@@ -315,8 +312,7 @@ def graph_to_json(graph):
         for edge in graph.edges:
             json_list.append(edge_to_json(edge))
         json_dict["edges"] = json_list
-
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
 
