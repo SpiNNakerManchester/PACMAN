@@ -15,6 +15,7 @@
 
 """ A collection of methods which support partitioning algorithms.
 """
+from pacman.model.partitioner_interfaces import HandOverToVertex
 from pacman.model.partitioner_interfaces.\
     abstract_controls_destination_of_edges import \
     AbstractControlsDestinationOfEdges
@@ -165,6 +166,12 @@ def get_same_size_vertex_groups(vertices):
                             vertex.label, vertex.n_atoms,
                             constraint.vertex.label,
                             constraint.vertex.n_atoms))
+                if isinstance(constraint.vertex, HandOverToVertex):
+                    raise PacmanPartitionException(
+                        "Vertex {} cannot handle being partitioned "
+                        "alongside vertex {}. Pleas efix and try "
+                        "again".format(vertex, constraint.vertex)
+                    )
                 same_size_as_vertices.append(constraint.vertex)
 
         if not same_size_as_vertices:
