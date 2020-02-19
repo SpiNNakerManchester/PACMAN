@@ -17,7 +17,7 @@ import json
 import gzip
 from collections import OrderedDict
 from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.model.routing_tables.multicast_routing_table import MulticastRoutingTable
+from .multicast_routing_table import MulticastRoutingTable
 from spinn_machine import MulticastRoutingEntry
 
 
