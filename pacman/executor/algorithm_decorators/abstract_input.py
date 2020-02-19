@@ -28,11 +28,15 @@ class AbstractInput(object):
     @abstractproperty
     def name(self):
         """ The name of the input
+
+        :rtype: str
         """
 
     @abstractproperty
     def param_types(self):
         """ The types of the input
+
+        :rtype: list(str)
         """
 
     @abstractmethod
@@ -40,8 +44,9 @@ class AbstractInput(object):
         """ Get the inputs that match this input by parameter name
 
         :param inputs: A dict of type to value
+        :type inputs: dict(str, ...)
         :return: A dict of parameter name to value
-        :rtype: dict
+        :rtype: dict(str, ...)
         """
 
     @abstractmethod
@@ -49,7 +54,9 @@ class AbstractInput(object):
         """ Determine if this input is in the set of inputs
 
         :param inputs: A set of input types
+        :type inputs: dict(str, ...)
         :return: True if this input type is in the list
+        :rtype: bool
         """
 
     @abstractmethod
@@ -57,8 +64,10 @@ class AbstractInput(object):
         """ Get input types that are not in inputs but which satisfy this input
 
         :param inputs: A set of input types
-        :return:\
+        :type inputs: dict(str, ...)
+        :return:
             A set of input parameter names that are not available in inputs
+        :rtype: set(str)
         """
 
     @abstractmethod
@@ -66,6 +75,8 @@ class AbstractInput(object):
         """ Get input types that are in inputs and satisfy this input
 
         :param inputs: A set of input types
-        :return:\
+        :type inputs: dict(str, ...)
+        :return:
             A set of input parameter names that are available in inputs
+        :rtype: set(str)
         """

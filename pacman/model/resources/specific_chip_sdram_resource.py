@@ -31,13 +31,10 @@ class SpecificChipSDRAMResource(object):
 
     def __init__(self, chip, sdram_usage):
         """
-        :param sdram_usage:\
-            The amount of SDRAM in bytes needed to be pre-allocated
-        :type sdram_usage: AbstractSDRAM
+        :param AbstractSDRAM sdram_usage:
             The amount of SDRAM in bytes needed to be preallocated
-        :param chip: chip of where the SDRAM is to be allocated
-        :type chip: :py:class:`spinn_machine.Chip`
-        :raise None: No known exceptions are raised
+        :param ~spinn_machine.Chip chip:
+            chip of where the SDRAM is to be allocated
         """
         assert isinstance(sdram_usage, AbstractSDRAM)
         self._sdram_usage = sdram_usage
@@ -45,15 +42,22 @@ class SpecificChipSDRAMResource(object):
 
     @property
     def sdram_usage(self):
+        """
+        :rtype: AbstractSDRAM
+        """
         return self._sdram_usage
 
     @property
     def chip(self):
+        """
+        :rtype: ~spinn_machine.Chip
+        """
         return self._chip
 
     def get_value(self):
         """
         :return: The chip for which it is required, and the amount of SDRAM\
             required thereon, in bytes.
+        :rtype: tuple(~spinn_machine.Chip, AbstractSDRAM)
         """
         return self._chip, self._sdram_usage
