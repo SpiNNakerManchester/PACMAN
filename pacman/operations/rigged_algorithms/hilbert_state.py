@@ -20,16 +20,11 @@ class HilbertState(object):
 
     def __init__(self, xpos=0, ypos=0, xchange=1, ychange=0):
         """
-        :param xpos: the x coordinate on the generated curve
-        :param ypos: the y coordinate on the generated curve
-        :param xchange: the change in x coordinate on the generated curve
-        :param ychange: the change in y coordinate on the generated curve
-        :type xpos: int
-        :type ypos: int
-        :type xchange: int
-        :type ychange: int
+        :param int xpos: the x coordinate on the generated curve
+        :param int ypos: the y coordinate on the generated curve
+        :param int xchange: the change in x coordinate on the generated curve
+        :param int ychange: the change in y coordinate on the generated curve
         """
-
         self._x_pos = xpos
         self._y_pos = ypos
         self._change_x = xchange
@@ -38,9 +33,9 @@ class HilbertState(object):
     def turn_left(self, angle):
         """ Turn left in the generation of a Hilbert curve
 
-        :param angle: determines the direction in which the curve turns
-        :type angle: int
+        :param int angle: determines the direction in which the curve turns
         :return: the x,y coordinates on the generated curve
+        :rtype: tuple(int,int)
         """
 
         self._change_x, self._change_y = (
@@ -50,9 +45,9 @@ class HilbertState(object):
     def turn_right(self, angle):
         """ Turn right in the generation of a Hilbert curve
 
-        :param angle: determines the direction in which the curve turns
-        :type angle: int
+        :param int angle: determines the direction in which the curve turns
         :return: the x,y coordinates on the generated curve
+        :rtype: tuple(int,int)
         """
 
         self._change_x, self._change_y = (
@@ -63,6 +58,7 @@ class HilbertState(object):
         """ Move forward in the generation of a Hilbert curve
 
         :return: the x,y coordinates on the generated curve
+        :rtype: tuple(int,int)
         """
 
         xp = self._x_pos

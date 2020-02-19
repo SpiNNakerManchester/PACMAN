@@ -28,20 +28,16 @@ logger = logging.getLogger(__name__)
 class HilbertPlacer(object):
     """ A simple placing algorithm using the Hilbert space-filling curve,\
         translated from RIG.
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
+    :param int minimum_simtime_in_us: simtime to plan for
+    :return: Placements of vertices on the machine
+    :rtype: Placements
     """
 
     def __call__(self, machine_graph, machine, minimum_simtime_in_us):
         """ Place each vertex in a machine graph on a core in the machine.
-
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param machine: A SpiNNaker machine object.
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param minimum_simtime_in_us: simtime to plan for
-        :type minimum_simtime_in_us: int
-        :return placements: Placements of vertices on the machine
-        :rtype :py:class:`pacman.model.placements.Placements`
         """
 
         # check that the algorithm can handle the constraints
@@ -77,13 +73,11 @@ class HilbertPlacer(object):
             self, vertices, additional_placement_constraints=None):
         """ Ensure that the algorithm conforms to any required constraints.
 
-        :param vertices: The vertices for which to check the constraints
-        :type vertices: dict()
-        :param additional_placement_constraints:\
-            Additional placement constraints supported by the algorithm doing\
+        :param list(AbstractVertex) vertices:
+            The vertices for which to check the constraints
+        :param set(AbstractPlacerConstraint) additional_placement_constraints:
+            Additional placement constraints supported by the algorithm doing
             this check
-        :type additional_placement_constraints: set of \
-            :py:class:`pacman.model.constraints.placer_constraints.AbstractPlacerConstraint`
         """
 
         placement_constraints = {SameChipAsConstraint}
@@ -98,10 +92,9 @@ class HilbertPlacer(object):
 
         For use as a chip ordering for the sequential placer.
 
-        :param machine: A SpiNNaker machine object.
-        :type machine: :py:class:`spinn_machine.Machine`
+        :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
         :return x, y coordinates of chips to place
-        :rtype int, int
+        :rtype tuple(int, int)
         """
 
         # set size of curve based on number of chips on machine
@@ -116,22 +109,16 @@ class HilbertPlacer(object):
                       vertices_on_same_chip):
         """ Creates placements and returns list of vertices placed.
 
-        :param vertex: the vertex that is placed
-        :type vertex: \
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :param resource_tracker: tracks the usage of resources of a machine
-        :type resource_tracker: \
-            :py:class:`pacman.utilities.utility_objs.ResourceTracker`
-        :param machine: A SpiNNaker machine object.
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param placements: Placements of vertices on the machine
-        :type placements: \
-            :py:class:`pacman.model.placements.Placements`
+        :param MachineVertex vertex: the vertex that is placed
+        :param ResourceTracker resource_tracker:
+            tracks the usage of resources of a machine
+        :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
+        :param Placements placements: Placements of vertices on the machine
         :param vertices_on_same_chip: a dictionary where keys are a vertex \
             and values are a list of vertices
-        :type vertices_on_same_chip: dict(vertex,list(vertex))
+        :type vertices_on_same_chip: dict(MachineVertex,list(MachineVertex))
         :return vertices: an iterable of vertices to be placed
-        :rtype vertices: list(vertex)
+        :rtype vertices: list(MachineVertex)
         """
 
         vertices = vertices_on_same_chip[vertex]
@@ -159,18 +146,16 @@ class HilbertPlacer(object):
     def _hilbert_curve(self, level, angle=1, state=None):
         """ Generator of points along a 2D Hilbert curve.
 
-        This implements the L-system as described on\
-        `http://en.wikipedia.org/wiki/Hilbert_curve`.
+        This implements the L-system as described on
+        http://en.wikipedia.org/wiki/Hilbert_curve
 
-        :param level: Number of levels of recursion to use in generating \
+        :param int level: Number of levels of recursion to use in generating
             the curve. The resulting curve will be `(2**level)-1` wide/tall.
-        :type level: int
-        :param angle: `1` if this is the 'positive' \
+        :param int angle: `1` if this is the 'positive' \
             expansion of the grammar and `-1` for the 'negative' expansion.
-        :type angle: int
         :param state: The current state of the system in a Hilbert curve.
-        :type state: \
-            :py:class:`pacman.operations.rigged_algorithms.hilbert_state.HilbertState`
+        :type state:
+            ~pacman.operations.rigged_algorithms.hilbert_state.HilbertState
         :return the x and y positions in a Hilbert curve as a state object.
         :rtype: iterable(tuple(int,int))
         """

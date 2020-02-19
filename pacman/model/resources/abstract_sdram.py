@@ -30,13 +30,14 @@ class AbstractSDRAM(object):
         """
         The total SDRAM need to run for this amount of time/simtime
 
-        Warning: This method is guaranteed to produce accurate results if the\
-        time is a multiple of the timestep.  Best is to use a time_in_ms which
-        is a multple of all different timesteps used.
-
         This allows costed elements like vertexes and graph to calculate their
         per_ms_sdram as their per_timestep_sdram / their timestep.
         The implementations of this method should round up to the nearest int.
+
+        ..warn::
+            This method is guaranteed to produce accurate results if the
+            time is a multiple of the timestep.  Best is to use a time_in_ms
+            which is a multple of all different timesteps used.
 
         :param time_in_us The simulation time in us for which space should
         be saved. A None value will be considered run forever
@@ -53,30 +54,27 @@ class AbstractSDRAM(object):
         """
         Combines this SDRAM resource with the other one and creates a new one
 
-        :param other: another SDRAM resource
-        :type other: ~.AbstractSDRAM
+        :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
-        :rtype: ~.AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractmethod
     def __sub__(self, other):
         """ Creates a new SDRAM which is this one less the other
 
-        :param other: another SDRAM resource
-        :type other: ~.AbstractSDRAM
+        :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
-        :rtype: ~.AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractmethod
     def sub_from(self, other):
         """ Creates a new SDRAM which is the other less this one
 
-        :param other: another  SDRAM resource
-        :type other: ~.AbstractSDRAM
+        :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
-        :rtype: ~.AbstractSDRAM
+        :rtype: AbstractSDRAM
         """
 
     @abstractproperty
@@ -88,11 +86,16 @@ class AbstractSDRAM(object):
     def per_simtime_us(self):
         """ Returns extra SDRAM cost for each additional ms of simtime
 
-        Warning: SDram required is only guaranteed to produce accurate\
-        results if the time is a multiple of the timestep.
-        Best is to use a time_in_us which is a multple of all different \
-        timesteps used.
-
         The value returned by this method may will probably just be the
         per_timestep_sdram / timestep.
+
+        warn:
+            SDram required is only guaranteed to produce accurate
+            results if the time is a multiple of the timestep.
+            Best is to use a time_in_us which is a multple of all different
+            timesteps used.
+
+        .. warn:
+            May well be zero.
+
         """

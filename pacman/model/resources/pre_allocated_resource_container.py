@@ -49,21 +49,17 @@ class PreAllocatedResourceContainer(object):
             core_resources=None, specific_iptag_resources=None,
             specific_reverse_iptag_resources=None):
         """
-        :param specific_sdram_usage:\
-            iterable of SpecificSDRAMResource which states that specific chips\
+        :param iterable(SpecificChipSDRAMResource) specific_sdram_usage:
+            iterable of SpecificSDRAMResource which states that specific chips
             have missing SDRAM
-        :type specific_sdram_usage: \
-            iterable( \
-            :py:class:`pacman.model.resources.SpecificChipSDRAMResource`)
-        :param  specific_core_resources:\
+        :param iterable(SpecificCoreResource) specific_core_resources:
             states which cores have been preallocated
-        :type specific_core_resources: \
-            iterable(:py:class:`pacman.model.resources.SpecificCoreResource`)
-        :param core_resources:\
+        :param iterable(CoreResource) core_resources:
             states a number of cores have been preallocated but don't care
             which ones they are
-        :type core_resources: \
-            iterable(:py:class:`pacman.model.resources.CoreResource`)
+        :param list(SpecificBoardTagResource) specific_iptag_resources:
+        :param list(SpecificReverseIPTagResource) \
+                specific_reverse_iptag_resources:
         """
         # pylint: disable=too-many-arguments
         self._specific_sdram_usage = specific_sdram_usage
@@ -106,6 +102,9 @@ class PreAllocatedResourceContainer(object):
         return self._specific_reverse_iptag_resources
 
     def extend(self, other):
+        """
+        :param PreAllocatedResourceContainer other:
+        """
         if not isinstance(other, PreAllocatedResourceContainer):
             raise PacmanConfigurationException(
                 "Only another preallocated resource container can extend a "

@@ -32,7 +32,10 @@ class IsomorphicChecker(object):
     def __call__(self, report_folder, placements, placements_copy):
         """ Outputs the result of the isomorphic check to a file.
 
-        :param report_folder: the folder to which the reports are being written
+        :param str report_folder:
+            the folder to which the reports are being written
+        :param Placements placements:
+        :param Placements placements_copy:
         :return: None
         """
 
@@ -62,15 +65,11 @@ class IsomorphicChecker(object):
         """ Checks if the placements on each processor are the same for\
             two placement algorithms.
 
-        :param placements: Placements of vertices on the machine
-        :type placements: \
-            :py:class:`pacman.model.placements.Placements`
-        :param placements_copy: \
+        :param Placements placements: Placements of vertices on the machine
+        :param Placements placements_copy: \
             memory copy of placements of vertices on the machine
-        :type placements_copy: \
-            :py:class:`pacman.model.placements.Placements`
         :return: True if the placements are the same
-        :rtype: bool
+        :rtype: tuple(bool, set(MachineVertex), set(MachineVertex))
         """
 
         chip_vertices = set()
