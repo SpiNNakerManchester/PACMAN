@@ -20,12 +20,10 @@ from six.moves import reduce, xrange
 def get_possible_masks(n_keys, mask_width=32, contiguous_keys=True):
     """ Get the possible masks given the number of keys.
 
-    :param n_keys: The number of keys to generate a mask for
-    :type n_keys: int
-    :param mask_width: \
+    :param int n_keys: The number of keys to generate a mask for
+    :param int mask_width:
         Number of bits that are meaningful in the mask. 32 by default.
-    :param mask_width: int
-    :param contiguous_keys: \
+    :param bool contiguous_keys:
         True if the mask should only have zeros in the LSBs
     :return: A generator of all possible masks
     :rtype: iterable(int)
@@ -56,10 +54,8 @@ def zero_out_bits(all_ones_mask, bits_to_zero):
     """ Takes a mask (with all interesting bits set to 1) and zeroes out the\
         bits at the given indices.
 
-    :param all_ones_mask: Initial mask
-    :type all_ones_mask: int
-    :param bits_to_zero: Which bits to clear. The LSB is zero.
-    :type bits_to_zero: iterable(int)
+    :param int all_ones_mask: Initial mask
+    :param iterable(int) bits_to_zero: Which bits to clear. The LSB is zero.
     :return: A single mask, with zeroes in all required places
     :rtype: int
     """

@@ -24,6 +24,13 @@ MACHINE_FILENAME = "machine.json"
 
 class WriteJsonMachine(object):
     """ Converter from memory machine to java machine
+
+    :param ~spinn_machine.Machine machine: Machine to convert
+    :param str file_path:
+        Location to write file to.
+
+        .. warn:
+             This will be overwritten!
     """
 
     def __call__(self, machine, json_folder):
@@ -31,10 +38,8 @@ class WriteJsonMachine(object):
 
         This is no longer the rig machine format
 
-        :param machine: Machine to convert
-        :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param json_folder: the folder to which the json are being written
-        :type json_folder: str
+        :param ~spinn_machine.Machine machine: Machine to convert
+        :param str json_folder: the folder to which the json are being written
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON machine")
@@ -45,10 +50,10 @@ class WriteJsonMachine(object):
     def write_json(machine, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param machine: Machine to convert
-        :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param json_folder: the folder to which the json are being written
-        :type json_folder: str
+        :param ~spinn_machine.Machine machine: Machine to convert
+        :param str json_folder: the folder to which the json are being written
+        :param progress: Progress Bar if one used
+        :type progress: ~spinn_utilities.progress_bar.ProgressBar or None
         """
 
         file_path = os.path.join(json_folder, MACHINE_FILENAME)

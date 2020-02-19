@@ -27,17 +27,18 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class WriteJsonMachineGraph(object):
-    """ Converter from MachineGraph to json
+    """ Converter (:py:obj:`callable`) from :py:class:`MulticastRoutingTables`
+        to JSON.
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param str json_folder:
+        The folder to which the reports are being written
+    :return: The name of the actual file that was written
+    :rtype: str
     """
 
     def __call__(self, machine_graph, json_folder):
-        """ Runs the code to write the machine graph in Java readable JSON.
-
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param json_folder: the folder to which the json are being written
-        :type json_folder: str
+        """ Runs the code to write the machine in Java readable JSON.
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON MachineGraph")
@@ -49,11 +50,15 @@ class WriteJsonMachineGraph(object):
     def write_json(machine_graph, json_folder, progress=None):
         """ Runs the code to write the machine graph in Java readable JSON.
 
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param json_folder: the folder to which the json are being written
-        :type json_folder: str
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param str json_folder:
+            The folder to which the json are being written
+
+            ..warning::
+                Will overwrite existing file in this folder!
+
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :rtype: str
         """
 
         file_path = os.path.join(json_folder, MACHINE_GRAPH_FILENAME)

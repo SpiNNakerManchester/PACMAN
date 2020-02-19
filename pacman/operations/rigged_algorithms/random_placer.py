@@ -23,27 +23,25 @@ from pacman.model.placements import Placement, Placements
 
 
 class RandomPlacer(object):
+    """
+    This placer chooses chips on a machine on which to place vertices at
+    random, and tracks those which have already been used.
 
-    # This placer chooses chips on a machine on which to place vertices at
-    # random, and tracks those which have already been used.
-    # THRESHOLD is an arbitrary number of times the generator is allowed to
-    # pick an already used chip. Once past this threshold is it assumed the
-    # algorithm begins to run out of unused chips and switches to picking from
-    # a list.
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return placements: Placements of vertices on the machine
+    :rtype: Placements
+    """
+
+    #: THRESHOLD is an arbitrary number of times the generator is allowed to
+    #: pick an already used chip. Once past this threshold is it assumed the
+    #: algorithm begins to run out of unused chips and switches to picking
+    #: from a list.
     THRESHOLD = 3
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
         """ Place each vertex in a machine graph on a core in the machine.
-
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param machine: A SpiNNaker machine object.
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :return placements: Placements of vertices on the machine
-        :rtype :py:class:`pacman.model.placements.Placements`
         """
 
         # check that the algorithm can handle the constraints
@@ -71,13 +69,12 @@ class RandomPlacer(object):
         """ Generates the list of chips in a random order, with the option \
             to provide a starting point.
 
-        :param machine: A SpiNNaker machine object.
-        :type machine: :py:class:`SpiNNMachine.spinn_machine.machine.Machine`
-        :param random_generator: Python's random number generator
-        :type random_generator: :py:class:`random.Random`
-        :param np: Numpy module
+        :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
+        :param ~random.SystemRandom random_generator:
+            Python's random number generator
+        :param module np: Numpy module
         :return: x, y coordinates of chips for placement
-        :rtype (int, int)
+        :rtype: iterable(tuple(int, int))
         """
 
         # Create a numpy array of size equal or greater to size of machine,
@@ -119,6 +116,14 @@ class RandomPlacer(object):
 
     def _place_vertex(self, vertex, resource_tracker, machine,
                       placements, location):
+        """
+        :param MachineVertex vertex:
+        :param ResourceTracker resource_tracker:
+        :param ~spinn_machine.Machine machine:
+        :param Placements placements:
+        :param dict(MachineVertex,list(MachineVertex)) location:
+        :rtype: list(MachineVertex)
+        """
         vertices = location[vertex]
         # random x and y value within the maximum of the machine
         chips = self._generate_random_chips(machine)

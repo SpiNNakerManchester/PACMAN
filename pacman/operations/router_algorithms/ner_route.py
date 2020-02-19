@@ -46,11 +46,13 @@ def _convert_a_route(
     """
     Converts the algorithm specific partition_route back to standard spinnaker
     and ands it to the routing_tables.
-    :param routing_tables:  spinnaker format routing tables
-    :param partition: Partition this route applices to
-    :param incoming_processor: collections of processors this link came from
-    :param incoming_link: collection of links this link came from
-    :param partition_route: algorithm specific format of the route
+
+    :param MulticastRoutingTableByPartition routing_tables:
+        spinnaker format routing tables
+    :param OutgoingEdgePartition partition: Partition this route applies to
+    :param int incoming_processor: processor this link came from
+    :param int incoming_link: link this link came from
+    :param RoutingTree partition_route: algorithm specific format of the route
     """
     x, y = partition_route.chip
 
@@ -86,20 +88,19 @@ def _ner_net(source, destinations, machine):
 
     This is the kernel of the NER algorithm.
 
-
-    :param source:  (x, y)
-        The coordinate of the source vertex.
-    :param destinations:  iterable([(x, y), ...])
+    :param tuple(int,int) source:
+        The coordinate (x, y) of the source vertex.
+    :param iterable(tuple(int,int)) destinations:
         The coordinates of destination vertices.
-    :param machine: machine for which routes are being generated
-    :return: (:py:class:`RoutingTree`
-     {(x,y): :py:class:`RoutingTree`, ...})
+    :param ~spinn_machine.Machine machine:
+        machine for which routes are being generated
+    :return:
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc. For
-        convenience, a dictionarry mapping from destination (x, y) coordinates
+        convenience, a dictionary mapping from destination (x, y) coordinates
         to the associated RoutingTree is provided to allow the caller to insert
         these items.
-
+    :rtype: tuple(RoutingTree, dict(tuple(int,int),RoutingTree))
     """
     radius = 20
     # Map from (x, y) to RoutingTree objects
@@ -170,6 +171,13 @@ def _ner_net(source, destinations, machine):
 
 
 def _is_linked(source, target, direction, machine):
+    """
+    :param tuple(int,int) source:
+    :param tuple(int,int) target:
+    :param int direction:
+    :param ~spinn_machine.Machine machine:
+    :rtype: bool
+    """
     s_chip = machine.get_chip_at(source[0], source[1])
     if s_chip is None:
         return False
@@ -195,10 +203,12 @@ def _copy_and_disconnect_tree(root, machine):
     situation is impossible to confirm since the input routing trees have not
     yet been populated with vertices. The caller is responsible for being
     sensible.
-    :param root: :py:class:`RoutingTree`
+
+    :param RoutingTree root:
         The root of the RoutingTree that contains nothing but RoutingTrees
         (i.e. no children which are vertices or links).
-    :param machine: The machine in which the routes exist
+    :param ~spinn_machine.Machine machine:
+        The machine in which the routes exist
     :return: (root, lookup, broken_links)
         Where:
         * `root` is the new root of the tree
@@ -207,6 +217,8 @@ def _copy_and_disconnect_tree(root, machine):
           :py:class:`~.RoutingTree`, ...}
         * `broken_links` is a set ([(parent, child), ...]) containing all
           disconnected parent and child (x, y) pairs due to broken links.
+    :rtype: tuple(RoutingTree, dict(tuple(int,int),RoutingTree),
+        set(tuple(tuple(int,int),tuple(int,int))))
     """
     new_root = None
 
@@ -254,8 +266,7 @@ def _copy_and_disconnect_tree(root, machine):
 
 
 def _a_star(sink, heuristic_source, sources, machine):
-    """
-    Use A* to find a path from any of the sources to the sink.
+    """ Use A* to find a path from any of the sources to the sink.
 
     Note that the heuristic means that the search will proceed towards
     heuristic_source without any concern for any other sources. This means that
@@ -266,18 +277,18 @@ def _a_star(sink, heuristic_source, sources, machine):
     forming loops in the rest of the tree since we'll stop as soon as we touch
     any part of it.
 
-    :param sink: (x, y)
-    :param heuristic_source: (x, y)
+    :param tuple(int,int) sink: (x, y)
+    :param tuple(int,int) heuristic_source: (x, y)
         An element from `sources` which is used as a guiding heuristic for the
         A* algorithm.
-    :param sources: set([(x, y), ...])
-    :param machine:
+    :param set(tuple(int,int)) sources: set([(x, y), ...])
+    :param ~spinn_machine.Machine machine:
     :return: [(int, (x, y)), ...]
         A path starting with a coordinate in `sources` and terminating at
         connected neighbour of `sink` (i.e. the path does not include `sink`).
         The direction given is the link down which to proceed from the given
         (x, y) to arrive at the next point in the path.
-
+    :rtype: list(tuple(int,tuple(int,int)))
     """
     # Select the heuristic function to use for distances
     heuristic = (lambda node: machine.get_vector_length(
@@ -345,11 +356,13 @@ def _a_star(sink, heuristic_source, sources, machine):
 def _route_has_dead_links(root, machine):
     """ Quickly determine if a route uses any dead links.
 
-    :param root: :py:class:`.routing_tree.RoutingTree`
+    :param RoutingTree root:
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    :param machine: The machine in which the routes exist.
+    :param ~spinn_machine.Machine machine:
+        The machine in which the routes exist.
     :return: True if the route uses any dead/missing links, False otherwise.
+    :rtype: bool
     """
     for _, (x, y), routes in root.traverse():
         chip = machine.get_chip_at(x, y)
@@ -367,14 +380,15 @@ def _avoid_dead_links(root, machine):
     Uses A* to reconnect disconnected branches of the tree (due to dead links
     in the machine).
 
-    :param root: :py:class:`~.routing_tree.RoutingTree`
+    :param RoutingTree root:
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    :param machine: The machine in which the routes exist.
-    :return: (:py:class:`~.RoutingTree`,
-     {(x,y): :py:class:`~.routing_tree.RoutingTree`, ...})
-        A new RoutingTree is produced rooted as before. A dictionarry mapping
-        from (x, y) to the associated RoutingTree is provided for convenienc
+    :param ~spinn_machine.Machine machine:
+        The machine in which the routes exist.
+    :return:
+        A new RoutingTree is produced rooted as before. A dictionary mapping
+        from (x, y) to the associated RoutingTree is provided for convenience
+    :rtype: tuple(RoutingTree,dict(tuple(int,int),RoutingTree))
     """
     # Make a copy of the RoutingTree with all broken parts disconnected
     root, lookup, broken_links = _copy_and_disconnect_tree(root, machine)
@@ -429,8 +443,7 @@ def _avoid_dead_links(root, machine):
 
 
 def _do_route(source_vertex, post_vertexes, machine, placements):
-    """
-    Routing algorithm based on Neighbour Exploring Routing (NER).
+    """ Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
     routing, Parallel Computing (2014).
@@ -441,11 +454,12 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
     fully connected, this algorithm will always succeed though no consideration
     of congestion or routing-table usage is attempted.
 
-    :param source_vertex:
-    :param post_vertexes:
-    :param machine:
-    :param placements:
+    :param MachineVertex source_vertex:
+    :param iterable(MachineVertex) post_vertexes:
+    :param ~spinn_machine.Machine machine:
+    :param Placements placements:
     :return:
+    :rtype: RoutingTree
     """
     source_xy = _vertex_xy(source_vertex, placements, machine)
     destinations = set(_vertex_xy(post_vertex, placements, machine)
@@ -479,6 +493,12 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
 
 
 def _vertex_xy(vertex, placements, machine):
+    """
+    :param MachineVertex vertex:
+    :param Placements placements:
+    :param ~spinn_machine.Machine machine:
+    :rtype: tuple(int,int)
+    """
     if not isinstance(vertex, AbstractVirtual):
         placement = placements.get_placement_of_vertex(vertex)
         return (placement.x, placement.y)
@@ -493,6 +513,11 @@ def _vertex_xy(vertex, placements, machine):
 
 
 def _route_to_endpoint(vertex, machine):
+    """
+    :param MachineVertex vertex:
+    :param ~spinn_machine.Machine machine:
+    :rtype: int
+    """
     if isinstance(vertex, AbstractFPGA):
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
@@ -506,13 +531,14 @@ def _longest_dimension_first(vector, start, machine):
     """
     List the (x, y) steps on a longest-dimension first route.
 
-    :param vector: (x, y, z)
+    :param tuple(int,int,int) vector: (x, y, z)
         The vector which the path should cover.
-    :param start: (x, y)
+    :param tuple(int,int) start: (x, y)
         The coordinates from which the path should start (note this is a 2D
         coordinate).
-    :param machine:
+    :param ~spinn_machine.Machine machine:
     :return:
+    :rtype: list(tuple(int,int))
     """
     x, y = start
 
@@ -567,11 +593,11 @@ class NerRoute(object):
 
     def __call__(self, machine_graph, machine, placements):
         """
-
-        :param machine_graph:
-        :param machine:
-        :param placements:  pacman.model.placements.placements.py
+        :param MachineGraph machine_graph:
+        :param ~spinn_machine.Machine machine:
+        :param Placements placements:
         :return:
+        :rtype: MulticastRoutingTableByPartition
         """
         routing_tables = MulticastRoutingTableByPartition()
 

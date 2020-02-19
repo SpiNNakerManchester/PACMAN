@@ -20,6 +20,12 @@ class Entry(object):
     __slots__ = ["key", "mask", "defaultable", "spinnaker_route"]
 
     def __init__(self, key, mask, defaultable, spinnaker_route):
+        """
+        :param int key:
+        :param int mask:
+        :param bool defaultable:
+        :param int spinnaker_route:
+        """
         self.key = key
         self.mask = mask
         self.defaultable = defaultable
@@ -36,12 +42,19 @@ class Entry(object):
 
     @staticmethod
     def from_MulticastRoutingEntry(mre):
+        """
+        :param MulticastRoutingEntry mre:
+        :rtype: Entry
+        """
         # Yes I know using _params is ugly but this is for speed
         return Entry(
             mre._routing_entry_key, mre._mask, mre._defaultable,
             mre._spinnaker_route)
 
     def to_MulticastRoutingEntry(self):
+        """
+        :rtype: MulticastRoutingEntry
+        """
         return MulticastRoutingEntry(
             self.key, self.mask, defaultable=self.defaultable,
             spinnaker_route=self.spinnaker_route)
