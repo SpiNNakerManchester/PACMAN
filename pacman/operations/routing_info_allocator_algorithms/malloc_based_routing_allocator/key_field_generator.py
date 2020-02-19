@@ -55,7 +55,10 @@ class KeyFieldGenerator(object):
 
     def __init__(self, fixed_mask, fields, free_space_list):
         """
-        :type fields: list(FixedKeyFieldConstraint)
+        :param int fixed_mask:
+        :param fields:
+        :type fields: list(Field) or None
+        :param list(ElementFreeSpace) free_space_list:
         """
 
         self._fixed_mask = fixed_mask

@@ -23,16 +23,17 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class NetworkSpecification(object):
     """ Generate report on the user's network specification.
+
+    :param str report_folder: the directory to which reports are stored
+    :param ApplicationGraph graph: the graph generated from the tools
     """
 
     _FILENAME = "network_specification.rpt"
 
     def __call__(self, report_folder, graph):
         """
-        :param report_folder: the directory to which reports are stored
-        :type report_folder: str
-        :param graph: the graph generated from the tools
-        :type graph: pacman.model.graph.application.ApplicationGraph
+        :param str report_folder: the directory to which reports are stored
+        :param ApplicationGraph graph: the graph generated from the tools
         :rtype: None
         """
         filename = os.path.join(report_folder, self._FILENAME)
@@ -47,6 +48,12 @@ class NetworkSpecification(object):
 
     @staticmethod
     def _write_report(f, vertex, graph):
+        """
+        :param ~io.FileIO f:
+        :param vertex:
+        :type vertex: ApplicationVertex or MachineVertex
+        :param ApplicationGraph graph:
+        """
         if isinstance(vertex, ApplicationVertex):
             f.write("Vertex {}, size: {}, model: {}\n".format(
                 vertex.label, vertex.n_atoms, vertex.__class__.__name__))
