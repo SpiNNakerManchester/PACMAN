@@ -84,17 +84,18 @@ class ApplicationEdge(AbstractEdge):
     def label(self):
         return self._label
 
+    # This method gets overridden
     def create_machine_edge(self, pre_vertex, post_vertex, label):
         """ Create a machine edge between two machine vertices that is a
             machine-level embodiment of this application edge.
 
-        :param MachineVertex pre_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
             The machine vertex at the start of the edge
-        :param MachineVertex post_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
             The machine vertex at the end of the edge
         :param str label: label of the edge
         :return: The created machine edge
-        :rtype: MachineEdge
+        :rtype: ~pacman.model.graphs.machine.MachineEdge
         """
         m_edge = self._machine_edge_type(
             pre_vertex, post_vertex, self._traffic_type, label=label,
