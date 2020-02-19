@@ -29,27 +29,32 @@ class SpecificCoreResource(object):
 
     def __init__(self, chip, cores):
         """
-        :param cores:\
+        :param iterable(int) cores:
             The specific cores that need to be allocated\
             (list of processor IDs)
-        :type cores: iterable(int)
-        :param chip: chip of where these cores are to be allocated
-        :type chip: :py:class:`spinn_machine.Chip`
-        :raise None: No known exceptions are raised
+        :param ~spinn_machine.Chip chip:
+            chip of where these cores are to be allocated
         """
         self._cores = cores
         self._chip = chip
 
     @property
     def cores(self):
+        """
+        :rtype: iterable(int)
+        """
         return self._cores
 
     @property
     def chip(self):
+        """
+        :rtype: ~spinn_machine.Chip
+        """
         return self._chip
 
     def get_value(self):
         """
         :return: The chip and the cores required on it.
+        :rtype: tuple(~spinn_machine.Chip, iterable(int))
         """
         return self._chip, self._cores

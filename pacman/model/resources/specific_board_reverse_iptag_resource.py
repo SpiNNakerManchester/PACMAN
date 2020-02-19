@@ -38,16 +38,14 @@ class ReverseIPtagResource(object):
 
     def __init__(self, board, port=None, sdp_port=1, tag=None):
         """
-        :param board: A board IP address which is where this reverse IP tag is\
-            to be placed
-        :type board: str
+        :param str board:
+            A board IP address which is where this reverse IP tag is to be
+            placed
         :param port: The target port of the tag or None to assign elsewhere
         :type port: int or None
-        :param port: The UDP port to listen to on the board for this tag
-        :type port: int
-        :param sdp_port: The SDP port number to be used when constructing \
+        :param int port: The UDP port to listen to on the board for this tag
+        :param int sdp_port: The SDP port number to be used when constructing
             SDP packets from the received UDP packets for this tag.
-        :type sdp_port: int
         :param tag: A fixed tag ID to assign, or None if any tag is OK
         :type tag: int or None
         """
@@ -60,7 +58,6 @@ class ReverseIPtagResource(object):
     def port(self):
         """ The port of the tag
 
-        :return: The port of the tag
         :rtype: int
         """
         return self._port
@@ -69,6 +66,8 @@ class ReverseIPtagResource(object):
     def sdp_port(self):
         """ The SDP port to use when constructing the SDP message from the\
             received UDP message.
+
+        :rtype: int
         """
         return self._sdp_port
 
@@ -76,7 +75,6 @@ class ReverseIPtagResource(object):
     def tag(self):
         """ The tag required, or None if any tag is OK
 
-        :return: The tag or None
         :rtype: int
         """
         return self._tag
@@ -86,13 +84,14 @@ class ReverseIPtagResource(object):
         """ A board IP address which is where this reverse IP tag is to be\
             placed.
 
-        :return: str
+        :rtype: str
         """
         return self._board
 
     def get_value(self):
         """
         :return: A description of the specific board's reverse IP tag required.
+        :rtype: list(str, int, int, int)
         """
         return [self._board, self._port, self._sdp_port, self._tag]
 

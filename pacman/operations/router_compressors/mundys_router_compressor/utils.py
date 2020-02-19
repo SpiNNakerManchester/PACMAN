@@ -35,10 +35,10 @@ def intersect(key_a, mask_a, key_b, mask_b):
         >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
         False
 
-    :param key_a:
-    :param mask_a: The first key-mask pair
-    :param key_b:
-    :param mask_b: The second key-mask pair
+    :param int key_a:
+    :param int mask_a: The first key-mask pair
+    :param int key_b:
+    :param int mask_b: The second key-mask pair
     :rtype: bool
     :return: True if the two key-mask pairs intersect, otherwise False.
     """

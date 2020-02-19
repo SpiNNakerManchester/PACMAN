@@ -44,6 +44,11 @@ class AbstractCompressor(object):
         self._ordered = ordered
 
     def __call__(self, router_tables, target_length=None):
+        """
+        :param MulticastRoutingTables router_tables:
+        :param int target_length:
+        :rtype: MulticastRoutingTables
+        """
         if target_length is None:
             self._target_length = 0  # Compress as much as you can
         else:
@@ -73,31 +78,26 @@ class AbstractCompressor(object):
             >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
             False
 
-        :param key_a: The key of first key-mask pair
-        :type key_a: int
-        :param mask_a: The mask of first key-mask pair
-        :type key_b: int
-        :param key_b: The key of second key-mask pair
-        :type key_b: int
-        :param mask_b: The mask of second key-mask pair
-        :type key_b: int
+        :param int key_a: The key of first key-mask pair
+        :param int mask_a: The mask of first key-mask pair
+        :param int key_b: The key of second key-mask pair
+        :param int mask_b: The mask of second key-mask pair
         :return: True if the two key-mask pairs intersect otherwise False.
         :rtype: bool
         """
         return (key_a & mask_b) == (key_b & mask_a)
 
     def merge(self, entry1, entry2):
-        """
-        Merges two entries/triples into one that covers both
+        """ Merges two entries/triples into one that covers both
 
         The assumption is that they both have the same known spinnaker_route
 
-        :param entry1: Key, Mask, defaultable from the first entry
-        :type entry1: ~pacman.operations.router_compressors.Entry
-        :param entry2: Key, Mask, defaultable from the second entry
-        :type entry2: ~pacman.operations.router_compressors.Entry
+        :param ~pacman.operations.router_compressors.Entry entry1:
+            Key, Mask, defaultable from the first entry
+        :param ~pacman.operations.router_compressors.Entry entry2:
+            Key, Mask, defaultable from the second entry
         :return: Key, Mask, defaultable from merged entry
-        :rtype: (int, int, bool)
+        :rtype: tuple(int, int, bool)
         """
         any_ones = entry1.key | entry2.key
         all_ones = entry1.key & entry2.key
@@ -112,19 +112,22 @@ class AbstractCompressor(object):
 
     @abstractmethod
     def compress_table(self, router_table):
-        pass
+        """
+        :param MulticastRoutingTable router_table:
+        :rtype: MulticastRoutingTable
+        """
 
     def compress_tables(self, router_tables, progress):
-        """
-        Compress all the unordered routing tables
+        """ Compress all the unordered routing tables
 
         Tables who start of smaller than target_length are not compressed
 
-        :param router_tables: Routing tables
-        :type router_tables: ~pacman.model.routing_tables.MulticastRoutingTable
-        :param progress: Progress bar to show while working
-        :tpye progress: ProgressBar
+        :param MulticastRoutingTables router_tables: Routing tables
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+            Progress bar to show while working
         :return: The compressed but still unordered routing tables
+        :rtype: MulticastRoutingTables
+        :raises MinimisationFailedError: on failure
         """
         compressed_tables = MulticastRoutingTables()
         self._problems = ""

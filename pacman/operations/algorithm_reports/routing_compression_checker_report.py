@@ -35,10 +35,8 @@ def codify(route, length=32):
     Whenever a mask bit is zero the list of covered keys is doubled to\
     include both the key with a zero and a one at that place.
 
-    :param route: single routing Entry
-    :type route: :py:class:`spinn_machine.MulticastRoutingEntry`
-    :param length: length in bits of the key and mask (defaults to 32)
-    :type length: int
+    :param ~spinn_machine.MulticastRoutingEntry route: single routing Entry
+    :param int length: length in bits of the key and mask (defaults to 32)
     :return: set of routing_keys covered by this route
     :rtype: str
     """
@@ -61,6 +59,11 @@ def codify(route, length=32):
 
 
 def codify_table(table, length=32):
+    """
+    :param MulticastRoutingTable table:
+    :param int length:
+    :rtype: dict(str, ~spinn_machine.MulticastRoutingEntry)
+    """
     code_dict = OrderedDict()
     for route in table.multicast_routing_entries:
         code_dict[codify(route, length)] = route
@@ -68,6 +71,11 @@ def codify_table(table, length=32):
 
 
 def covers(o_code, c_code):
+    """
+    :param str o_code:
+    :param str c_code:
+    :rtype: bool
+    """
     if o_code == c_code:
         return True
     for o_char, c_char in zip(o_code, c_code):
@@ -80,6 +88,11 @@ def covers(o_code, c_code):
 
 
 def calc_remainders(o_code, c_code):
+    """
+    :param str o_code:
+    :param str c_code:
+    :rtype: list(str)
+    """
     if o_code == c_code:
         # "" = "" so also the terminator case
         return []
@@ -95,6 +108,14 @@ def calc_remainders(o_code, c_code):
 
 
 def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
+    """
+    :param ~spinn_machine.MulticastRoutingEntry o_route: the original route
+    :param dict compressed_dict:
+    :param str o_code:
+    :param int start:
+    :param ~io.FileIO f:
+    :rtype: None
+    """
     if o_code is None:
         o_code = codify(o_route)
     keys = list(compressed_dict.keys())
@@ -135,12 +156,12 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
 
 
 def compare_tables(original, compressed):
-    """
-    Compares the two tables without generating any out
+    """ Compares the two tables without generating any output
 
-    :param original: The orginal routing tables
-    :param compressed: The compressed routing tables.
+    :param MulticastRoutingTable original: The original routing tables
+    :param MulticastRoutingTable compressed: The compressed routing tables.
         Which will be considered in order.
+    :rtype: None
     :raises: PacmanRoutingException if there is any error
     """
     compressed_dict = codify_table(compressed)
@@ -153,9 +174,10 @@ def generate_routing_compression_checker_report(
     """ Make a full report of how the compressed covers all routes in the\
         and uncompressed routing table
 
-    :param report_folder: the folder to store the resulting report
-    :param routing_tables: the original routing tables
-    :param compressed_routing_tables: the compressed routing tables
+    :param str report_folder: the folder to store the resulting report
+    :param MulticastRoutingTables routing_tables: the original routing tables
+    :param MulticastRoutingTables compressed_routing_tables:
+        the compressed routing tables
     :rtype: None
     """
     file_name = os.path.join(

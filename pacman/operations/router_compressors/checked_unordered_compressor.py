@@ -22,6 +22,13 @@ class CheckedUnorderedCompressor(UnorderedCompressor):
     __slots__ = []
 
     def __call__(self, router_tables, target_length=None):
+        """
+        :param MulticastRoutingTables router_tables:
+        :param int target_length:
+        :rtype: MulticastRoutingTables
+        :raises PacmanElementAllocationException:
+            if the compressed table won't fit
+        """
         if target_length is None:
             # Stop when enought
             self._target_length = self.MAX_SUPPORTED_LENGTH
@@ -35,6 +42,11 @@ class CheckedUnorderedCompressor(UnorderedCompressor):
         return compressed
 
     def verify_lengths(self, compressed):
+        """
+        :param MulticastRoutingTables compressed:
+        :raises PacmanElementAllocationException:
+            if the compressed table won't fit
+        """
         problems = ""
         for table in compressed:
             if table.number_of_entries > self.MAX_SUPPORTED_LENGTH:

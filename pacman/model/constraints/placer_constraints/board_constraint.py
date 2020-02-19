@@ -27,7 +27,7 @@ class BoardConstraint(AbstractPlacerConstraint):
 
     def __init__(self, board_address):
         """
-        :param board_address:\
+        :param str board_address:
             The IP address of the Ethernet of the board to be used
         """
         self._board_address = board_address
@@ -35,6 +35,8 @@ class BoardConstraint(AbstractPlacerConstraint):
     @property
     def board_address(self):
         """ The board of the constraint
+
+        :rtype: str
         """
         return self._board_address
 

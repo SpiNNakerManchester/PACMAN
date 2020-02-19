@@ -32,14 +32,11 @@ class MulticastRoutingTableByPartition(object):
     def add_path_entry(self, entry, router_x, router_y, partition):
         """ Adds a multicast routing path entry
 
-        :param entry: the entry to add
-        :type entry: \
-            :py:class:`pacman.model.routing_table_by_partition.MulticastRoutingTableByPartitionEntry`
-        :param router_x: the x coord of the router
-        :param router_y: the y coord of the router
-        :param partition: the partition containing the machine edge
-        :type partition: \
-            :py:class:`pacman.model.graphs.AbstractOutgoingEdgePartition`
+        :param MulticastRoutingTableByPartitionEntry entry: the entry to add
+        :param int router_x: the x coord of the router
+        :param int router_y: the y coord of the router
+        :param OutgoingEdgePartition partition:
+            the partition containing the machine edge
         """
 
         # update router_to_entries_map
@@ -55,15 +52,19 @@ class MulticastRoutingTableByPartition(object):
 
     def get_routers(self):
         """ Get the coordinates of all stored routers
+
+        :rtype: iterable(tuple(int, int))
         """
         return iterkeys(self._router_to_entries_map)
 
     def get_entries_for_router(self, router_x, router_y):
         """ Get the set of multicast path entries assigned to this router
 
-        :param router_x: the x coord of the router
-        :param router_y: the y coord of the router
-        :return: return all router_path_entries for the router.
+        :param int router_x: the x coord of the router
+        :param int router_y: the y coord of the router
+        :return: all router_path_entries for the router.
+        :rtype: dict(OutgoingEdgePartition,
+            MulticastRoutingTableByPartitionEntry)
         """
         key = (router_x, router_y)
         if key not in self._router_to_entries_map:
@@ -73,6 +74,10 @@ class MulticastRoutingTableByPartition(object):
     def get_entry_on_coords_for_edge(self, partition, router_x, router_y):
         """ Get an entry from a specific coordinate
 
+        :param OutgoingEdgePartition partition:
+        :param int router_x: the x coord of the router
+        :param int router_y: the y coord of the router
+        :rtype: MulticastRoutingTableByPartitionEntry or None
         """
         entries = self.get_entries_for_router(router_x, router_y)
         if partition in entries:
