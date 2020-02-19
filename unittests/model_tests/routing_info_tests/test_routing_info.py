@@ -22,8 +22,7 @@ from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo,
     DictBasedMachinePartitionNKeysMap)
 from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
-
-_32_BITS = 0xFFFFFFFF
+from pacman.utilities.constants import FULL_MASK
 
 
 class TestRoutingInfo(unittest.TestCase):
@@ -35,7 +34,7 @@ class TestRoutingInfo(unittest.TestCase):
         edge = MachineEdge(pre_vertex, post_vertex)
         key = 12345
         partition_info = PartitionRoutingInfo(
-            [BaseKeyAndMask(key, _32_BITS)], partition)
+            [BaseKeyAndMask(key, FULL_MASK)], partition)
         partition.add_edge(edge)
         routing_info = RoutingInfo([partition_info])
 
@@ -76,13 +75,13 @@ class TestRoutingInfo(unittest.TestCase):
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_partition_info(PartitionRoutingInfo(
-                [BaseKeyAndMask(key, _32_BITS)], partition2))
+                [BaseKeyAndMask(key, FULL_MASK)], partition2))
         assert partition != partition2
 
         partition3 = OutgoingEdgePartition("Test2", MachineEdge)
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
-            [BaseKeyAndMask(key, _32_BITS)], partition3))
+            [BaseKeyAndMask(key, FULL_MASK)], partition3))
 
         assert routing_info.get_routing_info_from_partition(partition) != \
             routing_info.get_routing_info_from_partition(partition3)
@@ -93,11 +92,11 @@ class TestRoutingInfo(unittest.TestCase):
         partition3 = OutgoingEdgePartition("Test3", MachineEdge)
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
-            [BaseKeyAndMask(key, _32_BITS),
-             BaseKeyAndMask(key*2, _32_BITS)], partition3))
+            [BaseKeyAndMask(key, FULL_MASK),
+             BaseKeyAndMask(key * 2, FULL_MASK)], partition3))
 
         assert routing_info.get_routing_info_from_partition(
-            partition3).get_keys().tolist() == [key, key*2]
+            partition3).get_keys().tolist() == [key, key * 2]
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
@@ -107,7 +106,7 @@ class TestRoutingInfo(unittest.TestCase):
         assert bkm1 != []
         assert str(bkm1) == "KeyAndMask:0x40:0xf0"
         assert bkm1.n_keys == 268435456
-        bkm2 = BaseKeyAndMask(0x40000000, _32_BITS & ~1)
+        bkm2 = BaseKeyAndMask(0x40000000, FULL_MASK & ~1)
         assert bkm1 != bkm2
         assert bkm2.n_keys == 2
         k, n = bkm2.get_keys()

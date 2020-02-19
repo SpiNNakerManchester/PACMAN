@@ -12,14 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from pacman.utilities.constants import FULL_MASK
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     MulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import PacmanRoutingException
 
-_32_BITS = 0xFFFFFFFF
 _UPPER_16_BITS = 0xFFFF << 16  # upper 16 bits of 32
 _LOWER_16_BITS = 0xFFFF
 
@@ -47,7 +46,7 @@ class BasicRouteMerger(object):
             "Compressing Routing Tables")
 
         # Create all masks without holes
-        allowed_masks = [_32_BITS - ((2 ** i) - 1) for i in range(33)]
+        allowed_masks = [FULL_MASK - ((2 ** i) - 1) for i in range(33)]
 
         # Check that none of the masks have "holes" e.g. 0xFFFF0FFF has a hole
         for router_table in router_tables.routing_tables:
@@ -111,7 +110,7 @@ class BasicRouteMerger(object):
                 for extra_bits in self._get_merge_masks(mask, previous_masks):
                     new_mask = _UPPER_16_BITS | extra_bits
                     new_key = router_entry.routing_entry_key & new_mask
-                    new_n_keys = ~new_mask & _32_BITS
+                    new_n_keys = ~new_mask & FULL_MASK
 
                     # Get candidates for this particular possible merge
                     potential_merges = self._mergeable_entries(
@@ -154,7 +153,7 @@ class BasicRouteMerger(object):
         potential_merges = set()
         for entry_2 in entries:
             key = entry_2.routing_entry_key
-            n_keys = ~entry_2.mask & _32_BITS
+            n_keys = ~entry_2.mask & FULL_MASK
             last_key = key + n_keys
             masked_key = entry_2.routing_entry_key & new_mask
             overlap = (min(new_last_key, last_key) - max(new_key, key)) > 0

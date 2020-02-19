@@ -17,6 +17,8 @@
 """
 from collections import namedtuple
 import logging
+
+from pacman.utilities.constants import FULL_MASK
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
@@ -27,8 +29,7 @@ from pacman.model.graphs.common import EdgeTrafficType
 from pacman.utilities import utility_calls
 
 logger = FormatAdapter(logging.getLogger(__name__))
-_32_BITS = 0xFFFFFFFF
-range_masks = {_32_BITS - ((2 ** i) - 1) for i in range(33)}
+range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(33)}
 
 # Define an internal class for placements
 PlacementTuple = namedtuple('PlacementTuple', 'x y p')
@@ -381,6 +382,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
     :param MulticastRoutingTable current_router:
         the current router being used in the trace
     :param int key: the key being used by the source placement
+    :param int n_atoms: the number of atoms
     :rtype: ~spinn_machine.MulticastRoutingEntry
     :raise PacmanRoutingException:
         when there is no entry located on this router
@@ -399,7 +401,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
                     " of entries.", hex(key))
             if entry.mask in range_masks:
                 last_atom = key + n_atoms - 1
-                last_key = e_key + (~entry.mask & _32_BITS)
+                last_key = e_key + (~entry.mask & FULL_MASK)
                 if last_key < last_atom:
                     raise PacmanRoutingException(
                         "Full key range not covered: key:{} key_combo:{} "
@@ -408,7 +410,7 @@ def _locate_routing_entry(current_router, key, n_atoms):
                             hex(last_key), hex(e_key)))
         elif entry.mask in range_masks:
             last_atom = key + n_atoms
-            last_key = e_key + (~entry.mask & _32_BITS)
+            last_key = e_key + (~entry.mask & FULL_MASK)
             if min(last_key, last_atom) - max(e_key, key) + 1 > 0:
                 raise Exception(
                     "Key range partially covered:  key:{} key_combo:{} "

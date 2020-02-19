@@ -145,6 +145,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_coverin
 from pacman.operations.router_compressors import Entry
 from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import minimise as remove_default_routes
+from pacman.utilities.constants import FULL_MASK
 from .utils import intersect
 
 
@@ -429,8 +430,8 @@ class _Merge(object):
         """
         # Generate the new key, mask and sources
         any_ones = 0x00000000  # Wherever there is a 1 in *any* of the keys
-        all_ones = 0xffffffff  # ... 1 in *all* of the keys
-        all_selected = 0xffffffff  # ... 1 in *all* of the masks
+        all_ones = FULL_MASK  # ... 1 in *all* of the keys
+        all_selected = FULL_MASK  # ... 1 in *all* of the masks
         self.defaultable = True
 
         for i in entries:

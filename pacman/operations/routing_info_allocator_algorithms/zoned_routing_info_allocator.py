@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import math
+
+from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
@@ -23,8 +26,6 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint)
 from pacman.model.graphs.common import EdgeTrafficType
-
-KEY_SIZE = 32
 
 
 class ZonedRoutingInfoAllocator(object):
@@ -54,10 +55,12 @@ class ZonedRoutingInfoAllocator(object):
         "__machine_graph",
         "__n_keys_map"
     ]
+    MAX_PARTITIONS_SUPPORTED = 1
     # pylint: disable=attribute-defined-outside-init
 
     def __call__(self, application_graph, machine_graph, n_keys_map):
         """
+        :param ApplicationGraph application_graph:
         :param MachineGraph machine_graph:
             The machine graph to allocate the routing info for
         :param AbstractMachinePartitionNKeysMap n_keys_map:
@@ -79,24 +82,24 @@ class ZonedRoutingInfoAllocator(object):
             supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-        max_partitions, max_app_keys_bits, key_bits_per_app = \
-            self._caluculate_zones()
-        if max_partitions != 1:
-            raise NotImplementedError()
+        max_app_keys_bits, key_bits_per_app = self._calculate_zones()
 
         return self._simple_allocate(max_app_keys_bits, key_bits_per_app)
 
-    def _caluculate_zones(self):
+    def _calculate_zones(self):
         """
         :rtype: tuple(int, int, dict(ApplicationVertex,int))
         :raises PacmanRouteInfoAllocationException:
         """
         progress = ProgressBar(
             self.__application_graph.n_vertices, "Calculating zones")
+        # holders
         max_app_keys_bits = 0
         source_zones = 0
         max_partitions = 0
         key_bits_per_app = dict()
+
+        # search for size of regions
         for app_vertex in progress.over(self.__application_graph.vertices):
             app_max_partitions = 0
             max_keys = 0
@@ -120,17 +123,21 @@ class ZonedRoutingInfoAllocator(object):
                 key_bits_per_app[app_vertex] = key_bits
         source_bits = self.__bits_needed(source_zones)
 
-        if source_bits + max_app_keys_bits > KEY_SIZE:
+        if source_bits + max_app_keys_bits > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bits".format(
                     source_bits, max_app_keys_bits))
-        return max_partitions, max_app_keys_bits, key_bits_per_app
+        if max_partitions > self.MAX_PARTITIONS_SUPPORTED:
+            raise NotImplementedError()
+        return max_app_keys_bits, key_bits_per_app
 
     def _simple_allocate(self, max_app_keys_bits, key_bits_map):
         """
-        :param int max_app_keys_bits:
+        :param int max_app_keys_bits: max bits for app keys
         :param dict(ApplicationVertex,int) key_bits_map:
+            map of app vertex to max keys for that vertex
+        :return: tuple of routing infos and map from app vertex and key masks
         :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
         """
         progress = ProgressBar(
@@ -155,8 +162,8 @@ class ZonedRoutingInfoAllocator(object):
                         key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
                         routing_infos.add_partition_info(
                             PartitionRoutingInfo([key_and_mask], partition))
-            by_app_vertex[app_vertex] = BaseKeyAndMask(
-                base_key=app_key, mask=app_mask)
+                by_app_vertex[app_vertex] = BaseKeyAndMask(
+                    base_key=app_key, mask=app_mask)
 
         return routing_infos, by_app_vertex
 
@@ -166,7 +173,7 @@ class ZonedRoutingInfoAllocator(object):
         :param int bits:
         :rtype int:
         """
-        return (2 ** 32) - (2 ** bits)
+        return FULL_MASK - ((2 ** bits) - 1)
 
     @staticmethod
     def __bits_needed(size):

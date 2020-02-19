@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
@@ -24,7 +25,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
     cpu_cycles = vertex.get_cpu_usage_for_atoms(lo_atom, hi_atom)
     dtcm_requirement = vertex.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
     sdram_requirement = vertex.get_sdram_usage_for_atoms(
-        lo_atom, hi_atom, vertex_in_edges)
+        Slice(lo_atom, hi_atom))
     return ResourceContainer(
         cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
         dtcm=DTCMResource(dtcm_requirement),
@@ -47,8 +48,16 @@ class Vertex(ApplicationVertex):
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         return 200 * (hi_atom - lo_atom)
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, graph):
-        return 4000 + 50 * (hi_atom - lo_atom)
+    def get_sdram_usage_for_atoms(self, vertex_slice):
+        return 4000 + 50 * (vertex_slice.hi_atom - vertex_slice.lo_atom)
+
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+        pass
+
+    def get_resources_used_by_atoms(self, vertex_slice):
+        pass
 
 
 class MachineVertex(SimpleMachineVertex):

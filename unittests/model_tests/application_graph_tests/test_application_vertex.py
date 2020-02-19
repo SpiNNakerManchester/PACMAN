@@ -125,7 +125,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         subv_from_vert = vert.create_machine_vertex(Slice(0, 9), resources, "")
         self.assertEqual(subv_from_vert.resources_required, resources)
 
-    @unittest.skip("demonstrating skipping")
     def test_create_new_vertex_from_vertex_with_additional_constraints(
             self):
         """
@@ -135,12 +134,12 @@ class TestApplicationGraphModel(unittest.TestCase):
         constraint1 = MaxVertexAtomsConstraint(2)
         constraint2 = MaxVertexAtomsConstraint(3)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        vert.add_constraint([constraint1])
+        vert.add_constraint(constraint1)
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
             vert.get_resources_used_by_atoms(Slice(0, 9)), "",
             [constraint2])
         subv_from_vert.add_constraint(constraint1)
         self.assertEqual(len(subv_from_vert.constraints), 2)
-        self.assertEqual(subv_from_vert.constraints[1], constraint1)
-        self.assertEqual(subv_from_vert.constraints[0], constraint2)
+        self.assertIn(constraint1, subv_from_vert.constraints)
+        self.assertIn(constraint2, subv_from_vert.constraints)
