@@ -15,17 +15,28 @@
 
 
 class ElementFreeSpace(object):
+    __slots__ = ["_size", "_start_address"]
 
     def __init__(self, start_address, size):
+        """
+        :param int start_address:
+        :param int size:
+        """
         self._start_address = start_address
         self._size = size
 
     @property
     def start_address(self):
+        """
+        :rtype: int
+        """
         return self._start_address
 
     @property
     def size(self):
+        """
+        :rtype: int
+        """
         return self._size
 
     def __repr__(self):
