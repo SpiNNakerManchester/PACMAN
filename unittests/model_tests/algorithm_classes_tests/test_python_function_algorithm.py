@@ -14,16 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-# from pacman.operations.routing_info_allocator_algorithms\
-#     .basic_routing_info_allocator import BasicRoutingInfoAllocator
+from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
 
 
-class MyTestCase(unittest.TestCase):
+class TestPythonFunctionAlgorithm(unittest.TestCase):
+    """
+    tests which test the application graph object
+    """
 
-    @unittest.skip("testing skipping")
-    def test_something(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_python_module(self):
+        python_module = "Foo"
+        python_function = "bar"
+        alg = PythonFunctionAlgorithm("algorithm_id", [], [], [], [], [], [],
+                                      python_module, python_function)
+        self.assertEqual(python_module, alg._python_module)
+        self.assertEqual(python_function, alg._python_function)
