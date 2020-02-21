@@ -6,14 +6,15 @@
     "items": {
         "type": "object",
         "properties": {
-            "chip": {
-                "description": "The chip the routing table entries are for.",
-                "type": "array",
-                "items": [
-                    {"type": "integer", "minimum": 0},
-                    {"type": "integer", "minimum": 0}
-                ],
-                "additionalItems": false
+            "x": {
+                "description": "The x coordinate of the cheo the routing table entries are for.",
+                "type": "integer",
+                "minimum": 0
+            },
+            "y": {
+                "description": "The y coordinate of the cheo the routing table entries are for.",
+                "type": "integer",
+                "minimum": 0
             },
             "entries": {
                 "description": "The routing table entries.",
@@ -23,20 +24,22 @@
                     "properties": {
                         "key": {"$ref": "#/resources/keyValue"},
                         "mask": {"$ref": "#/resources/keyValue"},
-                        "directions": {
-                            "type": "array",
-                            "items": {"$ref": "#/resources/direction"},
-                            "uniqueItems": true,
-                            "additionalItems": false
+                        "defaultable": {
+                            "type":  "boolean"
+                        } ,
+                        "spinnaker_route": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 16777215
                         }
                     },
                     "additionalProperties": false,
-                    "required": ["key", "mask", "directions"]
+                    "required": ["key", "mask", "defaultable", "spinnaker_route"]
                 }
             }
         },
         "additionalProperties": false,
-        "required": ["chip", "entries"]
+        "required": ["x", "y", "entries"]
     },
     
     "resources": {
@@ -45,32 +48,6 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 4294967295
-        },
-        "link": {
-            "description": "A chip-to-chip link.",
-            "type": "string",
-            "enum": [
-                "east", "north_east", "north",
-                "west", "south_west", "south"
-            ]
-        },
-        "core": {
-            "description": "A specific core.",
-            "type": "string",
-            "enum": [
-                "core0", "core1", "core2", "core3",
-                "core4", "core5", "core6", "core7",
-                "core8", "core9", "core10", "core11",
-                "core12", "core13", "core14", "core15",
-                "core16", "core17"
-            ]
-        },
-        "direction": {
-            "description": "A chip-to-chip link or a specific core.",
-            "oneOf": [
-                {"$ref": "#/resources/link"},
-                {"$ref": "#/resources/core"}
-            ]
         }
     }
 }
