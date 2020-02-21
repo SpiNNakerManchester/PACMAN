@@ -79,7 +79,6 @@ class PACMANAlgorithmExecutor(object):
 
         "__algorithm_data",
         "__optional_algorithm_data",
-        "__converter_algorithm_data"
     ]
 
     def __init__(
@@ -396,11 +395,7 @@ class PACMANAlgorithmExecutor(object):
             # Check optional algorithms without optional inputs
             # - as above, it shouldn't be necessary but might be if an
             # optional input is also an output of the same algorithm
-            (optionals_to_use, True, False),
-
-            # Check converter algorithms
-            # (only if they generate something new)
-            (self.__converter_algorithm_data, True, False)
+            (optionals_to_use, True, False)
         ]
 
         for (algorithms, check_outputs, force_required) in order:
