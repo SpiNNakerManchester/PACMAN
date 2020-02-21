@@ -92,7 +92,7 @@
         "dtcm": { "type": "integer"},
         "cpu_cycles": { "type": "integer"},
         "fixed_sdram": { "type": "integer"},
-        "per_timestep_sdram": { "type": "integer"},
+        "per_simtime_us": { "type": "integer"},
         "iptags": {"$ref": "#/types/iptags" },
         "reverse_iptags": {"$ref": "#/types/iptags" },
         "exception": {"$ref": "#/types/exception" }
