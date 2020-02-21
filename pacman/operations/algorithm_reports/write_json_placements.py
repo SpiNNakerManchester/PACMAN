@@ -19,56 +19,50 @@ import os
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
-from pacman.utilities.json_utils import graph_to_json
+from pacman.utilities.json_utils import placements_to_json
 from jsonschema.exceptions import ValidationError
 
-_ROUTING_FILENAME = "machine_graph.json"
+PLACEMENTS_FILENAME = "placements.json"
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class ConvertToJsonMachineGraph(object):
-    """ Converter (:py:obj:`callable`) from :py:class:`MulticastRoutingTables`
-        to JSON.
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param str report_folder:
-        the folder to which the reports are being written
-    :return: The name of the actual file that was written
-    :rtype: str
+class WriteJsonPlacements(object):
+    """ Converter from Placements to JSON.
     """
 
-    def __call__(self, machine_graph, report_folder):
-        """ Runs the code to write the machine in Java readable JSON.
+    def __call__(self, placements, json_folder):
+        """ Runs the code to write the placements in JSON.
+
+        :param Placements placements: The placements to write
+        :param str json_folder: the folder to which the JSON are being written
         """
         # Steps are tojson, validate and writefile
-        progress = ProgressBar(3, "Converting to JSON MachineGraph")
+        progress = ProgressBar(3, "Converting to JSON Placements")
 
-        file_path = os.path.join(report_folder, _ROUTING_FILENAME)
-        return ConvertToJsonMachineGraph.do_convert(
-            machine_graph, file_path, progress)
+        return WriteJsonPlacements.write_json(
+            placements, json_folder, progress)
 
     @staticmethod
-    def do_convert(machine_graph, file_path, progress=None):
-        """ Runs the code to write the machine in Java readable JSON.
+    def write_json(placements, json_folder, progress=None):
+        """ Runs the code to write the placements in Java readable JSON.
 
-        :param MachineGraph machine_graph: The machine_graph to place
-        :param str file_path:
-            Location to write file to.
-
-            ..warning::
-                Will overwrite!
-
-        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :param Placements placements: The placements to write
+        :param str json_folder: the folder to which the JSON are being written
+        :param progress: The progress bar, if any
+        :type progress: None or ~spinn_utilities.progress_bar.ProgressBar
+        :return: the name of the generated file
         :rtype: str
         """
-        json_obj = graph_to_json(machine_graph)
+
+        file_path = os.path.join(json_folder, PLACEMENTS_FILENAME)
+        json_obj = placements_to_json(placements)
 
         if progress:
             progress.update()
 
         # validate the schema
         try:
-            file_format_schemas.validate(json_obj, "machine_graph.json")
+            file_format_schemas.validate(json_obj, PLACEMENTS_FILENAME)
         except ValidationError as ex:
             logger.error("JSON validation exception: {}\n{}",
                          ex.message, ex.instance)

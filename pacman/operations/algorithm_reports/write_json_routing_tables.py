@@ -19,55 +19,50 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
 from pacman.model.routing_tables.multicast_routing_tables import to_json
 
-_ROUTING_FILENAME = "routing_tables.json"
+ROUTING_TABLES_FILENAME = "routing_tables.json"
 
 
-class ConvertToJsonRoutingTables(object):
-    """ Converter (:py:obj:`callable`) from MulticastRoutingTables to JSON
-
-    :param MulticastRoutingTables router_tables: Routing Tables to convert
-    :param str report_folder:
-        the folder to which the reports are being written
-    :return: the name of the file that was written
-    :rtype: str
+class WriteJsonRoutingTables(object):
+    """ Converter from MulticastRoutingTables to JSON
     """
 
-    def __call__(self, router_tables, report_folder):
+    def __call__(self, router_tables, json_folder):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param MulticastRoutingTables router_tables:
-        :param str report_folder:
+            Routing Tables to convert
+        :param str json_folder: the folder to which the JSON are being written
+        :return: the name of the generated file
         :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON RouterTables")
 
-        file_path = os.path.join(report_folder, _ROUTING_FILENAME)
-        return ConvertToJsonRoutingTables.do_convert(
-            router_tables, file_path, progress)
+        return WriteJsonRoutingTables.do_convert(
+            router_tables, json_folder, progress)
 
     @staticmethod
-    def do_convert(router_tables, file_path, progress=None):
+    def do_convert(router_tables, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param ~spinn_machine.MulticastRouterTables router_tables:
-        :param str file_path:
-            Location to write file to.
-
-            ..warning::
-                Will overwrite!
-
-        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :param MulticastRoutingTables router_tables:
+            Routing Tables to convert
+        :param str json_folder:
+            the folder to which the JSON files are being written
+        :param progress: The progress bar, if any
+        :type progress: None or ~spinn_utilities.progress_bar.ProgressBar
+        :return: the name of the generated file
         :rtype: str
         """
 
+        file_path = os.path.join(json_folder, ROUTING_TABLES_FILENAME)
         json_obj = to_json(router_tables)
 
         if progress:
             progress.update()
 
         # validate the schema
-        file_format_schemas.validate(json_obj, "router.json")
+        file_format_schemas.validate(json_obj, ROUTING_TABLES_FILENAME)
 
         # update and complete progress bar
         if progress:

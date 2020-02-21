@@ -14,12 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import os
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine.json_machine import to_json
 from pacman.utilities import file_format_schemas
 
+MACHINE_FILENAME = "machine.json"
 
-class ConvertToJavaMachine(object):
+
+class WriteJsonMachine(object):
     """ Converter from memory machine to java machine
 
     :param ~spinn_machine.Machine machine: Machine to convert
@@ -30,49 +33,52 @@ class ConvertToJavaMachine(object):
              This will be overwritten!
     """
 
-    def __call__(self, machine, file_path):
-        """ Runs the code to write the machine in Java readable JSON.
+    def __call__(self, machine, json_folder):
+        """ Runs the code to write the machine in readable JSON.
 
-        :param ~spinn_machine.Machine machine:
-        :param str file_path:
+        This is no longer the rig machine format
+
+        :param ~spinn_machine.Machine machine: Machine to convert
+        :param str json_folder: the folder to which the JSON are being written
+        :return: the name of the generated file
+        :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON machine")
 
-        return ConvertToJavaMachine.do_convert(machine, file_path, progress)
+        return WriteJsonMachine.write_json(machine, json_folder, progress)
 
     @staticmethod
-    def do_convert(machine, file_path, progress=None):
+    def write_json(machine, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param ~spinn_machine.Machine machine: Machine to convert
-        :param str file_path:
-            Location to write file to.
-
-            .. warn:
-                 This will be overwritten!
-
-        :param progress:
+        :param str json_folder: the folder to which the JSON are being written
+        :param progress: Progress Bar if one used
         :type progress: ~spinn_utilities.progress_bar.ProgressBar or None
+        :return: the name of the generated file
+        :rtype: str
         """
 
-        json_obj = to_json(machine)
+        file_path = os.path.join(json_folder, MACHINE_FILENAME)
+        if not os.path.exists(file_path):
+            json_obj = to_json(machine)
 
-        if progress:
-            progress.update()
+            if progress:
+                progress.update()
 
-        # validate the schema
-        file_format_schemas.validate(json_obj, "jmachine.json")
+            # validate the schema
+            file_format_schemas.validate(json_obj, MACHINE_FILENAME)
 
-        # update and complete progress bar
+            # update and complete progress bar
+            if progress:
+                progress.end()
+
+            # dump to json file
+            with open(file_path, "w") as f:
+                json.dump(json_obj, f)
+
         if progress:
             progress.end()
-
-        # dump to json file
-        with open(file_path, "w") as f:
-            json.dump(json_obj, f)
-
-        if progress:
-            progress.update()
 
         return file_path
