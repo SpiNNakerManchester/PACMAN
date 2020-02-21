@@ -33,3 +33,8 @@ class AbstractMachinePartitionNKeysMap(object):
         :return: The number of keys required by the partition
         :rtype: int
         """
+
+    @abstractmethod
+    def __iter__(self):
+        """ Returns an iterator over the mapped partitions"""
+        pass

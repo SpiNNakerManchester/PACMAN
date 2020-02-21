@@ -25,7 +25,6 @@ from .algorithm_decorators import (
     scan_packages, get_algorithms, Token)
 from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
 from pacman.operations import algorithm_reports
-from pacman.utilities import file_format_converters
 from pacman.executor.token_states import TokenStates
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -220,14 +219,10 @@ class PACMANAlgorithmExecutor(object):
         # decode the algorithms specs
         xml_decoder = AlgorithmMetadataXmlReader(xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
-        converter_decoder = AlgorithmMetadataXmlReader([
-            file_format_converters.converter_algorithms_metadata_file])
-        converters = converter_decoder.decode_algorithm_data_objects()
 
         # Scan for annotated algorithms
         packages.append(operations)
         packages.append(algorithm_reports)
-        converters.update(scan_packages([file_format_converters]))
         algorithm_data_objects.update(scan_packages(packages))
         if use_unscanned_algorithms:
             algorithm_data_objects.update(get_algorithms())
@@ -237,8 +232,6 @@ class PACMANAlgorithmExecutor(object):
             algorithms, algorithm_data_objects)
         self.__optional_algorithm_data = self._get_algorithm_data(
             optional_algorithms, algorithm_data_objects)
-        self.__converter_algorithm_data = self._get_algorithm_data(
-            converters.keys(), converters)
 
     @staticmethod
     def _get_algorithm_data(algorithm_names, algorithm_data_objects):
