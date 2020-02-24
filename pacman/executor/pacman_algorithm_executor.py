@@ -78,7 +78,7 @@ class PACMANAlgorithmExecutor(object):
         "_provenance_path",
 
         "__algorithm_data",
-        "__optional_algorithm_data"
+        "__optional_algorithm_data",
     ]
 
     def __init__(
