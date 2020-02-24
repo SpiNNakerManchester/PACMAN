@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "A Readable partial description of SpiNNaker machine graph.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "label": {"$ref": "#/types/graph_label"},
+    "vertices": {"$ref": "#/types/vertices"},
+    "edges": {"$ref": "#/types/edges"}
+  },
+
+  "types": {
+
+    "class": {
+      "description": "Python class name of the Object.",
+      "type": "string"
+    },
+
+    "constraints":{
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "class": { "$ref": "#/types/class" },
+          "exception": {"$ref": "#/types/exception" }
+        },
+        "anyOf": [
+          { "required": [ "class"] },
+          { "required": [ "exception"] }
+        ]
+      }
+    },
+
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pre_vertex": { "$ref": "#/types/vertex_label" },
+          "post_vertex": { "$ref": "#/types/vertex_label" },
+          "traffic_type": { "type": "integer" },
+          "label": { "type": "string" },
+          "traffic_weight": {"type": "integer"},
+          "exception": {"$ref": "#/types/exception" }
+        },
+        "additionalProperties": false,
+        "anyOf": [
+          { "required": [ "pre_vertex", "post_vertex", "traffic_type", "label", "traffic_weight"] },
+          { "required": [ "exception"] }
+        ]
+      }
+    },
+
+    "exception": {
+      "description": "Oops something went wrong.",
+      "type": "string"
+    },
+
+    "graph_label": {
+      "description": "Label of the whole grpah.",
+      "type": "string"
+    },
+
+    "iptag": {
+      "items": {
+        "type": "object",
+        "properties": {
+          "ip_address": { "type": "string" },
+          "port": { "type": "integer"},
+          "strip_sdp": {"type": "boolean" },
+          "tag": { "type": "integer"},
+          "traffic_identifier": { "type": "string" },
+          "exception": {"$ref": "#/types/exception" }
+          },
+        "additionalProperties": false,
+        "anyOf": [
+          { "required": ["ip_address", "strip_sdp", "traffic_identifier"] },
+          { "required": [ "exception"] }
+        ]
+      }
+    },
+
+    "iptags": {
+      "type": "array",
+      "items":{"$ref": "#/types/iptag" }
+    },
+
+    "resources": {
+      "type": "object",
+      "properties": {
+        "dtcm": { "type": "integer"},
+        "cpu_cycles": { "type": "integer"},
+        "fixed_sdram": { "type": "integer"},
+        "per_timestep_sdram": { "type": "integer"},
+        "iptags": {"$ref": "#/types/iptags" },
+        "reverse_iptags": {"$ref": "#/types/iptags" },
+        "exception": {"$ref": "#/types/exception" }
+        },
+      "additionalProperties": false,
+      "anyOf": [
+        { "required": ["dtcm", "cpu_cycles", "fixed_sdram", "per_timestep_sdram", "iptags", "reverse_iptags"] },
+        { "required": [ "exception"] }
+      ]
+    },
+
+    "vertex_label": {
+      "description": "Text Label of the vertex.",
+      "type": "string"
+    },
+
+    "vertices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "class": { "$ref": "#/types/class" },
+          "label": { "$ref": "#/types/vertex_label" },
+          "constraints": { "$ref": "#/types/constraints" },
+          "resources": { "$ref": "#/types/resources" },
+          "exception": {"$ref": "#/types/exception" }
+        },
+        "additionalProperties": false,
+        "anyOf": [
+          { "required": [ "class", "label", "constraints", "resources"] },
+          { "required": [ "exception"] }
+        ]
+      }
+    }
+  }
+}

@@ -114,7 +114,7 @@ class FixedRouteRouter(object):
         :rtype: int
         :raises PacmanConfigurationException: if no placement processor found
         """
-        for processor_id in range(Machine.MAX_CORES_PER_CHIP):
+        for processor_id in range(Machine.max_cores_per_chip()):
             # only check occupied processors
             if self._placements.is_processor_occupied(
                     chip_x, chip_y, processor_id):

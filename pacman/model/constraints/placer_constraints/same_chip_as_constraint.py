@@ -28,13 +28,15 @@ class SameChipAsConstraint(AbstractPlacerConstraint):
 
     def __init__(self, vertex):
         """
-        :param vertex: The vertex to place on the same chip
+        :param AbstractVertex vertex: The vertex to place on the same chip
         """
         self._vertex = vertex
 
     @property
     def vertex(self):
         """ The vertex to place on the same chip
+
+        :rtype: AbstractVertex
         """
         return self._vertex
 

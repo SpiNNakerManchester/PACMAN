@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import deque
+import functools
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanException, PacmanInvalidParameterException, PacmanValueError)
 from pacman.model.placements import Placement, Placements
@@ -29,7 +32,6 @@ from pacman.utilities.utility_calls import (
     is_single, locate_constraints_of_type)
 from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import PacmanPlaceException
-import functools
 
 
 def _conflict(x, y, post_x, post_y):
@@ -103,47 +105,43 @@ class OneToOnePlacer(RadialPlacer):
         # Virtual vertices can't be forced on other chips
         if isinstance(vertex, AbstractVirtual):
             return []
-        found_vertices = set()
+        found_vertices = OrderedSet()
         vertices_seen = {vertex}
 
         # look for one to ones leaving this vertex
         outgoing = graph.get_edges_starting_at_vertex(vertex)
-        vertices_to_try = [
+        vertices_to_try = deque(
             edge.post_vertex for edge in outgoing
-            if edge.post_vertex not in vertices_seen]
+            if edge.post_vertex not in vertices_seen)
         while vertices_to_try:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen and \
                     not isinstance(next_vertex, AbstractVirtual):
                 vertices_seen.add(next_vertex)
-                edges = graph.get_edges_ending_at_vertex(next_vertex)
-                if is_single(edges):
+                if is_single(graph.get_edges_ending_at_vertex(next_vertex)):
                     found_vertices.add(next_vertex)
                     outgoing = graph.get_edges_starting_at_vertex(next_vertex)
-                    vertices_to_try.extend([
+                    vertices_to_try.extend(
                         edge.post_vertex for edge in outgoing
-                        if edge.post_vertex not in vertices_seen])
+                        if edge.post_vertex not in vertices_seen)
 
         # look for one to ones entering this vertex
         incoming = graph.get_edges_ending_at_vertex(vertex)
-        vertices_to_try = [
+        vertices_to_try = deque(
             edge.pre_vertex for edge in incoming
-            if edge.pre_vertex not in vertices_seen]
+            if edge.pre_vertex not in vertices_seen)
         while vertices_to_try:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
                 vertices_seen.add(next_vertex)
-                edges = graph.get_edges_starting_at_vertex(next_vertex)
-                if is_single(edges):
+                if is_single(graph.get_edges_starting_at_vertex(next_vertex)):
                     found_vertices.add(next_vertex)
                     incoming = graph.get_edges_ending_at_vertex(next_vertex)
-                    vertices_to_try.extend([
+                    vertices_to_try.extend(
                         edge.pre_vertex for edge in incoming
-                        if edge.pre_vertex not in vertices_seen])
+                        if edge.pre_vertex not in vertices_seen)
 
-        extra_vertices = get_vertices_on_same_chip(vertex, graph)
-        for vertex in extra_vertices:
-            found_vertices.add(vertex)
+        found_vertices.update(get_vertices_on_same_chip(vertex, graph))
         return found_vertices
 
     def _do_allocation(

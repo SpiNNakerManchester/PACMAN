@@ -134,9 +134,10 @@ class PairCompressor(AbstractCompressor):
         For two different routes but with the same frequency order is based on
         the (currently arbitrary) order they are in the self._routes table
 
-        :param route_a:
-        :param route_b:
+        :param int route_a:
+        :param int route_b:
         :return: ordering value (-1, 0, 1)
+        :rtype: int
         """
         if route_a == route_b:
             return 0
@@ -153,9 +154,10 @@ class PairCompressor(AbstractCompressor):
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
 
-        :param low: Inclusive Lowest index to consider
-        :param high: Inclusive Highest index to consider
+        :param int low: Inclusive Lowest index to consider
+        :param int high: Inclusive Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
+        :rtype: tuple(int,int)
         """
         check = low + 1
         pivot = self._all_entries[low].spinnaker_route
@@ -181,8 +183,8 @@ class PairCompressor(AbstractCompressor):
         """
         Sorts the entries in place based on frequency of their route
 
-        :param low: Inclusive lowest index to consider
-        :param high: Inclusive highest index to consider
+        :param int low: Inclusive lowest index to consider
+        :param int high: Inclusive highest index to consider
         """
         if low < high:
             left, right = self._three_way_partition_table(low, high)
@@ -191,11 +193,10 @@ class PairCompressor(AbstractCompressor):
 
     def _swap_routes(self, index_a, index_b):
         """
-        Helper function to swap BOTH the routes and routes frequency tables
+        Helper function to swap *both* the routes and routes frequency tables
 
-        :param index_a:
-        :param index_b:
-        :return:
+        :param int index_a:
+        :param int index_b:
         """
         temp = self._routes_frequency[index_a]
         self._routes_frequency[index_a] = self._routes_frequency[index_b]
@@ -205,14 +206,14 @@ class PairCompressor(AbstractCompressor):
         self._routes[index_b] = temp
 
     def _three_way_partition_routes(self, low, high):
-        """
-        Partitions the routes and frequencies into three parts
+        """ Partitions the routes and frequencies into three parts
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
 
-        :param low: Lowest index to consider
-        :param high: Highest index to consider
+        :param int low: Lowest index to consider
+        :param int high: Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
+        :rtype: tuple(int,int)
         """
         check = low + 1
         pivot = self._routes_frequency[low]
@@ -232,8 +233,8 @@ class PairCompressor(AbstractCompressor):
         """
         Sorts the routes in place based on frequency
 
-        :param low: Inclusive lowest index to consider
-        :param high: Inclusive highest index to consider
+        :param int low: Inclusive lowest index to consider
+        :param int high: Inclusive highest index to consider
         """
         if low < high:
             left, right = self._three_way_partition_routes(low, high)
@@ -244,14 +245,15 @@ class PairCompressor(AbstractCompressor):
         """
         Attempt to find a merge between the left entry and the index entry
 
-        Creates a merge and then checks it does not intersect with entries \
+        Creates a merge and then checks it does not intersect with entries
         with different routes.
 
         If no intersect detected entry[left] is replaced with the merge
 
-        :param left: Index of Entry to merge and replace if possible
-        :param index: Index of entry to merge with
+        :param int left: Index of Entry to merge and replace if possible
+        :param int index: Index of entry to merge with
         :return: True if and only if a merge was found and done
+        :rtype: bool
         """
         m_key, m_mask, defaultable = self.merge(
             self._all_entries[left], self._all_entries[index])
@@ -277,8 +279,8 @@ class PairCompressor(AbstractCompressor):
         """
         Compresses the entries between left and right
 
-        :param left: Inclusive index of first entry to merge
-        :param right: Inclusive index of last entry to merge
+        :param int left: Inclusive index of first entry to merge
+        :param int right: Inclusive index of last entry to merge
         """
         while left < right:
             index = left + 1
@@ -304,6 +306,9 @@ class PairCompressor(AbstractCompressor):
             self._write_index += 1
 
     def update_frequency(self, route):
+        """
+        :param int route:
+        """
         for i in range(self._routes_count):
             if self._routes[i] == route:
                 self._routes_frequency[i] += 1
@@ -316,13 +321,13 @@ class PairCompressor(AbstractCompressor):
         """
         Compresses all the entries for a single table.
 
-        Compressed the entries for this unordered table \
+        Compressed the entries for this unordered table
         returning a new table with possibly fewer entries but still unordered
 
-        :param router_table: Original Routing table for a single chip
-        :type router_table: ~pacman.model.routing_tables.MulticastRoutingTable
+        :param MulticastRoutingTable router_table:
+            Original Routing table for a single chip
         :return: Compressed routing table for the same chip
-        :rtype: ~pacman.model.routing_tables.MulticastRoutingTable
+        :rtype: list(Entry)
         """
 
         # Split the entries into buckets based on spinnaker_route

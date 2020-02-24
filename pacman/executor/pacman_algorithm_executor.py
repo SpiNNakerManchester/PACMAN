@@ -25,7 +25,6 @@ from .algorithm_decorators import (
     scan_packages, get_algorithms, Token)
 from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
 from pacman.operations import algorithm_reports
-from pacman.utilities import file_format_converters
 from pacman.executor.token_states import TokenStates
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -216,15 +215,10 @@ class PACMANAlgorithmExecutor(object):
         # decode the algorithms specs
         xml_decoder = AlgorithmMetadataXmlReader(copy_of_xml_paths)
         algorithm_data_objects = xml_decoder.decode_algorithm_data_objects()
-        converter_xml_path = \
-            file_format_converters.converter_algorithms_metadata_file
-        converter_decoder = AlgorithmMetadataXmlReader([converter_xml_path])
-        converters = converter_decoder.decode_algorithm_data_objects()
 
         # Scan for annotated algorithms
         copy_of_packages.append(operations)
         copy_of_packages.append(algorithm_reports)
-        converters.update(scan_packages([file_format_converters]))
         algorithm_data_objects.update(scan_packages(copy_of_packages))
         if use_unscanned_algorithms:
             algorithm_data_objects.update(get_algorithms())
@@ -233,21 +227,17 @@ class PACMANAlgorithmExecutor(object):
         # import
         all_xml_paths = list()
         all_xml_paths.extend(copy_of_xml_paths)
-        all_xml_paths.append(converter_xml_path)
 
         # filter for just algorithms we want to use
         algorithm_data = self._get_algorithm_data(
             algorithms_names, algorithm_data_objects)
         optional_algorithms_datas = self._get_algorithm_data(
             copy_of_optional_algorithms, algorithm_data_objects)
-        converter_algorithms_datas = self._get_algorithm_data(
-            converters.keys(), converters)
 
         # sort_out_order_of_algorithms for execution
         self._determine_algorithm_order(
             inputs, required_outputs, algorithm_data,
-            optional_algorithms_datas, converter_algorithms_datas,
-            tokens, required_output_tokens)
+            optional_algorithms_datas, tokens, required_output_tokens)
 
     @staticmethod
     def _get_algorithm_data(
@@ -262,8 +252,7 @@ class PACMANAlgorithmExecutor(object):
 
     def _determine_algorithm_order(
             self, inputs, required_outputs, algorithm_data,
-            optional_algorithm_data, converter_algorithms_datas,
-            tokens, required_output_tokens):
+            optional_algorithm_data, tokens, required_output_tokens):
         """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
 
@@ -368,10 +357,6 @@ class PACMANAlgorithmExecutor(object):
                 # - as above, it shouldn't be necessary but might be if an
                 # optional input is also an output of the same algorithm
                 (optionals_to_use, True, False),
-
-                # Check converter algorithms
-                # (only if they generate something new)
-                (converter_algorithms_datas, True, False)
             ]
 
             for (algorithms, check_outputs, force_required) in order:

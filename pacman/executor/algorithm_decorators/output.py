@@ -27,10 +27,11 @@ class Output(object):
 
     def __init__(self, output_type, file_name_type=None):
         """
-        :param output_type: The type of the output
-        :param file_name_type:\
-            If the output is file based, the type of the input holding\
+        :param str output_type: The type of the output
+        :param file_name_type:
+            If the output is file based, the type of the input holding
             the file name
+        :type file_name_type: str or None
         """
         self._output_type = output_type
         self._file_name_type = file_name_type

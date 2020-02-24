@@ -33,21 +33,24 @@ class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
 
     def __init__(self, x, y):
         """
-        :param x: the x-coordinate of the chip
-        :type x: int
-        :param y: the y-coordinate of the chip
-        :type y: int
-        :raise None: does not raise any known exceptions
+        :param int x: the x-coordinate of the chip
+        :param int y: the y-coordinate of the chip
         """
         self._x = int(x)
         self._y = int(y)
 
     @property
     def x(self):
+        """
+        :rtype: int
+        """
         return self._x
 
     @property
     def y(self):
+        """
+        :rtype: int
+        """
         return self._y
 
     def __repr__(self):

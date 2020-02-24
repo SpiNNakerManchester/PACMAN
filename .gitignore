@@ -26,3 +26,4 @@ PACMAN.egg-info
 /.cache
 .coverage
 .pytest_cache
+.mypy_cache

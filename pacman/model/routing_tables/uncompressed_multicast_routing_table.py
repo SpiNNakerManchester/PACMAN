@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanRoutingException)
 from pacman.model.routing_tables.abstract_multicast_routing_table import \
@@ -54,18 +51,16 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
 
     def __init__(self, x, y, multicast_routing_entries=None):
         """
-        :param x: \
+        :param int x:
             The x-coordinate of the chip for which this is the routing table
-        :type x: int
-        :param y: \
+        :param int y:
             The y-coordinate of the chip for which this is the routing tables
-        :type y: int
-        :param multicast_routing_entries: \
+        :param multicast_routing_entries:
             The routing entries to add to the table
-        :type multicast_routing_entries: \
-            iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
-            routing entries contain the same key-mask combination
+        :type multicast_routing_entries:
+            iterable(~spinn_machine.MulticastRoutingEntry)
+        :raise PacmanAlreadyExistsException:
+            If any two routing entries contain the same key-mask combination
         """
         self._x = x
         self._y = y
@@ -81,12 +76,12 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
     def add_multicast_routing_entry(self, multicast_routing_entry):
         """ Adds a routing entry to this table
 
-        :param multicast_routing_entry: The route to add
-        :type multicast_routing_entry:\
-            :py:class:`spinn_machine.MulticastRoutingEntry`
+        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
+            The route to add
         :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
-            entry with the same key-mask combination already exists
+        :raise PacmanAlreadyExistsException:
+            If a routing entry with the same key-mask combination already
+            exists
         """
         routing_entry_key = multicast_routing_entry.routing_entry_key
         mask = multicast_routing_entry.mask
@@ -108,26 +103,49 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
     @property
     @overrides(AbsractMulticastRoutingTable.x)
     def x(self):
+        """ The x-coordinate of the chip of this table
+
+        :rtype: int
+        """
         return self._x
 
     @property
     @overrides(AbsractMulticastRoutingTable.y)
     def y(self):
+        """ The y-coordinate of the chip of this table
+
+        :rtype: int
+        """
         return self._y
 
     @property
     @overrides(AbsractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
+        """ The multicast routing entries in the table
+
+        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
+        :raise None: does not raise any known exceptions
+        """
         return self._multicast_routing_entries
 
     @property
     @overrides(AbsractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
+        """ The number of multi-cast routing entries there are in the\
+            multicast routing table
+
+        :rtype: int
+        """
         return len(self._multicast_routing_entries)
 
     @property
     @overrides(AbsractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
+        """ The number of multi-cast routing entries that are set to be\
+            defaultable within this multicast routing table
+
+        :rtype: int
+        """
         return self._number_of_defaulted_routing_entries
 
     def get_entry_by_routing_entry_key(self, routing_entry_key):
@@ -151,14 +169,11 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
             combination or None if the routing table does not match the\
             key_combo
 
-        :param routing_entry_key: the routing key to be searched
-        :type routing_entry_key: int
-        :param mask: the routing mask to be searched
-        :type mask: int
+        :param int routing_entry_key: the routing key to be searched
+        :param int mask: the routing mask to be searched
         :return: the routing entry associated with the routing key_combo or\
             None if no such entry exists
-        :rtype:\
-            :py:class:`spinn_machine.MulticastRoutingEntry`
+        :rtype: ~spinn_machine.MulticastRoutingEntry or None
         """
         if (routing_entry_key & mask) != routing_entry_key:
             raise PacmanRoutingException(
