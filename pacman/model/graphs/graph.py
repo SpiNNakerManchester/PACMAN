@@ -21,7 +21,7 @@ from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractGraph
 from pacman.model.graphs.common import ConstrainedObject
-from .outgoing_edge_partition import OutgoingEdgePartition
+from pacman.model.graphs.outgoing_edge_partition import OutgoingEdgePartition
 
 
 class Graph(ConstrainedObject, AbstractGraph):

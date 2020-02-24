@@ -16,7 +16,7 @@
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from pacman.model.graphs import AbstractOutgoingEdgePartition
-from pacman.model.graphs.impl import Graph
+from pacman.model.graphs import Graph
 
 
 class MachineGraph(Graph):

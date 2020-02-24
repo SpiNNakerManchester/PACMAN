@@ -20,7 +20,10 @@ from .abstract_outgoing_edge_partition import AbstractOutgoingEdgePartition
 from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
+from .abstract_virtual import AbstractVirtual
+from .graph import Graph
+from .outgoing_edge_partition import OutgoingEdgePartition
 
 __all__ = ["AbstractEdge", "AbstractFPGA", "AbstractGraph",
            "AbstractOutgoingEdgePartition", "AbstractSpiNNakerLink",
-           "AbstractVertex", "AbstractVirtual"]
+           "AbstractVertex", "AbstractVirtual", "Graph", "OutgoingEdgePartition"]

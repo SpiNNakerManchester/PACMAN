@@ -16,7 +16,7 @@
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractOutgoingEdgePartition
-from pacman.model.graphs.impl import Graph
+from pacman.model.graphs import Graph
 
 
 class ApplicationGraph(Graph):
