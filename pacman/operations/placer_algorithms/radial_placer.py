@@ -31,25 +31,19 @@ logger = logging.getLogger(__name__)
 class RadialPlacer(object):
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param ~spinn_machine.Machine machine:
+        The machine with respect to which to partition the application\
+        graph
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: A set of placements
+    :rtype: Placements
+    :raise PacmanPlaceException:
+        If something goes wrong with the placement
     """
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
-        """
-
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param machine:\
-            The machine with respect to which to partition the application\
-            graph
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :return: A set of placements
-        :rtype: :py:class:`pacman.model.placements.Placements`
-        :raise pacman.exceptions.PacmanPlaceException: \
-            If something goes wrong with the placement
-        """
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 
@@ -84,6 +78,16 @@ class RadialPlacer(object):
     def _place_vertex(
             self, vertex, resource_tracker, machine, placements,
             vertices_on_same_chip, machine_graph):
+        """
+        :param MachineVertex vertex:
+        :param ResourceTracker resource_tracker:
+        :param ~spinn_machine.Machine machine:
+        :param Placements placements:
+        :param vertices_on_same_chip:
+        :type vertices_on_same_chip: dict(MachineVertex, set(MachineVertex))
+        :param MachineGraph machine_graph:
+        :rtype: set(MachineVertex)
+        """
         vertices = vertices_on_same_chip[vertex]
 
         # Check for the radial placement constraint
@@ -113,6 +117,10 @@ class RadialPlacer(object):
 
     @staticmethod
     def _get_start(radial_constraints):
+        """
+        :param list(RadialPlacementFromChipConstraint) radial_constraints:
+        :rtype: tuple(int,int) or tuple(None,None)
+        """
         x = None
         y = None
         for constraint in radial_constraints:
@@ -133,17 +141,19 @@ class RadialPlacer(object):
         """ Generates the list of chips from a given starting point in a radial\
             format.
 
-        :param machine: the SpiNNaker machine object
-        :param resource_tracker:\
-            the resource tracker object which contains what resources of the\
+        :param ~spinn_machine.Machine machine: the SpiNNaker machine object
+        :param resource_tracker:
+            the resource tracker object which contains what resources of the
             machine have currently been used
-        :type resource_tracker: None or \
-            :py:class:`ResourceTracker`
-        :param start_chip_x:\
+        :type resource_tracker: ResourceTracker or None
+        :param start_chip_x:
             The chip x coordinate to start with for radial iteration
-        :param start_chip_y:\
+        :type start_chip_x: int or None
+        :param start_chip_y:
             the chip y coordinate to start with for radial iteration
+        :type start_chip_y: int or None
         :return: list of chips.
+        :rtype: iterable(tuple(int,int))
         """
 
         if start_chip_x is None or start_chip_y is None:

@@ -28,6 +28,11 @@ class ClashCompressor(AbstractCompressor):
     ]
 
     def find_merge(self, an_entry, route_entries):
+        """
+        :param ~.Entry an_entry:
+        :param list(Entry) route_entries:
+        :rtype: ~.Entry or None
+        """
         for another in route_entries:
             m_key, m_mask, defaultable = self.merge(an_entry, another)
             clashers = []
@@ -36,8 +41,7 @@ class ClashCompressor(AbstractCompressor):
                     if self.intersect(check.key, check.mask, m_key, m_mask):
                         if len(clashers) >= self._max_clashes:
                             break
-                        else:
-                            clashers.append(check)
+                        clashers.append(check)
                 if len(clashers) >= self._max_clashes:
                     break
             if len(clashers) == 0:
@@ -50,6 +54,10 @@ class ClashCompressor(AbstractCompressor):
         return None
 
     def compress_by_route(self, route_entries):
+        """
+        :param list(~.Entry) route_entres:
+        :rtype: list(~.Entry)
+        """
         results = []
         while len(route_entries) > 1:
             an_entry = route_entries.pop()
@@ -65,6 +73,12 @@ class ClashCompressor(AbstractCompressor):
         return results
 
     def compress_ignore_clashers(self, router_table, top_entries):
+        """
+        :param MulticastRoutingTable router_table:
+        :param list(~.Entry) top_entries:
+        :rtype: list(~.Entry)
+        :raises MinimisationFailedError:
+        """
         while True:
             self._all_entries = defaultdict(list)
             for mcr_entry in router_table.multicast_routing_entries:
@@ -85,7 +99,7 @@ class ClashCompressor(AbstractCompressor):
             complex_routes = sorted(
                 list(self._all_entries),
                 key=lambda x: len(self._all_entries[x]) +
-                1/(self._all_entries[x][0].spinnaker_route+1),
+                1/(self._all_entries[x][0].spinnaker_route + 1),
                 reverse=False)
             for spinnaker_route in complex_routes:
                 compressed = self.compress_by_route(
@@ -117,6 +131,10 @@ class ClashCompressor(AbstractCompressor):
             top_entries.extend(clashers[0:1])
 
     def compress_table(self, router_table):
+        """
+        :param MulticastRoutingTable router_table:
+        :rtype: list(~.Entry)
+        """
         # Split the entries into buckets based on spinnaker_route
 
         self._max_clashes = 1

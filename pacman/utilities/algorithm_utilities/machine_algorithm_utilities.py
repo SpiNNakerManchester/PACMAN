@@ -19,6 +19,14 @@ from spinn_machine import SDRAM, Chip, Link, Router
 
 
 def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
+    """ Create a virtual chip on a real machine.
+
+    :param ~spinn_machine.Machine machine:
+    :param ~spinn_machine.link_data_objects.AbstractLinkData link_data:
+        Describes the link from the real machine.
+    :param int virtual_chip_x: Virtual chip coordinate
+    :param int virtual_chip_x: Virtual chip coordinate
+    """
 
     # If the chip already exists, return the data
     if machine.is_chip_at(virtual_chip_x, virtual_chip_y):

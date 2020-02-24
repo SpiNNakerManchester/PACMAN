@@ -91,9 +91,9 @@ class TestMachineGraphModel(unittest.TestCase):
         """
         vertices = list()
         edges = list()
-        subv = SimpleMachineVertex(None, "")
+        subv = SimpleMachineVertex(None, "bacon")
         vertices.append(subv)
-        vertices.append(SimpleMachineVertex(None, ""))
+        vertices.append(SimpleMachineVertex(None, "eggs"))
         vertices.append(subv)
         edges.append(MachineEdge(vertices[0], vertices[1]))
         edges.append(MachineEdge(vertices[1], vertices[0]))

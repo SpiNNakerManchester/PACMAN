@@ -27,12 +27,9 @@ class PacmanInvalidParameterException(PacmanException):
 
     def __init__(self, parameter, value, problem):
         """
-        :param parameter: The name of the parameter
-        :type parameter: str
-        :param value: The value of the parameter
-        :type value: str
-        :param problem: The problem with the value of the parameter
-        :type problem: str
+        :param str parameter: The name of the parameter
+        :param str value: The value of the parameter
+        :param str problem: The problem with the value of the parameter
         """
         super(PacmanInvalidParameterException, self).__init__(problem)
         self.parameter = parameter
@@ -40,16 +37,14 @@ class PacmanInvalidParameterException(PacmanException):
 
 
 class PacmanAlreadyExistsException(PacmanException):
-    """ An exception that indicates that something already exists and that\
+    """ An exception that indicates that something already exists and that
         adding another would be a conflict.
     """
 
     def __init__(self, item_type, item_id):
         """
-        :param item_type: The type of the item that already exists
-        :type item_type: str
-        :param item_id: The ID of the item which is in conflict
-        :type item_id: str
+        :param str item_type: The type of the item that already exists
+        :param str item_id: The ID of the item which is in conflict
         """
         super(PacmanAlreadyExistsException, self).__init__(
             "{}({}) already exists".format(item_type, item_id))
@@ -73,13 +68,13 @@ class PacmanPruneException(PacmanException):
 
 
 class PacmanRouteInfoAllocationException(PacmanException):
-    """ An exception that indicates that something went wrong with route info\
+    """ An exception that indicates that something went wrong with route info
         allocation.
     """
 
 
 class PacmanElementAllocationException(PacmanException):
-    """ An exception that indicates that something went wrong with element\
+    """ An exception that indicates that something went wrong with element
         allocation.
     """
 
@@ -90,23 +85,28 @@ class PacmanRoutingException(PacmanException):
 
 
 class PacmanConfigurationException(PacmanException):
-    """ An exception that indicates that something went wrong with \
+    """ An exception that indicates that something went wrong with
         configuring some part of PACMAN.
     """
 
 
 class PacmanNotExistException(PacmanException):
-    """ An exception that indicates that a routing table entry was attempted\
+    """ An exception that indicates that a routing table entry was attempted
         to be removed from a routing table which didn't have such an entry.
     """
 
 
 class PacmanAlgorithmFailedToCompleteException(PacmanException):
-    """ An exception that indicates that a pacman algorithm ran from inside\
+    """ An exception that indicates that a pacman algorithm ran from inside
         the software stack has failed to complete for some unknown reason.
     """
 
     def __init__(self, algorithm, exception, tb):
+        """
+        :param AbstractAlgorithm algorithm:
+        :param Exception exception:
+        :param traceback tb:
+        """
         problem = (
             "Algorithm {} has crashed.\n"
             "    Inputs: {}\n"
@@ -122,19 +122,19 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
 
 
 class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
-    """ An exception that indicates that an algorithm ran from outside\
+    """ An exception that indicates that an algorithm ran from outside
         the software stack has failed to complete for some unknown reason.
     """
 
 
 class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
-    """ An exception that indicates that an algorithm has not generated the\
+    """ An exception that indicates that an algorithm has not generated the
         correct outputs for some unknown reason.
     """
 
 
 class PacmanAlreadyPlacedError(ValueError):
-    """ An exception that indicates multiple placements are being made for a\
+    """ An exception that indicates multiple placements are being made for a
         vertex.
     """
 
@@ -145,23 +145,28 @@ class PacmanNotPlacedError(KeyError):
 
 
 class PacmanProcessorAlreadyOccupiedError(ValueError):
-    """ An exception that indicates multiple placements are being made to a\
+    """ An exception that indicates multiple placements are being made to a
         processor.
     """
 
 
 class PacmanProcessorNotOccupiedError(KeyError):
-    """ An exception that indicates that no placement has been made to a\
+    """ An exception that indicates that no placement has been made to a
         processor.
     """
 
 
 class PacmanProcessorNotAvailableError(PacmanException):
-    """ An exception that indicates that a processor is unavailable for some\
+    """ An exception that indicates that a processor is unavailable for some
         reason.
     """
 
     def __init__(self, x, y, p):
+        """
+        :param int x:
+        :param int y:
+        :param int p:
+        """
         msg = "The processor {} {} {} is not available. " \
               "This may be caused by a clash between a ChipAndCoreConstraint"\
               " and the processor still being in use from a previous run." \
@@ -176,7 +181,7 @@ class PacmanValueError(ValueError, PacmanException):
 
 
 class PacmanNotFoundError(KeyError, PacmanException):
-    """ An exception that indicates that some object has not been found when\
+    """ An exception that indicates that some object has not been found when
         requested.
     """
 
@@ -187,7 +192,7 @@ class PacmanTypeError(TypeError, PacmanException):
 
 
 class PacmanNoMergeException(PacmanException):
-    """ An exception that indicates to indicate that there are no merges worth\
+    """ An exception that indicates to indicate that there are no merges worth
         performing.
     """
 
@@ -198,8 +203,8 @@ class PacmanCanNotFindChipException(PacmanException):
 
 
 class MachineHasDisconnectedSubRegion(PacmanException):
-    """Some part of the machine has no paths connecting it to the rest of the\
-    machine.
+    """ Some part of the machine has no paths connecting it to the rest of the
+        machine.
     """
 
 
@@ -210,22 +215,21 @@ class SDRAMEdgeSizeException(PacmanException):
 
 
 class MinimisationFailedError(PacmanException):
-    """Raised when a routing table could not be minimised to reach a specified
-    target.
+    """ Raised when a routing table could not be minimised to reach a
+        specified target.
     """
 
     def __init__(self, target_length, final_length=None, chip=None):
         """
-        :param target_length: \
+        :param int target_length:
             The target number of routing entries.
-        :type target_length: int
-        :param final_length: \
-            The number of routing entries reached when the algorithm \
-            completed. (`final_length > target_length`)
+        :param final_length:
+            The number of routing entries reached when the algorithm completed.
+            (`final_length > target_length`)
         :type final_length: int or None
-        :param chip: \
-            The coordinates of the chip on which routing table minimisation \
-            first failed. Only set when minimisation is performed across many \
+        :param chip:
+            The coordinates of the chip on which routing table minimisation
+            first failed. Only set when minimisation is performed across many
             chips simultaneously.
         :type chip: tuple(int, int) or None
         """

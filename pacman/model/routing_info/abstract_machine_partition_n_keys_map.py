@@ -28,9 +28,13 @@ class AbstractMachinePartitionNKeysMap(object):
     def n_keys_for_partition(self, partition):
         """ The number of keys required by the given partition
 
-        :param partition: The partition to set the number of keys for
-        :type partition:\
-            :py:class:`pacman.model.graphs.impl.OutgoingEdgePartition`
+        :param ~pacman.model.graphs.OutgoingEdgePartition partition:
+            The partition to set the number of keys for
         :return: The number of keys required by the partition
         :rtype: int
         """
+
+    @abstractmethod
+    def __iter__(self):
+        """ Returns an iterator over the mapped partitions"""
+        pass
