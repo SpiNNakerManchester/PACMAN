@@ -42,14 +42,12 @@ class VariableSDRAM(AbstractSDRAM):
             self, fixed_sdram, per_timestep_sdram, timestep_in_us):
         """
 
-        :param fixed_sdram: The amount of SDRAM in bytes
-        :type fixed_sdram: int
-        :param per_timestep_sdram: The amount of extra sdram per timestep.
-        Note: This needs only to be accurate at the timestep level.
-        So may be simply per_timestep_sdram / timestep
-        :type per_timestep_sdram: int
-        :param timestep_in_us: the timestep in us of the cost provider
-        :type timestep_in_us: int
+        :param int fixed_sdram:
+            The amount of SDRAM (in bytes) that represents static overhead
+        :param int per_timestep_sdram:
+            The amount of SDRAM (in bytes) required per timestep.
+            Often represents the space to record a timestep.
+        :param int timestep_in_us: the timestep used by the cost provider
         """
         self._fixed_sdram = fixed_sdram
         self._per_timestep_sdram = per_timestep_sdram

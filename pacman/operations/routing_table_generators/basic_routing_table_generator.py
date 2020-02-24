@@ -21,16 +21,21 @@ from pacman.model.routing_tables import (
 
 class BasicRoutingTableGenerator(object):
     """ An basic algorithm that can produce routing tables
+
+    :param RoutingInfo routing_infos:
+    :param MulticastRoutingTableByPartition routing_table_by_partitions:
+    :param ~spinn_machine.Machine machine:
+    :rtype: MulticastRoutingTables
     """
 
     __slots__ = []
 
-    def __call__(
-            self, routing_infos, routing_table_by_partitions, machine):
+    def __call__(self, routing_infos, routing_table_by_partitions, machine):
         """
-        :param routing_infos:
-        :param routing_table_by_partitions:
-        :param machine:
+        :param RoutingInfo routing_infos:
+        :param MulticastRoutingTableByPartition routing_table_by_partitions:
+        :param ~spinn_machine.Machine machine:
+        :rtype: MulticastRoutingTables
         """
         progress = ProgressBar(machine.n_chips, "Generating routing tables")
         routing_tables = MulticastRoutingTables()
@@ -44,14 +49,31 @@ class BasicRoutingTableGenerator(object):
         return routing_tables
 
     def _create_routing_table(self, chip, partitions_in_table, routing_infos):
+        """
+        :param ~spinn_machine.Chip chip:
+        :param partitions_in_table:
+        :type partitions_in_table:
+            dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
+        :param RoutingInfo routing_infos:
+        :rtype: MulticastRoutingTable
+        """
         table = MulticastRoutingTable(chip.x, chip.y)
         for partition in partitions_in_table:
             r_info = routing_infos.get_routing_info_from_partition(partition)
             entry = partitions_in_table[partition]
             for key_and_mask in r_info.keys_and_masks:
-                table.add_multicast_routing_entry(MulticastRoutingEntry(
-                    routing_entry_key=key_and_mask.key_combo,
-                    defaultable=entry.defaultable, mask=key_and_mask.mask,
-                    link_ids=entry.link_ids,
-                    processor_ids=entry.processor_ids))
+                table.add_multicast_routing_entry(
+                    self.__create_entry(key_and_mask, entry))
         return table
+
+    @staticmethod
+    def __create_entry(key_and_mask, entry):
+        """
+        :param BaseKeyAndMask key_and_mask:
+        :param MulticastRoutingTableByPartitionEntry entry:
+        :rtype: MulticastRoutingEntry
+        """
+        return MulticastRoutingEntry(
+            routing_entry_key=key_and_mask.key_combo,
+            defaultable=entry.defaultable, mask=key_and_mask.mask,
+            link_ids=entry.link_ids, processor_ids=entry.processor_ids)
