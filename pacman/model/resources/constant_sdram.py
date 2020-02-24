@@ -29,13 +29,11 @@ class ConstantSDRAM(AbstractSDRAM):
 
     def __init__(self, sdram):
         """
-        :param sdram: The amount of SDRAM in bytes
-        :type sdram: int
-        :raise None: No known exceptions are raised
+        :param int sdram: The amount of SDRAM in bytes
         """
         self._sdram = sdram
 
-    def get_total_sdram(self, n_timesteps):
+    def get_total_sdram(self, n_timesteps):  # @UnusedVariable
         return self._sdram
 
     @property
@@ -49,7 +47,7 @@ class ConstantSDRAM(AbstractSDRAM):
     def __add__(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
-                self._sdram + other._sdram)
+                self._sdram + other.fixed)
         else:
             # The other is more complex so delegate to it
             return other.__add__(self)
@@ -57,7 +55,7 @@ class ConstantSDRAM(AbstractSDRAM):
     def __sub__(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
-                self._sdram - other._sdram)
+                self._sdram - other.fixed)
         else:
             # The other is more complex so delegate to it
             return other.sub_from(self)
@@ -65,7 +63,7 @@ class ConstantSDRAM(AbstractSDRAM):
     def sub_from(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
-                other._sdram - self._sdram)
+                other.fixed - self._sdram)
         else:
             # The other is more complex so delegate to it
             return other - self

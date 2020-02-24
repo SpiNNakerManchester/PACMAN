@@ -46,7 +46,7 @@ class TestSameChipConstraint(unittest.TestCase):
         sdram_edges = list()
         for vertex in same_vertices:
             graph.add_vertex(vertex)
-            for i in range(0, random.randint(1, 5)):
+            for _i in range(0, random.randint(1, 5)):
                 sdram_edge = MachineEdge(
                     vertex, vertices[random.randint(0, 99)],
                     traffic_type=EdgeTrafficType.SDRAM)

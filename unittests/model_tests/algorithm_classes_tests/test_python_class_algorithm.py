@@ -22,8 +22,21 @@ class TestPythonClassAlgorithm(unittest.TestCase):
     tests which test the application graph object
     """
 
-    def test_python_module(self):
+    def test_python_class(self):
         python_module = "Foo"
-        alg = PythonClassAlgorithm("algorithm_id", [], [], [],
-                                   python_module, "python_function")
+        python_class = "Bar"
+        alg = PythonClassAlgorithm("algorithm_id", [], [], [], [], [], [],
+                                   python_module, python_class)
         self.assertEqual(python_module, alg._python_module)
+        self.assertEqual(python_class, alg._python_class)
+        self.assertIsNone(alg._python_method)
+
+    def test_python_method(self):
+        python_module = "Foo"
+        python_class = "Bar"
+        python_method = "grill"
+        alg = PythonClassAlgorithm("algorithm_id", [], [], [], [], [], [],
+                                   python_module, python_class, python_method)
+        self.assertEqual(python_module, alg._python_module)
+        self.assertEqual(python_class, alg._python_class)
+        self.assertEqual(python_method, alg._python_method)

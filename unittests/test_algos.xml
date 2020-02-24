@@ -60,4 +60,30 @@
             </param_type>
         </outputs>
     </algorithm>
+    <algorithm name="CommentedExternal">
+        <command_line_args>
+            <arg>/bin/sh</arg>
+            <arg>-c</arg>
+            <arg>echo foo &gt;{target_file}</arg>
+        </command_line_args>
+        <input_definitions>
+            <parameter>
+            	<!-- comment -->
+	        	<?process this!?>
+                <param_name>target_file</param_name>
+                <param_type>ExampleFilePath</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+        	<!-- comment -->
+            <param_name>target_file</param_name>
+        </required_inputs>
+        <outputs>
+        	<!-- comment -->
+        	<?process this!?>
+            <param_type file_name_type="ExampleFilePath">
+                Foo
+            </param_type>
+        </outputs>
+    </algorithm>
 </algorithms>

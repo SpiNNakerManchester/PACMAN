@@ -28,10 +28,8 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
 
     def __init__(self, vertex):
         """
-        :param vertex: The vertex to which the constraint refers
-        :type vertex: \
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :raise None: does not raise any known exceptions
+        :param ApplicationVertex vertex:
+            The vertex to which the constraint refers
         """
         self._vertex = vertex
 
@@ -39,10 +37,7 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
     def vertex(self):
         """ The vertex to partition with
 
-        :return: the vertex
-        :rtype:\
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :raise None: does not raise any known exceptions
+        :rtype: ApplicationVertex
         """
         return self._vertex
 
