@@ -15,7 +15,7 @@
 
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
-from pacman.model.graphs import AbstractOutgoingEdgePartition
+from pacman.model.graphs import OutgoingEdgePartition
 from pacman.model.graphs import Graph
 
 
@@ -27,4 +27,4 @@ class MachineGraph(Graph):
 
     def __init__(self, label):
         super(MachineGraph, self).__init__(
-            MachineVertex, MachineEdge, AbstractOutgoingEdgePartition, label)
+            MachineVertex, MachineEdge, OutgoingEdgePartition, label)
