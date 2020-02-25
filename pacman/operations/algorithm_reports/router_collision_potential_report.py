@@ -33,6 +33,10 @@ class RouterCollisionPotentialReport(object):
 
     @staticmethod
     def _write_report(collision_counts, writer):
+        if len(collision_counts) == 0:
+            writer.write("There are no collisions in this network mapping")
+            return
+
         for (x, y) in collision_counts:
             for link_id in collision_counts[(x, y)]:
                 writer.write(
