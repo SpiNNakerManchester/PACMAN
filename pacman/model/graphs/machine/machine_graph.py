@@ -34,8 +34,7 @@ class MachineGraph(Graph):
         :type application_graph: ApplicationGraph or None
         """
         super(MachineGraph, self).__init__(
-<<<<<<< HEAD
-            MachineVertex, MachineEdge, label)
+            MachineVertex, MachineEdge, OutgoingEdgePartition, label)
         self._app_graph = application_graph
 
     @property
@@ -48,6 +47,3 @@ class MachineGraph(Graph):
     @application_graph.setter
     def application_graph(self, application_graph):
         self._app_graph = application_graph
-=======
-            MachineVertex, MachineEdge, OutgoingEdgePartition, label)
->>>>>>> refs/remotes/origin/master

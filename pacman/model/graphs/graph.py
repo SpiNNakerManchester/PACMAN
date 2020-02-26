@@ -32,6 +32,8 @@ class Graph(ConstrainedObject):
         # The classes of edges that are allowed in this graph
         "_allowed_edge_types",
         # The vertices of the graph
+        "_allowed_partition_types",
+        # The vertices of the graph
         "_vertices",
         # The outgoing edge partitions of the graph by name
         "_outgoing_edge_partitions_by_name",
@@ -52,7 +54,8 @@ class Graph(ConstrainedObject):
         # count of vertex which had a None or already used label
         "_unlabelled_vertex_count"]
 
-    def __init__(self, allowed_vertex_types, allowed_edge_types, label):
+    def __init__(self, allowed_vertex_types, allowed_edge_types,
+                 allowed_partition_types, label):
         """
         :param allowed_vertex_types:
             A single or tuple of types of vertex to be allowed in the graph
