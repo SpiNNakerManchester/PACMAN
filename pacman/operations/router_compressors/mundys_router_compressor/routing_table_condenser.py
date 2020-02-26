@@ -28,6 +28,10 @@ class MundyRouterCompressor(AbstractCompressor):
         super(MundyRouterCompressor, self).__init__(True)
 
     def compress_table(self, router_table):
+        """
+        :param MulticastRoutingTable router_table:
+        :rtype: list(RoutingTableEntry)
+        """
         # convert to rig inspired format
         entries = list()
 
