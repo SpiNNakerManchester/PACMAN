@@ -26,5 +26,9 @@ class MachineGraph(Graph):
     __slots__ = []
 
     def __init__(self, label):
+        """
+        :param label: The label for the graph
+        :type label: str or None
+        """
         super(MachineGraph, self).__init__(
             MachineVertex, MachineEdge, OutgoingEdgePartition, label)

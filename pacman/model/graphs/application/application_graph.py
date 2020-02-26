@@ -26,6 +26,10 @@ class ApplicationGraph(Graph):
     __slots__ = []
 
     def __init__(self, label):
+        """
+        :param label: The label on the graph, or None
+        :type label: str or None
+        """
         super(ApplicationGraph, self).__init__(
             ApplicationVertex, ApplicationEdge, OutgoingEdgePartition,
             label)

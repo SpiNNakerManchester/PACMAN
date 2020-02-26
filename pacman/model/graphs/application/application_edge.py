@@ -45,17 +45,17 @@ class ApplicationEdge(AbstractEdge):
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
             machine_edge_type=MachineEdge):
         """
-        :param pre_vertex: the application vertex at the start of the edge
-        :type pre_vertex: \
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param post_vertex: the application vertex at the end of the edge
-        :type post_vertex: \
-            :py:class:`pacman.model.graphs.application.ApplicationVertex`
-        :param traffic_type: The type of the traffic on the edge
-        :type traffic_type:\
-            :py:class:`pacman.model.graphs.common.EdgeTrafficType`
-        :param label: The name of the edge
-        :type label: str
+        :param ApplicationVertex pre_vertex:
+            The application vertex at the start of the edge.
+        :param ApplicationVertex post_vertex:
+            The application vertex at the end of the edge.
+        :param EdgeTrafficType traffic_type:
+            The type of the traffic on the edge.
+        :param str label: The name of the edge.
+        :param machine_edge_type:
+            The type of machine edges made from this app edge. If `None`,
+            standard `MachineEdge`s will be made.
+        :type machine_edge_type: type(MachineEdge) or None
         """
         self._label = label
         self._pre_vertex = pre_vertex
@@ -71,17 +71,14 @@ class ApplicationEdge(AbstractEdge):
     def create_machine_edge(self, pre_vertex, post_vertex, label):
         """ Create a machine edge between two machine vertices
 
-        :param pre_vertex: The machine vertex at the start of the edge
-        :type pre_vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :param post_vertex: The machine vertex at the end of the edge
-        :type post_vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
+        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
+            The machine vertex at the start of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
+            The machine vertex at the end of the edge.
         :param label: label of the edge
         :type label: str
         :return: The created machine edge
-        :rtype:\
-            :py:class:`pacman.model.graphs.machine.MachineEdge`
+        :rtype: ~pacman.model.graphs.machine.MachineEdge
         """
         return self._machine_edge_type(
             pre_vertex, post_vertex, self._traffic_type, label=label)
