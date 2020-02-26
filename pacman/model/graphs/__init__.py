@@ -15,12 +15,12 @@
 
 from .abstract_edge import AbstractEdge
 from .abstract_fpga import AbstractFPGA
-from .abstract_graph import AbstractGraph
-from .abstract_outgoing_edge_partition import AbstractOutgoingEdgePartition
 from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
+from .outgoing_edge_partition import OutgoingEdgePartition
+from .graph import Graph
 
-__all__ = ["AbstractEdge", "AbstractFPGA", "AbstractGraph",
-           "AbstractOutgoingEdgePartition", "AbstractSpiNNakerLink",
-           "AbstractVertex", "AbstractVirtual"]
+__all__ = ["AbstractEdge", "AbstractFPGA", "AbstractSpiNNakerLink",
+           "AbstractVertex", "AbstractVirtual", "Graph",
+           "OutgoingEdgePartition"]

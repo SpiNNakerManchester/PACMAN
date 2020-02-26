@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .application_edge import ApplicationEdge
-from pacman.model.graphs.impl import OutgoingEdgePartition
+from pacman.model.graphs import OutgoingEdgePartition
 
 
 class ApplicationOutgoingEdgePartition(OutgoingEdgePartition):
