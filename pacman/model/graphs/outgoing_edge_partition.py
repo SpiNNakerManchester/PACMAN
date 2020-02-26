@@ -13,18 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanConfigurationException)
-from pacman.model.graphs import AbstractOutgoingEdgePartition
 from pacman.model.graphs.common import ConstrainedObject
 
 _REPR_TEMPLATE = \
     "OutgoingEdgePartition(identifier={}, edges={}, constraints={}, label={})"
 
 
-class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
+class OutgoingEdgePartition(ConstrainedObject):
     """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key.
     """
@@ -50,11 +48,13 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1):
         """
-        :param identifier: The identifier of the partition
+        :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
-        :param constraints: Any initial constraints
-        :param label: An optional label of the partition
-        :param traffic_weight: The weight of traffic going down this partition
+        :type allowed_edge_types: type or tuple(type, ...)
+        :param list(AbstractConstraint) constraints: Any initial constraints
+        :param str label: An optional label of the partition
+        :param int traffic_weight:
+            The weight of traffic going down this partition
         """
         super(OutgoingEdgePartition, self).__init__(constraints)
         self._label = label
@@ -66,12 +66,21 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
         self._traffic_weight = traffic_weight
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.label)
     def label(self):
+        """ The label of the outgoing edge partition.
+
+        :rtype: str
+        """
         return self._label
 
-    @overrides(AbstractOutgoingEdgePartition.add_edge)
     def add_edge(self, edge):
+        """ Add an edge to the outgoing edge partition.
+
+        :param AbstractEdge edge: the edge to add
+        :raises PacmanInvalidParameterException:
+            If the starting vertex of the edge does not match that of the
+            edges already in the partition
+        """
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
             raise PacmanInvalidParameterException(
@@ -99,33 +108,53 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
         self._edges.add(edge)
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.identifier)
     def identifier(self):
+        """ The identifier of this outgoing edge partition.
+
+        :rtype: str
+        """
         return self._identifier
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.edges)
     def edges(self):
+        """ The edges in this outgoing edge partition.
+
+        :rtype: iterable(AbstractEdge)
+        """
         return self._edges
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.n_edges)
     def n_edges(self):
+        """ The number of edges in the outgoing edge partition.
+
+        :rtype: int
+        """
         return len(self._edges)
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.pre_vertex)
     def pre_vertex(self):
+        """ The vertex at which all edges in this outgoing edge partition\
+            start.
+
+        :rtype: AbstractVertex
+        """
         return self._pre_vertex
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.traffic_type)
     def traffic_type(self):
+        """ The traffic type of all the edges in this outgoing edge partition.
+
+        :rtype: EdgeTrafficType
+        """
         return self._traffic_type
 
     @property
-    @overrides(AbstractOutgoingEdgePartition.traffic_weight)
     def traffic_weight(self):
+        """ The weight of the traffic in this outgoing edge partition compared\
+            to other partitions.
+
+        :rtype: int
+        """
         return self._traffic_weight
 
     def __repr__(self):
@@ -141,11 +170,10 @@ class OutgoingEdgePartition(ConstrainedObject, AbstractOutgoingEdgePartition):
     def __str__(self):
         return self.__repr__()
 
-    @overrides(AbstractOutgoingEdgePartition.__contains__)
     def __contains__(self, edge):
         """ Check if the edge is contained within this partition
 
-        :param edge: the edge to search for.
-        :return: boolean of true of false otherwise
+        :param AbstractEdge edge: the edge to search for.
+        :rtype: bool
         """
         return edge in self._edges
