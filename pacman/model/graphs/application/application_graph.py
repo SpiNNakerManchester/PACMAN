@@ -16,6 +16,7 @@
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs.graph import Graph
+from pacman.model.graphs import OutgoingEdgePartition
 
 
 class ApplicationGraph(Graph):
@@ -30,7 +31,7 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, label)
+            ApplicationVertex, ApplicationEdge, OutgoingEdgePartition, label)
         self.__machine_graph = None
 
     @property

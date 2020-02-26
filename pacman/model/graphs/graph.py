@@ -60,13 +60,17 @@ class Graph(ConstrainedObject):
         :param allowed_edge_types:
             A single or tuple of types of edges to be allowed in the graph
         :type allowed_edge_types: type or tuple(type, ...)
+        :param allowed_partition_types:
+            A single or tuple of types of partitions to be allowed in the
+            graph
+        :type allowed_partition_types: type or tuple(type, ...)
         :param label: The label on the graph, or None
         :type label: str or None
         """
         super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
-
+        self._allowed_partition_types = allowed_partition_types
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0

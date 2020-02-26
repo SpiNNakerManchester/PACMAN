@@ -16,6 +16,7 @@
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from pacman.model.graphs.graph import Graph
+from pacman.model.graphs import OutgoingEdgePartition
 
 
 class MachineGraph(Graph):
@@ -33,6 +34,7 @@ class MachineGraph(Graph):
         :type application_graph: ApplicationGraph or None
         """
         super(MachineGraph, self).__init__(
+<<<<<<< HEAD
             MachineVertex, MachineEdge, label)
         self._app_graph = application_graph
 
@@ -46,3 +48,6 @@ class MachineGraph(Graph):
     @application_graph.setter
     def application_graph(self, application_graph):
         self._app_graph = application_graph
+=======
+            MachineVertex, MachineEdge, OutgoingEdgePartition, label)
+>>>>>>> refs/remotes/origin/master
