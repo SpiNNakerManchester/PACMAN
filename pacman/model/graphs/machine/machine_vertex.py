@@ -28,11 +28,10 @@ class MachineVertex(AbstractVertex):
     def __init__(self, label=None, constraints=None):
         """
         :param label: The optional name of the vertex
-        :type label: str
-        :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable(~pacman.model.constraints.AbstractConstraint)
-        :raise pacman.exceptions.PacmanInvalidParameterException:
+        :type label: str or None
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex
+        :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
         if label is None:

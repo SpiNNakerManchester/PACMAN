@@ -57,6 +57,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_edges(self.edges, "foo")
 
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
         links.append(Link(0, 0, 0, 0, 1))
@@ -65,10 +66,10 @@ class TestBasicPartitioner(unittest.TestCase):
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = TestBasicPartitioner.TheTestAddress
@@ -156,20 +157,20 @@ class TestBasicPartitioner(unittest.TestCase):
         test that partitioning will work when close to filling the machine
         """
         self.setup()
-
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(2**12)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = TestBasicPartitioner.TheTestAddress
@@ -200,20 +201,20 @@ class TestBasicPartitioner(unittest.TestCase):
         raise an error
         """
         self.setup()
-
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(2**11)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = TestBasicPartitioner.TheTestAddress
@@ -241,21 +242,20 @@ class TestBasicPartitioner(unittest.TestCase):
         in that it has less SDRAM available
         """
         self.setup()
-        (e, _, n, w, _, s) = range(6)
-
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**19))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = TestBasicPartitioner.TheTestAddress
@@ -277,20 +277,20 @@ class TestBasicPartitioner(unittest.TestCase):
         in that it has more SDRAM available
         """
         self.setup()
-
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**21))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = TestBasicPartitioner.TheTestAddress
@@ -385,7 +385,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = BasicPartitioner()
         machine_graph, _, _ = partitioner(
             app_graph, machine, minimum_simtime_in_us=None)
-        self.assert_(len(machine_graph.vertices) == 4)
+        self.assertEqual(4, len(machine_graph.vertices))
 
 
 if __name__ == '__main__':

@@ -58,6 +58,7 @@ class WriteJsonMachineGraph(object):
                 Will overwrite existing file in this folder!
 
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :return: the name of the generated file
         :rtype: str
         """
 

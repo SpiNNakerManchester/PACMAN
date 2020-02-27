@@ -27,6 +27,9 @@ from pacman.model.graphs.abstract_virtual import AbstractVirtual
 def sort_vertices_by_known_constraints(vertices):
     """ Sort vertices to be placed by constraint so that those with\
         more restrictive constraints come first.
+
+    :param list(ApplicationVertex) vertices:
+    :rtype: list(ApplicationVertex)
     """
     sorter = VertexSorter([
         ConstraintOrder(ChipAndCoreConstraint, 1, ["p"]),
@@ -40,8 +43,9 @@ def sort_vertices_by_known_constraints(vertices):
 def get_vertices_on_same_chip(vertex, graph):
     """ Get the vertices that must be on the same chip as the given vertex
 
-    :param vertex: The vertex to search with
-    :param graph: The graph containing the vertex
+    :param AbstractVertex vertex: The vertex to search with
+    :param AbstractGraph graph: The graph containing the vertex
+    :rtype: set(AbstractVertex)
     """
     # Virtual vertices can't be forced on different chips
     if isinstance(vertex, AbstractVirtual):
@@ -62,7 +66,8 @@ def get_same_chip_vertex_groups(graph):
     """ Get a dictionary of vertex to list of vertices that must be placed on\
        the same chip
 
-    :param graph: The graph containing the vertices
+    :param AbstractGraph graph: The graph containing the vertices
+    :rtype: dict(AbstractVertex, set(AbstractVertex))
     """
     return group_vertices(graph.vertices, functools.partial(
         get_vertices_on_same_chip, graph=graph))
@@ -72,12 +77,13 @@ def group_vertices(vertices, same_group_as_function):
     """ Group vertices according to some function that can indicate the groups\
         that any vertex can be contained within
 
-    :param vertices: The vertices to group
-    :param same_group_as_function:\
+    :param iterable(AbstractVertex) vertices: The vertices to group
+    :param callable(AbstractVertex,set(AbstractVertex)) same_group_as_function:
         A function which takes a vertex and returns vertices that should be in\
         the same group (excluding the original vertex)
-    :return:\
+    :return:
         A dictionary of vertex to list of vertices that are grouped with it
+    :rtype: dict(AbstractVertex, set(AbstractVertex))
     """
 
     groups = create_vertices_groups(vertices, same_group_as_function)
@@ -103,8 +109,9 @@ def add_set(all_sets, new_set):
     created combining all the overlapping sets.
     Existing overlapping sets are removed and only the new superset is added.
 
-    :param all_sets: List of Non overlapping sets
-    :param new_set: A new set which may or may not overlap the previous sets.
+    :param list(set) all_sets: List of non-overlapping sets
+    :param set new_set:
+        A new set which may or may not overlap the previous sets.
     """
 
     union = OrderedSet()
@@ -122,8 +129,10 @@ def add_set(all_sets, new_set):
 
 def create_vertices_groups(vertices, same_group_as_function):
     """
-    :type vertices: Iterable[Vertex]
-    :type same_group_as_function: Callable[[Vertex],Set[Vertex]]
+    :param iterable(AbstractVertex) vertices:
+    :param same_group_as_function:
+    :type same_group_as_function:
+        callable(AbstractVertex, set(AbstractVertex))
     """
     groups = list()
     done = set()

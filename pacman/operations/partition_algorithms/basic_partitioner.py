@@ -32,6 +32,14 @@ logger = logging.getLogger(__name__)
 class BasicPartitioner(object):
     """ An basic algorithm that can partition an application graph based\
         on the number of atoms in the vertices.
+
+    :param ApplicationGraph graph: The application_graph to partition
+    :param ~spinn_machine.Machine machine:
+        The machine with respect to which to partition the application graph
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: A machine graph
+    :raise PacmanPartitionException:
+        If something goes wrong with the partitioning
     """
 
     __slots__ = []
@@ -45,19 +53,15 @@ class BasicPartitioner(object):
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine, minimum_simtime_in_us):
         """
-        :param graph: The application_graph to partition
-        :type graph:\
-            :py:class:`pacman.model.graphs.application.ApplicationGraph`
-        :param machine:\
+        :param ApplicationGraph graph: The application_graph to partition
+        :param ~spinn_machine.Machine machine:
             The machine with respect to which to partition the application\
             graph
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param minimum_simtime_in_us: the simtime in us to plan for
-        :type  minimum_simtime_in_us: int
+        :param int minimum_simtime_in_us: the simtime in us to plan for
         :return: A machine graph
-        :rtype:\
+        :rtype:
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :raise pacman.exceptions.PacmanPartitionException:\
+        :raise PacmanPartitionException:
             If something goes wrong with the partitioning
         """
         ResourceTracker.check_constraints(graph.vertices)
@@ -86,6 +90,13 @@ class BasicPartitioner(object):
     def _partition_one_application_vertex(
             self, vertex, res_tracker, m_graph, mapper, minimum_simtime_in_us):
         """ Partitions a single application vertex.
+
+        :param ApplicationVertex vertex:
+        :param ResourceTracker res_tracker:
+        :param MachineGraph m_graph:
+        :param int plan_n_timesteps:
+        :raise PacmanPartitionException:
+            If something goes wrong with the partitioning
         """
         # Compute how many atoms of this vertex we can put on one core
         atoms_per_core = self._compute_atoms_per_core(
@@ -123,7 +134,12 @@ class BasicPartitioner(object):
             vertex. Assumes that the first atom of the vertex is fully\
             representative.
 
+        :param ApplicationVertex vertex:
+        :param ResourceTracker res_tracker:
+        :param int plan_n_timesteps:
         :rtype: float
+        :raise PacmanPartitionException:
+            If something goes wrong with the partitioning
         """
         # Get the usage of the first atom, then assume that this will be the
         # usage of all the atoms.
