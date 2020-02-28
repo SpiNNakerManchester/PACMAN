@@ -34,9 +34,21 @@ class ZonedRoutingInfoAllocator(object):
         of the preceding vertex.
 
     .. note::
-        No constraints are supported, and that the number of keys\
-        required by each edge must be 2048 or less, and that all edges coming\
+        No constraints are supported, and that the number of keys
+        required by each edge must be 2048 or less, and that all edges coming
         out of a vertex will be given the same key/mask assignment.
+
+    :param ApplicationGraph application_graph:
+        The application graph to allocate the routing info for
+    :param MachineGraph machine_graph:
+        The machine graph to allocate the routing info for
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the
+        edges
+    :return: The routing information
+    :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+    :raise PacmanRouteInfoAllocationException:
+        If something goes wrong with the allocation
     """
 
     MAX_PARTITIONS_SUPPORTED = 1
@@ -44,23 +56,12 @@ class ZonedRoutingInfoAllocator(object):
     def __call__(
             self, application_graph, graph_mapper, machine_graph, n_keys_map):
         """
-        :param machine_graph:\
-            The machine graph to allocate the routing info for
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param n_keys_map:\
-            A map between the edges and the number of keys required by the\
-            edges
-        :type n_keys_map:\
-            :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
-        :param graph_mapper: map between graphs
-        :type graph_mapper:\
-            :py:class:`pacman.model.graphs.common.graph_mapper.GraphMapper`
-        :return: The routing information
-        :rtype:\
-            :py:class:`pacman.model.routing_info.PartitionRoutingInfo`
-        :raise pacman.exceptions.PacmanRouteInfoAllocationException: \
-            If something goes wrong with the allocation
+        :param ApplicationGraph application_graph:
+        :param GraphMapper graph_mapper:
+        :param MachineGraph machine_graph:
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+        :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+        :raise PacmanRouteInfoAllocationException:
         """
 
         # check that this algorithm supports the constraints put onto the
@@ -81,21 +82,16 @@ class ZonedRoutingInfoAllocator(object):
     def _calculate_zones(
             self, application_graph, graph_mapper, machine_graph, n_keys_map):
         """
-        :param machine_graph:\
+        :param ApplicationGraph application_graph:
+        :param MachineGraph machine_graph:
             The machine graph to allocate the routing info for
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param n_keys_map:\
-            A map between the edges and the number of keys required by the\
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            A map between the edges and the number of keys required by the
             edges
-        :type n_keys_map:\
-            :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
-        :param graph_mapper: map between graphs
-        :type graph_mapper:\
-            :py:class:`pacman.model.graphs.common.graph_mapper.GraphMapper`
-        :return: tuple containing max app keys and a map of app to max keys\
-         for any given machine vertex
-         :rtype: tuple of (int, dict(app vertex) : int)
+        :param GraphMapper graph_mapper: map between graphs
+        :return: tuple containing max app keys and a map of app to max keys
+            for any given machine vertex
+        :rtype: tuple(int, dict(ApplicationVertex, int))
         """
         progress = ProgressBar(
             application_graph.n_vertices, "Calculating zones")
@@ -147,25 +143,17 @@ class ZonedRoutingInfoAllocator(object):
             max_app_keys_bits, key_bits_per_app, application_graph,
             graph_mapper, machine_graph):
         """
-
-        :param max_app_keys_bits: max bits for app keys
-        :type max_app_keys_bits: int
-        :param key_bits_per_app: map of app to max keys for any given \
-        machine vertex
-        :type key_bits_per_app: dict of [app vertex] to int
-        :param machine_graph:\
-            The machine graph to allocate the routing info for
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param n_keys_map:\
-            A map between the edges and the number of keys required by the\
+        :param int max_app_keys_bits: max bits for app keys
+        :param dict(ApplicationVertex,int) key_bits_per_app:
+            map of app to max keys for any given application vertex
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            A map between the edges and the number of keys required by the
             edges
-        :type n_keys_map:\
-            :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
-        :param graph_mapper: map between graphs
-        :type graph_mapper:\
-            :py:class:`pacman.model.graphs.common.graph_mapper.GraphMapper`
+        :param GraphMapper graph_mapper: map between graphs
+        :param MachineGraph machine_graph:
+            The machine graph to allocate the routing info for
         :return: tuple of routing infos and map from app vertex and key masks
+        :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
         """
         progress = ProgressBar(
             application_graph.n_vertices, "Allocating routing keys")
@@ -200,4 +188,8 @@ class ZonedRoutingInfoAllocator(object):
 
     @staticmethod
     def _bits_needed(size):
+        """
+        :param int size:
+        :rtype: int
+        """
         return int(math.ceil(math.log(size, 2)))

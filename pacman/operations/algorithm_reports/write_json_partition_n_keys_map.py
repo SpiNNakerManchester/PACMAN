@@ -27,19 +27,21 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class WriteJsonPartitionNKeysMap(object):
-    """ Converter from MulticastRoutingTables to json
+    """ Converter from MulticastRoutingTables to JSON.
+
+    :param AbstractMachinePartitionNKeysMap partition_to_n_keys_map:
+        The number of keys needed for each partition.
+    :param str json_folder: the folder to which the JSON are being written
+    :return: the name of the generated file
+    :rtype: str
     """
 
     def __call__(self, partition_to_n_keys_map, json_folder):
         """ Runs the code to write the n_keys_map in JSON.
 
-        :param partition_to_n_keys_map:\
-            The number of keys needed for each patition.
-        :type partition_to_n_keys_map:\
-            :py:class:
-            `from pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
-        :param json_folder: the folder to which the json are being written
-        :type json_folder: str
+        :param AbstractMachinePartitionNKeysMap partition_to_n_keys_map:
+        :param str json_folder:
+        :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON partition n key map")
@@ -51,13 +53,13 @@ class WriteJsonPartitionNKeysMap(object):
     def write_json(partition_to_n_keys_map, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param partition_to_n_keys_map:\
-            The number of keys needed for each patition.
-        :type partition_to_n_keys_map:\
-            :py:class:
-            `from pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
-        :param json_folder: the folder to which the json are being written
-        :type json_folder: str
+        :param AbstractMachinePartitionNKeysMap partition_to_n_keys_map:
+            The number of keys needed for each partition.
+        :param str json_folder: the folder to which the JSON are being written
+        :param progress: Progress Bar if one used
+        :type progress: ~spinn_utilities.progress_bar.ProgressBar or None
+        :return: the name of the generated file
+        :rtype: str
         """
 
         file_path = os.path.join(json_folder, N_KEYS_MAP_FILENAME)

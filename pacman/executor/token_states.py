@@ -35,6 +35,9 @@ class _TokenState(object):
 
     def is_tracking_token_part(self, part):
         """ Determine if the given part is being tracked
+
+        :param part:
+        :type part: str or None
         """
         return part in self._incomplete_parts or part in self._complete_parts
 
@@ -42,12 +45,18 @@ class _TokenState(object):
         """ Indicates that this state should start tracking the completion\
             of a part of a token.  Part can be None to indicate the tracking\
             of a whole token.
+
+        :param part:
+        :type part: str or None
         """
         self._incomplete_parts.add(part)
 
     def complete_token_part(self, part):
         """ Indicates that a part of this token has completed.  If part is\
             None, indicates that the whole token has completed.
+
+        :param part:
+        :type part: str or None
         """
         if part is None:
             self._complete_parts.update(self._incomplete_parts)
@@ -58,6 +67,10 @@ class _TokenState(object):
     def is_complete(self, part=None):
         """ If part is None, true if all parts have completed, otherwise\
             checks for completion of a specific part of the token
+
+        :param part:
+        :type part: str or None
+        :rtype: bool
         """
         if part is None:
             return not self._incomplete_parts

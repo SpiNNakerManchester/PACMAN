@@ -44,21 +44,14 @@ class MachineEdge(AbstractEdge):
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
             traffic_weight=1):
         """
-        :param pre_vertex: the vertex at the start of the edge
-        :type pre_vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :param post_vertex: the vertex at the end of the edge
-        :type post_vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :param traffic_type: The type of traffic that this edge will carry
-        :type traffic_type:\
-            :py:class:`pacman.model.graphs.common.EdgeTrafficType`
-        :param label: The name of the edge
-        :type label: str
-        :param traffic_weight:\
-            the optional weight of traffic expected to travel down this edge\
-            relative to other edges (default is 1)
-        :type traffic_weight: int
+        :param MachineVertex pre_vertex: The vertex at the start of the edge.
+        :param MachineVertex post_vertex: The vertex at the end of the edge.
+        :param EdgeTrafficType traffic_type:
+            The type of traffic that this edge will carry.
+        :param str label: The name of the edge.
+        :param int traffic_weight:
+            The optional weight of traffic expected to travel down this edge
+            relative to other edges. (default is 1)
         """
         self._label = label
         self._pre_vertex = pre_vertex
@@ -72,13 +65,21 @@ class MachineEdge(AbstractEdge):
         return self._label
 
     @property
-    @overrides(AbstractEdge.pre_vertex)
+    @overrides(AbstractEdge.pre_vertex, extend_doc=False)
     def pre_vertex(self):
+        """ The vertex at the start of the edge.
+
+        :rtype: ~pacman.model.graphs.machine.MachineVertex
+        """
         return self._pre_vertex
 
     @property
-    @overrides(AbstractEdge.post_vertex)
+    @overrides(AbstractEdge.post_vertex, extend_doc=False)
     def post_vertex(self):
+        """ The vertex at the end of the edge.
+
+        :rtype: ~pacman.model.graphs.machine.MachineVertex
+        """
         return self._post_vertex
 
     @property
@@ -89,7 +90,9 @@ class MachineEdge(AbstractEdge):
     @property
     def traffic_weight(self):
         """ The amount of traffic expected to go down this edge relative to
-            other edges
+            other edges.
+
+        :rtype: int
         """
         return self._traffic_weight
 

@@ -28,8 +28,7 @@ class MaxVertexAtomsConstraint(AbstractPartitionerConstraint):
 
     def __init__(self, size):
         """
-        :param size: The maximum number of atoms to split the vertex into
-        :type size: int
+        :param int size: The maximum number of atoms to split the vertex into
         """
         self._size = size
 

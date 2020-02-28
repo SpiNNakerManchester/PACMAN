@@ -45,23 +45,20 @@ class SpecificBoardTagResource(object):
     def __init__(self, board, ip_address, port, strip_sdp, tag=None,
                  traffic_identifier="DEFAULT"):
         """
-        :param board: The IP address of the board to which this tag is to be\
-            associated with
-        :type board: str
-        :param ip_address: The IP address of the host that will receive data\
-            from this tag
-        :type ip_address: str
+        :param str board:
+            The IP address of the board to which this tag is to be associated
+            with
+        :param str ip_address:
+            The IP address of the host that will receive data from this tag
         :param port: The port that will
         :type port: int or None
-        :param strip_sdp: Whether the tag requires that SDP headers are\
+        :param bool strip_sdp: Whether the tag requires that SDP headers are
             stripped before transmission of data
-        :type strip_sdp: bool
         :param tag: A fixed tag ID to assign, or None if any tag is OK
-        :type tag: int
-        :param traffic_identifier: The traffic to be sent using this tag; \
-            traffic with the same traffic_identifier can be sent using\
+        :type tag: int or None
+        :param str traffic_identifier: The traffic to be sent using this tag;
+            traffic with the same traffic_identifier can be sent using
             the same tag
-        :type traffic_identifier: str
         """
         # pylint: disable=too-many-arguments
         self._board = board
@@ -75,7 +72,6 @@ class SpecificBoardTagResource(object):
     def ip_address(self):
         """ The IP address to assign to the tag.
 
-        :return: An IP address
         :rtype: str
         """
         return self._ip_address
@@ -84,7 +80,6 @@ class SpecificBoardTagResource(object):
     def port(self):
         """ The port of the tag
 
-        :return: The port of the tag
         :rtype: int
         """
         return self._port
@@ -92,6 +87,8 @@ class SpecificBoardTagResource(object):
     @property
     def traffic_identifier(self):
         """ The traffic identifier for this IP tag
+
+        :rtype: str
         """
         return self._traffic_identifier
 
@@ -99,7 +96,6 @@ class SpecificBoardTagResource(object):
     def strip_sdp(self):
         """ Whether SDP headers should be stripped for this tag
 
-        :return: True if the headers should be stripped, False otherwise
         :rtype: bool
         """
         return self._strip_sdp
@@ -108,8 +104,7 @@ class SpecificBoardTagResource(object):
     def tag(self):
         """ The tag required, or None if any tag is OK.
 
-        :return: The tag or None
-        :rtype: int
+        :rtype: int or None
         """
         return self._tag
 
@@ -117,13 +112,14 @@ class SpecificBoardTagResource(object):
     def board(self):
         """ The board IP address that this tag is to reside on
 
-        :return: IP address
+        :rtype: str
         """
         return self._board
 
     def get_value(self):
         """
         :return: A description of the specific board's IP tag required.
+        :rtype: list(str, str, int, bol, int, str)
         """
         return [
             self._board, self._ip_address, self._port, self._strip_sdp,

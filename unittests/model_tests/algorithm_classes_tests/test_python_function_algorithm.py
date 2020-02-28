@@ -13,7 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .graph import Graph
-from .outgoing_edge_partition import OutgoingEdgePartition
+import unittest
+from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
 
-__all__ = ["Graph", "OutgoingEdgePartition"]
+
+class TestPythonFunctionAlgorithm(unittest.TestCase):
+    """
+    tests which test the application graph object
+    """
+
+    def test_python_module(self):
+        python_module = "Foo"
+        python_function = "bar"
+        alg = PythonFunctionAlgorithm("algorithm_id", [], [], [], [], [], [],
+                                      python_module, python_function)
+        self.assertEqual(python_module, alg._python_module)
+        self.assertEqual(python_function, alg._python_function)

@@ -55,15 +55,10 @@ def determine_max_atoms_for_vertex(vertex):
 def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     """ Generate the machine edges for the vertices in the graph
 
-    :param machine_graph: the machine graph to add edges to
-    :type machine_graph:\
-        :py:class:`pacman.model.graphs.machine.MachineGraph`
-    :param graph_mapper: the mapper graphs
-    :type graph_mapper:\
-        :py:class:`pacman.model.graphs.common.GraphMapper`
-    :param application_graph: the application graph to work with
-    :type application_graph:\
-        :py:class:`pacman.model.graphs.application.ApplicationGraph`
+    :param MachineGraph machine_graph: the machine graph to add edges to
+    :param GraphMapper graph_mapper: the mapper graphs
+    :param ApplicationGraph application_graph:
+        the application graph to work with
     """
 
     # start progress bar
@@ -102,7 +97,10 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
 
 def get_remaining_constraints(vertex):
     """ Gets the rest of the constraints from a vertex after removing\
-        partitioning constraints
+        partitioning constraints.
+
+    :param ApplicationVertex vertex:
+    :rtype: list(AbstractConstraint)
     """
     return [constraint for constraint in vertex.constraints
             if not isinstance(constraint, AbstractPartitionerConstraint)]
@@ -110,7 +108,10 @@ def get_remaining_constraints(vertex):
 
 def get_same_size_vertex_groups(vertices):
     """ Get a dictionary of vertex to vertex that must be partitioned the same\
-        size
+        size.
+
+    :param iterble(ApplicationVertex) vertices:
+    :rtype: dict(ApplicationVertex, set(ApplicationVertex))
     """
 
     # Dict of vertex to list of vertices with same size

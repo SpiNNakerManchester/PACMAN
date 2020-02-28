@@ -31,6 +31,11 @@ class MallocBasedRouteMerger(object):
     __slots__ = []
 
     def __call__(self, router_tables):
+        """
+        :param MulticastRoutingTables router_tables:
+        :rtype: MulticastRoutingTables
+        :raises PacmanRoutingException:
+        """
         tables = MulticastRoutingTables()
 
         progress = ProgressBar(
@@ -52,9 +57,9 @@ class MallocBasedRouteMerger(object):
         for router_table in progress.over(router_tables.routing_tables):
             new_table = self._merge_routes(router_table)
             tables.add_routing_table(new_table)
-            n_entries = len([
-                entry for entry in new_table.multicast_routing_entries
-                if not entry.defaultable])
+            n_entries = sum(
+                not entry.defaultable
+                for entry in new_table.multicast_routing_entries)
             print("Reduced from {} to {}".format(
                 len(router_table.multicast_routing_entries),
                 n_entries))
@@ -65,9 +70,12 @@ class MallocBasedRouteMerger(object):
         return tables
 
     def _merge_routes(self, router_table):
+        """
+        :param MulticastRoutingTable router_table:
+        :rtype: MulticastRoutingTable
+        """
         merged_routes = CompressedMulticastRoutingTable(
             router_table.x, router_table.y)
-
         # Order the routes by key
         entries = sorted(
             router_table.multicast_routing_entries,
