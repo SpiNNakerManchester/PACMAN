@@ -32,6 +32,7 @@ from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
+from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 
 
 def json_to_object(json_object):
@@ -288,7 +289,6 @@ def edge_to_json(edge):
         json_dict["traffic_type"] = int(edge.traffic_type)
         if edge.label is not None:
             json_dict["label"] = edge.label
-        json_dict["traffic_weight"] = edge.traffic_weight
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
@@ -299,7 +299,25 @@ def edge_from_json(json_dict, graph=None):
     return MachineEdge(
         vertex_lookup(json_dict["pre_vertex"], graph),
         vertex_lookup(json_dict["post_vertex"], graph),
-        json_dict["traffic_type"], label, json_dict["traffic_weight"])
+        json_dict["traffic_type"], label)
+
+
+def partition_to_json(partition):
+    json_dict = OrderedDict()
+    # As label may be None or not unigue use id to map to n_keys
+    json_dict["identifier"] = partition.identifier
+    json_list = []
+    for edge in partition.edges:
+        json_list.append(edge_to_json(edge))
+    json_dict["edges"] = json_list
+    return json_dict
+
+
+def partition_from_json(json_dict, graph):
+    identifier = json_dict["identifier"]
+    for j_edge in json_dict["edges"]:
+        edge = edge_from_json(j_edge, graph)
+        graph.add_edge(edge, identifier)
 
 
 def graph_to_json(graph):
@@ -312,9 +330,9 @@ def graph_to_json(graph):
             json_list.append(vertex_to_json(vertex))
         json_dict["vertices"] = json_list
         json_list = []
-        for edge in graph.edges:
-            json_list.append(edge_to_json(edge))
-        json_dict["edges"] = json_list
+        for partition in graph.outgoing_edge_partitions:
+            json_list.append(partition_to_json(partition))
+        json_dict["partitions"] = json_list
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
@@ -328,9 +346,8 @@ def graph_from_json(json_dict):
     # Only do constraints when we have all the vertexes to link to
     for j_vertex in json_dict["vertices"]:
         vertex_add_contstraints_from_json(j_vertex, graph)
-    for j_edge in json_dict["edges"]:
-        edge = edge_from_json(j_edge, graph)
-        graph.add_edge(edge, "JSON_MOCK")
+    for j_partitions in json_dict["partitions"]:
+        partition_from_json(j_partitions, graph)
     return graph
 
 
@@ -386,3 +403,15 @@ def partition_to_n_keys_map_to_json(partition_to_n_keys_map):
             json_dict["exception"] = str(ex)
         json_list.append(json_dict)
     return json_list
+
+
+def n_keys_map_from_json(json_list, graph):
+    n_keys_map = DictBasedMachinePartitionNKeysMap()
+    json_list = json_to_object(json_list)
+    for json_dict in json_list:
+        vertex = vertex_lookup(json_dict["pre_vertex_label"], graph)
+        identifer = json_dict["identifier"]
+        partition = graph.get_outgoing_edge_partition_starting_at_vertex(
+            vertex, identifer)
+        n_keys_map.set_n_keys_for_partition(partition, json_dict["n_keys"])
+    return n_keys_map
