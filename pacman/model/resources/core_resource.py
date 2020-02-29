@@ -29,11 +29,9 @@ class CoreResource(object):
 
     def __init__(self, chip, n_cores):
         """
-        :param n_cores: The number of cores to allocate
-        :type n_cores: int
-        :param chip: chip of where these cores are to be allocated
-        :type chip: :py:class:`spinn_machine.Chip`
-        :raise None: No known exceptions are raised
+        :param int n_cores: The number of cores to allocate
+        :param ~spinn_machine.Chip chip:
+            chip of where these cores are to be allocated
         """
         self._n_cores = n_cores
         self._chip = chip
@@ -49,5 +47,6 @@ class CoreResource(object):
     def get_value(self):
         """
         :return: The chip and the cores required on it.
+        :rtype: tuple(~spinn_machine.Chip, int)
         """
         return self._chip, self._n_cores

@@ -53,8 +53,7 @@ class AllOf(object):
     def __init__(self, *items):
         """
         :param items: The items required
-        :type items: str, pacman.executor.algorithm_decorators.AllOf, \
-            pacman.executor.algorithm_decorators.OneOf
+        :type items: list(str or AllOf or OneOf)
         """
         self._items = items
 
@@ -80,8 +79,7 @@ class OneOf(object):
     def __init__(self, *items):
         """
         :param items: The items required
-        :type items: str, pacman.executor.algorithm_decorators.AllOf, \
-            pacman.executor.algorithm_decorators.OneOf
+        :type items: list(str or AllOf or OneOf)
         """
         self._items = items
 
@@ -102,13 +100,11 @@ def _decode_inputs(input_defs, inputs):
     """ Converts the inputs specified to actual input classes
 
     :param input_defs: A dict of algorithm parameter name SingleInput
+    :type input_defs: dict(str, AbstractInput)
     :param inputs: A list of inputs to decode
-    :type inputs: list of str, \
-        :py:class:`pacman.executor.algorithm_decorators.OneOf`, \
-        :py:class:`pacman.executor.algorithm_decorators.AllOf`
+    :type inputs: list(str or OneOf or AllOf)
     :return: a list of inputs
-    :rtype: \
-        list(:py:class:`pacman.executor.algorithm_decorators.AbstractInput`)
+    :rtype: list(AbstractInput)
     """
     final_inputs = list()
     for inp in inputs:
@@ -130,16 +126,13 @@ def _decode_algorithm_details(
     """ Convert the algorithm annotation inputs to input classes
 
     :param input_definitions: dict of algorithm parameter name to list of types
+    :type input_definitions: dict(str, AbstractInput)
     :param required_inputs: List of required algorithm parameter names
-    :type required_inputs: list(str or \
-        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
-        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
+    :type required_inputs: list(str or OneOf or AllOf)
     :param optional_inputs: List of optional algorithm parameter names
-    :type optional_inputs: list(str or \
-        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
-        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
-    :param function: The function to be called by the algorithm
-    :param has_self: True if the self parameter is expected
+    :type optional_inputs: list(str or OneOf or AllOf)
+    :param callable function: The function to be called by the algorithm
+    :param bool has_self: True if the self parameter is expected
     """
     function_args = getfullargspec(function)
     if function_args.defaults is not None:
@@ -196,53 +189,48 @@ def algorithm(
         input_definitions, outputs, algorithm_id=None, required_inputs=None,
         optional_inputs=None, method=None, required_input_tokens=None,
         optional_input_tokens=None, generated_output_tokens=None):
-    """ Define an object to be a PACMAN algorithm that can be executed by the \
-        :py:class:`pacman.executor.pacman_algorithm_executor.PACMANAlgorithmExecutor`.
+    """ A :py:obj:`decorator` that defines an object to be a PACMAN algorithm
+        that can be executed by the :py:class:`PACMANAlgorithmExecutor`.
 
         Can be used to decorate either a class or a function (not a method).\
         If this decorates a class, the class must be callable (i.e., have a\
-        __call__ method), or else a method must be specified to call to run\
-        the algorithm.
+        ``__call__`` method), or else a method must be specified to call to\
+        run the algorithm.
 
         The inputs and outputs referenced below refer to the parameters of the\
         method or function.
 
-    :param input_definitions:\
-        dict of algorithm parameter name to list of types, one for each\
-        required algorithm parameter, and one for each optional parameter\
+    :param input_definitions:
+        dict of algorithm parameter name to list of types, one for each
+        required algorithm parameter, and one for each optional parameter
         that is used in this algorithm call
     :type input_definitions: dict(str, str or list(str))
-    :param outputs:\
-        A list of types output from the algorithm that must match the order in\
+    :param list(str) outputs:
+        A list of types output from the algorithm that must match the order in
         which they are returned.
-    :type outputs: list(str)
-    :param algorithm_id:\
-        Optional unique ID of the algorithm; if not specified, the name of the\
+    :param str algorithm_id:
+        Optional unique ID of the algorithm; if not specified, the name of the
         class or function is used.
-    :type algorithm_id: str
-    :param required_inputs:\
-        Optional list of required algorithm parameter names; if not specified\
+    :param required_inputs:
+        Optional list of required algorithm parameter names; if not specified
         those parameters which have no default values are used.
-    :type required_inputs: list(str or \
-        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
-        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
-    :param optional_inputs:\
+    :type required_inputs: list(str or OneOf or AllOf)
+    :param optional_inputs:
         Optional list of optional algorithm parameter names; if not specified\
         those parameters which have default values are used.
-    :type optional_inputs: list(str or \
-        :py:class:`pacman.executor.algorithm_decorators.OneOf` or \
-        :py:class:`pacman.executor.algorithm_decorators.AllOf`)
-    :param method:\
-        The optional name of the method to call if decorating a class; if not\
-        specified, __call__ is used (i.e. it is assumed to be callable).  Must\
-        not be used if decorating a function
-    :param required_input_tokens:\
-        A list of tokens required to have been generated before this algorithm\
+    :type optional_inputs: list(str or OneOf or AllOf)
+    :param method:
+        The optional name of the method to call if decorating a class; if not
+        specified, ``__call__`` is used (i.e. it is assumed to be callable).
+        Must not be used if decorating a function
+    :type method: str or None
+    :param list(Token) required_input_tokens:
+        A list of tokens required to have been generated before this algorithm
         runs
-    :param optional_input_tokens:\
-        A list of tokens that if generated by any algorithm, must have been\
+    :param list(Token) optional_input_tokens:
+        A list of tokens that if generated by any algorithm, must have been
         generated before this algorithm runs
-    :param generated_output_tokens:\
+    :param list(Token) generated_output_tokens:
         A list of tokens generated by running this algorithm
     """
 
@@ -326,6 +314,7 @@ def algorithms(algorithms):
     """ Specify multiple algorithms for a single class or function
 
     :param algorithms: A list of algorithm definitions
+    :type algorithms: list(algorithm)
     """
 
     def wrap(alg):
@@ -346,6 +335,8 @@ def reset_algorithms():
 
 def get_algorithms():
     """ Get the dict of known algorithm ID -> algorithm data
+
+    :rtype: dict(str, AbstractAlgorithm)
     """
     return _algorithms
 
@@ -353,11 +344,13 @@ def get_algorithms():
 def scan_packages(packages, recursive=True):
     """ Scan packages for algorithms
 
-    :param packages:\
-        The names of the packages to scan (using dotted notation),\
+    :param packages:
+        The names of the packages to scan (using dotted notation),
         or the actual package modules
-    :param recursive: True if sub-packages should be examined
+    :type packages: list(str or package)
+    :param bool recursive: True if sub-packages should be examined
     :return: A dict of algorithm name -> algorithm data
+    :rtype: dict(str, AbstractAlgorithm)
     """
     global _algorithms
     # pylint: disable=broad-except

@@ -27,14 +27,13 @@ def minimise(table, target_length, check_for_aliases=True):
     Remove from the routing table any entries which could be replaced by
     default routing.
 
-    :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
-    :param target_length: \
-        Target length of the routing table; the minimisation procedure will \
-        halt once either this target is reached or no further minimisation is \
-        possible. If None then the table will be made as small as possible. \
+    :param RoutingTableEntry routing_table: Routing entries to be merged.
+    :param target_length:
+        Target length of the routing table; the minimisation procedure will
+        halt once either this target is reached or no further minimisation is
+        possible. If None then the table will be made as small as possible.
     :type target_length: int or None
-    :param check_for_aliases: \
+    :param bool check_for_aliases:
         If True (the default), default-route candidates are checked for aliased
         entries before suggesting a route may be default routed. This check is
         required to ensure correctness in the general case but has a runtime

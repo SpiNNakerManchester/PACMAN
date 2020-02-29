@@ -1,0 +1,34 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    
+    "title": "Gives a set of edge to n_keys mappings.",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "pre_vertex_label": {
+                "description": "The label of the pre vertex .",
+                "type": "string"
+            },
+            "n_keys": {
+                "description": "The number of keys needed for the placement.",
+                "type": "integer",
+                "minimum": 0
+            },
+            "identifier": {
+                "description": "The type of data being sent.",
+                "type": "string"
+            },
+            "exception": {
+                "description": "Oops something went wrong.",
+                "type": "string"
+            }
+        },
+        "additionalProperties": false,
+        "anyOf": [
+            { "required": ["pre_vertex_label", "n_keys", "identifier"] },
+            { "required": ["exception"] }
+        ]
+    }
+}
+

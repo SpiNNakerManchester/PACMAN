@@ -13,10 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-from .convert_to_java_machine import ConvertToJavaMachine
+import unittest
+from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
 
-converter_algorithms_metadata_file = os.path.join(
-    os.path.dirname(__file__), "converter_algorithms_metadata.xml")
 
-__all__ = ["ConvertToJavaMachine", "converter_algorithms_metadata_file"]
+class TestPythonFunctionAlgorithm(unittest.TestCase):
+    """
+    tests which test the application graph object
+    """
+
+    def test_python_module(self):
+        python_module = "Foo"
+        python_function = "bar"
+        alg = PythonFunctionAlgorithm("algorithm_id", [], [], [], [], [], [],
+                                      python_module, python_function)
+        self.assertEqual(python_module, alg._python_module)
+        self.assertEqual(python_function, alg._python_function)

@@ -29,6 +29,18 @@ from pacman.model.constraints.placer_constraints import (
 
 
 class SpreaderPlacer(OneToOnePlacer):
+    """ places vertices on as many chips as available with a effort to
+    reduce the number of packets being received by the router in total.
+
+    :param MachineGraph machine_graph: the machine graph
+    :param ~spinn_machine.Machine machine: the SpiNNaker machine
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        the n keys from partition map
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: placements.
+    :rtype: Placements
+    """
+
     # number of cycles over the machine graph (
     # 1. same chip,
     # 2. 1 to 1,
@@ -47,16 +59,6 @@ class SpreaderPlacer(OneToOnePlacer):
         OneToOnePlacer.__init__(self)
 
     def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
-        """ places vertices on as many chips as available with a effort to
-        reduce the number of packets being received by the router in total.
-
-        :param machine_graph: the machine graph
-        :param machine: the SpiNNaker machine
-        :param n_keys_map: the n keys from partition map
-        :param plan_n_timesteps: number of timesteps to plan for
-        :return: placements.
-        """
-
         # create progress bar
         progress_bar = ProgressBar(
             (machine_graph.n_vertices * self.ITERATIONS) + self.STEPS,
@@ -98,7 +100,7 @@ class SpreaderPlacer(OneToOnePlacer):
                 hard_vertex.resources_required, hard_vertex.constraints)
             placements.add_placement(Placement(hard_vertex, x, y, p))
             placed_vertices.add(hard_vertex)
-            cost_per_chip[(x, y)] += self._get_cost(
+            cost_per_chip[x, y] += self._get_cost(
                 hard_vertex, machine_graph, n_keys_map)
 
         # place groups of verts that need the same chip on the same chip,
@@ -130,33 +132,35 @@ class SpreaderPlacer(OneToOnePlacer):
         """ sort left overs verts so that the ones with the most costly verts
         are at the front of the list
 
-        :param machine_graph: machine graph
-        :param placed_vertices: the verts already placed
-        :param n_keys_map: map between partition to n keys.
+        :param MachineGraph machine_graph: machine graph
+        :param set(MachineVertex) placed_vertices: the verts already placed
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            map between partition to n keys.
         :return: new list of verts to process.
-        :rtype: iterable of vertices.
+        :rtype: list(MachineVertex)
         """
 
         vert_list = list()
-        in_coming_size_map = defaultdict(list)
+        incoming_size_map = defaultdict(list)
         for vertex in machine_graph.vertices:
             if vertex not in placed_vertices:
                 incoming_size = self._get_cost(
                     vertex, machine_graph, n_keys_map)
-                in_coming_size_map[incoming_size].append(vertex)
-        sorted_keys = sorted(in_coming_size_map.keys(), reverse=True)
+                incoming_size_map[incoming_size].append(vertex)
+        sorted_keys = sorted(incoming_size_map.keys(), reverse=True)
         for key in sorted_keys:
-            vert_list.extend(in_coming_size_map[key])
+            vert_list.extend(incoming_size_map[key])
         return vert_list
 
     @staticmethod
     def _sort_chips_based_off_incoming_cost(chips, cost_per_chip):
         """ sorts chips out so that the chip in front has least incoming cost.
 
-        :param chips: iterable of chips to sort
+        :param list(tuple(int,int)) chips: iterable of chips to sort
         :param cost_per_chip: the map of (x,y) and cost.
+        :type cost_per_chip: dict(tuple(int, int), int)
         :return: iterable of chips in a sorted fashion.
-        :rtype: iterable of SPiNNMachine.machine.chip
+        :rtype: list(tuple(int,int))
         """
 
         data = sorted(chips, key=lambda chip: cost_per_chip[chip[0], chip[1]])
@@ -166,9 +170,10 @@ class SpreaderPlacer(OneToOnePlacer):
     def _get_cost(vertex, machine_graph, n_keys_map):
         """ gets how many packets are to be processed by a given vertex.
 
-        :param vertex: the vertex the get the cost of
-        :param machine_graph: the machine graph
-        :param n_keys_map: the map of outgoing partition and n keys down it.
+        :param MachineVertex vertex: the vertex the get the cost of
+        :param MachineGraph machine_graph: the machine graph
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            the map of outgoing partition and n keys down it.
         :return: total keys to come into this vertex.
         :rtype: int
         """
@@ -200,9 +205,9 @@ class SpreaderPlacer(OneToOnePlacer):
     def _locate_hard_placement_verts(machine_graph):
         """ locates the verts with hard constraints
 
-        :param machine_graph: the machine graph
+        :param MachineGraph machine_graph: the machine graph
         :return: list of verts to just place where they demand it
-        :rtype: iterable of machine vertex.
+        :rtype: list(MachineVertex)
         """
         hard_verts = list()
         for vertex in machine_graph.vertices:
@@ -217,14 +222,21 @@ class SpreaderPlacer(OneToOnePlacer):
             cost_per_chip, machine_graph, n_keys_map):
         """ places verts which have to be on the same chip on minimum chip.
 
-        :param same_chip_vertex_groups: groups of verts which want to be on
-        the same chip.
+        :param same_chip_vertex_groups:
+            groups of verts which want to be on the same chip.
+        :type same_chip_vertex_groups: dict(MachineVertex, set(MachineVertex))
         :param chips_in_order: chips in radial order from mid machine
-        :param placements: placements holder
-        :param progress_bar: progress bar
-        :param resource_tracker: resource tracker
-        :param placed_vertices: list of vertices which have already been placed
+        :type chips_in_order: iterable(tuple(int,int))
+        :param Placements placements: placements holder
+        :param ~spinn_utilities.progress_bar.ProgressBar progress_bar:
+            progress bar
+        :param ResourceTracker resource_tracker: resource tracker
+        :param set(MachineVertex) placed_vertices:
+            vertices which have already been placed
         :param cost_per_chip: map between (x,y) and the cost of packets
+        :type cost_per_chip: dict(tuple(int, int), int)
+        :param MachineGraph machine_graph:
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
         :rtype: None
         """
         for vertex in same_chip_vertex_groups.keys():
@@ -249,7 +261,7 @@ class SpreaderPlacer(OneToOnePlacer):
                         placements.add_placement(
                             Placement(placed_vertex, x, y, p))
                         placed_vertices.add(placed_vertex)
-                        cost_per_chip[(x, y)] += self._get_cost(
+                        cost_per_chip[x, y] += self._get_cost(
                             placed_vertex, machine_graph, n_keys_map)
 
                 # resort the chips, as no idea where in the list the resource
@@ -268,15 +280,20 @@ class SpreaderPlacer(OneToOnePlacer):
         from it
 
         :param one_to_one_groups: the 1 to 1 groups
+        :type one_to_one_groups: iterable(iterable(MachineVertex))
         :param chips_in_order: chips in sorted order of lowest cost
-        :param placements: placements holder
-        :param progress_bar: the progress bar
-        :param resource_tracker: the resource tracker
-        :param placed_vertices: the verts already placed
+        :type chips_in_order: iterable(tuple(int,int))
+        :param Placements placements: placements holder
+        :param ~spinn_utilities.progress_bar.ProgressBar progress_bar:
+            the progress bar
+        :param ResourceTracker resource_tracker: the resource tracker
+        :param set(MachineVertex) placed_vertices: the verts already placed
         :param cost_per_chip: map of (x,y) and the incoming packet cost
-        :param machine_graph: machine graph
-        :param n_keys_map: map between outgoing partition and n keys down it
-        :param machine: the SpiNNMachine instance.
+        :type cost_per_chip: dict(tuple(int, int), int)
+        :param MachineGraph machine_graph: machine graph
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            map between outgoing partition and n keys down it
+        :param ~spinn_machine.Machine machine: the SpiNNMachine instance.
         :rtype: None
         """
 
@@ -331,7 +348,7 @@ class SpreaderPlacer(OneToOnePlacer):
                     vertex=one_to_one_vertex, x=x, y=y, p=p))
 
                 # update cost
-                cost_per_chip[(x, y)] += self._get_cost(
+                cost_per_chip[x, y] += self._get_cost(
                     one_to_one_vertex, machine_graph, n_keys_map)
 
             # sort chips for the next group cycle
@@ -345,15 +362,20 @@ class SpreaderPlacer(OneToOnePlacer):
             resource_tracker, placed_vertices, cost_per_chip, n_keys_map):
         """ places left over vertices in locations with least costs.
 
-        :param machine_graph: machine graph
+        :param MachineGraph machine_graph: machine graph
         :param chips_in_order: chips in sorted order
-        :param placements: placements
-        :param progress_bar: progress bar
-        :param resource_tracker: resource tracker
-        :param placed_vertices: the verts which already been placed
+        :type chips_in_order: iterable(tuple(int,int))
+        :param Placements placements: placements
+        :param ~spinn_utilities.progress_bar.ProgressBar progress_bar:
+            progress bar
+        :param ResourceTracker resource_tracker: resource tracker
+        :param set(MachineVertex) placed_vertices:
+            the verts which already been placed
         :param cost_per_chip: map between (x,y) and the total packets going
-        through it currently.
-        :param n_keys_map: map between outgoing partition and n keys down it.
+            through it currently.
+        :type cost_per_chip: dict(tuple(int, int), int)
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            map between outgoing partition and n keys down it.
         :rtype: None
         """
 
@@ -366,7 +388,7 @@ class SpreaderPlacer(OneToOnePlacer):
                 vertex.resources_required,
                 vertex.constraints, chips_in_order)
             placements.add_placement(Placement(vertex=vertex, x=x, y=y, p=p))
-            cost_per_chip[(x, y)] += self._get_cost(
+            cost_per_chip[x, y] += self._get_cost(
                 vertex, machine_graph, n_keys_map)
             # sort chips for the next group cycle
             chips_in_order = self._sort_chips_based_off_incoming_cost(
@@ -377,8 +399,10 @@ class SpreaderPlacer(OneToOnePlacer):
     def _determine_chip_list(self, machine):
         """ determines the radial list from a deduced middle of the machine
 
-        :param machine: the machine to find a middle from
+        :param ~spinn_machine.Machine machine:
+            the machine to find a middle from
         :return: a list of chips radially from a deduced middle
+        :rtype: list(tuple(int,int))
         """
         # try the middle chip
         middle_chip_x = math.ceil(machine.max_chip_x / 2)

@@ -107,16 +107,17 @@ class ResourceTracker(object):
     def __init__(self, machine, plan_n_timesteps, chips=None,
                  preallocated_resources=None):
         """
-        :param machine: The machine to track the usage of
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param ~spinn_machine.Machine machine:
+            The machine to track the usage of
+        :param int plan_n_timesteps: number of timesteps to plan for
         :param chips: If specified, this list of chips will be used instead\
             of the list from the machine. Note that the order will be\
             maintained, so this can be used either to reduce the set of chips\
             used, or to re-order the chips. Note also that on deallocation,\
             the order is no longer guaranteed.
-        :type chips: iterable(tuple(int, int))
+        :type chips: iterable(tuple(int, int)) or None
+        :param preallocated_resources:
+        :type preallocated_resources: PreAllocatedResourceContainer or None
         """
 
         # The amount of SDRAM available on each chip,
@@ -216,9 +217,8 @@ class ResourceTracker(object):
             Also builds an arbitrary core map for use throughout resource\
             tracker.
 
-        :param preallocated_resources:\
+        :param PreAllocatedResourceContainer preallocated_resources:
             the preallocated resources from the tools
-        :type preallocated_resources: PreAllocatedResourceContainer
         :return: a mapping of chip to arbitrary core demands
         :rtype: dict(tuple(int, int), int)
         """
@@ -277,12 +277,14 @@ class ResourceTracker(object):
     def check_constraints(
             vertices, additional_placement_constraints=None):
         """ Check that the constraints on the given vertices are supported\
-            by the resource tracker
+            by the resource tracker.
 
-        :param vertices: The vertices to check the constraints of
-        :param additional_placement_constraints:\
+        :param list(AbstractVertex) vertices:
+            The vertices to check the constraints of
+        :param set(AbstractConstraint) additional_placement_constraints:
             Additional placement constraints supported by the algorithm doing\
             this check
+        :raises PacmanInvalidParameterException:
         """
 
         # These placement constraints are supported by the resource tracker
@@ -303,18 +305,14 @@ class ResourceTracker(object):
     def get_ip_tag_info(resources, constraints):
         """ Get the IP tag resource information
 
-        :param resources: The resources to get the values from
-        :type resources:\
-            :py:class:`pacman.model.resources.ResourceContainer`
-        :param constraints: A list of constraints
-        :type constraints:\
-            list(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :return:\
-            A tuple of board address, iterable of IP tag resources and \
+        :param ResourceContainer resources:
+            The resources to get the values from
+        :param list(AbstractConstraint) constraints: A list of constraints
+        :return:
+            A tuple of board address, iterable of IP tag resources and
             iterable of reverse IP tag resources
-        :rtype: tuple(str, \
-            iterable(:py:class:`pacman.model.resources.IptagResource`),
-            iterable(:py:class:`pacman.model.resources.ReverseIPtabResource`))
+        :rtype: tuple(str, iterable(~IptagResource),
+            iterable(~ReverseIPtagResource))
         """
         board_address = None
         ip_tags = resources.iptags
@@ -330,15 +328,14 @@ class ResourceTracker(object):
     def get_chip_and_core(constraints, chips=None):
         """ Get an assigned chip and core from a set of constraints
 
-        :param constraints: The set of constraints to get the values from.\
-            Note that any type of constraint can be in the list but only those\
+        :param iterable(AbstractConstraint) constraints:
+            The set of constraints to get the values from.
+            Note that any type of constraint can be in the list but only those
             relevant will be used
-        :type constraints: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :param chips: Optional list of tuples of (x, y) coordinates of chips,\
+        :param chips: Optional list of tuples of (x, y) coordinates of chips,
             restricting the allowed chips
-        :type chips: iterable(int, int)
-        :return: tuple of a chip x and y coordinates, and processor ID, any of\
+        :type chips: iterable(tuple(int, int)) or None
+        :return: tuple of a chip x and y coordinates, and processor ID, any of
             which might be None
         :rtype: tuple(int or None, int or None, int or None)
         """
@@ -360,6 +357,11 @@ class ResourceTracker(object):
         return x, y, p
 
     def _chip_available(self, x, y):
+        """
+        :param int x:
+        :param int y:
+        :rtype: bool
+        """
         if not self._machine.is_chip_at(x, y):
             return False
         if (x, y) in self._core_tracker:
@@ -423,10 +425,12 @@ class ResourceTracker(object):
         """
         Check to see if any of the candidates chip have already been used.
         If not this may indicate the Chip was not there. Possibly a dead chip.
+
         :param chips: iterable of tuples of (x, y) coordinates of chips to \
             look though for usable chips, or None to use all available chips
         :type chips: iterable(tuple(int, int))
         :rtype: None
+        :raises PacmanCanNotFindChipException:
         """
         for chip in chips:
             if chip in self._chips_used:
@@ -438,6 +442,8 @@ class ResourceTracker(object):
     @property
     def chips_available(self):
         """ The chips currently available
+
+        :rtype: iterable(tuple(int,int))
         """
         return self._chips_available
 
@@ -445,11 +451,9 @@ class ResourceTracker(object):
         """ Check if the SDRAM available on a given chip is enough for the\
             given resources.
 
-        :param chip: The chip to check the resources of
-        :type chip: :py:class:`spinn_machine.Chip`
-        :param resources: the resources containing the SDRAM required
-        :type resources:\
-            :py:class:`pacman.model.resources.ResourceContainer`
+        :param ~spinn_machine.Chip chip: The chip to check the resources of
+        :param ResourceContainer resources:
+            the resources containing the SDRAM required
         :return: True if there is enough SDRAM available, or False otherwise
         :rtype: bool
         """
@@ -459,8 +463,7 @@ class ResourceTracker(object):
     def _sdram_available(self, chip):
         """ Return the amount of SDRAM available on a chip
 
-        :param chip: The chip to check the resources of
-        :type chip: :py:class:`spinn_machine.Chip`
+        :param ~spinn_machine.Chip chip: The chip to check the resources of
         :return: the SDRAM available
         :rtype: int
         """
@@ -469,8 +472,8 @@ class ResourceTracker(object):
     def sdram_avilable_on_chip(self, chip_x, chip_y):
         """ Get the available SDRAM on the chip at coordinates chip_x, chip_y
 
-        :param chip_x: x coord of the chip in question
-        :param chip_y: y coord of the chip in question
+        :param int chip_x: x coord of the chip in question
+        :param int chip_y: y coord of the chip in question
         :return: the SDRAM remaining
         """
         chip = self._machine.get_chip_at(chip_x, chip_y)
@@ -479,8 +482,7 @@ class ResourceTracker(object):
     def _best_core_available(self, chip):
         """ Locate the best core available on a chip
 
-        :param chip: The chip to check the resources of
-        :type chip: :py:class:`spinn_machine.Chip`
+        :param ~spinn_machine.Chip chip: The chip to check the resources of
         :return: The processor ID selected as the best on this chip
         """
 
@@ -496,8 +498,7 @@ class ResourceTracker(object):
         """ Check if there is a core available on a given chip given the\
             constraints
 
-        :param chip: The chip to check the resources of
-        :type chip: :py:class:`spinn_machine.Chip`
+        :param ~spinn_machine.Chip chip: The chip to check the resources of
         :param key: The (x, y) coordinates of the chip
         :type key: tuple(int, int)
         :param processor_id: A constraining fixed processor ID
@@ -511,8 +512,7 @@ class ResourceTracker(object):
         """ Get the number of cores available on the given chip given the\
             constraints
 
-        :param chip: The chip to check the resources of
-        :type chip: :py:class:`spinn_machine.Chip`
+        :param ~spinn_machine.Chip chip: The chip to check the resources of
         :param key: The (x, y) coordinates of the chip
         :type key: tuple(int, int)
         :param processor_id: A constraining fixed processor ID
@@ -560,20 +560,17 @@ class ResourceTracker(object):
         """ Attempt to locate a matching tag for the given details
 
         :param chip: The chip which is the source of the data for the tag
-        :type chip: :py:class:`spinn_machine.Chip` or None
+        :type chip: ~spinn_machine.Chip or None
         :param board_address: the board address to locate the chip on
         :type board_address: str or None
         :param tag_id: the tag ID to locate
         :type tag_id: int or None
-        :param ip_address: The IP address of the tag
-        :type ip_address: str
+        :param str ip_address: The IP address of the tag
         :param port: The port of the tag or None if not assigned
         :type port: int or None
-        :param strip_sdp: True if the tag is to strip SDP header
-        :type strip_sdp: bool
-        :param traffic_identifier: \
+        :param bool strip_sdp: True if the tag is to strip SDP header
+        :param str traffic_identifier:
             The identifier of the traffic to pass over this tag
-        :type traffic_identifier: str
         :return: A board address, tag ID, and port or None, None, None if none
         :rtype: tuple of (str, int, (int or None)) or (None, None, None)
         """
@@ -649,6 +646,13 @@ class ResourceTracker(object):
             or tag in self._tags_by_board[board_address]
 
     def _is_tag_available_on_ethernet_chip(self, ethernet_chip, tag_id):
+        """
+        :param ethernet_chip:
+        :type ethernet_chip: ~spinn_machine.Chip or None
+        :param tag_id:
+        :type tag_id: int or None
+        :rtype: bool
+        """
         if ethernet_chip is None:
             return False
 
@@ -666,14 +670,12 @@ class ResourceTracker(object):
         :type board_address: str or None
         :param tag: the tag ID to locate
         :type tag: int or None
-        :param ip_address: the IP address of the tag to be assigned
-        :type ip_address: str
+        :param str ip_address: the IP address of the tag to be assigned
         :param port: the port number of the tag to be assigned
         :type port: int or None
-        :param strip_sdp: if the IP tag has to be able to strip the SDP header
-        :type strip_sdp: bool
-        :param traffic_identifier: The type of traffic for the tag
-        :type traffic_identifier: str
+        :param bool strip_sdp:
+            if the IP tag has to be able to strip the SDP header
+        :param str traffic_identifier: The type of traffic for the tag
         :return: True if a matching IP tag is available, False otherwise
         :rtype: bool
         """
@@ -695,8 +697,7 @@ class ResourceTracker(object):
         :param board_address: the board to allocate IP tags on
         :type board_address: str or None
         :param ip_tags: The IP tag resource
-        :type ip_tags: \
-            iterable(:py:class:`pacman.model.resource.IptagResource`)
+        :type ip_tags: iterable(IptagResource) or None
         :return: True if the tags can be allocated, False otherwise
         :rtype: bool
         """
@@ -750,8 +751,7 @@ class ResourceTracker(object):
         :param board_address: the board to allocate IP tags on
         :type board_address: str or None
         :param reverse_ip_tags: The reverse IP tag resource to be met
-        :type reverse_ip_tags: \
-            iterable(:py:class:`pacman.model.resources.ReverseIptagResource`)
+        :type reverse_ip_tags: iterable(ReverseIptagResource) or None
         :return: True if the chip can be used, False otherwise
         :rtype: bool
         """
@@ -766,11 +766,9 @@ class ResourceTracker(object):
     def _allocate_sdram(self, chip, resources):
         """ Allocates the SDRAM on the given chip
 
-        :param key: The (x, y) coordinates of the chip
-        :type key: tuple(int, int)
-        :param resources: the resources containing the SDRAM required
-        :type resources: \
-            :py:class:`pacman.model.resources.ResourceContainer`
+        :param tuple(int,int) key: The (x, y) coordinates of the chip
+        :param ResourceContainer resources:
+            the resources containing the SDRAM required
         """
         self._sdram_tracker[chip.x, chip.y] -= \
             resources.sdram.get_total_sdram(self._plan_n_timesteps)
@@ -778,12 +776,12 @@ class ResourceTracker(object):
     def _allocate_core(self, chip, key, processor_id):
         """ Allocates a core on the given chip
 
-        :param chip: The chip to allocate the resources of
-        :type chip: :py:class:`spinn_machine.Chip`
-        :param key: The (x, y) coordinates of the chip
-        :type key: tuple(int, int)
-        :param processor_id: The ID of the processor to allocate
-        :type processor_id: int
+        :param ~spinn_machine.Chip chip: The chip to allocate the resources of
+        :param tuple(int,int) key: The (x, y) coordinates of the chip
+        :param processor_id:
+            The ID of the processor to allocate, or None to pick automatically
+        :type processor_id: int or None
+        :rtype: int
         """
         if key not in self._core_tracker:
             self._fill_in_core_tracker_for_chip(key, chip)
@@ -815,6 +813,10 @@ class ResourceTracker(object):
         return processor_id
 
     def _fill_in_core_tracker_for_chip(self, key, chip):
+        """
+        :param tuple(int,int) key:
+        :param ~spinn_machine.Chip chip:
+        """
         self._core_tracker[key] = set()
         for processor in chip.processors:
             if not processor.is_monitor:
@@ -823,13 +825,13 @@ class ResourceTracker(object):
     def _allocate_tag(self, chip, board_address, tag_id):
         """ Allocate a tag given the constraints
 
-        :param chip: The chip containing the source of data for this tag
-        :type chip: :py:class:`spinn_machine.Chip`
+        :param ~spinn_machine.Chip chip:
+            The chip containing the source of data for this tag
         :param board_address: the board address to allocate to
         :type board_address: str or None
         :param tag_id: the tag ID to allocate on this board address
         :type tag_id: int or None
-        :return: a tuple of (board_address and tag)
+        :return: (board address, tag)
         :rtype: tuple(str, int)
         """
 
@@ -861,10 +863,10 @@ class ResourceTracker(object):
     def _setup_board_tags(self, board_address):
         """ Establish the state for a given Ethernet chip if needed.
 
-        :param board_address: the board address to find the Ethernet chip of
+        :param str board_address:
+            the board address to find the Ethernet chip of
         :rtype: None
         """
-
         if board_address not in self._tags_by_board:
             e_chip_x, e_chip_y = self._ethernet_chips[board_address]
             e_chip = self._machine.get_chip_at(e_chip_x, e_chip_y)
@@ -874,8 +876,10 @@ class ResourceTracker(object):
         """ Locates a tag ID for the IP tag
 
         :param tag_id: tag ID to get, or None
-        :param board_address: board address
+        :type tag_id: int or None
+        :param str board_address: board address
         :return: tag ID allocated
+        :rtype: int
         """
         if tag_id is None:
             return self._tags_by_board[board_address].pop()
@@ -885,15 +889,13 @@ class ResourceTracker(object):
     def _allocate_ip_tags(self, chip, board_address, ip_tags):
         """ Allocate the given set of IP tag resources
 
-        :param chip: The chip to allocate the tags for
-        :type chip: :py:class:`spinn_machine.Chip`
+        :param ~spinn_machine.Chip chip: The chip to allocate the tags for
         :param board_address: The board address to allocate on
         :type board_address: str or None
-        :param ip_tags: The IP tag resources to allocate
-        :type ip_tags: \
-            iterable(:py:class:`pacman.model.resources.IptagResource`)
+        :param iterable(IptagResource) ip_tags:
+            The IP tag resources to allocate
         :return: iterable of tuples of (board address, tag) assigned
-        :rtype: iterable(tuple(str, int))
+        :rtype: iterable(tuple(str, int, int, int)) or None
         """
         if ip_tags is None or not ip_tags:
             return None
@@ -939,6 +941,14 @@ class ResourceTracker(object):
 
     def _update_data_structures_for_iptag(self, board_address, tag, ip_address,
                                           traffic_identifier, strip_sdp, port):
+        """
+        :param str board_address:
+        :param int tag:
+        :param str ip_address:
+        :param str traffic_identifier:
+        :param bool strip_sdp:
+        :param int port:
+        """
         tag_key = (board_address, tag)
         existing_tags = self._ip_tags_address_traffic[
             ip_address, traffic_identifier]
@@ -954,13 +964,11 @@ class ResourceTracker(object):
     def _allocate_reverse_ip_tags(self, chip, board_address, reverse_ip_tags):
         """ Allocate reverse IP tags with the given constraints
 
-        :param chip: The chip to allocate the tags for
-        :type chip: :py:class:`spinn_machine.Chip`
+        :param ~spinn_machine.Chip chip: The chip to allocate the tags for
         :param board_address: the board address to allocate on
         :type board_address: str or None
-        :param reverse_ip_tags: The reverse IP tag resources
-        :type reverse_ip_tags: \
-            iterable(:py:class:`pacman.model.resources.ReverseIptagResource`)
+        :param iterable(ReverseIptagResource) reverse_ip_tags:
+            The reverse IP tag resources
         :return: iterable of tuples of (board address, tag) assigned
         :rtype: iterable(tuple(str, int))
         """
@@ -979,9 +987,10 @@ class ResourceTracker(object):
     def _update_structures_for_reverse_ip_tag(self, board_address, tag, port):
         """ Updates the structures for reverse IP tags
 
-        :param board_address: the board its going to be placed on
-        :param tag: the tag ID
+        :param str board_address: the board its going to be placed on
+        :param int tag: the tag ID
         :param port: the port number
+        :type port: int or None
         :rtype: None
         """
         if port is not None:
@@ -993,23 +1002,19 @@ class ResourceTracker(object):
         """ Attempts to use the given resources of the machine, constrained\
             by the given placement constraints.
 
-        :param resources: The resources to be allocated
-        :type resources:\
-            :py:class:`pacman.model.resources.ResourceContainer`
-        :param constraints: the constraints to consider
-        :type constraints: \
-            list(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :param chips: \
-            The optional list of (x, y) tuples of chip coordinates of chips\
-            that can be used. Note that any chips passed in previously will\
+        :param ResourceContainer resources: The resources to be allocated
+        :param list(AbstractConstraint) constraints:
+            The constraints to consider
+        :param iterable(tuple(int,int)) chips:
+            The optional list of (x, y) tuples of chip coordinates of chips
+            that can be used. Note that any chips passed in previously will
             be ignored
-        :type chips: iterable(tuple(int, int))
-        :return:\
-            The x and y coordinates of the used chip, the processor_id,\
+        :return:
+            The x and y coordinates of the used chip, the processor_id,
             and the IP tag and reverse IP tag allocation tuples
-        :rtype: tuple(int, int, int, list(tuple(int, int)), \
+        :rtype: tuple(int, int, int, list(tuple(int, int, int, int)),
             list(tuple(int, int)))
-        :raise PacmanValueError: \
+        :raise PacmanValueError:
             If the constraints cannot be met given the\
             current allocation of resources
         """
@@ -1026,15 +1031,17 @@ class ResourceTracker(object):
             self, resource_and_constraint_list, chips=None):
         """ Allocates a group of cores on the same chip for these resources
 
-        :param resource_and_constraint_list:\
+        :param resource_and_constraint_list:
             A list of tuples of (resources, list of constraints) to allocate
-        :param chips: a list of chips that can be used
-        :return: list of The x and y coordinates of the used chip, the\
+        :type resource_and_constraint_list:
+            list(tuple(ResourceContainer,AbstractConstraint))
+        :param iterable(tuple(int,int)) chips:
+            A list of chips that can be used
+        :return: list of The x and y coordinates of the used chip, the
             processor_id, and the IP tag and reverse IP tag allocation tuples
-        :rtype: iterable(tuple(int, int, int, list(tuple(int, int)),\
+        :rtype: iterable(tuple(int, int, int, list(tuple(int, int, int, int)),
             list(tuple(int, int))))
         """
-
         x = None
         y = None
         board_address = None
@@ -1071,40 +1078,39 @@ class ResourceTracker(object):
 
     @staticmethod
     def __different(a, b):
+        """
+        :rtype: bool
+        """
         return a is not None and b is not None and a != b
 
     def allocate_group_resources(
             self, group_resources, chips=None, processor_ids=None,
             board_address=None, group_ip_tags=None,
             group_reverse_ip_tags=None):
-        """ Attempts to use the given group of resources on a single chip of\
-            the machine.  Can be given specific place to use the resources,\
-            or else it will allocate them on the first place that the\
-            resources of the group fit together.
+        """ Attempts to use the given group of resources on a single chip of
+            the machine. Can be given specific place to use the resources, or
+            else it will allocate them on the first place that the resources
+            of the group fit together.
 
-        :param group_resources: The resources to be allocated
-        :type group_resources: \
-            list(:py:class:`pacman.model.resources.ResourceContainer`)
-        :param chips: An iterable of (x, y) tuples of chips that are to be used
-        :type chips: iterable(tuple(int, int))
-        :param processor_ids: The specific processor to use on any chip for\
+        :param list(ResourceContainer) group_resources:
+            The resources to be allocated
+        :param iterable(tuple(int,int)) chips:
+            An iterable of (x, y) tuples of chips that are to be used
+        :param processor_ids: The specific processor to use on any chip for
             each resource of the group
         :type processor_ids: list(int or None)
-        :param board_address: the board address to allocate resources of a chip
-        :type board_address: str
-        :param group_ip_tags: list of lists of IP tag resources
-        :type group_ip_tags: \
-            list(list(:py:class:`pacman.model.resources.IptagResource`))
-        :param group_reverse_ip_tags: \
+        :param str board_address:
+            the board address to allocate resources of a chip
+        :param list(list(IptagResource)) group_ip_tags:
+            list of lists of IP tag resources
+        :param list(list(ReverseIptagResource)) group_reverse_ip_tags:
             list of lists of reverse IP tag resources
-        :type group_reverse_ip_tags: \
-            list(list(:py:class:`pacman.model.resources.ReverseIptagResource`))
-        :return: An iterable of tuples of the x and y coordinates of the used\
-            chip, the processor_id, and the IP tag and reverse IP tag\
+        :return: An iterable of tuples of the x and y coordinates of the used
+            chip, the processor_id, and the IP tag and reverse IP tag
             allocation tuples
-        :rtype: iterable(tuple(int, int, int, list(tuple(int, int)),\
+        :rtype: iterable(tuple(int, int, int, list(tuple(int, int, int, int)),
             list(tuple(int, int))))
-        :raises pacman.exceptions.PacmanValueError: \
+        :raises PacmanValueError:
             If there aren't chips available that can take the allocation.
         """
 
@@ -1179,30 +1185,24 @@ class ResourceTracker(object):
     def allocate_resources(self, resources, chips=None,
                            processor_id=None, board_address=None,
                            ip_tags=None, reverse_ip_tags=None):
-        """ Attempts to use the given resources of the machine.  Can be given\
-        specific place to use the resources, or else it will allocate them on\
+        """ Attempts to use the given resources of the machine.  Can be given
+        specific place to use the resources, or else it will allocate them on
         the first place that the resources fit.
 
-        :param resources: The resources to be allocated
-        :type resources:\
-            :py:class:`pacman.model.resources.ResourceContainer`
-        :param chips: An iterable of (x, y) tuples of chips that are to be used
-        :type chips: iterable(tuple(int, int))
-        :param processor_id: The specific processor to use on any chip.
-        :type processor_id: int
-        :param board_address: the board address to allocate resources of a chip
-        :type board_address: str
-        :param ip_tags: iterable of IP tag resources
-        :type ip_tags: \
-            iterable(:py:class:`pacman.model.resources.IptagResource`)
-        :param reverse_ip_tags: iterable of reverse IP tag resources
-        :type reverse_ip_tags: \
-            iterable(:py:class:`pacman.model.resources.ReverseIPtagResource`)
-        :return: The x and y coordinates of the used chip, the processor_id,\
+        :param ResourceContainer resources: The resources to be allocated
+        :param iterable(tuple(int,int)) chips:
+            An iterable of (x, y) tuples of chips that are to be used
+        :param int processor_id: The specific processor to use on any chip.
+        :param str board_address:
+            The board address to allocate resources of a chip
+        :param iterable(IptagResource) ip_tags: iterable of IP tag resources
+        :param iterable(ReverseIPtagResource) reverse_ip_tags:
+            iterable of reverse IP tag resources
+        :return: The x and y coordinates of the used chip, the processor_id,
             and the IP tag and reverse IP tag allocation tuples
-        :rtype: tuple(int, int, int, list(tuple(int, int, int, int)), \
+        :rtype: tuple(int, int, int, list(tuple(int, int, int, int)),
             list(tuple(int, int)))
-        :raises pacman.exceptions.PacmanValueError: \
+        :raises PacmanValueError:
             If there isn't a chip available that can take the allocation.
         """
         # Find the first usable chip which fits the resources
@@ -1262,8 +1262,8 @@ class ResourceTracker(object):
     def _available_resources(self, usable_chips):
         """ Describe how much of the various resource types are available.
 
-        :param usable_chips: Coordinates of usable chips
-        :type usable_chips: iterable(tuple(int,int))
+        :param iterable(tuple(int,int)) usable_chips:
+            Coordinates of usable chips
         :return: returns #cores, #chips, amount of SDRAM, #tags
         :rtype: tuple(int,int,int,int)
         """
@@ -1292,8 +1292,8 @@ class ResourceTracker(object):
         return n_cores, n_chips, max_sdram, n_tags
 
     def get_maximum_cores_available_on_a_chip(self):
-        """ returns the number of available cores of a real chip with the \
-        maximum number of available cores
+        """ Returns the number of available cores of a real chip with the
+            maximum number of available cores
 
         :return: the max cores available on the best real chip
         :rtype: int
@@ -1304,8 +1304,9 @@ class ResourceTracker(object):
                 return n_cores_available
 
     def get_maximum_cores_available_on_a_virtual_chip(self):
-        """ returns the number of available cores of a virtual chip with the \
-        maximum number of available cores
+        """ Returns the number of available cores of a virtual chip with the
+            maximum number of available cores
+
         :return: the max cores available on the best real chip
         :rtype: int
         """
@@ -1313,17 +1314,15 @@ class ResourceTracker(object):
                 enumerate(self._virtual_chips_with_n_cores_available))):
             if n_chips_with_n_cores != 0:
                 return n_cores_available
+        return 0
 
     def get_maximum_constrained_resources_available(
             self, resources, constraints):
         """ Get the maximum resources available given the constraints
 
-        :param resources: The resources of the item to check
-        :type resources: :py:class:`pacman.model.resources.ResourceContainer`
-        :type constraints: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :param chips: the chips to locate the max available resources of
-        :type chips: iterable(:py:class:`spinn_machine.Chip`)
+        :param ResourceContainer resources: The resources of the item to check
+        :param iterable(AbstractConstraint) constraints:
+        :rtype: ResourceContainer
         """
         (board_address, ip_tags, reverse_ip_tags) = self.get_ip_tag_info(
             resources, constraints)
@@ -1372,8 +1371,9 @@ class ResourceTracker(object):
         """ Get the maximum resources available
 
         :param area_code: A set of valid (x, y) coordinates to choose from
+        :type area_code: iterabke(tuple(int,int)) or None
         :return: a resource which shows max resources available
-        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
+        :rtype: ResourceContainer
         """
         # Go through the chips in order of sdram
         for ((chip_x, chip_y), sdram_available) in self._sdram_tracker.items():
@@ -1397,15 +1397,10 @@ class ResourceTracker(object):
                              ip_tags, reverse_ip_tags):
         """ Undo the allocation of resources
 
-        :param chip_x: the x coord of the chip allocated
-        :param chip_y: the y coord of the chip allocated
-        :type chip_x: int
-        :type chip_y: int
-        :param processor_id: the processor ID
-        :type processor_id: int
-        :param resources: The resources to be unallocated
-        :type resources:\
-            :py:class:`pacman.model.resources.ResourceContainer`
+        :param int chip_x: the x coord of the chip allocated
+        :param int chip_y: the y coord of the chip allocated
+        :param int processor_id: the processor ID
+        :param ResourceContainer resources: The resources to be unallocated
         :param ip_tags: the details of the IP tags allocated
         :type ip_tags: iterable(tuple(str, int)) or None
         :param reverse_ip_tags: the details of the reverse IP tags allocated
@@ -1465,10 +1460,8 @@ class ResourceTracker(object):
     def is_chip_available(self, chip_x, chip_y):
         """ Check if a given chip is available
 
-        :param chip_x: the x coord of the chip
-        :type chip_x: int
-        :param chip_y: the y coord of the chip
-        :type chip_y: int
+        :param int chip_x: the x coord of the chip
+        :param int chip_y: the y coord of the chip
         :return: True if the chip is available, False otherwise
         :rtype: bool
         """
@@ -1477,11 +1470,15 @@ class ResourceTracker(object):
     @property
     def keys(self):
         """ The chip coordinates assigned
+
+        :rtype: set(tuple(int,int))
         """
         return self._chips_used
 
     @property
     def chips_used(self):
         """ The number of chips used in this allocation.
+
+        :rtype: int
         """
         return len(self._chips_used)
