@@ -6,7 +6,7 @@
   "properties": {
     "label": {"$ref": "#/types/graph_label"},
     "vertices": {"$ref": "#/types/vertices"},
-    "edges": {"$ref": "#/types/edges"}
+    "partitions": {"$ref": "#/types/partitions"}
   },
 
   "types": {
@@ -37,16 +37,14 @@
       "items": {
         "type": "object",
         "properties": {
-          "pre_vertex": { "$ref": "#/types/vertex_label" },
           "post_vertex": { "$ref": "#/types/vertex_label" },
           "traffic_type": { "type": "integer" },
           "label": { "type": "string" },
-          "traffic_weight": {"type": "integer"},
           "exception": {"$ref": "#/types/exception" }
         },
         "additionalProperties": false,
         "anyOf": [
-          { "required": [ "pre_vertex", "post_vertex", "traffic_type", "label", "traffic_weight"] },
+          { "required": [ "post_vertex", "traffic_type"] },
           { "required": [ "exception"] }
         ]
       }
@@ -86,7 +84,44 @@
       "items":{"$ref": "#/types/iptag" }
     },
 
-    "resources": {
+    "machine_vertices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "class": { "$ref": "#/types/class" },
+          "label": { "$ref": "#/types/vertex_label" },
+          "constraints": { "$ref": "#/types/constraints" },
+          "resources": { "$ref": "#/types/resources" },
+          "exception": {"$ref": "#/types/exception" }
+        },
+        "additionalProperties": false,
+        "anyOf": [
+          { "required": [ "class", "label", "constraints", "resources"] },
+          { "required": [ "exception"] }
+        ]
+      }
+    },
+
+     "partitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "identifier": { "type": "string" },
+          "pre_vertex": { "$ref": "#/types/vertex_label" },
+          "edges": {"$ref": "#/types/edges"},
+          "exception": {"$ref": "#/types/exception" }
+        },
+        "additionalProperties": false,
+        "anyOf": [
+          { "required": [ "identifier", "pre_vertex", "edges"] },
+          { "required": [ "exception"] }
+        ]
+      }
+    },
+
+   "resources": {
       "type": "object",
       "properties": {
         "dtcm": { "type": "integer"},
@@ -114,15 +149,15 @@
       "items": {
         "type": "object",
         "properties": {
-          "class": { "$ref": "#/types/class" },
           "label": { "$ref": "#/types/vertex_label" },
           "constraints": { "$ref": "#/types/constraints" },
-          "resources": { "$ref": "#/types/resources" },
+          "max_atoms_per_core": { "type": "integer"},
+          "machine_vertices": {"$ref": "#/types/machine_vertices"},
           "exception": {"$ref": "#/types/exception" }
         },
         "additionalProperties": false,
         "anyOf": [
-          { "required": [ "class", "label", "constraints", "resources"] },
+          { "required": [ "label", "constraints", "max_atoms_per_core", "machine_vertices"] },
           { "required": [ "exception"] }
         ]
       }

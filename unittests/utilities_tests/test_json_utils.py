@@ -26,16 +26,23 @@ from pacman.model.constraints.partitioner_constraints import (
     FixedVertexAtomsConstraint)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
-    ResourceContainer)
+    ResourceContainer, VariableSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import (
     constraint_to_json, constraint_from_json,
     edge_to_json, edge_from_json,
+    graphs_to_json, graphs_from_json,
     machine_graph_to_json, machine_graph_from_json,
     resource_container_to_json, resource_container_from_json,
     machine_vertex_to_json, machine_vertex_from_json)
+from pacman.model.graphs.application import ApplicationGraph
+from pacman.model.graphs.common import GraphMapper
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
+from uinit_test_objects import SimpleTestVertex
+
+GRAPHS_SCHEMA_FILENAME = "graphs.json"
 
 
 class TestJsonUtils(unittest.TestCase):
@@ -98,7 +105,7 @@ class TestJsonUtils(unittest.TestCase):
         j_object = edge_to_json(there)
         j_str = json.dumps(j_object)
         j_object2 = json.loads(j_str)
-        back = edge_from_json(j_object2)
+        back = edge_from_json(j_object2, there.pre_vertex)
         self.assertEqual(there.label, back.label)
         self._compare_vertex(there.pre_vertex, back.pre_vertex)
         self._compare_vertex(there.post_vertex, back.post_vertex)
@@ -107,13 +114,27 @@ class TestJsonUtils(unittest.TestCase):
 
     def graph_there_and_back(self, there):
         j_object = machine_graph_to_json(there)
-        print(j_object)
         back = machine_graph_from_json(j_object)
         self.assertEqual(there.n_vertices, back.n_vertices)
         for vertex in there.vertices:
             b_vertex = back.vertex_by_label(vertex.label)
             self._compare_vertex(vertex, b_vertex)
 
+    def graphs_there_and_back(
+            self, application_graph, machine_graph, graph_mapper):
+        j_object = graphs_to_json(
+            application_graph, machine_graph, graph_mapper)
+        with open("temp.json", "w") as f:
+            json.dump(j_object, f)
+        file_format_schemas.validate(j_object, GRAPHS_SCHEMA_FILENAME)
+        application_back, machine_back, _ = graphs_from_json(j_object)
+        self.assertEqual(
+            application_graph.n_vertices, application_back.n_vertices)
+        self.assertEqual(
+            machine_graph.n_vertices, machine_back.n_vertices)
+        for vertex in machine_graph.vertices:
+            b_vertex = machine_back.vertex_by_label(vertex.label)
+            self._compare_vertex(vertex, b_vertex)
     # ------------------------------------------------------------------
     # Test cases
     # ------------------------------------------------------------------
@@ -239,3 +260,41 @@ class TestJsonUtils(unittest.TestCase):
         graph.add_vertices(vertices)
         graph.add_edges(edges, "bar")
         self.graph_there_and_back(graph)
+
+    def test_graphs(self):
+        """
+        tests that after building graphs, all partitined vertices
+        and partitioned edges are in existence
+        """
+        vertices = list()
+        edges = list()
+        application_graph = ApplicationGraph("foo")
+        app1 = SimpleTestVertex(10, "Application 1", 256)
+        application_graph.add_vertex(app1)
+        app2 = SimpleTestVertex(5, "Application 1", 256)
+        application_graph.add_vertex(app2)
+        ugly = GraphMapper()
+
+        dtcm = DTCMResource(100)
+        sdram = VariableSDRAM(50, 20)
+        cpu_cycles = CPUCyclesPerTickResource(25)
+        resources = ResourceContainer(dtcm, sdram, cpu_cycles)
+
+        for i in range(10):
+            vertices.append(SimpleMachineVertex(resources, "V{}".format(i)))
+        vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
+        vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
+        for i in range(7):
+            ugly.simple_add_vertex_mapping(vertices[i], app1)
+        for i in range(7, 10):
+            ugly.simple_add_vertex_mapping(vertices[i], app2)
+        for i in range(5):
+            edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
+        for i in range(5, 10):
+            edges.append(MachineEdge(
+                vertices[5], vertices[(i + 1) % 10]))
+        machine_graph = MachineGraph("foo")
+        machine_graph.add_vertices(vertices)
+        machine_graph.add_edges(edges, "bar")
+
+        self.graphs_there_and_back(application_graph, machine_graph, ugly)

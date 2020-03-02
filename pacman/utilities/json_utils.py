@@ -313,7 +313,7 @@ def application_vertex_to_json(application_vertex, graph_mapper):
         for machine_vertex in graph_mapper.get_machine_vertices(
                 application_vertex):
             json_list.append(machine_vertex_to_json(machine_vertex))
-        json_dict["machine_vertexes"] = json_list
+        json_dict["machine_vertices"] = json_list
         return json_dict
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
@@ -402,7 +402,7 @@ def machine_graph_from_json(json_dict):
     return graph
 
 
-def graph_to_json(application_graph, machine_graph, graph_mapper):
+def graphs_to_json(application_graph, machine_graph, graph_mapper):
     """
 
     :param ApplicationGraph application_graph:
@@ -436,7 +436,7 @@ def graphs_from_json(json_dict):
     for j_application_vertex in json_dict["vertices"]:
         application_vertex = application_vertex_from_json(j_application_vertex)
         application_graph.add_vertex(application_vertex)
-        for j_machine_vertex in j_application_vertex["machine_vertexes"]:
+        for j_machine_vertex in j_application_vertex["machine_vertices"]:
             machine_vertex = machine_vertex_from_json(
                 j_machine_vertex, convert_constraints=False)
             machine_graph.add_vertex(machine_vertex)
@@ -445,7 +445,7 @@ def graphs_from_json(json_dict):
     # Only do constraints when we have all the vertexes to link to
     for j_application_vertex in json_dict["vertices"]:
         vertex_add_contstraints_from_json(j_application_vertex, application_graph)
-        for j_machine_vertex in j_application_vertex["machine_vertexes"]:
+        for j_machine_vertex in j_application_vertex["machine_vertices"]:
             vertex_add_contstraints_from_json(j_machine_vertex, machine_graph)
     for j_partitions in json_dict["partitions"]:
         partition_from_json(j_partitions, machine_graph)

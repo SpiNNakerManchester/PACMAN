@@ -19,7 +19,7 @@ import os
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
-from pacman.utilities.json_utils import graph_to_json
+from pacman.utilities.json_utils import graphs_to_json
 from jsonschema.exceptions import ValidationError
 
 GRAPH_FILENAME = "graph.json"
@@ -66,7 +66,7 @@ class WriteJsonGraph(object):
         """
 
         file_path = os.path.join(json_folder, GRAPH_FILENAME)
-        json_obj = graph_to_json(
+        json_obj = graphs_to_json(
             application_graph, machine_graph, graph_mapper)
 
         if progress:
