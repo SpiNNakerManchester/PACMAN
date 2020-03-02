@@ -15,6 +15,7 @@
 from collections import OrderedDict
 import json
 import gzip
+import sys
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
     FixedMaskConstraint)
@@ -28,11 +29,28 @@ from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
     VariableSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.graphs.application import (
+    ApplicationGraph, ApplicationVertex)
+from pacman.model.graphs.common import GraphMapper
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
+
+
+class _MinApplicationVertex(ApplicationVertex):
+
+    def get_resources_used_by_atoms(self, vertex_slice):
+        raise NotImplementedError("Not needed I hope")
+
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+        raise NotImplementedError("Not needed I hope")
+
+    def n_atoms(self):
+        raise NotImplementedError("Not needed I hope")
 
 
 def json_to_object(json_object):
@@ -147,7 +165,8 @@ def constraint_from_json(json_dict, graph=None):
 def constraints_to_json(constraints):
     json_list = []
     for constraint in constraints:
-        json_list.append(constraint_to_json(constraint))
+        if not isinstance(constraint, MaxVertexAtomsConstraint):
+            json_list.append(constraint_to_json(constraint))
     return json_list
 
 
@@ -156,6 +175,13 @@ def constraints_from_json(json_list, graph):
     for sub in json_list:
         constraints.append(constraint_from_json(sub, graph))
     return constraints
+
+
+def constraints_to_size(constraints):
+    for constraint in constraints:
+        if isinstance(constraint, MaxVertexAtomsConstraint):
+            return constraint.size
+    return sys.maxsize
 
 
 def key_mask_to_json(key_mask):
@@ -250,7 +276,7 @@ def iptag_resources_from_json(json_list):
     return iptags
 
 
-def macine_vertex_to_json(vertex):
+def machine_vertex_to_json(vertex):
     json_dict = OrderedDict()
     try:
         json_dict["class"] = vertex.__class__.__name__
@@ -273,6 +299,31 @@ def machine_vertex_from_json(json_dict, convert_constraints=True):
     resources = resource_container_from_json(json_dict.get("resources"))
     return SimpleMachineVertex(
         resources, label=json_dict["label"], constraints=constraints)
+
+
+def application_vertex_to_json(application_vertex, graph_mapper):
+    json_dict = OrderedDict()
+    try:
+        json_dict["label"] = application_vertex.label
+        json_dict["max_atoms_per_core"] = \
+            constraints_to_size(application_vertex.constraints)
+        json_dict["constraints"] = constraints_to_json(
+            application_vertex.constraints)
+        json_list = []
+        for machine_vertex in graph_mapper.get_machine_vertices(
+                application_vertex):
+            json_list.append(machine_vertex_to_json(machine_vertex))
+        json_dict["machine_vertexes"] = json_list
+        return json_dict
+    except Exception as ex:  # pylint: disable=broad-except
+        json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def application_vertex_from_json(json_dict):
+    return _MinApplicationVertex(
+        label=json_dict["label"],
+        max_atoms_per_core=json_dict["max_atoms_per_core"])
 
 
 def vertex_add_contstraints_from_json(json_dict, graph):
@@ -327,7 +378,7 @@ def machine_graph_to_json(graph):
             json_dict["label"] = graph.label
         json_list = []
         for vertex in graph.vertices:
-            json_list.append(macine_vertex_to_json(vertex))
+            json_list.append(machine_vertex_to_json(vertex))
         json_dict["vertices"] = json_list
         json_list = []
         for partition in graph.outgoing_edge_partitions:
@@ -349,6 +400,56 @@ def machine_graph_from_json(json_dict):
     for j_partitions in json_dict["partitions"]:
         partition_from_json(j_partitions, graph)
     return graph
+
+
+def graph_to_json(application_graph, machine_graph, graph_mapper):
+    """
+
+    :param ApplicationGraph application_graph:
+    :param MachineGraph machine_graph:
+    :param graph_mapper:  TODO NUKE ME!
+    :return:
+    """
+    json_dict = OrderedDict()
+    try:
+        if machine_graph.label is not None:
+            json_dict["label"] = machine_graph.label
+        json_list = []
+        for application_vertex in application_graph.vertices:
+            json_list.append(application_vertex_to_json(
+                application_vertex, graph_mapper))
+        json_dict["vertices"] = json_list
+        json_list = []
+        for partition in machine_graph.outgoing_edge_partitions:
+            json_list.append(partition_to_json(partition))
+        json_dict["partitions"] = json_list
+    except Exception as ex:  # pylint: disable=broad-except
+        json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def graphs_from_json(json_dict):
+    json_dict = json_to_object(json_dict)
+    application_graph = ApplicationGraph(json_dict.get("label"))
+    machine_graph = MachineGraph(json_dict.get("label"))
+    graph_mapper = GraphMapper()
+    for j_application_vertex in json_dict["vertices"]:
+        application_vertex = application_vertex_from_json(j_application_vertex)
+        application_graph.add_vertex(application_vertex)
+        for j_machine_vertex in j_application_vertex["machine_vertexes"]:
+            machine_vertex = machine_vertex_from_json(
+                j_machine_vertex, convert_constraints=False)
+            machine_graph.add_vertex(machine_vertex)
+            graph_mapper.simple_add_vertex_mapping(
+                machine_vertex, application_vertex)
+    # Only do constraints when we have all the vertexes to link to
+    for j_application_vertex in json_dict["vertices"]:
+        vertex_add_contstraints_from_json(j_application_vertex, application_graph)
+        for j_machine_vertex in j_application_vertex["machine_vertexes"]:
+            vertex_add_contstraints_from_json(j_machine_vertex, machine_graph)
+    for j_partitions in json_dict["partitions"]:
+        partition_from_json(j_partitions, machine_graph)
+    return application_graph, machine_graph, graph_mapper
 
 
 def vertex_lookup(label, graph=None):

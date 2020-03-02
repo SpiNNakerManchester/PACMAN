@@ -417,6 +417,37 @@
             <param_type>JsonRoutingTablesPath</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="WriteJsonGraph">
+        <python_module>pacman.operations.algorithm_reports.write_json_graph</python_module>
+        <python_class>WriteJsonGraph</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>application_graph</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>json_folder</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>JsonMachineGraphPath</param_type>
+        </outputs>
+    </algorithm>
     <algorithm name="WriteJsonMachineGraph">
         <python_module>pacman.operations.algorithm_reports.write_json_machine_graph</python_module>
         <python_class>WriteJsonMachineGraph</python_class>

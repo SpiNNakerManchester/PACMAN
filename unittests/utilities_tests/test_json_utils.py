@@ -33,7 +33,7 @@ from pacman.utilities.json_utils import (
     edge_to_json, edge_from_json,
     machine_graph_to_json, machine_graph_from_json,
     resource_container_to_json, resource_container_from_json,
-    macine_vertex_to_json, machine_vertex_from_json)
+    machine_vertex_to_json, machine_vertex_from_json)
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 
@@ -88,7 +88,7 @@ class TestJsonUtils(unittest.TestCase):
         self.assertEqual(there, back)
 
     def vertex_there_and_back(self, there):
-        j_object = macine_vertex_to_json(there)
+        j_object = machine_vertex_to_json(there)
         j_str = json.dumps(j_object)
         j_object2 = json.loads(j_str)
         back = machine_vertex_from_json(j_object2)

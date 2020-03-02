@@ -88,6 +88,22 @@ class GraphMapper(object):
         self._slices_by_application_vertex[application_vertex].append(
             vertex_slice)
 
+    def simple_add_vertex_mapping(
+            self, machine_vertex, application_vertex):
+        """ Add a mapping between application and machine vertices
+
+        :param machine_vertex: A vertex from a Machine Graph
+        :param application_vertex: A vertex from an Application Graph
+        :raise pacman.exceptions.PacmanValueError:\
+            If atom selection is out of bounds.
+        """
+        self._application_vertex_by_machine_vertex[machine_vertex] = \
+            application_vertex
+        machine_vertices = self._machine_vertices_by_application_vertex[
+            application_vertex]
+        self._index_by_machine_vertex[machine_vertex] = len(machine_vertices)
+        machine_vertices.add(machine_vertex)
+
     def add_edge_mapping(self, machine_edge, application_edge):
         """ Add a mapping between a machine edge and an application edge
 
