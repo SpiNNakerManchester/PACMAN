@@ -477,8 +477,7 @@ class PACMANAlgorithmExecutor(object):
                 algorithms_by_token,
                 algorithm_input_requirement_breakdown))
 
-    @staticmethod
-    def _remove_outputs_which_are_inputs(required_outputs):
+    def _remove_outputs_which_are_inputs(self, required_outputs):
         """ Generates the output list which has pruned outputs which are\
             already in the input list
 
