@@ -284,7 +284,6 @@ def vertex_add_contstraints_from_json(json_dict, graph):
 def edge_to_json(edge):
     json_dict = OrderedDict()
     try:
-        json_dict["pre_vertex"] = edge.pre_vertex.label
         json_dict["post_vertex"] = edge.post_vertex.label
         json_dict["traffic_type"] = int(edge.traffic_type)
         if edge.label is not None:
@@ -294,11 +293,10 @@ def edge_to_json(edge):
     return json_dict
 
 
-def edge_from_json(json_dict, graph=None):
+def edge_from_json(json_dict, pre_vertex, graph=None):
     label = json_dict.get("label")
     return MachineEdge(
-        vertex_lookup(json_dict["pre_vertex"], graph),
-        vertex_lookup(json_dict["post_vertex"], graph),
+        pre_vertex, vertex_lookup(json_dict["post_vertex"], graph),
         json_dict["traffic_type"], label)
 
 
@@ -306,6 +304,7 @@ def partition_to_json(partition):
     json_dict = OrderedDict()
     # As label may be None or not unigue use id to map to n_keys
     json_dict["identifier"] = partition.identifier
+    json_dict["pre_vertex"] = partition.pre_vertex.label
     json_list = []
     for edge in partition.edges:
         json_list.append(edge_to_json(edge))
@@ -315,8 +314,9 @@ def partition_to_json(partition):
 
 def partition_from_json(json_dict, graph):
     identifier = json_dict["identifier"]
+    pre_vertex = vertex_lookup(json_dict["pre_vertex"], graph)
     for j_edge in json_dict["edges"]:
-        edge = edge_from_json(j_edge, graph)
+        edge = edge_from_json(j_edge, pre_vertex, graph)
         graph.add_edge(edge, identifier)
 
 
