@@ -19,7 +19,7 @@ import os
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
-from pacman.utilities.json_utils import graph_to_json
+from pacman.utilities.json_utils import machine_graph_to_json
 from jsonschema.exceptions import ValidationError
 
 MACHINE_GRAPH_FILENAME = "machine_graph.json"
@@ -63,7 +63,7 @@ class WriteJsonMachineGraph(object):
         """
 
         file_path = os.path.join(json_folder, MACHINE_GRAPH_FILENAME)
-        json_obj = graph_to_json(machine_graph)
+        json_obj = machine_graph_to_json(machine_graph)
 
         if progress:
             progress.update()

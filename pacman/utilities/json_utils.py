@@ -250,7 +250,7 @@ def iptag_resources_from_json(json_list):
     return iptags
 
 
-def vertex_to_json(vertex):
+def macine_vertex_to_json(vertex):
     json_dict = OrderedDict()
     try:
         json_dict["class"] = vertex.__class__.__name__
@@ -264,7 +264,7 @@ def vertex_to_json(vertex):
     return json_dict
 
 
-def vertex_from_json(json_dict, convert_constraints=True):
+def machine_vertex_from_json(json_dict, convert_constraints=True):
     if convert_constraints:
         constraints = constraints_from_json(
             json_dict["constraints"], graph=None)
@@ -320,14 +320,14 @@ def partition_from_json(json_dict, graph):
         graph.add_edge(edge, identifier)
 
 
-def graph_to_json(graph):
+def machine_graph_to_json(graph):
     json_dict = OrderedDict()
     try:
         if graph.label is not None:
             json_dict["label"] = graph.label
         json_list = []
         for vertex in graph.vertices:
-            json_list.append(vertex_to_json(vertex))
+            json_list.append(macine_vertex_to_json(vertex))
         json_dict["vertices"] = json_list
         json_list = []
         for partition in graph.outgoing_edge_partitions:
@@ -338,11 +338,11 @@ def graph_to_json(graph):
     return json_dict
 
 
-def graph_from_json(json_dict):
+def machine_graph_from_json(json_dict):
     json_dict = json_to_object(json_dict)
     graph = MachineGraph(json_dict.get("label"))
     for j_vertex in json_dict["vertices"]:
-        graph.add_vertex(vertex_from_json(j_vertex, convert_constraints=False))
+        graph.add_vertex(machine_vertex_from_json(j_vertex, convert_constraints=False))
     # Only do constraints when we have all the vertexes to link to
     for j_vertex in json_dict["vertices"]:
         vertex_add_contstraints_from_json(j_vertex, graph)
