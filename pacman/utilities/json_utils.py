@@ -393,7 +393,8 @@ def machine_graph_from_json(json_dict):
     json_dict = json_to_object(json_dict)
     graph = MachineGraph(json_dict.get("label"))
     for j_vertex in json_dict["vertices"]:
-        graph.add_vertex(machine_vertex_from_json(j_vertex, convert_constraints=False))
+        graph.add_vertex(machine_vertex_from_json(
+            j_vertex, convert_constraints=False))
     # Only do constraints when we have all the vertexes to link to
     for j_vertex in json_dict["vertices"]:
         vertex_add_contstraints_from_json(j_vertex, graph)
@@ -444,7 +445,8 @@ def graphs_from_json(json_dict):
                 machine_vertex, application_vertex)
     # Only do constraints when we have all the vertexes to link to
     for j_application_vertex in json_dict["vertices"]:
-        vertex_add_contstraints_from_json(j_application_vertex, application_graph)
+        vertex_add_contstraints_from_json(
+            j_application_vertex, application_graph)
         for j_machine_vertex in j_application_vertex["machine_vertices"]:
             vertex_add_contstraints_from_json(j_machine_vertex, machine_graph)
     for j_partitions in json_dict["partitions"]:
