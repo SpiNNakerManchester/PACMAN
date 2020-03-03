@@ -15,9 +15,8 @@
 
 from __future__ import division
 import math
-
-from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.utilities.utility_calls import (
@@ -34,10 +33,12 @@ class ZonedRoutingInfoAllocator(object):
         of the preceding vertex.
 
     .. note::
-        No constraints are supported, and that the number of keys\
-        required by each edge must be 2048 or less, and that all edges coming\
+        No constraints are supported, and that the number of keys
+        required by each edge must be 2048 or less, and that all edges coming
         out of a vertex will be given the same key/mask assignment.
 
+    :param ApplicationGraph application_graph:
+        The application graph to allocate the routing info for
     :param MachineGraph machine_graph:
         The machine graph to allocate the routing info for
     :param AbstractMachinePartitionNKeysMap n_keys_map:
@@ -62,14 +63,9 @@ class ZonedRoutingInfoAllocator(object):
         """
         :param ApplicationGraph application_graph:
         :param MachineGraph machine_graph:
-            The machine graph to allocate the routing info for
         :param AbstractMachinePartitionNKeysMap n_keys_map:
-            A map between the edges and the number of keys required by the
-            edges
-        :return: The routing information
-        :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
+        :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
         :raise PacmanRouteInfoAllocationException:
-            If something goes wrong with the allocation
         """
         # check that this algorithm supports the constraints put onto the
         # partitions
@@ -88,7 +84,9 @@ class ZonedRoutingInfoAllocator(object):
 
     def _calculate_zones(self):
         """
-        :rtype: tuple(int, int, dict(ApplicationVertex,int))
+        :return: tuple containing max app keys and a map of app to max keys
+            for any given machine vertex
+        :rtype: tuple(int, dict(ApplicationVertex, int))
         :raises PacmanRouteInfoAllocationException:
         """
         progress = ProgressBar(
@@ -153,7 +151,7 @@ class ZonedRoutingInfoAllocator(object):
                 key_bits = key_bits_map[app_vertex]
                 for machine_index, vertex in enumerate(
                         app_vertex.machine_vertices):
-                    partitions = self.__machine_graph. \
+                    partitions = self.__machine_graph.\
                         get_outgoing_edge_partitions_starting_at_vertex(vertex)
                     partition = partitions.peek()
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
@@ -181,4 +179,4 @@ class ZonedRoutingInfoAllocator(object):
         :param int size:
         :rtype: int
         """
-        return math.ceil(math.log(size, 2))
+        return int(math.ceil(math.log(size, 2)))

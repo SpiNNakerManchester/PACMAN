@@ -34,7 +34,7 @@ from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 class TestPartitionAndPlacePartitioner(unittest.TestCase):
     """
-    test for basic partitioning algorithm
+    test for partition-and-place partitioning algorithm
     """
 
     def setup(self):
@@ -56,18 +56,19 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         self.graph.add_edges(self.edges, "foo")
 
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**20))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -156,18 +157,19 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         self.setup()
 
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(2**12)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -199,18 +201,19 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         """
         self.setup()
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(2**11)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -238,20 +241,20 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         in that it has less SDRAM available
         """
         self.setup()
-
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**19))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -273,20 +276,20 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         in that it has more SDRAM available
         """
         self.setup()
-
         n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**21))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"

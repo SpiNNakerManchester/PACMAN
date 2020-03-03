@@ -28,13 +28,19 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class WriteJsonPlacements(object):
     """ Converter from Placements to JSON.
+
+    :param Placements placements: The placements to write.
+    :param str json_folder: The folder to which the JSON are being written.
+    :return: The name of the generated file.
+    :rtype: str
     """
 
     def __call__(self, placements, json_folder):
         """ Runs the code to write the placements in JSON.
 
-        :param Placements placements: The placements to write
-        :param str json_folder: the folder to which the JSON are being written
+        :param Placements placements:
+        :param str json_folder:
+        :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON Placements")
@@ -48,8 +54,8 @@ class WriteJsonPlacements(object):
 
         :param Placements placements: The placements to write
         :param str json_folder: the folder to which the JSON are being written
-        :param progress: The progress bar, if any
-        :type progress: None or ~spinn_utilities.progress_bar.ProgressBar
+        :param progress: Progress Bar if one used
+        :type progress: ~spinn_utilities.progress_bar.ProgressBar or None
         :return: the name of the generated file
         :rtype: str
         """

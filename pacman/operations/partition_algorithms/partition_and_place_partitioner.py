@@ -48,8 +48,9 @@ class PartitionAndPlacePartitioner(object):
     :param preallocated_resources:
     :type preallocated_resources: PreAllocatedResourceContainer or None
     :return:
-        A machine_graph of partitioned vertices and partitioned edges
-    :rtype: MachineGraph
+        A machine_graph of partitioned vertices and partitioned edges,
+        and the number of chips needed to satisfy this partitioning.
+    :rtype: tuple(MachineGraph, int)
     :raise PacmanPartitionException:
         If something goes wrong with the partitioning
     """
@@ -60,6 +61,15 @@ class PartitionAndPlacePartitioner(object):
     def __call__(
             self, graph, machine, plan_n_timesteps,
             preallocated_resources=None):
+        """
+        :param ApplicationGraph graph:
+        :param ~spinn_machine.Machine machine:
+        :param int plan_n_timesteps:
+        :param preallocated_resources:
+        :type preallocated_resources: PreAllocatedResourceContainer or None
+        :rtype: tuple(MachineGraph, int)
+        :raise PacmanPartitionException:
+        """
         ResourceTracker.check_constraints(graph.vertices)
         utils.check_algorithm_can_support_constraints(
             constrained_vertices=graph.vertices,
@@ -277,7 +287,7 @@ class PartitionAndPlacePartitioner(object):
         :param bool fixed_n_atoms:
             True if max_atoms_per_core is actually the fixed number of atoms
             per core
-        :return: the list of placements made by this method and the new amount\
+        :return: the list of placements made by this method and the new amount
             of atoms partitioned
         :rtype: tuple(iterable(tuple(ApplicationVertex, ResourceContainer)),
             int)
@@ -405,8 +415,7 @@ class PartitionAndPlacePartitioner(object):
         :param int plan_n_timesteps: number of timesteps to plan for
         :param ResourceContainer resources:
             the resource estimate for the vertex for a given number of atoms
-        :param float ratio:
-            the ratio between max atoms and available resources
+        :param float ratio: the ratio between max atoms and available resources
         :return: the new resources used and the new hi_atom
         :rtype: tuple(ResourceContainer, int)
         """
@@ -468,18 +477,20 @@ class PartitionAndPlacePartitioner(object):
 
     @staticmethod
     def _ratio(numerator, denominator):
-        """ Get the ratio between two values, with special
-            handling for when the denominator is zero.
+        """ Get the ratio between two values, with special handling for when\
+            the denominator is zero.
 
+        :param int numerator:
+        :param int denominator:
         :rtype: float
         """
         if denominator == 0:
             return 0.0
         return numerator / denominator
 
-    @staticmethod
-    def _find_max_ratio(required, available, plan_n_timesteps):
-        """ Find the max ratio between the resources
+    @classmethod
+    def _find_max_ratio(cls, required, available, plan_n_timesteps):
+        """ Find the max ratio between the resources.
 
         :param ResourceContainer required: the resources used by the vertex
         :param ResourceContainer available:
@@ -489,11 +500,11 @@ class PartitionAndPlacePartitioner(object):
         :rtype: float
         :raise None: this method does not raise any known exceptions
         """
-        cpu_ratio = PartitionAndPlacePartitioner._ratio(
+        cpu_ratio = cls._ratio(
             required.cpu_cycles.get_value(), available.cpu_cycles.get_value())
-        dtcm_ratio = PartitionAndPlacePartitioner._ratio(
+        dtcm_ratio = cls._ratio(
             required.dtcm.get_value(), available.dtcm.get_value())
-        sdram_ratio = PartitionAndPlacePartitioner._ratio(
+        sdram_ratio = cls._ratio(
             required.sdram.get_total_sdram(plan_n_timesteps),
             available.sdram.get_total_sdram(plan_n_timesteps))
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))

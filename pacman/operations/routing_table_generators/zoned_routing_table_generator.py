@@ -23,12 +23,13 @@ from pacman.model.routing_tables import (
 class SharedEntry(object):
     slots = [
 
-        # the edges this path entry goes down
+        #: the edges this path entry goes down
         "link_ids",
 
-        # the processors this path entry goes to
+        #: the processors this path entry goes to
         "processor_ids",
 
+        #: whether this entry is defaultable
         "defaultable"
         ]
 

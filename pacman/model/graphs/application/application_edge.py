@@ -62,11 +62,10 @@ class ApplicationEdge(AbstractEdge):
             The application vertex at the end of the edge.
         :param EdgeTrafficType traffic_type:
             The type of the traffic on the edge.
-        :param label: The name of the edge.
-        :type label: str or None
+        :param str label: The name of the edge.
         :param machine_edge_type:
             The type of machine edges made from this app edge. If `None`,
-            standard MachineEdges will be made.
+            standard `MachineEdge`s will be made.
         :type machine_edge_type: type(MachineEdge) or None
         """
         self._label = label
@@ -90,9 +89,9 @@ class ApplicationEdge(AbstractEdge):
             machine-level embodiment of this application edge.
 
         :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
-            The machine vertex at the start of the edge
+            The machine vertex at the start of the edge.
         :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
-            The machine vertex at the end of the edge
+            The machine vertex at the end of the edge.
         :param str label: label of the edge
         :return: The created machine edge
         :rtype: ~pacman.model.graphs.machine.MachineEdge

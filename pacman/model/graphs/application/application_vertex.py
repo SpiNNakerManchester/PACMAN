@@ -35,11 +35,11 @@ class ApplicationVertex(AbstractVertex):
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
         """
-        :param str label: The optional name of the vertex
+        :param str label: The optional name of the vertex.
         :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex
-        :param int max_atoms_per_core: the max number of atoms that can be\
-            placed on a core, used in partitioning
+            The optional initial constraints of the vertex.
+        :param int max_atoms_per_core: The max number of atoms that can be
+            placed on a core, used in partitioning.
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
@@ -65,7 +65,7 @@ class ApplicationVertex(AbstractVertex):
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
-        :return: a Resource container that contains a \
+        :return: a Resource container that contains a
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
         :rtype: ~pacman.model.resources.ResourceContainer
         """
@@ -77,14 +77,14 @@ class ApplicationVertex(AbstractVertex):
         """ Create a machine vertex from this application vertex
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of atoms that the machine vertex will cover
+            The slice of atoms that the machine vertex will cover.
         :param ~pacman.model.resources.ResourceContainer resources_required:
-            the resources used by the machine vertex
+            The resources used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
         :param iterable(~pacman.model.constraints.AbstractConstraint) \
                 constraints:
-            Constraints to be passed on to the machine vertex
+            Constraints to be passed on to the machine vertex.
         """
 
     def remember_associated_machine_vertex(self, machine_vertex):
@@ -123,7 +123,10 @@ class ApplicationVertex(AbstractVertex):
         return self._slices
 
     def get_max_atoms_per_core(self):
-        """
+        """ Gets the maximum number of atoms per core, which is either the\
+            number of atoms required across the whole application vertex,\
+            or a lower value if a constraint lowers it.
+
         :rtype: int
         """
         for constraint in self.constraints:

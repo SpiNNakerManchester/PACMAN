@@ -93,7 +93,7 @@ def add_set(all_sets, new_set):
     created combining all the overlapping sets.
     Existing overlapping sets are removed and only the new superset is added.
 
-    :param list(set) all_sets: List of Non overlapping sets
+    :param list(set) all_sets: List of non-overlapping sets
     :param set new_set:
         A new set which may or may not overlap the previous sets.
     """

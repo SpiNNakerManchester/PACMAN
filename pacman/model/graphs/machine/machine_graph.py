@@ -27,10 +27,11 @@ class MachineGraph(Graph):
 
     def __init__(self, label, application_graph=None):
         """
-        :param label: The label for the graph
+        :param label: The label for the graph.
         :type label: str or None
         :param application_graph:
-            The application graph that this machine graph is derived from.
+            The application graph that this machine graph is derived from, if
+            it is derived from one at all.
         :type application_graph: ApplicationGraph or None
         """
         super(MachineGraph, self).__init__(

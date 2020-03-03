@@ -39,7 +39,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     """ A Routing Info Allocation Allocator algorithm that keeps track of\
-        free keys and attempts to allocate them as requested
+        free keys and attempts to allocate them as requested.
 
     :param MachineGraph machine_graph:
     :param AbstractMachinePartitionNKeysMap n_keys_map:
@@ -197,8 +197,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 keys_and_masks, routing_infos, partition)
 
     @staticmethod
-    def _update_routing_objects(
-            keys_and_masks, routing_infos, group):
+    def _update_routing_objects(keys_and_masks, routing_infos, group):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:
         :param RoutingInfo routing_infos:
@@ -211,7 +210,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     @staticmethod
     def _get_key_ranges(key, mask):
         """ Get a generator of base_key, n_keys pairs that represent ranges
-            allowed by the mask
+            allowed by the mask.
 
         :param int key: The base key
         :param int mask: The mask
@@ -248,7 +247,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             yield compress_from_bit_array(generated_key), n_keys
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
-        """ Allocate fixed keys and masks
+        """ Allocate fixed keys and masks.
 
         :param iterable(BaseKeyAndMask) keys_and_masks:
             the fixed keys and masks combos

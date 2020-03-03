@@ -61,8 +61,8 @@ def generate_machine_edges(machine_graph, application_graph):
 
 
 def get_remaining_constraints(vertex):
-    """ Gets the rest of the constraints from a vertex after removing
-        partitioning constraints
+    """ Gets the rest of the constraints from a vertex after removing\
+        partitioning constraints.
 
     :param ApplicationVertex vertex:
     :rtype: list(AbstractConstraint)
@@ -72,8 +72,8 @@ def get_remaining_constraints(vertex):
 
 
 def get_same_size_vertex_groups(vertices):
-    """ Get a dictionary of vertex to vertex that must be partitioned the same
-        size
+    """ Get a dictionary of vertex to vertex that must be partitioned the same\
+        size.
 
     :param iterble(ApplicationVertex) vertices:
     :rtype: dict(ApplicationVertex, set(ApplicationVertex))
