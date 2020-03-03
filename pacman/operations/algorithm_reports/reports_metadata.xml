@@ -444,6 +444,9 @@
             <param_name>graph_mapper</param_name>
             <param_name>json_folder</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>JsonMachineGraphPath</param_type>
         </outputs>
