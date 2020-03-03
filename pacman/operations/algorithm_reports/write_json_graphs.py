@@ -19,38 +19,41 @@ import os
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
-from pacman.utilities.json_utils import machine_graph_to_json
+from pacman.utilities.json_utils import graphs_to_json
 from jsonschema.exceptions import ValidationError
 
-MACHINE_GRAPH_FILENAME = "machine_graph.json"
+GRAPH_FILENAME = "graphs.json"
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class WriteJsonMachineGraph(object):
+class WriteJsonGraphs(object):
     """ Converter (:py:obj:`callable`) from :py:class:`MulticastRoutingTables`
         to JSON.
 
-    :param MachineGraph machine_graph: The machine_graph to place
+    :param ApplicationGraph graph:
+    :param graph_mapper:  TODO NUKE ME!
     :param str json_folder:
         The folder to which the reports are being written
     :return: The name of the actual file that was written
     :rtype: str
     """
 
-    def __call__(self, machine_graph, json_folder):
-        """ Runs the code to write the machine in Java readable JSON.
-        """
+    def __call__(self, application_graph, machine_graph, graph_mapper,
+                 json_folder):
         # Steps are tojson, validate and writefile
-        progress = ProgressBar(3, "Converting to JSON MachineGraph")
+        progress = ProgressBar(3, "Converting to JSON Graph")
 
-        return WriteJsonMachineGraph.write_json(
-            machine_graph, json_folder, progress)
+        return WriteJsonGraphs.write_json(application_graph, machine_graph,
+                                          graph_mapper, json_folder, progress)
 
     @staticmethod
-    def write_json(machine_graph, json_folder, progress=None):
+    def write_json(application_graph, machine_graph, graph_mapper,
+                   json_folder, progress=None):
         """ Runs the code to write the machine graph in Java readable JSON.
 
-        :param MachineGraph machine_graph: The machine_graph to place
+        :param ApplicationGraph application_graph:
+        :param MachineGraph machine_graph:
+        :param graph_mapper:  TODO NUKE ME!
         :param str json_folder:
             The folder to which the json are being written
 
@@ -62,18 +65,19 @@ class WriteJsonMachineGraph(object):
         :rtype: str
         """
 
-        file_path = os.path.join(json_folder, MACHINE_GRAPH_FILENAME)
-        json_obj = machine_graph_to_json(machine_graph)
+        file_path = os.path.join(json_folder, GRAPH_FILENAME)
+        json_obj = graphs_to_json(
+            application_graph, machine_graph, graph_mapper)
 
         if progress:
             progress.update()
 
         # validate the schema
-        try:
-            file_format_schemas.validate(json_obj, MACHINE_GRAPH_FILENAME)
-        except ValidationError as ex:
-            logger.error("JSON validation exception: {}\n{}",
-                         ex.message, ex.instance)
+#        try:
+#            file_format_schemas.validate(json_obj, GRAPH_FILENAME)
+#        except ValidationError as ex:
+#            logger.error("JSON validation exception: {}\n{}",
+#                         ex.message, ex.instance)
 
         # update and complete progress bar
         if progress:
