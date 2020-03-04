@@ -419,7 +419,7 @@ class SpreaderPlacer(OneToOnePlacer):
 
             # compare each chip loc to the middle. don't need to be majorly
             # precise, all we're looking for is a chip nearby.
-            for chip in machine.chips():
+            for chip in machine.chips:
                 x_diff = abs(middle_chip_x - chip.x)
                 y_diff = abs(middle_chip_y - chip.y)
                 diff_total = x_diff + y_diff
