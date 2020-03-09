@@ -41,7 +41,6 @@ _ROUTING_TABLE_DIR = "routing_tables_generated"
 _SDRAM_FILENAME = "chip_sdram_usage_by_core.rpt"
 _TAGS_FILENAME = "tags.rpt"
 _VIRTKEY_FILENAME = "virtual_key_space_information_report.rpt"
-
 _LOWER_16_BITS = 0xFFFF
 
 
@@ -645,26 +644,31 @@ def _sdram_usage_report_per_chip_with_timesteps(
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.get_total_sdram(
-            timesteps)
+        sdram_rec = placement.vertex.resources_required.sdram
+        sdram_total = sdram_rec.get_total_sdram(timesteps)
+
         x, y, p = placement.x, placement.y, placement.p
-        f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
-                "".format(x, y, p, int(sdram / 1024.0), sdram, placement))
+        f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) "
+                "fixed: {} per_timestep {} for {}\n"
+                "".format(x, y, p, int(sdram_total / 1024.0), sdram_total,
+                          sdram_rec.fixed, sdram_rec.per_timestep, placement))
         key = (x, y)
         if key not in used_sdram_by_chip:
-            used_sdram_by_chip[key] = sdram
+            used_sdram_by_chip[key] = sdram_rec
         else:
-            used_sdram_by_chip[key] += sdram
+            used_sdram_by_chip[key] += sdram_rec
     for chip in progress.over(machine.chips, end_progress):
         try:
-            used_sdram = used_sdram_by_chip[chip.x, chip.y]
+            chip_sdram = used_sdram_by_chip[chip.x, chip.y]
+            used_sdram = chip_sdram.get_total_sdram(timesteps)
             if used_sdram:
                 f.write(
                     "**** Chip: ({}, {}) has total memory usage of"
-                    " {} KB ({} bytes) out of a max of "
-                    "{} KB ({} bytes)\n\n".format(
+                    " {} KB ({} bytes) fixed: {} per_timestep {} "
+                    "out of a max of {} KB ({} bytes)\n\n".format(
                         chip.x, chip.y,
                         int(used_sdram / 1024.0), used_sdram,
+                        chip_sdram.fixed, chip_sdram.per_timestep,
                         int(chip.sdram.size / 1024.0), chip.sdram.size))
         except KeyError:
             # Do Nothing
