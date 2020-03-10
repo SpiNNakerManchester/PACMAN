@@ -72,3 +72,10 @@ class AbstractSDRAM(object):
         .. warn:
             May well be zero.
         """
+
+    def __eq__(self, other):
+        if not isinstance(other, AbstractSDRAM):
+            return False
+        if other.fixed != self.fixed:
+            return False
+        return other.per_timestep == self.per_timestep
