@@ -79,3 +79,14 @@ class AbstractSDRAM(object):
         if other.fixed != self.fixed:
             return False
         return other.per_timestep == self.per_timestep
+
+    @abstractmethod
+    def report(self, indent = "", preamble="", target=None):
+        """
+        Writes a description of this sdram to the target
+
+        :param String indent: Text at the start of this and all children
+        :param String preamble:
+            Additional text at the start but not in children
+        :param file target: Where to write the output. None is stanrd print
+        """

@@ -12,8 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
+from spinn_utilities.overrides import overrides
 
 
 class MultiRegionSDRAM(VariableSDRAM):
@@ -53,8 +55,8 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param region: Key to identify the region
         :type region: int or String or enum
-        :param int fixed_sdram: The fixed cost for this region
-        :param int per_timestep_sdram: The vaariable cost for this region is any
+        :param int fixed_sdram: The fixed cost for this region.
+        :param int per_timestep_sdram: The variable cost for this region is any
         """
         self._fixed_sdram = self._fixed_sdram + fixed_sdram
         self._per_timestep_sdram = \
@@ -68,6 +70,18 @@ class MultiRegionSDRAM(VariableSDRAM):
         else:
             self.__regions[region] = sdram
 
+    def nest(self, region, other):
+        self._fixed_sdram = self._fixed_sdram + other.fixed
+        self._per_timestep_sdram = \
+            self._per_timestep_sdram + other.per_timestep
+        if region in self.__regions:
+            if isinstance(other, MultiRegionSDRAM):
+                self.__regions[region].merge(other)
+            else:
+                self.__regions[region] += other
+        else:
+            self.__regions[region] = other
+
     def merge(self, other):
         """
         Combines the other sdram costs keeping the region mappings
@@ -78,12 +92,18 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param MultiRegionSDRAM other: Another mapping of costs by region
         """
+        self._fixed_sdram = self._fixed_sdram + other.fixed
+        self._per_timestep_sdram = \
+            self._per_timestep_sdram + other.per_timestep
         for region in other.__regions:
-            previous = other.__regions[region]
             if region in self.__regions:
-                self.__regions[region] += previous
+                self.__regions[region] += other.__regions[region]
             else:
-                self.__regions[region] = previous
-            self._fixed_sdram = self._fixed_sdram + previous.fixed
-            self._per_timestep_sdram = \
-                self._per_timestep_sdram + previous.per_timestep
+                self.__regions[region] = other.__regions[region]
+
+    @overrides(AbstractSDRAM.report)
+    def report(self, indent = "", preamble="", target=None):
+        super().report(indent, preamble, target)
+        for region in self.__regions:
+            self.__regions[region].report(
+                indent+"    ", str(region)+":", target)
