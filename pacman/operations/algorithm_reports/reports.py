@@ -645,16 +645,16 @@ def _sdram_usage_report_per_chip_with_timesteps(
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
-        sdram = placement.vertex.resources_required.sdram.get_total_sdram(
-            timesteps)
+        vertex_sdram = placement.vertex.resources_required.sdram
+        core_sdram = vertex_sdram.get_total_sdram(timesteps)
         x, y, p = placement.x, placement.y, placement.p
-        f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
-                "".format(x, y, p, int(sdram / 1024.0), sdram, placement))
+
+        vertex_sdram.report(preamble="core ({},{},{})".format(x,y,p), target=f)
         key = (x, y)
         if key not in used_sdram_by_chip:
-            used_sdram_by_chip[key] = sdram
+            used_sdram_by_chip[key] = core_sdram
         else:
-            used_sdram_by_chip[key] += sdram
+            used_sdram_by_chip[key] += core_sdram
     for chip in progress.over(machine.chips, end_progress):
         try:
             used_sdram = used_sdram_by_chip[chip.x, chip.y]
