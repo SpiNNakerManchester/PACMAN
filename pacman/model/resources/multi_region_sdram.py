@@ -12,10 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
-from spinn_utilities.overrides import overrides
 
 
 class MultiRegionSDRAM(VariableSDRAM):
@@ -42,40 +40,29 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param regions: A dict of AbstractSDRAM, one per "region" of SDRAM.
 
         """
+        super(MultiRegionSDRAM, self).__init__(0, 0)
         self.__regions = {}
 
     @property
     def regions(self):
         return self.__regions
 
-    @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps):
-        return sum(
-            r.get_total_sdram(n_timesteps) for r in self.__regions.values())
-
-    @property
-    @overrides(AbstractSDRAM.fixed)
-    def fixed(self):
-        return sum(r.fixed for r in self.__regions.values())
-
-    @property
-    @overrides(AbstractSDRAM.per_timestep)
-    def per_timestep(self):
-        return sum(r.per_timestep for r in self.__regions.values())
-
-    def add_cost(self, region, fixed, variable=0):
+    def add_cost(self, region, fixed_sdram, per_timestep_sdram=0):
         """
         Adds the cost for the specified region
 
         :param region: Key to identify the region
         :type region: int or String or enum
-        :param int fixed: The fixed cost for this region
-        :param int variable: The vaariable cost for this region is any
+        :param int fixed_sdram: The fixed cost for this region
+        :param int per_timestep_sdram: The vaariable cost for this region is any
         """
-        if variable:
-            sdram = VariableSDRAM(fixed, variable)
+        self._fixed_sdram = self._fixed_sdram + fixed_sdram
+        self._per_timestep_sdram = \
+            self._per_timestep_sdram + per_timestep_sdram
+        if per_timestep_sdram:
+            sdram = VariableSDRAM(fixed_sdram, per_timestep_sdram)
         else:
-            sdram = ConstantSDRAM(fixed)
+            sdram = ConstantSDRAM(fixed_sdram)
         if region in self.__regions:
             self.__regions[region] += sdram
         else:
@@ -92,7 +79,11 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param MultiRegionSDRAM other: Another mapping of costs by region
         """
         for region in other.__regions:
+            previous = other.__regions[region]
             if region in self.__regions:
-                self.__regions[region] += other.__regions[region]
+                self.__regions[region] += previous
             else:
-                self.__regions[region] = other.__regions[region]
+                self.__regions[region] = previous
+            self._fixed_sdram = self._fixed_sdram + previous.fixed
+            self._per_timestep_sdram = \
+                self._per_timestep_sdram + previous.per_timestep
