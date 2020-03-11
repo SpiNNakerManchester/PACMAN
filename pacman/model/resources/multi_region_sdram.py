@@ -102,8 +102,8 @@ class MultiRegionSDRAM(VariableSDRAM):
                 self.__regions[region] = other.__regions[region]
 
     @overrides(AbstractSDRAM.report)
-    def report(self, indent = "", preamble="", target=None):
-        super().report(indent, preamble, target)
+    def report(self, timesteps, indent = "", preamble="", target=None):
+        super().report(timesteps, indent, preamble, target)
         for region in self.__regions:
             self.__regions[region].report(
-                indent+"    ", str(region)+":", target)
+                timesteps, indent+"    ", str(region)+":", target)

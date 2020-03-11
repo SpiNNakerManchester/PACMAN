@@ -620,18 +620,18 @@ def sdram_usage_report_per_chip(
             f.write("Planned by partitioner\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
-                f, placements, machine, plan_n_timesteps, progress, False)
+                f, placements, machine, plan_n_timesteps, progress, False, False)
             f.write("\nActual space reserved on the machine\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
-                f, placements, machine, data_n_timesteps, progress, True)
+                f, placements, machine, data_n_timesteps, progress, True, True)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for "
                          "writing.", file_name)
 
 
 def _sdram_usage_report_per_chip_with_timesteps(
-        f, placements, machine, timesteps, progress, end_progress):
+        f, placements, machine, timesteps, progress, end_progress, details):
     """
     :param ~io.FileIO f:
     :param Placements placements:
@@ -639,6 +639,7 @@ def _sdram_usage_report_per_chip_with_timesteps(
     :param int timesteps:
     :param ~spinn_utilities.progress_bar.ProgressBar progress:
     :param bool end_progress:
+    :param bool details: If True will get costs printed by regions
     """
     f.write("Based on {} timesteps\n\n".format(timesteps))
     used_sdram_by_chip = dict()
@@ -648,8 +649,15 @@ def _sdram_usage_report_per_chip_with_timesteps(
         vertex_sdram = placement.vertex.resources_required.sdram
         core_sdram = vertex_sdram.get_total_sdram(timesteps)
         x, y, p = placement.x, placement.y, placement.p
-
-        vertex_sdram.report(preamble="core ({},{},{})".format(x,y,p), target=f)
+        if details:
+            vertex_sdram.report(
+                timesteps=timesteps, preamble="core ({},{},{})".format(x,y,p),
+                target=f)
+        else:
+            f.write(
+                "SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
+                "".format(x, y, p, int(core_sdram / 1024.0), core_sdram,
+                          placement))
         key = (x, y)
         if key not in used_sdram_by_chip:
             used_sdram_by_chip[key] = core_sdram

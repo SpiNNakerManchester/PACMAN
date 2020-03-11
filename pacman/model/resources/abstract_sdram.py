@@ -81,10 +81,11 @@ class AbstractSDRAM(object):
         return other.per_timestep == self.per_timestep
 
     @abstractmethod
-    def report(self, indent = "", preamble="", target=None):
+    def report(self, timesteps, indent = "", preamble="", target=None):
         """
         Writes a description of this sdram to the target
 
+        :param int timesteps:  Number of timesteps to do total cost for
         :param String indent: Text at the start of this and all children
         :param String preamble:
             Additional text at the start but not in children
