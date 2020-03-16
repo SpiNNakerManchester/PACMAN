@@ -92,7 +92,7 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(multi1, combo)
         self.assertEqual(multi1, multi3)
         with tempfile.TemporaryFile(mode="w") as target:
-            multi3.report(target=target)
+            multi3.report(1000, target=target)
         # multi3.report(preamble="core (0,0,1):")
 
     def test_dtcm(self):
