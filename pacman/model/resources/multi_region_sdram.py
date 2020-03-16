@@ -71,6 +71,18 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = sdram
 
     def nest(self, region, other):
+        """
+        Combines the other sdram cost, in a nested fashion.
+
+        The totals for the new region are added to the total of this one.
+        A new region is created summerizing the cost of others.
+        If other contains a regions which is the same as one in self they are
+            NOT combined, but kept seperate.
+
+        :param region: Key to identify the summary region
+        :param AbstractSDRAM other: Another sdram model to make combine by
+            nesting
+        """
         self._fixed_sdram = self._fixed_sdram + other.fixed
         self._per_timestep_sdram = \
             self._per_timestep_sdram + other.per_timestep
