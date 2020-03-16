@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from six import print_
 from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
 
@@ -75,5 +76,5 @@ class ConstantSDRAM(AbstractSDRAM):
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps, indent="", preamble="", target=None):
-        print(indent, preamble, "Constant {} bytes".format(self._sdram),
+        print_(indent, preamble, "Constant {} bytes".format(self._sdram),
               file=target)
