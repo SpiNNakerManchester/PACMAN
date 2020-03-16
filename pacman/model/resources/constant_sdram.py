@@ -77,4 +77,4 @@ class ConstantSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps, indent="", preamble="", target=None):
         print_(indent, preamble, "Constant {} bytes".format(self._sdram),
-              file=target)
+               file=target)
