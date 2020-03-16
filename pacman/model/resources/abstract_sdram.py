@@ -81,7 +81,7 @@ class AbstractSDRAM(object):
         return other.per_timestep == self.per_timestep
 
     @abstractmethod
-    def report(self, timesteps, indent = "", preamble="", target=None):
+    def report(self, timesteps, indent="", preamble="", target=None):
         """
         Writes a description of this sdram to the target
 

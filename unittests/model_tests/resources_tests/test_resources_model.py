@@ -25,9 +25,11 @@ from pacman.model.resources import (
     SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource,
     VariableSDRAM)
 
+
 class MockEnum(Enum):
     ZERO = 0
     ONE = 1
+
 
 class TestResourceModels(unittest.TestCase):
     """

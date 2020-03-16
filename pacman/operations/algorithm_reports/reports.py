@@ -620,7 +620,8 @@ def sdram_usage_report_per_chip(
             f.write("Planned by partitioner\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
-                f, placements, machine, plan_n_timesteps, progress, False, False)
+                f, placements, machine, plan_n_timesteps, progress, False,
+                False)
             f.write("\nActual space reserved on the machine\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
@@ -651,8 +652,8 @@ def _sdram_usage_report_per_chip_with_timesteps(
         x, y, p = placement.x, placement.y, placement.p
         if details:
             vertex_sdram.report(
-                timesteps=timesteps, preamble="core ({},{},{})".format(x,y,p),
-                target=f)
+                timesteps=timesteps,
+                preamble="core ({},{},{})".format(x, y, p), target=f)
         else:
             f.write(
                 "SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
