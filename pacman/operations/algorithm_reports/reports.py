@@ -811,6 +811,8 @@ def _compression_ratio(uncompressed, compressed):
     :param int compressed:
     :rtype: float
     """
+    if uncompressed == 0:
+        return 0
     return (uncompressed - compressed) / float(uncompressed) * 100
 
 
