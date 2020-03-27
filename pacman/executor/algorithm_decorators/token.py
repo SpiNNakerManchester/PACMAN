@@ -20,13 +20,16 @@ class Token(object):
     """
 
     __slots__ = [
-        # The name of the token
         "_name",
-        # The part of the token, or None if no part
         "_part"
     ]
 
     def __init__(self, name, part=None):
+        """
+        :param str name: The name of the token
+        :param part: The part of the token, or None if no part
+        :type part: str or None
+        """
         self._name = name
         self._part = part
 

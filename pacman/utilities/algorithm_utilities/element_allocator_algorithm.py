@@ -31,9 +31,8 @@ class ElementAllocatorAlgorithm(object):
     def __init__(self, ranges):
         """
         :param ranges: iterable of tuples of (size being, size_end)
-        :type ranges: iterable(int, int)
+        :type ranges: iterable(tuple(int, int))
         """
-
         self._free_space_tracker = list()
         for size_begin, size_end in ranges:
             self._free_space_tracker.append(
@@ -42,9 +41,9 @@ class ElementAllocatorAlgorithm(object):
     def allocate_elements(self, base_element_id, n_elements):
         """ Handle the allocating of space for a given set of elements
 
-        :param base_element_id: the first element ID to allocate
-        :param n_elements: the number of elements to allocate
-        :raises: PacmanRouteInfoAllocationException: \
+        :param int base_element_id: the first element ID to allocate
+        :param int n_elements: the number of elements to allocate
+        :raises PacmanRouteInfoAllocationException:
             when the ID cannot be assigned due to the number of elements
         """
 
@@ -55,11 +54,15 @@ class ElementAllocatorAlgorithm(object):
                 "been allocated".format(n_elements, base_element_id))
 
         # base element should be >= slot element at this point
-        self._do_allocation(index, base_element_id, n_elements)
+        self.__do_allocation(index, base_element_id, n_elements)
 
     def _find_slot(self, base_element_id, lo=0):
-        """ Find the free slot with the closest\
+        """ Find the free slot with the closest
             base element ID  <= base element using a binary search
+
+        :param int base_element_id:
+        :param int lo:
+        :rtype: int or None
         """
         hi = len(self._free_space_tracker) - 1
         while lo < hi:
@@ -77,15 +80,16 @@ class ElementAllocatorAlgorithm(object):
             return None
         return lo
 
-    def _do_allocation(self, index, base_element_id, n_elements):
+    def __do_allocation(self, index, base_element_id, n_elements):
         """ Allocate a given base element ID and number of elements into the\
             space at the given slot
 
-        :param index: The index of the free space slot to check
-        :param base_element_id: \
-            The element ID to start with - must be inside the slot
-        :param n_elements: \
-            The number of elements to be allocated - should be power of 2
+        :param int index: The index of the free space slot to check
+        :param int base_element_id:
+            The element ID to start with; must be inside the slot
+        :param int n_elements:
+            The number of elements to be allocated; should be power of 2
+        :raises PacmanElementAllocationException:
         """
 
         free_space_slot = self._free_space_tracker[index]
@@ -102,26 +106,22 @@ class ElementAllocatorAlgorithm(object):
 
         if (free_space_slot.start_address == base_element_id and
                 free_space_slot.size == n_elements):
-
             # If the slot exactly matches the space, remove it
             del self._free_space_tracker[index]
 
         elif free_space_slot.start_address == base_element_id:
-
             # If the slot starts with the element ID, reduce the size
             self._free_space_tracker[index] = ElementFreeSpace(
                 free_space_slot.start_address + n_elements,
                 free_space_slot.size - n_elements)
 
         elif space == n_elements:
-
             # If the space at the end exactly matches the spot, reduce the size
             self._free_space_tracker[index] = ElementFreeSpace(
                 free_space_slot.start_address,
                 free_space_slot.size - n_elements)
 
         else:
-
             # Otherwise, the allocation lies in the middle of the region:
             # First, reduce the size of the space before the allocation
             self._free_space_tracker[index] = ElementFreeSpace(
@@ -138,11 +138,13 @@ class ElementAllocatorAlgorithm(object):
         """ Check if there is enough space for a given set of element IDs\
             starting at a base element ID inside a given slot
 
-        :param index: The index of the free space slot to check
-        :param base_element_id: \
-            The element ID to start with - must be inside the slot
-        :param n_elements: \
-            The number of elements to be allocated - should be power of 2
+        :param int index: The index of the free space slot to check
+        :param int base_element_id:
+            The element ID to start with; must be inside the slot
+        :param int n_elements:
+            The number of elements to be allocated; should be power of 2
+        :rtype: int or None
+        :raises PacmanElementAllocationException:
         """
         free_space_slot = self._free_space_tracker[index]
         space = (free_space_slot.size -

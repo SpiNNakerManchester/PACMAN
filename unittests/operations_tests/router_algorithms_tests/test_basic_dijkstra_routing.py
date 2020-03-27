@@ -14,10 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-try:
-    from collections.abc import deque
-except ImportError:
-    from collections import deque
+from collections import deque
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
@@ -26,7 +23,7 @@ from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
 
 
-class MyTestCase(unittest.TestCase):
+class TestBasicDijkstraRouting(unittest.TestCase):
 
     def test_routing(self):
         graph = MachineGraph("Test")

@@ -15,8 +15,8 @@
 
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
-from pacman.model.graphs import AbstractOutgoingEdgePartition
-from pacman.model.graphs.impl import Graph
+from pacman.model.graphs import OutgoingEdgePartition
+from pacman.model.graphs import Graph
 
 
 class ApplicationGraph(Graph):
@@ -26,6 +26,10 @@ class ApplicationGraph(Graph):
     __slots__ = []
 
     def __init__(self, label):
+        """
+        :param label: The label on the graph, or None
+        :type label: str or None
+        """
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, AbstractOutgoingEdgePartition,
+            ApplicationVertex, ApplicationEdge, OutgoingEdgePartition,
             label)

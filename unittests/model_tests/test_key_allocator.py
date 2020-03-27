@@ -15,10 +15,10 @@
 
 import unittest
 from pacman.model.routing_info import BaseKeyAndMask
-from pacman.utilities.utility_objs import Field, FlexiField
+from pacman.utilities.utility_objs import Field
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
-    FixedKeyFieldConstraint, FixedMaskConstraint, FlexiKeyFieldConstraint)
+    FixedKeyFieldConstraint, FixedMaskConstraint)
 
 
 class TestKeyAllocatorConstraints(unittest.TestCase):
@@ -100,29 +100,4 @@ class TestKeyAllocatorConstraints(unittest.TestCase):
         d[c2] = 2
         d[c3] = 3
         self.assertEqual(len(d), 2)
-        self.assertEqual(d[c1], 2)
-
-    def test_flexi_key_constraint(self):
-        f = FlexiField("foo")
-        c1 = FlexiKeyFieldConstraint([f])
-        self.assertEqual(c1.fields, [f])
-        c1a = FlexiKeyFieldConstraint([
-            FlexiField("foo")])
-        c2 = FlexiKeyFieldConstraint([
-            FlexiField("bar")])
-        c3 = FlexiKeyFieldConstraint([
-            FlexiField("foo"), FlexiField("bar")])
-        self.assertEqual(c1, c1a)
-        self.assertNotEqual(c1, c2)
-        self.assertNotEqual(c1, c3)
-        self.assertNotEqual(c3, c1)
-        r = ("FlexiKeyFieldConstraint(fields=["
-             "ID:foo:IV:None:INK:None:TAG:None])")
-        self.assertEqual(str(c1), r)
-        d = {}
-        d[c1] = 1
-        d[c1a] = 2
-        d[c2] = 3
-        d[c3] = 4
-        self.assertEqual(len(d), 3)
         self.assertEqual(d[c1], 2)

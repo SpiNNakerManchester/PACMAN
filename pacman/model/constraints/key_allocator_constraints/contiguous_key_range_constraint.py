@@ -17,9 +17,12 @@ from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class ContiguousKeyRangeContraint(AbstractKeyAllocatorConstraint):
-    """ Key allocator constraint that keeps the keys allocated to a contiguous\
-        range.  Without this constraint, keys can be allocated across the key\
-        space.
+    """ Key allocator constraint that keeps the keys allocated to a contiguous
+    range.  Without this constraint, keys can be allocated across the key
+    space.
+
+    .. note::
+        All current key allocators *always* allocate contiguous keys.
     """
 
     __slots__ = []

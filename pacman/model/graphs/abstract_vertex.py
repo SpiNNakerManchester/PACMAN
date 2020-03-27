@@ -30,13 +30,11 @@ class AbstractVertex(ConstrainedObject):
 
     def __init__(self, label=None, constraints=None):
         """
-        :param label: The optional name of the vertex
-        :type label: str
-        :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :raise pacman.exceptions.PacmanInvalidParameterException:\
-            * If one of the constraints is not valid
+        :param str label: The optional name of the vertex
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex
+        :raise PacmanInvalidParameterException:
+            If one of the constraints is not valid
         """
 
         super(AbstractVertex, self).__init__(constraints)
@@ -45,20 +43,18 @@ class AbstractVertex(ConstrainedObject):
 
     @property
     def label(self):
-        """
-        Returns the current label to the vertex.
+        """ The current label to the vertex.
 
         This label could change when the vertex is added to the graph.
-        :return: The label
+
         :rtype: str
         """
         return self._label
 
     def set_label(self, label):
-        """
-        Changes the label for a vertex NOT yet ADDED to a graph
+        """ Changes the label for a vertex *not yet added* to a graph.
 
-        :param label: new value for the label
+        :param str label: new value for the label
         :raises PacmanConfigurationException:
             If there is an attempt to change the label once the vertex has
             been added to a graph
@@ -69,8 +65,8 @@ class AbstractVertex(ConstrainedObject):
         self._label = label
 
     def addedToGraph(self):
-        """
-        Records that the vertex has been added to a graph
+        """ Records that the vertex has been added to a graph
+
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once
         """

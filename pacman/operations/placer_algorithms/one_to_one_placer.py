@@ -13,9 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import deque
+import functools
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
-    PacmanException, PacmanInvalidParameterException, PacmanValueError)
+    PacmanException, PacmanInvalidParameterException, PacmanValueError,
+    PacmanPlaceException)
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
@@ -28,8 +32,6 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.utilities.utility_calls import (
     is_single, locate_constraints_of_type)
 from pacman.model.graphs import AbstractVirtual
-from pacman.exceptions import PacmanPlaceException
-import functools
 
 
 def _conflict(x, y, post_x, post_y):
@@ -43,26 +45,20 @@ def _conflict(x, y, post_x, post_y):
 class OneToOnePlacer(RadialPlacer):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param ~spinn_machine.Machine machine:
+        The machine with respect to which to partition the application graph
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: A set of placements
+    :rtype: Placements
+    :raise PacmanPlaceException:
+        If something goes wrong with the placement
     """
 
     __slots__ = []
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
-        """
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param machine:\
-            The machine with respect to which to partition the application\
-            graph
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :return: A set of placements
-        :rtype: :py:class:`pacman.model.placements.Placements`
-        :raise pacman.exceptions.PacmanPlaceException: \
-            If something goes wrong with the placement
-        """
         # Iterate over vertices and generate placements
         # +3 covers check_constraints, get_same_chip_vertex_groups and
         #    create_vertices_groups
@@ -96,80 +92,72 @@ class OneToOnePlacer(RadialPlacer):
             vertex, and where their constraints don't force them onto\
             different chips.
 
-        :param graph: the graph to look for other one to one vertices
-        :param vertex: the vertex to use as a basis for one to one connections
+        :param MachineGraph graph:
+            the graph to look for other one to one vertices
+        :param MachineVertex vertex:
+            the vertex to use as a basis for one to one connections
         :return: set of one to one vertices
+        :rtype: set(MachineVertex)
         """
         # Virtual vertices can't be forced on other chips
         if isinstance(vertex, AbstractVirtual):
             return []
-        found_vertices = set()
+        found_vertices = OrderedSet()
         vertices_seen = {vertex}
 
         # look for one to ones leaving this vertex
         outgoing = graph.get_edges_starting_at_vertex(vertex)
-        vertices_to_try = [
+        vertices_to_try = deque(
             edge.post_vertex for edge in outgoing
-            if edge.post_vertex not in vertices_seen]
+            if edge.post_vertex not in vertices_seen)
         while vertices_to_try:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen and \
                     not isinstance(next_vertex, AbstractVirtual):
                 vertices_seen.add(next_vertex)
-                edges = graph.get_edges_ending_at_vertex(next_vertex)
-                if is_single(edges):
+                if is_single(graph.get_edges_ending_at_vertex(next_vertex)):
                     found_vertices.add(next_vertex)
                     outgoing = graph.get_edges_starting_at_vertex(next_vertex)
-                    vertices_to_try.extend([
+                    vertices_to_try.extend(
                         edge.post_vertex for edge in outgoing
-                        if edge.post_vertex not in vertices_seen])
+                        if edge.post_vertex not in vertices_seen)
 
         # look for one to ones entering this vertex
         incoming = graph.get_edges_ending_at_vertex(vertex)
-        vertices_to_try = [
+        vertices_to_try = deque(
             edge.pre_vertex for edge in incoming
-            if edge.pre_vertex not in vertices_seen]
+            if edge.pre_vertex not in vertices_seen)
         while vertices_to_try:
             next_vertex = vertices_to_try.pop()
             if next_vertex not in vertices_seen:
                 vertices_seen.add(next_vertex)
-                edges = graph.get_edges_starting_at_vertex(next_vertex)
-                if is_single(edges):
+                if is_single(graph.get_edges_starting_at_vertex(next_vertex)):
                     found_vertices.add(next_vertex)
                     incoming = graph.get_edges_ending_at_vertex(next_vertex)
-                    vertices_to_try.extend([
+                    vertices_to_try.extend(
                         edge.pre_vertex for edge in incoming
-                        if edge.pre_vertex not in vertices_seen])
+                        if edge.pre_vertex not in vertices_seen)
 
-        extra_vertices = get_vertices_on_same_chip(vertex, graph)
-        for vertex in extra_vertices:
-            found_vertices.add(vertex)
+        found_vertices.update(get_vertices_on_same_chip(vertex, graph))
         return found_vertices
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
             machine, plan_n_timesteps, machine_graph, progress):
         """
-
-        :param one_to_one_groups:
+        :param list(set(MachineVertex)) one_to_one_groups:
             Groups of vertexes that would be nice on same chip
-        :type one_to_one_groups:
-            list(set(vertex))
         :param same_chip_vertex_groups:
             Mapping of Vertex to the Vertex that must be on the same Chip
         :type same_chip_vertex_groups:
-            dict(vertex, collection(vertex))
-        :param machine:\
-            The machine with respect to which to partition the application\
+            dict(MachineVertex, collection(MachineVertex))
+        :param ~spinn_machine.Machine machine:
+            The machine with respect to which to partition the application
             graph
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param progress:
-        :return:
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :rtype: Placements
         """
 
         placements = Placements()
@@ -240,6 +228,16 @@ class OneToOnePlacer(RadialPlacer):
     def _allocate_one_to_one_group(
             resource_tracker, vertices, progress, placements, chips,
             all_vertices_placed):
+        """
+        :param ResourceTracker resource_tracker:
+        :param list(MachineVertex) vertices:
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :param Placements placements:
+        :param chips:
+        :type chips: iterable(tuple(int, int)) or None
+        :param set(MachineVertex) all_vertices_placed:
+        :rtype: bool
+        """
         try:
             allocs = resource_tracker.allocate_constrained_group_resources(
                 [(v.resources_required, v.constraints) for v in vertices],
@@ -259,6 +257,13 @@ class OneToOnePlacer(RadialPlacer):
     def _allocate_same_chip_as_group(
             vertex, placements, tracker, same_chip_vertex_groups,
             all_vertices_placed, progress):
+        """
+        :param MachineVertex vertex:
+        :param Placements placements:
+        :param ResourceTracker tracker:
+        :param dict(MachineVertex,set(MachineVertex)) same_chip_vertex_groups:
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        """
         if vertex not in all_vertices_placed:
             vertices = same_chip_vertex_groups[vertex]
             resources = tracker.allocate_constrained_group_resources([

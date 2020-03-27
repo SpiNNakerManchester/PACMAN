@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from six import print_
+from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
 
 
@@ -29,27 +31,28 @@ class ConstantSDRAM(AbstractSDRAM):
 
     def __init__(self, sdram):
         """
-        :param sdram: The amount of SDRAM in bytes
-        :type sdram: int
-        :raise None: No known exceptions are raised
+        :param int sdram: The amount of SDRAM in bytes
         """
         self._sdram = sdram
 
-    def get_total_sdram(self, n_timesteps):
+    @overrides(AbstractSDRAM.get_total_sdram)
+    def get_total_sdram(self, n_timesteps):  # @UnusedVariable
         return self._sdram
 
     @property
+    @overrides(AbstractSDRAM.fixed)
     def fixed(self):
         return self._sdram
 
     @property
+    @overrides(AbstractSDRAM.per_timestep)
     def per_timestep(self):
         return 0
 
     def __add__(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
-                self._sdram + other._sdram)
+                self._sdram + other.fixed)
         else:
             # The other is more complex so delegate to it
             return other.__add__(self)
@@ -57,15 +60,21 @@ class ConstantSDRAM(AbstractSDRAM):
     def __sub__(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
-                self._sdram - other._sdram)
+                self._sdram - other.fixed)
         else:
             # The other is more complex so delegate to it
             return other.sub_from(self)
 
+    @overrides(AbstractSDRAM.sub_from)
     def sub_from(self, other):
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
-                other._sdram - self._sdram)
+                other.fixed - self._sdram)
         else:
             # The other is more complex so delegate to it
             return other - self
+
+    @overrides(AbstractSDRAM.report)
+    def report(self, timesteps, indent="", preamble="", target=None):
+        print_(indent, preamble, "Constant {} bytes".format(self._sdram),
+               file=target)

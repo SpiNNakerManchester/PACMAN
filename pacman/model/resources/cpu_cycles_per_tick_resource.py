@@ -27,14 +27,13 @@ class CPUCyclesPerTickResource(object):
 
     def __init__(self, cycles):
         """
-        :param cycles: The number of CPU clock cycles
-        :type cycles: int
-        :raise None: No known exceptions are raised
+        :param int cycles: The number of CPU clock cycles
         """
         self._cycles = cycles
 
     def get_value(self):
         """
         :return: The number of CPU clock cycles needed per simulation tick.
+        :rtype: int
         """
         return self._cycles

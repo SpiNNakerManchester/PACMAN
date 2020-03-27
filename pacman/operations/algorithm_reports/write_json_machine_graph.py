@@ -20,42 +20,49 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import graph_to_json
+from jsonschema.exceptions import ValidationError
 
-_ROUTING_FILENAME = "machine_graph.json"
+MACHINE_GRAPH_FILENAME = "machine_graph.json"
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class ConvertToJsonMachineGraph(object):
-    """ Converter from MulticastRoutingTables to json
+class WriteJsonMachineGraph(object):
+    """ Converter (:py:obj:`callable`) from :py:class:`MulticastRoutingTables`
+        to JSON.
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param str json_folder:
+        The folder to which the reports are being written
+    :return: The name of the actual file that was written
+    :rtype: str
     """
 
-    def __call__(self, machine_graph, report_folder):
+    def __call__(self, machine_graph, json_folder):
         """ Runs the code to write the machine in Java readable JSON.
-
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param report_folder: the folder to which the reports are being written
-        :type report_folder: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON MachineGraph")
 
-        file_path = os.path.join(report_folder, _ROUTING_FILENAME)
-        return ConvertToJsonMachineGraph.do_convert(
-            machine_graph, file_path, progress)
+        return WriteJsonMachineGraph.write_json(
+            machine_graph, json_folder, progress)
 
     @staticmethod
-    def do_convert(machine_graph, file_path, progress=None):
-        """ Runs the code to write the machine in Java readable JSON.
+    def write_json(machine_graph, json_folder, progress=None):
+        """ Runs the code to write the machine graph in Java readable JSON.
 
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param file_path: Location to write file to. Warning will overwrite!
-        :type file_path: str
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param str json_folder:
+            The folder to which the json are being written
+
+            ..warning::
+                Will overwrite existing file in this folder!
+
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :return: the name of the generated file
+        :rtype: str
         """
 
+        file_path = os.path.join(json_folder, MACHINE_GRAPH_FILENAME)
         json_obj = graph_to_json(machine_graph)
 
         if progress:
@@ -63,10 +70,10 @@ class ConvertToJsonMachineGraph(object):
 
         # validate the schema
         try:
-            file_format_schemas.validate(json_obj, "machine_graph.json")
-        except Exception as ex:
-            logger.error("json valiation exception:\n {} \n {} \n".format(
-                ex.message, ex.instance))
+            file_format_schemas.validate(json_obj, MACHINE_GRAPH_FILENAME)
+        except ValidationError as ex:
+            logger.error("JSON validation exception: {}\n{}",
+                         ex.message, ex.instance)
 
         # update and complete progress bar
         if progress:

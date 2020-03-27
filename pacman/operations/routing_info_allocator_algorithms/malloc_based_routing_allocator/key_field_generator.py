@@ -54,6 +54,12 @@ class KeyFieldGenerator(object):
     ]
 
     def __init__(self, fixed_mask, fields, free_space_list):
+        """
+        :param int fixed_mask:
+        :param fields:
+        :type fields: list(Field) or None
+        :param list(ElementFreeSpace) free_space_list:
+        """
 
         self._fixed_mask = fixed_mask
         self._is_next_key = True
@@ -75,8 +81,8 @@ class KeyFieldGenerator(object):
             the_fields = [Field(0, field_max, fixed_mask)]
 
         # Check that the fields don't cross each other
-        for field in the_fields:
-            for other_field in the_fields:
+        for idx, field in enumerate(the_fields):
+            for other_field in the_fields[idx+1:]:
                 if field != other_field and field.mask & other_field.mask != 0:
                     raise PacmanRouteInfoAllocationException(
                         "Field masks {} and {} overlap".format(

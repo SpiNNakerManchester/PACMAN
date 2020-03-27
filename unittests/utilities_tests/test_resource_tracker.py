@@ -27,7 +27,7 @@ class TestResourceTracker(unittest.TestCase):
 
     def test_n_cores_available(self):
         machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
+            width=2, height=2, n_cpus_per_chip=18)
         chip = machine.get_chip_at(0, 0)
         preallocated_resources = PreAllocatedResourceContainer(
             specific_core_resources=[
@@ -58,7 +58,7 @@ class TestResourceTracker(unittest.TestCase):
 
     def test_deallocation_of_resources(self):
         machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=18, with_monitors=True)
+            width=2, height=2, n_cpus_per_chip=18)
         chip_sdram = machine.get_chip_at(1, 1).sdram.size
         res_sdram = 12345
 
@@ -115,7 +115,7 @@ class TestResourceTracker(unittest.TestCase):
         router = Router([])
         sdram = SDRAM()
         empty_chip = Chip(
-            0, 0, [], router, sdram, 0, 0, "127.0.0.1",
+            0, 0, 1, router, sdram, 0, 0, "127.0.0.1",
             virtual=False, tag_ids=[1])
         machine = machine_from_chips([empty_chip])
         resource_tracker = ResourceTracker(machine, plan_n_timesteps=None)

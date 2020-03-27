@@ -22,15 +22,12 @@ from pacman.exceptions import (
 def locate_constraints_of_type(constraints, constraint_type):
     """ Locates all constraints of a given type out of a list
 
-    :param constraints: The constraints to filter
-    :type constraints: \
-        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-    :param constraint_type: The type of constraints to return
-    :type constraint_type:\
-        :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
-    :return: The constraints of constraint_type that are found in the \
+    :param iterable(AbstractConstraint) constraints: The constraints to filter
+    :param type(AbstractConstraint) constraint_type:
+        The type of constraints to return
+    :return: The constraints of constraint_type that are found in the
         constraints given
-    :rtype: iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
+    :rtype: iterable(AbstractConstraint`)
     :raises None: no known exceptions
     """
     return [c for c in constraints if isinstance(c, constraint_type)]
@@ -39,16 +36,14 @@ def locate_constraints_of_type(constraints, constraint_type):
 def locate_first_constraint_of_type(constraints, constraint_type):
     """ Locates the first constraint of a given type out of a list
 
-    :param constraints: The constraints to select from
-    :type constraints: \
-        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-    :param constraint_type: The type of constraints to return
-    :type constraint_type:\
-        :py:class:`pacman.model.constraints.partitioner_constraints.AbstractPartitionConstraint`
-    :return: The first constraint of constraint_type that was found in the\
+    :param iterable(AbstractConstraint) constraints:
+        The constraints to select from
+    :param type(AbstractConstraint) constraint_type:
+        The type of constraints to return
+    :return: The first constraint of `constraint_type` that was found in the
         constraints given
-    :rtype: :py:class:`pacman.model.constraints.AbstractConstraint`
-    :raises pacman.exceptions.PacmanInvalidParameterException: \
+    :rtype: AbstractConstraint
+    :raises PacmanInvalidParameterException:
         If no such constraint is present
     """
     for constraint in constraints:
@@ -60,28 +55,30 @@ def locate_first_constraint_of_type(constraints, constraint_type):
 
 
 def _is_constraint_supported(constraint, supported_constraints):
+    """
+    :param AbstractConstraint constraint:
+    :param list(type(AbstractConstraint)) supported_constraints:
+    :rtype: bool
+    """
     return any(isinstance(constraint, supported_constraint)
                for supported_constraint in supported_constraints)
 
 
 def check_algorithm_can_support_constraints(
         constrained_vertices, supported_constraints, abstract_constraint_type):
-    """ Helper method to find out if an algorithm can support all the\
+    """ Helper method to find out if an algorithm can support all the
         constraints given the objects its expected to work on
 
-    :param constrained_vertices: a list of constrained vertices which each has\
-        constraints given to the algorithm
-    :type constrained_vertices: \
-        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-    :param supported_constraints: The constraints supported
-    :type supported_constraints: \
-        iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-    :param abstract_constraint_type: The overall abstract c type supported
-    :type abstract_constraint_type:\
-        :py:class:`pacman.model.constraints.AbstractConstraint`
+    :param list(AbstractVertex) constrained_vertices:
+        a list of constrained vertices which each has constraints given to the
+        algorithm
+    :param list(type(AbstractConstraint)) supported_constraints:
+        The constraints supported
+    :param type(AbstractConstraint) abstract_constraint_type:
+        The overall abstract c type supported
     :return: Nothing is returned
     :rtype: None
-    :raise pacman.exceptions.PacmanInvalidParameterException: \
+    :raise PacmanInvalidParameterException:
         When the algorithm cannot support the constraints demanded of it
     """
     for constrained_vertex in constrained_vertices:
@@ -109,23 +106,21 @@ def check_constrained_value(value, current_value):
 
 
 def expand_to_bit_array(value):
-    """ Expand a 32-bit value in to an array of length 32 of uint8 values,\
+    """ Expand a 32-bit value in to an array of length 32 of uint8 values,
         each of which is a 1 or 0
 
-    :param value: The value to expand
-    :type value: int
-    :rtype: numpy.array(uint8)
+    :param int value: The value to expand
+    :rtype: ~numpy.ndarray(uint8)
     """
     return numpy.unpackbits(
         numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
 
 
 def compress_from_bit_array(bit_array):
-    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0,\
+    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0,
         into a 32-bit value
 
-    :param bit_array: The array to compress
-    :type bit_array: numpy.array(uint8)
+    :param ~numpy.ndarray(uint8) bit_array: The array to compress
     :rtype: int
     """
     return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
@@ -135,11 +130,11 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
     """ Compress specific positions from a bit array of 32 uint8 value,\
         where is a 1 or 0, into a 32-bit value.
 
-    :param bit_array: The array to extract the value from
-    :type bit_array: numpy.array(uint8)
-    :param bit_positions: The positions of the bits to extract, each value\
-        being between 0 and 31
-    :type bit_positions: numpy.array(int)
+    :param ~numpy.ndarray(uint8) bit_array:
+        The array to extract the value from
+    :param ~numpy.ndarray(int) bit_positions:
+        The positions of the bits to extract,
+        each value being between 0 and 31
     :rtype: int
     """
     expanded_value = numpy.zeros(32, dtype="uint8")
@@ -150,12 +145,16 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
 def is_equal_or_None(a, b):
     """ If a and b are both not None, return True iff they are equal,\
         otherwise return True
+
+    :rtype: bool
     """
     return (a is None or b is None or a == b)
 
 
 def is_single(iterable):
     """ Test if there is exactly one item in the iterable
+
+    :rtype: bool
     """
     iterator = iter(iterable)
 
@@ -174,16 +173,16 @@ def is_single(iterable):
 def md5(string):
     """ Get the MD5 hash of the given string, which is UTF-8 encoded.
 
-    :type string: str
+    :param str string:
     :rtype: str
     """
     return hashlib.md5(string.encode()).hexdigest()
 
 
-def ident(object):  # @ReservedAssignment
+def ident(object):  # @ReservedAssignment pylint: disable=redefined-builtin
     """ Get the ID of the given object.
 
-    :type object: object
+    :param object object:
     :rtype: str
     """
     return str(id(object))

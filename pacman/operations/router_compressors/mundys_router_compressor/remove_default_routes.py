@@ -19,6 +19,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_
 """
 
 from .utils import intersect
+from pacman.exceptions import MinimisationFailedError
 
 
 def minimise(table, target_length, check_for_aliases=True):
@@ -26,14 +27,13 @@ def minimise(table, target_length, check_for_aliases=True):
     Remove from the routing table any entries which could be replaced by
     default routing.
 
-    :param routing_table: Routing entries to be merged.
-    :type routing_table: RoutingTableEntry
-    :param target_length :
+    :param RoutingTableEntry routing_table: Routing entries to be merged.
+    :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
         possible. If None then the table will be made as small as possible.
-    :type target_length : int or None
-    :param check_for_aliases:
+    :type target_length: int or None
+    :param bool check_for_aliases:
         If True (the default), default-route candidates are checked for aliased
         entries before suggesting a route may be default routed. This check is
         required to ensure correctness in the general case but has a runtime
@@ -42,10 +42,9 @@ def minimise(table, target_length, check_for_aliases=True):
         If False, the alias-check is skipped resulting in O(N) runtime. This
         option should only be used if the supplied table is guaranteed not to
         contain any aliased entries.
-
-    :return: list(RoutingTableEntry)
-    :raises MinimisationFailedError
-        If the smallest table that can be produced is larger than
+    :rtype: list(RoutingTableEntry)
+    :raises MinimisationFailedError: \
+        If the smallest table that can be produced is larger than \
         `target_length`.
     """
     # If alias checking is required, see if we can cheaply prove that no
@@ -69,5 +68,8 @@ def minimise(table, target_length, check_for_aliases=True):
             if any(intersect(key, mask, d.key, d.mask) for
                     d in table[i + 1:]):
                 new_table.append(entry)
+
+    if target_length and len(new_table) > target_length:
+        raise MinimisationFailedError(target_length, len(new_table))
 
     return new_table

@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict, OrderedDict
-except ImportError:
-    from collections import defaultdict, OrderedDict
+from collections import defaultdict, OrderedDict
 import logging
 from six import iteritems, itervalues
 from spinn_utilities.log import FormatAdapter
@@ -37,17 +34,21 @@ from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
     import (
         check_types_of_edge_constraint, get_edge_groups,
         generate_key_ranges_from_mask)
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanRouteInfoAllocationException)
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from .utils import get_possible_masks
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
-    """ A Routing Info Allocation Allocator algorithm that keeps track of\
-        free keys and attempts to allocate them as requested, but that also\
+    """ A Routing Info Allocation Allocator algorithm that keeps track of
+        free keys and attempts to allocate them as requested, but that also
         looks at routing tables in an attempt to make things more compressible
+
+    :param MachineGraph machine_graph:
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+    :param MulticastRoutingTableByPartition routing_tables:
+    :rtype: RoutingInfo
     """
 
     __slots__ = []
@@ -57,6 +58,12 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             [(0, 2 ** 32)])
 
     def __call__(self, machine_graph, n_keys_map, routing_tables):
+        """
+        :param MachineGraph machine_graph:
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+        :param MulticastRoutingTableByPartition routing_tables:
+        :rtype: RoutingInfo
+        """
         # check that this algorithm supports the constraints
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
@@ -73,16 +80,12 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         routing_infos = RoutingInfo()
 
         # Get the edges grouped by those that require the same key
-        (fixed_keys, _shared_keys, fixed_masks, fixed_fields, flexi_fields,
-         continuous, noncontinuous) = get_edge_groups(
+        (fixed_keys, _shared_keys, fixed_masks, fixed_fields, continuous,
+         noncontinuous) = get_edge_groups(
              machine_graph, EdgeTrafficType.MULTICAST)
-        if flexi_fields:
-            raise PacmanConfigurationException(
-                "MallocBasedRoutingInfoAllocator does not support FlexiField")
 
         # Even non-continuous keys will be continuous
-        for group in noncontinuous:
-            continuous.append(group)
+        continuous.extend(noncontinuous)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(
@@ -200,16 +203,24 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         return routing_infos
 
     @staticmethod
-    def _update_routing_objects(keys_and_masks, routing_infos, group):
+    def _update_routing_objects(
+            keys_and_masks, routing_infos, partition):
+        """
+        :param iterable(BaseKeyAndMask) keys_and_masks:
+        :param RoutingInfo routing_infos:
+        :param OutgoingEdgePartition partition:
+        """
         # Allocate the routing information
         routing_infos.add_partition_info(PartitionRoutingInfo(
-            keys_and_masks, group))
+            keys_and_masks, partition))
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks):
         """ Allocate fixed keys and masks
 
-        :param keys_and_masks: set of keys and masks
+        :param iterable(BaseKeyAndMask) keys_and_masks:
+            the fixed keys and masks combos
         :rtype: None
+        :raises PacmanRouteInfoAllocationException:
         """
         # If there are fixed keys and masks, allocate them
         for key_and_mask in keys_and_masks:
@@ -220,6 +231,16 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys,
                                  contiguous_keys=True):
+        """
+        :param fixed_mask:
+        :type fixed_mask: int or None
+        :param fields:
+        :type fields: iterable(Field) or None
+        :param int partition_n_keys:
+        :param bool contiguous_keys:
+        :rtype: list(BaseKeyAndMask)
+        :raises PacmanRouteInfoAllocationException:
+        """
         # If there isn't a fixed mask, generate a fixed mask based
         # on the number of keys required
         masks_available = [fixed_mask]

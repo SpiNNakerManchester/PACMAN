@@ -43,7 +43,7 @@ class TestSameChipConstraint(unittest.TestCase):
         random.seed(12345)
         for vertex in same_vertices:
             graph.add_vertex(vertex)
-            for i in range(0, random.randint(1, 5)):
+            for _i in range(0, random.randint(1, 5)):
                 vertex.add_constraint(
                     SameChipAsConstraint(
                         vertices[random.randint(0, 99)]))
@@ -75,7 +75,7 @@ class TestSameChipConstraint(unittest.TestCase):
                 if isinstance(constraint, SameChipAsConstraint):
                     other_placement = placements.get_placement_of_vertex(
                         constraint.vertex)
-                    self.assert_(
+                    self.assertTrue(
                         other_placement.x == placement.x and
                         other_placement.y == placement.y,
                         "Vertex was not placed on the same chip as requested")

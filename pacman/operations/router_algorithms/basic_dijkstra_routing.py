@@ -27,6 +27,11 @@ infinity = float("inf")
 
 
 class _NodeInfo(object):
+    """
+    :ivar list(~spinn_machine.Link) neighbours:
+    :ivar list(float) bws:
+    :ivar list(float) weights:
+    """
     __slots__ = ["neighbours", "bws", "weights"]
 
     def __init__(self):
@@ -51,6 +56,16 @@ class BasicDijkstraRouting(object):
     """ An routing algorithm that can find routes for edges between vertices\
         in a machine graph that have been placed on a machine by the use of a\
         Dijkstra shortest path algorithm.
+
+    :param Placements placements: The placements of the edges
+    :param ~spinn_machine.Machine machine:
+        The machine through which the routes are to be found
+    :param MachineGraph machine_graph: the machine_graph object
+    :param bool use_progress_bar: whether to show a progress bar
+    :return: The discovered routes
+    :rtype: MulticastRoutingTables
+    :raise PacmanRoutingException:
+        If something goes wrong with the routing
     """
 
     __slots__ = [
@@ -73,23 +88,17 @@ class BasicDijkstraRouting(object):
     def __call__(self, placements, machine, machine_graph,
                  bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW,
                  use_progress_bar=True):
-        """ Find routes between the edges with the allocated information,\
+        """ Find routes between the edges with the allocated information,
             placed in the given places
 
-        :param placements: The placements of the edges
-        :type placements:\
-            :py:class:`pacman.model.placements.Placements`
-        :param machine: The machine through which the routes are to be found
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param machine_graph: the machine_graph object
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param use_progress_bar: whether to show a progress bar
-        :type use_progress_bar: bool
+        :param Placements placements: The placements of the edges
+        :param ~spinn_machine.Machine machine:
+            The machine through which the routes are to be found
+        :param MachineGraph machine_graph: the machine_graph object
+        :param bool use_progress_bar: whether to show a progress bar
         :return: The discovered routes
-        :rtype:\
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTables`
-        :raise pacman.exceptions.PacmanRoutingException: \
+        :rtype: MulticastRoutingTables
+        :raise PacmanRoutingException:
             If something goes wrong with the routing
         """
 
@@ -114,10 +123,19 @@ class BasicDijkstraRouting(object):
         return self._routing_paths
 
     def _route(self, placement, placements, machine, graph, node_info, tables):
+        """
+        :param Placement placement:
+        :param Placements placements:
+        :param ~spinn_machine.Machine machine:
+        :param MachineGraph graph:
+        :param dict(tuple(int,int),_NodeInfo) node_info:
+        :param dict(tuple(int,int),_DijkstraInfo) tables:
+        """
         # pylint: disable=too-many-arguments
-        out_going_edges = filter(
-            lambda edge: edge.traffic_type == EdgeTrafficType.MULTICAST,
-            graph.get_edges_starting_at_vertex(placement.vertex))
+        out_going_edges = (
+            edge
+            for edge in graph.get_edges_starting_at_vertex(placement.vertex)
+            if edge.traffic_type == EdgeTrafficType.MULTICAST)
 
         dest_chips = set()
         edges_to_route = list()
@@ -147,11 +165,9 @@ class BasicDijkstraRouting(object):
         """ Set up a dictionary which contains data for each chip in the\
             machine
 
-        :param machine: the machine object
-        :type machine: spinn_machine.Machine
+        :param ~spinn_machine.Machine machine: the machine object
         :return: nodes_info dictionary
-        :rtype: dict
-        :raise None: this method does not raise any known exceptions
+        :rtype: dict(tuple(int,int),_NodeInfo)
         """
         nodes_info = dict()
         for chip in machine.chips:
@@ -171,11 +187,9 @@ class BasicDijkstraRouting(object):
         """ Set up the Dijkstra's table which includes if you've reached a\
             given node
 
-        :param machine: the machine object
-        :type machine: the spinn_machine.Machine object
+        :param ~spinn_machine.Machine machine: the machine object
         :return: the  Dijkstra's table dictionary
-        :rtype: dict
-        :raise None: this method does not raise any known exception
+        :rtype: dict(tuple(int,int),_DijkstraInfo)
         """
         # Holds all the information about nodes within one full run of
         # Dijkstra's algorithm
@@ -187,10 +201,8 @@ class BasicDijkstraRouting(object):
     def _update_all_weights(self, nodes_info):
         """ Change the weights of the neighbouring nodes
 
-        :param nodes_info: the node info dictionary
-        :type nodes_info: dict
-        :rtype: None
-        :raise None: this method does not raise any known exception
+        :param dict(tuple(int,int),_NodeInfo) nodes_info:
+            the node info dictionary
         """
         for key in nodes_info:
             if nodes_info[key] is not None:
@@ -199,12 +211,10 @@ class BasicDijkstraRouting(object):
     def _update_neighbour_weights(self, nodes_info, key):
         """ Change the weights of the neighbouring nodes
 
-        :param nodes_info: the node info dictionary
-        :param key: the identifier to the object in nodes_info
-        :type key: str
-        :type nodes_info: dict
-        :rtype: None
-        :raise None: this method does not raise any known exception
+        :param dict(tuple(int,int),_NodeInfo) nodes_info:
+            the node info dictionary
+        :param tuple(int,int) key:
+            the identifier to the object in `nodes_info`
         """
         for n, neighbour in enumerate(nodes_info[key].neighbours):
             if neighbour is not None:
@@ -214,10 +224,8 @@ class BasicDijkstraRouting(object):
     def _reset_tables(tables):
         """ Reset the Dijkstra tables for a new path search
 
-        :param tables: the dictionary object for the Dijkstra-tables
-        :type tables: dict
-        :rtype: None
-        :raise None: this method does not raise any known exception
+        :param dict(tuple(int,int),_DijkstraInfo) tables:
+            the dictionary object for the Dijkstra-tables
         """
         for key in tables:
             tables[key] = _DijkstraInfo()
@@ -227,20 +235,16 @@ class BasicDijkstraRouting(object):
         """ Propagate the weights till the destination nodes of the source\
             nodes are retraced
 
-        :param tables: the dictionary object for the Dijkstra-tables
-        :param nodes_info: \
+        :param dict(tuple(int,int),_DijkstraInfo) tables:
+            the dictionary object for the Dijkstra-tables
+        :param dict(tuple(int,int),_NodeInfo) nodes_info:
             the dictionary object for the nodes inside a route scope
-        :param dest_chips:
-        :param x_source:
-        :param y_source:
-        :type tables: dict
-        :type nodes_info: dict
-        :type dest_chips:
-        :type x_source: int
-        :type y_source: int
-        :rtype: None
-        :raise PacmanRoutingException: when the destination node could not be\
-            reached from this source node.
+        :param set(tuple(int,int)) dest_chips:
+        :param int x_source:
+        :param int y_source:
+        :raise PacmanRoutingException:
+            when the destination node could not be reached from this source
+            node
         """
 
         dest_chips_to_find = set(dest_chips)
@@ -272,6 +276,10 @@ class BasicDijkstraRouting(object):
 
     @staticmethod
     def _minimum(tables):
+        """
+        :param dict(tuple(int,int),_DijkstraInfo) tables:
+        :rtype: tuple(int,int)
+        """
         # This is the lowest cost across ALL deactivated nodes in the graph.
         lowest_cost = sys.maxsize
         lowest = None
@@ -296,8 +304,12 @@ class BasicDijkstraRouting(object):
     def _update_neighbour(tables, neighbour, current, source, weight):
         """ Update the lowest cost for each neighbour_xy of a node
 
-        :rtype: None
-        :raise PacmanRoutingException: when the algorithm goes to a node that\
+        :param dict(tuple(int,int),_DijkstraInfo) tables:
+        :param ~spinn_machine.Link neighbour:
+        :param tuple(int,int) current:
+        :param tuple(int,int) source:
+        :param float weight:
+        :raise PacmanRoutingException: when the algorithm goes to a node that
             doesn't exist in the machine or the node's cost was set too low.
         """
         neighbour_xy = (neighbour.destination_x, neighbour.destination_y)
@@ -327,24 +339,18 @@ class BasicDijkstraRouting(object):
     def _retrace_back_to_source(
             self, dest, tables, edge, nodes_info, source_processor, graph):
         """
-
-        :param dest: Destination placement
-        :param tables:
-        :param edge:
-        :param nodes_info:
-        :param source_processor:
-        :param graph:
-        :type nodes_info: dict( _NodeInfo )
-        :type edge:
-        :type dest: Placement
-        :type tables: dict( _DijkstraInfo )
-        :type graph:
+        :param Placement dest: Destination placement
+        :param dict(tuple(int,int),_DijkstraInfo) tables:
+        :param MachineEdge edge:
+        :param dict(tuple(int,int),_NodeInfo) nodes_info:
+        :param int source_processor:
+        :param MachineGraph graph:
         :return: the next coordinates to look into
-        :rtype: (int, int)
-        :raise PacmanRoutingException: \
-            when the algorithm doesn't find a next point to search from. AKA,\
-            the neighbours of a chip do not have a cheaper cost than the node\
-            itself, but the node is not the destination or when the algorithm\
+        :rtype: tuple(int, int)
+        :raise PacmanRoutingException:
+            when the algorithm doesn't find a next point to search from. AKA,
+            the neighbours of a chip do not have a cheaper cost than the node
+            itself, but the node is not the destination or when the algorithm
             goes to a node that's not considered in the weighted search.
         """
         # Set the tracking node to the destination to begin with
@@ -402,8 +408,17 @@ class BasicDijkstraRouting(object):
             nodes_info, x, y, previous_entry, edge, graph):
         """ Create a new routing entry
 
+        :param tuple(int,int) neighbour_xy:
+        :param dict(tuple(int,int),_DijkstraInfo) tables:
+        :param int neighbour_index:
+        :param dict(tuple(int,int),_NodeInfo) nodes_info:
+        :param int x:
+        :param int y:
+        :param MulticastRoutingTableByPartitionEntry previous_entry:
+        :param MachineEdge edge:
+        :param MachineGraph graph:
         :return: x, y, previous_entry, made_an_entry
-        :rtype: int, int, spinn_machine.MulticastRoutingEntry, bool
+        :rtype: tuple(int, int, MulticastRoutingTableByPartitionEntry, bool)
         :raise PacmanRoutingException: \
             when the bandwidth of a router is beyond expected parameters
         """
@@ -444,17 +459,20 @@ class BasicDijkstraRouting(object):
 
     @staticmethod
     def _close_enough(v1, v2, delta=0.00000000001):
+        """
+        :param float v1:
+        :param float v2:
+        :param float delta: How close values have to be to be "equal"
+        """
         return abs(v1 - v2) < delta
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
         """ Determine the direction of a link to go down
 
-        :param neighbour_position: the position the neighbour is at
-        :type neighbour_position: int
+        :param int neighbour_position: the position the neighbour is at
         :return: The position of the opposite link
         :rtype: int
-        :raise None: this method does not raise any known exceptions
         """
 
         if neighbour_position == 0:

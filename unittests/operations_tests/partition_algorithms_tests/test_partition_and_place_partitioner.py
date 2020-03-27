@@ -19,10 +19,10 @@ test for partitioning
 from __future__ import division
 import unittest
 from spinn_machine import (
-    Processor, SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
+    SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
-    PacmanPartitionException, PacmanInvalidParameterException,
+    PacmanException, PacmanPartitionException, PacmanInvalidParameterException,
     PacmanValueError)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
@@ -32,9 +32,9 @@ from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
-class TestBasicPartitioner(unittest.TestCase):
+class TestPartitionAndPlacePartitioner(unittest.TestCase):
     """
-    test for basic partitioning algorithm
+    test for partition-and-place partitioning algorithm
     """
 
     def setup(self):
@@ -55,23 +55,20 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertices(self.verts)
         self.graph.add_edges(self.edges, "foo")
 
-        flops = 200000000
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**20))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -79,9 +76,10 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp = PartitionAndPlacePartitioner()
@@ -157,24 +155,21 @@ class TestBasicPartitioner(unittest.TestCase):
         test that partitioning will work when close to filling the machine
         """
         self.setup()
-        flops = 200000000
-        (e, _, n, w, _, s) = range(6)
 
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(2**12)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -182,12 +177,14 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
-        singular_vertex = SimpleTestVertex(450, "Large vertex",
+        n_neurons = 17 * 5 * 5
+        singular_vertex = SimpleTestVertex(n_neurons, "Large vertex",
                                            max_atoms_per_core=1)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
@@ -195,7 +192,7 @@ class TestBasicPartitioner(unittest.TestCase):
         graph, _, _ = self.bp(self.graph, self.machine,
                               PreAllocatedResourceContainer())
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
-        self.assertEqual(len(list(graph.vertices)), 450)
+        self.assertEqual(len(list(graph.vertices)), n_neurons)
 
     def test_partition_with_insufficient_space(self):
         """
@@ -203,24 +200,20 @@ class TestBasicPartitioner(unittest.TestCase):
         raise an error
         """
         self.setup()
-        flops = 1000
-        (e, _, n, w, _, s) = range(6)
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(2**11)
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -228,9 +221,10 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
@@ -247,24 +241,20 @@ class TestBasicPartitioner(unittest.TestCase):
         in that it has less SDRAM available
         """
         self.setup()
-        flops = 200000000
-        (e, _, n, w, _, s) = range(6)
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**19))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -272,9 +262,10 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
@@ -285,24 +276,20 @@ class TestBasicPartitioner(unittest.TestCase):
         in that it has more SDRAM available
         """
         self.setup()
-        flops = 200000000
-        (e, _, n, w, _, s) = range(6)
-
-        processors = list()
-        for i in range(18):
-            processors.append(Processor(i, flops))
+        n_processors = 18
+        (e, ne, n, w, _, _) = range(6)
 
         links = list()
-        links.append(Link(0, 0, 0, 0, 1))
+        links.append(Link(0, 0, e, 0, 1))
 
         _sdram = SDRAM(128 * (2**21))
 
         links = list()
 
-        links.append(Link(0, 0, 0, 1, 1))
-        links.append(Link(0, 1, 1, 1, 0))
-        links.append(Link(1, 1, 2, 0, 0))
-        links.append(Link(1, 0, 3, 0, 1))
+        links.append(Link(0, 0, e, 1, 1))
+        links.append(Link(0, 1, ne, 1, 0))
+        links.append(Link(1, 1, n, 0, 0))
+        links.append(Link(1, 0, w, 0, 1))
         r = Router(links, False, 1024)
 
         ip = "192.162.240.253"
@@ -310,9 +297,10 @@ class TestBasicPartitioner(unittest.TestCase):
         for x in range(5):
             for y in range(5):
                 if x == y == 0:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, ip))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(x, y, processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(
+                        x, y, n_processors, r, _sdram, 0, 0, None))
 
         self.machine = machine_from_chips(chips)
         self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
@@ -419,7 +407,7 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex_2.add_constraint(SameAtomsAsVertexConstraint(
             vertex_1))
         graph.add_vertices([vertex_1, vertex_2, vertex_3])
-        machine = virtual_machine(version=3)
+        machine = virtual_machine(width=2, height=2)
         partitioner = PartitionAndPlacePartitioner()
         _, graph_mapper, _ = partitioner(graph, machine, plan_n_timesteps=None)
         subvertices_1 = list(graph_mapper.get_machine_vertices(vertex_1))
@@ -437,38 +425,6 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         partitioner(self.graph, self.machine, PreAllocatedResourceContainer())
 
-    @unittest.skip("Test not implemented yet")
-    def test_detect_subclass_hierarchy(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_partition_by_atoms(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_scale_down_resource_usage(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_scale_up_resource_usage(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_find_max_ratio(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_locate_vertices_to_partition_now(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_partition_with_supported_constraints_enough_space(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
-    @unittest.skip("Test not implemented yet")
-    def test_partition_with_supported_constraints_not_enough_space(self):
-        self.assertEqual(True, False, "Test not implemented yet")
-
     def test_partition_with_fixed_atom_constraints(self):
         """
         test a partitioning with a graph with fixed atom constraint
@@ -479,8 +435,7 @@ class TestBasicPartitioner(unittest.TestCase):
         n_cores_per_chip = 10
         sdram_per_chip = (n_cores_per_chip * 2) - 1
         machine = virtual_machine(
-            width=2, height=2, with_monitors=False,
-            n_cpus_per_chip=n_cores_per_chip,
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
 
         # Create a vertex where each atom requires 1MB (default) of SDRAM
@@ -494,7 +449,7 @@ class TestBasicPartitioner(unittest.TestCase):
         app_graph.add_vertex(vertex)
 
         # Do the partitioning - this should result in an error
-        with self.assertRaises(PacmanPartitionException):
+        with self.assertRaises(PacmanException):
             partitioner = PartitionAndPlacePartitioner()
             partitioner(app_graph, machine, plan_n_timesteps=None)
 
@@ -506,11 +461,10 @@ class TestBasicPartitioner(unittest.TestCase):
 
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
         # and 8MB SDRAM per chip
-        n_cores_per_chip = 1
+        n_cores_per_chip = 2  # remember 1 is the monitor
         sdram_per_chip = 8
         machine = virtual_machine(
-            width=2, height=2, with_monitors=False,
-            n_cpus_per_chip=n_cores_per_chip,
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
             sdram_per_chip=sdram_per_chip)
 
         # Create a vertex which will need to be split perfectly into 4 cores
@@ -525,7 +479,7 @@ class TestBasicPartitioner(unittest.TestCase):
         partitioner = PartitionAndPlacePartitioner()
         machine_graph, _, _ = partitioner(
             app_graph, machine, plan_n_timesteps=None)
-        self.assert_(len(machine_graph.vertices) == 4)
+        self.assertEqual(4, len(machine_graph.vertices))
 
 
 if __name__ == '__main__':

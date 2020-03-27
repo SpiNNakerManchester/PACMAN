@@ -28,6 +28,16 @@ class DestinationBasedRoutingInfoAllocator(object):
     """ A routing key allocator that operates for people who wish to have a\
         separate key for each destination (making a multicast into a\
         point-to-point cast).
+
+    :param MachineGraph machine_graph:
+        The graph to allocate the routing info for
+    :param Placements placements: The placements of the vertices
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the edges
+    :return: The routing information
+    :rtype: tuple(RoutingInfo, MulticastRoutingTable)
+    :raise PacmanRouteInfoAllocationException:
+        If something goes wrong with the allocation
     """
 
     __slots__ = []
@@ -37,21 +47,15 @@ class DestinationBasedRoutingInfoAllocator(object):
 
     def __call__(self, machine_graph, placements, n_keys_map):
         """
-        :param machine_graph: The graph to allocate the routing info for
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param placements: The placements of the vertices
-        :type placements:\
-            :py:class:`pacman.model.placements.Placements`
-        :param n_keys_map: A map between the edges and the number of keys\
-            required by the edges
-        :type n_keys_map:\
-            :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
+        :param MachineGraph machine_graph:
+            The graph to allocate the routing info for
+        :param Placements placements: The placements of the vertices
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            A map between the edges and the number of keys required by the
+            edges
         :return: The routing information
-        :rtype: \
-            :py:class:`pacman.model.routing_info.RoutingInfo`, \
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTable
-        :raise pacman.exceptions.PacmanRouteInfoAllocationException: \
+        :rtype: tuple(RoutingInfo, MulticastRoutingTable)
+        :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """
 
@@ -77,6 +81,14 @@ class DestinationBasedRoutingInfoAllocator(object):
         return routing_infos, routing_tables
 
     def _allocate_partition_route(self, edge, placements, graph, n_keys_map):
+        """
+        :param MachineEdge edge:
+        :param Placements placements:
+        :param MachineGraph graph:
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+        :rtype: PartitionRoutingInfo
+        :raises PacmanConfigurationException:
+        """
         destination = edge.post_vertex
         placement = placements.get_placement_of_vertex(destination)
         keys_and_masks = list([BaseKeyAndMask(
@@ -94,9 +106,7 @@ class DestinationBasedRoutingInfoAllocator(object):
     def _get_key_from_placement(placement):
         """ Return a key given a placement
 
-        :param placement: the associated placement
-        :type placement:\
-            :py:class:`pacman.model.placements.Placement`
+        :param Placement placement: the associated placement
         :return: The key
         :rtype: int
         """

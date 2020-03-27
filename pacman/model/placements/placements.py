@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from six import iterkeys, itervalues, raise_from
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
@@ -39,12 +36,10 @@ class Placements(object):
 
     def __init__(self, placements=None):
         """
-        :param placements: Any initial placements
-        :type placements:\
-            iterable(:py:class:`pacman.model.placements.Placement`)
-        :raise PacmanAlreadyPlacedError:\
+        :param iterable(Placement) placements: Any initial placements
+        :raise PacmanAlreadyPlacedError:
             If there is any vertex with more than one placement.
-        :raise PacmanProcessorAlreadyOccupiedError:\
+        :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
         self._placements = OrderedDict()
@@ -63,9 +58,7 @@ class Placements(object):
     def add_placements(self, placements):
         """ Add some placements
 
-        :param placements: The placements to add
-        :type placements:\
-            iterable(:py:class:`pacman.model.placements.Placement`)
+        :param iterable(Placement) placements: The placements to add
         """
         for placement in placements:
             self.add_placement(placement)
@@ -73,15 +66,13 @@ class Placements(object):
     def add_placement(self, placement):
         """ Add a placement
 
-        :param placement: The placement to add
-        :type placement:\
-            :py:class:`pacman.model.placements.placement.Placement`
-        :raise PacmanAlreadyPlacedError:\
+        :param Placement placement: The placement to add
+        :raise PacmanAlreadyPlacedError:
             If there is any vertex with more than one placement.
-        :raise PacmanProcessorAlreadyOccupiedError:\
+        :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        placement_id = (placement.x, placement.y, placement.p)
+        placement_id = placement.location
         if placement_id in self._placements:
             raise PacmanProcessorAlreadyOccupiedError(placement_id)
         if placement.vertex in self._machine_vertices:
@@ -91,18 +82,15 @@ class Placements(object):
         self._machine_vertices[placement.vertex] = placement
 
     def get_vertex_on_processor(self, x, y, p):
-        """ Return the vertex on a specific processor or None if the\
-            processor has not been allocated
+        """ Return the vertex on a specific processor or raises an exception
+            if the processor has not been allocated
 
-        :param x: the x coordinate of the chip
-        :type x: int
-        :param y: the y coordinate of the chip
-        :type y: int
-        :param p: the processor on the chip
-        :type p: int
+        :param int x: the x coordinate of the chip
+        :param int y: the y coordinate of the chip
+        :param int p: the processor on the chip
         :return: the vertex placed on the given processor
-        :rtype: :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :raise PacmanProcessorNotOccupiedError:\
+        :rtype: MachineVertex
+        :raise PacmanProcessorNotOccupiedError:
             If the processor is not occupied
         """
         placement_id = (x, y, p)
@@ -114,10 +102,9 @@ class Placements(object):
     def get_placement_of_vertex(self, vertex):
         """ Return the placement information for a vertex
 
-        :param vertex: The vertex to find the placement of
-        :type vertex: :py:class:`pacman.model.graphs.machine.MachineVertex`
+        :param MachineVertex vertex: The vertex to find the placement of
         :return: The placement
-        :rtype: :py:class:`pacman.model.placements.Placement`
+        :rtype: Placement
         :raise PacmanNotPlacedError: If the vertex has not been placed.
         """
         try:
@@ -148,8 +135,7 @@ class Placements(object):
         """ All of the placements
 
         :return: iterable of placements
-        :rtype: iterable(:py:class:`pacman.model.placements.Placement`)
-        :raise None: does not raise any known exceptions
+        :rtype: iterable(Placement)
         """
         return itervalues(self._placements)
 
@@ -161,7 +147,6 @@ class Placements(object):
 
     def __iter__(self):
         """ An iterator for the placements object within
-
         """
         return iter(self.placements)
 

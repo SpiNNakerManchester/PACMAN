@@ -13,8 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from enum import Enum
 import uuid
-from .flexi_field import SUPPORTED_TAGS
+
+
+class SUPPORTED_TAGS(Enum):
+    APPLICATION = 0
+    ROUTING = 1
 
 
 class Field(object):
@@ -22,23 +27,22 @@ class Field(object):
     """
 
     __slots__ = [
-        # the low bit in the routing table entry for this field
         "_lo",
-
-        # the high bit in the routing table entry for this field
         "_hi",
-
-        # the value to store in this field
         "_value",
-
-        # field tag
         "_tag",
-
-        # field name
         "_name"
     ]
 
     def __init__(self, lo, hi, value, tag=SUPPORTED_TAGS.ROUTING, name=None):
+        """
+        :param int lo: the low bit in the routing table entry for this field
+        :param int hi: the high bit in the routing table entry for this field
+        :param int value: the value to store in this field
+        :param SUPPORTED_TAGS tag: field tag
+        :param name: field name
+        :type name: str or None
+        """
         # pylint: disable=too-many-arguments
         self._lo = lo
         self._hi = hi
@@ -48,14 +52,26 @@ class Field(object):
 
     @property
     def lo(self):
+        """ the low bit in the routing table entry for this field
+
+        :rtype: int
+        """
         return self._lo
 
     @property
     def hi(self):
+        """ the high bit in the routing table entry for this field
+
+        :rtype: int
+        """
         return self._hi
 
     @property
     def name(self):
+        """ field name
+
+        :rtype: str or ~uuid.UUID
+        """
         return self._name
 
     @name.setter
@@ -64,6 +80,10 @@ class Field(object):
 
     @property
     def value(self):
+        """ the value to store in this field
+
+        :rtype: int
+        """
         return self._value
 
     @value.setter
@@ -72,6 +92,10 @@ class Field(object):
 
     @property
     def tag(self):
+        """ field tag
+
+        :rtype: SUPPORTED_TAGS
+        """
         return self._tag
 
     @tag.setter

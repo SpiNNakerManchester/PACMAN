@@ -34,13 +34,21 @@ class AbstractCompressor(object):
     __slots__ = [
         # Max length below which the algorithm should stop compressing
         "_target_length",
-        # String of problems detected. Must be "" to finsih
+        # String of problems detected. Must be "" to finish
         "_problems",
-        # Flag to say if the results can be order dependant
+        # Flag to say if the results can be order dependent
         "_ordered",
     ]
 
+    def __init__(self, ordered=True):
+        self._ordered = ordered
+
     def __call__(self, router_tables, target_length=None):
+        """
+        :param MulticastRoutingTables router_tables:
+        :param int target_length:
+        :rtype: MulticastRoutingTables
+        """
         if target_length is None:
             self._target_length = 0  # Compress as much as you can
         else:
@@ -56,44 +64,40 @@ class AbstractCompressor(object):
     def intersect(key_a, mask_a, key_b, mask_b):
         """
         Return if key-mask pairs intersect (i.e., would both match some of
-            the same keys).
+        the same keys).
 
         For example, the key-mask pairs ``00XX`` and ``001X`` both match the
-            keys``0010`` and ``0011`` (i.e., they do intersect)::
+        keys``0010`` and ``0011`` (i.e., they do intersect)::
 
             >>> intersect(0b0000, 0b1100, 0b0010, 0b1110)
             True
 
         But the key-mask pairs ``00XX`` and ``11XX`` do not match any of the
-            same keys (i.e., they do not intersect)::
+        same keys (i.e., they do not intersect)::
 
             >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
             False
 
-        :param key_a: The key of first key-mask pair
-        :type key_a : int
-        :param mask_a: The mask of first key-mask pair
-        :type key_b: int
-        :param key_b: The key of second key-mask pair
-        :type key_b : int
-        :param mask_b: The mask of second key-mask pair
-        :type key_b: int
+        :param int key_a: The key of first key-mask pair
+        :param int mask_a: The mask of first key-mask pair
+        :param int key_b: The key of second key-mask pair
+        :param int mask_b: The mask of second key-mask pair
         :return: True if the two key-mask pairs intersect otherwise False.
+        :rtype: bool
         """
         return (key_a & mask_b) == (key_b & mask_a)
 
     def merge(self, entry1, entry2):
-        """
-        Merges two entries/triples into one that covers both
+        """ Merges two entries/triples into one that covers both
 
         The assumption is that they both have the same known spinnaker_route
 
-        :param entry1: Key, Mask, defaultable from the first entry
-        :type entry1: Entry
-        :param entry2: Key, Mask, defaultable from the second entry
-        :type entry2: Entry
+        :param ~pacman.operations.router_compressors.Entry entry1:
+            Key, Mask, defaultable from the first entry
+        :param ~pacman.operations.router_compressors.Entry entry2:
+            Key, Mask, defaultable from the second entry
         :return: Key, Mask, defaultable from merged entry
-        :rtype: (int, int, bool)
+        :rtype: tuple(int, int, bool)
         """
         any_ones = entry1.key | entry2.key
         all_ones = entry1.key & entry2.key
@@ -108,19 +112,22 @@ class AbstractCompressor(object):
 
     @abstractmethod
     def compress_table(self, router_table):
-        pass
+        """
+        :param MulticastRoutingTable router_table:
+        :rtype: MulticastRoutingTable
+        """
 
     def compress_tables(self, router_tables, progress):
-        """
-        Compress all the unordered routing tables
+        """ Compress all the unordered routing tables
 
         Tables who start of smaller than target_length are not compressed
 
-        :param router_tables: Routing tables
-        :type router_tables: MulticastRoutingTables
-        :param progress: Progress bar to show while working
-        :tpye progress: ProgressBar
+        :param MulticastRoutingTables router_tables: Routing tables
+        :param ~spinn_utilities.progress_bar.ProgressBar progress:
+            Progress bar to show while working
         :return: The compressed but still unordered routing tables
+        :rtype: MulticastRoutingTables
+        :raises MinimisationFailedError: on failure
         """
         compressed_tables = MulticastRoutingTables()
         self._problems = ""
@@ -149,3 +156,7 @@ class AbstractCompressor(object):
             else:
                 logger.warning(self._problems)
         return compressed_tables
+
+    @property
+    def ordered(self):
+        return self._ordered

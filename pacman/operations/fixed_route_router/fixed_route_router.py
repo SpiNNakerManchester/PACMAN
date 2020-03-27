@@ -21,18 +21,36 @@ from pacman.exceptions import (
 
 
 class FixedRouteRouter(object):
+    """ Computes the fixed routes used to direct data out traffic to the
+        board-local gatherer processors.
+
+    :param ~spinn_machine.Machine machine: SpiNNMachine object
+    :param Placements placements: placements object
+    :param destination_class: the destination class to route packets to
+    :type destination_class: type or tuple(type,...)
+    :return: router tables for fixed route paths
+    :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
+    :raises PacmanConfigurationException: if no placement processor found
+    :raises PacmanRoutingException:
+    :raises PacmanAlreadyExistsException:
+    """
+
     __slots__ = [
         "_destination_class", "_fixed_route_tables",
         "_machine", "_placements"]
 
-    def __call__(self, machine, placements, board_version, destination_class):
+    def __call__(self, machine, placements, destination_class):
         """ Runs the fixed route generator for all boards on machine
 
-        :param machine: SpiNNMachine object
-        :param placements: placements object
-        :param board_version: to be nuked
+        :param ~spinn_machine.Machine machine: SpiNNMachine object
+        :param Placements placements: placements object
         :param destination_class: the destination class to route packets to
+        :type destination_class: type or tuple(type,...)
         :return: router tables for fixed route paths
+        :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
+        :raises PacmanConfigurationException: if no placement processor found
+        :raises PacmanRoutingException:
+        :raises PacmanAlreadyExistsException:
         """
         # pylint: disable=attribute-defined-outside-init
 
@@ -54,10 +72,11 @@ class FixedRouteRouter(object):
         """ Handles this board through the quick routing process, based on a\
             predefined routing table.
 
-        :param ethernet_connected_chip: the Ethernet connected chip
-        :rtype: None
+        :param ~spinn_machine.Chip ethernet_connected_chip:
+            the Ethernet connected chip
+        :raises PacmanRoutingException:
+        :raises PacmanAlreadyExistsException:
         """
-
         eth_x = ethernet_connected_chip.x
         eth_y = ethernet_connected_chip.y
 
@@ -93,11 +112,17 @@ class FixedRouteRouter(object):
 
         # create final fixed route entry
         # locate where to put data on ethernet chip
-        processor_id = self.__locate_destination(eth_x, eth_y)
+        processor_id = self.__locate_destination(ethernet_connected_chip)
         # build entry and add to table and add to tables
         self.__add_fixed_route_entry((eth_x, eth_y), [], [processor_id])
 
     def __add_fixed_route_entry(self, key, link_ids, processor_ids):
+        """
+        :param tuple(int,int) key:
+        :param list(int) link_ids:
+        :param list(int) processor_ids:
+        :raises PacmanAlreadyExistsException:
+        """
         fixed_route_entry = FixedRouteEntry(
             link_ids=link_ids, processor_ids=processor_ids)
         if key in self._fixed_route_tables:
@@ -105,26 +130,23 @@ class FixedRouteRouter(object):
                 "fixed route entry", str(key))
         self._fixed_route_tables[key] = fixed_route_entry
 
-    def __locate_destination(self, chip_x, chip_y):
-        """ Locate destination vertex on Ethernet connected chip to send\
+    def __locate_destination(self, chip):
+        """ Locate destination vertex on (Ethernet-connected) chip to send
             fixed data to
 
-        :param chip_x: chip x to search
-        :param chip_y: chip y to search
+        :param ~spinn_machine.Chip chip:
         :return: processor ID as a int
         :rtype: int
         :raises PacmanConfigurationException: if no placement processor found
         """
-        for processor_id in range(Machine.MAX_CORES_PER_CHIP):
-            # only check occupied processors
-            if self._placements.is_processor_occupied(
-                    chip_x, chip_y, processor_id):
-                # verify if vertex correct one
-                if isinstance(
-                        self._placements.get_vertex_on_processor(
-                            chip_x, chip_y, processor_id),
-                        self._destination_class):
-                    return processor_id
+        x = chip.x
+        y = chip.y
+        for p in range(Machine.max_cores_per_chip()):
+            # check if occupied and by the right vertex type
+            if self._placements.is_processor_occupied(x, y, p) and isinstance(
+                    self._placements.get_vertex_on_processor(x, y, p),
+                    self._destination_class):
+                return p
         raise PacmanConfigurationException(
             "no destination vertex found on Ethernet chip {}:{}".format(
-                chip_x, chip_y))
+                chip.x, chip.y))

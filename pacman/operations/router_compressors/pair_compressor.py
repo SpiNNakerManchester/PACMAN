@@ -18,74 +18,85 @@ from .entry import Entry
 
 
 class PairCompressor(AbstractCompressor):
-    """
-    Routing Table compressor based on brute force.
+    """ Routing Table compressor based on brute force. \
     Finds mergable pairs to replace.
 
-    This algorithm assumes unordered rounting tables and returns
-        a possiibly ordered routing tables. If unordered it can be used
-        as a precompressor for another that makes use of order.
+    This algorithm assumes unordered routing tables and returns \
+    a possibly ordered routing tables. If unordered it can be used \
+    as a precompressor for another that makes use of order.
 
-    In the simplest format the algorithm is.
-        For every pair of entries in the table
-            If they have the same spinnaker_route
-                Create a merged entry
-                Check that does not intersect any entry with a different route
-                    Remove the two original entries
-                    Add the merged entry
-                    Start over
+    In the simplest format the algorithm is:
+
+    #. For every pair of entries in the table
+
+       #. If they have the same spinnaker_route
+
+          #. Create a merged entry
+          #. Check that does not intersect any entry with a different route
+
+             #. Remove the two original entries
+             #. Add the merged entry
+             #. Start over
 
     A slightly optimised algorithm is:
-        Split the entries into buckets based on spinnaker route
-        Process the buckets one at a time
-            For each entry in the buckets
-                For each other entry in the bucket
-                    Create a merge entry
-                    Make sure there is no clash with an entry in another bucket
-                    Replace the two entries and add the merge
-                    Start the bucket over
-                If no merge found move the entry from the bucket to the result
-                    list
-            When the bucket is empty the result list becomes the bucket
 
-    A farther optimisation is to do the whole thing in place in a single list.
-        Step 1 is sort the list by route in place
+    #. Split the entries into buckets based on spinnaker route
+    #. Process the buckets one at a time
 
-        Step 2 do the compression route by route usings indexes into the array
-            The array is split into 6 parts.
-                0 to _previous_pointer(-1):
+       #. For each entry in the buckets
+
+          #. For each other entry in the bucket
+
+             #. Create a merge entry
+             #. Make sure there is no clash with an entry in another bucket
+             #. Replace the two entries and add the merge
+             #. Start the bucket over
+
+          #. If no merge found move the entry from the bucket to the result\
+             list
+
+       #. When the bucket is empty the result list becomes the bucket
+
+    A farther optimisation is to do the whole thing in place in a single list:
+
+    #. Step 1 is sort the list by route in place
+    #. Step 2 do the compression route by route using indexes into the array
+
+       #. The array is split into 6 parts.
+
+          #. 0 to _previous_pointer(-1): \
                     Entries in buckets that have already been compressed
-                _previous_pointer to _write_pointer(-1):
+          #. _previous_pointer to _write_pointer(-1): \
                     Finished entries for the current bucket
-                _write_pointer to left(-1);
+          #. _write_pointer to left(-1): \
                     Unused space due to previous merges
-                left to right:
+          #. left to right: \
                     Not yet finished entries from the current bucket
-                right(+ 1) to _remaining_index(-1)
+          #. right(+ 1) to _remaining_index(-1): \
                     Unused space due to previous merges
-                _remaining_index to max_index(-1)
+          #. _remaining_index to max_index(-1): \
                     Entries in buckets not yet compressed
 
-        Step 3 use only the entries up to _write_pointer(-1)
+    #. Step 3 use only the entries up to _write_pointer(-1)
 
     A farther optimisation is to uses order.
-        The entries are sorted by route frequency from low to highg.
-        The results are considered ordered so previous routes are not
-            considered.
+    The entries are sorted by route frequency from low to high.
+    The results are considered ordered so previous routes are not \
+    considered.
 
-        The advatange is this allows all the entries from the most frequent
-            route to be merged into a single entry. And the second most
-            frequent only has to consider the most frequent routes.
+    The advantage is this allows all the entries from the most frequent \
+    route to be merged into a single entry. And the second most \
+    frequent only has to consider the most frequent routes.
 
-        Step 1 requires the counting of the frequency of routes and the
-                sorting the routes based on this ferequency.
-            The current tie break between routes with the same frequency is
-                the route but this is arbitrary at the algorithm level.
-            This code does not use a dictionary to keep the code the same as
-                the c
+    Step 1 requires the counting of the frequency of routes and the \
+    sorting the routes based on this frequency.
+    The current tie break between routes with the same frequency is \
+    the route but this is arbitrary at the algorithm level.
+    This code does not use a dictionary to keep the code the same as \
+    the C.
 
-        Step 2 is change in that the previous entries
-            (0 to _previous_pointer(-1)) are not considered for clash checking
+    Step 2 is change in that the previous entries \
+    (0 to _previous_pointer(-1)) are not considered for clash checking
     """
 
     __slots__ = [
@@ -111,9 +122,6 @@ class PairCompressor(AbstractCompressor):
         "_routes_count",
     ]
 
-    def __init__(self):
-        self._ordered = True
-
     def _compare_routes(self, route_a, route_b):
         """
         Compares two routes for sorting based on the frequency of each route.
@@ -125,9 +133,11 @@ class PairCompressor(AbstractCompressor):
 
         For two different routes but with the same frequency order is based on
         the (currently arbitrary) order they are in the self._routes table
-        :param route_a:
-        :param route_b:
-        :return:
+
+        :param int route_a:
+        :param int route_b:
+        :return: ordering value (-1, 0, 1)
+        :rtype: int
         """
         if route_a == route_b:
             return 0
@@ -143,9 +153,11 @@ class PairCompressor(AbstractCompressor):
         Partitions the entries between low and high into three parts
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-        :param low: Inclusive Lowest index to consider
-        :param high: Inclusive Highest index to consider
+
+        :param int low: Inclusive Lowest index to consider
+        :param int high: Inclusive Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
+        :rtype: tuple(int,int)
         """
         check = low + 1
         pivot = self._all_entries[low].spinnaker_route
@@ -170,8 +182,9 @@ class PairCompressor(AbstractCompressor):
     def _quicksort_table(self, low, high):
         """
         Sorts the entries in place based on frequency of their route
-        :param low: Inclusive lowest index to consider
-        :param high: Inclusive highest index to consider
+
+        :param int low: Inclusive lowest index to consider
+        :param int high: Inclusive highest index to consider
         """
         if low < high:
             left, right = self._three_way_partition_table(low, high)
@@ -180,11 +193,10 @@ class PairCompressor(AbstractCompressor):
 
     def _swap_routes(self, index_a, index_b):
         """
-        Helper function to swap BOTH the routes and routes frequency tables
+        Helper function to swap *both* the routes and routes frequency tables
 
-        :param index_a:
-        :param index_b:
-        :return:
+        :param int index_a:
+        :param int index_b:
         """
         temp = self._routes_frequency[index_a]
         self._routes_frequency[index_a] = self._routes_frequency[index_b]
@@ -194,13 +206,14 @@ class PairCompressor(AbstractCompressor):
         self._routes[index_b] = temp
 
     def _three_way_partition_routes(self, low, high):
-        """
-        Partitions the routes and frequencties into three parts
+        """ Partitions the routes and frequencies into three parts
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-        :param low: Lowest index to consider
-        :param high: Highest index to consider
+
+        :param int low: Lowest index to consider
+        :param int high: Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
+        :rtype: tuple(int,int)
         """
         check = low + 1
         pivot = self._routes_frequency[low]
@@ -219,8 +232,9 @@ class PairCompressor(AbstractCompressor):
     def _quicksort_routes(self, low, high):
         """
         Sorts the routes in place based on frequency
-        :param low: Inclusive lowest index to consider
-        :param high: Inclusive highest index to consider
+
+        :param int low: Inclusive lowest index to consider
+        :param int high: Inclusive highest index to consider
         """
         if low < high:
             left, right = self._three_way_partition_routes(low, high)
@@ -231,18 +245,19 @@ class PairCompressor(AbstractCompressor):
         """
         Attempt to find a merge between the left entry and the index entry
 
-        Creates a merge and then checks it does not interesct with entries
+        Creates a merge and then checks it does not intersect with entries
         with different routes.
 
         If no intersect detected entry[left] is replaced with the merge
 
-        :param left: Index of Entry to merge and replace if possible
-        :param index: Index of entry to merge with
+        :param int left: Index of Entry to merge and replace if possible
+        :param int index: Index of entry to merge with
         :return: True if and only if a merge was found and done
+        :rtype: bool
         """
         m_key, m_mask, defaultable = self.merge(
             self._all_entries[left], self._all_entries[index])
-        if not self._ordered:
+        if not self.ordered:
             for check in range(self._previous_index):
                 if self.intersect(
                         self._all_entries[check].key,
@@ -264,8 +279,8 @@ class PairCompressor(AbstractCompressor):
         """
         Compresses the entries between left and right
 
-        :param left: Inclusive index of first entry to merge
-        :param right: Inclusive index of last entry to merge
+        :param int left: Inclusive index of first entry to merge
+        :param int right: Inclusive index of last entry to merge
         """
         while left < right:
             index = left + 1
@@ -291,6 +306,9 @@ class PairCompressor(AbstractCompressor):
             self._write_index += 1
 
     def update_frequency(self, route):
+        """
+        :param int route:
+        """
         for i in range(self._routes_count):
             if self._routes[i] == route:
                 self._routes_frequency[i] += 1
@@ -306,10 +324,10 @@ class PairCompressor(AbstractCompressor):
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries but still unordered
 
-        :param router_table: Original Routing table for a single chip
-        :type router_table:  MulticastRoutingTable
+        :param MulticastRoutingTable router_table:
+            Original Routing table for a single chip
         :return: Compressed routing table for the same chip
-        :rtype:  MulticastRoutingTable
+        :rtype: list(Entry)
         """
 
         # Split the entries into buckets based on spinnaker_route

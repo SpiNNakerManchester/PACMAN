@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 try:
     from inspect import getfullargspec
 except ImportError:
@@ -24,7 +21,7 @@ except ImportError:
     from inspect import getargspec as getfullargspec
 from functools import wraps
 from six import iteritems, itervalues
-
+# pylint: disable=deprecated-method
 _instances = list()
 _methods = defaultdict(dict)
 _injectables = None
@@ -36,7 +33,8 @@ class InjectionException(Exception):
 
 
 def supports_injection(injectable_class):
-    """ Indicate that the class has methods on which objects can be injected.
+    """ A :py:obj:`decorator` that indicates that the class has methods on
+        which objects can be injected.
     """
     orig_init = injectable_class.__init__
 
@@ -53,11 +51,11 @@ def supports_injection(injectable_class):
 
 
 def inject(type_to_inject):
-    """ Marks a method as something to be called to inject an object of the\
-        given type.  The type is just a name for the type, and should match up\
-        at some point with some generated data.
+    """ A :py:obj:`decorator` that marks a method as something to be called to
+        inject an object of the given type.  The type is just a name for the
+        type, and should match up at some point with some generated data.
 
-    :param type_to_inject: The type to be injected using this method
+    :param str type_to_inject: The type to be injected using this method
     """
     def wrap(method):
         # pylint: disable=protected-access
@@ -75,12 +73,12 @@ def inject(type_to_inject):
 
 
 def requires_injection(types_required):
-    """ Indicates that injection of the given types is required before this\
-        method is called; an Exception is raised if the types have not been\
-        injected.
+    """ A :py:obj:`decorator` that indicates that injection of the given types
+        is required before this method is called; an Exception is raised if
+        the types have not been injected.
 
-    :param types_required: A list of types that must have been injected
-    :type types_required: list(str)
+    :param list(str) types_required:
+        A list of types that must have been injected
     """
     def wrap(wrapped_method):
 
@@ -106,9 +104,11 @@ def requires_injection(types_required):
 
 
 def inject_items(types):
-    """ Indicates values that need to be injected into the method
+    """ A :py:obj:`decorator` that ndicates values that need to be injected
+        into the method
 
     :param types: A dict of method argument name to type name to be injected
+    :type types: dict(str, str)
     """
     def wrap(wrapped_method):
         exn_arg = None
@@ -150,6 +150,7 @@ def provide_injectables(injectables):
     """ Set the objects from which values should be injected into methods
 
     :param injectables: A dict of type to value
+    :type injectables: dict(str, ...)
     """
     global _injectables
     if _injectables is not None:
@@ -173,6 +174,7 @@ class _DictFacade(dict):
         """
         :param dicts: An iterable of dict objects to be used
         """
+        super(_DictFacade, self).__init__()
         self._dicts = dicts
 
     def get(self, key, default=None):
@@ -199,8 +201,9 @@ class injection_context(object):
 
     def __init__(self, injection_dictionary):
         """
-        :param injection_dictionary:\
+        :param injection_dictionary:
             The dictionary of items to inject whilst in the context
+        :type injection_dictionary: dict(str, ...)
         """
         self._old = None
         self._mine = injection_dictionary
@@ -222,13 +225,13 @@ class injection_context(object):
 def do_injection(objects_to_inject, objects_to_inject_into=None):
     """ Perform the actual injection of objects.
 
-    :param objects_to_inject:\
+    :param objects_to_inject:
         The objects to be injected as a dict of type name -> object of type
-    :type objects_to_inject: dict(str)->object
-    :param objects_to_inject_into: \
-        The objects whose classes support_injection, or None to use all\
-        instances that have been created
-    :type objects_to_inject_into: list
+    :type objects_to_inject: dict(str, ...)
+    :param objects_to_inject_into:
+        The objects whose classes :py:func:`support_injection`, or None to use
+        all instances that have been created
+    :type objects_to_inject_into: list or None
     """
     if objects_to_inject is None:
         return

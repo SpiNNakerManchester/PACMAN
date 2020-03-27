@@ -15,6 +15,7 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.constraints import AbstractConstraint
 
@@ -29,19 +30,19 @@ class ConstrainedObject(object):
     """
 
     __slots__ = [
-
         # The constraints of the object
         "_constraints"
     ]
 
     def __init__(self, constraints=None):
         """
-        :param constraints: Any initial constraints
+        :param iterable(AbstractConstraint) constraints:
+            Any initial constraints
         """
 
         # safety point for diamond inheritance
         if not hasattr(self, '_constraints') or self._constraints is None:
-            self._constraints = set()
+            self._constraints = OrderedSet()
 
         # add new constraints to the set
         self.add_constraints(constraints)
@@ -49,11 +50,8 @@ class ConstrainedObject(object):
     def add_constraint(self, constraint):
         """ Add a new constraint to the collection of constraints
 
-        :param constraint: constraint to add
-        :type constraint:\
-            :py:class:`pacman.model.constraints.AbstractConstraint`
-        :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: \
+        :param AbstractConstraint constraint: constraint to add
+        :raise PacmanInvalidParameterException:
             If the constraint is not valid
         """
         if constraint is None:
@@ -66,18 +64,15 @@ class ConstrainedObject(object):
 
         try:
             self._constraints.add(constraint)
-        except Exception:
-            self._constraints = set()
+        except Exception:  # pylint: disable=broad-except
+            self._constraints = OrderedSet()
             self._constraints.add(constraint)
 
     def add_constraints(self, constraints):
         """ Add an iterable of constraints to the collection of constraints
 
-        :param constraints: the constraints to add
-        :type constraints: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :rtype: None
-        :raise pacman.exceptions.PacmanInvalidParameterException: \
+        :param AbstractConstraint constraints: the constraints to add
+        :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
         if constraints is not None:
@@ -88,12 +83,9 @@ class ConstrainedObject(object):
     def constraints(self):
         """ An iterable of constraints
 
-        :return: the constraints
-        :rtype: \
-            iterable(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        :raise None: Raises no known exceptions
+        :rtype: iterable(AbstractConstraint)
         """
         try:
             return self._constraints
-        except Exception:
-            return set()
+        except Exception:  # pylint: disable=broad-except
+            return OrderedSet()

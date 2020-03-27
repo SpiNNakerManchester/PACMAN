@@ -39,11 +39,6 @@ from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from .routing_tree import RoutingTree
 
-_concentric_hexagons = {}
-"""Memoized concentric_hexagons outputs, as lists.  Access via
-:py:func:`.memoized_concentric_hexagons`.
-"""
-
 
 def _convert_a_route(
         routing_tables, partition, incoming_processor, incoming_link,
@@ -51,11 +46,13 @@ def _convert_a_route(
     """
     Converts the algorithm specific partition_route back to standard spinnaker
     and ands it to the routing_tables.
-    :param routing_tables:  spinnaker format routing tables
-    :param partition: Partition this route applices to
-    :param incoming_processor: collections of processors this link came from
-    :param incoming_link: collection of links this link came from
-    :param partition_route: algorithm specific format of the route
+
+    :param MulticastRoutingTableByPartition routing_tables:
+        spinnaker format routing tables
+    :param OutgoingEdgePartition partition: Partition this route applies to
+    :param int incoming_processor: processor this link came from
+    :param int incoming_link: link this link came from
+    :param RoutingTree partition_route: algorithm specific format of the route
     """
     x, y = partition_route.chip
 
@@ -86,45 +83,25 @@ def _convert_a_route(
             routing_tables, partition, None, next_incoming_link, next_hop)
 
 
-def _memoized_concentric_hexagons(radius):
-    """A memoized wrapper around concentric_hexagons`
-    which memoizes the coordinates and stores them as a tuple. Note that the
-    caller must manually offset the coordinates as required.
-
-    This wrapper is used to avoid the need to repeatedly call
-    concentric_hexagons` for every sink in a network.
-    This results in a relatively minor speedup (but at equally minor cost) in
-    large networks.
-    """
-    out = _concentric_hexagons.get(radius)
-    if out is None:
-        out = tuple(_get_concentric_hexagons(radius))
-        _concentric_hexagons[radius] = out
-    return out
-
-
 def _ner_net(source, destinations, machine):
     """ Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
 
-
-    :param source:  (x, y)
-        The coordinate of the source vertex.
-    :param destinations:  iterable([(x, y), ...])
+    :param tuple(int,int) source:
+        The coordinate (x, y) of the source vertex.
+    :param iterable(tuple(int,int)) destinations:
         The coordinates of destination vertices.
-    :param machine: machine for which routes are being generated
-    :return: (:py:class:`RoutingTree`
-     {(x,y): :py:class:`RoutingTree`, ...})
+    :param ~spinn_machine.Machine machine:
+        machine for which routes are being generated
+    :return:
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc. For
-        convenience, a dictionarry mapping from destination (x, y) coordinates
+        convenience, a dictionary mapping from destination (x, y) coordinates
         to the associated RoutingTree is provided to allow the caller to insert
         these items.
-
+    :rtype: tuple(RoutingTree, dict(tuple(int,int),RoutingTree))
     """
-    width = machine.max_chip_x + 1
-    height = machine.max_chip_y + 1
     radius = 20
     # Map from (x, y) to RoutingTree objects
     route = {source: RoutingTree(source)}
@@ -141,81 +118,19 @@ def _ner_net(source, destinations, machine):
         # Try to find a nearby (within radius hops) node in the routing tree
         # that we can route to (falling back on just routing to the source).
         #
-        # In an implementation according to the algorithm's original
-        # specification looks for nodes at each point in a growing set of rings
-        # of concentric hexagons. If it doesn't find any destinations this
-        # means an awful lot of checks: 1261 for the default radius of 20.
-        #
-        # An alternative (but behaviourally identical) implementation scans the
-        # list of all route nodes created so far and finds the closest node
-        # which is < radius hops (falling back on the origin if no node is
-        # closer than radius hops).  This implementation requires one check per
-        # existing route node. In most routes this is probably a lot less than
-        # 1261 since most routes will probably have at most a few hundred route
-        # nodes by the time the last destination is being routed.
-        #
-        # Which implementation is best is a difficult question to answer:
-        # * In principle nets with quite localised connections (e.g.
-        #   nearest-neighbour or centroids traffic) may route slightly more
-        #   quickly with the original algorithm since it may very quickly find
-        #   a neighbour.
-        # * In nets which connect very spaced-out destinations the second
-        #   implementation may be quicker since in such a scenario it is
-        #   unlikely that a neighbour will be found.
-        # * In extremely high-fan-out nets (e.g. broadcasts), the original
-        #   method is very likely to perform *far* better than the alternative
-        #   method since most iterations will complete immediately while the
-        #   alternative method must scan *all* the route vertices.
-        # As such, it should be clear that neither method alone is 'best' and
-        # both have degenerate performance in certain completely reasonable
-        # styles of net. As a result, a simple heuristic is used to decide
-        # which technique to use.
-        #
-        # The following micro-benchmarks are crude estimate of the
-        # runtime-per-iteration of each approach (at least in the case of a
-        # torus topology)::
-        #
-        #     $ # Original approach
-        #     $ python -m timeit --setup 'x, y, w, h, r = 1, 2, 5, 10, \
-        #                                     {x:None for x in range(10)}' \
-        #                        'x += 1; y += 1; x %= w; y %= h; (x, y) in r'
-        #     1000000 loops, best of 3: 0.207 usec per loop
-        #     $ # Alternative approach
-        #     $ python -m timeit --setup 'from rig.geometry import \
-        #                                 shortest_torus_path_length' \
-        #                        'shortest_torus_path_length( \
-        #                             (0, 1, 2), (3, 2, 1), 10, 10)'
-        #     1000000 loops, best of 3: 0.666 usec per loop
-        #
-        # From this we can approximately suggest that the alternative approach
-        # is 3x more expensive per iteration. A very crude heuristic is to use
-        # the original approach when the number of route nodes is more than
-        # 1/3rd of the number of routes checked by the original method.
-        concentric_hexagons = _memoized_concentric_hexagons(radius)
-        if len(concentric_hexagons) < len(route) / 3:
-            # Original approach: Start looking for route nodes in a concentric
-            # spiral pattern out from the destination node.
-            for x, y in concentric_hexagons:
-                x += destination[0]
-                y += destination[1]
-                if machine.has_wrap_arounds:
-                    x %= width
-                    y %= height
-                if (x, y) in route:
-                    neighbour = (x, y)
-                    break
-        else:
-            # Alternative approach: Scan over every route node and check to see
-            # if any are < radius, picking the closest one if so.
-            neighbour = None
-            neighbour_distance = None
-            for candidate_neighbour in route:
-                distance = machine.get_vector_length(
-                        candidate_neighbour, destination)
-                if distance <= radius and (neighbour is None or
-                                           distance < neighbour_distance):
-                    neighbour = candidate_neighbour
-                    neighbour_distance = distance
+        # This implementation scans the list of all route nodes created so far
+        # and finds the closest node which is < radius hops
+        # (falling back on the origin if no node is closer than radius hops).
+
+        neighbour = None
+        neighbour_distance = None
+        for candidate_neighbour in route:
+            distance = machine.get_vector_length(
+                candidate_neighbour, destination)
+            if distance <= radius and (
+                    neighbour is None or distance < neighbour_distance):
+                neighbour = candidate_neighbour
+                neighbour_distance = distance
 
         # Fall back on routing directly to the source if no nodes within radius
         # hops of the destination was found.
@@ -256,6 +171,13 @@ def _ner_net(source, destinations, machine):
 
 
 def _is_linked(source, target, direction, machine):
+    """
+    :param tuple(int,int) source:
+    :param tuple(int,int) target:
+    :param int direction:
+    :param ~spinn_machine.Machine machine:
+    :rtype: bool
+    """
     s_chip = machine.get_chip_at(source[0], source[1])
     if s_chip is None:
         return False
@@ -281,10 +203,12 @@ def _copy_and_disconnect_tree(root, machine):
     situation is impossible to confirm since the input routing trees have not
     yet been populated with vertices. The caller is responsible for being
     sensible.
-    :param root: :py:class:`RoutingTree`
+
+    :param RoutingTree root:
         The root of the RoutingTree that contains nothing but RoutingTrees
         (i.e. no children which are vertices or links).
-    :param machine: The machine in which the routes exist
+    :param ~spinn_machine.Machine machine:
+        The machine in which the routes exist
     :return: (root, lookup, broken_links)
         Where:
         * `root` is the new root of the tree
@@ -293,6 +217,8 @@ def _copy_and_disconnect_tree(root, machine):
           :py:class:`~.RoutingTree`, ...}
         * `broken_links` is a set ([(parent, child), ...]) containing all
           disconnected parent and child (x, y) pairs due to broken links.
+    :rtype: tuple(RoutingTree, dict(tuple(int,int),RoutingTree),
+        set(tuple(tuple(int,int),tuple(int,int))))
     """
     new_root = None
 
@@ -340,8 +266,7 @@ def _copy_and_disconnect_tree(root, machine):
 
 
 def _a_star(sink, heuristic_source, sources, machine):
-    """
-    Use A* to find a path from any of the sources to the sink.
+    """ Use A* to find a path from any of the sources to the sink.
 
     Note that the heuristic means that the search will proceed towards
     heuristic_source without any concern for any other sources. This means that
@@ -352,18 +277,18 @@ def _a_star(sink, heuristic_source, sources, machine):
     forming loops in the rest of the tree since we'll stop as soon as we touch
     any part of it.
 
-    :param sink: (x, y)
-    :param heuristic_source: (x, y)
+    :param tuple(int,int) sink: (x, y)
+    :param tuple(int,int) heuristic_source: (x, y)
         An element from `sources` which is used as a guiding heuristic for the
         A* algorithm.
-    :param sources: set([(x, y), ...])
-    :param machine:
+    :param set(tuple(int,int)) sources: set([(x, y), ...])
+    :param ~spinn_machine.Machine machine:
     :return: [(int, (x, y)), ...]
         A path starting with a coordinate in `sources` and terminating at
         connected neighbour of `sink` (i.e. the path does not include `sink`).
         The direction given is the link down which to proceed from the given
         (x, y) to arrive at the next point in the path.
-
+    :rtype: list(tuple(int,tuple(int,int)))
     """
     # Select the heuristic function to use for distances
     heuristic = (lambda node: machine.get_vector_length(
@@ -431,11 +356,13 @@ def _a_star(sink, heuristic_source, sources, machine):
 def _route_has_dead_links(root, machine):
     """ Quickly determine if a route uses any dead links.
 
-    :param root: :py:class:`.routing_tree.RoutingTree`
+    :param RoutingTree root:
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    :param machine: The machine in which the routes exist.
+    :param ~spinn_machine.Machine machine:
+        The machine in which the routes exist.
     :return: True if the route uses any dead/missing links, False otherwise.
+    :rtype: bool
     """
     for _, (x, y), routes in root.traverse():
         chip = machine.get_chip_at(x, y)
@@ -453,14 +380,15 @@ def _avoid_dead_links(root, machine):
     Uses A* to reconnect disconnected branches of the tree (due to dead links
     in the machine).
 
-    :param root: :py:class:`~.routing_tree.RoutingTree`
+    :param RoutingTree root:
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    :param machine: The machine in which the routes exist.
-    :return: (:py:class:`~.RoutingTree`,
-     {(x,y): :py:class:`~.routing_tree.RoutingTree`, ...})
-        A new RoutingTree is produced rooted as before. A dictionarry mapping
-        from (x, y) to the associated RoutingTree is provided for convenienc
+    :param ~spinn_machine.Machine machine:
+        The machine in which the routes exist.
+    :return:
+        A new RoutingTree is produced rooted as before. A dictionary mapping
+        from (x, y) to the associated RoutingTree is provided for convenience
+    :rtype: tuple(RoutingTree,dict(tuple(int,int),RoutingTree))
     """
     # Make a copy of the RoutingTree with all broken parts disconnected
     root, lookup, broken_links = _copy_and_disconnect_tree(root, machine)
@@ -515,8 +443,7 @@ def _avoid_dead_links(root, machine):
 
 
 def _do_route(source_vertex, post_vertexes, machine, placements):
-    """
-    Routing algorithm based on Neighbour Exploring Routing (NER).
+    """ Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
     routing, Parallel Computing (2014).
@@ -527,11 +454,12 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
     fully connected, this algorithm will always succeed though no consideration
     of congestion or routing-table usage is attempted.
 
-    :param source_vertex:
-    :param post_vertexes:
-    :param machine:
-    :param placements:
+    :param MachineVertex source_vertex:
+    :param iterable(MachineVertex) post_vertexes:
+    :param ~spinn_machine.Machine machine:
+    :param Placements placements:
     :return:
+    :rtype: RoutingTree
     """
     source_xy = _vertex_xy(source_vertex, placements, machine)
     destinations = set(_vertex_xy(post_vertex, placements, machine)
@@ -565,6 +493,12 @@ def _do_route(source_vertex, post_vertexes, machine, placements):
 
 
 def _vertex_xy(vertex, placements, machine):
+    """
+    :param MachineVertex vertex:
+    :param Placements placements:
+    :param ~spinn_machine.Machine machine:
+    :rtype: tuple(int,int)
+    """
     if not isinstance(vertex, AbstractVirtual):
         placement = placements.get_placement_of_vertex(vertex)
         return (placement.x, placement.y)
@@ -579,6 +513,11 @@ def _vertex_xy(vertex, placements, machine):
 
 
 def _route_to_endpoint(vertex, machine):
+    """
+    :param MachineVertex vertex:
+    :param ~spinn_machine.Machine machine:
+    :rtype: int
+    """
     if isinstance(vertex, AbstractFPGA):
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
@@ -588,39 +527,18 @@ def _route_to_endpoint(vertex, machine):
     return link_data.connected_link
 
 
-def _get_concentric_hexagons(radius, start=(0, 0)):
-    """
-    A generator which produces coordinates of concentric rings of hexagons.
-
-    :param radius:  Number of layers to produce (0 is just one hexagon)
-    :param start:  (x, y)
-        The coordinate of the central hexagon.
-    :return:
-    """
-    x, y = start
-    yield (x, y)
-    for r in range(1, radius + 1):
-        # Move to the next layer
-        y -= 1
-        # Walk around the hexagon of this radius
-        for dx, dy in [(1, 1), (0, 1), (-1, 0), (-1, -1), (0, -1), (1, 0)]:
-            for _ in range(r):
-                yield (x, y)
-                x += dx
-                y += dy
-
-
 def _longest_dimension_first(vector, start, machine):
     """
     List the (x, y) steps on a longest-dimension first route.
 
-    :param vector: (x, y, z)
+    :param tuple(int,int,int) vector: (x, y, z)
         The vector which the path should cover.
-    :param start: (x, y)
+    :param tuple(int,int) start: (x, y)
         The coordinates from which the path should start (note this is a 2D
         coordinate).
-    :param machine:
+    :param ~spinn_machine.Machine machine:
     :return:
+    :rtype: list(tuple(int,int))
     """
     x, y = start
 
@@ -675,11 +593,11 @@ class NerRoute(object):
 
     def __call__(self, machine_graph, machine, placements):
         """
-
-        :param machine_graph:
-        :param machine:
-        :param placements:  pacman.model.placements.placements.py
+        :param MachineGraph machine_graph:
+        :param ~spinn_machine.Machine machine:
+        :param Placements placements:
         :return:
+        :rtype: MulticastRoutingTableByPartition
         """
         routing_tables = MulticastRoutingTableByPartition()
 
