@@ -40,6 +40,9 @@
             <param_name>machine</param_name>
             <param_name>destination_class</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryFixedRoutes</param_type>
         </outputs>
@@ -318,6 +321,9 @@
             <param_name>machine</param_name>
             <param_name>machine_graph</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingTableByPartition</param_type>
         </outputs>
@@ -344,6 +350,9 @@
             <param_name>n_keys_map</param_name>
             <param_name>placements</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
         </outputs>
@@ -375,6 +384,9 @@
             <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
             <param_type>ApplicationRoutingInfos</param_type>
@@ -402,6 +414,9 @@
             <param_name>n_keys_map</param_name>
             <param_name>placements</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
             <param_type>MemoryRoutingTables</param_type>
@@ -429,6 +444,7 @@
             <param_name>n_keys_map</param_name>
         </required_inputs>
         <optional_inputs>
+            <token>EdgesFiltered</token>
             <param_name>graph_mapper</param_name>
         </optional_inputs>
         <outputs>
@@ -457,6 +473,9 @@
             <param_name>n_keys_map</param_name>
             <param_name>routing_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
         </outputs>
@@ -771,6 +790,9 @@
             <param_name>machine</param_name>
             <param_name>placements</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingTableByPartition</param_type>
         </outputs>

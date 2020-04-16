@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from six import print_
 from .abstract_sdram import AbstractSDRAM
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 
 
@@ -41,6 +43,7 @@ class VariableSDRAM(AbstractSDRAM):
         self._fixed_sdram = fixed_sdram
         self._per_timestep_sdram = per_timestep_sdram
 
+    @overrides(AbstractSDRAM.get_total_sdram)
     def get_total_sdram(self, n_timesteps):
         if n_timesteps is not None:
             return (self._fixed_sdram +
@@ -51,10 +54,12 @@ class VariableSDRAM(AbstractSDRAM):
             "Unable to run forever with a variable SDRAM cost")
 
     @property
+    @overrides(AbstractSDRAM.fixed)
     def fixed(self):
         return self._fixed_sdram
 
     @property
+    @overrides(AbstractSDRAM.per_timestep)
     def per_timestep(self):
         return self._per_timestep_sdram
 
@@ -68,7 +73,15 @@ class VariableSDRAM(AbstractSDRAM):
             self._fixed_sdram - other.fixed,
             self._per_timestep_sdram - other.per_timestep)
 
+    @overrides(AbstractSDRAM.sub_from)
     def sub_from(self, other):
         return VariableSDRAM(
             other.fixed - self._fixed_sdram,
             other.per_timestep - self._per_timestep_sdram)
+
+    @overrides(AbstractSDRAM.report)
+    def report(self, timesteps, indent="", preamble="", target=None):
+        print_(indent, preamble,
+               "Fixed {} bytes Per_timestep {} bytes for a total of {}".format(
+                   self._fixed_sdram, self._per_timestep_sdram,
+                   self.get_total_sdram(timesteps)), file=target)
