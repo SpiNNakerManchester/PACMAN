@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from spinn_utilities.ordered_default_dict import DefaultOrderedDict
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
@@ -201,7 +201,6 @@ class Graph(ConstrainedObject):
 
     def add_outgoing_edge_partition(self, outgoing_edge_partition):
         """ Add an outgoing edge partition to the graph.
-
         :param OutgoingEdgePartition outgoing_edge_partition:
             The outgoing edge partition to add
         :raises PacmanAlreadyExistsException:

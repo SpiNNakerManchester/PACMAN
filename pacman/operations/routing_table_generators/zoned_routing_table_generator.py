@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.ordered_default_dict import DefaultOrderedDict
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 
 
 class SharedEntry(object):
@@ -87,7 +87,7 @@ class ZonedRoutingTableGenerator(object):
         :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
         :rtype: MulticastRoutingTables
         """
-        table = MulticastRoutingTable(chip.x, chip.y)
+        table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
         partitions_by_app_vertex = DefaultOrderedDict(set)
         for partition in partitions_in_table:
             machine_vertex = partition.pre_vertex
