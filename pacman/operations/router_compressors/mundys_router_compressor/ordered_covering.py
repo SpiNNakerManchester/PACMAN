@@ -147,10 +147,13 @@ from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import minimise as remove_default_routes
 from pacman.utilities.constants import FULL_MASK
 from .utils import intersect
+from spinn_utilities.timer import Timer
 
 
-def minimise(routing_table, target_length):
-    """ Reduce the size of a routing table by merging together entries where
+def minimise(
+        routing_table, target_length, use_timer_cut_off=False,
+        time_to_run_for_before_raising_exception=None):
+    """Reduce the size of a routing table by merging together entries where
     possible and by removing any remaining default routes.
 
     .. warning::
@@ -174,19 +177,28 @@ def minimise(routing_table, target_length):
         halt once either this target is reached or no further minimisation is
         possible. If None then the table will be made as small as possible.
     :type target_length: int or None
+    :param use_timer_cut_off: Boolean flag for timing cutoff to be used.
+    :type use_timer_cut_off: bool
+    :param time_to_run_for_before_raising_exception: The time to run for \
+        in seconds before raising an exception
+    :type time_to_run_for_before_raising_exception: int or None
+
     :return: list(RoutingTableEntry)
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         `target_length`.
     """
-    table, _ = _ordered_covering(routing_table, target_length, no_raise=True)
+    table, _ = ordered_covering(
+        routing_table=routing_table, target_length=target_length,
+        no_raise=True, use_timer_cut_off=use_timer_cut_off,
+        time_to_run_for=time_to_run_for_before_raising_exception)
     return remove_default_routes(table, target_length)
 
 
-def _ordered_covering(routing_table, target_length, aliases=None,
-                      no_raise=False):
-    """
-    Reduce the size of a routing table by merging together entries where
+def ordered_covering(
+        routing_table, target_length, aliases=None, no_raise=False,
+        use_timer_cut_off=False, time_to_run_for=None):
+    """Reduce the size of a routing table by merging together entries where
     possible.
 
     .. warning::
@@ -234,11 +246,14 @@ def _ordered_covering(routing_table, target_length, aliases=None,
     # Copy the aliases dictionary, handle default
     aliases = dict(aliases) if aliases is not None else {}
 
+    timer = Timer()
+    timer.start_timing()
+
     # Perform an initial sort of the routing table in order of increasing
     # generality.
     routing_table = sorted(
         routing_table,
-        key=lambda entry: _get_generality(entry.key, entry.mask)
+        key=lambda entry: get_generality(entry.key, entry.mask)
     )
 
     while target_length is None or len(routing_table) > target_length:
@@ -253,9 +268,15 @@ def _ordered_covering(routing_table, target_length, aliases=None,
         # aliases dictionary.
         routing_table, aliases = merge.apply(aliases)
 
+        # control for limiting the search
+        if use_timer_cut_off:
+            diff = timer.take_sample()
+            if diff.total_seconds() >= time_to_run_for:
+                raise MinimisationFailedError(
+                    target_length, len(routing_table))
+
     # If the table is still too big then raise an error
-    if (not no_raise and
-            target_length is not None and
+    if (not no_raise and target_length is not None and
             len(routing_table) > target_length):
         raise MinimisationFailedError(target_length, len(routing_table))
 
@@ -263,17 +284,17 @@ def _ordered_covering(routing_table, target_length, aliases=None,
     return routing_table, aliases
 
 
-def _get_generality(key, mask):
+def get_generality(key, mask):
     """Count the number of Xs in the key-mask pair.
 
     For example, there are 32 Xs in ``0x00000000/0x00000000``::
 
-        >>> _get_generality(0x0, 0x0)
+        >>> get_generality(0x0, 0x0)
         32
 
     And no Xs in ``0xffffffff/0xffffffff``::
 
-        >>> _get_generality(0xffffffff, 0xffffffff)
+        >>> get_generality(0xffffffff, 0xffffffff)
         0
 
     :param int key:
@@ -343,7 +364,7 @@ def _get_all_merges(routing_table):
 
         # Construct a merge by including other routing table entries below this
         # one which have equivalent routes.
-        merge = set([i])
+        merge = {i}
         merge.update(
             j for j, other_entry in enumerate(routing_table[i+1:], start=i+1)
             if entry.spinnaker_route == other_entry.spinnaker_route
@@ -370,7 +391,7 @@ def _get_insertion_index(routing_table, generality):
 
     # Wrapper for _get_generality which accepts a routing entry
     def gg(entry):
-        return _get_generality(entry.key, entry.mask)
+        return get_generality(entry.key, entry.mask)
 
     # Perform a binary search through the routing table
     bottom = 0
@@ -450,7 +471,7 @@ class _Merge(object):
         self.mask = all_selected & new_xs  # Combine existing and new Xs
         self.key = all_ones & self.mask
 
-        self.generality = _get_generality(self.key, self.mask)
+        self.generality = get_generality(self.key, self.mask)
         self.insertion_index = _get_insertion_index(
             routing_table, self.generality)
 
