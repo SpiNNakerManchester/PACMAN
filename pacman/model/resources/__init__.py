@@ -18,10 +18,12 @@ from .constant_sdram import ConstantSDRAM
 from .core_resource import CoreResource
 from .cpu_cycles_per_tick_resource import CPUCyclesPerTickResource
 from .dtcm_resource import DTCMResource
+from .ds_sdram import DsSDRAM
 from .element_free_space import ElementFreeSpace
 from .iptag_resource import IPtagResource
 from .multi_region_sdram import MultiRegionSDRAM
 from .pre_allocated_resource_container import PreAllocatedResourceContainer
+from .recording_sdram import RecordingSDRAM
 from .resource_container import ResourceContainer
 from .reverse_iptag_resource import ReverseIPtagResource
 from .specific_board_iptag_resource import (
@@ -35,9 +37,9 @@ from .specific_core_resource import SpecificCoreResource
 from .variable_sdram import VariableSDRAM
 
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
-           "CPUCyclesPerTickResource", "DTCMResource",
+           "CPUCyclesPerTickResource", "DTCMResource", "DsSDRAM",
            "ElementFreeSpace", "IPtagResource", "MultiRegionSDRAM",
-           "ResourceContainer", "ReverseIPtagResource",
+           "ResourceContainer", "RecordingSDRAM", "ReverseIPtagResource",
            "PreAllocatedResourceContainer", "SpecificChipSDRAMResource",
            "SpecificCoreResource", "SpecificBoardIPtagResource",
            "SpecificBoardReverseIPtagResource", "VariableSDRAM"]

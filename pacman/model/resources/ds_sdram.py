@@ -12,26 +12,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from .with_malloc_sdram import WithMallocSdram
+from spinn_utilities.overrides import overrides
+from pacman.utilities.constants import SARK_PER_MALLOC_SDRAM_USAGE
 
-from enum import Enum
 
-DEFAULT_MASK = 0xfffff800  # DEFAULT LOCATION FOR THE APP MASK
-BITS_IN_KEY = 32
-FULL_MASK = 0xFFFFFFFF  # DEFAULT MASK FOR EVERYTHING
+class DsSDRAM(WithMallocSdram):
 
-CORES_PER_VIRTUAL_CHIP = 128
+    def __init__(self):
+        super(DsSDRAM, self).__init__()
+        self._fixed_sdram = self.malloc_cost
 
-EDGES = Enum(
-    value="EDGES",
-    names=[("EAST", 0),
-           ("NORTH_EAST", 1),
-           ("NORTH", 2),
-           ("WEST", 3),
-           ("SOUTH_WEST", 4),
-           ("SOUTH", 5)])
+    @property
+    @overrides(WithMallocSdram.malloc_cost)
+    def malloc_cost(self):
+        return SARK_PER_MALLOC_SDRAM_USAGE
 
-# how many bytes there are in a word
-BYTES_PER_WORDS = 4
+    @overrides(WithMallocSdram.merge)
+    def merge(self, other):
+        super(DsSDRAM, self).merge(other)
+        self._fixed_sdram -= self.malloc_cost
 
-# The number of bytes used by SARK per memory allocation
-SARK_PER_MALLOC_SDRAM_USAGE = 2 * BYTES_PER_WORDS

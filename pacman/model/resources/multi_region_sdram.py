@@ -16,6 +16,7 @@ from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
 from spinn_utilities.overrides import overrides
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 class MultiRegionSDRAM(VariableSDRAM):
@@ -37,11 +38,6 @@ class MultiRegionSDRAM(VariableSDRAM):
     ]
 
     def __init__(self):
-        """
-
-        :param regions: A dict of AbstractSDRAM, one per "region" of SDRAM.
-
-        """
         super(MultiRegionSDRAM, self).__init__(0, 0)
         self.__regions = {}
 
@@ -94,6 +90,13 @@ class MultiRegionSDRAM(VariableSDRAM):
         else:
             self.__regions[region] = other
 
+    def _check_mergable(self, other):
+         if type(other) != type(self):
+            raise PacmanInvalidParameterException(
+                "other", other,
+                "You can not nest a {} into a {}".format(
+                    type(other), type(self)));
+
     def merge(self, other):
         """
         Combines the other sdram costs keeping the region mappings
@@ -104,6 +107,7 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param MultiRegionSDRAM other: Another mapping of costs by region
         """
+        self._check_mergable(other)
         self._fixed_sdram = self._fixed_sdram + other.fixed
         self._per_timestep_sdram = \
             self._per_timestep_sdram + other.per_timestep

@@ -20,10 +20,11 @@ from enum import Enum
 import tempfile
 import unittest
 from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
-    IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
-    SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource,
-    VariableSDRAM)
+    ConstantSDRAM, CPUCyclesPerTickResource, DsSDRAM, DTCMResource,
+    IPtagResource, MultiRegionSDRAM, RecordingSDRAM, ResourceContainer,
+    ReverseIPtagResource, SpecificBoardIPtagResource,
+    SpecificBoardReverseIPtagResource,  VariableSDRAM)
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 class MockEnum(Enum):
@@ -96,6 +97,68 @@ class TestResourceModels(unittest.TestCase):
         with tempfile.TemporaryFile(mode="w") as target:
             multi3.report(1000, target=target)
         # multi3.report(preamble="core (0,0,1):")
+
+    def test_ds_sdram(self):
+        ds_sdram1 = DsSDRAM()
+        ds_sdram1.add_cost(1, 100, 4)
+        ds_sdram1.add_cost(2, 50, 3)
+        self.assertEqual(ds_sdram1.get_total_sdram(150),
+                         100 + 50 + 8 + (4 + 3) * 150)
+        ds_sdram2 = DsSDRAM()
+        ds_sdram2.add_cost(MockEnum.ZERO, 88)
+        self.assertEqual(ds_sdram2.get_total_sdram(150), 88 + 8)
+        ds_sdram2.merge(ds_sdram1)
+        self.assertEqual(
+            ds_sdram2.get_total_sdram(150),
+            100 + 50 + 88 + 8 + (4 + 3) * 150)
+
+        multi1 = MultiRegionSDRAM()
+        multi1.add_cost(1, 40, 6)
+        multi1.add_cost(2, 45, 7)
+
+        with self.assertRaises(PacmanInvalidParameterException):
+            ds_sdram2.merge(multi1)
+        with self.assertRaises(PacmanInvalidParameterException):
+            multi1.merge(ds_sdram2)
+
+        ds_sdram2.nest("many", multi1)
+        self.assertEqual(
+            ds_sdram2.get_total_sdram(150),
+            100 + 50 + 88 + 40 + 45 + 8 + (4 + 3 + 6 + 7) * 150)
+        with self.assertRaises(PacmanInvalidParameterException):
+            ds_sdram2.nest("weird", ds_sdram1)
+        multi1.nest("weird", ds_sdram2)
+
+    def test_recording_sdram(self):
+        rec_sdram1 = RecordingSDRAM()
+        rec_sdram1.add_cost(1, 100, 4)
+        rec_sdram1.add_cost(2, 50, 3)
+        self.assertEqual(rec_sdram1.get_total_sdram(150),
+                         100 + 50 + (8 * 2) + (4 + 3) * 150)
+        rec_sdram2 = RecordingSDRAM()
+        rec_sdram2.add_cost(MockEnum.ZERO, 88)
+        self.assertEqual(rec_sdram2.get_total_sdram(150), 88 + 8)
+        rec_sdram2.merge(rec_sdram1)
+        self.assertEqual(
+            rec_sdram2.get_total_sdram(150),
+            100 + 50 + 88 + (8 * 3) + (4 + 3) * 150)
+
+        multi1 = MultiRegionSDRAM()
+        multi1.add_cost(1, 40, 6)
+        multi1.add_cost(2, 45, 7)
+
+        with self.assertRaises(PacmanInvalidParameterException):
+            rec_sdram2.merge(multi1)
+        with self.assertRaises(PacmanInvalidParameterException):
+            multi1.merge(rec_sdram2)
+
+        rec_sdram2.nest("many", multi1)
+        self.assertEqual(
+            rec_sdram2.get_total_sdram(150),
+            100 + 50 + 88 + (40 + 45) + (8 * 4) + (4 + 3 + (6 + 7)) * 150)
+        with self.assertRaises(PacmanInvalidParameterException):
+            rec_sdram2.nest("weird", rec_sdram1)
+        multi1.nest("weird", rec_sdram2)
 
     def test_dtcm(self):
         """
