@@ -25,6 +25,9 @@ from pacman.exceptions import PacmanInvalidParameterException
 class WithMallocSdram(MultiRegionSDRAM):
     """ A resource for SDRAM that comes in regions and has malloc costs
 
+        The malloc cost will be automatically added to the total costs,
+        but is not part of any of the regions and reported after a subtotal.
+
         .. note:
         Adding or Subtracting two MultiRegionSDRAM objects will be assumed to
         be an operation over multiple cores/placements so these functions
@@ -32,25 +35,27 @@ class WithMallocSdram(MultiRegionSDRAM):
 
         To add extra SDRAM costs for the same core/placement use the method
         add_cost
-        merge
+        merge (But only for a MultiRegionSDRAM of the same type/ malloc)
+        nest (But only of a MultiRegionSDRAM without malloc)
     """
 
     @abstractproperty
     def malloc_cost(self):
         """
         The malloc cost which is included in the total and in the regions
-        property, but not in the _reg
-        :return: The cost to malloc for these regions
+        property, but not in the regions
+
+        :return: The automatically added cost to malloc for these regions
         """
 
     def nest(self, region, other):
-        # Only nest if other a simple MultiRegionSDRAM
-         if other.__class__ != MultiRegionSDRAM:
+        # Only nest if other is simple MultiRegionSDRAM
+        if other.__class__ != MultiRegionSDRAM:
             raise PacmanInvalidParameterException(
                 "other", other,
                 "You can not nest a {} into a {}".format(
-                    other.__class__.__name__, MultiRegionSDRAM.__name__));
-         super(WithMallocSdram, self).nest(region, other)
+                    other.__class__.__name__, MultiRegionSDRAM.__name__))
+        super(WithMallocSdram, self).nest(region, other)
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps, indent="", preamble="", target=None):

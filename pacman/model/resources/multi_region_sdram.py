@@ -30,6 +30,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         To add extra SDRAM costs for the same core/placement use the method
         add_cost
         merge
+        nest
     """
 
     __slots__ = [
@@ -91,7 +92,15 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = other
 
     def _check_mergable(self, other):
-         if type(other) != type(self):
+        """
+        Check that the two types being merge are possible.
+
+        Currently only multi region sdram of the same type (or sub type) of
+        MultiRegionSDRAM can be merged.
+        :param MultiRegionSDRAM other: Another sdram of the same type
+        raise PacmanInvalidParameterException: If the types do not support merge
+        """
+        if type(other) != type(self):
             raise PacmanInvalidParameterException(
                 "other", other,
                 "You can not nest a {} into a {}".format(
@@ -101,6 +110,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         """
         Combines the other sdram costs keeping the region mappings
 
+        Merge is only guranteed to be possible between the same type/subtype of
         .. note:
             This method should only be called when combining cost for the same
             core/ placement. Use + to combine for different cores
