@@ -139,9 +139,9 @@ class TestResourceModels(unittest.TestCase):
         multi4.add_cost(1, 40, 6)
         multi4.add_cost(2, 45, 7)
         multi4.nest("details", ds_sdram1)
-        with open("m4.txt","w") as target:
+        with open("m4.txt", "w") as target:
             multi4.report(10, indent="", preamble="", target=target)
-        with open("ds2.txt","w") as target:
+        with open("ds2.txt", "w") as target:
             ds_sdram2.report(10, indent="", preamble="", target=target)
 
     def test_recording_sdram(self):
@@ -171,7 +171,7 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(
             rec_sdram2.get_total_sdram(150),
             100 + 50 + 88 + (40 + 45) + (8 * 4) + (4 + 3 + (6 + 7)) * 150)
-        with open("rec2.txt","w") as target:
+        with open("rec2.txt", "w") as target:
             rec_sdram2.report(10, indent="", preamble="", target=target)
         with self.assertRaises(PacmanInvalidParameterException):
             rec_sdram2.nest("weird", rec_sdram1)

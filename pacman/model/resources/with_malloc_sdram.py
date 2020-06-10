@@ -64,12 +64,9 @@ class WithMallocSdram(MultiRegionSDRAM):
         print_(indent+"   ", preamble,
                "Malloc cost {} bytes".format(self.malloc_cost), file=target)
         print_(indent+"   ", preamble,
-               "Regions subtotal: Fixed {} bytes Per_timestep {} bytes for a total of {}"
-               "".format(
+               "Regions subtotal: Fixed {} bytes Per_timestep {} "
+               "bytes for a total of {}".format(
                    self._fixed_sdram - self.malloc_cost,
                    self._per_timestep_sdram,
                    self.get_total_sdram(timesteps) - self.malloc_cost),
                file=target)
-        #for region in self.regions:
-        #    self.regions[region].report(
-        #        timesteps, indent+"        ", str(region)+":", target)
