@@ -98,13 +98,14 @@ class MultiRegionSDRAM(VariableSDRAM):
         Currently only multi region sdram of the same type (or sub type) of
         MultiRegionSDRAM can be merged.
         :param MultiRegionSDRAM other: Another sdram of the same type
-        raise PacmanInvalidParameterException: If the types do not support merge
+        raise PacmanInvalidParameterException:
+            If the types do not support merge
         """
         if type(other) != type(self):
             raise PacmanInvalidParameterException(
                 "other", other,
                 "You can not nest a {} into a {}".format(
-                    type(other), type(self)));
+                    type(other), type(self)))
 
     def merge(self, other):
         """

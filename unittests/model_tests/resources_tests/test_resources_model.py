@@ -17,6 +17,8 @@
 test for the resources model
 """
 from enum import Enum
+import os
+import sys
 import tempfile
 import unittest
 from pacman.model.resources import (
@@ -36,6 +38,11 @@ class TestResourceModels(unittest.TestCase):
     """
     unit tests on the resources object
     """
+
+    def setUp(self):
+        class_file = sys.modules[self.__module__].__file__
+        path = os.path.dirname(os.path.abspath(class_file))
+        os.chdir(path)
 
     def test_sdram(self):
         """
@@ -96,7 +103,8 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(multi1, multi3)
         with tempfile.TemporaryFile(mode="w") as target:
             multi3.report(1000, target=target)
-        # multi3.report(preamble="core (0,0,1):")
+        with open("m1.txt", "w") as target:
+            multi1.report(10, indent="", preamble="", target=target)
 
     def test_ds_sdram(self):
         ds_sdram1 = DsSDRAM()
@@ -115,7 +123,6 @@ class TestResourceModels(unittest.TestCase):
         multi1 = MultiRegionSDRAM()
         multi1.add_cost(1, 40, 6)
         multi1.add_cost(2, 45, 7)
-
         with self.assertRaises(PacmanInvalidParameterException):
             ds_sdram2.merge(multi1)
         with self.assertRaises(PacmanInvalidParameterException):
@@ -127,7 +134,15 @@ class TestResourceModels(unittest.TestCase):
             100 + 50 + 88 + 40 + 45 + 8 + (4 + 3 + 6 + 7) * 150)
         with self.assertRaises(PacmanInvalidParameterException):
             ds_sdram2.nest("weird", ds_sdram1)
-        multi1.nest("weird", ds_sdram2)
+
+        multi4 = MultiRegionSDRAM()
+        multi4.add_cost(1, 40, 6)
+        multi4.add_cost(2, 45, 7)
+        multi4.nest("details", ds_sdram1)
+        with open("m4.txt","w") as target:
+            multi4.report(10, indent="", preamble="", target=target)
+        with open("ds2.txt","w") as target:
+            ds_sdram2.report(10, indent="", preamble="", target=target)
 
     def test_recording_sdram(self):
         rec_sdram1 = RecordingSDRAM()
@@ -156,9 +171,10 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(
             rec_sdram2.get_total_sdram(150),
             100 + 50 + 88 + (40 + 45) + (8 * 4) + (4 + 3 + (6 + 7)) * 150)
+        with open("rec2.txt","w") as target:
+            rec_sdram2.report(10, indent="", preamble="", target=target)
         with self.assertRaises(PacmanInvalidParameterException):
             rec_sdram2.nest("weird", rec_sdram1)
-        multi1.nest("weird", rec_sdram2)
 
     def test_dtcm(self):
         """
