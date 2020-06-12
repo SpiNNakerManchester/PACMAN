@@ -48,6 +48,8 @@ class ApplicationEdge(AbstractEdge):
 
         # The label
         "_label",
+
+        # Ordered set of associated machine edges
         "__machine_edges"
     ]
 
