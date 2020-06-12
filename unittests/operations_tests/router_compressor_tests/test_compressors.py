@@ -17,8 +17,8 @@ import unittest
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
-from pacman.operations.algorithm_reports.routing_compression_checker_report \
-    import compare_tables
+from pacman.operations.router_compressors.routing_compression_checker import (
+    compare_tables)
 from pacman.operations.router_compressors.pair_compressor import (
     PairCompressor)
 from pacman.operations.router_compressors.unordered_compressor import (
