@@ -25,6 +25,7 @@ from pacman.model.graphs import (
 _MachineVertex = None
 
 
+# see ApplicationVertex._machine_vertex_class
 def _machine_vertex_class():
     global _MachineVertex  # pylint: disable=global-statement
     if _MachineVertex is None:

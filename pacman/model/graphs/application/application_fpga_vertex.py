@@ -23,7 +23,7 @@ from pacman.model.resources import ResourceContainer
 
 _MachineVertex = None
 
-
+# see ApplicationVertex._machine_vertex_class
 def _machine_vertex_class():
     global _MachineVertex  # pylint: disable=global-statement
     if _MachineVertex is None:

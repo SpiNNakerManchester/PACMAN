@@ -312,6 +312,7 @@ def _write_one_vertex_partition(f, vertex):
     f.write("Pop size: {}\n".format(num_atoms))
     f.write("Machine Vertices: \n")
 
+    # Sort by slice and then by label
     machine_vertices = sorted(vertex.machine_vertices,
                               key=lambda x: x.label)
     machine_vertices = sorted(machine_vertices,
@@ -368,6 +369,7 @@ def _write_one_vertex_application_placement(f, vertex, placements):
     f.write("Pop size: {}\n".format(num_atoms))
     f.write("Machine Vertices: \n")
 
+    # Sort by slice and then by label
     machine_vertices = sorted(vertex.machine_vertices,
                               key=lambda vert: vert.label)
     machine_vertices = sorted(machine_vertices,

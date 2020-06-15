@@ -23,7 +23,9 @@ class ApplicationGraph(Graph):
     """ An application-level abstraction of a graph.
     """
 
-    __slots__ = ["__machine_graph"]
+    __slots__ = [
+        # Pointer to the machine_graph created from this graph
+        "__machine_graph"]
 
     def __init__(self, label):
         """

@@ -22,6 +22,14 @@ _MachineEdge = None
 
 
 def _machine_edge_class():
+    """
+    Gets the MachineEdge class while avoiding circular dependency
+
+    There is a unknown hidden circular dependency cause by sPyNNaker classes
+    Error when The MachineVertex imports ApplicationVertex
+
+    :return: MachineEdge class
+    """
     global _MachineEdge  # pylint: disable=global-statement
     if _MachineEdge is None:
         from pacman.model.graphs.machine import MachineEdge
