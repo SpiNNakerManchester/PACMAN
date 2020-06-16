@@ -80,7 +80,8 @@ class PartitionAndPlacePartitioner(object):
 
         # Load the vertices and create the machine_graph to fill
         machine_graph = MachineGraph(
-            label="partitioned graph for {}".format(graph.label))
+            label="partitioned graph for {}".format(graph.label),
+            application_graph=graph)
 
         # sort out vertex's by placement constraints
         vertices = sort_vertices_by_known_constraints(graph.vertices)
@@ -108,9 +109,6 @@ class PartitionAndPlacePartitioner(object):
         progress.end()
 
         generate_machine_edges(machine_graph, graph)
-
-        # Remember that we've done the partitioning
-        graph.machine_graph = machine_graph
 
         return machine_graph, resource_tracker.chips_used
 

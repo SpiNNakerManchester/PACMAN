@@ -69,7 +69,7 @@ class BasicPartitioner(object):
 
         # start progress bar
         progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
-        machine_graph = MachineGraph("Machine graph for " + graph.label)
+        machine_graph = MachineGraph("Machine graph for " + graph.label, graph)
         resource_tracker = ResourceTracker(machine, plan_n_timesteps)
 
         # Partition one vertex at a time
@@ -78,9 +78,6 @@ class BasicPartitioner(object):
                 vertex, resource_tracker, machine_graph, plan_n_timesteps)
 
         generate_machine_edges(machine_graph, graph)
-
-        # Remember that we've done the partitioning
-        graph.machine_graph = machine_graph
 
         return machine_graph, resource_tracker.chips_used
 
