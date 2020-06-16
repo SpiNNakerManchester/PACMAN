@@ -18,7 +18,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import PacmanInvalidParameterException, PacmanValueError
 
 
 @add_metaclass(AbstractBase)
@@ -26,7 +26,7 @@ class MachineVertex(AbstractVertex):
     """ A machine graph vertex.
     """
 
-    __slots__ = ["_app_vertex", "_index", "_vertex_slice"]
+    __slots__ = ["_app_vertex", "__index", "_vertex_slice"]
     _DEFAULT_SLICE = Slice(0, 0)
 
     def __init__(self, label=None, constraints=None, app_vertex=None,
@@ -52,7 +52,7 @@ class MachineVertex(AbstractVertex):
         super(MachineVertex, self).__init__(label, constraints)
         self._added_to_graph = False
         self._app_vertex = app_vertex
-        self._index = None
+        self.__index = None
         if app_vertex is not None and not isinstance(
                 app_vertex, ApplicationVertex):
             raise PacmanInvalidParameterException(
@@ -87,17 +87,16 @@ class MachineVertex(AbstractVertex):
 
         :rtype: int
         """
-        return self._index if self._index is not None else 0
+        return self.__index if self.__index is not None else 0
 
     @index.setter
     def index(self, value):
         """ The index into the collection of machine vertices for an
             application vertex.
         """
-        if self._index is not None:
-            # TODO: Should we error or warn about this?
-            pass
-        self._index = value
+        if self.__index is not None:
+            raise PacmanValueError("this vertex already has an index")
+        self.__index = value
 
     def __str__(self):
         _l = self.label

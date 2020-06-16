@@ -69,9 +69,6 @@ class MachineEdge(AbstractEdge):
     @property
     @overrides(AbstractEdge.label)
     def label(self):
-        """
-        :rtype: str or None
-        """
         return self._label
 
     @property
