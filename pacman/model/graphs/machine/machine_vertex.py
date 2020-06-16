@@ -18,7 +18,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.exceptions import PacmanInvalidParameterException, PacmanValueError
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 @add_metaclass(AbstractBase)
@@ -94,8 +94,6 @@ class MachineVertex(AbstractVertex):
         """ The index into the collection of machine vertices for an
             application vertex.
         """
-        if self._index is not None:
-            raise PacmanValueError("this vertex already has an index")
         self._index = value
 
     def __str__(self):
