@@ -46,7 +46,8 @@ class ApplicationGraph(Graph):
     @machine_graph.setter
     def machine_graph(self, machine_graph):
         self.__machine_graph = machine_graph
-        machine_graph.application_graph = self
+        # TRICKY! *Only* place that sets that field to non-None
+        machine_graph._app_graph = self
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.

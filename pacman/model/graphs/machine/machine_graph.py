@@ -36,7 +36,10 @@ class MachineGraph(Graph):
         """
         super(MachineGraph, self).__init__(
             MachineVertex, MachineEdge, OutgoingEdgePartition, label)
-        self._app_graph = application_graph
+        self._app_graph = None
+        if application_graph:
+            # Causes self._app_graph to be set!
+            application_graph.machine_graph = self
 
     @property
     def application_graph(self):
@@ -44,7 +47,3 @@ class MachineGraph(Graph):
         :rtype: ApplicationGraph or None
         """
         return self._app_graph
-
-    @application_graph.setter
-    def application_graph(self, application_graph):
-        self._app_graph = application_graph

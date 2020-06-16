@@ -22,13 +22,15 @@ _MachineEdge = None
 
 
 def _machine_edge_class():
-    """
-    Gets the MachineEdge class while avoiding circular dependency
+    """ Get the MachineEdge class while avoiding circular dependency.
 
-    There is a unknown hidden circular dependency cause by sPyNNaker classes
-    Error when The MachineVertex imports ApplicationVertex
+    There is a unknown hidden circular dependency cause by sPyNNaker classes.
+    That causes an error when the MachineVertex imports ApplicationVertex. This
+    works around that by (effectively) postponing the import of the class until
+    it is actually needed, by which point all classes are actually known.
 
-    :return: MachineEdge class
+    :return: the MachineEdge class
+    :rtype: type
     """
     global _MachineEdge  # pylint: disable=global-statement
     if _MachineEdge is None:
@@ -82,9 +84,12 @@ class ApplicationEdge(AbstractEdge):
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
+        machine_edge_class = _machine_edge_class()
         if machine_edge_type is None:
-            machine_edge_type = _machine_edge_class()
-        # TODO: Enforce the type relationship
+            machine_edge_type = machine_edge_class
+        elif not issubclass(machine_edge_type, machine_edge_class):
+            raise ValueError(
+                "machine_edge_type must be a kind of machine edge")
         self._machine_edge_type = machine_edge_type
         self.__machine_edges = OrderedSet()
 
@@ -93,10 +98,13 @@ class ApplicationEdge(AbstractEdge):
     def label(self):
         return self._label
 
-    # This method gets overridden
     def create_machine_edge(self, pre_vertex, post_vertex, label):
-        """ Create a machine edge between two machine vertices that is a
+        """ Create a machine edge between two machine vertices that is a \
             machine-level embodiment of this application edge.
+
+        If you are thinking about overriding this, you probably ought to
+        override :py:meth:`~_create_machine_edge` instead; this is a wrapper
+        round that method that handles application-edge level bookkeeping.
 
         :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
             The machine vertex at the start of the edge.
@@ -106,11 +114,29 @@ class ApplicationEdge(AbstractEdge):
         :return: The created machine edge
         :rtype: ~pacman.model.graphs.machine.MachineEdge
         """
-        m_edge = self._machine_edge_type(
-            pre_vertex, post_vertex, self._traffic_type, label=label,
-            app_edge=self)
+        m_edge = self._create_machine_edge(pre_vertex, post_vertex, label)
         self.remember_associated_machine_edge(m_edge)
         return m_edge
+
+    def _create_machine_edge(self, pre_vertex, post_vertex, label):
+        """ Create a machine edge between two machine vertices that is a \
+            machine-level embodiment of this application edge.
+
+        This method is intended to be easy to override if alternate arguments
+        are to be passed to the relevant machine edge constructor. It should
+        only ever be called from :py:meth:`~create_machine_edge`.
+
+        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
+            The machine vertex at the start of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
+            The machine vertex at the end of the edge.
+        :param str label: label of the edge
+        :return: The created machine edge
+        :rtype: ~pacman.model.graphs.machine.MachineEdge
+        """
+        return self._machine_edge_type(
+            pre_vertex, post_vertex, self._traffic_type, label=label,
+            app_edge=self)
 
     @property
     @overrides(AbstractEdge.pre_vertex)
