@@ -119,7 +119,6 @@ class BasicPartitioner(object):
                 "{}:{}:{}".format(vertex.label, first, last),
                 get_remaining_constraints(vertex))
             m_graph.add_vertex(m_vertex)
-            vertex.remember_associated_machine_vertex(m_vertex)
 
             # update allocated resources
             res_tracker.allocate_constrained_resources(

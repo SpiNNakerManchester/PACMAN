@@ -220,8 +220,6 @@ class PartitionAndPlacePartitioner(object):
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
-                vertex.remember_associated_machine_vertex(machine_vertex)
-
                 progress.update(vertex_slice.n_atoms)
 
     @staticmethod

@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from pacman.model.graphs.graph import Graph
@@ -47,3 +48,9 @@ class MachineGraph(Graph):
         :rtype: ApplicationGraph or None
         """
         return self._app_graph
+
+    @overrides(Graph.add_vertex)
+    def add_vertex(self, vertex):
+        super(MachineGraph, self).add_vertex(vertex)
+        if self._app_graph:
+            vertex.app_vertex.remember_associated_machine_vertex(vertex)
