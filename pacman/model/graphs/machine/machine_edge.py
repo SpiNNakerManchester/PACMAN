@@ -65,6 +65,16 @@ class MachineEdge(AbstractEdge):
         self._traffic_type = traffic_type
         self._traffic_weight = traffic_weight
         self._app_edge = app_edge
+        # depends on self._app_edge being set
+        self.associate_application_edge()
+
+    def associate_application_edge(self):
+        """
+        Asks the application edge (if any) to remember this machine edge.
+        """
+        if self._app_edge:
+            self._app_edge.remember_associated_machine_edge(self)
+
 
     @property
     @overrides(AbstractEdge.label)

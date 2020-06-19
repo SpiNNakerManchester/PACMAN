@@ -18,7 +18,6 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.exceptions import PacmanInvalidParameterException
 
 
 @add_metaclass(AbstractBase)
@@ -46,6 +45,9 @@ class MachineVertex(AbstractVertex):
         :type vertex_slice: Slice or None
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
+        :raises PacmanValueError: If the slice of the machine_vertex is too big
+        :raise AttributeError:
+            If a not None app_vertex is not an ApplicationVertex
         """
         if label is None:
             label = str(type(self))
@@ -53,14 +55,21 @@ class MachineVertex(AbstractVertex):
         self._added_to_graph = False
         self._app_vertex = app_vertex
         self._index = None
-        if app_vertex is not None and not isinstance(
-                app_vertex, ApplicationVertex):
-            raise PacmanInvalidParameterException(
-                "app_vertex", app_vertex, "must be an application vertex")
         if vertex_slice is not None:
             self._vertex_slice = vertex_slice
         else:
             self._vertex_slice = self._DEFAULT_SLICE
+        # associate depends on self._vertex_slice and self._app_vertex
+        self.associate_application_vertex()
+
+    def associate_application_vertex(self):
+        """
+        Asks the application vertex (if any) to remember this machine vertex.
+        :raises PacmanValueError: If the slice of the machine_vertex is too big
+        """
+        # remember depends on slice already being set
+        if self._app_vertex:
+            self._app_vertex.remember_associated_machine_vertex(self)
 
     @property
     def app_vertex(self):

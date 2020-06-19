@@ -88,6 +88,12 @@ class ApplicationVertex(AbstractVertex):
         """
 
     def remember_associated_machine_vertex(self, machine_vertex):
+        """
+        Adds the Machine vertex the iterable returned by machine_vertices
+        :param machine_vertex: A pointer to a machine_vertex.
+            This vertex may not be fully initialized but will have a slice
+        :raises PacmanValueError: If the slice of the machine_vertex is too big
+        """
         if machine_vertex.vertex_slice.hi_atom >= self.n_atoms:
             raise PacmanValueError(
                 "hi_atom {:d} >= maximum {:d}".format(

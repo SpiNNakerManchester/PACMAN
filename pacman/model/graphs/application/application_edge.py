@@ -162,7 +162,10 @@ class ApplicationEdge(AbstractEdge):
 
     def remember_associated_machine_edge(self, machine_edge):
         """
-        :param MachineEdge machine_edge:
+        Adds the Machine Edge to the iterable returned by machine_edges
+
+        :param MachineEdge machine_edge: A pointer to a machine_edge.
+            This edge may not be fully initialized
         """
         self.__machine_edges.add(machine_edge)
 

@@ -48,9 +48,3 @@ class MachineGraph(Graph):
         :rtype: ApplicationGraph or None
         """
         return self._app_graph
-
-    @overrides(Graph.add_vertex)
-    def add_vertex(self, vertex):
-        super(MachineGraph, self).add_vertex(vertex)
-        if self._app_graph:
-            vertex.app_vertex.remember_associated_machine_vertex(vertex)
