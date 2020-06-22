@@ -40,7 +40,6 @@ class ApplicationGraph(Graph):
             v.forget_machine_vertices()
         for e in self.edges:
             e.forget_machine_edges()
-        self.__machine_graph = None
 
     def forget_machine_edges(self):
         """ Ensure that all application edges in this graph forget what
