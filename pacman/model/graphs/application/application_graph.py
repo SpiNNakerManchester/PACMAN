@@ -23,9 +23,7 @@ class ApplicationGraph(Graph):
     """ An application-level abstraction of a graph.
     """
 
-    __slots__ = [
-        # Pointer to the machine_graph created from this graph
-        "__machine_graph"]
+    __slots__ = []
 
     def __init__(self, label):
         """
@@ -34,21 +32,6 @@ class ApplicationGraph(Graph):
         """
         super(ApplicationGraph, self).__init__(
             ApplicationVertex, ApplicationEdge, OutgoingEdgePartition, label)
-        self.__machine_graph = None
-
-    @property
-    def machine_graph(self):
-        """
-        :rtype: MachineGraph
-        """
-        return self.__machine_graph
-
-    @machine_graph.setter
-    def machine_graph(self, machine_graph):
-        self.forget_machine_graph()
-        self.__machine_graph = machine_graph
-        # TRICKY! *Only* place that sets that field to non-None
-        machine_graph._app_graph = self
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.
