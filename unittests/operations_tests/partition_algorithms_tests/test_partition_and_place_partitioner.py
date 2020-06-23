@@ -43,12 +43,12 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         self.vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
         self.vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3")
-        self.edge1 = ApplicationEdge(self.vert1, self.vert2, None,
-                                     "First edge")
-        self.edge2 = ApplicationEdge(self.vert2, self.vert1, None,
-                                     "Second edge")
-        self.edge3 = ApplicationEdge(self.vert1, self.vert3, None,
-                                     "Third edge")
+        self.edge1 = ApplicationEdge(
+            self.vert1, self.vert2, label="First edge")
+        self.edge2 = ApplicationEdge(
+            self.vert2, self.vert1, label="Second edge")
+        self.edge3 = ApplicationEdge(
+            self.vert1, self.vert3, label="Third edge")
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
         self.graph = ApplicationGraph("Graph")
@@ -78,8 +78,7 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(
-                        x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
         self.bp = PartitionAndPlacePartitioner()
@@ -179,8 +178,7 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(
-                        x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
         n_neurons = 17 * 5 * 5
@@ -223,8 +221,7 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(
-                        x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
@@ -233,7 +230,8 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         with self.assertRaises(PacmanValueError):
-            self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
+            self.bp(self.graph, self.machine, 3000,
+                    PreAllocatedResourceContainer())
 
     def test_partition_with_less_sdram_than_default(self):
         """
@@ -264,11 +262,11 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(
-                        x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
-        self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
+        self.bp(self.graph, self.machine, 3000,
+                PreAllocatedResourceContainer())
 
     def test_partition_with_more_sdram_than_default(self):
         """
@@ -299,11 +297,11 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
                 if x == y == 0:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
                 else:
-                    chips.append(Chip(
-                        x, y, n_processors, r, _sdram, 0, 0, None))
+                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
-        self.bp(self.graph, self.machine, PreAllocatedResourceContainer())
+        self.bp(self.graph, self.machine, 3000,
+                PreAllocatedResourceContainer())
 
     def test_partition_with_unsupported_constraints(self):
         """
@@ -318,7 +316,8 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
         with self.assertRaises(PacmanInvalidParameterException):
-            partitioner(graph, self.machine, PreAllocatedResourceContainer())
+            partitioner(graph, self.machine, 3000,
+                        PreAllocatedResourceContainer())
 
     def test_partition_with_empty_graph(self):
         """test that the partitioner can work with an empty graph
@@ -421,7 +420,8 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         constrained_vertex = SimpleTestVertex(16000, "Constrained")
         self.graph.add_vertex(constrained_vertex)
         partitioner = PartitionAndPlacePartitioner()
-        partitioner(self.graph, self.machine, PreAllocatedResourceContainer())
+        partitioner(
+            self.graph, self.machine, 3000, PreAllocatedResourceContainer())
 
     def test_partition_with_fixed_atom_constraints(self):
         """
@@ -449,7 +449,7 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         # Do the partitioning - this should result in an error
         with self.assertRaises(PacmanException):
             partitioner = PartitionAndPlacePartitioner()
-            partitioner(app_graph, machine, plan_n_timesteps=None)
+            partitioner(app_graph, machine, 3000)
 
     def test_partition_with_fixed_atom_constraints_at_limit(self):
         """
@@ -475,8 +475,7 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
 
         # Do the partitioning - this should just work
         partitioner = PartitionAndPlacePartitioner()
-        machine_graph, _ = partitioner(
-            app_graph, machine, plan_n_timesteps=None)
+        machine_graph, _ = partitioner(app_graph, machine, 3000)
         self.assertEqual(4, len(machine_graph.vertices))
 
 
