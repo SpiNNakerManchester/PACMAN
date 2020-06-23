@@ -51,7 +51,8 @@ class MachineEdge(AbstractEdge):
         :param MachineVertex post_vertex: The vertex at the end of the edge.
         :param EdgeTrafficType traffic_type:
             The type of traffic that this edge will carry.
-        :param str label: The name of the edge.
+        :param label: The name of the edge.
+        :type label: str or None
         :param int traffic_weight:
             The optional weight of traffic expected to travel down this edge
             relative to other edges. (default is 1)

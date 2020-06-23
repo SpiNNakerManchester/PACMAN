@@ -24,7 +24,7 @@ class MachineGraph(Graph):
     """ A graph whose vertices can fit on the chips of a machine.
     """
 
-    __slots__ = ["_app_graph"]
+    __slots__ = []
 
     def __init__(self, label, application_graph=None):
         """
@@ -37,14 +37,5 @@ class MachineGraph(Graph):
         """
         super(MachineGraph, self).__init__(
             MachineVertex, MachineEdge, OutgoingEdgePartition, label)
-        self._app_graph = None
         if application_graph:
-            # Causes self._app_graph to be set!
-            application_graph.machine_graph = self
-
-    @property
-    def application_graph(self):
-        """
-        :rtype: ApplicationGraph or None
-        """
-        return self._app_graph
+            application_graph.forget_machine_graph()
