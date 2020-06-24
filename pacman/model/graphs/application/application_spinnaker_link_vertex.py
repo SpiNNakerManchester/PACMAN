@@ -21,17 +21,7 @@ from .application_vertex import ApplicationVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs import (
     AbstractVirtual, AbstractSpiNNakerLink)
-
-_MachineVertex = None
-
-
-# see ApplicationVertex._machine_vertex_class
-def _machine_vertex_class():
-    global _MachineVertex  # pylint: disable=global-statement
-    if _MachineVertex is None:
-        from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
-        _MachineVertex = MachineSpiNNakerLinkVertex
-    return _MachineVertex
+from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
 
 
 class ApplicationSpiNNakerLinkVertex(
@@ -98,9 +88,10 @@ class ApplicationSpiNNakerLinkVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        machine_vertex = _machine_vertex_class()(
-            self._spinnaker_link_id, self._board_address, label, constraints,
-            self, vertex_slice)
+        machine_vertex = MachineSpiNNakerLinkVertex(
+            self._spinnaker_link_id, self._board_address, label, constraints)
         if resources_required:
             assert (resources_required == machine_vertex.resources_required)
+        if vertex_slice:
+            assert (vertex_slice == machine_vertex.vertex_slice)
         return machine_vertex

@@ -19,18 +19,8 @@ from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
 from pacman.model.graphs import AbstractFPGA, AbstractVirtual
+from pacman.model.graphs.machine import MachineFPGAVertex
 from pacman.model.resources import ResourceContainer
-
-_MachineVertex = None
-
-
-# see ApplicationVertex._machine_vertex_class
-def _machine_vertex_class():
-    global _MachineVertex  # pylint: disable=global-statement
-    if _MachineVertex is None:
-        from pacman.model.graphs.machine import MachineFPGAVertex
-        _MachineVertex = MachineFPGAVertex
-    return _MachineVertex
 
 
 class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGA):
@@ -104,7 +94,7 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGA):
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        machine_vertex = _machine_vertex_class()(
+        machine_vertex = MachineFPGAVertex(
             self._fpga_id, self._fpga_link_id, self._board_address,
             label, constraints, self, vertex_slice)
         machine_vertex.set_virtual_chip_coordinates(
