@@ -190,7 +190,8 @@ class Graph(ConstrainedObject):
         """
         if isinstance(self._allowed_partition_types, (tuple, list)):
             cls = self._allowed_partition_types[0]
-        cls = self._allowed_partition_types
+        else:
+            cls = self._allowed_partition_types
         return cls(name, self._allowed_edge_types)
 
     def add_edges(self, edges, outgoing_edge_partition_name):
