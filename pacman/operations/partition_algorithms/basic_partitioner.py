@@ -102,7 +102,7 @@ class BasicPartitioner(object):
         # Partition into vertices
         for first in range(0, vertex.n_atoms, int(atoms_per_core)):
             # Determine vertex size
-            last = min(first + atoms_per_core, vertex.n_atoms) - 1
+            last = int(min(first + atoms_per_core, vertex.n_atoms) - 1)
             if first < 0 or last < 0:
                 raise PacmanPartitionException(
                     "Not enough resources available to create vertex")
