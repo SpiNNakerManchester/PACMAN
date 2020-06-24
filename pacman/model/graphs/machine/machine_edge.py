@@ -76,7 +76,6 @@ class MachineEdge(AbstractEdge):
         if self._app_edge:
             self._app_edge.remember_associated_machine_edge(self)
 
-
     @property
     @overrides(AbstractEdge.label)
     def label(self):
