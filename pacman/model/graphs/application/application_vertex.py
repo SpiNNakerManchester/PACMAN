@@ -30,7 +30,7 @@ class ApplicationVertex(AbstractVertex):
         based on the resources that the vertex requires.
     """
 
-    __slots__ = ["_machine_vertices", "_slices"]
+    __slots__ = ["_machine_vertices"]
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
@@ -46,7 +46,6 @@ class ApplicationVertex(AbstractVertex):
 
         super(ApplicationVertex, self).__init__(label, constraints)
         self._machine_vertices = OrderedSet()
-        self._slices = list()
 
         # add a constraint for max partitioning
         self.add_constraint(
@@ -103,7 +102,6 @@ class ApplicationVertex(AbstractVertex):
 
         machine_vertex.index = len(self._machine_vertices)
         self._machine_vertices.add(machine_vertex)
-        self._slices.append(machine_vertex.vertex_slice)
 
     @abstractproperty
     def n_atoms(self):
@@ -128,7 +126,7 @@ class ApplicationVertex(AbstractVertex):
 
         :rtype: iterable(Slice)
         """
-        return self._slices
+        return map(lambda x: x.vertex_slice, self._machine_vertices)
 
     def get_max_atoms_per_core(self):
         """ Gets the maximum number of atoms per core, which is either the\
@@ -147,4 +145,3 @@ class ApplicationVertex(AbstractVertex):
             vertex maps to.
         """
         self._machine_vertices = OrderedSet()
-        self._slices = list()
