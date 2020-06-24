@@ -76,8 +76,10 @@ class ApplicationVertex(AbstractVertex):
             constraints=None):
         """ Create a machine vertex from this application vertex
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of atoms that the machine vertex will cover.
+        :param vertex_slice:
+            The slice of atoms that the machine vertex will cover,
+            or None to use the default slice
+        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the machine vertex.
         :param label: human readable label for the machine vertex
