@@ -190,7 +190,8 @@ class Graph(ConstrainedObject):
         """
         if isinstance(self._allowed_partition_types, (tuple, list)):
             cls = self._allowed_partition_types[0]
-        cls = self._allowed_partition_types
+        else:
+            cls = self._allowed_partition_types
         return cls(name, self._allowed_edge_types)
 
     def add_edges(self, edges, outgoing_edge_partition_name):
@@ -344,7 +345,7 @@ class Graph(ConstrainedObject):
             The vertex at the start of the edges in the partition
         :param str outgoing_edge_partition_name:
             The name of the edge partition
-        :rtype: pacman.model.graphs.OutgoingEdgePartition
+        :rtype: pacman.model.graphs.OutgoingEdgePartition, or None
         """
         return self._outgoing_edge_partitions_by_name.get(
             (vertex, outgoing_edge_partition_name), None)
