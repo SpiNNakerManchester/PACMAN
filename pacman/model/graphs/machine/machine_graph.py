@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.overrides import overrides
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from pacman.model.graphs.graph import Graph
