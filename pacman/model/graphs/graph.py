@@ -345,7 +345,7 @@ class Graph(ConstrainedObject):
             The vertex at the start of the edges in the partition
         :param str outgoing_edge_partition_name:
             The name of the edge partition
-        :rtype: pacman.model.graphs.OutgoingEdgePartition
+        :rtype: pacman.model.graphs.OutgoingEdgePartition, or None
         """
         return self._outgoing_edge_partitions_by_name.get(
             (vertex, outgoing_edge_partition_name), None)
