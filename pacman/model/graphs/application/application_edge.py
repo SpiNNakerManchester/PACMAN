@@ -17,26 +17,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.graphs import AbstractEdge
 from pacman.model.graphs.common import EdgeTrafficType
-
-_MachineEdge = None
-
-
-def _machine_edge_class():
-    """ Get the MachineEdge class while avoiding circular dependency.
-
-    There is a unknown hidden circular dependency cause by sPyNNaker classes.
-    That causes an error when the MachineVertex imports ApplicationVertex. This
-    works around that by (effectively) postponing the import of the class until
-    it is actually needed, by which point all classes are actually known.
-
-    :return: the MachineEdge class
-    :rtype: type
-    """
-    global _MachineEdge  # pylint: disable=global-statement
-    if _MachineEdge is None:
-        from pacman.model.graphs.machine import MachineEdge
-        _MachineEdge = MachineEdge
-    return _MachineEdge
+from pacman.model.graphs.machine import MachineEdge
 
 
 class ApplicationEdge(AbstractEdge):
@@ -66,7 +47,7 @@ class ApplicationEdge(AbstractEdge):
     def __init__(
             self, pre_vertex, post_vertex,
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
-            machine_edge_type=None):
+            machine_edge_type=MachineEdge):
         """
         :param ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.
@@ -79,16 +60,13 @@ class ApplicationEdge(AbstractEdge):
         :param machine_edge_type:
             The type of machine edges made from this app edge. If `None`,
             standard `MachineEdge`s will be made.
-        :type machine_edge_type: type(MachineEdge) or None
+        :type machine_edge_type: type(MachineEdge)
         """
         self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
-        machine_edge_class = _machine_edge_class()
-        if machine_edge_type is None:
-            machine_edge_type = machine_edge_class
-        elif not issubclass(machine_edge_type, machine_edge_class):
+        if not issubclass(machine_edge_type, MachineEdge):
             raise ValueError(
                 "machine_edge_type must be a kind of machine edge")
         self._machine_edge_type = machine_edge_type
