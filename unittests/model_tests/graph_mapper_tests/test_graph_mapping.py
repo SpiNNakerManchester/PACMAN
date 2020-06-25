@@ -80,9 +80,6 @@ class TestGraphMapping(unittest.TestCase):
         vertex2 = SimpleMachineVertex(None, "", app_vertex=vert,
                                       vertex_slice=Slice(2, 3))
 
-        vert.remember_associated_machine_vertex(vertex1)
-        vert.remember_associated_machine_vertex(vertex2)
-
         self.assertEqual(vert, vertex1.app_vertex)
         self.assertEqual(vert, vertex2.app_vertex)
         self.assertEqual([vertex1, vertex2], list(vert.machine_vertices))
