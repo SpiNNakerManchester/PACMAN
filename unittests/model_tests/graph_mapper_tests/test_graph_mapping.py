@@ -53,12 +53,13 @@ class TestGraphMapping(unittest.TestCase):
         test getting the vertex from a graph mapper via the vertex
         """
         vertices = list()
-        vertices.append(SimpleMachineVertex(None, ""))
-        vertices.append(SimpleMachineVertex(None, ""))
-        vertex1 = SimpleMachineVertex(None, "", vertex_slice=Slice(0, 1))
-        vertex2 = SimpleMachineVertex(None, "", vertex_slice=Slice(2, 3))
-
         vert = SimpleTestVertex(4, "Some testing vertex")
+        vertices.append(SimpleMachineVertex(None, ""))
+        vertices.append(SimpleMachineVertex(None, ""))
+        vertex1 = SimpleMachineVertex(
+            None, "", vertex_slice=Slice(0, 1), app_vertex=vert)
+        vertex2 = SimpleMachineVertex(
+            None, "", vertex_slice=Slice(2, 3), app_vertex=vert)
 
         returned_vertices = vert.machine_vertices
 
