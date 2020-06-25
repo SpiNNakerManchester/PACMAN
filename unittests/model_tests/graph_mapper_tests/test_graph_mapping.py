@@ -60,9 +60,6 @@ class TestGraphMapping(unittest.TestCase):
 
         vert = SimpleTestVertex(4, "Some testing vertex")
 
-        vert.remember_associated_machine_vertex(vertex1)
-        vert.remember_associated_machine_vertex(vertex2)
-
         returned_vertices = vert.machine_vertices
 
         self.assertIn(vertex1, returned_vertices)
