@@ -77,7 +77,7 @@ class ApplicationEdge(AbstractEdge):
     def label(self):
         return self._label
 
-    def create_machine_edge(self, pre_vertex, post_vertex, label=None):
+    def create_machine_edge(self, pre_vertex, post_vertex, label):
         """ Create a machine edge between two machine vertices that is a \
             machine-level embodiment of this application edge.
 
