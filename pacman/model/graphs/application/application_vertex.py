@@ -126,7 +126,7 @@ class ApplicationVertex(AbstractVertex):
 
         :rtype: iterable(Slice)
         """
-        return map(lambda x: x.vertex_slice, self._machine_vertices)
+        return list(map(lambda x: x.vertex_slice, self._machine_vertices))
 
     def get_max_atoms_per_core(self):
         """ Gets the maximum number of atoms per core, which is either the\
