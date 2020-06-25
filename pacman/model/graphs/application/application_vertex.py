@@ -21,7 +21,7 @@ from spinn_utilities.abstract_base import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
-from pacman.exceptions import PacmanValueError
+from pacman.exceptions import PacmanValueError, PacmanAlreadyExistsException
 
 
 @add_metaclass(AbstractBase)
@@ -101,6 +101,10 @@ class ApplicationVertex(AbstractVertex):
                     machine_vertex.vertex_slice.hi_atom, self.n_atoms))
 
         machine_vertex.index = len(self._machine_vertices)
+
+        if machine_vertex in self._machine_vertices:
+            raise PacmanAlreadyExistsException(
+                str(machine_vertex), machine_vertex)
         self._machine_vertices.add(machine_vertex)
 
     @abstractproperty
