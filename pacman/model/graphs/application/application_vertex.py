@@ -27,7 +27,6 @@ class ApplicationVertex(AbstractVertex):
         based on the resources that the vertex requires.
     """
 
-
     __slots__ = []
 
     def __init__(self, label=None, constraints=None,
