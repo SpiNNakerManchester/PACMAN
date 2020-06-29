@@ -127,3 +127,11 @@ class IPtagResource(object):
                 self._strip_sdp == other._strip_sdp and
                 self._tag == other._tag and
                 self._traffic_identifier == other._traffic_identifier)
+
+    def __hash__(self):
+        return hash((
+            self._ip_address, self._port, self._strip_sdp, self._tag,
+            self._traffic_identifier))
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
