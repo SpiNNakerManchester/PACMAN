@@ -28,7 +28,8 @@ class AllOfInput(AbstractInput):
 
     def __init__(self, inputs):
         """
-        :param inputs: The inputs that make up this input
+        :param list(AbstractInput) inputs:
+            The inputs that make up this input
         """
         self._inputs = inputs
 

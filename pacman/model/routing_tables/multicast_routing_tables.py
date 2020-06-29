@@ -17,7 +17,8 @@ import json
 import gzip
 from collections import OrderedDict
 from pacman.exceptions import PacmanAlreadyExistsException
-from .multicast_routing_table import MulticastRoutingTable
+from .uncompressed_multicast_routing_table import \
+    UnCompressedMulticastRoutingTable
 from spinn_machine import MulticastRoutingEntry
 
 
@@ -34,10 +35,9 @@ class MulticastRoutingTables(object):
 
     def __init__(self, routing_tables=None):
         """
-        :param routing_tables: The routing tables to add
-        :type routing_tables: \
-            iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
-        :raise pacman.exceptions.PacmanAlreadyExistsException: \
+        :param iterable(MulticastRoutingTable) routing_tables:
+            The routing tables to add
+        :raise PacmanAlreadyExistsException:
             If any two routing tables are for the same chip
         """
         self._routing_tables = set()
@@ -50,11 +50,9 @@ class MulticastRoutingTables(object):
     def add_routing_table(self, routing_table):
         """ Add a routing table
 
-        :param routing_table: a routing table to add
-        :type routing_table:\
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`
+        :param MulticastRoutingTable routing_table: a routing table to add
         :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: \
+        :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
         if routing_table in self._routing_tables:
@@ -77,8 +75,7 @@ class MulticastRoutingTables(object):
         """ The routing tables stored within
 
         :return: an iterable of routing tables
-        :rtype: \
-            iterable(:py:class:`pacman.model.routing_tables.MulticastRoutingTable`)
+        :rtype: iterable(MulticastRoutingTable)
         :raise None: does not raise any known exceptions
         """
         return self._routing_tables
@@ -86,14 +83,10 @@ class MulticastRoutingTables(object):
     def get_routing_table_for_chip(self, x, y):
         """ Get a routing table for a particular chip
 
-        :param x: The x-coordinate of the chip
-        :type x: int
-        :param y: The y-coordinate of the chip
-        :type y: int
+        :param int x: The x-coordinate of the chip
+        :param int y: The y-coordinate of the chip
         :return: The routing table, or None if no such table exists
-        :rtype:\
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTable`\
-            or None
+        :rtype: MulticastRoutingTable or None
         :raise None: No known exceptions are raised
         """
         return self._routing_tables_by_chip.get((x, y), None)
@@ -136,7 +129,7 @@ def from_json(j_router):
 
     tables = MulticastRoutingTables()
     for j_table in j_router:
-        table = MulticastRoutingTable(j_table["x"], j_table["y"])
+        table = UnCompressedMulticastRoutingTable(j_table["x"], j_table["y"])
         tables.add_routing_table(table)
         for j_entry in j_table["entries"]:
             table.add_multicast_routing_entry(MulticastRoutingEntry(

@@ -40,6 +40,9 @@
             <param_name>machine</param_name>
             <param_name>destination_class</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryFixedRoutes</param_type>
         </outputs>
@@ -318,6 +321,9 @@
             <param_name>machine</param_name>
             <param_name>machine_graph</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingTableByPartition</param_type>
         </outputs>
@@ -344,6 +350,9 @@
             <param_name>n_keys_map</param_name>
             <param_name>placements</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
         </outputs>
@@ -368,18 +377,16 @@
                 <param_name>n_keys_map</param_name>
                 <param_type>MemoryMachinePartitionNKeysMap</param_type>
             </parameter>
-            <parameter>
-                <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>application_graph</param_name>
             <param_name>graph_mapper</param_name>
             <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
-            <param_name>placements</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
             <param_type>ApplicationRoutingInfos</param_type>
@@ -407,6 +414,9 @@
             <param_name>n_keys_map</param_name>
             <param_name>placements</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
             <param_type>MemoryRoutingTables</param_type>
@@ -434,6 +444,7 @@
             <param_name>n_keys_map</param_name>
         </required_inputs>
         <optional_inputs>
+            <token>EdgesFiltered</token>
             <param_name>graph_mapper</param_name>
         </optional_inputs>
         <outputs>
@@ -462,6 +473,9 @@
             <param_name>n_keys_map</param_name>
             <param_name>routing_tables</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
         </outputs>
@@ -490,6 +504,7 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingTables</param_type>
+            <token part="UnCompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
     <algorithm name="ZonedRoutingTableGenerator">
@@ -596,7 +611,31 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
+            <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
+    </algorithm>
+    <algorithm name="RoutingCompressionChecker">
+        <python_module>pacman.operations.router_compressors.routing_compression_checker</python_module>
+        <python_function>generate_routing_compression_checker_report</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>compressed_routing_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>compressed_routing_tables</param_name>
+            <param_name>routing_tables</param_name>
+        </required_inputs>
     </algorithm>
     <algorithm name="BasicRouteMerger">
         <python_module>pacman.operations.router_compressors.basic_route_merger</python_module>
@@ -774,6 +813,9 @@
             <param_name>machine</param_name>
             <param_name>placements</param_name>
         </required_inputs>
+        <optional_inputs>
+            <token>EdgesFiltered</token>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingTableByPartition</param_type>
         </outputs>

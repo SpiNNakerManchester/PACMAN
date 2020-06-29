@@ -12,14 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from pacman.utilities.constants import FULL_MASK
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.model.routing_tables.compressed_multicast_routing_table import \
+    CompressedMulticastRoutingTable
+from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.exceptions import PacmanRoutingException
 
-_32_BITS = 0xFFFFFFFF
 _UPPER_16_BITS = 0xFFFF << 16  # upper 16 bits of 32
 _LOWER_16_BITS = 0xFFFF
 
@@ -27,11 +27,18 @@ _LOWER_16_BITS = 0xFFFF
 class BasicRouteMerger(object):
     """ Merges routing tables entries via different masks and an\
         exploration process
+
+    :param MulticastRoutingTables router_tables:
+    :rtype: MulticastRoutingTables
     """
 
     __slots__ = []
 
     def __call__(self, router_tables):
+        """
+        :param MulticastRoutingTables router_tables:
+        :rtype: MulticastRoutingTables
+        """
         tables = MulticastRoutingTables()
         previous_masks = dict()
 
@@ -40,7 +47,7 @@ class BasicRouteMerger(object):
             "Compressing Routing Tables")
 
         # Create all masks without holes
-        allowed_masks = [_32_BITS - ((2 ** i) - 1) for i in range(33)]
+        allowed_masks = [FULL_MASK - ((2 ** i) - 1) for i in range(33)]
 
         # Check that none of the masks have "holes" e.g. 0xFFFF0FFF has a hole
         for router_table in router_tables.routing_tables:
@@ -54,9 +61,9 @@ class BasicRouteMerger(object):
         for router_table in progress.over(router_tables.routing_tables):
             new_table = self._merge_routes(router_table, previous_masks)
             tables.add_routing_table(new_table)
-            n_entries = len([
-                entry for entry in new_table.multicast_routing_entries
-                if not entry.defaultable])
+            n_entries = sum(
+                not entry.defaultable
+                for entry in new_table.multicast_routing_entries)
             # print("Reduced from {} to {}".format(
             #     len(router_table.multicast_routing_entries), n_entries))
             if n_entries > 1023:
@@ -67,6 +74,11 @@ class BasicRouteMerger(object):
         return tables
 
     def _get_merge_masks(self, mask, previous_masks):
+        """
+        :param int mask:
+        :param dict(int,list(int)) previous_masks:
+        :rtype: list(int)
+        """
         if mask in previous_masks:
             return previous_masks[mask]
 
@@ -81,7 +93,13 @@ class BasicRouteMerger(object):
         return merge_masks
 
     def _merge_routes(self, router_table, previous_masks):
-        merged_routes = MulticastRoutingTable(router_table.x, router_table.y)
+        """
+        :param MulticastRoutingTable router_table:
+        :param dict(int,list(int)) previous_masks:
+        :rtype: MulticastRoutingTable
+        """
+        merged_routes = CompressedMulticastRoutingTable(
+            router_table.x, router_table.y)
         keys_merged = set()
 
         entries = router_table.multicast_routing_entries
@@ -94,7 +112,7 @@ class BasicRouteMerger(object):
                 for extra_bits in self._get_merge_masks(mask, previous_masks):
                     new_mask = _UPPER_16_BITS | extra_bits
                     new_key = router_entry.routing_entry_key & new_mask
-                    new_n_keys = ~new_mask & _32_BITS
+                    new_n_keys = ~new_mask & FULL_MASK
 
                     # Get candidates for this particular possible merge
                     potential_merges = self._mergeable_entries(
@@ -108,9 +126,9 @@ class BasicRouteMerger(object):
                                 new_key, new_mask,
                                 router_entry.processor_ids,
                                 router_entry.link_ids, defaultable=False))
-                        keys_merged.update([
+                        keys_merged.update(
                             route.routing_entry_key
-                            for route in potential_merges])
+                            for route in potential_merges)
                         break
                 else:
                     # print("Was not able to merge", hex(key))
@@ -123,12 +141,21 @@ class BasicRouteMerger(object):
 
     def _mergeable_entries(
             self, entry, entries, new_key, new_mask, new_last_key, merged):
+        """
+        :param ~spinn_machine.MulticastRoutingEntry entry:
+        :param iterable(~spinn_machine.MulticastRoutingEntry) entries:
+        :param int new_key:
+        :param int new_mask:
+        :param int new_last_key:
+        :param set(int) merged:
+        :rtype: list(~spinn_machine.MulticastRoutingEntry)
+        """
         # Check that all the cores on this chip have the same route as this is
         # the only way we can merge here
         potential_merges = set()
         for entry_2 in entries:
             key = entry_2.routing_entry_key
-            n_keys = ~entry_2.mask & _32_BITS
+            n_keys = ~entry_2.mask & FULL_MASK
             last_key = key + n_keys
             masked_key = entry_2.routing_entry_key & new_mask
             overlap = (min(new_last_key, last_key) - max(new_key, key)) > 0

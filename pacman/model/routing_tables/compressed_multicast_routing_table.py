@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2019-2020 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanRoutingException)
+from pacman.model.routing_tables.abstract_multicast_routing_table import \
+    AbsractMulticastRoutingTable
+from spinn_utilities.overrides import overrides
 
 
-class MulticastRoutingTable(object):
-    """ Represents a routing table for a chip.
+class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
+    """ Represents a compressed routing table for a chip.
     """
 
     __slots__ = [
@@ -31,10 +31,6 @@ class MulticastRoutingTable(object):
 
         # An iterable of routing entries to add to the table
         "_multicast_routing_entries",
-
-        # dict of multicast routing entries.
-        # (key, mask) -> multicast_routing_entry
-        "_multicast_routing_entries_by_routing_entry_key",
 
         # counter of how many entries in their multicast routing table are
         # defaultable
@@ -60,7 +56,6 @@ class MulticastRoutingTable(object):
         self._y = y
         self._number_of_defaulted_routing_entries = 0
         self._multicast_routing_entries = list()
-        self._multicast_routing_entries_by_routing_entry_key = OrderedDict()
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
@@ -76,16 +71,6 @@ class MulticastRoutingTable(object):
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
             entry with the same key-mask combination already exists
         """
-        routing_entry_key = multicast_routing_entry.routing_entry_key
-        mask = multicast_routing_entry.mask
-
-        tuple_key = (routing_entry_key, mask)
-        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
-            raise PacmanAlreadyExistsException(
-                "Multicast_routing_entry", str(multicast_routing_entry))
-
-        self._multicast_routing_entries_by_routing_entry_key[tuple_key] =\
-            multicast_routing_entry
         self._multicast_routing_entries.append(multicast_routing_entry)
 
         # update default routed counter if required
@@ -93,92 +78,50 @@ class MulticastRoutingTable(object):
             self._number_of_defaulted_routing_entries += 1
 
     @property
+    @overrides(AbsractMulticastRoutingTable.x)
     def x(self):
-        """ The x-coordinate of the chip of this table
-
-        :return: The x-coordinate
-        :rtype: int
-        """
         return self._x
 
     @property
+    @overrides(AbsractMulticastRoutingTable.y)
     def y(self):
-        """ The y-coordinate of the chip of this table
-
-        :return: The y-coordinate
-        :rtype: int
-        """
         return self._y
 
     @property
+    @overrides(AbsractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
-        """ The multicast routing entries in the table
-
-        :return: an iterable of multicast routing entries
-        :rtype: iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
-        :raise None: does not raise any known exceptions
-        """
         return self._multicast_routing_entries
 
     @property
+    @overrides(AbsractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
-        """ The number of multi-cast routing entries there are in the\
-            multicast routing table
-        """
         return len(self._multicast_routing_entries)
 
     @property
+    @overrides(AbsractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
-        """ The number of multi-cast routing entries that are set to be\
-            defaultable within this multicast routing table
-
-        :return: int
-        """
         return self._number_of_defaulted_routing_entries
 
-    def get_multicast_routing_entry_by_routing_entry_key(
-            self, routing_entry_key, mask):
-        """ Get the routing entry associated with the specified key_combo-mask\
-            combination or None if the routing table does not match the\
-            key_combo
-
-        :param routing_entry_key: the routing key to be searched
-        :type routing_entry_key: int
-        :param mask: the routing mask to be searched
-        :type mask: int
-        :return: the routing entry associated with the routing key_combo or\
-            None if no such entry exists
-        :rtype:\
-            :py:class:`spinn_machine.MulticastRoutingEntry`
-        """
-        if (routing_entry_key & mask) != routing_entry_key:
-            raise PacmanRoutingException(
-                "The key {} is changed when masked with the mask {}."
-                " This is determined to be an error in the tool chain. Please "
-                "correct this and try again.".format(routing_entry_key, mask))
-
-        tuple_key = (routing_entry_key, mask)
-        if tuple_key in self._multicast_routing_entries_by_routing_entry_key:
-            return self._multicast_routing_entries_by_routing_entry_key[
-                tuple_key]
-        return None
-
+    @overrides(AbsractMulticastRoutingTable.__eq__)
     def __eq__(self, other):
-        if not isinstance(other, MulticastRoutingTable):
+        if not isinstance(other, CompressedMulticastRoutingTable):
             return False
         if self._x != other.x and self._y != other.y:
             return False
         return self._multicast_routing_entries == \
             other.multicast_routing_entries
 
+    @overrides(AbsractMulticastRoutingTable.__ne__)
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    @overrides(AbsractMulticastRoutingTable.__repr__)
     def __repr__(self):
         entry_string = ""
         for entry in self._multicast_routing_entries:
             entry_string += "{}\n".format(entry)
         return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
 
+    @overrides(AbsractMulticastRoutingTable.__hash__)
     def __hash__(self):
         return id(self)

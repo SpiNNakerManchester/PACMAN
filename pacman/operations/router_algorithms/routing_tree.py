@@ -27,7 +27,7 @@ from collections import deque
 
 
 class RoutingTree(object):
-    """Explicitly defines a multicast route through a SpiNNaker machine.
+    """ Explicitly defines a multicast route through a SpiNNaker machine.
 
     Each instance represents a single hop in a route and recursively refers to
     following steps.
@@ -44,15 +44,15 @@ class RoutingTree(object):
 
     def __init__(self, chip):
         """
-        :param chip: The chip the route is currently passing through.
-        :type chip: tuple(int,int)
+        :param tuple(int,int) chip:
+            The chip the route is currently passing through.
         """
         self.chip = chip
         self._children = []
 
     @property
     def chip(self):
-        """The chip the route is currently passing through.
+        """ The chip the route is currently passing through.
 
         :rtype: tuple(int,int)
         """
@@ -86,15 +86,23 @@ class RoutingTree(object):
           additional logic may be required to determine what core to target to\
           reach the vertex.
 
-        :rtype: iterable
+        :rtype: iterable(RoutingTree or MachineVertex)
         """
         for child in self._children:
             yield child
 
     def append_child(self, child):
+        """
+        :param child:
+        :type child: RoutingTree or MachineVertex
+        """
         self._children.append(child)
 
     def remove_child(self, child):
+        """
+        :param child:
+        :type child: RoutingTree or MachineVertex
+        """
         self._children.remove(child)
 
     def __iter__(self):
@@ -124,7 +132,7 @@ class RoutingTree(object):
         :return: (direction, (x, y), set(route)) \
             Direction taken to reach a Node in the tree, the (x, y) coordinate\
             of that Node and routes leading to children of the Node.
-
+        :rtype: iterable(tuple(int, tuple(int,int), set(int)))
         """
         # A queue of (direction, node) to visit. The direction is the Links
         # entry which describes the direction in which we last moved to reach

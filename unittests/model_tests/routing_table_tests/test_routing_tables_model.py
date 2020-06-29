@@ -15,9 +15,9 @@
 
 import unittest
 from spinn_machine import MulticastRoutingEntry
-from pacman.model.graphs.impl import OutgoingEdgePartition
+from pacman.model.graphs import OutgoingEdgePartition
 from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.routing_tables.multicast_routing_tables import (
     to_json, from_json)
 from pacman.model.routing_table_by_partition import (
@@ -60,7 +60,7 @@ class TestRoutingTable(unittest.TestCase):
             multicast_entries.append(
                 MulticastRoutingEntry(key_combo + i, mask + i, proc_ids,
                                       link_ids, True))
-        mrt = MulticastRoutingTable(0, 0, multicast_entries)
+        mrt = UnCompressedMulticastRoutingTable(0, 0, multicast_entries)
         self.assertEqual(mrt.x, 0)
         self.assertEqual(mrt.y, 0)
 
@@ -82,7 +82,7 @@ class TestRoutingTable(unittest.TestCase):
         """
         tests creating a basic multicast routing table
         """
-        MulticastRoutingTable(0, 0)
+        UnCompressedMulticastRoutingTable(0, 0)
 
     def test_new_multicast_routing_table_duplicate_entry(self):
         """
@@ -101,7 +101,7 @@ class TestRoutingTable(unittest.TestCase):
         for i in range(5):
             multicast_entries.append(MulticastRoutingEntry(
                 key_combo + i, mask + i, proc_ids, link_ids, True))
-        mrt = MulticastRoutingTable(0, 0, multicast_entries)
+        mrt = UnCompressedMulticastRoutingTable(0, 0, multicast_entries)
         with self.assertRaises(PacmanAlreadyExistsException):
             mrt.add_multicast_routing_entry(multicast_entries[0])
 
@@ -120,7 +120,7 @@ class TestRoutingTable(unittest.TestCase):
             multicast_entries.append(MulticastRoutingEntry(
                 key_combo, mask, proc_ids, link_ids, True))
         with self.assertRaises(PacmanAlreadyExistsException):
-            MulticastRoutingTable(0, 0, multicast_entries)
+            UnCompressedMulticastRoutingTable(0, 0, multicast_entries)
 
     def test_new_multicast_routing_tables(self):
         key_combo = 0xff35
@@ -137,8 +137,8 @@ class TestRoutingTable(unittest.TestCase):
             key_combo - 1, mask - 1, proc_ids, link_ids, True)
         mrt = list()
 
-        t1 = MulticastRoutingTable(0, 0, [multicast_entries1])
-        t2 = MulticastRoutingTable(1, 0, [multicast_entries2])
+        t1 = UnCompressedMulticastRoutingTable(0, 0, [multicast_entries1])
+        t2 = UnCompressedMulticastRoutingTable(1, 0, [multicast_entries2])
         mrt.append(t1)
         mrt.append(t2)
         tables = MulticastRoutingTables(mrt)
@@ -152,7 +152,7 @@ class TestRoutingTable(unittest.TestCase):
         self.assertEqual(tables.get_routing_table_for_chip(2, 0), None)
 
         json_obj = to_json(tables)
-        file_format_schemas.validate(json_obj, "router.json")
+        file_format_schemas.validate(json_obj, "routing_tables.json")
         new_tables = from_json(json_obj)
         self.assertEqual(new_tables.get_routing_table_for_chip(0, 0), t1)
         self.assertEqual(new_tables.get_routing_table_for_chip(1, 0), t2)
@@ -176,8 +176,10 @@ class TestRoutingTable(unittest.TestCase):
         multicast_entries2 = MulticastRoutingEntry(
             key_combo - 1, mask, proc_ids, link_ids, True)
         mrt = list()
-        mrt.append(MulticastRoutingTable(3, 0, [multicast_entries1]))
-        mrt.append(MulticastRoutingTable(3, 0, [multicast_entries2]))
+        mrt.append(
+            UnCompressedMulticastRoutingTable(3, 0, [multicast_entries1]))
+        mrt.append(
+            UnCompressedMulticastRoutingTable(3, 0, [multicast_entries2]))
         with self.assertRaises(PacmanAlreadyExistsException):
             MulticastRoutingTables(mrt)
 

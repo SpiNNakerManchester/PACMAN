@@ -18,6 +18,34 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
 			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+    <algorithm name="RouterCollisionPotentialReport">
+        <python_module>pacman.operations.algorithm_reports.router_collision_potential_report</python_module>
+        <python_class>RouterCollisionPotentialReport</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables_by_partition</param_name>
+                <param_type>MemoryRoutingTableByPartition</param_type>
+            </parameter>
+            <parameter>
+                <param_name>n_keys_map</param_name>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>default_report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables_by_partition</param_name>
+            <param_name>n_keys_map</param_name>
+            <param_name>default_report_folder</param_name>
+            <param_name>machine</param_name>
+        </required_inputs>
+    </algorithm>
     <algorithm name="PlacerReportWithApplicationGraph">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>placer_reports_with_application_graph</python_function>
@@ -159,6 +187,9 @@
             <param_name>hostname</param_name>
             <param_name>machine</param_name>
         </required_inputs>
+        <outputs>
+            <param_type>UnCompressedSummary</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="CompressedRouterSummaryReport">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
@@ -187,6 +218,9 @@
             <param_name>hostname</param_name>
             <param_name>machine</param_name>
         </required_inputs>
+        <outputs>
+            <param_type>CompressedSummary</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="routingInfoReports">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
@@ -308,29 +342,6 @@
             <param_name>routing_tables</param_name>
         </required_inputs>
     </algorithm>
-    <algorithm name="routingCompressionCheckerReport">
-        <python_module>pacman.operations.algorithm_reports.routing_compression_checker_report</python_module>
-        <python_function>generate_routing_compression_checker_report</python_function>
-        <input_definitions>
-            <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>compressed_routing_tables</param_name>
-                <param_type>MemoryCompressedRoutingTables</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>report_folder</param_name>
-            <param_name>compressed_routing_tables</param_name>
-            <param_name>routing_tables</param_name>
-        </required_inputs>
-    </algorithm>
     <algorithm name="PartitionerReport">
         <python_module>pacman.operations.algorithm_reports.reports</python_module>
         <python_function>partitioner_report</python_function>
@@ -396,46 +407,109 @@
             <param_name>graph</param_name>
         </required_inputs>
     </algorithm>
-    <algorithm name="ConvertToJsonRoutingTables">
-        <python_module>pacman.operations.algorithm_reports.convert_to_json_routing_tables</python_module>
-        <python_class>ConvertToJsonRoutingTables</python_class>
+    <algorithm name="WriteJsonRoutingTables">
+        <python_module>pacman.operations.algorithm_reports.write_json_routing_tables</python_module>
+        <python_class>WriteJsonRoutingTables</python_class>
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
-            <param_name>report_folder</param_name>
+            <param_name>json_folder</param_name>
         </required_inputs>
         <outputs>
             <param_type>JsonRoutingTablesPath</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="ConvertToJsonMachineGraph">
-        <python_module>pacman.operations.algorithm_reports.convert_to_json_machine_graph</python_module>
-        <python_class>ConvertToJsonMachineGraph</python_class>
+    <algorithm name="WriteJsonMachineGraph">
+        <python_module>pacman.operations.algorithm_reports.write_json_machine_graph</python_module>
+        <python_class>WriteJsonMachineGraph</python_class>
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
-            <param_name>report_folder</param_name>
+            <param_name>json_folder</param_name>
         </required_inputs>
         <outputs>
             <param_type>JsonMachineGraphPath</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="WriteJsonPlacements">
+        <python_module>pacman.operations.algorithm_reports.write_json_placements</python_module>
+        <python_class>WriteJsonPlacements</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>placements</param_name>
+            <param_name>json_folder</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>JsonPlacementsPath</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="WriteJsonMachine">
+        <python_module>pacman.operations.algorithm_reports.write_json_machine</python_module>
+        <python_class>WriteJsonMachine</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine</param_name>
+            <param_name>json_folder</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>JsonMachine</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="WriteJsonPartitionNKeysMap">
+        <python_module>pacman.operations.algorithm_reports.write_json_partition_n_keys_map</python_module>
+        <python_class>WriteJsonPartitionNKeysMap</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>partition_to_n_keys_map</param_name>
+                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+            </parameter>
+            <parameter>
+                <param_name>json_folder</param_name>
+                <param_type>JsonFolder</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>partition_to_n_keys_map</param_name>
+            <param_name>json_folder</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>JsonPartitionNKeysMap</param_type>
         </outputs>
     </algorithm>
 </algorithms>

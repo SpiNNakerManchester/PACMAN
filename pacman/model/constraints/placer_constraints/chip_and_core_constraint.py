@@ -37,13 +37,10 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
 
     def __init__(self, x, y, p=None):
         """
-        :param x: the x-coordinate of the chip
-        :type x: int
-        :param y: the y-coordinate of the chip
-        :type y: int
+        :param int x: the x-coordinate of the chip
+        :param int y: the y-coordinate of the chip
         :param p: the processor (if any) of the chip
-        :type p: int
-        :raise None: does not raise any known exceptions
+        :type p: int or None
         """
         self._x = int(x)
         self._y = int(y)
@@ -53,9 +50,7 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
     def x(self):
         """ The x-coordinate of the chip
 
-        :return: the x-coordinate
         :rtype: int
-        :raise None: does not raise any known exceptions
         """
         return self._x
 
@@ -63,29 +58,24 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
     def y(self):
         """ The y-coordinate of the chip
 
-        :return: the y-coordinate
         :rtype: int
-        :raise None: does not raise any known exceptions
         """
         return self._y
 
     @property
     def p(self):
-        """ The processor on the chip
+        """ The processor on the chip, or None if that is not constrained
 
-        :return: the processor ID, or None if that is not constrained
         :rtype: int or None
-        :raise None: does not raise any known exceptions
         """
         return self._p
 
     @property
     def location(self):
-        """ The location as a dictionary with three keys: "x", "y" and "p"
+        """ The location as a dictionary with three keys: "``x``", "``y``"
+            and "``p``"
 
-        :return: a dictionary containing the location
-        :rtype: dict of {"x": int, "y": int, "p": int}
-        :raise None: does not raise any known exceptions
+        :rtype: dict(str, int)
         """
         return {"x": self._x, "y": self._y, "p": self._p}
 

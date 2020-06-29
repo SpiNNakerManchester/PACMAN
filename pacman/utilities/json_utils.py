@@ -30,6 +30,8 @@ from pacman.model.resources import (
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
+from pacman.model.placements.placements import Placements
+from pacman.model.placements.placement import Placement
 
 
 def json_to_object(json_object):
@@ -98,6 +100,7 @@ def constraint_to_json(constraint):
             # Oops an unexpected class
             # Classes Not covered include
             # FixedKeyFieldConstraint
+            # FlexiKeyFieldConstraint
             # ShareKeyConstraint
             json_dict["str"] = str(constraint)
             json_dict["repr"] = repr(constraint)
@@ -189,7 +192,7 @@ def resource_container_to_json(container):
         json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
         json_dict["fixed_sdram"] = int(container.sdram.fixed)
         json_dict["per_timestep_sdram"] = int(container.sdram.per_timestep)
-        json_dict["iptag"] = iptag_resources_to_json(container.iptags)
+        json_dict["iptags"] = iptag_resources_to_json(container.iptags)
         json_dict["reverse_iptags"] = iptag_resources_to_json(
             container.reverse_iptags)
     except Exception as ex:  # pylint: disable=broad-except
@@ -204,7 +207,7 @@ def resource_container_from_json(json_dict):
     sdram = VariableSDRAM(
         json_dict["fixed_sdram"], json_dict["per_timestep_sdram"])
     cpu_cycles = CPUCyclesPerTickResource(json_dict["cpu_cycles"])
-    iptags = iptag_resources_from_json(json_dict["iptag"])
+    iptags = iptag_resources_from_json(json_dict["iptags"])
     reverse_iptags = iptag_resources_from_json(json_dict["reverse_iptags"])
     return ResourceContainer(dtcm, sdram, cpu_cycles, iptags, reverse_iptags)
 
@@ -335,3 +338,51 @@ def vertex_lookup(label, graph=None):
     if graph:
         return graph.vertex_by_label(label)
     return SimpleMachineVertex(None, label)
+
+
+def placement_to_json(placement):
+    json_dict = OrderedDict()
+    try:
+        json_dict["vertex_label"] = placement.vertex.label
+        json_dict["x"] = placement.x
+        json_dict["y"] = placement.y
+        json_dict["p"] = placement.p
+    except Exception as ex:  # pylint: disable=broad-except
+        json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def placements_to_json(placements):
+    json_list = []
+    for placement in placements:
+        json_list.append(placement_to_json(placement))
+    return json_list
+
+
+def placement_from_json(json_dict, graph=None):
+    vertex = vertex_lookup(json_dict["vertex_label"], graph)
+    return Placement(
+        vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
+
+
+def placements_from_json(json_list, graph=None):
+    json_list = json_to_object(json_list)
+    placements = Placements()
+    for json_placement in json_list:
+        placements.add_placement(placement_from_json(json_placement))
+    return placements
+
+
+def partition_to_n_keys_map_to_json(partition_to_n_keys_map):
+    json_list = []
+    for partition in partition_to_n_keys_map:
+        json_dict = OrderedDict()
+        try:
+            json_dict["pre_vertex_label"] = partition.pre_vertex.label
+            json_dict["identifier"] = partition.identifier
+            json_dict["n_keys"] = partition_to_n_keys_map.n_keys_for_partition(
+                partition)
+        except Exception as ex:  # pylint: disable=broad-except
+            json_dict["exception"] = str(ex)
+        json_list.append(json_dict)
+    return json_list

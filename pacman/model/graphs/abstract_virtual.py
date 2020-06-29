@@ -13,17 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.abstract_base import (
-    abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import abstractmethod, abstractproperty
 
 
 class AbstractVirtual(object):
     """ An Object (most likely a vertex) which exists outside of the machine,
         allowing a graph to formally participate in I/O.
 
-        Note: It is expected that everything that is an instance of
-        AbstractVirtual is also an instance of AbstractVertex,
-        This is not enforced to avoid diamond inheritance.
+        .. note::
+            It is expected that everything that is an instance of
+            AbstractVirtual is also an instance of :py:class:`AbstractVertex`.
+            This is not enforced to avoid diamond inheritance.
     """
 
     __slots__ = ()
@@ -41,8 +41,8 @@ class AbstractVirtual(object):
         """ Set the details of the virtual chip that has been added to the\
             machine for this vertex.
 
-        :param virtual_chip_x: The x-coordinate of the added chip
-        :param virtual_chip_y: The y-coordinate of the added chip
+        :param int virtual_chip_x: The x-coordinate of the added chip
+        :param int virtual_chip_y: The y-coordinate of the added chip
         """
 
     @abstractproperty

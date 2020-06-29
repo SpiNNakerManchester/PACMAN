@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.impl import OutgoingEdgePartition
+from pacman.model.graphs import OutgoingEdgePartition
 from .machine_edge import MachineEdge
 
 

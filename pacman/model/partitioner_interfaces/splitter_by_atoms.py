@@ -25,12 +25,11 @@ class SplitterByAtoms(object):
     def get_resources_used_by_atoms(self, vertex_slice):
         """ Get the separate resource requirements for a range of atoms
 
-        :param vertex_slice: the low value of atoms to calculate resources from
-        :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
-        :return: a Resource container that contains a \
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the low value of atoms to calculate resources from
+        :return: a Resource container that contains a
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: :py:class:`pacman.model.resources.ResourceContainer`
-        :raise None: this method does not raise any known exception
+        :rtype: ~pacman.model.resources.ResourceContainer
         """
 
     @abstractmethod
@@ -39,11 +38,15 @@ class SplitterByAtoms(object):
             constraints=None):
         """ Create a machine vertex from this application vertex
 
-        :param vertex_slice:\
-            The slice of atoms that the machine vertex will cover
-        :param resources_required: the resources used by the machine vertex
-        :param label: the label for the machine vertex to add to.
-        :param constraints: Constraints to be passed on to the machine vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of atoms that the machine vertex will cover.
+        :param ~pacman.model.resources.ResourceContainer resources_required:
+            The resources used by the machine vertex.
+        :param label: human readable label for the machine vertex
+        :type label: str or None
+        :param iterable(~pacman.model.constraints.AbstractConstraint) \
+                constraints:
+            Constraints to be passed on to the machine vertex.
         """
 
     @abstractproperty

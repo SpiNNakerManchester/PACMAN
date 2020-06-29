@@ -17,14 +17,13 @@ import collections
 from pacman.exceptions import PacmanValueError
 
 
-class Slice(collections.namedtuple('Slice',
-                                   'lo_atom hi_atom n_atoms as_slice')):
+class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
     """ Represents a slice of a vertex.
 
     :attr int lo_atom: The lowest atom represented in the slice.
     :attr int hi_atom: The highest atom represented in the slice.
     :attr int n_atoms: The number of atoms represented by the slice.
-    :attr as_slice: This slice represented as a :py:func:`slice` object (for
+    :attr slice as_slice: This slice represented as a `slice` object (for
         use in indexing lists, arrays, etc.)
     """
     def __new__(cls, lo_atom, hi_atom):
@@ -43,10 +42,11 @@ class Slice(collections.namedtuple('Slice',
         # Number of atoms represented by this slice
         n_atoms = hi_atom - lo_atom + 1
 
-        # Slice for accessing arrays of values
-        as_slice = slice(lo_atom, hi_atom + 1)
-
         # Create the Slice object as a `namedtuple` with these pre-computed
         # values filled in.
-        return super(cls, Slice).__new__(cls, lo_atom, hi_atom, n_atoms,
-                                         as_slice)
+        return super(cls, Slice).__new__(cls, lo_atom, hi_atom, n_atoms)
+
+    @property
+    def as_slice(self):
+        # Slice for accessing arrays of values
+        return slice(self.lo_atom, self.hi_atom + 1)

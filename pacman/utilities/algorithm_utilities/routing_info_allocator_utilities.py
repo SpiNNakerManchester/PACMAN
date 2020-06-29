@@ -34,6 +34,9 @@ class ConstraintGroup(list):
     """
 
     def __init__(self, values):
+        """
+        :param iterable(OutgoingEdgePartition) values:
+        """
         super(ConstraintGroup, self).__init__(values)
         self._constraint = None
         self._n_keys = None
@@ -171,10 +174,8 @@ def check_types_of_edge_constraint(machine_graph):
     for partition in machine_graph.outgoing_edge_partitions:
         fixed_key = locate_constraints_of_type(
             partition.constraints, FixedKeyAndMaskConstraint)
-
         fixed_mask = locate_constraints_of_type(
             partition.constraints, FixedMaskConstraint)
-
         fixed_field = locate_constraints_of_type(
             partition.constraints, FixedKeyFieldConstraint)
 

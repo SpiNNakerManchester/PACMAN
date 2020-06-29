@@ -28,29 +28,26 @@ class AbstractEdge(object):
     def label(self):
         """ The label of the edge
 
-        :return: The label
         :rtype: str
-        :raise None: Raises no known exceptions
         """
 
     @abstractproperty
     def pre_vertex(self):
         """ The vertex at the start of the edge
 
-        :rtype: :py:class:`pacman.model.graphs.abstract_vertex.AbstractVertex`
+        :rtype: AbstractVertex
         """
 
     @abstractproperty
     def post_vertex(self):
         """ The vertex at the end of the edge
 
-        :rtype: :py:class:`pacman.model.graphs.abstract_vertex.AbstractVertex`
+        :rtype: AbstractVertex
         """
 
     @abstractproperty
     def traffic_type(self):
         """ The traffic type of the edge
 
-        :rtype:\
-            :py:class:`pacman.model.graphs.common.edge_traffic_type.EdgeTrafficType`
+        :rtype: EdgeTrafficType
         """

@@ -32,15 +32,12 @@ class ApplicationVertex(AbstractVertex):
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
         """
-        :param label: The optional name of the vertex
-        :type label: str
-        :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable(~pacman.model.constraints.AbstractConstraint)
-        :param max_atoms_per_core: the max number of atoms that can be\
-            placed on a core, used in partitioning
-        :type max_atoms_per_core: int
-        :raise pacman.exceptions.PacmanInvalidParameterException:\
+        :param str label: The optional name of the vertex.
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex.
+        :param int max_atoms_per_core: The max number of atoms that can be
+            placed on a core, used in partitioning.
+        :raise PacmanInvalidParameterException:
             * If one of the constraints is not valid
         """
 
@@ -66,6 +63,12 @@ class ApplicationVertex(AbstractVertex):
         """
 
     def get_max_atoms_per_core(self):
+        """ Gets the maximum number of atoms per core, which is either the\
+            number of atoms required across the whole application vertex,\
+            or a lower value if a constraint lowers it.
+
+        :rtype: int
+        """
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
