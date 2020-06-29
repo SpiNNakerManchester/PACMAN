@@ -121,34 +121,35 @@ class TestResourceModels(unittest.TestCase):
                          145 - 234 + (4 - 6) * 150)
 
     def test_VariableSdram(self):
-        var1 = VariableSDRAM(124, 8, 1000)
+        timestep_in_us = 1000
+        var1 = VariableSDRAM(124, 8, timestep_in_us)
         self.assertEqual(124 + 8 * 5, var1.get_sdram_for_simtime(5000))
         self.assertEqual(8/1000, var1.per_simtime_us)
 
         with self.assertRaises(Exception):
             var1.get_sdram_for_simtime(5001)
 
-        multi1 = MultiRegionSDRAM()
+        multi1 = MultiRegionSDRAM(timestep_in_us)
         multi1.add_cost(1, 100, 4)
         multi1.add_cost(2, 50, 3)
         multi1.add_cost("overheads", 20)
-        multi2 = MultiRegionSDRAM()
+        multi2 = MultiRegionSDRAM(1000)
         multi2.add_cost(MockEnum.ZERO, 88)
         multi2.add_cost(MockEnum.ONE, 72)
         multi2.add_cost("overheads", 22)
 
         combo = multi1 + multi2
-        self.assertEqual(combo.get_total_sdram(150),
+        self.assertEqual(combo.get_sdram_for_simtime(150 * timestep_in_us),
                          100 + 50 + 20 + 88 + 72 + 22 + (4 + 3) * 150)
 
-        multi3 = MultiRegionSDRAM()
+        multi3 = MultiRegionSDRAM(timestep_in_us)
         multi3.nest("foo", multi1)
         multi3.nest("bar", multi2)
 
         multi1.merge(multi2)
         self.assertEqual(len(multi1.regions), 5)
         self.assertEqual(multi1.regions["overheads"], ConstantSDRAM(20 + 22))
-        self.assertEqual(multi1.get_total_sdram(150),
+        self.assertEqual(multi1.get_sdram_for_simtime(150 * timestep_in_us),
                          100 + 50 + 20 + 88 + 72 + 22 + (4 + 3) * 150)
         self.assertEqual(multi1, combo)
         self.assertEqual(multi1, multi3)

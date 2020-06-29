@@ -14,8 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
+from six import print_
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 
 
@@ -46,6 +48,7 @@ class TimeBasedSDRAM(AbstractSDRAM):
         self._fixed_sdram = fixed_sdram
         self._per_simtime_us = per_simtime_us
 
+    @overrides(AbstractSDRAM.get_sdram_for_simtime)
     def get_sdram_for_simtime(self, time_in_us):
         if time_in_us is not None:
             return self._fixed_sdram + \
@@ -58,10 +61,12 @@ class TimeBasedSDRAM(AbstractSDRAM):
                     "Unable to run forever with a variable SDRAM cost")
 
     @property
+    @overrides(AbstractSDRAM.fixed)
     def fixed(self):
         return self._fixed_sdram
 
     @property
+    @overrides(AbstractSDRAM.per_simtime_us)
     def per_simtime_us(self):
         return self._per_simtime_us
 
@@ -83,8 +88,16 @@ class TimeBasedSDRAM(AbstractSDRAM):
             # The other is more complex so delegate to it
             return other.sub_from(self)
 
+    @overrides(AbstractSDRAM.sub_from)
     def sub_from(self, other):
         # Only Ever called from less complex so no type check required
         return TimeBasedSDRAM(
             other.fixed - self.fixed,
             other.per_simtime_us - self.per_simtime_us)
+
+    @overrides(AbstractSDRAM.report)
+    def report(self, time_in_us, indent="", preamble="", target=None):
+        print_(indent, preamble,
+               "Fixed {} bytes Per_us {} bytes for a total of {}".format(
+                   self._fixed_sdram, self._per_simtime_us,
+                   self.get_sdram_for_simtime(time_in_us)), file=target)

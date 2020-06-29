@@ -36,13 +36,13 @@ class MultiRegionSDRAM(VariableSDRAM):
         "__regions"
     ]
 
-    def __init__(self):
+    def __init__(self, timestep_in_us):
         """
 
-        :param regions: A dict of AbstractSDRAM, one per "region" of SDRAM.
+        :param int timestep_in_us: the timestep used by the cost provider
 
         """
-        super(MultiRegionSDRAM, self).__init__(0, 0)
+        super(MultiRegionSDRAM, self).__init__(0, 0, timestep_in_us)
         self.__regions = {}
 
     @property
@@ -62,7 +62,8 @@ class MultiRegionSDRAM(VariableSDRAM):
         self._per_timestep_sdram = \
             self._per_timestep_sdram + per_timestep_sdram
         if per_timestep_sdram:
-            sdram = VariableSDRAM(fixed_sdram, per_timestep_sdram)
+            sdram = VariableSDRAM(
+                fixed_sdram, per_timestep_sdram, self._timestep_in_us)
         else:
             sdram = ConstantSDRAM(fixed_sdram)
         if region in self.__regions:
@@ -84,8 +85,11 @@ class MultiRegionSDRAM(VariableSDRAM):
             nesting
         """
         self._fixed_sdram = self._fixed_sdram + other.fixed
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + other.per_timestep
+        if isinstance(other, VariableSDRAM):
+            if self._timestep_in_us != other._timestep_in_us:
+                raise NotImplementedError(
+                    "Nest not supported with different timesteps")
+            self._per_timestep_sdram += other._per_timestep_sdram
         if region in self.__regions:
             if isinstance(other, MultiRegionSDRAM):
                 self.__regions[region].merge(other)
@@ -105,8 +109,11 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param MultiRegionSDRAM other: Another mapping of costs by region
         """
         self._fixed_sdram = self._fixed_sdram + other.fixed
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + other.per_timestep
+        if isinstance(other, VariableSDRAM):
+            if self._timestep_in_us != other._timestep_in_us:
+                raise NotImplementedError(
+                    "Merge not supported with different timesteps")
+            self._per_timestep_sdram += other._per_timestep_sdram
         for region in other.__regions:
             if region in self.__regions:
                 self.__regions[region] += other.__regions[region]

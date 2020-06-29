@@ -135,4 +135,4 @@ class VariableSDRAM(AbstractSDRAM):
         print_(indent, preamble,
                "Fixed {} bytes Per_timestep {} bytes for a total of {}".format(
                    self._fixed_sdram, self._per_timestep_sdram,
-                   self._get_sdram_for_simtime(time_in_us)), file=target)
+                   self.get_sdram_for_simtime(time_in_us)), file=target)

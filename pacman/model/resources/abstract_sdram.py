@@ -105,7 +105,7 @@ class AbstractSDRAM(object):
             return False
         if other.fixed != self.fixed:
             return False
-        return other.per_timestep == self.per_timestep
+        return other. per_simtime_us == self. per_simtime_us
 
     @abstractmethod
     def report(self, time_in_us, indent="", preamble="", target=None):
