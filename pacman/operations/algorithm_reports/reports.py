@@ -22,6 +22,7 @@ from spinn_machine import Router
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLink, AbstractFPGA
 from pacman.model.graphs.common import EdgeTrafficType
+from pacman.operations.algorithm_reports.router_summary import RouterSummary
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -116,12 +117,12 @@ def router_summary_report(
     :param MulticastRoutingTables routing_tables: The original routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
-    :rtype: None
+    :rtype: RouterSummary
     """
     file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
     progress = ProgressBar(machine.n_chips,
                            "Generating Routing summary report")
-    _do_router_summary_report(
+    return _do_router_summary_report(
         file_name, progress, routing_tables,  hostname, machine)
 
 
@@ -133,13 +134,13 @@ def router_compressed_summary_report(
     :param MulticastRoutingTables routing_tables: The original routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
-    :rtype: None
+    :rtype: RouterSummary
     """
     file_name = os.path.join(
         report_folder, _COMPRESSED_ROUTING_SUMMARY_FILENAME)
     progress = ProgressBar(machine.n_chips,
                            "Generating Routing summary report")
-    _do_router_summary_report(
+    return _do_router_summary_report(
         file_name, progress, routing_tables, hostname, machine)
 
 
@@ -151,6 +152,7 @@ def _do_router_summary_report(
     :param MulticastRoutingTables routing_tables:
     :param str hostname:
     :param ~spinn_machine.Machine machine:
+    :return: RouterSummary
     """
     time_date_string = time.strftime("%c")
     convert = Router.convert_routing_table_entry_to_spinnaker_route
@@ -195,6 +197,9 @@ def _do_router_summary_report(
                     "max unique spinnaker routes {}\n\n".format(
                         total_entries, max_entries, max_none_defaultable,
                         max_link_only, max_spinnaker_routes))
+            return RouterSummary(
+                total_entries, max_entries, max_none_defaultable,
+                max_link_only, max_spinnaker_routes)
 
     except IOError:
         logger.exception("Generate_routing summary reports: "
@@ -620,35 +625,46 @@ def sdram_usage_report_per_chip(
             f.write("Planned by partitioner\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
-                f, placements, machine, minimum_simtime_in_us, progress, False)
+                f, placements, machine, minimum_simtime_in_us, progress, False,
+                False)
             f.write("\nActual space reserved on the machine\n")
             f.write("----------------------\n")
             _sdram_usage_report_per_chip_with_timesteps(
-                f, placements, machine, data_simtime_in_us, progress, True)
+                f, placements, machine, data_simtime_in_us, progress, True,
+                True)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for "
                          "writing.", file_name)
 
 
 def _sdram_usage_report_per_chip_with_timesteps(
-        f, placements, machine, data_simtime_in_us, progress, end_progress):
+        f, placements, machine, time_in_us, progress, end_progress,
+        details):
     """
     :param ~io.FileIO f:
     :param Placements placements:
     :param ~spinn_machine.Machine machine:
-    :param int data_simtime_in_us:
+    :param time_in_us The simulation time in us for which space should
+        be reported. A None value will be considered run forever
     :param ~spinn_utilities.progress_bar.ProgressBar progress:
     :param bool end_progress:
+    :param bool details: If True will get costs printed by regions
     """
-    f.write("Based on runtime of {}us\n\n".format(data_simtime_in_us))
+    f.write("Based on runtime of {}us\n\n".format(time_in_us))
     used_sdram_by_chip = dict()
     placements = sorted(placements.placements,
                         key=lambda x: x.vertex.label)
     for placement in progress.over(placements, False):
         sdram_rec = placement.vertex.resources_required.sdram
-        sdram = sdram_rec.get_sdram_for_simtime(data_simtime_in_us)
+        sdram = sdram_rec.get_sdram_for_simtime(time_in_us)
         x, y, p = placement.x, placement.y, placement.p
-        f.write("SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
+        if details:
+            sdram_rec.report(
+                time_in_us=time_in_us,
+                preamble="core ({},{},{})".format(x, y, p), target=f)
+        else:
+            f.write(
+                "SDRAM reqs for core ({},{},{}) is {} KB ({} bytes) for {}\n"
                 "".format(x, y, p, int(sdram / 1024.0), sdram, placement))
         key = (x, y)
         if key not in used_sdram_by_chip:
@@ -727,7 +743,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
                            "Generating Router table report")
     for routing_table in progress.over(routing_tables.routing_tables):
         if routing_table.number_of_entries:
-            _generate_routing_table(routing_table, top_level_folder)
+            generate_routing_table(routing_table, top_level_folder)
 
 
 def router_report_from_compressed_router_tables(report_folder, routing_tables):
@@ -745,7 +761,7 @@ def router_report_from_compressed_router_tables(report_folder, routing_tables):
                            "Generating compressed router table report")
     for routing_table in progress.over(routing_tables.routing_tables):
         if routing_table.number_of_entries:
-            _generate_routing_table(routing_table, top_level_folder)
+            generate_routing_table(routing_table, top_level_folder)
 
 
 def format_route(entry):
@@ -764,7 +780,7 @@ def format_route(entry):
                               route_txt)
 
 
-def _generate_routing_table(routing_table, top_level_folder):
+def generate_routing_table(routing_table, top_level_folder):
     """
     :param ~spinn_machine.MulticastRoutingTable routing_table:
     :param str top_level_folder:
@@ -806,6 +822,8 @@ def _compression_ratio(uncompressed, compressed):
     :param int compressed:
     :rtype: float
     """
+    if uncompressed == 0:
+        return 0
     return (uncompressed - compressed) / float(uncompressed) * 100
 
 

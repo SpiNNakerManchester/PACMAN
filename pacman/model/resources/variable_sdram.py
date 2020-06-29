@@ -14,9 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from .abstract_sdram import AbstractSDRAM
-from spinn_utilities.overrides import overrides
+from six import print_
 from spinn_utilities.helpful_functions import lcm
+from spinn_utilities.overrides import overrides
+from .abstract_sdram import AbstractSDRAM
 from pacman.exceptions import PacmanConfigurationException
 
 
@@ -68,10 +69,12 @@ class VariableSDRAM(AbstractSDRAM):
         return self._fixed_sdram + (self._per_timestep_sdram * n_timesteps)
 
     @property
+    @overrides(AbstractSDRAM.fixed)
     def fixed(self):
         return self._fixed_sdram
 
     @property
+    @overrides(AbstractSDRAM.per_simtime_us)
     def per_simtime_us(self):
         return self._per_timestep_sdram / self._timestep_in_us
 
@@ -119,9 +122,17 @@ class VariableSDRAM(AbstractSDRAM):
             per_self - per_other,
             timestep)
 
+    @overrides(AbstractSDRAM.sub_from)
     def sub_from(self, other):
         timestep, per_self, per_other = self.__new_costs(other)
         return VariableSDRAM(
             other.fixed - self.fixed,
             per_other - per_self,
             timestep)
+
+    @overrides(AbstractSDRAM.report)
+    def report(self, time_in_us, indent="", preamble="", target=None):
+        print_(indent, preamble,
+               "Fixed {} bytes Per_timestep {} bytes for a total of {}".format(
+                   self._fixed_sdram, self._per_timestep_sdram,
+                   self._get_sdram_for_simtime(time_in_us)), file=target)
