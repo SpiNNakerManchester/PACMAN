@@ -15,8 +15,9 @@
 from pacman.utilities.constants import FULL_MASK
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.model.routing_tables.compressed_multicast_routing_table import \
+    CompressedMulticastRoutingTable
+from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.exceptions import PacmanRoutingException
 
 _UPPER_16_BITS = 0xFFFF << 16  # upper 16 bits of 32
@@ -97,7 +98,8 @@ class BasicRouteMerger(object):
         :param dict(int,list(int)) previous_masks:
         :rtype: MulticastRoutingTable
         """
-        merged_routes = MulticastRoutingTable(router_table.x, router_table.y)
+        merged_routes = CompressedMulticastRoutingTable(
+            router_table.x, router_table.y)
         keys_merged = set()
 
         entries = router_table.multicast_routing_entries

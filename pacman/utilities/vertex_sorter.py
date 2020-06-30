@@ -15,7 +15,7 @@
 
 import sys
 from six import itervalues
-from spinn_utilities.ordered_default_dict import DefaultOrderedDict
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 
 
 class ConstraintOrder(object):

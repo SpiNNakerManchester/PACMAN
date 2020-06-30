@@ -16,7 +16,7 @@
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 
 
 class BasicRoutingTableGenerator(object):
@@ -57,7 +57,7 @@ class BasicRoutingTableGenerator(object):
         :param RoutingInfo routing_infos:
         :rtype: MulticastRoutingTable
         """
-        table = MulticastRoutingTable(chip.x, chip.y)
+        table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
         for partition in partitions_in_table:
             r_info = routing_infos.get_routing_info_from_partition(partition)
             entry = partitions_in_table[partition]

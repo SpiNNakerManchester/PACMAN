@@ -16,9 +16,9 @@
 import unittest
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
-from pacman.operations.algorithm_reports.routing_compression_checker_report \
-    import compare_tables
+    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
+from pacman.operations.router_compressors.routing_compression_checker import (
+    compare_tables)
 from pacman.operations.router_compressors.pair_compressor import (
     PairCompressor)
 from pacman.operations.router_compressors.unordered_compressor import (
@@ -31,7 +31,7 @@ class MyTestCase(unittest.TestCase):
 
     def setUp(self):
         self.original_tables = MulticastRoutingTables()
-        original_table = MulticastRoutingTable(x=0, y=0)
+        original_table = UnCompressedMulticastRoutingTable(x=0, y=0)
         original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0000, 0b1111, [1, 2], [], False))
         original_table.add_multicast_routing_entry(
