@@ -56,12 +56,11 @@ class ZonedRoutingTableGenerator(object):
 
     def __call__(
             self, routing_infos, routing_table_by_partitions, machine,
-            graph_mapper, info_by_app_vertex):
+            info_by_app_vertex):
         """
         :param RoutingInfo routing_infos:
         :param MulticastRoutingTableByPartition routing_table_by_partitions:
         :param ~spinn_machine.Machine machine:
-        :param GraphMapper graph_mapper:
         :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
         :rtype: MulticastRoutingTables
         """
@@ -72,27 +71,27 @@ class ZonedRoutingTableGenerator(object):
                 get_entries_for_router(chip.x, chip.y)
             if partitions_in_table:
                 routing_tables.add_routing_table(self._create_routing_table(
-                    chip, partitions_in_table, routing_infos, graph_mapper,
+                    chip, partitions_in_table, routing_infos,
                     info_by_app_vertex))
 
         return routing_tables
 
     def _create_routing_table(self, chip, partitions_in_table, routing_infos,
-                              graph_mapper, info_by_app_vertex):
+                              info_by_app_vertex):
         """
+        :param ~spinn_machine.Chip chip:
+        :param partitions_in_table:
+        :type partitions_in_table:
+            dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
         :param RoutingInfo routing_infos:
-        :param MulticastRoutingTableByPartition routing_table_by_partitions:
-        :param ~spinn_machine.Machine machine:
-        :param GraphMapper graph_mapper:
         :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
-        :rtype: MulticastRoutingTables
+        :rtype: MulticastRoutingTable
         """
         table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
         partitions_by_app_vertex = DefaultOrderedDict(set)
         for partition in partitions_in_table:
-            machine_vertex = partition.pre_vertex
-            app_vertex = graph_mapper.get_application_vertex(machine_vertex)
-            partitions_by_app_vertex[app_vertex].add(partition)
+            partitions_by_app_vertex[partition.pre_vertex.app_vertex].add(
+                partition)
         for app_vertex in partitions_by_app_vertex:
             if app_vertex in info_by_app_vertex:
                 shared_entry = self._find_shared_entry(
@@ -104,7 +103,7 @@ class ZonedRoutingTableGenerator(object):
                     partitions_by_app_vertex[app_vertex], routing_infos,
                     partitions_in_table, table)
             else:
-                self._add_key_and_mask(
+                self.__add_key_and_mask(
                     info_by_app_vertex[app_vertex], shared_entry, table)
         return table
 
@@ -143,10 +142,10 @@ class ZonedRoutingTableGenerator(object):
             r_info = routing_infos.get_routing_info_from_partition(partition)
             entry = partitions_in_table[partition]
             for key_and_mask in r_info.keys_and_masks:
-                self._add_key_and_mask(key_and_mask, entry, table)
+                self.__add_key_and_mask(key_and_mask, entry, table)
 
     @staticmethod
-    def _add_key_and_mask(key_and_mask, entry, table):
+    def __add_key_and_mask(key_and_mask, entry, table):
         """
         :param BaseKeyAndMask key_and_mask:
         :param MulticastRoutingTableByPartitionEntry entry:
