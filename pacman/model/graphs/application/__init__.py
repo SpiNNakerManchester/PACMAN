@@ -15,9 +15,7 @@
 
 from .application_edge import ApplicationEdge
 from .application_graph import ApplicationGraph
-from .application_outgoing_edge_partition import (
-    ApplicationOutgoingEdgePartition)
 from .application_vertex import ApplicationVertex
 
 __all__ = ["ApplicationEdge", "ApplicationGraph",
-           "ApplicationOutgoingEdgePartition", "ApplicationVertex"]
+           "ApplicationVertex"]

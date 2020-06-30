@@ -25,6 +25,9 @@ MACHINE_FILENAME = "machine.json"
 class WriteJsonMachine(object):
     """ Converter from memory machine to java machine.
 
+    .. note::
+        This is no longer the rig machine format!
+
     :param ~spinn_machine.Machine machine: Machine to convert
     :param str json_folder:
         The folder to which the JSON are being written.
@@ -38,8 +41,6 @@ class WriteJsonMachine(object):
 
     def __call__(self, machine, json_folder):
         """ Runs the code to write the machine in readable JSON.
-
-        This is no longer the rig machine format
 
         :param ~spinn_machine.Machine machine:
         :param str json_folder:
