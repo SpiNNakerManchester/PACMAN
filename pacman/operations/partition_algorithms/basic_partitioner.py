@@ -19,7 +19,7 @@ from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
     FixedVertexAtomsConstraint)
-from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
@@ -38,6 +38,7 @@ class BasicPartitioner(object):
         The machine with respect to which to partition the application graph
     :param int plan_n_timesteps: number of timesteps to plan for
     :return: A machine graph
+    :rtype: MachineGraph
     :raise PacmanPartitionException:
         If something goes wrong with the partitioning
     """
@@ -56,6 +57,7 @@ class BasicPartitioner(object):
         :param ApplicationGraph graph:
         :param ~spinn_machine.Machine machine:
         :param int plan_n_timesteps:
+        :rtype: MachineGraph
         :raise PacmanPartitionException:
         """
         ResourceTracker.check_constraints(graph.vertices)
@@ -67,22 +69,20 @@ class BasicPartitioner(object):
 
         # start progress bar
         progress = ProgressBar(graph.n_vertices, "Partitioning graph vertices")
-        machine_graph = MachineGraph("Machine graph for " + graph.label)
-        graph_mapper = GraphMapper()
+        machine_graph = MachineGraph("Machine graph for " + graph.label, graph)
         resource_tracker = ResourceTracker(machine, plan_n_timesteps)
 
         # Partition one vertex at a time
         for vertex in progress.over(graph.vertices):
             self._partition_one_application_vertex(
-                vertex, resource_tracker, machine_graph, graph_mapper,
-                plan_n_timesteps)
+                vertex, resource_tracker, machine_graph, plan_n_timesteps)
 
-        generate_machine_edges(machine_graph, graph_mapper, graph)
+        generate_machine_edges(machine_graph, graph)
 
-        return machine_graph, graph_mapper, resource_tracker.chips_used
+        return machine_graph, resource_tracker.chips_used
 
     def _partition_one_application_vertex(
-            self, vertex, res_tracker, m_graph, mapper, plan_n_timesteps):
+            self, vertex, res_tracker, m_graph, plan_n_timesteps):
         """ Partitions a single application vertex.
 
         :param ApplicationVertex vertex:
@@ -102,7 +102,7 @@ class BasicPartitioner(object):
         # Partition into vertices
         for first in range(0, vertex.n_atoms, int(atoms_per_core)):
             # Determine vertex size
-            last = min(first + atoms_per_core, vertex.n_atoms) - 1
+            last = int(min(first + atoms_per_core, vertex.n_atoms) - 1)
             if first < 0 or last < 0:
                 raise PacmanPartitionException(
                     "Not enough resources available to create vertex")
@@ -116,7 +116,6 @@ class BasicPartitioner(object):
                 "{}:{}:{}".format(vertex.label, first, last),
                 get_remaining_constraints(vertex))
             m_graph.add_vertex(m_vertex)
-            mapper.add_vertex_mapping(m_vertex, vertex_slice, vertex)
 
             # update allocated resources
             res_tracker.allocate_constrained_resources(

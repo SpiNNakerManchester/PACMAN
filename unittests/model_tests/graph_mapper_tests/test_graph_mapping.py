@@ -14,24 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-tests for graph mapper
+tests for graph mapping
 """
 import unittest
-from pacman.model.graphs.common import Slice, GraphMapper
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
 from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
-class TestGraphMapper(unittest.TestCase):
+class TestGraphMapping(unittest.TestCase):
     """
     graph mapper tests
     """
-
-    def test_create_new_mapper(self):
-        """
-        test creating a empty graph mapper
-        """
-        GraphMapper()
 
     def test_get_edges_from_edge(self):
         """
@@ -45,12 +39,11 @@ class TestGraphMapper(unittest.TestCase):
         edges.append(MachineEdge(vertices[1], vertices[1]))
         sube = MachineEdge(vertices[1], vertices[0])
         edges.append(sube)
-        graph = GraphMapper()
         edge = SimpleTestEdge(SimpleTestVertex(10, "pre"),
                               SimpleTestVertex(5, "post"))
-        graph.add_edge_mapping(sube, edge)
-        graph.add_edge_mapping(edges[0], edge)
-        edges_from_edge = graph.get_machine_edges(edge)
+        edge.remember_associated_machine_edge(sube)
+        edge.remember_associated_machine_edge(edges[0])
+        edges_from_edge = edge.machine_edges
         self.assertIn(sube, edges_from_edge)
         self.assertIn(edges[0], edges_from_edge)
         self.assertNotIn(edges[1], edges_from_edge)
@@ -60,24 +53,15 @@ class TestGraphMapper(unittest.TestCase):
         test getting the vertex from a graph mapper via the vertex
         """
         vertices = list()
-        vertices.append(SimpleMachineVertex(None, ""))
-        vertices.append(SimpleMachineVertex(None, ""))
-        vertex1 = SimpleMachineVertex(None, "")
-        vertex2 = SimpleMachineVertex(None, "")
-
-        edges = list()
-        edges.append(MachineEdge(vertices[0], vertices[1]))
-        edges.append(MachineEdge(vertices[1], vertices[1]))
-
-        graph_mapper = GraphMapper()
         vert = SimpleTestVertex(4, "Some testing vertex")
+        vertices.append(SimpleMachineVertex(None, ""))
+        vertices.append(SimpleMachineVertex(None, ""))
+        vertex1 = SimpleMachineVertex(
+            None, "", vertex_slice=Slice(0, 1), app_vertex=vert)
+        vertex2 = SimpleMachineVertex(
+            None, "", vertex_slice=Slice(2, 3), app_vertex=vert)
 
-        vertex_slice = Slice(0, 1)
-        graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
-        vertex_slice = Slice(2, 3)
-        graph_mapper.add_vertex_mapping(vertex2, vertex_slice, vert)
-
-        returned_vertices = graph_mapper.get_machine_vertices(vert)
+        returned_vertices = vert.machine_vertices
 
         self.assertIn(vertex1, returned_vertices)
         self.assertIn(vertex2, returned_vertices)
@@ -88,29 +72,15 @@ class TestGraphMapper(unittest.TestCase):
         """
         test that the graph mapper can retrieve a vertex from a given vertex
         """
-        vertices = list()
-        vertices.append(SimpleMachineVertex(None, ""))
-        vertices.append(SimpleMachineVertex(None, ""))
-
-        vertex1 = SimpleMachineVertex(None, "")
-        vertex2 = SimpleMachineVertex(None, "")
-
-        graph_mapper = GraphMapper()
         vert = SimpleTestVertex(10, "Some testing vertex")
+        vertex1 = SimpleMachineVertex(None, "", app_vertex=vert,
+                                      vertex_slice=Slice(0, 1))
+        vertex2 = SimpleMachineVertex(None, "", app_vertex=vert,
+                                      vertex_slice=Slice(2, 3))
 
-        vertex_slice = Slice(0, 1)
-        graph_mapper.add_vertex_mapping(vertex1, vertex_slice, vert)
-        vertex_slice = Slice(2, 3)
-        graph_mapper.add_vertex_mapping(vertex2, vertex_slice, vert)
-
-        self.assertEqual(
-            vert, graph_mapper.get_application_vertex(vertex1))
-        self.assertEqual(
-            vert, graph_mapper.get_application_vertex(vertex2))
-        self.assertEqual(
-            None, graph_mapper.get_application_vertex(vertices[0]))
-        self.assertEqual(
-            None, graph_mapper.get_application_vertex(vertices[1]))
+        self.assertEqual(vert, vertex1.app_vertex)
+        self.assertEqual(vert, vertex2.app_vertex)
+        self.assertEqual([vertex1, vertex2], list(vert.machine_vertices))
 
     def test_get_edge_from_machine_edge(self):
         """
@@ -120,28 +90,22 @@ class TestGraphMapper(unittest.TestCase):
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
 
-        edges = list()
-        edges.append(MachineEdge(vertices[0], vertices[1]))
-        edges.append(MachineEdge(vertices[1], vertices[1]))
-
-        sube = MachineEdge(vertices[1], vertices[0])
-        edges.append(sube)
-
-        # Create the graph mapper
-        graph = GraphMapper()
-
         edge = SimpleTestEdge(SimpleTestVertex(10, "pre"),
                               SimpleTestVertex(5, "post"))
-        graph.add_edge_mapping(sube, edge)
-        graph.add_edge_mapping(edges[0], edge)
 
-        edge_from_machine_edge = graph.get_application_edge(sube)
+        edges = list()
+        edges.append(MachineEdge(vertices[0], vertices[1], app_edge=edge))
+        edges.append(MachineEdge(vertices[1], vertices[1]))
 
-        self.assertEqual(edge_from_machine_edge, edge)
-        self.assertEqual(
-            graph.get_application_edge(edges[0]),
-            edge)
-        self.assertIsNone(graph.get_application_edge(edges[1]))
+        sube = MachineEdge(vertices[1], vertices[0], app_edge=edge)
+        edges.append(sube)
+
+        edge.remember_associated_machine_edge(sube)
+        edge.remember_associated_machine_edge(edges[0])
+
+        self.assertEqual(sube.app_edge, edge)
+        self.assertEqual(edges[0].app_edge, edge)
+        self.assertIsNone(edges[1].app_edge)
 
 
 if __name__ == '__main__':

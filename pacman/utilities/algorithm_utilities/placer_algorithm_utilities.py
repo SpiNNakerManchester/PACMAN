@@ -69,31 +69,15 @@ def get_same_chip_vertex_groups(graph):
     :param AbstractGraph graph: The graph containing the vertices
     :rtype: dict(AbstractVertex, set(AbstractVertex))
     """
-    return group_vertices(graph.vertices, functools.partial(
+    groups = create_vertices_groups(graph.vertices, functools.partial(
         get_vertices_on_same_chip, graph=graph))
-
-
-def group_vertices(vertices, same_group_as_function):
-    """ Group vertices according to some function that can indicate the groups\
-        that any vertex can be contained within
-
-    :param iterable(AbstractVertex) vertices: The vertices to group
-    :param callable(AbstractVertex,set(AbstractVertex)) same_group_as_function:
-        A function which takes a vertex and returns vertices that should be in\
-        the same group (excluding the original vertex)
-    :return:
-        A dictionary of vertex to list of vertices that are grouped with it
-    :rtype: dict(AbstractVertex, set(AbstractVertex))
-    """
-
-    groups = create_vertices_groups(vertices, same_group_as_function)
     # Dict of vertex to set of vertices on same chip (repeated lists expected)
     # A empty set value indicates a set that is too big.
     same_chip_vertices = OrderedDict()
     for group in groups:
         for vertex in group:
             same_chip_vertices[vertex] = group
-    for vertex in vertices:
+    for vertex in graph.vertices:
         if vertex not in same_chip_vertices:
             same_chip_vertices[vertex] = {vertex}
     return same_chip_vertices

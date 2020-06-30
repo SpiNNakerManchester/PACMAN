@@ -19,7 +19,7 @@ runs all pacman unittest scripts
 import unittest
 
 testmodules = [
-    'model_tests.graph_mapper_tests.test_graph_mapper',
+    'model_tests.graph_mapper_tests.test_graph_mapping',
     'model_tests.graph_mapper_tests.test_slice',
     'model_tests.machine_graph_tests.test_machine_graph_model',
     'model_tests.application_graph_tests.test_application_edge',
@@ -32,9 +32,6 @@ testmodules = [
     'model_tests.routing_table_tests.test_routing_tables_model',
     'model_tests.tag_tests.test_tag_infos_model',
     'utilities_tests.test_progress_bar',
-    'utilities_tests.test_report_states',
-    'utilities_tests.test_reports',
-    'utilities_tests.test_utility_calls',
     'operations_tests.partition_algorithms_tests.test_basic_partitioner',
     'operations_tests.partition_algorithms_tests.'
     'test_partition_and_place_partitioner',
@@ -42,8 +39,6 @@ testmodules = [
     'operations_tests.placer_algorithms_tests.test_radial_placer',
     'operations_tests.router_algorithms_tests.test_basic_dijkstra_routing',
     'operations_tests.router_algorithms_tests.test_generic_router',
-    'operations_tests.routing_info_algorithms_tests.'
-    'test_basic_routing_info_allocator',
     'operations_tests.routing_info_algorithms_tests.'
     'test_malloc_routing_info_allocator']
 
