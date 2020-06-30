@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.operations.router_compressors import (AbstractCompressor, Entry)
-from pacman.operations.router_compressors.mundys_router_compressor import \
-    ordered_covering as rigs_compressor
+from pacman.operations.router_compressors.mundys_router_compressor import (
+    ordered_covering as rigs_compressor)
 
 
 class MundyRouterCompressor(AbstractCompressor):
