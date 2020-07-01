@@ -24,7 +24,8 @@ class MachineTimestepVertex(MachineVertex):
 
     __slots__ = ["_timestep_in_us"]
 
-    def __init__(self, timestep_in_us, label=None, constraints=None):
+    def __init__(self, timestep_in_us, label=None, constraints=None,
+                 app_vertex=None, vertex_slice=None):
         """
         :param timestep_in_us: The timestep of this vertex in us
         :type timestep_in_us: int
@@ -33,10 +34,22 @@ class MachineTimestepVertex(MachineVertex):
         :param constraints: The optional initial constraints of the vertex
         :type constraints: \
             iterable(~pacman.model.constraints.AbstractConstraint)
+        :param app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If None, there is no such application vertex.
+        :type app_vertex: ApplicationVertex or None
+        :param vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        :type vertex_slice: Slice or None
         :raise pacman.exceptions.PacmanInvalidParameterException:
             If one of the constraints is not valid
+        :raises PacmanValueError: If the slice of the machine_vertex is too big
+        :raise AttributeError:
+            If a not None app_vertex is not an ApplicationVertex
         """
-        super(MachineTimestepVertex, self).__init__(label, constraints)
+        super(MachineTimestepVertex, self).__init__(
+            label, constraints, app_vertex, vertex_slice)
         assert 0 < timestep_in_us
         self._timestep_in_us = timestep_in_us
 
