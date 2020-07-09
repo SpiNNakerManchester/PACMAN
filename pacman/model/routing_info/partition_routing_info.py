@@ -59,8 +59,9 @@ class PartitionRoutingInfo(object):
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0
         for key_and_mask in self._keys_and_masks:
-            _, offset = key_and_mask.get_keys(
+            _, km_offset = key_and_mask.get_keys(
                 key_array=key_array, offset=offset, n_keys=(n_keys - offset))
+            offset += km_offset
         return key_array
 
     @property
