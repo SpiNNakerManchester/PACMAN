@@ -18,16 +18,44 @@
 from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.utilities import utility_calls as utils
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
-    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint)
+    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint,
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 
 
-def generate_machine_edges(machine_graph, graph_mapper, application_graph):
+def determine_max_atoms_for_vertex(vertex):
+    """  returns the max atom constraint after assessing them all.
+
+    :param vertex: the vertex to find max atoms of
+    :return: the max number of atoms per core
+    """
+    possible_max_atoms = list()
+    n_atoms = None
+    max_atom_constraints = utils.locate_constraints_of_type(
+        vertex.constraints, MaxVertexAtomsConstraint)
+    for constraint in max_atom_constraints:
+        possible_max_atoms.append(constraint.size)
+    n_atom_constraints = utils.locate_constraints_of_type(
+        vertex.constraints, FixedVertexAtomsConstraint)
+    for constraint in n_atom_constraints:
+        if n_atoms is not None and constraint.size != n_atoms:
+            raise PacmanPartitionException(
+                "Vertex has multiple contradictory fixed atom "
+                "constraints - cannot be both {} and {}".format(
+                    n_atoms, constraint.size))
+        n_atoms = constraint.size
+    if len(possible_max_atoms) != 0:
+        return int(min(possible_max_atoms))
+    else:
+        return vertex.n_atoms
+
+
+def generate_machine_edges(machine_graph, application_graph):
     """ Generate the machine edges for the vertices in the graph
 
     :param MachineGraph machine_graph: the machine graph to add edges to
-    :param GraphMapper graph_mapper: the mapper graphs
     :param ApplicationGraph application_graph:
         the application graph to work with
     """
@@ -40,17 +68,16 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     for source_vertex in progress.over(machine_graph.vertices):
 
         # For each out edge of the parent vertex...
-        vertex = graph_mapper.get_application_vertex(source_vertex)
+        vertex = source_vertex.app_vertex
         application_outgoing_partitions = application_graph.\
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
         for application_partition in application_outgoing_partitions:
-            for application_edge in application_partition.edges:
+            for edge in application_partition.edges:
                 # create new partitions
-                for dest_vertex in graph_mapper.get_machine_vertices(
-                        application_edge.post_vertex):
-                    machine_edge = application_edge.create_machine_edge(
+                for dest_vertex in edge.post_vertex.machine_vertices:
+                    machine_edge = edge.create_machine_edge(
                         source_vertex, dest_vertex,
-                        "machine_edge_for{}".format(application_edge.label))
+                        "machine_edge_for{}".format(edge.label))
                     machine_graph.add_edge(
                         machine_edge, application_partition.identifier)
 
@@ -60,10 +87,6 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
                             source_vertex, application_partition.identifier)
                     machine_partition.add_constraints(
                         application_partition.constraints)
-
-                    # update mapping object
-                    graph_mapper.add_edge_mapping(
-                        machine_edge, application_edge)
 
 
 def get_remaining_constraints(vertex):

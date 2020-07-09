@@ -17,7 +17,8 @@ import json
 import gzip
 from collections import OrderedDict
 from pacman.exceptions import PacmanAlreadyExistsException
-from .multicast_routing_table import MulticastRoutingTable
+from .uncompressed_multicast_routing_table import \
+    UnCompressedMulticastRoutingTable
 from spinn_machine import MulticastRoutingEntry
 
 
@@ -128,7 +129,7 @@ def from_json(j_router):
 
     tables = MulticastRoutingTables()
     for j_table in j_router:
-        table = MulticastRoutingTable(j_table["x"], j_table["y"])
+        table = UnCompressedMulticastRoutingTable(j_table["x"], j_table["y"])
         tables.add_routing_table(table)
         for j_entry in j_table["entries"]:
             table.add_multicast_routing_entry(MulticastRoutingEntry(

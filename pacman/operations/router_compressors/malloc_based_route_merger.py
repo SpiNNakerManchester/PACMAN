@@ -12,11 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+from pacman.model.routing_tables.compressed_multicast_routing_table import \
+    CompressedMulticastRoutingTable
 from pacman.utilities.constants import FULL_MASK
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
-from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.exceptions import PacmanRoutingException
 
 
@@ -71,8 +74,8 @@ class MallocBasedRouteMerger(object):
         :param MulticastRoutingTable router_table:
         :rtype: MulticastRoutingTable
         """
-        merged_routes = MulticastRoutingTable(router_table.x, router_table.y)
-
+        merged_routes = CompressedMulticastRoutingTable(
+            router_table.x, router_table.y)
         # Order the routes by key
         entries = sorted(
             router_table.multicast_routing_entries,
