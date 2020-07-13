@@ -15,8 +15,8 @@
 
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
+from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import OutgoingEdgePartition
-from pacman.model.graphs import Graph
 
 
 class ApplicationGraph(Graph):
@@ -31,5 +31,19 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, OutgoingEdgePartition,
-            label)
+            ApplicationVertex, ApplicationEdge, OutgoingEdgePartition, label)
+
+    def forget_machine_graph(self):
+        """ Forget the whole mapping from this graph to an application graph.
+        """
+        for v in self.vertices:
+            v.forget_machine_vertices()
+        for e in self.edges:
+            e.forget_machine_edges()
+
+    def forget_machine_edges(self):
+        """ Ensure that all application edges in this graph forget what
+            machine edges they map to. The mapping of vertices is unaffected.
+        """
+        for e in self.edges:
+            e.forget_machine_edges()

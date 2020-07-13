@@ -18,7 +18,7 @@ python:
   - 2.7
   - 3.6
   - 3.7
-dist: xenial
+dist: focal
 cache: pip
 addons:
   apt:
@@ -32,7 +32,7 @@ before_install:
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
   - support/rat.sh download
-  # Bring pip up to date 
+  # Bring pip up to date
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy numpy scipy
   # SpiNNakerManchester internal dependencies; development mode
@@ -41,7 +41,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install pylint python-coveralls 'coverage>=4.4,<5.0' flake8 pylint
+  - pip install 'pylint<2.5' python-coveralls 'coverage>=4.4,<5.0' flake8
   - python ./setup.py install
 
 script:
@@ -50,7 +50,7 @@ script:
   # - py.test integration_tests
   # Code quality check
   - flake8 pacman
-  - flake8 integration_tests unittests uinit_test_objects
+  - flake8 pacman_integration_tests unittests uinit_test_objects
   - ( pylint --output-format=colorized --disable=R,C pacman; exit $(($? & 35)) )
   - find pacman -name '*.xml' | xargs -n 1 support/validate-xml.sh
   - support/rat.sh run

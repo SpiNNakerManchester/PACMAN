@@ -278,8 +278,8 @@ class PACMANAlgorithmExecutor(object):
 
         # Set up the token tracking and make all specified tokens complete
         token_states = TokenStates()
-        for token_name in tokens:
-            token = Token(token_name)
+        for token in tokens:
+            token = Token(token.name, token.part)
             token_states.track_token(token)
             token_states.process_output_token(token)
 
@@ -288,7 +288,8 @@ class PACMANAlgorithmExecutor(object):
         for algorithm in chain(
                 self.__algorithm_data, self.__optional_algorithm_data):
             for token in algorithm.generated_output_tokens:
-                if not token_states.is_token_complete(token):
+                if (not token_states.is_token_complete(token) or
+                        not token_states.is_tracking_token_part(token)):
                     token_states.track_token(token)
 
         # Go through the algorithms and add a fake token for any algorithm that
@@ -429,6 +430,26 @@ class PACMANAlgorithmExecutor(object):
             for token in algorithm.generated_output_tokens:
                 algorithms_by_token[token.name].append("{}: part={}".format(
                     algorithm.algorithm_id, token.part))
+
+        # create complete token string
+        completed_tokens_string = ""
+        for token in token_states.get_completed_tokens():
+            completed_tokens_string += "{}, ".format(token.name)
+
+        # create fake token string
+        fake_token_string = ""
+        for token in fake_tokens.get_completed_tokens():
+            fake_token_string += (
+                "{},{} ".format(token.name, token.part))
+
+        # tokens to find string
+        token_to_find_string = ""
+        for token_name in tokens_to_find:
+            token = token_states.get_token(token_name)
+            for incomplete_part in token.incomplete_parts:
+                token_to_find_string += (
+                    "{}:{}".format(token_name, incomplete_part))
+
         raise PacmanConfigurationException(
             "Unable to deduce a future algorithm to use.\n"
             "    Inputs: {}\n"
@@ -446,9 +467,9 @@ class PACMANAlgorithmExecutor(object):
                 sorted(self._inputs),
                 sorted(fake_inputs),
                 outputs_to_find,
-                token_states.get_completed_tokens(),
-                fake_tokens.get_completed_tokens(),
-                tokens_to_find,
+                completed_tokens_string,
+                fake_token_string,
+                token_to_find_string,
                 algorithms_to_find_names,
                 optional_algorithms_names,
                 algorithms_used,
@@ -470,7 +491,8 @@ class PACMANAlgorithmExecutor(object):
                 copy_required_outputs.remove(input_type)
         return copy_required_outputs
 
-    def _remove_complete_tokens(self, tokens, output_tokens):
+    @staticmethod
+    def _remove_complete_tokens(tokens, output_tokens):
         """
         :param TokenStates tokens:
         :param output_tokens:
@@ -481,8 +503,9 @@ class PACMANAlgorithmExecutor(object):
             if not tokens.is_token_complete(Token(token))
         }
 
+    @staticmethod
     def __deduce_inputs_required_to_run(
-            self, algorithm, inputs, tokens, fake_inputs, fake_tokens):
+            algorithm, inputs, tokens, fake_inputs, fake_tokens):
         """
         :param AbstractAlgorithm algorithm:
         :param inputs: the inputs available *currently*

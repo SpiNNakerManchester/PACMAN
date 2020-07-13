@@ -45,19 +45,21 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     :raises PacmanRouteInfoAllocationException:
     """
 
-    __slots__ = []
+    __slots__ = ["_n_keys_map"]
 
     def __init__(self):
         super(MallocBasedRoutingInfoAllocator, self).__init__(
             [(0, 2 ** 32)])
+        self._n_keys_map = None
 
-    def __call__(self, machine_graph, n_keys_map, graph_mapper=None):
+    def __call__(self, machine_graph, n_keys_map):
         """
         :param MachineGraph machine_graph:
         :param AbstractMachinePartitionNKeysMap n_keys_map:
         :rtype: RoutingInfo
         :raises PacmanRouteInfoAllocationException:
         """
+        self._n_keys_map = n_keys_map
         # check that this algorithm supports the constraints
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
@@ -89,54 +91,52 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             self._allocate_fixed_keys(group, routing_infos)
 
         for group in progress.over(fixed_masks, False):
-            self._allocate_fixed_masks(group, n_keys_map, routing_infos)
+            self._allocate_fixed_masks(group, routing_infos)
 
         for group in progress.over(fixed_fields, False):
-            self._allocate_fixed_fields(group, n_keys_map, routing_infos)
+            self._allocate_fixed_fields(group, routing_infos)
 
         for group in progress.over(shared_keys, False):
-            self._allocate_share_key(group, routing_infos, n_keys_map)
+            self._allocate_share_key(group, routing_infos)
 
         for group in continuous:
-            self._allocate_other_groups(group, routing_infos, n_keys_map,
-                                        continuous=True)
+            self._allocate_other_groups(group, routing_infos, True)
 
         for group in noncontinuous:
-            self._allocate_other_groups(group, routing_infos, n_keys_map,
-                                        continuous=False)
+            self._allocate_other_groups(group, routing_infos, False)
 
         progress.end()
         return routing_infos
 
-    def _get_n_keys(self, group, n_keys_map):
+    def __get_n_keys(self, group):
         """
         :param ConstraintGroup group:
         :rtype: int
         """
         return max(
-            n_keys_map.n_keys_for_partition(partition) for partition in group)
+            self._n_keys_map.n_keys_for_partition(partition)
+            for partition in group)
 
-    def _allocate_other_groups(
-            self, group, routing_infos, n_keys_map, continuous):
+    def _allocate_other_groups(self, group, routing_infos, continuous):
         """
         :param ConstraintGroup group:
         :param RoutingInfo routing_infos:
         :param bool continuous:
         """
         keys_and_masks = self._allocate_keys_and_masks(
-            None, None, self._get_n_keys(group, n_keys_map),
+            None, None, self.__get_n_keys(group),
             contiguous_keys=continuous)
         for partition in group:
             self._update_routing_objects(
                 keys_and_masks, routing_infos, partition)
 
-    def _allocate_share_key(self, group, routing_infos, n_keys_map):
+    def _allocate_share_key(self, group, routing_infos):
         """
         :param ConstraintGroup group:
         :param RoutingInfo routing_infos:
         """
         keys_and_masks = self._allocate_keys_and_masks(
-            None, None, self._get_n_keys(group, n_keys_map))
+            None, None, self.__get_n_keys(group))
 
         for partition in group:
             # update the pacman data objects
@@ -162,7 +162,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
                 partition)
 
-    def _allocate_fixed_masks(self, group, n_keys_map, routing_infos):
+    def _allocate_fixed_masks(self, group, routing_infos):
         """
         :param ConstraintGroup group:
         :param RoutingInfo routing_infos:
@@ -172,14 +172,14 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # try to allocate
         keys_and_masks = self._allocate_keys_and_masks(
-            fixed_mask, None, self._get_n_keys(group, n_keys_map))
+            fixed_mask, None, self.__get_n_keys(group))
 
         for partition in group:
             # update the pacman data objects
             self._update_routing_objects(
                 keys_and_masks, routing_infos, partition)
 
-    def _allocate_fixed_fields(self, group, n_keys_map, routing_infos):
+    def _allocate_fixed_fields(self, group, routing_infos):
         """
         :param ConstraintGroup group:
         :param RoutingInfo routing_infos:
@@ -188,7 +188,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # try to allocate
         keys_and_masks = self._allocate_keys_and_masks(
-            None, fields, self._get_n_keys(group, n_keys_map))
+            None, fields, self.__get_n_keys(group))
 
         for partition in group:
             # update the pacman data objects

@@ -22,6 +22,7 @@ from spinn_machine import Router
 from pacman import exceptions
 from pacman.model.graphs import AbstractSpiNNakerLink, AbstractFPGA
 from pacman.model.graphs.common import EdgeTrafficType
+from pacman.operations.algorithm_reports.router_summary import RouterSummary
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -71,7 +72,7 @@ def tag_allocator_report(report_folder, tag_infos):
 
 
 def placer_reports_with_application_graph(
-        report_folder, hostname, graph, graph_mapper, placements, machine):
+        report_folder, hostname, graph, placements, machine):
     """ Reports that can be produced from placement given a application\
         graph's existence
 
@@ -79,16 +80,14 @@ def placer_reports_with_application_graph(
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ApplicationGraph graph:
         The application graph to which placements were built.
-    :param graph_mapper: \
-        the mapping between application and machine graphs
-    :param Placements placements: The placements objects built by the placer.
-    :param ~spinn_machine.Machine machine: The python machine object.
+    :param Placements placements: the placements objects built by the placer.
+    :param ~spinn_machine.Machine machine: the python machine object.
     :rtype: None
     """
     placement_report_with_application_graph_by_vertex(
-        report_folder, hostname, graph, graph_mapper, placements)
+        report_folder, hostname, graph, placements)
     placement_report_with_application_graph_by_core(
-        report_folder, hostname, placements, machine, graph_mapper)
+        report_folder, hostname, placements, machine)
 
 
 def placer_reports_without_application_graph(
@@ -116,12 +115,12 @@ def router_summary_report(
     :param MulticastRoutingTables routing_tables: The original routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
-    :rtype: None
+    :rtype: RouterSummary
     """
     file_name = os.path.join(report_folder, _ROUTING_SUMMARY_FILENAME)
     progress = ProgressBar(machine.n_chips,
                            "Generating Routing summary report")
-    _do_router_summary_report(
+    return _do_router_summary_report(
         file_name, progress, routing_tables,  hostname, machine)
 
 
@@ -129,17 +128,17 @@ def router_compressed_summary_report(
         report_folder, routing_tables, hostname, machine):
     """ Generates a text file of routing summaries
 
-    :param stri report_folder: The report folder to store this value.
+    :param str report_folder: The report folder to store this value.
     :param MulticastRoutingTables routing_tables: The original routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
-    :rtype: None
+    :rtype: RouterSummary
     """
     file_name = os.path.join(
         report_folder, _COMPRESSED_ROUTING_SUMMARY_FILENAME)
     progress = ProgressBar(machine.n_chips,
                            "Generating Routing summary report")
-    _do_router_summary_report(
+    return _do_router_summary_report(
         file_name, progress, routing_tables, hostname, machine)
 
 
@@ -151,6 +150,7 @@ def _do_router_summary_report(
     :param MulticastRoutingTables routing_tables:
     :param str hostname:
     :param ~spinn_machine.Machine machine:
+    :return: RouterSummary
     """
     time_date_string = time.strftime("%c")
     convert = Router.convert_routing_table_entry_to_spinnaker_route
@@ -195,6 +195,9 @@ def _do_router_summary_report(
                     "max unique spinnaker routes {}\n\n".format(
                         total_entries, max_entries, max_none_defaultable,
                         max_link_only, max_spinnaker_routes))
+            return RouterSummary(
+                total_entries, max_entries, max_none_defaultable,
+                max_link_only, max_spinnaker_routes)
 
     except IOError:
         logger.exception("Generate_routing summary reports: "
@@ -206,13 +209,13 @@ def router_report_from_paths(
         machine_graph, placements, machine):
     """ Generates a text file of routing paths
 
-    :param str report_folder: the report folder to store this value
-    :param MulticastRoutingTables routing_tables: the original routing tables
-    :param str hostname: the machine's hostname to which the placer worked on
+    :param str report_folder: The report folder to store this value.
+    :param MulticastRoutingTables routing_tables: The original routing tables.
+    :param str hostname: The machine's hostname to which the placer worked on.
     :param RoutingInfo routing_infos:
     :param MachineGraph machine_graph:
     :param Placements placements:
-    :param ~spinn_machine.Machine machine: the python machine object
+    :param ~spinn_machine.Machine machine: The python machine object.
     :rtype: None
     """
     file_name = os.path.join(report_folder, _ROUTING_FILENAME)
@@ -267,7 +270,7 @@ def _write_one_router_partition_report(f, partition, machine, placements,
         f.write("\n")
 
 
-def partitioner_report(report_folder, hostname, graph, graph_mapper):
+def partitioner_report(report_folder, hostname, graph):
     """ Generate report on the placement of vertices onto cores.
 
     :param str report_folder: the folder to which the reports are being written
@@ -290,13 +293,13 @@ def partitioner_report(report_folder, hostname, graph, graph_mapper):
                 time_date_string, hostname))
 
             for vertex in progress.over(graph.vertices):
-                _write_one_vertex_partition(f, vertex, graph_mapper)
+                _write_one_vertex_partition(f, vertex)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for"
                          " writing.", file_name)
 
 
-def _write_one_vertex_partition(f, vertex, graph_mapper):
+def _write_one_vertex_partition(f, vertex):
     """
     :param ~io.FileIO f:
     :param ApplicationVertex vertex:
@@ -309,26 +312,25 @@ def _write_one_vertex_partition(f, vertex, graph_mapper):
     f.write("Pop size: {}\n".format(num_atoms))
     f.write("Machine Vertices: \n")
 
-    machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
+    # Sort by slice and then by label
+    machine_vertices = sorted(vertex.machine_vertices,
                               key=lambda x: x.label)
     machine_vertices = sorted(machine_vertices,
-                              key=lambda x: graph_mapper.get_slice(x).lo_atom)
+                              key=lambda x: x.vertex_slice.lo_atom)
     for sv in machine_vertices:
-        lo_atom = graph_mapper.get_slice(sv).lo_atom
-        hi_atom = graph_mapper.get_slice(sv).hi_atom
         f.write("  Slice {}:{} ({} atoms) \n".format(
-            lo_atom, hi_atom, hi_atom - lo_atom + 1))
+            sv.vertex_slice.lo_atom, sv.vertex_slice.hi_atom,
+            sv.vertex_slice.n_atoms))
     f.write("\n")
 
 
 def placement_report_with_application_graph_by_vertex(
-        report_folder, hostname, graph, graph_mapper, placements):
+        report_folder, hostname, graph, placements):
     """ Generate report on the placement of vertices onto cores by vertex.
 
     :param str report_folder: the folder to which the reports are being written
     :param str hostname: the machine's hostname to which the placer worked on
     :param ApplicationGraph graph: the graph to which placements were built
-    :param graph_mapper: the mapping between graphs
     :param Placements placements: the placements objects built by the placer.
     """
 
@@ -346,23 +348,14 @@ def placement_report_with_application_graph_by_vertex(
             f.write("Generated: {} for target machine '{}'\n\n".format(
                 time_date_string, hostname))
 
-            used_processors_by_chip = dict()
-            used_sdram_by_chip = dict()
-            vertex_by_processor = dict()
-
             for vertex in progress.over(graph.vertices):
-                _write_one_vertex_application_placement(
-                    f, vertex, placements, graph_mapper,
-                    used_processors_by_chip, used_sdram_by_chip,
-                    vertex_by_processor)
+                _write_one_vertex_application_placement(f, vertex, placements)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for"
                          " writing.", file_name)
 
 
-def _write_one_vertex_application_placement(
-        f, vertex, placements, graph_mapper,
-        used_processors_by_chip, used_sdram_by_chip, vertex_by_processor):
+def _write_one_vertex_application_placement(f, vertex, placements):
     """
     :param ~io.FileIO f:
     :param ApplicationVertex vertex:
@@ -376,27 +369,17 @@ def _write_one_vertex_application_placement(
     f.write("Pop size: {}\n".format(num_atoms))
     f.write("Machine Vertices: \n")
 
-    machine_vertices = sorted(graph_mapper.get_machine_vertices(vertex),
+    # Sort by slice and then by label
+    machine_vertices = sorted(vertex.machine_vertices,
                               key=lambda vert: vert.label)
     machine_vertices = sorted(machine_vertices,
-                              key=lambda vert:
-                              graph_mapper.get_slice(vert).lo_atom)
+                              key=lambda vert: vert.vertex_slice.lo_atom)
     for sv in machine_vertices:
-        lo_atom = graph_mapper.get_slice(sv).lo_atom
-        hi_atom = graph_mapper.get_slice(sv).hi_atom
-        num_atoms = hi_atom - lo_atom + 1
+        lo_atom = sv.vertex_slice.lo_atom
+        hi_atom = sv.vertex_slice.hi_atom
+        num_atoms = sv.vertex_slice.n_atoms
         cur_placement = placements.get_placement_of_vertex(sv)
         x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
-        key = "{},{}".format(x, y)
-        if key in used_processors_by_chip:
-            used_pros = used_processors_by_chip[key]
-        else:
-            used_pros = list()
-            used_sdram_by_chip.update({key: 0})
-        vertex_by_processor["{},{},{}".format(x, y, p)] = sv
-        new_pro = [p, cur_placement]
-        used_pros.append(new_pro)
-        used_processors_by_chip.update({key: used_pros})
         f.write("  Slice {}:{} ({} atoms) on core ({}, {}, {}) \n"
                 .format(lo_atom, hi_atom, num_atoms, x, y, p))
     f.write("\n")
@@ -427,22 +410,14 @@ def placement_report_without_application_graph_by_vertex(
             f.write("Generated: {} for target machine '{}'\n\n".format(
                 time_date_string, hostname))
 
-            used_processors_by_chip = dict()
-            used_sdram_by_chip = dict()
-            vertex_by_processor = dict()
-
             for vertex in progress.over(machine_graph.vertices):
-                _write_one_vertex_machine_placement(
-                    f, vertex, placements, used_processors_by_chip,
-                    used_sdram_by_chip, vertex_by_processor)
+                _write_one_vertex_machine_placement(f, vertex, placements)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for"
                          " writing.", file_name)
 
 
-def _write_one_vertex_machine_placement(
-        f, vertex, placements, used_processors_by_chip, used_sdram_by_chip,
-        vertex_by_processor):
+def _write_one_vertex_machine_placement(f, vertex, placements):
     """
     :param ~io.FileIO f:
     :param MachineVertex vertex:
@@ -455,27 +430,15 @@ def _write_one_vertex_machine_placement(
 
     cur_placement = placements.get_placement_of_vertex(vertex)
     x, y, p = cur_placement.x, cur_placement.y, cur_placement.p
-    key = "{},{}".format(x, y)
-    if key in used_processors_by_chip:
-        used_pros = used_processors_by_chip[key]
-    else:
-        used_pros = list()
-        used_sdram_by_chip.update({key: 0})
-    vertex_by_processor["{},{},{}".format(x, y, p)] = vertex
-    new_pro = [p, cur_placement]
-    used_pros.append(new_pro)
-    used_processors_by_chip.update({key: used_pros})
     f.write(" Placed on core ({}, {}, {})\n\n".format(x, y, p))
 
 
 def placement_report_with_application_graph_by_core(
-        report_folder, hostname, placements, machine, graph_mapper):
+        report_folder, hostname, placements, machine):
     """ Generate report on the placement of vertices onto cores by core.
 
     :param str report_folder: the folder to which the reports are being written
     :param str hostname: the machine's hostname to which the placer worked on
-    :param graph_mapper: \
-        the mapping between application and machine graphs
     :param ~spinn_machine.Machine machine: the SpiNNaker machine object
     :param Placements placements: the placements objects built by the placer.
     """
@@ -496,14 +459,13 @@ def placement_report_with_application_graph_by_core(
                 time_date_string, hostname))
 
             for chip in progress.over(machine.chips):
-                _write_one_chip_application_placement(
-                    f, chip, placements, graph_mapper)
+                _write_one_chip_application_placement(f, chip, placements)
     except IOError:
         logger.exception("Generate_placement_reports: Can't open file {} for "
                          "writing.", file_name)
 
 
-def _write_one_chip_application_placement(f, chip, placements, graph_mapper):
+def _write_one_chip_application_placement(f, chip, placements):
     """
     :param ~io.FileIO f:
     :param ~spinn_machine.Chip chip:
@@ -521,13 +483,13 @@ def _write_one_chip_application_placement(f, chip, placements, graph_mapper):
             pro_id = processor.processor_id
             vertex = placements.get_vertex_on_processor(
                 chip.x, chip.y, processor.processor_id)
-            app_vertex = graph_mapper.get_application_vertex(vertex)
+            app_vertex = vertex.app_vertex
             vertex_label = app_vertex.label
             vertex_model = app_vertex.__class__.__name__
             vertex_atoms = app_vertex.n_atoms
-            lo_atom = graph_mapper.get_slice(vertex).lo_atom
-            hi_atom = graph_mapper.get_slice(vertex).hi_atom
-            num_atoms = hi_atom - lo_atom + 1
+            lo_atom = vertex.vertex_slice.lo_atom
+            hi_atom = vertex.vertex_slice.hi_atom
+            num_atoms = vertex.vertex_slice.n_atoms
             f.write("  Processor {}: Vertex: '{}', pop size: {}\n".format(
                 pro_id, vertex_label, vertex_atoms))
             f.write("              Slice on this core: {}:{} ({} atoms)\n"
@@ -736,7 +698,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
                            "Generating Router table report")
     for routing_table in progress.over(routing_tables.routing_tables):
         if routing_table.number_of_entries:
-            _generate_routing_table(routing_table, top_level_folder)
+            generate_routing_table(routing_table, top_level_folder)
 
 
 def router_report_from_compressed_router_tables(report_folder, routing_tables):
@@ -754,7 +716,7 @@ def router_report_from_compressed_router_tables(report_folder, routing_tables):
                            "Generating compressed router table report")
     for routing_table in progress.over(routing_tables.routing_tables):
         if routing_table.number_of_entries:
-            _generate_routing_table(routing_table, top_level_folder)
+            generate_routing_table(routing_table, top_level_folder)
 
 
 def format_route(entry):
@@ -773,7 +735,7 @@ def format_route(entry):
                               route_txt)
 
 
-def _generate_routing_table(routing_table, top_level_folder):
+def generate_routing_table(routing_table, top_level_folder):
     """
     :param ~spinn_machine.MulticastRoutingTable routing_table:
     :param str top_level_folder:
@@ -815,6 +777,8 @@ def _compression_ratio(uncompressed, compressed):
     :param int compressed:
     :rtype: float
     """
+    if uncompressed == 0:
+        return 0
     return (uncompressed - compressed) / float(uncompressed) * 100
 
 
@@ -932,7 +896,6 @@ def _search_route(
     :param ~spinn_machine.Machine machine:
     :rtype: tuple(str, int)
     """
-
     # Create text for starting point
     source_vertex = source_placement.vertex
     text = ""
@@ -1024,7 +987,7 @@ def _locate_routing_entry(current_router, key):
         the current router being used in the trace
     :param int key: the key being used by the source placement
     :return: the routing table entry
-    :rtype: ~spinn_machine.MulticstRoutingEntry
+    :rtype: ~spinn_machine.MulticastRoutingEntry
     :raise PacmanRoutingException:
         when there is no entry located on this router.
     """

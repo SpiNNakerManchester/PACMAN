@@ -72,7 +72,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
-            <param_type>MemoryGraphMapper</param_type>
             <param_type>NChipsRequired</param_type>
         </outputs>
     </algorithm>
@@ -109,7 +108,6 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
-            <param_type>MemoryGraphMapper</param_type>
             <param_type>NChipsRequired</param_type>
         </outputs>
     </algorithm>
@@ -366,10 +364,6 @@
                 <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
@@ -380,7 +374,6 @@
         </input_definitions>
         <required_inputs>
             <param_name>application_graph</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
         </required_inputs>
@@ -434,10 +427,6 @@
                 <param_name>n_keys_map</param_name>
                 <param_type>MemoryMachinePartitionNKeysMap</param_type>
             </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
@@ -445,7 +434,6 @@
         </required_inputs>
         <optional_inputs>
             <token>EdgesFiltered</token>
-            <param_name>graph_mapper</param_name>
         </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
@@ -504,6 +492,7 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingTables</param_type>
+            <token part="UnCompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
     <algorithm name="ZonedRoutingTableGenerator">
@@ -523,10 +512,6 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
                 <param_name>info_by_app_vertex</param_name>
                 <param_type>ApplicationRoutingInfos</param_type>
             </parameter>
@@ -535,7 +520,6 @@
             <param_name>routing_infos</param_name>
             <param_name>routing_table_by_partitions</param_name>
             <param_name>machine</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>info_by_app_vertex</param_name>
         </required_inputs>
         <outputs>
@@ -610,7 +594,31 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
+            <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
+    </algorithm>
+    <algorithm name="RoutingCompressionChecker">
+        <python_module>pacman.operations.router_compressors.routing_compression_checker</python_module>
+        <python_function>generate_routing_compression_checker_report</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>compressed_routing_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>compressed_routing_tables</param_name>
+            <param_name>routing_tables</param_name>
+        </required_inputs>
     </algorithm>
     <algorithm name="BasicRouteMerger">
         <python_module>pacman.operations.router_compressors.basic_route_merger</python_module>
@@ -746,10 +754,6 @@
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_tables</param_name>
                 <param_type>MemoryCompressedRoutingTables</param_type>
                 <param_type>MemoryRoutingTables</param_type>
@@ -762,9 +766,6 @@
             <param_name>routing_infos</param_name>
             <param_name>routing_tables</param_name>
         </required_inputs>
-        <optional_inputs>
-            <param_name>graph_mapper</param_name>
-        </optional_inputs>
     </algorithm>
     <algorithm name="NerRoute">
         <python_module>pacman.operations.router_algorithms</python_module>
