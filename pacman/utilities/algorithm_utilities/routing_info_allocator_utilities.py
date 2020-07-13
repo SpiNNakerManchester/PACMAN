@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-import logging
 import numpy
 from six import itervalues
 from six.moves import xrange
@@ -28,8 +27,6 @@ from pacman.utilities.utility_calls import (
 from pacman.exceptions import (
     PacmanValueError, PacmanConfigurationException,
     PacmanInvalidParameterException, PacmanRouteInfoAllocationException)
-
-logger = logging.getLogger(__name__)
 
 
 class ConstraintGroup(list):
@@ -283,10 +280,10 @@ def generate_key_ranges_from_mask(key, mask):
     """ Get a generator of base_key, n_keys pairs that represent ranges\
         allowed by the mask
 
-    :param key: The base key
-    :param mask: The mask
-    :return: generator of two ints representing the key field, and the n keys\
-        for that field
+    :param int key: The base key
+    :param int mask: The mask
+    :return: sequence of descriptions of fields, each item comprised of the
+        start of the key field, and the number of keys in that field
     :rtype: iterator(tuple(int, int))
     """
     unwrapped_mask = expand_to_bit_array(mask)
@@ -315,7 +312,6 @@ def generate_key_ranges_from_mask(key, mask):
     unwrapped_key = expand_to_bit_array(key)
     for value in xrange(n_sets):
         generated_key = numpy.copy(unwrapped_key)
-        unwrapped_value = expand_to_bit_array(value)[
-            -len(remaining_zeros):]
+        unwrapped_value = expand_to_bit_array(value)[-len(remaining_zeros):]
         generated_key[remaining_zeros] = unwrapped_value
         yield compress_from_bit_array(generated_key), n_keys

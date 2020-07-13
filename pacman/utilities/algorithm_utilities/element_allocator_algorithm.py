@@ -160,10 +160,19 @@ class ElementAllocatorAlgorithm(object):
         return space
 
     def space_remaining(self):
-        remaining = 0
-        for free_space in self._free_space_tracker:
-            remaining += free_space.size
-        return remaining
+        """ Get how much space remains in the pool that we allocate from.
+
+        .. note::
+            This does not guarantee that an allocation of this size will
+            succeed, due to possible fragmentation.
+
+        :return: The space remaining.
+        :rtype: int
+        """
+        return sum(free_space.size for free_space in self._free_space_tracker)
 
     def spaces_left(self):
+        """
+        :rtype: list(ElementFreeSpace)
+        """
         return self._free_space_tracker

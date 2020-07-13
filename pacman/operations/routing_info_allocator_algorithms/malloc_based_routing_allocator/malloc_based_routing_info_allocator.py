@@ -265,7 +265,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 # Check if all the key ranges can be allocated
                 matched_all = True
                 index = 0
-                for (base_key, n_keys) in generate_key_ranges_from_mask(
+                for base_key, n_keys in generate_key_ranges_from_mask(
                         key, mask):
                     logger.debug("Finding slot for {}, n_keys={}",
                                  hex(base_key), n_keys)
@@ -294,7 +294,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # If we found a working key and mask that can be assigned,
         # Allocate them
         if key_found is not None and mask_found is not None:
-            for (base_key, n_keys) in generate_key_ranges_from_mask(
+            for base_key, n_keys in generate_key_ranges_from_mask(
                     key_found, mask):
                 self.allocate_elements(base_key, n_keys)
 

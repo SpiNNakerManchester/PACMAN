@@ -278,7 +278,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # If we found a working key and mask that can be assigned,
         # Allocate them
         if key_found is not None and mask_found is not None:
-            for (base_key, n_keys) in generate_key_ranges_from_mask(
+            for base_key, n_keys in generate_key_ranges_from_mask(
                     key_found, mask):
                 self.allocate_elements(base_key, n_keys)
             # If we get here, we can assign the keys to the edges
@@ -288,8 +288,13 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             "Could not find space to allocate keys")
 
     def __check_match(self, key, mask):
+        """
+        :param int key:
+        :param int mask:
+        :rtype: bool
+        """
         index = 0
-        for (base_key, n_keys) in generate_key_ranges_from_mask(key, mask):
+        for base_key, n_keys in generate_key_ranges_from_mask(key, mask):
             logger.debug("Finding slot for {}, n_keys={}",
                          hex(base_key), n_keys)
             index = self._find_slot(base_key, lo=index)

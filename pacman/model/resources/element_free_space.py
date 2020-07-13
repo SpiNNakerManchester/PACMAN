@@ -15,12 +15,16 @@
 
 
 class ElementFreeSpace(object):
+    """ Describes a contiguous chunk of free space managed by an allocator \
+        algorithm.
+    """
+
     __slots__ = ["_size", "_start_address"]
 
     def __init__(self, start_address, size):
         """
-        :param int start_address:
-        :param int size:
+        :param int start_address: Where the space starts
+        :param int size: The number of items (bytes, etc.) in the space
         """
         self._start_address = start_address
         self._size = size
