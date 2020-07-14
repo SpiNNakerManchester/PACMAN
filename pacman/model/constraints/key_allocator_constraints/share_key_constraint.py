@@ -17,8 +17,8 @@ from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
 
 
 class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
-    """ Constraint to allow the same keys to be allocated to multiple edges
-    via partitions.
+    """ Constraint to allow the same keys to be allocated to multiple edges \
+        via partitions.
 
     .. warning::
         This constraint appears to be unused.
@@ -32,7 +32,7 @@ class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
 
     def __init__(self, other_partitions):
         """
-        :param list(OutgoingEdgePartition) other_partitions:
+        :param list(AbstractSingleSourcePartition) other_partitions:
             the other edges which keys are shared with.
         """
         self._other_partitions = other_partitions
@@ -41,6 +41,6 @@ class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
     def other_partitions(self):
         """ the other edges which keys are shared with
 
-        :rtype: list(OutgoingEdgePartition)
+        :rtype: list(AbstractSingleSourcePartition)
         """
         return self._other_partitions

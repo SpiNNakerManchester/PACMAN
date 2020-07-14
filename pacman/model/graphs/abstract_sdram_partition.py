@@ -24,9 +24,6 @@ class AbstractSDRAMPartition(AbstractCostedPartition):
 
     __slots__ = []
 
-    def __init__(self):
-        pass
-
     @abstractmethod
     def total_sdram_requirements(self):
         """ returns the total sdram required by this outgoing partition

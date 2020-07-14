@@ -14,8 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
+from .application_edge_partition import ApplicationEdgePartition
 from pacman.model.graphs.graph import Graph
-from pacman.model.graphs import AbstractEdgePartition, OutgoingEdgePartition
+from pacman.model.graphs import AbstractEdgePartition
 
 
 class ApplicationGraph(Graph):
@@ -31,7 +32,7 @@ class ApplicationGraph(Graph):
         """
         super(ApplicationGraph, self).__init__(
             ApplicationVertex, ApplicationEdge, AbstractEdgePartition, label,
-            OutgoingEdgePartition)
+            ApplicationEdgePartition)
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.

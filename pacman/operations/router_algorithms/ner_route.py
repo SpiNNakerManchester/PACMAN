@@ -49,7 +49,8 @@ def _convert_a_route(
 
     :param MulticastRoutingTableByPartition routing_tables:
         spinnaker format routing tables
-    :param OutgoingEdgePartition partition: Partition this route applies to
+    :param AbstractSingleSourcePartition partition:
+        Partition this route applies to
     :param int incoming_processor: processor this link came from
     :param int incoming_link: link this link came from
     :param RoutingTree partition_route: algorithm specific format of the route

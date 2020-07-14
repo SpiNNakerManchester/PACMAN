@@ -106,7 +106,7 @@ def validate_routes(machine_graph, placements, routing_infos,
 
 def _check_if_partition_has_continuous_keys(partition):
     """
-    :param OutgoingEdgePartition partition:
+    :param AbstractSingleSourcePartition partition:
     :rtype: bool
     """
     continuous_constraints = locate_constraints_of_type(

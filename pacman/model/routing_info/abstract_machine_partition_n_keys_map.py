@@ -28,7 +28,7 @@ class AbstractMachinePartitionNKeysMap(object):
     def n_keys_for_partition(self, partition):
         """ The number of keys required by the given partition
 
-        :param ~pacman.model.graphs.OutgoingEdgePartition partition:
+        :param ~pacman.model.graphs.AbstractSingleSourcePartition partition:
             The partition to set the number of keys for
         :return: The number of keys required by the partition
         :rtype: int

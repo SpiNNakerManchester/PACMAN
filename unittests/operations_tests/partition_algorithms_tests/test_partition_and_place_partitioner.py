@@ -21,7 +21,7 @@ import unittest
 from spinn_machine import (
     SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
 from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationGraph, ApplicationOutgoingEdgePartition)
+    ApplicationEdge, ApplicationGraph, ApplicationEdgePartition)
 from pacman.exceptions import (
     PacmanException, PacmanPartitionException, PacmanInvalidParameterException,
     PacmanValueError)
@@ -102,8 +102,7 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
         """test that the basic form with an extra edge works
         """
         self.setup()
-        outgoing_partition = ApplicationOutgoingEdgePartition(
-            "TEST", self.vert3)
+        outgoing_partition = ApplicationEdgePartition("TEST", self.vert3)
         self.graph.add_outgoing_edge_partition(outgoing_partition)
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1), "TEST")

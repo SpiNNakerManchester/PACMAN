@@ -245,7 +245,7 @@ def _write_one_router_partition_report(f, partition, machine, placements,
                                        routing_infos, routing_tables):
     """
     :param ~io.FileIO f:
-    :param OutgoingEdgePartition partition:
+    :param AbstractSingleSourcePartition partition:
     :param ~spinn_machine.Machine machine:
     :param Placements placements:
     :param RoutingInfo routing_infos:

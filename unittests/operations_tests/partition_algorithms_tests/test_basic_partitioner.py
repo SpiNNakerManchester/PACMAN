@@ -20,8 +20,8 @@ test for partitioning
 import unittest
 from spinn_machine import (
     SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-from pacman.model.graphs import OutgoingEdgePartition
+from pacman.model.graphs.application import (
+    ApplicationEdge, ApplicationGraph, ApplicationEdgePartition)
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanException,
     PacmanValueError)
@@ -55,10 +55,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.verts = [self.vert1, self.vert2, self.vert3]
         self.edges = [self.edge1, self.edge2, self.edge3]
 
-        outgoing_partition1 = OutgoingEdgePartition(
-            "foo", ApplicationEdge, self.vert1)
-        outgoing_partition2 = OutgoingEdgePartition(
-            "foo", ApplicationEdge, self.vert2)
+        outgoing_partition1 = ApplicationEdgePartition("foo", self.vert1)
+        outgoing_partition2 = ApplicationEdgePartition("foo", self.vert2)
 
         self.graph = ApplicationGraph("Graph")
         self.graph.add_vertices(self.verts)
@@ -113,8 +111,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the basic form with an extra edge works
         """
         self.setup()
-        outgoing_partition = OutgoingEdgePartition(
-            "TEST", ApplicationEdge, self.vert3)
+        outgoing_partition = ApplicationEdgePartition("TEST", self.vert3)
         self.graph.add_outgoing_edge_partition(outgoing_partition)
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, label="extra"), "TEST")

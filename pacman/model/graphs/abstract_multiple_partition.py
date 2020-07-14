@@ -14,11 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
-from spinn_utilities.ordered_default_dict import DefaultOrderedDict
-from spinn_utilities.ordered_set import OrderedSet
 
 
 class AbstractMultiplePartition(AbstractEdgePartition):

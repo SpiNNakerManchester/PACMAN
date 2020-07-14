@@ -19,8 +19,7 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
 from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineEdge,
-    MachineOutgoingEdgePartition)
+    MachineGraph, SimpleMachineVertex, MachineEdge, MachineEdgePartition)
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
@@ -132,14 +131,11 @@ class MyTestCase(unittest.TestCase):
         e4 = MachineEdge(v1, v4, label="e4")
 
         machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="part1", pre_vertex=v1))
+            MachineEdgePartition(identifier="part1", pre_vertex=v1))
         machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="part2", pre_vertex=v2))
+            MachineEdgePartition(identifier="part2", pre_vertex=v2))
         machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="part2", pre_vertex=v1))
+            MachineEdgePartition(identifier="part2", pre_vertex=v1))
 
         machine_graph.add_edge(e1, "part1")
         machine_graph.add_edge(e2, "part1")
@@ -156,8 +152,7 @@ class MyTestCase(unittest.TestCase):
             self._integration_setup()
         e5 = MachineEdge(v4, v2, label="e1")
         machine_graph.add_outgoing_edge_partition(
-            MachineOutgoingEdgePartition(
-                identifier="part3", pre_vertex=v4))
+            MachineEdgePartition(identifier="part3", pre_vertex=v4))
 
         machine_graph.add_edge(e5, "part3")
         partition2 = machine_graph.\

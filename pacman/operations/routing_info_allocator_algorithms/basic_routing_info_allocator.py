@@ -86,7 +86,7 @@ class BasicRoutingInfoAllocator(object):
     def _allocate_key_for_partition(
             self, partition, vertex, placements, n_keys_map):
         """
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         :param MachineVertex vertex:
         :param Placements placements:
         :param AbstractMachinePartitionNKeysMap n_keys_map:

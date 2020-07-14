@@ -36,7 +36,7 @@ class ConstraintGroup(list):
 
     def __init__(self, values):
         """
-        :param iterable(OutgoingEdgePartition) values:
+        :param iterable(AbstractSingleSourcePartition) values:
         """
         super(ConstraintGroup, self).__init__(values)
         self._constraint = None
@@ -218,7 +218,7 @@ def _check_masks_are_correct(partition):
     """ Check that the masks between a fixed mask constraint and a fixed_field\
         constraint. Raises error if not.
 
-    :param OutgoingEdgePartition partition:
+    :param AbstractSingleSourcePartition partition:
         the outgoing_edge_partition to search for these constraints
     :raise PacmanInvalidParameterException: if the masks are incompatible
     """

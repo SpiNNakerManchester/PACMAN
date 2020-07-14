@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import SDRAMEdgeSizeException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
 from pacman.model.graphs import (
     AbstractSingleSourcePartition, AbstractSDRAMPartition)
-from spinn_utilities.overrides import overrides
 
 
 class ConstantSDRAMMachinePartition(
@@ -29,7 +29,6 @@ class ConstantSDRAMMachinePartition(
     ]
 
     def __init__(self, identifier, pre_vertex, label):
-        AbstractSDRAMPartition.__init__(self)
         AbstractSingleSourcePartition.__init__(
             self, pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
             constraints=None, label=label, traffic_weight=1,

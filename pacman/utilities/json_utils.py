@@ -29,10 +29,8 @@ from pacman.model.resources import (
     VariableSDRAM)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, SimpleMachineVertex,
-    MachineOutgoingEdgePartition)
-from pacman.model.placements.placements import Placements
-from pacman.model.placements.placement import Placement
+    MachineEdge, MachineGraph, SimpleMachineVertex)
+from pacman.model.placements import Placements, Placement
 
 
 def json_to_object(json_object):
@@ -330,12 +328,8 @@ def graph_from_json(json_dict):
     for j_vertex in json_dict["vertices"]:
         vertex_add_contstraints_from_json(j_vertex, graph)
     for j_edge in json_dict["edges"]:
-        edge = edge_from_json(j_edge, graph)
-        if not graph.outgoing_partition_exists(edge.pre_vertex, "JSON_MOCK"):
-            graph.add_outgoing_edge_partition(
-                MachineOutgoingEdgePartition(
-                    identifier="JSON_MOCK", pre_vertex=edge.pre_vertex))
-        graph.add_edge(edge, "JSON_MOCK")
+        partition_label = j_edge.get("partition_label", "JSON_MOCK")
+        graph.add_edge(edge_from_json(j_edge, graph), partition_label)
     return graph
 
 

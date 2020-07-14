@@ -22,6 +22,8 @@ from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_costed_partition import AbstractCostedPartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
+from .abstract_edge import AbstractEdge
+from .abstract_vertex import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
 
@@ -194,22 +196,21 @@ class Graph(ConstrainedObject):
         self._outgoing_edge_partition_by_edge[edge] = partition
 
     def _new_edge_partition(self, name, pre_vertex):
-        """ How we create a new :py:class:`~.OutgoingEdgePartition` in the \
-            first place. Uses the first/only element in the allowed partition\
-            types argument to the graph's constructor.
+        """ How we create a new :py:class:`AbstractSingleSourcePartition` in \
+            the first place. Uses the first/only element in the allowed \
+            partition types argument to the graph's constructor.
 
         Called from :py:method:`~add_edge`.
         Can be overridden if different arguments should be passed.
 
         :param str name: The identifier of the partition
-        :param ~.AbstractVertex pre_vertex:
+        :param AbstractVertex pre_vertex:
             The starting vertex for the partition
         :return: the new edge partition
-        :rtype: ~.AbstractSingleSourcePartition
+        :rtype: AbstractSingleSourcePartition
         """
         return self._default_partition_type(
-                identifier=name, allowed_edge_types=self._allowed_edge_types,
-                pre_vertex=pre_vertex)
+            identifier=name, pre_vertex=pre_vertex)
 
     def add_edges(self, edges, outgoing_edge_partition_name):
         """ Add a collection of edges to the graph.
@@ -371,7 +372,7 @@ class Graph(ConstrainedObject):
 
         :param AbstractVertex vertex:
             The vertex at which the edge partitions to find starts
-        :rtype: iterable(OutgoingEdgePartition)
+        :rtype: iterable(AbstractEdgePartition)
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
@@ -398,3 +399,19 @@ class Graph(ConstrainedObject):
         """
         return self._outgoing_edge_partitions_by_name.get(
             (vertex, outgoing_edge_partition_name), None)
+
+    def __contains__(self, value):
+        """ Determines if a value is an object that is in the graph.
+
+        :param value: The object to see if it is in the graph
+        :type value: AbstractVertex or AbstractEdge or AbstractEdgePartition
+        :return: True if the value is in the graph, False otherwise
+        :rtype: bool
+        """
+        if isinstance(value, AbstractEdgePartition):
+            return value in self._outgoing_edge_partitions_by_name.values()
+        elif isinstance(value, AbstractEdge):
+            return value in self._outgoing_edge_partition_by_edge
+        elif isinstance(value, AbstractVertex):
+            return value in self._vertices
+        return False
