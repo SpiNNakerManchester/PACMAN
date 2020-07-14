@@ -15,9 +15,8 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.abstract_multiple_partition import (
-    AbstractMultiplePartition)
-from pacman.model.graphs import AbstractSDRAMPartition
+from pacman.model.graphs import (
+    AbstractEdgePartition, AbstractMultiplePartition, AbstractSDRAMPartition)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
 
@@ -92,6 +91,10 @@ class SourceSegmentedSDRAMMachinePartition(
         else:
             return self.total_sdram_requirements()
 
+    @overrides(AbstractEdgePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
+        """
+        :rtype: SourceSegmentedSDRAMMachinePartition
+        """
         return SourceSegmentedSDRAMMachinePartition(
             self._identifier, self._label, self._pre_vertices)

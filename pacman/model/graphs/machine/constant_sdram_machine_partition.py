@@ -18,7 +18,8 @@ from pacman.exceptions import SDRAMEdgeSizeException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
 from pacman.model.graphs import (
-    AbstractSingleSourcePartition, AbstractSDRAMPartition)
+    AbstractEdgePartition, AbstractSingleSourcePartition,
+    AbstractSDRAMPartition)
 
 
 class ConstantSDRAMMachinePartition(
@@ -69,6 +70,10 @@ class ConstantSDRAMMachinePartition(
             return 0
         return self._edges.peek().sdram_size
 
+    @overrides(AbstractEdgePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
+        """
+        :rtype: ConstantSDRAMMachinePartition
+        """
         return ConstantSDRAMMachinePartition(
             self._identifier, self._pre_vertex, self._label)

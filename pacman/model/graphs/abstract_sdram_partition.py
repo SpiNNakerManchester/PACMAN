@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
-
 from pacman.model.graphs import AbstractCostedPartition
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
@@ -26,21 +25,24 @@ class AbstractSDRAMPartition(AbstractCostedPartition):
 
     @abstractmethod
     def total_sdram_requirements(self):
-        """ returns the total sdram required by this outgoing partition
+        """ Get the total SDRAM required by this outgoing partition.
+
         :return: int
         """
 
     @abstractmethod
     def get_sdram_base_address_for(self, vertex):
-        """ return the sdram base address for a edge given which side
-        the vertex is on
-        :param vertex: the vertex to find sdram base address of
-        :return: the sdram address for this vertex
+        """ Get the SDRAM base address for a edge given which side \
+            the vertex is on.
+
+        :param vertex: the vertex to find SDRAM base address of
+        :return: the SDRAM address for this vertex
         """
 
     @abstractmethod
     def get_sdram_size_of_region_for(self, vertex):
-        """ returns the size of the region for a vertex given a edge
-        :param vertex: the vertex to find sdram size of
-        :return: the sdram size for this vertex
+        """ Get the size of the region for a vertex given a edge.
+
+        :param vertex: the vertex to find SDRAM size of
+        :return: the SDRAM size for this vertex
         """

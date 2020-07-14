@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs import AbstractSDRAMPartition
+from pacman.model.graphs import (
+    AbstractEdgePartition, AbstractSDRAMPartition,
+    AbstractSingleSourcePartition)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
-from pacman.model.graphs.abstract_single_source_partition import (
-    AbstractSingleSourcePartition)
 
 
 class DestinationSegmentedSDRAMMachinePartition(
@@ -79,6 +79,10 @@ class DestinationSegmentedSDRAMMachinePartition(
                 return edge.sdram_size
         return None
 
+    @overrides(AbstractEdgePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
+        """
+        :rtype: DestinationSegmentedSDRAMMachinePartition
+        """
         return DestinationSegmentedSDRAMMachinePartition(
             self._identifier, self._pre_vertex, self._label)

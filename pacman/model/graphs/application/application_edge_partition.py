@@ -16,7 +16,8 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import (
-    AbstractSingleSourcePartition, AbstractApplicationOutgoingPartition)
+    AbstractEdgePartition, AbstractSingleSourcePartition,
+    AbstractApplicationOutgoingPartition)
 from .application_edge import ApplicationEdge
 from pacman.model.graphs.machine import MachineEdgePartition
 
@@ -49,9 +50,18 @@ class ApplicationEdgePartition(
             class_name="ApplicationEdgePartition")
 
     @overrides(AbstractApplicationOutgoingPartition.
-               convert_to_machine_out_going_partition)
-    def convert_to_machine_out_going_partition(self, machine_pre_vertex):
+               convert_to_machine_outgoing_partition)
+    def convert_to_machine_outgoing_partition(self, machine_pre_vertex):
         return MachineEdgePartition(
             identifier=self.identifier, pre_vertex=machine_pre_vertex,
             constraints=self.constraints, label=self.label,
             traffic_weight=self.traffic_weight)
+
+    @overrides(AbstractEdgePartition.clone_for_graph_move)
+    def clone_for_graph_move(self):
+        """
+        :rtype: ApplicationEdgePartition
+        """
+        return ApplicationEdgePartition(
+            self._identifier, self._pre_vertex, self._constraints, self._label,
+            self._traffic_weight)

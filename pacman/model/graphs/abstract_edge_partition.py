@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
-
-from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanConfigurationException)
@@ -167,3 +166,11 @@ class AbstractEdgePartition(ConstrainedObject):
         :rtype: bool
         """
         return edge in self._edges
+
+    @abstractmethod
+    def clone_for_graph_move(self):
+        """ Make a copy of this edge partition for insertion into another \
+            graph.
+
+        :return: The copied edge partition.
+        """

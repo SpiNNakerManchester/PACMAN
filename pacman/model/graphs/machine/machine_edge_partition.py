@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.graphs import AbstractSingleSourcePartition
+from pacman.model.graphs import (
+    AbstractEdgePartition, AbstractSingleSourcePartition)
 from .machine_edge import MachineEdge
 
 
@@ -45,3 +47,12 @@ class MachineEdgePartition(AbstractSingleSourcePartition):
             label=label, traffic_weight=traffic_weight,
             traffic_type=EdgeTrafficType.MULTICAST,
             class_name="MachineEdgePartition")
+
+    @overrides(AbstractEdgePartition.clone_for_graph_move)
+    def clone_for_graph_move(self):
+        """
+        :rtype: MachineEdgePartition
+        """
+        return MachineEdgePartition(
+            self._identifier, self._pre_vertex, self._constraints, self._label,
+            self._traffic_weight)

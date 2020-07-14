@@ -20,7 +20,7 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 class AbstractApplicationOutgoingPartition(object):
 
     @abstractmethod
-    def convert_to_machine_out_going_partition(self, machine_pre_vertex):
+    def convert_to_machine_outgoing_partition(self, machine_pre_vertex):
         """ Build an equivalent of this application outgoing partition as a\
             machine outgoing partition.
 

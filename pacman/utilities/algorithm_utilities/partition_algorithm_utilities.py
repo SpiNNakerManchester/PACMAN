@@ -74,8 +74,7 @@ def generate_machine_edges(machine_graph, application_graph):
             # ... create the machine partition for the application partition;
             # It will be used by identifier later
             machine_graph.add_outgoing_edge_partition(
-                partition.convert_to_machine_out_going_partition(
-                    source_vertex))
+                partition.convert_to_machine_outgoing_partition(source_vertex))
 
             for edge in partition.edges:
                 # Create new edges for the machine partition

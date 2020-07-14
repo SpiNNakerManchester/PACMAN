@@ -12,21 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.common import EdgeTrafficType
+from spinn_utilities.overrides import overrides
+from pacman.model.graphs import AbstractEdgePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 
 
 class OutgoingEdgePartition(AbstractSingleSourcePartition):
-    """ A collection of edges which start at a single vertex which have the
-        same semantics and so can share a single key.
+    """ A collection of edges which start at a single vertex which have the \
+        same semantics. The traffic type and allowed edge type(s) must be \
+        specified.
     """
 
     __slots__ = ()
 
     def __init__(
             self, identifier, allowed_edge_types, pre_vertex,
-            traffic_type=EdgeTrafficType.MULTICAST,
-            constraints=None, label=None, traffic_weight=1):
+            traffic_type, constraints=None, label=None, traffic_weight=1):
         """
         :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
@@ -44,3 +45,13 @@ class OutgoingEdgePartition(AbstractSingleSourcePartition):
             allowed_edge_types=allowed_edge_types, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
             class_name="OutgoingEdgePartition", traffic_type=traffic_type)
+
+    @overrides(AbstractEdgePartition.clone_for_graph_move)
+    def clone_for_graph_move(self):
+        """
+        :rtype: OutgoingEdgePartition
+        """
+        return OutgoingEdgePartition(
+            self._identifier, self._allowed_edge_types, self._pre_vertex,
+            self._traffic_type, self._constraints, self._label,
+            self._traffic_weight)
