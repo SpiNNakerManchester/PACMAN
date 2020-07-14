@@ -50,13 +50,16 @@ class AbstractEdgePartition(ConstrainedObject):
             self, identifier, allowed_edge_types, constraints=None,
             label=None, traffic_weight=1,
             traffic_type=EdgeTrafficType.MULTICAST,
-            class_name="AbstractBasicEdgePartition"):
+            class_name="AbstractEdgePartition"):
         """
-        :param identifier: The identifier of the partition
+        :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
-        :param constraints: Any initial constraints
-        :param label: An optional label of the partition
-        :param traffic_weight: The weight of traffic going down this partition
+        :type allowed_edge_types: type or tuple(type, ...)
+        :param iterable(AbstractConstraint) constraints:
+            Any initial constraints
+        :param str label: An optional label of the partition
+        :param int traffic_weight:
+            The weight of traffic going down this partition
         """
         ConstrainedObject.__init__(self, constraints)
         self._label = label
@@ -73,9 +76,19 @@ class AbstractEdgePartition(ConstrainedObject):
 
     @property
     def label(self):
+        """ The label of the edge partition.
+
+        :rtype: str
+        """
         return self._label
 
     def add_edge(self, edge):
+        """ Add an edge to the edge partition.
+
+        :param AbstractEdge edge: the edge to add
+        :raises PacmanInvalidParameterException:
+            If the edge does not belong in this edge partition
+        """
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
             raise PacmanInvalidParameterException(
@@ -94,22 +107,43 @@ class AbstractEdgePartition(ConstrainedObject):
 
     @property
     def identifier(self):
+        """ The identifier of this edge partition.
+
+        :rtype: str
+        """
         return self._identifier
 
     @property
     def edges(self):
+        """ The edges in this edge partition.
+
+        :rtype: iterable(AbstractEdge)
+        """
         return self._edges
 
     @property
     def n_edges(self):
+        """ The number of edges in the edge partition.
+
+        :rtype: int
+        """
         return len(self._edges)
 
     @property
     def traffic_type(self):
+        """ The traffic type of all the edges in this edge partition.
+
+        :rtype: EdgeTrafficType
+        """
         return self._traffic_type
 
     @property
     def traffic_weight(self):
+        """ The weight of the traffic in this edge partition compared to\
+            other partitions.
+
+        :rtype: int
+        """
         return self._traffic_weight
 
     def __repr__(self):
@@ -129,7 +163,7 @@ class AbstractEdgePartition(ConstrainedObject):
     def __contains__(self, edge):
         """ Check if the edge is contained within this partition
 
-        :param edge: the edge to search for.
-        :return: boolean of true of false otherwise
+        :param AbstractEdge edge: the edge to search for.
+        :rtype: bool
         """
         return edge in self._edges

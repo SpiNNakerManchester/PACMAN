@@ -16,11 +16,19 @@
 """
 test for the resources model
 """
+from enum import Enum
+import tempfile
 import unittest
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
-    IPtagResource, ReverseIPtagResource, SpecificBoardIPtagResource,
-    SpecificBoardReverseIPtagResource, VariableSDRAM)
+    IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
+    SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource,
+    VariableSDRAM)
+
+
+class MockEnum(Enum):
+    ZERO = 0
+    ONE = 1
 
 
 class TestResourceModels(unittest.TestCase):
@@ -60,6 +68,34 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (6 + 8) * 150)
         combo = var2 - var1
         self.assertEqual(combo.get_total_sdram(150), 234 - 124 + (6 - 8) * 150)
+
+        multi1 = MultiRegionSDRAM()
+        multi1.add_cost(1, 100, 4)
+        multi1.add_cost(2, 50, 3)
+        multi1.add_cost("overheads", 20)
+        multi2 = MultiRegionSDRAM()
+        multi2.add_cost(MockEnum.ZERO, 88)
+        multi2.add_cost(MockEnum.ONE, 72)
+        multi2.add_cost("overheads", 22)
+
+        combo = multi1 + multi2
+        self.assertEqual(combo.get_total_sdram(150),
+                         100 + 50 + 20 + 88 + 72 + 22 + (4 + 3) * 150)
+
+        multi3 = MultiRegionSDRAM()
+        multi3.nest("foo", multi1)
+        multi3.nest("bar", multi2)
+
+        multi1.merge(multi2)
+        self.assertEqual(len(multi1.regions), 5)
+        self.assertEqual(multi1.regions["overheads"], ConstantSDRAM(20 + 22))
+        self.assertEqual(multi1.get_total_sdram(150),
+                         100 + 50 + 20 + 88 + 72 + 22 + (4 + 3) * 150)
+        self.assertEqual(multi1, combo)
+        self.assertEqual(multi1, multi3)
+        with tempfile.TemporaryFile(mode="w") as target:
+            multi3.report(1000, target=target)
+        # multi3.report(preamble="core (0,0,1):")
 
     def test_dtcm(self):
         """

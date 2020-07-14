@@ -12,12 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.abstract_single_source_partition import \
-    AbstractSingleSourcePartition
-from spinn_utilities.abstract_base import abstractmethod
-
-_REPR_TEMPLATE = \
-    "OutgoingEdgePartition(identifier={}, edges={}, constraints={}, label={})"
+from pacman.model.graphs.common import EdgeTrafficType
+from .abstract_single_source_partition import AbstractSingleSourcePartition
 
 
 class OutgoingEdgePartition(AbstractSingleSourcePartition):
@@ -25,27 +21,26 @@ class OutgoingEdgePartition(AbstractSingleSourcePartition):
         same semantics and so can share a single key.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(
-            self, identifier, allowed_edge_types, pre_vertex, traffic_type,
+            self, identifier, allowed_edge_types, pre_vertex,
+            traffic_type=EdgeTrafficType.MULTICAST,
             constraints=None, label=None, traffic_weight=1):
         """
-        :param identifier: The identifier of the partition
+        :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
-        :param constraints: Any initial constraints
-        :param label: An optional label of the partition
-        :param traffic_weight: The weight of traffic going down this partition
+        :type allowed_edge_types: type or tuple(type, ...)
+        :param AbstractVertex pre_vertex: The source of this partition
+        :param EdgeTrafficType traffic_type:
+            What kind of traffic will be carried by this partition
+        :param list(AbstractConstraint) constraints: Any initial constraints
+        :param str label: An optional label of the partition
+        :param int traffic_weight:
+            The weight of traffic going down this partition
         """
-        AbstractSingleSourcePartition.__init__(
-            self, pre_vertex=pre_vertex, identifier=identifier,
+        super(OutgoingEdgePartition, self).__init__(
+            pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=allowed_edge_types, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
             class_name="OutgoingEdgePartition", traffic_type=traffic_type)
-
-    @abstractmethod
-    def clone_for_graph_move(self):
-        """ handle cloning this partition for moving between graphs.
-
-        :return: a clone of this partition with no edge data
-        """

@@ -18,8 +18,8 @@ from pacman.model.graphs import AbstractEdgePartition
 
 
 class AbstractSingleSourcePartition(AbstractEdgePartition):
-
     __slots__ = [
+        # The vertex at the start of all the edges
         "_pre_vertex"
     ]
 
@@ -34,6 +34,13 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
         self._pre_vertex = pre_vertex
 
     def add_edge(self, edge):
+        """ Add an edge to the edge partition.
+
+        :param AbstractEdge edge: the edge to add
+        :raises PacmanInvalidParameterException:
+            If the starting vertex of the edge does not match that of the
+            edges already in the partition
+        """
         if edge.pre_vertex != self._pre_vertex:
             raise PacmanConfigurationException(
                 "A partition can only contain edges with the same pre_vertex")
@@ -41,4 +48,9 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
 
     @property
     def pre_vertex(self):
+        """ The vertex at which all edges in this outgoing edge partition\
+            start.
+
+        :rtype: AbstractVertex
+        """
         return self._pre_vertex

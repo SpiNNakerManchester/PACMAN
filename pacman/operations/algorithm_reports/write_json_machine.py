@@ -23,23 +23,28 @@ MACHINE_FILENAME = "machine.json"
 
 
 class WriteJsonMachine(object):
-    """ Converter from memory machine to java machine
+    """ Converter from memory machine to java machine.
+
+    .. note::
+        This is no longer the rig machine format!
 
     :param ~spinn_machine.Machine machine: Machine to convert
-    :param str file_path:
-        Location to write file to.
+    :param str json_folder:
+        The folder to which the JSON are being written.
 
         .. warn:
-             This will be overwritten!
+             The files in this folder will be overwritten!
+
+    :return: the name of the generated file
+    :rtype: str
     """
 
     def __call__(self, machine, json_folder):
         """ Runs the code to write the machine in readable JSON.
 
-        This is no longer the rig machine format
-
-        :param ~spinn_machine.Machine machine: Machine to convert
-        :param str json_folder: the folder to which the json are being written
+        :param ~spinn_machine.Machine machine:
+        :param str json_folder:
+        :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON machine")
@@ -51,9 +56,11 @@ class WriteJsonMachine(object):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param ~spinn_machine.Machine machine: Machine to convert
-        :param str json_folder: the folder to which the json are being written
+        :param str json_folder: the folder to which the JSON are being written
         :param progress: Progress Bar if one used
         :type progress: ~spinn_utilities.progress_bar.ProgressBar or None
+        :return: the name of the generated file
+        :rtype: str
         """
 
         file_path = os.path.join(json_folder, MACHINE_FILENAME)

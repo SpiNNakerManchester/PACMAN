@@ -15,11 +15,13 @@
 
 import sys
 from six import add_metaclass
+from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.abstract_base import (
     abstractmethod, abstractproperty, AbstractBase)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
+from pacman.exceptions import PacmanValueError, PacmanAlreadyExistsException
 
 
 @add_metaclass(AbstractBase)
@@ -28,24 +30,22 @@ class ApplicationVertex(AbstractVertex):
         based on the resources that the vertex requires.
     """
 
-    __slots__ = []
+    __slots__ = ["_machine_vertices"]
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
         """
-        :param label: The optional name of the vertex
-        :type label: str
-        :param constraints: The optional initial constraints of the vertex
-        :type constraints: \
-            iterable(~pacman.model.constraints.AbstractConstraint)
-        :param max_atoms_per_core: the max number of atoms that can be\
-            placed on a core, used in partitioning
-        :type max_atoms_per_core: int
-        :raise pacman.exceptions.PacmanInvalidParameterException:\
-            * If one of the constraints is not valid
+        :param str label: The optional name of the vertex.
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex.
+        :param int max_atoms_per_core: The max number of atoms that can be
+            placed on a core, used in partitioning.
+        :raise PacmanInvalidParameterException:
+            If one of the constraints is not valid
         """
 
         super(ApplicationVertex, self).__init__(label, constraints)
+        self._machine_vertices = OrderedSet()
 
         # add a constraint for max partitioning
         self.add_constraint(
@@ -62,12 +62,11 @@ class ApplicationVertex(AbstractVertex):
     def get_resources_used_by_atoms(self, vertex_slice):
         """ Get the separate resource requirements for a range of atoms
 
-        :param vertex_slice: the low value of atoms to calculate resources from
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
-        :return: a Resource container that contains a \
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the low value of atoms to calculate resources from
+        :return: a Resource container that contains a
             CPUCyclesPerTickResource, DTCMResource and SDRAMResource
         :rtype: ~pacman.model.resources.ResourceContainer
-        :raise None: this method does not raise any known exception
         """
 
     @abstractmethod
@@ -76,17 +75,37 @@ class ApplicationVertex(AbstractVertex):
             constraints=None):
         """ Create a machine vertex from this application vertex
 
-        :param vertex_slice:\
-            The slice of atoms that the machine vertex will cover
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
-        :param resources_required: the resources used by the machine vertex
-        :type resources_required: ~pacman.model.resources.ResourceContainer
+        :param vertex_slice:
+            The slice of atoms that the machine vertex will cover,
+            or None to use the default slice
+        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
+        :param ~pacman.model.resources.ResourceContainer resources_required:
+            The resources used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
-        :param constraints: Constraints to be passed on to the machine vertex
-        :type constraints: \
-            iterable(~pacman.model.constraints.AbstractConstraint)
+        :param iterable(~pacman.model.constraints.AbstractConstraint) \
+                constraints:
+            Constraints to be passed on to the machine vertex.
         """
+
+    def remember_associated_machine_vertex(self, machine_vertex):
+        """
+        Adds the Machine vertex the iterable returned by machine_vertices
+        :param machine_vertex: A pointer to a machine_vertex.
+            This vertex may not be fully initialized but will have a slice
+        :raises PacmanValueError: If the slice of the machine_vertex is too big
+        """
+        if machine_vertex.vertex_slice.hi_atom >= self.n_atoms:
+            raise PacmanValueError(
+                "hi_atom {:d} >= maximum {:d}".format(
+                    machine_vertex.vertex_slice.hi_atom, self.n_atoms))
+
+        machine_vertex.index = len(self._machine_vertices)
+
+        if machine_vertex in self._machine_vertices:
+            raise PacmanAlreadyExistsException(
+                str(machine_vertex), machine_vertex)
+        self._machine_vertices.add(machine_vertex)
 
     @abstractproperty
     def n_atoms(self):
@@ -95,8 +114,38 @@ class ApplicationVertex(AbstractVertex):
         :rtype: int
         """
 
+    @property
+    def machine_vertices(self):
+        """ The machine vertices that this application vertex maps to.
+            Will be the same length as :py:meth:`vertex_slices`.
+
+        :rtype: iterable(MachineVertex)
+        """
+        return self._machine_vertices
+
+    @property
+    def vertex_slices(self):
+        """ The slices of this vertex that each machine vertex manages.
+            Will be the same length as :py:meth:`machine_vertices`.
+
+        :rtype: iterable(Slice)
+        """
+        return list(map(lambda x: x.vertex_slice, self._machine_vertices))
+
     def get_max_atoms_per_core(self):
+        """ Gets the maximum number of atoms per core, which is either the\
+            number of atoms required across the whole application vertex,\
+            or a lower value if a constraint lowers it.
+
+        :rtype: int
+        """
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
         return self.n_atoms
+
+    def forget_machine_vertices(self):
+        """ Arrange to forget all machine vertices that this application
+            vertex maps to.
+        """
+        self._machine_vertices = OrderedSet()

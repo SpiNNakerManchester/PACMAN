@@ -17,7 +17,6 @@ from .machine_edge import MachineEdge
 from .machine_fpga_vertex import MachineFPGAVertex
 from .machine_sdram_edge import SDRAMMachineEdge
 from .machine_graph import MachineGraph
-from .machine_outgoing_edge_partition import MachineOutgoingEdgePartition
 from .machine_spinnaker_link_vertex import MachineSpiNNakerLinkVertex
 from .machine_vertex import MachineVertex
 from .simple_machine_vertex import SimpleMachineVertex
@@ -27,9 +26,9 @@ from .destination_segmented_sdram_machine_partition import (
 from .source_segmented_sdram_machine_partition import (
     SourceSegmentedSDRAMMachinePartition)
 
-__all__ = ["MachineEdge", "MachineFPGAVertex", "MachineGraph",
-           "MachineOutgoingEdgePartition", "MachineSpiNNakerLinkVertex",
-           "MachineVertex", "SimpleMachineVertex", "SDRAMMachineEdge",
-           "ConstantSDRAMMachinePartition",
-           "DestinationSegmentedSDRAMMachinePartition",
-           "SourceSegmentedSDRAMMachinePartition"]
+__all__ = [
+    "ConstantSDRAMMachinePartition",
+    "DestinationSegmentedSDRAMMachinePartition", "MachineEdge",
+    "MachineFPGAVertex", "MachineGraph", "MachineSpiNNakerLinkVertex",
+    "MachineVertex", "SDRAMMachineEdge", "SimpleMachineVertex",
+    "SourceSegmentedSDRAMMachinePartition"]

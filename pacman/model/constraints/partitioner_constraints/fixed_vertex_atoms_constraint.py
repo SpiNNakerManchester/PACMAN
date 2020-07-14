@@ -28,8 +28,7 @@ class FixedVertexAtomsConstraint(AbstractPartitionerConstraint):
 
     def __init__(self, size):
         """
-        :param size: The exact number of atoms to split the vertex into
-        :type size: int
+        :param int size: The exact number of atoms to split the vertex into
         """
         self._size = size
 

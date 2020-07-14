@@ -13,7 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .multicast_routing_table import MulticastRoutingTable
+from .uncompressed_multicast_routing_table import (
+    UnCompressedMulticastRoutingTable)
+from .compressed_multicast_routing_table import (
+    CompressedMulticastRoutingTable)
 from .multicast_routing_tables import MulticastRoutingTables
 
-__all__ = ["MulticastRoutingTable", "MulticastRoutingTables"]
+__all__ = ["UnCompressedMulticastRoutingTable",
+           "CompressedMulticastRoutingTable", "MulticastRoutingTables"]

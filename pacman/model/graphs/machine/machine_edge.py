@@ -37,35 +37,45 @@ class MachineEdge(AbstractEdge):
         "_traffic_weight",
 
         # The label of the edge
-        "_label"
+        "_label",
+
+        # The originating application edge
+        "_app_edge"
     ]
 
     def __init__(
             self, pre_vertex, post_vertex,
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
-            traffic_weight=1):
+            traffic_weight=1, app_edge=None):
         """
-        :param pre_vertex: the vertex at the start of the edge
-        :type pre_vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :param post_vertex: the vertex at the end of the edge
-        :type post_vertex:\
-            :py:class:`pacman.model.graphs.machine.MachineVertex`
-        :param traffic_type: The type of traffic that this edge will carry
-        :type traffic_type:\
-            :py:class:`pacman.model.graphs.common.EdgeTrafficType`
-        :param label: The name of the edge
-        :type label: str
-        :param traffic_weight:\
-            the optional weight of traffic expected to travel down this edge\
-            relative to other edges (default is 1)
-        :type traffic_weight: int
+        :param MachineVertex pre_vertex: The vertex at the start of the edge.
+        :param MachineVertex post_vertex: The vertex at the end of the edge.
+        :param EdgeTrafficType traffic_type:
+            The type of traffic that this edge will carry.
+        :param label: The name of the edge.
+        :type label: str or None
+        :param int traffic_weight:
+            The optional weight of traffic expected to travel down this edge
+            relative to other edges. (default is 1)
+        :param app_edge: The application edge from which this was created.
+            If `None`, this edge is part of a pure machine graph.
+        :type app_edge: ApplicationEdge or None
         """
         self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
         self._traffic_type = traffic_type
         self._traffic_weight = traffic_weight
+        self._app_edge = app_edge
+        # depends on self._app_edge being set
+        self.associate_application_edge()
+
+    def associate_application_edge(self):
+        """
+        Asks the application edge (if any) to remember this machine edge.
+        """
+        if self._app_edge:
+            self._app_edge.remember_associated_machine_edge(self)
 
     @property
     @overrides(AbstractEdge.label)
@@ -73,24 +83,45 @@ class MachineEdge(AbstractEdge):
         return self._label
 
     @property
-    @overrides(AbstractEdge.pre_vertex)
+    @overrides(AbstractEdge.pre_vertex, extend_doc=False)
     def pre_vertex(self):
+        """ The vertex at the start of the edge.
+
+        :rtype: ~pacman.model.graphs.machine.MachineVertex
+        """
         return self._pre_vertex
 
     @property
-    @overrides(AbstractEdge.post_vertex)
+    @overrides(AbstractEdge.post_vertex, extend_doc=False)
     def post_vertex(self):
+        """ The vertex at the end of the edge.
+
+        :rtype: ~pacman.model.graphs.machine.MachineVertex
+        """
         return self._post_vertex
 
     @property
     @overrides(AbstractEdge.traffic_type)
     def traffic_type(self):
+        """
+        :rtype: EdgeTrafficType
+        """
         return self._traffic_type
+
+    @property
+    def app_edge(self):
+        """ The application edge from which this was created
+
+        :rtype: ApplicationEdge or None
+        """
+        return self._app_edge
 
     @property
     def traffic_weight(self):
         """ The amount of traffic expected to go down this edge relative to
-            other edges
+            other edges.
+
+        :rtype: int
         """
         return self._traffic_weight
 

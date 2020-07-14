@@ -21,7 +21,7 @@ from abc import abstractmethod
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
-    MulticastRoutingTable, MulticastRoutingTables)
+    CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
 
 logger = logging.getLogger(__name__)
@@ -137,7 +137,7 @@ class AbstractCompressor(object):
             else:
                 compressed_table = self.compress_table(table)
 
-                new_table = MulticastRoutingTable(table.x, table.y)
+                new_table = CompressedMulticastRoutingTable(table.x, table.y)
 
                 for entry in compressed_table:
                     new_table.add_multicast_routing_entry(

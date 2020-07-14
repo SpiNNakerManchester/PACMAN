@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationGraph, ApplicationOutgoingEdgePartition)
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from pacman.model.graphs import OutgoingEdgePartition
 from uinit_test_objects import SimpleTestVertex
 
 
@@ -31,8 +31,10 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2", 256)
         vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3", 256)
-        outgoing_partition1 = ApplicationOutgoingEdgePartition("foo", vert2)
-        outgoing_partition2 = ApplicationOutgoingEdgePartition("foo", vert1)
+        outgoing_partition1 = OutgoingEdgePartition(
+            "foo", ApplicationEdge, vert2)
+        outgoing_partition2 = OutgoingEdgePartition(
+            "foo", ApplicationEdge, vert1)
         edge1 = ApplicationEdge(vert1, vert2, label="First edge")
         edge2 = ApplicationEdge(vert2, vert1, label="First edge")
         edge3 = ApplicationEdge(vert1, vert3, label="First edge")

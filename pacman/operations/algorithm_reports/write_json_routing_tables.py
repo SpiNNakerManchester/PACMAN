@@ -23,17 +23,21 @@ ROUTING_TABLES_FILENAME = "routing_tables.json"
 
 
 class WriteJsonRoutingTables(object):
-    """ Converter from MulticastRoutingTables to json
+    """ Converter from MulticastRoutingTables to JSON.
+
+    :param MulticastRoutingTables router_tables:
+        Routing Tables to convert
+    :param str json_folder: the folder to which the JSON are being written
+    :return: the name of the generated file
+    :rtype: str
     """
 
     def __call__(self, router_tables, json_folder):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param router_tables: Routing Tables to convert
-        :type router_tables:
-            :py:class:`pacman.model.routing_tables.MulticastRoutingTables`
-       :param json_folder: the folder to which the json are being written
-       :type json_folder: str
+        :param MulticastRoutingTables router_tables:
+        :param str json_folder:
+        :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON RouterTables")
@@ -42,17 +46,21 @@ class WriteJsonRoutingTables(object):
             router_tables, json_folder, progress)
 
     @staticmethod
-    def do_convert(router_table, json_folder, progress=None):
+    def do_convert(router_tables, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
-        :param machine: Machine to convert
-        :type machine: :py:class:`spinn_machine.machine.Machine`
-        :param json_folder: the folder to which the json are being written
-        :type json_folder: str
+        :param MulticastRoutingTables router_tables:
+            Routing Tables to convert
+        :param str json_folder:
+            the folder to which the JSON files are being written
+        :param progress: The progress bar, if any
+        :type progress: ~spinn_utilities.progress_bar.ProgressBar or None
+        :return: the name of the generated file
+        :rtype: str
         """
 
         file_path = os.path.join(json_folder, ROUTING_TABLES_FILENAME)
-        json_obj = to_json(router_table)
+        json_obj = to_json(router_tables)
 
         if progress:
             progress.update()

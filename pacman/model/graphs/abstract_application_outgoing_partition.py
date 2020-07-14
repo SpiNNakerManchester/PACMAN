@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
-
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
@@ -22,9 +21,11 @@ class AbstractApplicationOutgoingPartition(object):
 
     @abstractmethod
     def convert_to_machine_out_going_partition(self, machine_pre_vertex):
-        """ builds a equiv of this application outgoing partition as a
-         machine outgoing partition.
+        """ Build an equivalent of this application outgoing partition as a\
+            machine outgoing partition.
 
-        :param machine_pre_vertex: the machine vertex to be the pre vertex
+        :param MachineVertex machine_pre_vertex:
+            the machine vertex to be the pre-vertex
         :return: The machine outgoing partition
+        :rtype: AbstractEdgePartition
         """
