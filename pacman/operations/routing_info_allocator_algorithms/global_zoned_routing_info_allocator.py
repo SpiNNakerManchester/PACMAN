@@ -43,19 +43,17 @@ class GlobalZonedRoutingInfoAllocator(object):
 
     __slots__ = [
         # Passed in parameters
-        "_application_graph",
-        "_machine_graph",
-        "_placements",
-        "_n_keys_map",
-        "_n_bits_partition",
-        "_n_bits_machine",
-        "_n_bits_atoms",
-        "_n_bits_total"
+        "__application_graph",
+        "__machine_graph",
+        "__n_keys_map",
+        "__n_bits_partition",
+        "__n_bits_machine",
+        "__n_bits_atoms",
+        "__n_bits_total"
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, application_graph, machine_graph, placements,
-                 n_keys_map):
+    def __call__(self, application_graph, machine_graph, n_keys_map):
         """
         :param application graph:\
             The application graph to allocate the routing info for
@@ -65,9 +63,6 @@ class GlobalZonedRoutingInfoAllocator(object):
             The machine graph to allocate the routing info for
         :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param placements: The placements of the vertices
-        :type placements:\
-            :py:class:`pacman.model.placements.placements.Placements`
         :param n_keys_map:\
             A map between the edges and the number of keys required by the\
             edges
@@ -82,10 +77,9 @@ class GlobalZonedRoutingInfoAllocator(object):
 
         # check that this algorithm supports the constraints put onto the
         # partitions
-        self._application_graph = application_graph
-        self._machine_graph = machine_graph
-        self._placements = placements
-        self._n_keys_map = n_keys_map
+        self.__application_graph = application_graph
+        self.__machine_graph = machine_graph
+        self.__n_keys_map = n_keys_map
 
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
@@ -97,23 +91,23 @@ class GlobalZonedRoutingInfoAllocator(object):
 
     def _calculate_zones(self):
         progress = ProgressBar(
-            self._application_graph.n_vertices, "Calculating zones")
+            self.__application_graph.n_vertices, "Calculating zones")
         max_partitions = 0
         max_machine_vertices = 0
         max_keys = 0
         n_app_vertices = 0
 
-        for app_vertex in progress.over(self._application_graph.vertices):
+        for app_vertex in progress.over(self.__application_graph.vertices):
             app_max_partitions = 0
             n_machine_vertices = 0
             for vertex in app_vertex.machine_vertices:
-                partitions = self._machine_graph.\
+                partitions = self.__machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 n_partitions = 0
                 local_max_keys = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        n_keys = self._n_keys_map.n_keys_for_partition(
+                        n_keys = self.__n_keys_map.n_keys_for_partition(
                             partition)
                         local_max_keys = max(local_max_keys, n_keys)
                         n_partitions += 1
@@ -126,41 +120,42 @@ class GlobalZonedRoutingInfoAllocator(object):
                 max_keys = max(local_max_keys, max_keys)
                 n_app_vertices += 1
 
-        self._n_bits_machine = _bits_needed(max_machine_vertices)
-        self._n_bits_partition = _bits_needed(max_partitions)
-        self._n_bits_atoms = _bits_needed(max_keys)
-        self._n_bits_total = sum(
-            self._n_bits_machine, self._n_bits_partition, self._n_bits_atoms)
+        self.__n_bits_machine = _bits_needed(max_machine_vertices)
+        self.__n_bits_partition = _bits_needed(max_partitions)
+        self.__n_bits_atoms = _bits_needed(max_keys)
+        self.__n_bits_total = sum(
+            self.__n_bits_machine, self.__n_bits_partition,
+            self.__n_bits_atoms)
         n_bits_vertices = _bits_needed(n_app_vertices)
 
-        if (self._n_bits_total + n_bits_vertices) > BITS_IN_KEY:
+        if (self.__n_bits_total + n_bits_vertices) > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use GlobalZonedRoutingInfoAllocator as it needs "
                 "{} + {} + {} + {} bits".format(
-                    self._n_bits_machine, self._n_bits_partition,
-                    self._n_bits_atoms, n_bits_vertices))
+                    self.__n_bits_machine, self.__n_bits_partition,
+                    self.__n_bits_atoms, n_bits_vertices))
         return max_partitions
 
     def _simple_allocate(self):
         progress = ProgressBar(
-            self._application_graph.n_vertices, "Allocating routing keys")
+            self.__application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
         by_app_vertex = dict()
-        mask = 0xFFFFFFFF - ((2 ** self._n_bits_atoms) - 1)
-        app_mask = 0xFFFFFFFF - ((2 ** self._n_bits_total) - 1)
+        mask = 0xFFFFFFFF - ((2 ** self.__n_bits_atoms) - 1)
+        app_mask = 0xFFFFFFFF - ((2 ** self.__n_bits_total) - 1)
         app_index = 0
-        for app_vertex in progress.over(self._application_graph.vertices):
+        for app_vertex in progress.over(self.__application_graph.vertices):
             machine_index = 0
             for vertex in app_vertex.machine_vertices:
-                partitions = self._machine_graph.\
+                partitions = self.__machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 part_index = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
                         key = app_index
-                        key = (key << self._n_bits_machine) | machine_index
-                        key = (key << self._n_bits_partition) | part_index
-                        key = key << self._n_bits_atoms
+                        key = (key << self.__n_bits_machine) | machine_index
+                        key = (key << self.__n_bits_partition) | part_index
+                        key = key << self.__n_bits_atoms
                         key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
                         info = PartitionRoutingInfo([key_and_mask], partition)
                         routing_infos.add_partition_info(info)
@@ -168,7 +163,7 @@ class GlobalZonedRoutingInfoAllocator(object):
                 if part_index > 0:
                     machine_index += 1
             if machine_index > 0:
-                app_key = app_index << self._n_bits_total
+                app_key = app_index << self.__n_bits_total
                 by_app_vertex[app_vertex] = BaseKeyAndMask(
                     base_key=app_key, mask=app_mask)
                 app_index += 1
