@@ -394,10 +394,6 @@
                 <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
@@ -412,7 +408,6 @@
         </input_definitions>
         <required_inputs>
             <param_name>application_graph</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>machine_graph</param_name>
             <param_name>n_keys_map</param_name>
             <param_name>placements</param_name>

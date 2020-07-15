@@ -44,7 +44,6 @@ class GlobalZonedRoutingInfoAllocator(object):
     __slots__ = [
         # Passed in parameters
         "_application_graph",
-        "_graph_mapper",
         "_machine_graph",
         "_placements",
         "_n_keys_map",
@@ -55,9 +54,13 @@ class GlobalZonedRoutingInfoAllocator(object):
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, application_graph, graph_mapper, machine_graph,
-                 placements, n_keys_map):
+    def __call__(self, application_graph, machine_graph, placements,
+                 n_keys_map):
         """
+        :param application graph:\
+            The application graph to allocate the routing info for
+        :type machine_graph:\
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param machine_graph:\
             The machine graph to allocate the routing info for
         :type machine_graph:\
@@ -80,7 +83,6 @@ class GlobalZonedRoutingInfoAllocator(object):
         # check that this algorithm supports the constraints put onto the
         # partitions
         self._application_graph = application_graph
-        self._graph_mapper = graph_mapper
         self._machine_graph = machine_graph
         self._placements = placements
         self._n_keys_map = n_keys_map
@@ -103,10 +105,8 @@ class GlobalZonedRoutingInfoAllocator(object):
 
         for app_vertex in progress.over(self._application_graph.vertices):
             app_max_partitions = 0
-            machine_vertices = self._graph_mapper.get_machine_vertices(
-                app_vertex)
             n_machine_vertices = 0
-            for vertex in machine_vertices:
+            for vertex in app_vertex.machine_vertices:
                 partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 n_partitions = 0
@@ -150,10 +150,8 @@ class GlobalZonedRoutingInfoAllocator(object):
         app_mask = 0xFFFFFFFF - ((2 ** self._n_bits_total) - 1)
         app_index = 0
         for app_vertex in progress.over(self._application_graph.vertices):
-            machine_vertices = self._graph_mapper.get_machine_vertices(
-                app_vertex)
             machine_index = 0
-            for vertex in machine_vertices:
+            for vertex in app_vertex.machine_vertices:
                 partitions = self._machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
                 part_index = 0
