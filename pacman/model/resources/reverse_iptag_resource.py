@@ -85,3 +85,14 @@ class ReverseIPtagResource(object):
             "ReverseIPTagResource(port={}, sdp_port={}, tag={})"
             .format(self._port, self._sdp_port, self._tag)
         )
+
+    def __eq__(self, other):
+        return (self._port == other._port and
+                self._sdp_port == other._sdp_port and
+                self._tag == other._tag)
+
+    def __hash__(self):
+        return hash((self._port, self._sdp_port, self._tag))
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

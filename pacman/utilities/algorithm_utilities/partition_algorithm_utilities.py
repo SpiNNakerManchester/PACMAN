@@ -64,21 +64,19 @@ def determine_max_atoms_for_vertex(vertex):
 
 
 def _process_edge(
-        app_edge, machine_graph, graph_mapper, application_partition,
+        app_edge, machine_graph, application_partition,
         original_source_machine_vertex):
     # get destinations
     if isinstance(app_edge.post_vertex, AbstractControlsDestinationOfEdges):
         dest_vertices = app_edge.post_vertex.get_destinations_for_edge_from(
-            app_edge, application_partition, graph_mapper,
-            original_source_machine_vertex)
+            app_edge, application_partition, original_source_machine_vertex)
     else:
-        dest_vertices = graph_mapper.get_machine_vertices(app_edge.post_vertex)
+        dest_vertices = app_edge.post_vertex.machine_vertices
 
     # get sources
     if isinstance(app_edge.pre_vertex, AbstractControlsSourceOfEdges):
         source_vertices = app_edge.pre_vertex.get_sources_for_edge_from(
-            app_edge, application_partition, graph_mapper,
-            original_source_machine_vertex)
+            app_edge, application_partition, original_source_machine_vertex)
     else:
         source_vertices = [original_source_machine_vertex]
 
@@ -99,15 +97,11 @@ def _process_edge(
             machine_partition.add_constraints(
                 application_partition.constraints)
 
-            # update mapping object
-            graph_mapper.add_edge_mapping(machine_edge, app_edge)
 
-
-def generate_machine_edges(machine_graph, graph_mapper, application_graph):
+def generate_machine_edges(machine_graph, application_graph):
     """ Generate the machine edges for the vertices in the graph
 
     :param MachineGraph machine_graph: the machine graph to add edges to
-    :param GraphMapper graph_mapper: the mapper graphs
     :param ApplicationGraph application_graph:
         the application graph to work with
     """
@@ -120,14 +114,14 @@ def generate_machine_edges(machine_graph, graph_mapper, application_graph):
     for source_vertex in progress.over(machine_graph.vertices):
 
         # For each out edge of the parent vertex...
-        vertex = graph_mapper.get_application_vertex(source_vertex)
+        vertex = source_vertex.app_vertex
         application_outgoing_partitions = application_graph.\
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
         for application_partition in application_outgoing_partitions:
             for application_edge in application_partition.edges:
                 _process_edge(
-                    application_edge, machine_graph, graph_mapper,
-                    application_partition, source_vertex)
+                    application_edge, machine_graph, application_partition,
+                    source_vertex)
 
 
 def get_remaining_constraints(vertex):

@@ -29,9 +29,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class WriteJsonPlacements(object):
     """ Converter from Placements to JSON.
 
-    :param Placements placements: The placements to write
-    :param str json_folder: the folder to which the JSON are being written
-    :return: the name of the generated file
+    :param Placements placements: The placements to write.
+    :param str json_folder: The folder to which the JSON are being written.
+    :return: The name of the generated file.
     :rtype: str
     """
 
@@ -50,7 +50,7 @@ class WriteJsonPlacements(object):
 
     @staticmethod
     def write_json(placements, json_folder, progress=None):
-        """ Runs the code to write the machine in Java readable JSON.
+        """ Runs the code to write the placements in Java readable JSON.
 
         :param Placements placements: The placements to write
         :param str json_folder: the folder to which the JSON are being written

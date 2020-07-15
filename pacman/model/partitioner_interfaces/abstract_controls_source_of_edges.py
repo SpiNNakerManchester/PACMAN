@@ -25,14 +25,12 @@ class AbstractControlsSourceOfEdges(object):
 
     @abstractmethod
     def get_sources_for_edge_from(
-            self, app_edge, partition_id, graph_mapper,
-            original_source_machine_vertex):
+            self, app_edge, partition_id, original_source_machine_vertex):
         """ allows a vertex to decide which of its internal machine vertices \
         sends a given machine edge
 
         :param app_edge: the application edge
         :param partition_id: the outgoing partition id
-        :param graph_mapper: the graph mapper
         :param original_source_machine_vertex: the machine vertex that set
         off this application edge consideration
         :return: iterable of src machine vertices

@@ -46,20 +46,21 @@ class WriteJsonRoutingTables(object):
             router_tables, json_folder, progress)
 
     @staticmethod
-    def do_convert(router_table, json_folder, progress=None):
+    def do_convert(router_tables, json_folder, progress=None):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param MulticastRoutingTables router_tables:
             Routing Tables to convert
-        :param str json_folder: the folder to which the JSON are being written
-        :param progress: Progress Bar if one used
+        :param str json_folder:
+            the folder to which the JSON files are being written
+        :param progress: The progress bar, if any
         :type progress: ~spinn_utilities.progress_bar.ProgressBar or None
         :return: the name of the generated file
         :rtype: str
         """
 
         file_path = os.path.join(json_folder, ROUTING_TABLES_FILENAME)
-        json_obj = to_json(router_table)
+        json_obj = to_json(router_tables)
 
         if progress:
             progress.update()

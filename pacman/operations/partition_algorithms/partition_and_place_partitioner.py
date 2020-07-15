@@ -27,7 +27,7 @@ from pacman.model.graphs.abstract_virtual import AbstractVirtual
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, MaxVertexAtomsConstraint,
     FixedVertexAtomsConstraint, SameAtomsAsVertexConstraint)
-from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph
 from pacman.utilities import utility_calls as utils
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
@@ -53,7 +53,9 @@ class PartitionAndPlacePartitioner(object):
     :param preallocated_resources:
     :type preallocated_resources: PreAllocatedResourceContainer or None
     :return:
-        A machine_graph of partitioned vertices and partitioned edges
+        A machine_graph of partitioned vertices and partitioned edges,
+        and the number of chips needed to satisfy this partitioning.
+    :rtype: tuple(MachineGraph, int)
     :raise PacmanPartitionException:
         If something goes wrong with the partitioning
     """
@@ -70,6 +72,7 @@ class PartitionAndPlacePartitioner(object):
         :param int plan_n_timesteps:
         :param preallocated_resources:
         :type preallocated_resources: PreAllocatedResourceContainer or None
+        :rtype: tuple(MachineGraph, int)
         :raise PacmanPartitionException:
         """
         ResourceTracker.check_constraints(graph.vertices)
@@ -82,8 +85,8 @@ class PartitionAndPlacePartitioner(object):
 
         # Load the vertices and create the machine_graph to fill
         machine_graph = MachineGraph(
-            label="partitioned graph for {}".format(graph.label))
-        graph_mapper = GraphMapper()
+            label="partitioned graph for {}".format(graph.label),
+            application_graph=graph)
 
         # sort out vertex's by placement constraints
         vertices = sort_vertices_by_known_constraints(graph.vertices)
@@ -103,15 +106,11 @@ class PartitionAndPlacePartitioner(object):
 
         # Partition one vertex at a time
         for vertex in vertices:
-
-            # check that the vertex hasn't already been partitioned
-            machine_vertices = graph_mapper.get_machine_vertices(vertex)
-
-            # if not, partition
-            if machine_vertices is None:
+            # if no existing machine vertices, partition
+            if not vertex.machine_vertices:
                 if isinstance(vertex, SplitterByAtoms):
                     self._partition_vertex(
-                        vertex, plan_n_timesteps, machine_graph, graph_mapper,
+                        vertex, plan_n_timesteps, machine_graph,
                         resource_tracker, progress, vertex_groups)
                 elif isinstance(vertex, HandOverToVertex):
                     vertex.create_and_add_to_graphs_and_resources(
@@ -125,21 +124,18 @@ class PartitionAndPlacePartitioner(object):
                         "1 of these types. Please fix and try again")
         progress.end()
 
-        generate_machine_edges(machine_graph, graph_mapper, graph)
+        generate_machine_edges(machine_graph, graph)
 
-        return machine_graph, graph_mapper, resource_tracker.chips_used
+        return machine_graph, resource_tracker.chips_used
 
     def _partition_vertex(
-            self, vertex, plan_n_timesteps, machine_graph, graph_mapper,
+            self, vertex, plan_n_timesteps, machine_graph,
             resource_tracker, progress, vertex_groups):
         """ Partition a single vertex
 
         :param ApplicationVertex vertex: the vertex to partition
         :param int plan_n_timesteps: number of timesteps to plan for
         :param MachineGraph machine_graph: the graph to add vertices to
-        :param graph_mapper: the mappings between graphs
-        :type graph_mapper:\
-            :py:class:`pacman.model.graphs.common.GraphMapper'
         :param ResourceTracker resource_tracker:
             A tracker of assigned resources
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
@@ -188,13 +184,12 @@ class PartitionAndPlacePartitioner(object):
         # partition by atoms
         self._partition_by_atoms(
             partition_together_vertices, plan_n_timesteps, vertex.n_atoms,
-            max_atoms_per_core, machine_graph, graph_mapper, resource_tracker,
+            max_atoms_per_core, machine_graph, resource_tracker,
             progress, n_atoms is not None)
 
     def _partition_by_atoms(
             self, vertices, plan_n_timesteps, n_atoms, max_atoms_per_core,
-            machine_graph, graph_mapper, resource_tracker, progress,
-            fixed_n_atoms=False):
+            machine_graph, resource_tracker, progress, fixed_n_atoms=False):
         """ Try to partition vertices on how many atoms it can fit on\
             each vertex
 
@@ -206,17 +201,13 @@ class PartitionAndPlacePartitioner(object):
             the max atoms from all the vertexes considered that have max_atom
             constraints
         :param MachineGraph machine_graph: the machine graph
-        :param graph_mapper: the mapper between graphs
-        :type graph_mapper:\
-            :py:class:`pacman.model.graphs.common.GraphMapper'
         :param ResourceTracker resource_tracker:
             A tracker of assigned resources
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
             The progress bar
         :param bool fixed_n_atoms:
-            True if max_atoms_per_core is actually the fixed number of atoms
+            True if `max_atoms_per_core` is actually the fixed number of atoms
             per core and cannot be reduced
-        :type fixed_n_atoms: bool
         """
         n_atoms_placed = 0
         while n_atoms_placed < n_atoms:
@@ -243,9 +234,6 @@ class PartitionAndPlacePartitioner(object):
 
                 # update objects
                 machine_graph.add_vertex(machine_vertex)
-                graph_mapper.add_vertex_mapping(
-                    machine_vertex, vertex_slice, vertex)
-
                 progress.update(vertex_slice.n_atoms)
 
     @staticmethod
@@ -279,8 +267,8 @@ class PartitionAndPlacePartitioner(object):
 
             # Get the new resource usage
             vertex_slice = Slice(lo_atom, hi_atom)
-            new_resources = \
-                placed_vertex.get_resources_used_by_atoms(vertex_slice)
+            new_resources = placed_vertex.get_resources_used_by_atoms(
+                vertex_slice)
 
             if not isinstance(placed_vertex, AbstractVirtual):
                 # Re-allocate the existing resources
@@ -435,7 +423,7 @@ class PartitionAndPlacePartitioner(object):
         :param int max_atoms_per_core: the min max atoms from all the vertexes
             considered that have max_atom constraints
         :param ApplicationVertex vertex:
-            the vertexes to scale up the num atoms per core for
+            the vertex to scale up the num atoms per core for
         :param int plan_n_timesteps: number of timesteps to plan for
         :param ResourceContainer resources:
             the resource estimate for the vertex for a given number of atoms
@@ -443,7 +431,6 @@ class PartitionAndPlacePartitioner(object):
         :return: the new resources used and the new hi_atom
         :rtype: tuple(ResourceContainer, int)
         """
-
         previous_used_resources = used_resources
         previous_hi_atom = hi_atom
 
@@ -510,7 +497,7 @@ class PartitionAndPlacePartitioner(object):
         :rtype: float
         """
         if denominator == 0:
-            return 0
+            return 0.0
         return numerator / denominator
 
     @classmethod
@@ -524,7 +511,6 @@ class PartitionAndPlacePartitioner(object):
         :return: the largest ratio of resources
         :rtype: float
         :raise None: this method does not raise any known exceptions
-
         """
         cpu_ratio = cls._ratio(
             required.cpu_cycles.get_value(), available.cpu_cycles.get_value())

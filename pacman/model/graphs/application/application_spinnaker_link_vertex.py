@@ -90,6 +90,9 @@ class ApplicationSpiNNakerLinkVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        vertex = MachineSpiNNakerLinkVertex(
-            self._spinnaker_link_id, self._board_address, label, constraints)
-        return vertex
+        machine_vertex = MachineSpiNNakerLinkVertex(
+            self._spinnaker_link_id, self._board_address, label, constraints,
+            self, vertex_slice)
+        if resources_required:
+            assert (resources_required == machine_vertex.resources_required)
+        return machine_vertex

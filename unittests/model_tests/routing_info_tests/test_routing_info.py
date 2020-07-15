@@ -21,15 +21,14 @@ from pacman.model.graphs import OutgoingEdgePartition
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo,
     DictBasedMachinePartitionNKeysMap)
-from pacman.model.graphs.machine import (
-    MachineOutgoingEdgePartition, MachineEdge, SimpleMachineVertex)
+from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
 from pacman.utilities.constants import FULL_MASK
 
 
 class TestRoutingInfo(unittest.TestCase):
 
     def test_routing_info(self):
-        partition = MachineOutgoingEdgePartition("Test")
+        partition = OutgoingEdgePartition("Test", MachineEdge)
         pre_vertex = SimpleMachineVertex(resources=ResourceContainer())
         post_vertex = SimpleMachineVertex(resources=ResourceContainer())
         edge = MachineEdge(pre_vertex, post_vertex)
@@ -71,7 +70,7 @@ class TestRoutingInfo(unittest.TestCase):
 
         assert next(iter(routing_info)) == partition_info
 
-        partition2 = MachineOutgoingEdgePartition("Test")
+        partition2 = OutgoingEdgePartition("Test", MachineEdge)
         partition2.add_edge(MachineEdge(pre_vertex, post_vertex))
 
         with self.assertRaises(PacmanAlreadyExistsException):
@@ -79,7 +78,7 @@ class TestRoutingInfo(unittest.TestCase):
                 [BaseKeyAndMask(key, FULL_MASK)], partition2))
         assert partition != partition2
 
-        partition3 = MachineOutgoingEdgePartition("Test2")
+        partition3 = OutgoingEdgePartition("Test2", MachineEdge)
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK)], partition3))
@@ -90,7 +89,7 @@ class TestRoutingInfo(unittest.TestCase):
         assert routing_info.get_routing_info_from_partition(
             partition3).get_keys().tolist() == [key]
 
-        partition3 = MachineOutgoingEdgePartition("Test3")
+        partition3 = OutgoingEdgePartition("Test3", MachineEdge)
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK),

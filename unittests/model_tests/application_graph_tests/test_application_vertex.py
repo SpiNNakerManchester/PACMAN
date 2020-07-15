@@ -143,3 +143,16 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertEqual(len(subv_from_vert.constraints), 2)
         self.assertIn(constraint1, subv_from_vert.constraints)
         self.assertIn(constraint2, subv_from_vert.constraints)
+
+    def test_machine_vertexes(self):
+        vert = SimpleTestVertex(12, "New AbstractConstrainedVertex", 256)
+        sub1 = vert.create_machine_vertex(
+            Slice(0, 7),
+            vert.get_resources_used_by_atoms(Slice(0, 7)), "M1")
+        sub2 = vert.create_machine_vertex(
+            Slice(7, 11),
+            vert.get_resources_used_by_atoms(Slice(7, 11)), "M2")
+        self.assertIn(sub1, vert.machine_vertices)
+        self.assertIn(sub2, vert.machine_vertices)
+        self.assertIn(Slice(0, 7), vert.vertex_slices)
+        self.assertIn(Slice(7, 11), vert.vertex_slices)
