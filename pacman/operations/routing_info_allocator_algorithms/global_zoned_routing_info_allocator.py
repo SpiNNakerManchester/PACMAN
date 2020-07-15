@@ -47,7 +47,8 @@ class GlobalZonedRoutingInfoAllocator(object):
         "_n_keys_map",
         "_n_bits_partition",
         "_n_bits_machine",
-        "_n_bits_atoms"
+        "_n_bits_atoms",
+        "_n_bits_total"
     ]
     # pylint: disable=attribute-defined-outside-init
 
@@ -122,15 +123,14 @@ class GlobalZonedRoutingInfoAllocator(object):
                 max_keys = max(local_max_keys, max_keys)
                 n_app_vertices += 1
 
-        self._n_bits_machine = self._bites_needed(max_machine_vertices)
-        self._n_bits_partition = self._bites_needed(max_partitions)
-        self._n_bits_atoms = self._bites_needed(max_keys)
-        n_bits_vertices = self._bites_needed(n_app_vertices)
+        self._n_bits_machine = self._bits_needed(max_machine_vertices)
+        self._n_bits_partition = self._bits_needed(max_partitions)
+        self._n_bits_atoms = self._bits_needed(max_keys)
+        self._n_bits_total = sum(
+            self._n_bits_machine, self._n_bits_partition, self._n_bits_atoms)
+        n_bits_vertices = self._bits_needed(n_app_vertices)
 
-        if sum((self._n_bits_machine,
-                self._n_bits_partition,
-                self._n_bits_atoms,
-                n_bits_vertices)) > KEY_SIZE:
+        if (self._n_bits_total + n_bits_vertices) > KEY_SIZE:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use GlobalZonedRoutingInfoAllocator as it needs "
                 "{} + {} + {} + {} bits".format(
@@ -144,9 +144,7 @@ class GlobalZonedRoutingInfoAllocator(object):
         routing_infos = RoutingInfo()
         by_app_vertex = dict()
         mask = 0xFFFFFFFF - ((2 ** self._n_bits_atoms) - 1)
-        app_bits = (
-            self._n_bits_atoms + self._n_bits_machine + self._n_bits_partition)
-        app_mask = 0xFFFFFFFF - ((2 ** app_bits) - 1)
+        app_mask = 0xFFFFFFFF - ((2 ** self._n_bits_total) - 1)
         app_index = 0
         for app_vertex in progress.over(self._application_graph.vertices):
             machine_vertices = self._graph_mapper.get_machine_vertices(
@@ -162,23 +160,19 @@ class GlobalZonedRoutingInfoAllocator(object):
                         key = (key << self._n_bits_machine) | machine_index
                         key = (key << self._n_bits_partition) | part_index
                         key = key << self._n_bits_atoms
-                        key_and_mask = BaseKeyAndMask(
-                            base_key=key, mask=mask)
-                        info = PartitionRoutingInfo(
-                            [key_and_mask], partition)
+                        key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
+                        info = PartitionRoutingInfo([key_and_mask], partition)
                         routing_infos.add_partition_info(info)
                         part_index += 1
                 if part_index > 0:
                     machine_index += 1
             if machine_index > 0:
-                app_key = app_index << (self._n_bits_machine +
-                                        self._n_bits_partition +
-                                        self._n_bits_atoms)
+                app_key = app_index << self._n_bits_total
                 by_app_vertex[app_vertex] = BaseKeyAndMask(
                     base_key=app_key, mask=app_mask)
                 app_index += 1
 
         return routing_infos, by_app_vertex
 
-    def _bites_needed(self, size):
+    def _bits_needed(self, size):
         return int(math.ceil(math.log(size, 2)))
