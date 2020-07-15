@@ -24,8 +24,11 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint)
 from pacman.model.graphs.common import EdgeTrafficType
+from pacman.utilities.constants import BITS_IN_KEY
 
-KEY_SIZE = 32
+
+def _bits_needed(size):
+    return int(math.ceil(math.log(size, 2)))
 
 
 class GlobalZonedRoutingInfoAllocator(object):
@@ -123,14 +126,14 @@ class GlobalZonedRoutingInfoAllocator(object):
                 max_keys = max(local_max_keys, max_keys)
                 n_app_vertices += 1
 
-        self._n_bits_machine = self._bits_needed(max_machine_vertices)
-        self._n_bits_partition = self._bits_needed(max_partitions)
-        self._n_bits_atoms = self._bits_needed(max_keys)
+        self._n_bits_machine = _bits_needed(max_machine_vertices)
+        self._n_bits_partition = _bits_needed(max_partitions)
+        self._n_bits_atoms = _bits_needed(max_keys)
         self._n_bits_total = sum(
             self._n_bits_machine, self._n_bits_partition, self._n_bits_atoms)
-        n_bits_vertices = self._bits_needed(n_app_vertices)
+        n_bits_vertices = _bits_needed(n_app_vertices)
 
-        if (self._n_bits_total + n_bits_vertices) > KEY_SIZE:
+        if (self._n_bits_total + n_bits_vertices) > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use GlobalZonedRoutingInfoAllocator as it needs "
                 "{} + {} + {} + {} bits".format(
@@ -173,6 +176,3 @@ class GlobalZonedRoutingInfoAllocator(object):
                 app_index += 1
 
         return routing_infos, by_app_vertex
-
-    def _bits_needed(self, size):
-        return int(math.ceil(math.log(size, 2)))
