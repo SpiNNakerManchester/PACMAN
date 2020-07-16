@@ -114,7 +114,7 @@ class PartitionAndPlacePartitioner(object):
                         resource_tracker, progress, vertex_groups)
                 elif isinstance(vertex, HandOverToVertex):
                     vertex.create_and_add_to_graphs_and_resources(
-                        resource_tracker, machine_graph, graph_mapper)
+                        resource_tracker, machine_graph)
                     progress.update(vertex.n_atoms)
                 else:
                     raise Exception(

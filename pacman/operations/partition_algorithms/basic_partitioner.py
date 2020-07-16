@@ -82,7 +82,7 @@ class BasicPartitioner(object):
                     vertex, resource_tracker, machine_graph, plan_n_timesteps)
             elif isinstance(vertex, HandOverToVertex):
                 vertex.create_and_add_to_graphs_and_resources(
-                    resource_tracker, machine_graph, graph_mapper)
+                    resource_tracker, machine_graph)
             else:
                 raise Exception(
                     "The vertex type {} is neither a SpillerByAtoms nor a "
