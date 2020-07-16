@@ -17,7 +17,7 @@ import sys
 from six import add_metaclass
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.abstract_base import (
-    abstractmethod, abstractproperty, AbstractBase)
+    abstractproperty, AbstractBase)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
