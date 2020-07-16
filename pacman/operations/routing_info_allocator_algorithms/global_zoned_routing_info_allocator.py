@@ -40,9 +40,9 @@ class GlobalZonedRoutingInfoAllocator(object):
         all vertices.  This will hopefully make the keys more compressible.
 
         Keys will have the format:
-             <--- 32 bits --->
-        Key: | A | M | P | X |
-        Mask:|11111111111|   | (i.e. 1s covering A, M and P fields)
+              <--- 32 bits --->
+        Key:  | A | M | P | X |
+        Mask: |11111111111|   | (i.e. 1s covering A, M and P fields)
 
         A: the index of the application vertex
         M: the index of the machine vertex of the application vertex
