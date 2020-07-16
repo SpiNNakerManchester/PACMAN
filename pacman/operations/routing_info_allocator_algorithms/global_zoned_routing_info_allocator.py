@@ -198,7 +198,7 @@ class GlobalZonedRoutingInfoAllocator(object):
         # Keep track of the application vertex keys and masks
         by_app_vertex = dict()
 
-        # Work out the mask to use in the key and the applcation-vertex key
+        # Work out the mask to use in the key and the application-vertex key
         mask = FULL_MASK - ((2 ** self.__n_bits_atoms) - 1)
         app_mask = FULL_MASK - ((2 ** self.__n_bits_total) - 1)
 

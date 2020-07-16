@@ -51,8 +51,8 @@ def _convert_a_route(
     :param MulticastRoutingTableByPartition routing_tables:
         spinnaker format routing tables
     :param OutgoingEdgePartition partition: Partition this route applies to
-    :param int incoming_processor: processor this link came from
-    :param int incoming_link: link this link came from
+    :param int or None incoming_processor: processor this link came from
+    :param int or None incoming_link: link this link came from
     :param RoutingTree partition_route: algorithm specific format of the route
     """
     x, y = partition_route.chip
@@ -62,7 +62,6 @@ def _convert_a_route(
     link_ids = list()
     for (route, next_hop) in partition_route.children:
         if route is not None:
-            link = None
             if route >= 6:
                 # The route was offset as first 6 are the links
                 processor_ids.append(route - 6)
@@ -70,9 +69,6 @@ def _convert_a_route(
                 link_ids.append(route)
             if isinstance(next_hop, RoutingTree):
                 next_incoming_link = None
-                if link is not None:
-                    #  Same as Router.opposite just inlined for speed
-                    next_incoming_link = (link + 3) % 6
                 next_hops.append((next_hop, next_incoming_link))
 
     entry = MulticastRoutingTableByPartitionEntry(
@@ -84,7 +80,7 @@ def _convert_a_route(
             routing_tables, partition, None, next_incoming_link, next_hop)
 
 
-def _ner_net(source, destinations, machine, vector_to_nodes):
+def _ner_net(src, destinations, machine, vector_to_nodes):
     """ Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
@@ -95,6 +91,7 @@ def _ner_net(source, destinations, machine, vector_to_nodes):
         The coordinates of destination vertices.
     :param ~spinn_machine.Machine machine:
         machine for which routes are being generated
+    :param vector_to_nodes: ??????????
     :return:
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc. For
@@ -105,13 +102,12 @@ def _ner_net(source, destinations, machine, vector_to_nodes):
     """
     radius = 20
     # Map from (x, y) to RoutingTree objects
-    route = {source: RoutingTree(source)}
+    route = {src: RoutingTree(src)}
 
     # Handle each destination, sorted by distance from the source, closest
     # first.
     sorted_dest = sorted(
-        destinations, key=(lambda destination: machine.get_vector_length(
-                source, destination)))
+        destinations, key=(lambda dest: machine.get_vector_length(src, dest)))
     for destination in sorted_dest:
         # We shall attempt to find our nearest neighbouring placed node.
         neighbour = None
@@ -136,7 +132,7 @@ def _ner_net(source, destinations, machine, vector_to_nodes):
         # Fall back on routing directly to the source if no nodes within radius
         # hops of the destination was found.
         if neighbour is None:
-            neighbour = source
+            neighbour = src
 
         # Find the shortest vector from the neighbour to this destination
         vector = machine.get_vector(neighbour, destination)
@@ -168,7 +164,7 @@ def _ner_net(source, destinations, machine, vector_to_nodes):
             last_node.append_child((direction, this_node))
             last_node = this_node
 
-    return (route[source], route)
+    return route[src], route
 
 
 def _is_linked(source, target, direction, machine):
@@ -185,9 +181,9 @@ def _is_linked(source, target, direction, machine):
     link = s_chip.router.get_link(direction)
     if link is None:
         return False
-    if (link.destination_x != target[0]):
+    if link.destination_x != target[0]:
         return False
-    if (link.destination_y != target[1]):
+    if link.destination_y != target[1]:
         return False
     return True
 
@@ -248,22 +244,25 @@ def _copy_and_disconnect_tree(root, machine):
         if new_parent is None:
             # This is the root node
             new_root = new_node
-        elif new_node is not new_parent:
-            # If this node is not dead, check connectivity to parent node (no
-            # reason to check connectivity between a dead node and its parent).
-            if _is_linked(new_parent.chip, new_node.chip, direction, machine):
-                # Is connected via working link
-                new_parent.append_child((direction, new_node))
-            else:
-                # Link to parent is dead (or original parent was dead and the
-                # new parent is not adjacent)
-                broken_links.add((new_parent.chip, new_node.chip))
+        else:
+            if new_node is not new_parent:
+                # If this node is not dead, check connectivity to parent
+                # node (no reason to check connectivity between a dead node
+                # and its parent).
+                if _is_linked(
+                        new_parent.chip, new_node.chip, direction, machine):
+                    # Is connected via working link
+                    new_parent.append_child((direction, new_node))
+                else:
+                    # Link to parent is dead (or original parent was dead and
+                    # the new parent is not adjacent)
+                    broken_links.add((new_parent.chip, new_node.chip))
 
         # Copy children
         for child_direction, child in old_node.children:
             to_visit.append((new_node, child_direction, child))
 
-    return (new_root, new_lookup, broken_links)
+    return new_root, new_lookup, broken_links
 
 
 def _a_star(sink, heuristic_source, sources, machine):
@@ -292,8 +291,8 @@ def _a_star(sink, heuristic_source, sources, machine):
     :rtype: list(tuple(int,tuple(int,int)))
     """
     # Select the heuristic function to use for distances
-    heuristic = (lambda node: machine.get_vector_length(
-        node, heuristic_source))
+    heuristic = (lambda the_node: machine.get_vector_length(
+        the_node, heuristic_source))
 
     # A dictionary {node: (direction, previous_node}. An entry indicates that
     # 1) the node has been visited and 2) which node we hopped from (and the
@@ -416,7 +415,7 @@ def _avoid_dead_links(root, machine):
                 # new RoutingTree for the segment.
                 new_node = RoutingTree((x, y))
                 # A* will not traverse anything but chips in this tree so this
-                # assert is meerly a sanity check that this ocurred correctly.
+                # assert is meerly a sanity check that this occurred correctly.
                 assert (x, y) not in lookup, "Cycle created."
                 lookup[(x, y)] = new_node
             else:
@@ -440,7 +439,7 @@ def _avoid_dead_links(root, machine):
             last_direction = direction
         last_node.append_child((last_direction, lookup[child]))
 
-    return (root, lookup)
+    return root, lookup
 
 
 def _do_route(source_vertex, post_vertexes, machine, placements,
@@ -504,7 +503,7 @@ def _vertex_xy(vertex, placements, machine):
     """
     if not isinstance(vertex, AbstractVirtual):
         placement = placements.get_placement_of_vertex(vertex)
-        return (placement.x, placement.y)
+        return placement.x, placement.y
     link_data = None
     if isinstance(vertex, AbstractFPGA):
         link_data = machine.get_fpga_link_with_id(
@@ -512,7 +511,7 @@ def _vertex_xy(vertex, placements, machine):
     elif isinstance(vertex, AbstractSpiNNakerLink):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
-    return (link_data.connected_chip_x, link_data.connected_chip_y)
+    return link_data.connected_chip_x, link_data.connected_chip_y
 
 
 def _route_to_endpoint(vertex, machine):
@@ -540,8 +539,8 @@ def _least_busy_dimension_first(traffic, vector, start, machine):
     :param start: (x, y)
         The coordinates from which the path should start (note this is a 2D
         coordinate).
-    :param machine:
-    :return:
+    :param machine:the spinn machine.
+    :return: min route
     """
 
     # Go through and find the sum of traffic depending on the route taken
@@ -645,13 +644,14 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
             if partition.traffic_type == EdgeTrafficType.MULTICAST:
                 post_vertexes = list(
                     e.post_vertex for e in partition.edges)
-                routingtree = _do_route(
+                routing_tree = _do_route(
                     source_vertex, post_vertexes, machine, placements,
                     vector_to_nodes)
                 incoming_processor = placements.get_placement_of_vertex(
                     partition.pre_vertex).p
-                _convert_a_route(routing_tables, partition, incoming_processor,
-                                 None, routingtree)
+                _convert_a_route(
+                    routing_tables, partition, incoming_processor, None,
+                    routing_tree)
 
     progress_bar.end()
 
@@ -665,11 +665,12 @@ class NerRoute(object):
     __slots__ = []
 
     def __call__(self, machine_graph, machine, placements):
-        """
-        :param MachineGraph machine_graph:
-        :param ~spinn_machine.Machine machine:
-        :param Placements placements:
-        :return:
+        """ basic ner router
+
+        :param MachineGraph machine_graph: the machine graph
+        :param ~spinn_machine.Machine machine: spinnaker machine
+        :param Placements placements: the placements
+        :return: a routing table by partition
         :rtype: MulticastRoutingTableByPartition
         """
         return _ner_route(
@@ -683,12 +684,13 @@ class NerRouteTrafficAware(object):
     __slots__ = []
 
     def __call__(self, machine_graph, machine, placements):
-        """
+        """ traffic aware ner router
 
-        :param machine_graph:
-        :param machine:
+        :param machine_graph: the machine graph
+        :param machine: spinnaker machine
         :param placements:  pacman.model.placements.placements.py
-        :return:
+        :return: a routing table by partition
+        :rtype: MulticastRoutingTableByPartition
         """
         traffic = defaultdict(lambda: 0)
         return _ner_route(
