@@ -175,9 +175,9 @@ class GlobalZonedRoutingInfoAllocator(object):
         self.__n_bits_atoms = _bits_needed(max_keys)
 
         # Add up the bits needed by everything below the application vertex
-        self.__n_bits_total = sum(
+        self.__n_bits_total = sum((
             self.__n_bits_machine, self.__n_bits_partition,
-            self.__n_bits_atoms)
+            self.__n_bits_atoms))
 
         # Check the total number of bits isn't too big
         n_bits_vertices = _bits_needed(n_app_vertices)
