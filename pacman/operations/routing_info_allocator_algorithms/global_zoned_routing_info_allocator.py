@@ -24,21 +24,44 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint)
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.utilities.constants import BITS_IN_KEY
+from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 
 
 def _bits_needed(size):
+    """ Work out the bits needed to represent a number of values
+
+    :param int size: The number of values to be represented
+    """
     return int(math.ceil(math.log(size, 2)))
 
 
 class GlobalZonedRoutingInfoAllocator(object):
-    """ A routing key allocator that uses fixed zones that are the same for\
-        all vertices
+    """ A routing key allocator that uses fixed zones that are the same for
+        all vertices.  This will hopefully make the keys more compressible.
+
+        Keys will have the format:
+             <--- 32 bits --->
+        Key: | A | M | P | X |
+        Mask:|11111111111|   | (i.e. 1s covering A, M and P fields)
+
+        A: the index of the application vertex
+        M: the index of the machine vertex of the application vertex
+        P: the index of the outgoing edge partition of the machine vertex
+        X: space for the maximum number of keys required by any outgoing edge
+           partition
+
+        Note that this also means that all machine vertices of the same
+        application vertex will have a shared key.
+
+        The widths of the fields are determined such that every key will have
+        every field in the same place in the key, and the mask is the same
+        for every vertex.
 
     .. note::
-        No constraints are supported, and that the number of keys\
-        required by each edge must be 2048 or less, and that all edges coming\
-        out of a vertex will be given the same key/mask assignment.
+        No special constraints are supported.  This will only work if the
+        numbers above add up to 32-bits (an error will result if not).  A
+        single large vertex (like a retina) and lots of small vertices (like
+        a large neural network) will thus not likely work here.
     """
 
     __slots__ = [
@@ -74,45 +97,71 @@ class GlobalZonedRoutingInfoAllocator(object):
         :raise pacman.exceptions.PacmanRouteInfoAllocationException: \
             If something goes wrong with the allocation
         """
-
-        # check that this algorithm supports the constraints put onto the
-        # partitions
         self.__application_graph = application_graph
         self.__machine_graph = machine_graph
         self.__n_keys_map = n_keys_map
 
+        # check that this algorithm supports the constraints put onto the
+        # partitions
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
             supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
+        # Do the allocation
         self._calculate_zones()
         return self._simple_allocate()
 
     def _calculate_zones(self):
+        """ Work out the number of bits needed to allow the mask to be the\
+            same for all routing table entries
+
+        :raises PacmanRouteInfoAllocationException:
+        """
         progress = ProgressBar(
             self.__application_graph.n_vertices, "Calculating zones")
+
+        # Over all application vertices work out:
+        # - the maximum number of multicast keys sent down any outgoing edge
+        #   partition
+        # - the maximum number of machine vertices for any application vertex
+        # - the maximum number of outgoing edge partitions that send multicast
+        #   keys for any machine vertex
+        # - the number of application vertices which send multicast packets
         max_partitions = 0
         max_machine_vertices = 0
         max_keys = 0
         n_app_vertices = 0
-
         for app_vertex in progress.over(self.__application_graph.vertices):
+
+            # For this application vertex work out:
+            # - the max number of keys sent by an outgoing edge partition of
+            #   any machine vertex
+            # - the maximum number of outgoing edge partitions of any machine
+            #   vertex
+            # - The total number of machine vertices that send multicast
+            local_max_keys = 0
             app_max_partitions = 0
             n_machine_vertices = 0
             for vertex in app_vertex.machine_vertices:
                 partitions = self.__machine_graph.\
                     get_outgoing_edge_partitions_starting_at_vertex(vertex)
+
+                # Count only outgoing edge partitions that send multicast keys
+                # for this machine vertex
                 n_partitions = 0
-                local_max_keys = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
                         n_keys = self.__n_keys_map.n_keys_for_partition(
                             partition)
                         local_max_keys = max(local_max_keys, n_keys)
                         n_partitions += 1
-                app_max_partitions = max(app_max_partitions, n_partitions)
-                n_machine_vertices += 1
+                if n_partitions > 0:
+                    app_max_partitions = max(app_max_partitions, n_partitions)
+                    n_machine_vertices += 1
+
+            # Only count the number for this machine vertex if one of the
+            # outgoing edge partitions sends multicast
             if local_max_keys > 0:
                 max_partitions = max(max_partitions, app_max_partitions)
                 max_machine_vertices = max(
@@ -120,29 +169,39 @@ class GlobalZonedRoutingInfoAllocator(object):
                 max_keys = max(local_max_keys, max_keys)
                 n_app_vertices += 1
 
+        # Work out the number of bits needed by each part
         self.__n_bits_machine = _bits_needed(max_machine_vertices)
         self.__n_bits_partition = _bits_needed(max_partitions)
         self.__n_bits_atoms = _bits_needed(max_keys)
+
+        # Add up the bits needed by everything below the application vertex
         self.__n_bits_total = sum(
             self.__n_bits_machine, self.__n_bits_partition,
             self.__n_bits_atoms)
-        n_bits_vertices = _bits_needed(n_app_vertices)
 
+        # Check the total number of bits isn't too big
+        n_bits_vertices = _bits_needed(n_app_vertices)
         if (self.__n_bits_total + n_bits_vertices) > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use GlobalZonedRoutingInfoAllocator as it needs "
                 "{} + {} + {} + {} bits".format(
                     self.__n_bits_machine, self.__n_bits_partition,
                     self.__n_bits_atoms, n_bits_vertices))
-        return max_partitions
 
     def _simple_allocate(self):
+        """ Allocate the keys given the calculations done previously
+        """
         progress = ProgressBar(
             self.__application_graph.n_vertices, "Allocating routing keys")
         routing_infos = RoutingInfo()
+
+        # Keep track of the application vertex keys and masks
         by_app_vertex = dict()
-        mask = 0xFFFFFFFF - ((2 ** self.__n_bits_atoms) - 1)
-        app_mask = 0xFFFFFFFF - ((2 ** self.__n_bits_total) - 1)
+
+        # Work out the mask to use in the key and the applcation-vertex key
+        mask = FULL_MASK - ((2 ** self.__n_bits_atoms) - 1)
+        app_mask = FULL_MASK - ((2 ** self.__n_bits_total) - 1)
+
         app_index = 0
         for app_vertex in progress.over(self.__application_graph.vertices):
             machine_index = 0
@@ -152,6 +211,7 @@ class GlobalZonedRoutingInfoAllocator(object):
                 part_index = 0
                 for partition in partitions:
                     if partition.traffic_type == EdgeTrafficType.MULTICAST:
+                        # Build a key based on the indices
                         key = app_index
                         key = (key << self.__n_bits_machine) | machine_index
                         key = (key << self.__n_bits_partition) | part_index
@@ -162,6 +222,10 @@ class GlobalZonedRoutingInfoAllocator(object):
                         part_index += 1
                 if part_index > 0:
                     machine_index += 1
+
+            # If we allocated a key for one of the machine vertices, store
+            # the "application" key and mask; that is the key used by every
+            # machine vertex of this application vertex.
             if machine_index > 0:
                 app_key = app_index << self.__n_bits_total
                 by_app_vertex[app_vertex] = BaseKeyAndMask(
