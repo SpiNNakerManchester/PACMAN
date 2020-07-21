@@ -18,6 +18,7 @@
 from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.utilities import utility_calls as utils
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
@@ -51,7 +52,6 @@ def determine_max_atoms_for_vertex(vertex):
     else:
         return vertex.n_atoms
 
-
 def generate_machine_edges(machine_graph, application_graph):
     """ Generate the machine edges for the vertices in the graph
 
@@ -75,6 +75,13 @@ def generate_machine_edges(machine_graph, application_graph):
             for edge in application_partition.edges:
                 # create new partitions
                 for dest_vertex in edge.post_vertex.machine_vertices:
+                    if isinstance(edge, AbstractSlicesConnect):
+                        if not edge.could_connect(
+                                source_vertex.vertex_slice,
+                                dest_vertex.vertex_slice):
+                            continue
+                    else:
+                        a = 1
                     machine_edge = edge.create_machine_edge(
                         source_vertex, dest_vertex,
                         "machine_edge_for{}".format(edge.label))
