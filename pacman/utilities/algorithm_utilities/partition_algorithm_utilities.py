@@ -89,7 +89,7 @@ def generate_machine_edges(machine_graph, application_graph):
                         machine_partition = machine_graph.\
                             get_outgoing_edge_partition_starting_at_vertex(
                                 source_vertex,
-                            application_partition.identifier)
+                                application_partition.identifier)
                         machine_partition.add_constraints(
                             application_partition.constraints)
 
