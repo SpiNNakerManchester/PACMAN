@@ -52,6 +52,7 @@ def determine_max_atoms_for_vertex(vertex):
     else:
         return vertex.n_atoms
 
+
 def generate_machine_edges(machine_graph, application_graph):
     """ Generate the machine edges for the vertices in the graph
 
@@ -80,8 +81,6 @@ def generate_machine_edges(machine_graph, application_graph):
                                 source_vertex.vertex_slice,
                                 dest_vertex.vertex_slice):
                             continue
-                    else:
-                        a = 1
                     machine_edge = edge.create_machine_edge(
                         source_vertex, dest_vertex,
                         "machine_edge_for{}".format(edge.label))
