@@ -74,25 +74,23 @@ def generate_machine_edges(machine_graph, application_graph):
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
         for application_partition in application_outgoing_partitions:
             for edge in application_partition.edges:
-                # create new partitions
                 for dest_vertex in edge.post_vertex.machine_vertices:
-                    if isinstance(edge, AbstractSlicesConnect):
-                        if not edge.could_connect(
+                    if not isinstance(edge, AbstractSlicesConnect) or \
+                            edge.could_connect(
                                 source_vertex.vertex_slice,
                                 dest_vertex.vertex_slice):
-                            continue
-                    machine_edge = edge.create_machine_edge(
-                        source_vertex, dest_vertex,
-                        "machine_edge_for{}".format(edge.label))
-                    machine_graph.add_edge(
-                        machine_edge, application_partition.identifier)
+                        machine_edge = edge.create_machine_edge(
+                            source_vertex, dest_vertex,
+                            "machine_edge_for{}".format(edge.label))
+                        machine_graph.add_edge(
+                            machine_edge, application_partition.identifier)
 
-                    # add constraints from the application partition
-                    machine_partition = machine_graph.\
-                        get_outgoing_edge_partition_starting_at_vertex(
-                            source_vertex, application_partition.identifier)
-                    machine_partition.add_constraints(
-                        application_partition.constraints)
+                        # add constraints from the application partition
+                        machine_partition = machine_graph.\
+                            get_outgoing_edge_partition_starting_at_vertex(
+                                source_vertex, application_partition.identifier)
+                        machine_partition.add_constraints(
+                            application_partition.constraints)
 
 
 def get_remaining_constraints(vertex):
