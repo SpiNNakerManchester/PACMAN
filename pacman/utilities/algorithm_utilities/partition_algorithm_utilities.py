@@ -67,9 +67,9 @@ def generate_machine_edges(machine_graph, application_graph):
 
     for application_partition in progress.over(
             application_graph.outgoing_edge_partitions):
-         vertex = application_partition.pre_vertex
-         for edge in application_partition.edges:
-             for source_vertex in vertex.machine_vertices:
+        vertex = application_partition.pre_vertex
+        for edge in application_partition.edges:
+            for source_vertex in vertex.machine_vertices:
                 # create new partitions
                 for dest_vertex in edge.post_vertex.machine_vertices:
                     machine_edge = edge.create_machine_edge(
