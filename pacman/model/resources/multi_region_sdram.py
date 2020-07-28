@@ -12,25 +12,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_utilities.overrides import overrides
+from pacman.exceptions import PacmanInvalidParameterException
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
-from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanInvalidParameterException
 
 
 class MultiRegionSDRAM(VariableSDRAM):
-    """ A resource for SDRAM that comes in regions
+    """ A resource for SDRAM that comes in regions.
 
-        .. note:
-        Adding or Subtracting two MultiRegionSDRAM objects will be assumed to
-        be an operation over multiple cores/placements so these functions
-        return a VariableSDRAM object without the regions data.
+        .. note::
+            Adding or Subtracting two :py:class:`MultiRegionSDRAM` objects will
+            be assumed to be an operation over multiple cores/placements so
+            these functions return a :py:class:`VariableSDRAM` object without
+            the regions data.
 
-        To add extra SDRAM costs for the same core/placement use the method
-        add_cost
-        merge
-        nest
+            To add extra SDRAM costs for the *same* core/placement use the
+            methods :py:meth:`add_cost`, :py:meth:`merge`, or :py:meth:`nest`.
     """
 
     __slots__ = [
@@ -47,11 +46,10 @@ class MultiRegionSDRAM(VariableSDRAM):
         return self.__regions
 
     def add_cost(self, region, fixed_sdram, per_timestep_sdram=0):
-        """
-        Adds the cost for the specified region
+        """ Adds the cost for the specified region
 
         :param region: Key to identify the region
-        :type region: int or String or enum
+        :type region: int or str or enum
         :param int fixed_sdram: The fixed cost for this region.
         :param int per_timestep_sdram: The variable cost for this region is any
         """
@@ -68,17 +66,17 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = sdram
 
     def nest(self, region, other):
-        """
-        Combines the other sdram cost, in a nested fashion.
+        """ Combines the other SDRAM cost, in a nested fashion.
 
         The totals for the new region are added to the total of this one.
-        A new region is created summerizing the cost of others.
+        A new region is created summarising the cost of others.
         If other contains a regions which is the same as one in self they are
-            NOT combined, but kept seperate.
+        *not* combined, but kept separate.
 
         :param region: Key to identify the summary region
-        :param AbstractSDRAM other: Another sdram model to make combine by
-            nesting
+        :type region: int or str or enum
+        :param AbstractSDRAM other:
+            Another SDRAM model to make combine by nesting
         """
         self._fixed_sdram = self._fixed_sdram + other.fixed
         self._per_timestep_sdram = \
@@ -92,13 +90,13 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = other
 
     def _check_mergable(self, other):
-        """
-        Check that the two types being merge are possible.
+        """ Check that the two types being merge are possible.
 
-        Currently only multi region sdram of the same type (or sub type) of
+        Currently only multi-region SDRAM of the same type (or sub-type) of
         MultiRegionSDRAM can be merged.
-        :param MultiRegionSDRAM other: Another sdram of the same type
-        raise PacmanInvalidParameterException:
+
+        :param MultiRegionSDRAM other: Another SDRAM of the same type
+        :raises PacmanInvalidParameterException:
             If the types do not support merge
         """
         if type(other) != type(self):
@@ -108,15 +106,18 @@ class MultiRegionSDRAM(VariableSDRAM):
                     type(other), type(self)))
 
     def merge(self, other):
-        """
-        Combines the other sdram costs keeping the region mappings
+        """ Combines the other SDRAM costs keeping the region mappings
 
-        Merge is only guranteed to be possible between the same type/subtype of
-        .. note:
+        Merge is only guaranteed to be possible between the same type/subtype
+        of :py:class:`MultiRegionSDRAM`.
+
+        .. note::
             This method should only be called when combining cost for the same
-            core/ placement. Use + to combine for different cores
+            core/placement. Use `+` to combine for different cores
 
         :param MultiRegionSDRAM other: Another mapping of costs by region
+        :raises PacmanInvalidParameterException:
+            If the types do not support merge
         """
         self._check_mergable(other)
         self._fixed_sdram = self._fixed_sdram + other.fixed
