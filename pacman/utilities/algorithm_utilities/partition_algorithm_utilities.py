@@ -120,6 +120,7 @@ def generate_machine_edges(machine_graph, application_graph):
                     application_edge, machine_graph, application_partition,
                     source_vertex)
 
+
 def get_remaining_constraints(vertex):
     """ Gets the rest of the constraints from a vertex after removing\
         partitioning constraints.
