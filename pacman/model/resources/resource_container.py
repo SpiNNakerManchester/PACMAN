@@ -86,22 +86,49 @@ class ResourceContainer(object):
 
     @property
     def dtcm(self):
+        """ Reflects the amount of DTCM (in bytes) used by a machine vertex \
+            on the SpiNNaker machine.
+
+        :rtype: DTCMResource
+        """
         return self._dtcm_usage
 
     @property
     def cpu_cycles(self):
+        """ Reflects the number of CPU cycles the machine vertex is expected \
+            to use on a SpiNNaker machine.
+
+        :rtype: CPUCyclesPerTickResource
+        """
         return self._cpu_cycles
 
     @property
     def sdram(self):
+        """ Reflects the amount of SDRAM (in bytes) used by a machine vertex \
+            on the SpiNNaker machine.
+
+        :rtype: AbstractSDRAM
+        """
         return self._sdram_usage
 
     @property
     def iptags(self):
+        """ Reflects the number of IP tags a machine vertex is going to use \
+            on a SpiNNaker machine, as well as the configuration data of said\
+            IP tags.
+
+        :rtype: list(IPtagResource)
+        """
         return self._iptags
 
     @property
     def reverse_iptags(self):
+        """ Reflects the number of Reverse IP tags a machine vertex is going \
+            to use on a SpiNNaker machine, as well as the configuration data \
+            of said reverse IP tags.
+
+        :rtype: list(SpecificBoardReverseIPtagResource)
+        """
         return self._reverse_iptags
 
     def extend(self, other):

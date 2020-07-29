@@ -17,13 +17,13 @@ from pacman.exceptions import PacmanConfigurationException
 
 
 class PreAllocatedResourceContainer(object):
-    """ Container object for preallocated resources
+    """ Container object for preallocated resources.
     """
 
     __slots__ = [
         # An iterable of SpecificSDRAMResource object that reflects the amount
         # of SDRAM (in bytes) preallocated on a specific chip on the SpiNNaker
-        #  machine
+        # machine
         "_specific_sdram_usage",
 
         # An iterable of SpecificCoreResource objects that reflect the number
@@ -50,15 +50,19 @@ class PreAllocatedResourceContainer(object):
             specific_reverse_iptag_resources=None):
         """
         :param iterable(SpecificChipSDRAMResource) specific_sdram_usage:
-            iterable of SpecificSDRAMResource which states that specific chips
-            have missing SDRAM
+            states that specific chips have missing SDRAM
         :param iterable(SpecificCoreResource) specific_core_resources:
             states which cores have been preallocated
         :param iterable(CoreResource) core_resources:
             states a number of cores have been preallocated but don't care
             which ones they are
         :param list(SpecificBoardIPtagResource) specific_iptag_resources:
-        :param list(SpecificBoardReverseIPtagResource) specific_reverse_iptag_resources:
+            states the IP tag details that have been preallocated on a board
+        :param specific_reverse_iptag_resources:
+            states the reverse IP tag details that have been preallocated on
+            a board
+        :type specific_reverse_iptag_resources:
+            list(SpecificBoardReverseIPtagResource)
         """
         # pylint: disable=too-many-arguments
         self._specific_sdram_usage = specific_sdram_usage
@@ -82,22 +86,47 @@ class PreAllocatedResourceContainer(object):
 
     @property
     def specific_sdram_usage(self):
+        """ Reflects the amount of SDRAM (in bytes) preallocated on a specific\
+            chip on the SpiNNaker machine.
+
+        :rtype: iterable(SpecificChipSDRAMResource)
+        """
         return self._specific_sdram_usage
 
     @property
     def specific_core_resources(self):
+        """ Reflects the number of specific cores that have been preallocated\
+            on a chip.
+
+        :rtype: iterable(SpecificCoreResource)
+        """
         return self._specific_core_resources
 
     @property
     def core_resources(self):
+        """ Reflects the number of cores that have been preallocated on a\
+            chip, but which don't care which core it uses.
+
+        :rtype: iterable(CoreResource)
+        """
         return self._core_resources
 
     @property
     def specific_iptag_resources(self):
+        """ Reflects the IP tag details that have been preallocated on a\
+            board.
+
+        :rtype: list(SpecificBoardIPtagResource)
+        """
         return self._specific_iptag_resources
 
     @property
     def specific_reverse_iptag_resources(self):
+        """ Reflects the reverse IP tag details that have been preallocated\
+            on a board.
+
+        :rtype: list(SpecificBoardReverseIPtagResource)
+        """
         return self._specific_reverse_iptag_resources
 
     def extend(self, other):

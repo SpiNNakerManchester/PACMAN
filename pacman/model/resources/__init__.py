@@ -40,8 +40,8 @@ from .with_malloc_sdram import WithMallocSdram
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
            "CPUCyclesPerTickResource", "DsSDRAM", "DTCMResource",
            "ElementFreeSpace", "IPtagResource", "MultiRegionSDRAM",
-           "ResourceContainer", "RecordingSDRAM", "ReverseIPtagResource",
-           "PreAllocatedResourceContainer", "SpecificChipSDRAMResource",
-           "SpecificCoreResource", "SpecificBoardIPtagResource",
-           "SpecificBoardReverseIPtagResource", "VariableSDRAM",
-           "WithMallocSdram"]
+           "PreAllocatedResourceContainer", "RecordingSDRAM",
+           "ResourceContainer", "ReverseIPtagResource",
+           "SpecificBoardIPtagResource", "SpecificBoardReverseIPtagResource",
+           "SpecificChipSDRAMResource", "SpecificCoreResource",
+           "VariableSDRAM", "WithMallocSdram"]

@@ -45,8 +45,13 @@ class ConstantSDRAM(AbstractSDRAM):
         return self._sdram
 
     @property
-    @overrides(AbstractSDRAM.per_timestep)
+    @overrides(AbstractSDRAM.per_timestep, extend_doc=False)
     def per_timestep(self):
+        """ The extra SDRAM cost for each additional timestep, in bytes. \
+            Always zero; constants have no variable factor.
+
+        :rtype: int
+        """
         return 0
 
     def __add__(self, other):

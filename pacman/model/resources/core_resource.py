@@ -38,10 +38,18 @@ class CoreResource(object):
 
     @property
     def n_cores(self):
+        """ The number of cores that need to be allocated on a give chip.
+
+        :rtype: int
+        """
         return self._n_cores
 
     @property
     def chip(self):
+        """ The chip that has these cores allocated.
+
+        :rtype: ~spinn_machine.Chip
+        """
         return self._chip
 
     def get_value(self):
