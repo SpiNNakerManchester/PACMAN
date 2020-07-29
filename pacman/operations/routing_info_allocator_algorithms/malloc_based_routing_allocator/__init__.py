@@ -12,3 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from .compressible_malloc_based_routing_info_allocator import (
+    CompressibleMallocBasedRoutingInfoAllocator)
+from .key_field_generator import KeyFieldGenerator
+from .malloc_based_routing_info_allocator import (
+    MallocBasedRoutingInfoAllocator)
+
+__all__ = ["CompressibleMallocBasedRoutingInfoAllocator",
+           "KeyFieldGenerator", "MallocBasedRoutingInfoAllocator"]

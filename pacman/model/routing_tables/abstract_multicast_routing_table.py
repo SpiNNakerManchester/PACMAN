@@ -14,18 +14,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty, \
-    abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractproperty, abstractmethod)
 
 
 @add_metaclass(AbstractBase)
-class AbsractMulticastRoutingTable(object):
+class AbstractMulticastRoutingTable(object):
+    """ A multicast routing table. Might be compressed or uncompressed.
+    """
 
     @abstractproperty
     def x(self):
-        """The x-coordinate of the chip of this table
+        """ The x-coordinate of the chip of this table
 
-        :return: The x-coordinate
         :rtype: int
         """
 
@@ -33,7 +34,6 @@ class AbsractMulticastRoutingTable(object):
     def y(self):
         """ The y-coordinate of the chip of this table
 
-        :return: The y-coordinate
         :rtype: int
         """
 
@@ -41,9 +41,7 @@ class AbsractMulticastRoutingTable(object):
     def multicast_routing_entries(self):
         """ The multicast routing entries in the table
 
-        :return: an iterable of multicast routing entries
-        :rtype: iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
-        :raise None: does not raise any known exceptions
+        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
 
     @abstractproperty
@@ -51,7 +49,7 @@ class AbsractMulticastRoutingTable(object):
         """ The number of multi-cast routing entries there are in the\
             multicast routing table
 
-        :return: int
+        :rtype: int
         """
 
     @abstractproperty
@@ -59,7 +57,7 @@ class AbsractMulticastRoutingTable(object):
         """ The number of multi-cast routing entries that are set to be\
             defaultable within this multicast routing table
 
-        :return: int
+        :rtype: int
         """
 
     @abstractmethod

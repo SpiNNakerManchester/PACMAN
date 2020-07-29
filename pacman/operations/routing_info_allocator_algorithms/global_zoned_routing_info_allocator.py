@@ -36,32 +36,47 @@ def _bits_needed(size):
 
 
 class GlobalZonedRoutingInfoAllocator(object):
-    """ A routing key allocator that uses fixed zones that are the same for
+    """ A routing key allocator that uses fixed zones that are the same for\
         all vertices.  This will hopefully make the keys more compressible.
 
-        Keys will have the format:
+    Keys will have the format::
+
               <--- 32 bits --->
         Key:  | A | M | P | X |
         Mask: |11111111111|   | (i.e. 1s covering A, M and P fields)
 
-        A: the index of the application vertex
-        M: the index of the machine vertex of the application vertex
-        P: the index of the outgoing edge partition of the machine vertex
-        X: space for the maximum number of keys required by any outgoing edge
-           partition
+    Where:
 
-        Note that this also means that all machine vertices of the same
-        application vertex will have a shared key.
+    * `A` --- the index of the application vertex
+    * `M` --- the index of the machine vertex of the application vertex
+    * `P` --- the index of the outgoing edge partition of the machine vertex
+    * `X` --- space for the maximum number of keys required by any outgoing \
+        edge partition
 
-        The widths of the fields are determined such that every key will have
-        every field in the same place in the key, and the mask is the same
-        for every vertex.
+    Note that this also means that all machine vertices of the same
+    application vertex will have a shared key.
+
+    The widths of the fields are determined such that every key will have
+    every field in the same place in the key, and the mask is the same
+    for every vertex.
 
     .. note::
         No special constraints are supported.  This will only work if the
         numbers above add up to 32-bits (an error will result if not).  A
         single large vertex (like a retina) and lots of small vertices (like
         a large neural network) will thus not likely work here.
+
+    :param ApplicationGraph application graph:
+        The application graph to allocate the routing info for
+    :param MachineGraph machine_graph:
+        The machine graph to allocate the routing info for
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the
+        edges
+    :return: The routing information
+    :rtype: PartitionRoutingInfo
+    :raise PacmanRouteInfoAllocationException:
+        If something goes wrong with the allocation
     """
 
     __slots__ = [
@@ -78,23 +93,16 @@ class GlobalZonedRoutingInfoAllocator(object):
 
     def __call__(self, application_graph, machine_graph, n_keys_map):
         """
-        :param application graph:\
+        :param ApplicationGraph application graph:
             The application graph to allocate the routing info for
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param machine_graph:\
+        :param MachineGraph machine_graph:
             The machine graph to allocate the routing info for
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param n_keys_map:\
-            A map between the edges and the number of keys required by the\
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            A map between the edges and the number of keys required by the
             edges
-        :type n_keys_map:\
-            :py:class:`pacman.model.routing_info.AbstractMachinePartitionNKeysMap`
         :return: The routing information
-        :rtype:\
-            :py:class:`pacman.model.routing_info.PartitionRoutingInfo`
-        :raise pacman.exceptions.PacmanRouteInfoAllocationException: \
+        :rtype: PartitionRoutingInfo
+        :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """
         self.__application_graph = application_graph
@@ -189,7 +197,9 @@ class GlobalZonedRoutingInfoAllocator(object):
                     self.__n_bits_atoms, n_bits_vertices))
 
     def _simple_allocate(self):
-        """ Allocate the keys given the calculations done previously
+        """ Allocate the keys given the calculations done previously.
+
+        :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
         """
         progress = ProgressBar(
             self.__application_graph.n_vertices, "Allocating routing keys")

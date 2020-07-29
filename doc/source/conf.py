@@ -57,7 +57,7 @@ root_package = "pacman"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://docs.scipy.org/doc/numpy/", None),
+    'numpy': ("https://numpy.org/doc/stable/", None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
 
@@ -399,5 +399,7 @@ apidoc.main([None, '-o', ".", base,
              base + "/operations/router_compressors/[a-ep-z]*.py",
              base + "/operations/router_compressors/malloc*.py",
              base + "/operations/router_compressors/m*/[a-z]*.py",
+             base + "/operations/routing_info_allocator_algorithms/[bdgz]*.py",
+             base + "/operations/routing_info_allocator_algorithms/m*/[a-t]*.py",
              base + "/utilities/utility_objs/[a-z]*.py",
              ])

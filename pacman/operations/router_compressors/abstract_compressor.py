@@ -113,8 +113,8 @@ class AbstractCompressor(object):
     @abstractmethod
     def compress_table(self, router_table):
         """
-        :param MulticastRoutingTable router_table:
-        :rtype: MulticastRoutingTable
+        :param UnCompressedMulticastRoutingTable router_table:
+        :rtype: list(Entry)
         """
 
     def compress_tables(self, router_tables, progress):

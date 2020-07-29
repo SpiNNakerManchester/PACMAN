@@ -35,7 +35,7 @@ class DestinationBasedRoutingInfoAllocator(object):
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         A map between the edges and the number of keys required by the edges
     :return: The routing information
-    :rtype: tuple(RoutingInfo, MulticastRoutingTable)
+    :rtype: tuple(RoutingInfo, MulticastRoutingTables)
     :raise PacmanRouteInfoAllocationException:
         If something goes wrong with the allocation
     """
@@ -54,7 +54,7 @@ class DestinationBasedRoutingInfoAllocator(object):
             A map between the edges and the number of keys required by the
             edges
         :return: The routing information
-        :rtype: tuple(RoutingInfo, MulticastRoutingTable)
+        :rtype: tuple(RoutingInfo, MulticastRoutingTables)
         :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """

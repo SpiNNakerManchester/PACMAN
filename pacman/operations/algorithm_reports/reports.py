@@ -737,7 +737,7 @@ def format_route(entry):
 
 def generate_routing_table(routing_table, top_level_folder):
     """
-    :param ~spinn_machine.MulticastRoutingTable routing_table:
+    :param AbstractMulticastRoutingTable routing_table:
     :param str top_level_folder:
     """
     file_name = "routing_table_{}_{}.rpt".format(
@@ -983,7 +983,7 @@ def _recursive_trace_to_destinations(
 def _locate_routing_entry(current_router, key):
     """ Locate the entry from the router based off the edge
 
-    :param ~spinn_machine.MulticastRoutingTable current_router:
+    :param AbstractMulticastRoutingTable current_router:
         the current router being used in the trace
     :param int key: the key being used by the source placement
     :return: the routing table entry

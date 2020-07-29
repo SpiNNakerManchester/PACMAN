@@ -22,6 +22,9 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 
 class KeyFieldGenerator(object):
     """ Handle fields in a routing key.
+
+    .. note::
+        This is an iterable(:py:class:`int`).
     """
 
     __slots__ = [
@@ -96,6 +99,9 @@ class KeyFieldGenerator(object):
         self._increment_space_until_valid_key()
 
     def _get_current_space_end_address(self):
+        """
+        :rtype: int
+        """
         current_space = self._free_space_list[self._free_space_pos]
         return current_space.start_address + current_space.size
 
@@ -106,7 +112,6 @@ class KeyFieldGenerator(object):
             self._update_next_valid_fields()
 
     def _update_next_valid_fields(self):
-
         # Find the next valid key for the general mask
         min_key = self._free_space_list[self._free_space_pos].start_address
         if min_key & self._fixed_mask != min_key:
@@ -150,7 +155,6 @@ class KeyFieldGenerator(object):
             self._field_value[top_field] = top_field.lo
 
     def _increment_key(self):
-
         # Update the key
         fields_updated = False
         field_no = len(self._fields) - 1
@@ -171,7 +175,9 @@ class KeyFieldGenerator(object):
         self._increment_space_until_valid_key()
 
     def _get_next_key(self):
-
+        """
+        :rtype: int
+        """
         # Form the key from the value of the fields
         expanded_key = numpy.zeros(32, dtype="uint8")
         for field in self._fields:
@@ -185,6 +191,10 @@ class KeyFieldGenerator(object):
 
     @property
     def is_next_key(self):
+        """ Does this generator have a next key available?
+
+        :rtype: bool
+        """
         if self._next_key_read:
             self._increment_key()
             self._next_key_read = False
@@ -192,7 +202,10 @@ class KeyFieldGenerator(object):
 
     @property
     def next_key(self):
+        """ The next key, or `None` if there are no further keys.
 
+        :rtype: int or None
+        """
         # If there are no more keys, return None
         if not self._is_next_key:
             return None
@@ -203,6 +216,10 @@ class KeyFieldGenerator(object):
         return self
 
     def next(self):
+        """ Used for making this an iterator.
+
+        :rtype: int
+        """
         if not self.is_next_key:
             raise StopIteration
         return self.next_key

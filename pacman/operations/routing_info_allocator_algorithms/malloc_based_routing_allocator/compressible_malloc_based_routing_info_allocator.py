@@ -43,8 +43,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
-    """ A Routing Info Allocation Allocator algorithm that keeps track of
-        free keys and attempts to allocate them as requested, but that also
+    """ A Routing Info Allocation Allocator algorithm that keeps track of\
+        free keys and attempts to allocate them as requested, but that also\
         looks at routing tables in an attempt to make things more compressible
 
     :param MachineGraph machine_graph:
@@ -221,7 +221,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     @staticmethod
     def _get_key_ranges(key, mask):
-        """ Get a generator of base_key, n_keys pairs that represent ranges
+        """ Get a generator of base_key, n_keys pairs that represent ranges\
             allowed by the mask
 
         :param int key: The base key

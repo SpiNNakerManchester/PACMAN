@@ -94,9 +94,9 @@ class BasicRouteMerger(object):
 
     def _merge_routes(self, router_table, previous_masks):
         """
-        :param MulticastRoutingTable router_table:
+        :param AbstractMulticastRoutingTable router_table:
         :param dict(int,list(int)) previous_masks:
-        :rtype: MulticastRoutingTable
+        :rtype: CompressedMulticastRoutingTable
         """
         merged_routes = CompressedMulticastRoutingTable(
             router_table.x, router_table.y)

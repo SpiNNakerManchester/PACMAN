@@ -18,6 +18,7 @@ from pacman.exceptions import MinimisationFailedError
 
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
+from spinn_utilities.overrides import overrides
 
 
 class ClashCompressor(AbstractCompressor):
@@ -74,7 +75,7 @@ class ClashCompressor(AbstractCompressor):
 
     def compress_ignore_clashers(self, router_table, top_entries):
         """
-        :param MulticastRoutingTable router_table:
+        :param AbstractMulticastRoutingTable router_table:
         :param list(~.Entry) top_entries:
         :rtype: list(~.Entry)
         :raises MinimisationFailedError:
@@ -130,11 +131,8 @@ class ClashCompressor(AbstractCompressor):
             clashers = sorted(clashers, key=lambda x: x.clashes, reverse=True)
             top_entries.extend(clashers[0:1])
 
+    @overrides(AbstractCompressor.compress_table)
     def compress_table(self, router_table):
-        """
-        :param MulticastRoutingTable router_table:
-        :rtype: list(~.Entry)
-        """
         # Split the entries into buckets based on spinnaker_route
 
         self._max_clashes = 1

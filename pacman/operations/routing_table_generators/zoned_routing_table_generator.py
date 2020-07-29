@@ -85,7 +85,7 @@ class ZonedRoutingTableGenerator(object):
             dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
         :param RoutingInfo routing_infos:
         :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
-        :rtype: MulticastRoutingTable
+        :rtype: UnCompressedMulticastRoutingTable
         """
         table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
         partitions_by_app_vertex = DefaultOrderedDict(set)
@@ -136,7 +136,7 @@ class ZonedRoutingTableGenerator(object):
         :param partitions_in_table:
         :type partitions_in_table:
             dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
-        :param MulticastRoutingTable table:
+        :param UnCompressedMulticastRoutingTable table:
         """
         for partition in partitions:
             r_info = routing_infos.get_routing_info_from_partition(partition)
@@ -149,7 +149,7 @@ class ZonedRoutingTableGenerator(object):
         """
         :param BaseKeyAndMask key_and_mask:
         :param MulticastRoutingTableByPartitionEntry entry:
-        :param MulticastRoutingTable table:
+        :param UnCompressedMulticastRoutingTable table:
         """
         table.add_multicast_routing_entry(MulticastRoutingEntry(
             routing_entry_key=key_and_mask.key_combo,

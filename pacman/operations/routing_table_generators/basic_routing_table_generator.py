@@ -55,7 +55,7 @@ class BasicRoutingTableGenerator(object):
         :type partitions_in_table:
             dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
         :param RoutingInfo routing_infos:
-        :rtype: MulticastRoutingTable
+        :rtype: UnCompressedMulticastRoutingTable
         """
         table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
         for partition in partitions_in_table:

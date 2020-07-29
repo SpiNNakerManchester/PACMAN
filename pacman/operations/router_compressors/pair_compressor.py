@@ -15,6 +15,7 @@
 
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
+from spinn_utilities.overrides import overrides
 
 
 class PairCompressor(AbstractCompressor):
@@ -123,8 +124,8 @@ class PairCompressor(AbstractCompressor):
     ]
 
     def _compare_routes(self, route_a, route_b):
-        """
-        Compares two routes for sorting based on the frequency of each route.
+        """ Compares two routes for sorting based on the frequency of each \
+            route.
 
         The assumption here is that self._routes has been sorted with the
         highest frequency at the top of the tables.
@@ -149,8 +150,7 @@ class PairCompressor(AbstractCompressor):
         raise Exception("Apply Gibbs slap!")
 
     def _three_way_partition_table(self, low, high):
-        """
-        Partitions the entries between low and high into three parts
+        """ Partitions the entries between low and high into three parts
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
 
@@ -180,8 +180,7 @@ class PairCompressor(AbstractCompressor):
         return low, check
 
     def _quicksort_table(self, low, high):
-        """
-        Sorts the entries in place based on frequency of their route
+        """ Sorts the entries in place based on frequency of their route
 
         :param int low: Inclusive lowest index to consider
         :param int high: Inclusive highest index to consider
@@ -192,8 +191,7 @@ class PairCompressor(AbstractCompressor):
             self._quicksort_table(right, high)
 
     def _swap_routes(self, index_a, index_b):
-        """
-        Helper function to swap *both* the routes and routes frequency tables
+        """ Swaps *both* the routes and routes frequency tables
 
         :param int index_a:
         :param int index_b:
@@ -230,8 +228,7 @@ class PairCompressor(AbstractCompressor):
         return low, check
 
     def _quicksort_routes(self, low, high):
-        """
-        Sorts the routes in place based on frequency
+        """ Sorts the routes in place based on frequency
 
         :param int low: Inclusive lowest index to consider
         :param int high: Inclusive highest index to consider
@@ -242,8 +239,7 @@ class PairCompressor(AbstractCompressor):
             self._quicksort_routes(right, high)
 
     def _find_merge(self, left, index):
-        """
-        Attempt to find a merge between the left entry and the index entry
+        """ Attempt to find a merge between the left entry and the index entry
 
         Creates a merge and then checks it does not intersect with entries
         with different routes.
@@ -276,8 +272,7 @@ class PairCompressor(AbstractCompressor):
         return True
 
     def _compress_by_route(self, left, right):
-        """
-        Compresses the entries between left and right
+        """ Compresses the entries between left and right
 
         :param int left: Inclusive index of first entry to merge
         :param int right: Inclusive index of last entry to merge
@@ -317,17 +312,13 @@ class PairCompressor(AbstractCompressor):
         self._routes_frequency[self._routes_count] = 1
         self._routes_count += 1
 
+    @overrides(AbstractCompressor.compress_table)
     def compress_table(self, router_table):
         """
         Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries but still unordered
-
-        :param MulticastRoutingTable router_table:
-            Original Routing table for a single chip
-        :return: Compressed routing table for the same chip
-        :rtype: list(Entry)
         """
 
         # Split the entries into buckets based on spinnaker_route

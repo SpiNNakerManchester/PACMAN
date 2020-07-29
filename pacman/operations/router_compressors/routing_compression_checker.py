@@ -60,7 +60,7 @@ def codify(route, length=32):
 
 def codify_table(table, length=32):
     """
-    :param MulticastRoutingTable table:
+    :param AbstractMulticastRoutingTable table:
     :param int length:
     :rtype: dict(str, ~spinn_machine.MulticastRoutingEntry)
     """
@@ -158,10 +158,11 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
 def compare_tables(original, compressed):
     """ Compares the two tables without generating any output
 
-    :param MulticastRoutingTable original: The original routing tables
-    :param MulticastRoutingTable compressed: The compressed routing tables.
+    :param UnCompressedMulticastRoutingTable original:
+        The original routing tables
+    :param CompressedMulticastRoutingTable compressed:
+        The compressed routing tables.
         Which will be considered in order.
-    :rtype: None
     :raises: PacmanRoutingException if there is any error
     """
     compressed_dict = codify_table(compressed)

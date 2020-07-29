@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.routing_tables.abstract_multicast_routing_table import \
-    AbsractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
+from .abstract_multicast_routing_table import AbstractMulticastRoutingTable
 
 
-class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
+class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """ Represents a compressed routing table for a chip.
     """
 
@@ -39,18 +38,16 @@ class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
 
     def __init__(self, x, y, multicast_routing_entries=None):
         """
-        :param x: \
+        :param int x:
             The x-coordinate of the chip for which this is the routing table
-        :type x: int
-        :param y: \
+        :param int y:
             The y-coordinate of the chip for which this is the routing tables
-        :type y: int
-        :param multicast_routing_entries: \
+        :param multicast_routing_entries:
             The routing entries to add to the table
-        :type multicast_routing_entries: \
-            iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
-            routing entries contain the same key-mask combination
+        :type multicast_routing_entries:
+            iterable(~spinn_machine.MulticastRoutingEntry)
+        :raise PacmanAlreadyExistsException:
+            If any two routing entries contain the same key-mask combination
         """
         self._x = x
         self._y = y
@@ -64,12 +61,11 @@ class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
     def add_multicast_routing_entry(self, multicast_routing_entry):
         """ Adds a routing entry to this table
 
-        :param multicast_routing_entry: The route to add
-        :type multicast_routing_entry:\
-            :py:class:`spinn_machine.MulticastRoutingEntry`
-        :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
-            entry with the same key-mask combination already exists
+        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
+            The route to add
+        :raise PacmanAlreadyExistsException:
+            If a routing entry with the same key-mask combination already
+            exists
         """
         self._multicast_routing_entries.append(multicast_routing_entry)
 
@@ -78,31 +74,31 @@ class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
             self._number_of_defaulted_routing_entries += 1
 
     @property
-    @overrides(AbsractMulticastRoutingTable.x)
+    @overrides(AbstractMulticastRoutingTable.x)
     def x(self):
         return self._x
 
     @property
-    @overrides(AbsractMulticastRoutingTable.y)
+    @overrides(AbstractMulticastRoutingTable.y)
     def y(self):
         return self._y
 
     @property
-    @overrides(AbsractMulticastRoutingTable.multicast_routing_entries)
+    @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
         return self._multicast_routing_entries
 
     @property
-    @overrides(AbsractMulticastRoutingTable.number_of_entries)
+    @overrides(AbstractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
         return len(self._multicast_routing_entries)
 
     @property
-    @overrides(AbsractMulticastRoutingTable.number_of_defaultable_entries)
+    @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
         return self._number_of_defaulted_routing_entries
 
-    @overrides(AbsractMulticastRoutingTable.__eq__)
+    @overrides(AbstractMulticastRoutingTable.__eq__)
     def __eq__(self, other):
         if not isinstance(other, CompressedMulticastRoutingTable):
             return False
@@ -111,17 +107,17 @@ class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._multicast_routing_entries == \
             other.multicast_routing_entries
 
-    @overrides(AbsractMulticastRoutingTable.__ne__)
+    @overrides(AbstractMulticastRoutingTable.__ne__)
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    @overrides(AbsractMulticastRoutingTable.__repr__)
+    @overrides(AbstractMulticastRoutingTable.__repr__)
     def __repr__(self):
         entry_string = ""
         for entry in self._multicast_routing_entries:
             entry_string += "{}\n".format(entry)
         return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
 
-    @overrides(AbsractMulticastRoutingTable.__hash__)
+    @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self):
         return id(self)

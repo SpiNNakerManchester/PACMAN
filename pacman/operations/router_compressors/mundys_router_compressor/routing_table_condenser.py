@@ -29,7 +29,7 @@ class MundyRouterCompressor(AbstractCompressor):
 
     def compress_table(self, router_table):
         """
-        :param MulticastRoutingTable router_table:
+        :param AbstractMulticastRoutingTable router_table:
         :rtype: list(RoutingTableEntry)
         """
         # convert to rig inspired format

@@ -71,8 +71,8 @@ class MallocBasedRouteMerger(object):
 
     def _merge_routes(self, router_table):
         """
-        :param MulticastRoutingTable router_table:
-        :rtype: MulticastRoutingTable
+        :param AbstractMulticastRoutingTable router_table:
+        :rtype: CompressedMulticastRoutingTable
         """
         merged_routes = CompressedMulticastRoutingTable(
             router_table.x, router_table.y)

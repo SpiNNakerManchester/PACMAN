@@ -271,7 +271,7 @@ def _recursive_trace_to_destinations(
     :param ~spinn_machine.MulticastRoutingEntry entry:
         the original entry used by the first router which resides on the
         source placement chip.
-    :param MulticastRoutingTable current_router:
+    :param AbstractMulticastRoutingTable current_router:
         the router currently being visited during the trace
     :param int chip_x: the x coordinate of the chip being considered
     :param int chip_y: the y coordinate of the chip being considered
@@ -363,7 +363,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
     :param list(int) processor_ids:
         the processor IDs which the last router entry said the trace should
         visit
-    :param MulticastRoutingTable current_router:
+    :param AbstractMulticastRoutingTable current_router:
         the current router being used in the trace
     :param set(PlacementTuple) reached_placements:
         the placements to which the trace visited
@@ -377,7 +377,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
 def _locate_routing_entry(current_router, key, n_atoms):
     """ Locate the entry from the router based off the edge
 
-    :param MulticastRoutingTable current_router:
+    :param AbstractMulticastRoutingTable current_router:
         the current router being used in the trace
     :param int key: the key being used by the source placement
     :param int n_atoms: the number of atoms

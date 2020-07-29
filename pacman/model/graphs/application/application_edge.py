@@ -48,7 +48,7 @@ class ApplicationEdge(AbstractEdge):
             self, pre_vertex, post_vertex,
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
             machine_edge_type=MachineEdge):
-        """
+        r"""
         :param ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.
         :param ApplicationVertex post_vertex:
@@ -59,7 +59,7 @@ class ApplicationEdge(AbstractEdge):
         :type label: str or None
         :param machine_edge_type:
             The type of machine edges made from this app edge. If `None`,
-            standard `MachineEdge`s will be made.
+            standard `MachineEdge`\ s will be made.
         :type machine_edge_type: type(MachineEdge)
         """
         self._label = label
