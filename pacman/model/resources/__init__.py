@@ -35,11 +35,13 @@ from .specific_board_reverse_iptag_resource import (
 from .specific_chip_sdram_resource import SpecificChipSDRAMResource
 from .specific_core_resource import SpecificCoreResource
 from .variable_sdram import VariableSDRAM
+from .with_malloc_sdram import WithMallocSdram
 
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
-           "CPUCyclesPerTickResource", "DTCMResource", "DsSDRAM",
+           "CPUCyclesPerTickResource", "DsSDRAM", "DTCMResource",
            "ElementFreeSpace", "IPtagResource", "MultiRegionSDRAM",
            "ResourceContainer", "RecordingSDRAM", "ReverseIPtagResource",
            "PreAllocatedResourceContainer", "SpecificChipSDRAMResource",
            "SpecificCoreResource", "SpecificBoardIPtagResource",
-           "SpecificBoardReverseIPtagResource", "VariableSDRAM"]
+           "SpecificBoardReverseIPtagResource", "VariableSDRAM",
+           "WithMallocSdram"]

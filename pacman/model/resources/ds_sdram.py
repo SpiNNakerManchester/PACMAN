@@ -12,13 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from .with_malloc_sdram import WithMallocSdram
 from spinn_utilities.overrides import overrides
 from pacman.utilities.constants import SARK_PER_MALLOC_SDRAM_USAGE
+from .with_malloc_sdram import WithMallocSdram
 
 
 class DsSDRAM(WithMallocSdram):
-    """ A resource for SDRAM that comes in DS regions and has malloc costs
+    """ A resource for SDRAM that comes in DS regions and has malloc costs.
 
         Handles all the regions that are part of the same DS generation phase
         for a single core. Currently malloc cost is only added once as all
@@ -27,15 +27,17 @@ class DsSDRAM(WithMallocSdram):
         The malloc cost will be automatically added to the total costs,
         but is not part of any of the regions and reported after a subtotal.
 
-        .. note:
-        Adding or Subtracting two MultiRegionSDRAM objects will be assumed to
-        be an operation over multiple cores/placements so these functions
-        return a VariableSDRAM object without the regions data.
+        .. note::
+            Adding or subtracting two :py:class:`MultiRegionSDRAM` objects will
+            be assumed to be an operation over multiple cores/placements so
+            these functions return a :py:class:`VariableSDRAM` object without
+            the regions data.
 
-        To add extra SDRAM costs for the same core/placement use the method
-        add_cost
-        merge (But only of another DsSDRAM)
-        nest (But only of a MultiRegionSDRAM without malloc)
+            To add extra SDRAM costs for the same core/placement use the
+            methods :py:meth:`~.MultiRegionSDRAM.add_cost`, :py:meth:`merge`
+            (but only of another :py:class:`DsSDRAM`), or
+            :py:meth:`~.MultiRegionSDRAM.nest` (but only of a
+            :py:class:`MultiRegionSDRAM` without malloc)
     """
 
     def __init__(self):
@@ -45,10 +47,6 @@ class DsSDRAM(WithMallocSdram):
     @property
     @overrides(WithMallocSdram.malloc_cost)
     def malloc_cost(self):
-        """
-        The part of total (fixed cost) that was automatically added for malloc
-        :return: malloc cost in bytes.
-        """
         return SARK_PER_MALLOC_SDRAM_USAGE
 
     @overrides(WithMallocSdram.merge)

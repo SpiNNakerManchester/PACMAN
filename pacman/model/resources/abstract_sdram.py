@@ -25,20 +25,21 @@ class AbstractSDRAM(object):
 
     @abstractmethod
     def get_total_sdram(self, n_timesteps):
-        """
-        The total SDRAM.
+        """ The total SDRAM.
 
         :param int n_timesteps: number of timesteps to cost for
-        :return:
+        :return: The mumber of bytes required for the given number of
+            timesteps.
+        :rtype: int
         """
 
     @abstractmethod
     def __add__(self, other):
-        """
-        Combines this SDRAM resource with the other one and creates a new one
+        """ Combines this SDRAM resource with the other one and creates a new\
+            one
 
         :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
+        :return: a new :py:class:`AbstractSDRAM`
         :rtype: AbstractSDRAM
         """
 
@@ -47,7 +48,7 @@ class AbstractSDRAM(object):
         """ Creates a new SDRAM which is this one less the other
 
         :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
+        :return: a new :py:class:`AbstractSDRAM`
         :rtype: AbstractSDRAM
         """
 
@@ -56,21 +57,28 @@ class AbstractSDRAM(object):
         """ Creates a new SDRAM which is the other less this one
 
         :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
+        :return: a new :py:class:`AbstractSDRAM`
         :rtype: AbstractSDRAM
         """
 
     @abstractproperty
     def fixed(self):
-        """ Returns the fixed SDRAM cost
+        """ The fixed SDRAM cost, in bytes
+
+        .. warning::
+            May well be zero.
+
+        :rtype: int
         """
 
     @abstractproperty
     def per_timestep(self):
-        """ Returns extra SDRAM cost for each additional timestep
+        """ The extra SDRAM cost for each additional timestep, in bytes
 
-        .. warn:
+        .. warning::
             May well be zero.
+
+        :rtype: int
         """
 
     def __eq__(self, other):
@@ -82,12 +90,12 @@ class AbstractSDRAM(object):
 
     @abstractmethod
     def report(self, timesteps, indent="", preamble="", target=None):
-        """
-        Writes a description of this sdram to the target
+        """ Writes a description of this SDRAM to the target
 
         :param int timesteps:  Number of timesteps to do total cost for
-        :param String indent: Text at the start of this and all children
-        :param String preamble:
+        :param str indent: Text at the start of this and all children
+        :param str preamble:
             Additional text at the start but not in children
-        :param file target: Where to write the output. None is stanrd print
+        :param target: Where to write the output. None is standard output
+        :type target: str or None
         """

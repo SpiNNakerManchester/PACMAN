@@ -57,9 +57,8 @@ class PreAllocatedResourceContainer(object):
         :param iterable(CoreResource) core_resources:
             states a number of cores have been preallocated but don't care
             which ones they are
-        :param list(SpecificBoardTagResource) specific_iptag_resources:
-        :param list(SpecificReverseIPTagResource) \
-                specific_reverse_iptag_resources:
+        :param list(SpecificBoardIPtagResource) specific_iptag_resources:
+        :param list(SpecificBoardReverseIPtagResource) specific_reverse_iptag_resources:
         """
         # pylint: disable=too-many-arguments
         self._specific_sdram_usage = specific_sdram_usage
