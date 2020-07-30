@@ -69,7 +69,7 @@ class AbstractSDRAM(object):
     def per_timestep(self):
         """ Returns extra SDRAM cost for each additional timestep
 
-        .. warn:
+        .. warning::
             May well be zero.
         """
 

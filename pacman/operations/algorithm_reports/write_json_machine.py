@@ -32,7 +32,7 @@ class WriteJsonMachine(object):
     :param str json_folder:
         The folder to which the JSON are being written.
 
-        .. warn:
+        .. warning::
              The files in this folder will be overwritten!
 
     :return: the name of the generated file
