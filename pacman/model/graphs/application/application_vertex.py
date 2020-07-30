@@ -60,12 +60,14 @@ class ApplicationVertex(AbstractVertex):
 
     @abstractmethod
     def get_resources_used_by_atoms(self, vertex_slice):
-        """ Get the separate resource requirements for a range of atoms
+        """ Get the separate resource requirements for a range of atoms.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the low value of atoms to calculate resources from
-        :return: a Resource container that contains a
-            CPUCyclesPerTickResource, DTCMResource and SDRAMResource
+            the range of atoms to calculate resources for
+        :return: a resource container that contains a
+            :py:class:`~pacman.model.resources.CPUCyclesPerTickResource`,
+            :py:class:`~pacman.model.resources.DTCMResource` and
+            :py:class:`~pacman.model.resources.AbstractSDRAM`
         :rtype: ~pacman.model.resources.ResourceContainer
         """
 
@@ -73,11 +75,11 @@ class ApplicationVertex(AbstractVertex):
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        """ Create a machine vertex from this application vertex
+        """ Create a machine vertex from this application vertex.
 
         :param vertex_slice:
             The slice of atoms that the machine vertex will cover,
-            or None to use the default slice
+            or `None` to use the default slice
         :type vertex_slice: ~pacman.model.graphs.common.Slice or None
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the machine vertex.
@@ -117,7 +119,7 @@ class ApplicationVertex(AbstractVertex):
 
     @property
     def machine_vertices(self):
-        """ The machine vertices that this application vertex maps to.
+        """ The machine vertices that this application vertex maps to.\
             Will be the same length as :py:meth:`vertex_slices`.
 
         :rtype: iterable(MachineVertex)
@@ -126,7 +128,7 @@ class ApplicationVertex(AbstractVertex):
 
     @property
     def vertex_slices(self):
-        """ The slices of this vertex that each machine vertex manages.
+        """ The slices of this vertex that each machine vertex manages.\
             Will be the same length as :py:meth:`machine_vertices`.
 
         :rtype: iterable(Slice)
@@ -146,7 +148,7 @@ class ApplicationVertex(AbstractVertex):
         return self.n_atoms
 
     def forget_machine_vertices(self):
-        """ Arrange to forget all machine vertices that this application
+        """ Arrange to forget all machine vertices that this application\
             vertex maps to.
         """
         self._machine_vertices = OrderedSet()

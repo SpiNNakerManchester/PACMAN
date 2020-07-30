@@ -71,7 +71,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
                 self.add_multicast_routing_entry(multicast_routing_entry)
 
     def add_multicast_routing_entry(self, multicast_routing_entry):
-        """ Adds a routing entry to this table
+        """ Adds a routing entry to this table.
 
         :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
             The route to add
@@ -87,8 +87,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
             raise PacmanAlreadyExistsException(
                 "Multicast_routing_entry", str(multicast_routing_entry))
 
-        self._entries_by_key_mask[tuple_key] =\
-            multicast_routing_entry
+        self._entries_by_key_mask[tuple_key] = multicast_routing_entry
         self._entries_by_key[routing_entry_key] = multicast_routing_entry
         self._multicast_routing_entries.append(multicast_routing_entry)
 
@@ -123,7 +122,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     def get_entry_by_routing_entry_key(self, routing_entry_key):
         """ Get the routing entry associated with the specified key, \
-            or `None` if the routing table does not match the key
+            or `None` if the routing table does not match the key.
 
         :param routing_entry_key: the routing key to be searched
         :type routing_entry_key: int
@@ -135,9 +134,9 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     def get_multicast_routing_entry_by_routing_entry_key(
             self, routing_entry_key, mask):
-        """ Get the routing entry associated with the specified key_combo-mask\
+        """ Get the routing entry associated with the specified key-mask\
             combination, or `None` if the routing table does not match the\
-            key_combo
+            key_combo.
 
         :param int routing_entry_key: the routing key to be searched
         :param int mask: the routing mask to be searched
@@ -147,8 +146,8 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         """
         if (routing_entry_key & mask) != routing_entry_key:
             raise PacmanRoutingException(
-                "The key {} is changed when masked with the mask {}."
-                " This is determined to be an error in the tool chain. Please "
+                "The key {} is changed when masked with the mask {}. "
+                "This is determined to be an error in the tool chain. Please "
                 "correct this and try again.".format(routing_entry_key, mask))
 
         return self._entries_by_key_mask.get((routing_entry_key, mask), None)

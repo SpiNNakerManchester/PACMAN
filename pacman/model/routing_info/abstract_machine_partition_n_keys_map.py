@@ -19,7 +19,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractMachinePartitionNKeysMap(object):
-    """ A map that provides the number of keys required by each partition
+    """ A map that provides the number of keys required by each partition.
     """
 
     __slots__ = []
@@ -36,5 +36,8 @@ class AbstractMachinePartitionNKeysMap(object):
 
     @abstractmethod
     def __iter__(self):
-        """ Returns an iterator over the mapped partitions"""
+        """ Get an iterator over the mapped partitions.
+
+        :rtype: iterable(~pacman.model.graphs.OutgoingEdgePartition)
+        """
         pass

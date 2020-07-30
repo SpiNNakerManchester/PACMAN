@@ -36,11 +36,11 @@ class MachineVertex(AbstractVertex):
             The optional initial constraints of the vertex
         :param app_vertex:
             The application vertex that caused this machine vertex to be
-            created. If None, there is no such application vertex.
+            created. If `None`, there is no such application vertex.
         :type app_vertex: ApplicationVertex or None
         :param vertex_slice:
             The slice of the application vertex that this machine vertex
-            implements.
+            implements, if meaningful.
         :type vertex_slice: Slice or None
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
@@ -62,8 +62,9 @@ class MachineVertex(AbstractVertex):
         self.associate_application_vertex()
 
     def associate_application_vertex(self):
-        """
-        Asks the application vertex (if any) to remember this machine vertex.
+        """ Asks the application vertex (if any) to remember this machine \
+            vertex.
+
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         """
         # remember depends on slice already being set
@@ -72,7 +73,7 @@ class MachineVertex(AbstractVertex):
 
     @property
     def app_vertex(self):
-        """ The application vertex that caused this machine vertex to be
+        """ The application vertex that caused this machine vertex to be\
             created. If None, there is no such application vertex.
 
         :rtype: ApplicationVertex or None
@@ -81,7 +82,7 @@ class MachineVertex(AbstractVertex):
 
     @property
     def vertex_slice(self):
-        """ The slice of the application vertex that this machine vertex
+        """ The slice of the application vertex that this machine vertex\
             implements.
 
         :rtype: Slice
@@ -90,7 +91,7 @@ class MachineVertex(AbstractVertex):
 
     @property
     def index(self):
-        """ The index into the collection of machine vertices for an
+        """ The index into the collection of machine vertices for an\
             application vertex.
 
         :rtype: int
@@ -99,7 +100,7 @@ class MachineVertex(AbstractVertex):
 
     @index.setter
     def index(self, value):
-        """ The index into the collection of machine vertices for an
+        """ The index into the collection of machine vertices for an\
             application vertex.
         """
         self._index = value
@@ -116,7 +117,7 @@ class MachineVertex(AbstractVertex):
 
     @abstractproperty
     def resources_required(self):
-        """ The resources required by the vertex
+        """ The resources required by the vertex.
 
         :rtype: ~pacman.model.resources.ResourceContainer
         """

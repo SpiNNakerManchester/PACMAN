@@ -52,7 +52,7 @@ class Placement(object):
 
     @property
     def vertex(self):
-        """ The vertex that was placed
+        """ The vertex that was placed.
 
         :rtype: MachineVertex
         """
@@ -60,7 +60,7 @@ class Placement(object):
 
     @property
     def x(self):
-        """ The x-coordinate of the chip where the vertex is placed
+        """ The x-coordinate of the chip where the vertex is placed.
 
         :rtype: int
         """
@@ -68,7 +68,7 @@ class Placement(object):
 
     @property
     def y(self):
-        """ The y-coordinate of the chip where the vertex is placed
+        """ The y-coordinate of the chip where the vertex is placed.
 
         :rtype: int
         """
@@ -76,7 +76,7 @@ class Placement(object):
 
     @property
     def p(self):
-        """ The ID of the processor of the chip where the vertex is placed
+        """ The ID of the processor of the chip where the vertex is placed.
 
         :rtype: int
         """

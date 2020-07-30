@@ -23,7 +23,7 @@ _REPR_TEMPLATE = \
 
 
 class OutgoingEdgePartition(ConstrainedObject):
-    """ A collection of edges which start at a single vertex which have the
+    """ A collection of edges which start at a single vertex which have the\
         same semantics and so can share a single key.
     """
 

@@ -24,8 +24,8 @@ class AbstractVertex(ConstrainedObject):
     # Because of diamond inheritance slots must be empty
     __slots__ = [
         # Indicates if the Vertex has been added to a graph
-        "_added_to_graph",
-        # Label for the vertex. Changable until added to graph
+        "__added_to_graph",
+        # Label for the vertex. Changeable until added to graph
         "_label"]
 
     def __init__(self, label=None, constraints=None):
@@ -39,7 +39,7 @@ class AbstractVertex(ConstrainedObject):
 
         super(AbstractVertex, self).__init__(constraints)
         self._label = label
-        self._added_to_graph = False
+        self.__added_to_graph = False
 
     @property
     def label(self):
@@ -59,15 +59,12 @@ class AbstractVertex(ConstrainedObject):
             If there is an attempt to change the label once the vertex has
             been added to a graph
         """
-        if self._added_to_graph:
+        if self.__added_to_graph:
             raise PacmanConfigurationException(
                 "As Labels are also IDs they can not be changed.")
         self._label = label
 
-    def addedToGraph(self):
-        """ Records that the vertex has been added to a graph
-
-        :raises PacmanConfigurationException:
-            If there is an attempt to add the same vertex more than once
+    def _added_to_graph(self):
+        """ Records that the vertex has been added to a graph.
         """
-        self._added_to_graph = True
+        self.__added_to_graph = True

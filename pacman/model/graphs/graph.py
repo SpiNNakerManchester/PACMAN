@@ -118,7 +118,7 @@ class Graph(ConstrainedObject):
             if self._vertex_by_label[vertex.label] == vertex:
                 raise PacmanAlreadyExistsException("vertex", vertex.label)
             vertex.set_label(vertex.label + self._label_postfix())
-        vertex.addedToGraph()
+        vertex._added_to_graph()
         self._vertices.append(vertex)
         self._vertex_by_label[vertex.label] = vertex
 
@@ -315,7 +315,7 @@ class Graph(ConstrainedObject):
 
     def get_edges_ending_at_vertex_with_partition_name(
             self, vertex, partition_name):
-        """ Get all the edges that end at the given vertex, and reside in the
+        """ Get all the edges that end at the given vertex, and reside in the\
             correct partition ID.
 
         :param AbstractVertex vertex: The vertex at which the edges to get end
@@ -338,7 +338,7 @@ class Graph(ConstrainedObject):
 
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
-        """ Get the given outgoing edge partition that starts at the
+        """ Get the given outgoing edge partition that starts at the\
             given vertex, or `None` if no such edge partition exists.
 
         :param AbstractVertex vertex:

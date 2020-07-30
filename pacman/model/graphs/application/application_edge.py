@@ -48,7 +48,7 @@ class ApplicationEdge(AbstractEdge):
             self, pre_vertex, post_vertex,
             traffic_type=EdgeTrafficType.MULTICAST, label=None,
             machine_edge_type=MachineEdge):
-        r"""
+        """
         :param ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.
         :param ApplicationVertex post_vertex:
@@ -57,10 +57,8 @@ class ApplicationEdge(AbstractEdge):
             The type of the traffic on the edge.
         :param label: The name of the edge.
         :type label: str or None
-        :param machine_edge_type:
-            The type of machine edges made from this app edge. If `None`,
-            standard `MachineEdge`\ s will be made.
-        :type machine_edge_type: type(MachineEdge)
+        :param type(MachineEdge) machine_edge_type:
+            The type of machine edges made from this application edge.
         """
         self._label = label
         self._pre_vertex = pre_vertex
@@ -81,9 +79,10 @@ class ApplicationEdge(AbstractEdge):
         """ Create a machine edge between two machine vertices that is a \
             machine-level embodiment of this application edge.
 
-        If you are thinking about overriding this, you probably ought to
-        override :py:meth:`~_create_machine_edge` instead; this is a wrapper
-        round that method that handles application-edge level bookkeeping.
+        .. note::
+            If you are thinking about overriding this, you probably ought to
+            override :py:meth:`_create_machine_edge` instead; this is a wrapper
+            round that method that handles application-edge level bookkeeping.
 
         :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
             The machine vertex at the start of the edge.
@@ -120,13 +119,21 @@ class ApplicationEdge(AbstractEdge):
             app_edge=self)
 
     @property
-    @overrides(AbstractEdge.pre_vertex)
+    @overrides(AbstractEdge.pre_vertex, extend_doc=False)
     def pre_vertex(self):
+        """ The vertex at the start of the edge.
+
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
         return self._pre_vertex
 
     @property
-    @overrides(AbstractEdge.post_vertex)
+    @overrides(AbstractEdge.post_vertex, extend_doc=False)
     def post_vertex(self):
+        """ The vertex at the end of the edge.
+
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
         return self._post_vertex
 
     @property
@@ -136,14 +143,15 @@ class ApplicationEdge(AbstractEdge):
 
     @property
     def machine_edges(self):
-        """ The machine
+        """ The machine edges that this application edge knows it is mapped to.
+
         :rtype: iterable(MachineEdge)
         """
         return self.__machine_edges
 
     def remember_associated_machine_edge(self, machine_edge):
-        """
-        Adds the Machine Edge to the iterable returned by machine_edges
+        """ Adds the machine edge to the iterable returned by \
+            :py:meth:`machine_edges`.
 
         :param MachineEdge machine_edge: A pointer to a machine_edge.
             This edge may not be fully initialized
@@ -151,7 +159,7 @@ class ApplicationEdge(AbstractEdge):
         self.__machine_edges.add(machine_edge)
 
     def forget_machine_edges(self):
-        """ Clear the collection of machine edges created by this application
+        """ Clear the collection of machine edges created by this application\
             edge.
         """
         self.__machine_edges = OrderedSet()

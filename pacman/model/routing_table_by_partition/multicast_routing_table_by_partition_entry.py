@@ -148,6 +148,8 @@ class MulticastRoutingTableByPartitionEntry(object):
     @property
     def defaultable(self):
         """ The defaultable status of the entry
+
+        :rtype: bool
         """
         if (self._incoming_link is None
                 or self._incoming_processor is not None

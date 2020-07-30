@@ -41,14 +41,18 @@ class RadialPlacementFromChipConstraint(AbstractPlacerConstraint):
 
     @property
     def x(self):
-        """
+        """ The chip x-coordinate in the SpiNNaker machine to which the \
+            machine vertex is placed.
+
         :rtype: int
         """
         return self._x
 
     @property
     def y(self):
-        """
+        """ The chip y-coordinate in the SpiNNaker machine to which the \
+            machine vertex is placed.
+
         :rtype: int
         """
         return self._y

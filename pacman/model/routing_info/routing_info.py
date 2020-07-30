@@ -38,7 +38,7 @@ class RoutingInfo(object):
         """
         :param partition_info_items: The partition information items to add
         :type partition_info_items: iterable(PartitionRoutingInfo) or None
-        :raise PacmanAlreadyExistsException: If there are \
+        :raise PacmanAlreadyExistsException: If there are
             two partition information objects with the same partition
         """
 
@@ -61,7 +61,6 @@ class RoutingInfo(object):
 
         :param PartitionRoutingInfo partition_info:
             The partition information item to add
-        :rtype: None
         :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
         """
@@ -101,9 +100,7 @@ class RoutingInfo(object):
         :return: the partition_routing_info for the partition, if any exists
         :rtype: PartitionRoutingInfo or None
         """
-        if partition in self._info_by_partition:
-            return self._info_by_partition[partition]
-        return None
+        return self._info_by_partition.get(partition, None)
 
     def get_routing_info_from_pre_vertex(self, vertex, partition_id):
         """ Get routing information for edges with a given partition_id from\
@@ -112,10 +109,9 @@ class RoutingInfo(object):
         :param AbstractVertex vertex: The prevertex to search for
         :param str partition_id:
             The ID of the partition for which to get the routing information
+        :rtype: PartitionRoutingInfo or None
         """
-        if (vertex, partition_id) in self._info_by_prevertex:
-            return self._info_by_prevertex[vertex, partition_id]
-        return None
+        return self._info_by_prevertex.get((vertex, partition_id), None)
 
     def get_first_key_from_pre_vertex(self, vertex, partition_id):
         """ Get the first key for the partition starting at a (pre)vertex
@@ -151,5 +147,6 @@ class RoutingInfo(object):
         """ Gets an iterator for the partition routing information
 
         :return: a iterator of partition routing information
+        :rtype: iterator(PartitionRoutingInfo)
         """
         return itervalues(self._info_by_partition)

@@ -30,11 +30,11 @@ class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
         :param iterable(Field) fields:
             any fields that define regions in the mask with further limitations
         :raise PacmanInvalidParameterException:
-            if any of the fields are outside of the mask i.e.,:
+            if any of the fields are outside of the mask i.e.,::
 
                 mask & field.value != field.value
 
-            or if any of the field masks overlap i.e.,:
+            or if any of the field masks overlap i.e.,::
 
                 field.value & other_field.value != 0
         """
@@ -47,8 +47,7 @@ class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
         """ Any fields in the mask, i.e., ranges of the mask that have\
             further limitations
 
-        :return: Iterable of fields, ordered by mask with the highest bit\
-            range first
+        :return: The fields, ordered by mask with the highest bit range first
         :rtype: list(Field)
         """
         return self._fields

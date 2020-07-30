@@ -18,12 +18,12 @@ from .abstract_virtual import AbstractVirtual
 
 
 class AbstractFPGA(AbstractVirtual):
-    """ An Object (most likely a vertex) connected to an FPGA.
+    """ An object (most likely a vertex) connected to an FPGA.
 
-        .. note::
-            It is expected that everything that is an instance of AbstractFPGA
-            is also an instance of :py:class:`AbstractVertex`.
-            This is not enforced to avoid diamond inheritance.
+    .. note::
+        It is expected that everything that is an instance of AbstractFPGA
+        is also an instance of :py:class:`AbstractVertex`.
+        This is not enforced to avoid diamond inheritance.
     """
 
     __slots__ = ()

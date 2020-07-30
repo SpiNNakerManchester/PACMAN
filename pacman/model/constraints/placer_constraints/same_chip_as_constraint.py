@@ -34,7 +34,7 @@ class SameChipAsConstraint(AbstractPlacerConstraint):
 
     @property
     def vertex(self):
-        """ The vertex to place on the same chip
+        """ The other vertex that we are constraining to cohabit a chip with.
 
         :rtype: AbstractVertex
         """

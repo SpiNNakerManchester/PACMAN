@@ -70,8 +70,7 @@ class MachineEdge(AbstractEdge):
         self.associate_application_edge()
 
     def associate_application_edge(self):
-        """
-        Asks the application edge (if any) to remember this machine edge.
+        """ Asks the application edge (if any) to remember this machine edge.
         """
         if self._app_edge:
             self._app_edge.remember_associated_machine_edge(self)
@@ -102,9 +101,6 @@ class MachineEdge(AbstractEdge):
     @property
     @overrides(AbstractEdge.traffic_type)
     def traffic_type(self):
-        """
-        :rtype: EdgeTrafficType
-        """
         return self._traffic_type
 
     @property
@@ -117,7 +113,7 @@ class MachineEdge(AbstractEdge):
 
     @property
     def traffic_weight(self):
-        """ The amount of traffic expected to go down this edge relative to
+        """ The amount of traffic expected to go down this edge relative to\
             other edges.
 
         :rtype: int

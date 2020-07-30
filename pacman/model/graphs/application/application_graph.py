@@ -42,7 +42,7 @@ class ApplicationGraph(Graph):
             e.forget_machine_edges()
 
     def forget_machine_edges(self):
-        """ Ensure that all application edges in this graph forget what
+        """ Ensure that all application edges in this graph forget what\
             machine edges they map to. The mapping of vertices is unaffected.
         """
         for e in self.edges:

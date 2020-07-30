@@ -20,6 +20,12 @@ class EdgeTrafficType(IntEnum):
     """ Indicates the traffic type of an Edge in a graph
     """
 
+    #: Traffic is via SpiNNaker multicast packets. General, but can only pass
+    #: a very small amount of information per message.
     MULTICAST = 1
+    #: Traffic is via SpiNNaker fixed route packets.
+    #: Vertices must usually be on the same board; number of destinations is
+    #: strictly constrained.
     FIXED_ROUTE = 2
+    #: Traffic is via a region of SDRAM. Vertices must be on same chip.
     SDRAM = 3

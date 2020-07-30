@@ -48,7 +48,8 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
 
     @property
     def x(self):
-        """ The x-coordinate of the chip
+        """ The chip x-coordinate in the SpiNNaker machine to which the \
+            machine vertex is placed.
 
         :rtype: int
         """
@@ -56,7 +57,8 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
 
     @property
     def y(self):
-        """ The y-coordinate of the chip
+        """ The chip y-coordinate in the SpiNNaker machine to which the \
+            machine vertex is placed.
 
         :rtype: int
         """
@@ -64,7 +66,9 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
 
     @property
     def p(self):
-        """ The processor on the chip, or None if that is not constrained
+        """ The processor ID on chip (:py:attr:`x`, :py:attr:`y`) that this\
+            vertex is placed on within the SpiNNaker machine, or `None` if\
+            that is not constrained.
 
         :rtype: int or None
         """
@@ -72,8 +76,8 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
 
     @property
     def location(self):
-        """ The location as a dictionary with three keys: "``x``", "``y``"
-            and "``p``"
+        """ The location as a dictionary with three keys: "``x``", "``y``"\
+            and "``p``".
 
         :rtype: dict(str, int)
         """

@@ -82,7 +82,7 @@ class Placements(object):
         self._machine_vertices[placement.vertex] = placement
 
     def get_vertex_on_processor(self, x, y, p):
-        """ Return the vertex on a specific processor or raises an exception
+        """ Return the vertex on a specific processor, or raises an exception\
             if the processor has not been allocated
 
         :param int x: the x coordinate of the chip
@@ -100,7 +100,7 @@ class Placements(object):
             raise_from(PacmanProcessorNotOccupiedError(placement_id), e)
 
     def get_placement_of_vertex(self, vertex):
-        """ Return the placement information for a vertex
+        """ Return the placement information for a vertex.
 
         :param MachineVertex vertex: The vertex to find the placement of
         :return: The placement
@@ -121,7 +121,7 @@ class Placements(object):
         return iterkeys(self._placements)
 
     def is_processor_occupied(self, x, y, p):
-        """ Determine if a processor has a vertex on it
+        """ Determine if a processor has a vertex on it.
 
         :param int x: x coordinate of processor.
         :param int y: y coordinate of processor.
@@ -132,7 +132,7 @@ class Placements(object):
 
     @property
     def placements(self):
-        """ All of the placements
+        """ All of the placements.
 
         :return: iterable of placements
         :rtype: iterable(Placement)
@@ -146,7 +146,7 @@ class Placements(object):
         return output
 
     def __iter__(self):
-        """ An iterator for the placements object within
+        """ An iterator for the placements object within.
         """
         return iter(self.placements)
 

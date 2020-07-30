@@ -48,11 +48,10 @@ class MulticastRoutingTables(object):
                 self.add_routing_table(routing_table)
 
     def add_routing_table(self, routing_table):
-        """ Add a routing table
+        """ Add a routing table.
 
         :param AbstractMulticastRoutingTable routing_table:
             a routing table to add
-        :rtype: None
         :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
@@ -86,7 +85,7 @@ class MulticastRoutingTables(object):
 
         :param int x: The x-coordinate of the chip
         :param int y: The y-coordinate of the chip
-        :return: The routing table, or None if no such table exists
+        :return: The routing table, or `None` if no such table exists
         :rtype: AbstractMulticastRoutingTable or None
         :raise None: No known exceptions are raised
         """

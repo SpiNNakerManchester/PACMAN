@@ -48,7 +48,7 @@ class ConstrainedObject(object):
         self.add_constraints(constraints)
 
     def add_constraint(self, constraint):
-        """ Add a new constraint to the collection of constraints
+        """ Add a new constraint to the collection of constraints.
 
         :param AbstractConstraint constraint: constraint to add
         :raise PacmanInvalidParameterException:
@@ -69,7 +69,7 @@ class ConstrainedObject(object):
             self._constraints.add(constraint)
 
     def add_constraints(self, constraints):
-        """ Add an iterable of constraints to the collection of constraints
+        """ Add an iterable of constraints to the collection of constraints.
 
         :param AbstractConstraint constraints: the constraints to add
         :raise PacmanInvalidParameterException:

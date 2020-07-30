@@ -18,13 +18,27 @@ from pacman.exceptions import PacmanValueError
 
 
 class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
+    # TODO: Convert to a standard class
+    # TODO: be careful as we need to support equality and hashing correctly
     """ Represents a slice of a vertex.
 
-    :attr int lo_atom: The lowest atom represented in the slice.
-    :attr int hi_atom: The highest atom represented in the slice.
-    :attr int n_atoms: The number of atoms represented by the slice.
-    :attr slice as_slice: This slice represented as a `slice` object (for
-        use in indexing lists, arrays, etc.)
+    .. py:attribute:: lo_atom
+
+        The lowest atom represented in the slice.
+
+        :type: :py:class:`int`
+
+    .. py:attribute:: hi_atom
+
+        The highest atom represented in the slice.
+
+        :type: :py:class:`int`
+
+    .. py:attribute:: n_atoms
+
+        The number of atoms represented by the slice.
+
+        :type: :py:class:`int`
     """
     def __new__(cls, lo_atom, hi_atom):
         """ Create a new Slice object.
@@ -48,5 +62,10 @@ class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
 
     @property
     def as_slice(self):
+        """ This slice represented as a `slice` object (for use in indexing\
+            lists, arrays, etc.)
+
+        :rtype: slice
+        """
         # Slice for accessing arrays of values
         return slice(self.lo_atom, self.hi_atom + 1)
