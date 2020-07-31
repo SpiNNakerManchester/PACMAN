@@ -114,7 +114,6 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
     :param str o_code:
     :param int start:
     :param ~io.FileIO f:
-    :rtype: None
     """
     if o_code is None:
         o_code = codify(o_route)
@@ -179,7 +178,6 @@ def generate_routing_compression_checker_report(
     :param MulticastRoutingTables routing_tables: the original routing tables
     :param MulticastRoutingTables compressed_routing_tables:
         the compressed routing tables
-    :rtype: None
     """
     file_name = os.path.join(
         report_folder, "routing_compression_checker_report.rpt")

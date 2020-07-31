@@ -34,7 +34,6 @@ class NetworkSpecification(object):
         """
         :param str report_folder: the directory to which reports are stored
         :param ApplicationGraph graph: the graph generated from the tools
-        :rtype: None
         """
         filename = os.path.join(report_folder, self._FILENAME)
         try:

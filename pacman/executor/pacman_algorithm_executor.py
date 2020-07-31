@@ -192,7 +192,7 @@ class PACMANAlgorithmExecutor(object):
     def __load_algorithm_definitions(
             self, algorithms, optional_algorithms, xml_paths, packages,
             use_unscanned_algorithms):
-        """ Translates the algorithm string and uses the config XML to create
+        """ Translates the algorithm string and uses the config XML to create\
             algorithm objects
 
         :param list(str) algorithms:
@@ -250,17 +250,16 @@ class PACMANAlgorithmExecutor(object):
 
     def _determine_algorithm_order(
             self, required_outputs, tokens, required_output_tokens):
-        """ Takes the algorithms and determines which order they need to be
+        """ Takes the algorithms and determines which order they need to be\
             executed to generate the correct data objects
 
         :param iterable(str) required_outputs:
             the set of outputs that this workflow is meant to generate
         :param iterable(str) tokens:
         :param iterable(str) required_output_tokens:
-        :rtype: None
         :raises PacmanConfigurationException:
+            If there is no possible order that generates the required outputs
         """
-
         # Go through the algorithms and get all possible outputs
         all_outputs = set(self._inputs)
         for algorithm in chain(
@@ -557,7 +556,6 @@ class PACMANAlgorithmExecutor(object):
         :param set(str) generated_outputs:
             the outputs list to update output from algorithm
         :param set(str) outputs_to_find:
-        :rtype: None
         """
         algorithm_list.remove(algorithm)
         for output in algorithm.outputs:
@@ -650,8 +648,6 @@ class PACMANAlgorithmExecutor(object):
 
     def execute_mapping(self):
         """ Executes the algorithms
-
-        :rtype: None
         """
         self._internal_type_mapping.update(self._inputs)
         if self._do_direct_injection:
@@ -726,6 +722,10 @@ class PACMANAlgorithmExecutor(object):
 
     @property
     def algorithm_timings(self):
+        """ The timing of algorithms.
+
+        :rtype: list(tuple(str, ~datetime.timedelta, str))
+        """
         return self._algorithm_timings
 
     def _update_timings(self, timer, algorithm):

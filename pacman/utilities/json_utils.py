@@ -39,7 +39,9 @@ def json_to_object(json_object):
     Makes sure this is a JSON object reading in a file if required
 
     :param json_object: Either a JSON Object or a string pointing to a file
-    :return: a JSON object
+    :type json_object: str or dict or list
+    :return: a JSON object or an array (list) of JSON objects
+    :rtype: dict or list
     """
     if isinstance(json_object, str):
         if json_object.endswith(".gz"):
@@ -60,15 +62,18 @@ _SIZE_CONSTRAINTS = (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)
 def constraint_to_json(constraint):
     """ Converts a constraint to JSON.
 
-    Note: Vertexes are represented by just their label.
+    .. note::
+        Vertexes are represented by just their label.
 
-    Note: If an unexpected constraint is received, the str() and repr() values
-    are saved
+    .. note::
+        If an unexpected constraint is received, the str() and repr() values
+        are saved
 
     If an Exception occurs, that is caught and added to the JSON object.
 
-    :param constraint: The constraint to describe
+    :param AbstractConstraint constraint: The constraint to describe
     :return: A dict describing the constraint
+    :rtype: dict
     """
     json_dict = OrderedDict()
     try:
@@ -110,6 +115,12 @@ def constraint_to_json(constraint):
 
 
 def constraint_from_json(json_dict, graph=None):
+    """
+    :param dict json_dict:
+    :param MachineGraph graph:
+    :rtype: AbstractConstraint
+    :raises NotImplementedError: If the class is not recognised
+    """
     if json_dict["class"] == "BoardConstraint":
         return BoardConstraint(json_dict["board_address"])
     if json_dict["class"] == "ChipAndCoreConstraint":
@@ -144,22 +155,29 @@ def constraint_from_json(json_dict, graph=None):
 
 
 def constraints_to_json(constraints):
-    json_list = []
-    for constraint in constraints:
-        json_list.append(constraint_to_json(constraint))
-    return json_list
+    """
+    :param list(AbstractConstraint) constraints:
+    :rtype: list(dict)
+    """
+    return [constraint_to_json(constraint) for constraint in constraints]
 
 
 def constraints_from_json(json_list, graph):
-    constraints = []
-    for sub in json_list:
-        constraints.append(constraint_from_json(sub, graph))
-    return constraints
+    """
+    :param list(dict) json_list:
+    :param MachineGraph graph:
+    :rtype: list(AbstractConstraint)
+    """
+    return [constraint_from_json(sub, graph) for sub in json_list]
 
 
 def key_mask_to_json(key_mask):
+    """
+    :param BaseKeyAndMask key_mask:
+    :rtype: dict
+    """
+    json_object = OrderedDict()
     try:
-        json_object = OrderedDict()
         json_object["key"] = key_mask.key
         json_object["mask"] = key_mask.mask
     except Exception as ex:  # pylint: disable=broad-except
@@ -168,24 +186,34 @@ def key_mask_to_json(key_mask):
 
 
 def key_mask_from_json(json_dict):
+    """
+    :param dict json_dict:
+    :rtype: BaseKeyAndMask
+    """
     return BaseKeyAndMask(json_dict["key"], json_dict["mask"])
 
 
 def key_masks_to_json(key_masks):
-    json_list = []
-    for key_mask in key_masks:
-        json_list.append(key_mask_to_json(key_mask))
-    return json_list
+    """
+    :param list(BaseKeyAndMask) key_masks:
+    :rtype: list(dict)
+    """
+    return [key_mask_to_json(key_mask) for key_mask in key_masks]
 
 
 def key_masks_from_json(json_list):
-    key_masks = []
-    for sub in json_list:
-        key_masks.append(key_mask_from_json(sub))
-    return key_masks
+    """
+    :param list(dict) json_list:
+    :rtype: list(BaseKeyAndMask)
+    """
+    return [key_mask_from_json(sub) for sub in json_list]
 
 
 def resource_container_to_json(container):
+    """
+    :param ResourceContainer container:
+    :rtype: dict
+    """
     json_dict = OrderedDict()
     try:
         json_dict["dtcm"] = container.dtcm.get_value()
@@ -201,6 +229,10 @@ def resource_container_to_json(container):
 
 
 def resource_container_from_json(json_dict):
+    """
+    :param dict json_dict:
+    :rtype: ResourceContainer or None
+    """
     if json_dict is None:
         return None
     dtcm = DTCMResource(json_dict["dtcm"])
@@ -213,6 +245,10 @@ def resource_container_from_json(json_dict):
 
 
 def iptag_resource_to_json(iptag):
+    """
+    :param IPtagResource iptag:
+    :rtype: dict
+    """
     json_dict = OrderedDict()
     try:
         json_dict["ip_address"] = iptag.ip_address
@@ -228,6 +264,10 @@ def iptag_resource_to_json(iptag):
 
 
 def iptag_resource_from_json(json_dict):
+    """
+    :param dict json_dict:
+    :rtype: IPtagResource
+    """
     port = json_dict.get("port")
     tag = json_dict.get("tag")
     return IPtagResource(
@@ -236,20 +276,26 @@ def iptag_resource_from_json(json_dict):
 
 
 def iptag_resources_to_json(iptags):
-    json_list = []
-    for iptag in iptags:
-        json_list.append(iptag_resource_to_json(iptag))
-    return json_list
+    """
+    :param list(IPtagResource) iptags:
+    :rtype: list(dict)
+    """
+    return [iptag_resource_to_json(iptag) for iptag in iptags]
 
 
 def iptag_resources_from_json(json_list):
-    iptags = []
-    for json_dict in json_list:
-        iptags.append(iptag_resource_from_json(json_dict))
-    return iptags
+    """
+    :param list(dict) json_list:
+    :rtype: list(IPtagResource)
+    """
+    return [iptag_resource_from_json(json_dict) for json_dict in json_list]
 
 
 def vertex_to_json(vertex):
+    """
+    :param MachineVertex vertex:
+    :rtype: dict
+    """
     json_dict = OrderedDict()
     try:
         json_dict["class"] = vertex.__class__.__name__
@@ -264,6 +310,11 @@ def vertex_to_json(vertex):
 
 
 def vertex_from_json(json_dict, convert_constraints=True):
+    """
+    :param dict json_dict:
+    :param bool convert_constraints:
+    :rtype: MachineVertex
+    """
     if convert_constraints:
         constraints = constraints_from_json(
             json_dict["constraints"], graph=None)
@@ -275,12 +326,20 @@ def vertex_from_json(json_dict, convert_constraints=True):
 
 
 def vertex_add_contstraints_from_json(json_dict, graph):
+    """
+    :param dict json_dict:
+    :param MachineGraph graph:
+    """
     vertex = vertex_lookup(json_dict["label"], graph)
     constraints = constraints_from_json(json_dict["constraints"], graph)
     vertex.add_constraints(constraints)
 
 
 def edge_to_json(edge):
+    """
+    :param MachineEdge edge:
+    :rtype: dict
+    """
     json_dict = OrderedDict()
     try:
         json_dict["pre_vertex"] = edge.pre_vertex.label
@@ -295,6 +354,11 @@ def edge_to_json(edge):
 
 
 def edge_from_json(json_dict, graph=None):
+    """
+    :param dict json_dict:
+    :param MachineGraph graph:
+    :rtype: MachineEdge
+    """
     label = json_dict.get("label")
     return MachineEdge(
         vertex_lookup(json_dict["pre_vertex"], graph),
@@ -303,24 +367,27 @@ def edge_from_json(json_dict, graph=None):
 
 
 def graph_to_json(graph):
+    """
+    :param MachineGraph graph:
+    :rtype: dict
+    """
     json_dict = OrderedDict()
     try:
         if graph.label is not None:
             json_dict["label"] = graph.label
-        json_list = []
-        for vertex in graph.vertices:
-            json_list.append(vertex_to_json(vertex))
-        json_dict["vertices"] = json_list
-        json_list = []
-        for edge in graph.edges:
-            json_list.append(edge_to_json(edge))
-        json_dict["edges"] = json_list
+        json_dict["vertices"] = [
+            vertex_to_json(vertex) for vertex in graph.vertices]
+        json_dict["edges"] = [edge_to_json(edge) for edge in graph.edges]
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
 
 
 def graph_from_json(json_dict):
+    """
+    :param dict json_dict:
+    :rtype: MachineGraph
+    """
     json_dict = json_to_object(json_dict)
     graph = MachineGraph(json_dict.get("label"))
     for j_vertex in json_dict["vertices"]:
@@ -335,12 +402,21 @@ def graph_from_json(json_dict):
 
 
 def vertex_lookup(label, graph=None):
+    """
+    :param str label:
+    :param MachineGraph graph:
+    :rtype: MachineVertex
+    """
     if graph:
         return graph.vertex_by_label(label)
     return SimpleMachineVertex(None, label)
 
 
 def placement_to_json(placement):
+    """
+    :param Placement placement:
+    :rtype: dict
+    """
     json_dict = OrderedDict()
     try:
         json_dict["vertex_label"] = placement.vertex.label
@@ -353,27 +429,41 @@ def placement_to_json(placement):
 
 
 def placements_to_json(placements):
-    json_list = []
-    for placement in placements:
-        json_list.append(placement_to_json(placement))
-    return json_list
+    """
+    :param Placements placements:
+    :rtype: list(dict)
+    """
+    return [placement_to_json(placement) for placement in placements]
 
 
 def placement_from_json(json_dict, graph=None):
+    """
+    :param dict json_dict:
+    :param MachineGraph graph:
+    :rtype: Placement
+    """
     vertex = vertex_lookup(json_dict["vertex_label"], graph)
     return Placement(
         vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
 
 
 def placements_from_json(json_list, graph=None):
+    """
+    :param dict json_list:
+    :param MachineGraph graph:
+    :rtype: Placements
+    """
     json_list = json_to_object(json_list)
-    placements = Placements()
-    for json_placement in json_list:
-        placements.add_placement(placement_from_json(json_placement))
-    return placements
+    return Placements(
+        placement_from_json(json_placement, graph)
+        for json_placement in json_list)
 
 
 def partition_to_n_keys_map_to_json(partition_to_n_keys_map):
+    """
+    :param AbstractMachinePartitionNKeysMap partition_to_n_keys_map:
+    :rtype: list(dict)
+    """
     json_list = []
     for partition in partition_to_n_keys_map:
         json_dict = OrderedDict()

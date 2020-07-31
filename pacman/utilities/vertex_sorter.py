@@ -88,7 +88,7 @@ class VertexSorter(object):
 
     def __init__(self, constraint_order):
         """
-        :param list(~.ConstraintOrder) constraint_order:
+        :param list(~pacman.utilities.ConstraintOrder) constraint_order:
             The order in which the constraints are to be sorted
         """
         # Group constraints based on the class

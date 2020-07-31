@@ -429,7 +429,6 @@ class ResourceTracker(object):
         :param chips: iterable of tuples of (x, y) coordinates of chips to \
             look though for usable chips, or None to use all available chips
         :type chips: iterable(tuple(int, int))
-        :rtype: None
         :raises PacmanCanNotFindChipException:
         """
         for chip in chips:
@@ -865,7 +864,6 @@ class ResourceTracker(object):
 
         :param str board_address:
             the board address to find the Ethernet chip of
-        :rtype: None
         """
         if board_address not in self._tags_by_board:
             e_chip_x, e_chip_y = self._ethernet_chips[board_address]
@@ -991,7 +989,6 @@ class ResourceTracker(object):
         :param int tag: the tag ID
         :param port: the port number
         :type port: int or None
-        :rtype: None
         """
         if port is not None:
             self._reverse_ip_tag_listen_port.add((board_address, port))
@@ -1405,7 +1402,6 @@ class ResourceTracker(object):
         :type ip_tags: iterable(tuple(str, int)) or None
         :param reverse_ip_tags: the details of the reverse IP tags allocated
         :type reverse_ip_tags: iterable(tuple(str, int)) or None
-        :rtype: None
         """
 
         self._chips_available.add((chip_x, chip_y))

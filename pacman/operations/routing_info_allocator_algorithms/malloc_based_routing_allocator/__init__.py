@@ -18,6 +18,8 @@ from .compressible_malloc_based_routing_info_allocator import (
 from .key_field_generator import KeyFieldGenerator
 from .malloc_based_routing_info_allocator import (
     MallocBasedRoutingInfoAllocator)
+from .utils import get_possible_masks, zero_out_bits
 
-__all__ = ["CompressibleMallocBasedRoutingInfoAllocator",
-           "KeyFieldGenerator", "MallocBasedRoutingInfoAllocator"]
+__all__ = ("CompressibleMallocBasedRoutingInfoAllocator", "get_possible_masks",
+           "KeyFieldGenerator", "MallocBasedRoutingInfoAllocator",
+           "zero_out_bits")

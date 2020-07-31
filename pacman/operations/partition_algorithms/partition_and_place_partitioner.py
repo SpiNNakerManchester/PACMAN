@@ -127,7 +127,6 @@ class PartitionAndPlacePartitioner(object):
         :param vertex_groups:
             Groups together vertices that are supposed to be the same size
         :type vertex_groups: dict(ApplicationVertex, list(ApplicationVertex))
-        :rtype: None
         :raise PacmanPartitionException:
             if the extra vertex for partitioning identically has a different
             number of atoms than its counterpart.

@@ -253,7 +253,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             the fixed keys and masks combos
         :param fixed_mask: fixed mask
         :type fixed_mask: int or None
-        :rtype: None
         :raises PacmanRouteInfoAllocationException:
         """
         # If there are fixed keys and masks, allocate them

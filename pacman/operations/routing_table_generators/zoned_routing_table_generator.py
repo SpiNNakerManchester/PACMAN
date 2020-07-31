@@ -21,24 +21,34 @@ from pacman.model.routing_tables import (
 
 
 class SharedEntry(object):
-    slots = [
-
-        #: the edges this path entry goes down
-        "link_ids",
-
-        #: the processors this path entry goes to
-        "processor_ids",
-
-        #: whether this entry is defaultable
-        "defaultable"
-        ]
+    __slots__ = ( "link_ids", "processor_ids", "defaultable" )
 
     def __init__(self, entry):
+        """
+        :param MulticastRoutingTableByPartitionEntry entry:
+        """
         self.link_ids = entry.link_ids
+        """ The edges this path entry goes down.
+
+        :rtype: set(int)
+        """
         self.processor_ids = entry.processor_ids
+        """ The processors this path entry goes to.
+
+        :rtype: set(int)
+        """
         self.defaultable = entry.defaultable
+        """ Whether this entry is defaultable.
+
+        :rtype: bool
+        """
 
     def still_defaultable(self, entry):
+        """ Updates the :py:attr:`defaultable` property with whether the given\
+            entry is also defaultable.
+
+        :param MulticastRoutingTableByPartitionEntry entry:
+        """
         self.defaultable = self.defaultable & entry.defaultable
 
 

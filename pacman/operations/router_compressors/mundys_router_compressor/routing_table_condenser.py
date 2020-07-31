@@ -30,7 +30,7 @@ class MundyRouterCompressor(AbstractCompressor):
     def compress_table(self, router_table):
         """
         :param AbstractMulticastRoutingTable router_table:
-        :rtype: list(RoutingTableEntry)
+        :rtype: list(~pacman.operations.router_compressors.Entry)
         """
         # convert to rig inspired format
         entries = list()

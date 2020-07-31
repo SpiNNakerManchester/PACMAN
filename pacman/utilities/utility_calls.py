@@ -27,7 +27,7 @@ def locate_constraints_of_type(constraints, constraint_type):
         The type of constraints to return
     :return: The constraints of constraint_type that are found in the
         constraints given
-    :rtype: iterable(AbstractConstraint`)
+    :rtype: iterable(AbstractConstraint)
     :raises None: no known exceptions
     """
     return [c for c in constraints if isinstance(c, constraint_type)]
@@ -66,7 +66,7 @@ def _is_constraint_supported(constraint, supported_constraints):
 
 def check_algorithm_can_support_constraints(
         constrained_vertices, supported_constraints, abstract_constraint_type):
-    """ Helper method to find out if an algorithm can support all the
+    """ Helper method to find out if an algorithm can support all the \
         constraints given the objects its expected to work on
 
     :param list(AbstractVertex) constrained_vertices:
@@ -76,8 +76,6 @@ def check_algorithm_can_support_constraints(
         The constraints supported
     :param type(AbstractConstraint) abstract_constraint_type:
         The overall abstract c type supported
-    :return: Nothing is returned
-    :rtype: None
     :raise PacmanInvalidParameterException:
         When the algorithm cannot support the constraints demanded of it
     """
@@ -106,7 +104,7 @@ def check_constrained_value(value, current_value):
 
 
 def expand_to_bit_array(value):
-    """ Expand a 32-bit value in to an array of length 32 of uint8 values,
+    """ Expand a 32-bit value in to an array of length 32 of uint8 values, \
         each of which is a 1 or 0
 
     :param int value: The value to expand
@@ -117,7 +115,7 @@ def expand_to_bit_array(value):
 
 
 def compress_from_bit_array(bit_array):
-    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0,
+    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0, \
         into a 32-bit value
 
     :param ~numpy.ndarray(uint8) bit_array: The array to compress

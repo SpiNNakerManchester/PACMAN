@@ -21,7 +21,7 @@ from pacman.exceptions import (
 
 
 class FixedRouteRouter(object):
-    """ Computes the fixed routes used to direct data out traffic to the
+    """ Computes the fixed routes used to direct data out traffic to the\
         board-local gatherer processors.
 
     :param ~spinn_machine.Machine machine: SpiNNMachine object

@@ -67,7 +67,7 @@ class AbstractCompressor(object):
         the same keys).
 
         For example, the key-mask pairs ``00XX`` and ``001X`` both match the
-        keys``0010`` and ``0011`` (i.e., they do intersect)::
+        keys ``0010`` and ``0011`` (i.e., they do intersect)::
 
             >>> intersect(0b0000, 0b1100, 0b0010, 0b1110)
             True

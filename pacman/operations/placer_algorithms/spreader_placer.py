@@ -32,8 +32,8 @@ import sys
 
 
 class SpreaderPlacer(OneToOnePlacer):
-    """ places vertices on as many chips as available with a effort to
-    reduce the number of packets being received by the router in total.
+    """ Places vertices on as many chips as available with a effort to\
+        reduce the number of packets being received by the router in total.
 
     :param MachineGraph machine_graph: the machine graph
     :param ~spinn_machine.Machine machine: the SpiNNaker machine
@@ -132,8 +132,8 @@ class SpreaderPlacer(OneToOnePlacer):
 
     def _sort_left_over_verts_based_on_incoming_packets(
             self, machine_graph, placed_vertices, n_keys_map):
-        """ sort left overs verts so that the ones with the most costly verts
-        are at the front of the list
+        """ sort left overs verts so that the ones with the most costly verts\
+            are at the front of the list
 
         :param MachineGraph machine_graph: machine graph
         :param set(MachineVertex) placed_vertices: the verts already placed
@@ -240,7 +240,6 @@ class SpreaderPlacer(OneToOnePlacer):
         :type cost_per_chip: dict(tuple(int, int), int)
         :param MachineGraph machine_graph:
         :param AbstractMachinePartitionNKeysMap n_keys_map:
-        :rtype: None
         """
         for vertex in same_chip_vertex_groups.keys():
             if len(same_chip_vertex_groups[vertex]) != 1:
@@ -279,8 +278,8 @@ class SpreaderPlacer(OneToOnePlacer):
             self, one_to_one_groups, chips_in_order, placements, progress_bar,
             resource_tracker, placed_vertices, cost_per_chip, machine_graph,
             n_keys_map, machine):
-        """ place 1 to 1 groups on the same chip if possible. else radially
-        from it
+        """ place 1 to 1 groups on the same chip if possible. else radially\
+            from it
 
         :param one_to_one_groups: the 1 to 1 groups
         :type one_to_one_groups: iterable(iterable(MachineVertex))
@@ -297,9 +296,7 @@ class SpreaderPlacer(OneToOnePlacer):
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             map between outgoing partition and n keys down it
         :param ~spinn_machine.Machine machine: the SpiNNMachine instance.
-        :rtype: None
         """
-
         # go through each 1 to 1 group separately
         for group in one_to_one_groups:
 
@@ -379,9 +376,7 @@ class SpreaderPlacer(OneToOnePlacer):
         :type cost_per_chip: dict(tuple(int, int), int)
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             map between outgoing partition and n keys down it.
-        :rtype: None
         """
-
         # locate whatever verts are left
         sorted_verts = self._sort_left_over_verts_based_on_incoming_packets(
             machine_graph, placed_vertices, n_keys_map)
