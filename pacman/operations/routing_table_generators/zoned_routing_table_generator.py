@@ -21,7 +21,7 @@ from pacman.model.routing_tables import (
 
 
 class SharedEntry(object):
-    __slots__ = ( "link_ids", "processor_ids", "defaultable" )
+    __slots__ = ("link_ids", "processor_ids", "defaultable")
 
     def __init__(self, entry):
         """
