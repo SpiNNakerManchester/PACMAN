@@ -56,8 +56,10 @@ extensions = [
 root_package = "pacman"
 
 intersphinx_mapping = {
-    'spinn_utilities': ('https://spinnutils.readthedocs.org/en/latest/', None),
-    'spinn_machine': ('https://spinnmachine.readthedocs.org/en/latest/', None)}
+    'python': ('https://docs.python.org/3.6', None),
+    'numpy': ("https://docs.scipy.org/doc/numpy/", None),
+    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
+    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
