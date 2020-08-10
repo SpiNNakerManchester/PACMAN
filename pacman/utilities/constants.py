@@ -31,7 +31,7 @@ EDGES = Enum(
            ("SOUTH", 5)])
 
 #: How many bytes there are in a word
-BYTES_PER_WORDS = 4
+BYTES_PER_WORD = 4
 
 #: The number of bytes used by SARK per memory allocation
-SARK_PER_MALLOC_SDRAM_USAGE = 2 * BYTES_PER_WORDS
+SARK_PER_MALLOC_SDRAM_USAGE = 2 * BYTES_PER_WORD

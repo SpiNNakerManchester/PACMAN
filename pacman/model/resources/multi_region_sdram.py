@@ -43,6 +43,10 @@ class MultiRegionSDRAM(VariableSDRAM):
 
     @property
     def regions(self):
+        """ The regions of SDRAM, and how much space is allocated for each.
+
+        :rtype: dict(int or str or enum, AbstractSDRAM)
+        """
         return self.__regions
 
     def add_cost(self, region, fixed_sdram, per_timestep_sdram=0):
@@ -93,7 +97,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         """ Check that the two types being merge are possible.
 
         Currently only multi-region SDRAM of the same type (or sub-type) of
-        MultiRegionSDRAM can be merged.
+        :py:class:`MultiRegionSDRAM` can be merged.
 
         :param MultiRegionSDRAM other: Another SDRAM of the same type
         :raises PacmanInvalidParameterException:

@@ -82,6 +82,7 @@ class IPtagResource(object):
     def traffic_identifier(self):
         """ The traffic identifier for this IP tag
 
+        :rtype: str
         """
         return self._traffic_identifier
 
