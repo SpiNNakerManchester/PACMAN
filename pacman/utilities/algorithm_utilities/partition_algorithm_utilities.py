@@ -62,17 +62,14 @@ def generate_machine_edges(machine_graph, application_graph):
 
     # start progress bar
     progress = ProgressBar(
-        machine_graph.n_vertices, "Partitioning graph edges")
+        application_graph.n_outgoing_edge_partitions,
+        "Partitioning graph edges")
 
-    # Partition edges according to vertex partitioning
-    for source_vertex in progress.over(machine_graph.vertices):
-
-        # For each out edge of the parent vertex...
-        vertex = source_vertex.app_vertex
-        application_outgoing_partitions = application_graph.\
-            get_outgoing_edge_partitions_starting_at_vertex(vertex)
-        for application_partition in application_outgoing_partitions:
-            for edge in application_partition.edges:
+    for application_partition in progress.over(
+            application_graph.outgoing_edge_partitions):
+        vertex = application_partition.pre_vertex
+        for edge in application_partition.edges:
+            for source_vertex in vertex.machine_vertices:
                 # create new partitions
                 for dest_vertex in edge.post_vertex.machine_vertices:
                     machine_edge = edge.create_machine_edge(
