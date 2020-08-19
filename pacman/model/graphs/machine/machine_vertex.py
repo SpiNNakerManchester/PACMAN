@@ -89,6 +89,17 @@ class MachineVertex(AbstractVertex):
         return self._vertex_slice
 
     @property
+    def get_n_keys_for_partition(self, partition):
+        """ Get the number of keys required by the given partition of edges.
+
+        :param ~pacman.model.graphs.OutgoingEdgePartition partition:
+            An partition that comes out of this vertex
+        :return: The number of keys required
+        :rtype: int
+        """
+        return self._vertex_slice.n_atoms
+
+    @property
     def index(self):
         """ The index into the collection of machine vertices for an
             application vertex.
