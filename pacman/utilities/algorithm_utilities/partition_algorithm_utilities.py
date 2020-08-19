@@ -29,6 +29,7 @@ except ImportError:
     from collections import OrderedDict
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.utilities import utility_calls as utils
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
@@ -83,19 +84,24 @@ def _process_edge(
     # build and update objects
     for dest_vertex in dest_vertices:
         for source_vertex in source_vertices:
-            # create new partitions
-            machine_edge = app_edge.create_machine_edge(
-                source_vertex, dest_vertex,
-                "machine_edge_for{}".format(app_edge.label))
-            machine_graph.add_edge(
-                machine_edge, application_partition.identifier)
+            # Check if edge should exist
+            if (not isinstance(app_edge, AbstractSlicesConnect) or
+                    app_edge.could_connect(
+                        source_vertex.vertex_slice,
+                        dest_vertex.vertex_slice)):
+                # create new partitions
+                machine_edge = app_edge.create_machine_edge(
+                    source_vertex, dest_vertex,
+                    "machine_edge_for{}".format(app_edge.label))
+                machine_graph.add_edge(
+                    machine_edge, application_partition.identifier)
 
-            # add constraints from the application partition
-            machine_partition = machine_graph.\
-                get_outgoing_edge_partition_starting_at_vertex(
-                    source_vertex, application_partition.identifier)
-            machine_partition.add_constraints(
-                application_partition.constraints)
+                # add constraints from the application partition
+                machine_partition = machine_graph.\
+                    get_outgoing_edge_partition_starting_at_vertex(
+                        source_vertex, application_partition.identifier)
+                machine_partition.add_constraints(
+                    application_partition.constraints)
 
 
 def generate_machine_edges(machine_graph, application_graph):

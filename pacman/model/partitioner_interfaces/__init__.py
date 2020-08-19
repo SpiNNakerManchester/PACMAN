@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The University of Manchester
+# Copyright (c) 2017-2020 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@ from .abstract_controls_destination_of_edges import (
 from .abstract_controls_source_of_edges import AbstractControlsSourceOfEdges
 from .splitter_by_atoms import SplitterByAtoms
 from .hand_over_to_vertex import HandOverToVertex
+from .abstract_slices_connect import AbstractSlicesConnect
 
 __all__ = ["AbstractControlsDestinationOfEdges", "HandOverToVertex",
-           "AbstractControlsSourceOfEdges", "SplitterByAtoms"]
+           "AbstractControlsSourceOfEdges", "SplitterByAtoms",
+           "AbstractSlicesConnect"]
