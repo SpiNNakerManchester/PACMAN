@@ -40,6 +40,6 @@ class AbstractSlicesConnect(object):
 
         :param ~pacman.model.graphs.common.Slice pre_slice:
         :param ~pacman.model.graphs.common.Slice post_slice:
-        :return: True if a connection coulb be possible
+        :return: True if a connection could be possible
         :rtype: bool
         """
