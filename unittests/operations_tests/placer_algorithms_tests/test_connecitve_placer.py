@@ -64,7 +64,6 @@ class TestConnectivePlacer(unittest.TestCase):
         self.edges.append(edge4)
         self.mach_graph.add_edge(edge1, "bacon")
 
-
         self.plan_n_timesteps = 100
 
     def test_simple(self):
