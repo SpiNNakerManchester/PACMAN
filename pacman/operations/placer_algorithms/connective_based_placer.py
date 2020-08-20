@@ -31,26 +31,26 @@ class ConnectiveBasedPlacer(RadialPlacer):
     """ A radial algorithm that can place a machine graph onto a\
         machine using a circle out behaviour from a Ethernet at a given point\
         and which will place things that are most connected closest to each\
-        other	
+        other
     """
 
     __slots__ = []
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
-        """	
-        :param machine_graph: The machine_graph to place	
+        """
+        :param machine_graph: The machine_graph to place
         :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`	
+            :py:class:`pacman.model.graphs.machine.MachineGraph`
         :param machine:\
             The machine with respect to which to partition the application\
-            graph	
-        :type machine: :py:class:`spinn_machine.Machine`	
-        :param plan_n_timesteps: number of timesteps to plan for	
-        :type  plan_n_timesteps: int	
-        :return: A set of placements	
-        :rtype: :py:class:`pacman.model.placements.Placements`	
+            graph
+        :type machine: :py:class:`spinn_machine.Machine`
+        :param plan_n_timesteps: number of timesteps to plan for
+        :type  plan_n_timesteps: int
+        :return: A set of placements
+        :rtype: :py:class:`pacman.model.placements.Placements`
         :raise pacman.exceptions.PacmanPlaceException: \
-            If something goes wrong with the placement	
+            If something goes wrong with the placement
         """
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
@@ -130,10 +130,10 @@ class ConnectiveBasedPlacer(RadialPlacer):
         max_weight = 0
         for vertex in vertices:
             in_weight = sum(
-                edge.weight
+                edge.pre_vertex.n_atoms
                 for edge in graph.get_edges_starting_at_vertex(vertex))
             out_weight = sum(
-                edge.weight
+                edge.pre_vertex.n_atoms
                 for edge in graph.get_edges_ending_at_vertex(vertex))
             weight = in_weight + out_weight
 
