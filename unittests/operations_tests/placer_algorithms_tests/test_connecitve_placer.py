@@ -77,7 +77,8 @@ class TestConnectivePlacer(unittest.TestCase):
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
         self.vertex3.add_constraint(RadialPlacementFromChipConstraint(2, 4))
-        placements = ConnectiveBasedPlacer()(self.mach_graph, self.machine, 100)
+        placements = ConnectiveBasedPlacer()(
+            self.mach_graph, self.machine, 100)
         for placement in placements.placements:
             if placement.vertex == self.vertex2:
                 self.assertEqual(placement.x, 3)
