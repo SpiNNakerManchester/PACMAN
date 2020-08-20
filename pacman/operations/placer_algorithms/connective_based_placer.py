@@ -28,9 +28,9 @@ logger = logging.getLogger(__name__)
 
 
 class ConnectiveBasedPlacer(RadialPlacer):
-    """ A radial algorithm that can place a machine graph onto a\	
-        machine using a circle out behaviour from a Ethernet at a given point\	
-        and which will place things that are most connected closest to each\	
+    """ A radial algorithm that can place a machine graph onto a\
+        machine using a circle out behaviour from a Ethernet at a given point\
+        and which will place things that are most connected closest to each\
         other	
     """
 
@@ -39,17 +39,17 @@ class ConnectiveBasedPlacer(RadialPlacer):
     def __call__(self, machine_graph, machine, plan_n_timesteps):
         """	
         :param machine_graph: The machine_graph to place	
-        :type machine_graph:\	
+        :type machine_graph:\
             :py:class:`pacman.model.graphs.machine.MachineGraph`	
-        :param machine:\	
-            The machine with respect to which to partition the application\	
+        :param machine:\
+            The machine with respect to which to partition the application\
             graph	
         :type machine: :py:class:`spinn_machine.Machine`	
         :param plan_n_timesteps: number of timesteps to plan for	
         :type  plan_n_timesteps: int	
         :return: A set of placements	
         :rtype: :py:class:`pacman.model.placements.Placements`	
-        :raise pacman.exceptions.PacmanPlaceException: \	
+        :raise pacman.exceptions.PacmanPlaceException: \
             If something goes wrong with the placement	
         """
         # check that the algorithm can handle the constraints
@@ -124,7 +124,8 @@ class ConnectiveBasedPlacer(RadialPlacer):
                 if edge.post_vertex in unplaced_vertices:
                     to_do.add(edge.post_vertex)
 
-    def _find_max_connected_vertex(self, vertices, graph):
+    @staticmethod
+    def _find_max_connected_vertex(vertices, graph):
         max_connected_vertex = None
         max_weight = 0
         for vertex in vertices:
