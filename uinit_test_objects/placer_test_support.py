@@ -68,3 +68,4 @@ class MachineVertex(SimpleMachineVertex):
         self.lo_atom = lo_atom
         self.hi_atom = hi_atom
         self._model_based_max_atoms_per_core = 256
+        self.n_atoms = hi_atom - lo_atom

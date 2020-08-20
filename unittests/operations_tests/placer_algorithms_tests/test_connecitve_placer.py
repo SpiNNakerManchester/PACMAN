@@ -16,7 +16,7 @@
 from __future__ import print_function
 import unittest
 from spinn_machine import virtual_machine
-from pacman.model.graphs.machine import MachineGraph
+from pacman.model.graphs.machine import MachineGraph, MachineEdge
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from pacman.exceptions import PacmanValueError
@@ -51,6 +51,19 @@ class TestConnectivePlacer(unittest.TestCase):
         self.vertices.append(self.vertex4)
         self.mach_graph.add_vertex(self.vertex4)
         self.edges = list()
+        edge1 = MachineEdge(self.vertex2, self.vertex3)
+        self.edges.append(edge1)
+        self.mach_graph.add_edge(edge1, "packet")
+        edge2 = MachineEdge(self.vertex2, self.vertex4)
+        self.edges.append(edge2)
+        self.mach_graph.add_edge(edge2, "packet")
+        edge3 = MachineEdge(self.vertex3, self.vertex4)
+        self.edges.append(edge3)
+        self.mach_graph.add_edge(edge3, "packet")
+        edge4 = MachineEdge(self.vertex3, self.vertex1)
+        self.edges.append(edge4)
+        self.mach_graph.add_edge(edge1, "bacon")
+
 
         self.plan_n_timesteps = 100
 
