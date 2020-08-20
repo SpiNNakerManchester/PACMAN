@@ -130,10 +130,10 @@ class ConnectiveBasedPlacer(RadialPlacer):
         max_weight = 0
         for vertex in vertices:
             in_weight = sum(
-                edge.pre_vertex.n_atoms
+                edge.pre_vertex.vertex_slice.n_atoms
                 for edge in graph.get_edges_starting_at_vertex(vertex))
             out_weight = sum(
-                edge.pre_vertex.n_atoms
+                edge.pre_vertex.vertex_slice.n_atoms
                 for edge in graph.get_edges_ending_at_vertex(vertex))
             weight = in_weight + out_weight
 
