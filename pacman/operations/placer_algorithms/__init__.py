@@ -16,5 +16,7 @@
 from .radial_placer import RadialPlacer
 from .one_to_one_placer import OneToOnePlacer
 from .spreader_placer import SpreaderPlacer
+from .connective_based_placer import ConnectiveBasedPlacer
 
-__all__ = ['RadialPlacer', 'OneToOnePlacer', "SpreaderPlacer"]
+__all__ = ['RadialPlacer', 'OneToOnePlacer', "SpreaderPlacer",
+           'ConnectiveBasedPlacer']
