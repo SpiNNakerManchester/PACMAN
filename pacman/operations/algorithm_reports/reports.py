@@ -275,7 +275,8 @@ def partitioner_report(report_folder, hostname, graph):
 
     :param str report_folder: the folder to which the reports are being written
     :param str hostname: the machine's hostname to which the placer worked on
-    :param ApplicationGraph graph:
+    :param ApplicationGraph graph: the app graph
+
     """
 
     # Cycle through all vertices, and for each cycle through its vertices.
@@ -287,7 +288,7 @@ def partitioner_report(report_folder, hostname, graph):
             progress = ProgressBar(graph.n_vertices,
                                    "Generating partitioner report")
 
-            f.write("        Placement Information by Vertex\n")
+            f.write("        Partitioning Information by Vertex\n")
             f.write("        ===============================\n\n")
             f.write("Generated: {} for target machine '{}'\n\n".format(
                 time_date_string, hostname))

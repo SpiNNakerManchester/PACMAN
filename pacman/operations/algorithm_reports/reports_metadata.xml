@@ -358,6 +358,7 @@
             <param_name>report_folder</param_name>
             <param_name>hostname</param_name>
             <param_name>graph</param_name>
+            <token>PartitioningDone</token>
         </required_inputs>
     </algorithm>
     <algorithm name="TagReport">

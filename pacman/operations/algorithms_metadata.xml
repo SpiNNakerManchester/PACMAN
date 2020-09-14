@@ -73,6 +73,7 @@
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
             <param_type>NChipsRequired</param_type>
+            <token>PartitioningDone</token>
         </outputs>
     </algorithm>
     <algorithm name="PartitionAndPlacePartitioner">
@@ -109,6 +110,7 @@
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
             <param_type>NChipsRequired</param_type>
+            <token>PartitioningDone</token>
         </outputs>
     </algorithm>
     <algorithm name="RadialPlacer">
