@@ -24,13 +24,13 @@ class SplitterObjectPartitioner(object):
     """ partitioner which hands the partitioning work to app vertices
     splitter objects.
 
-    :param ApplicationGraph graph: The application_graph to partition
+    :param ApplicationGraph app_graph: The application_graph to partition
     :param ~spinn_machine.Machine machine:
         The machine with respect to which to partition the application
         graph
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :param preallocated_resources:
-    :type preallocated_resources: PreAllocatedResourceContainer or None
+    :param int plan_n_time_steps: number of time steps to plan for
+    :param pre_allocated_resources:
+    :type pre_allocated_resources: PreAllocatedResourceContainer or None
     :return:
         A machine_graph of partitioned vertices and partitioned edges,
         and the number of chips needed to satisfy this partitioning.
@@ -52,14 +52,14 @@ class SplitterObjectPartitioner(object):
 
     # inherited from AbstractPartitionAlgorithm
     def __call__(
-            self, app_graph, machine, plan_n_timesteps,
-            preallocated_resources=None):
+            self, app_graph, machine, plan_n_time_steps,
+            pre_allocated_resources=None):
         """
         :param ApplicationGraph app_graph:
         :param ~spinn_machine.Machine machine:
-        :param int plan_n_timesteps:
-        :param preallocated_resources:
-        :type preallocated_resources: PreAllocatedResourceContainer or None
+        :param int plan_n_time_steps:
+        :param pre_allocated_resources:
+        :type pre_allocated_resources: PreAllocatedResourceContainer or None
         :rtype: tuple(MachineGraph, int)
         :raise PacmanPartitionException:
         """
@@ -70,7 +70,7 @@ class SplitterObjectPartitioner(object):
         # get the setup objects
         (machine_graph, resource_tracker, vertices, progress) = (
             self.__setup_objects(
-                app_graph, machine, plan_n_timesteps, preallocated_resources))
+                app_graph, machine, plan_n_time_steps, pre_allocated_resources))
 
         # Partition one vertex at a time
         for vertex in progress.over(vertices):
@@ -83,14 +83,14 @@ class SplitterObjectPartitioner(object):
         return machine_graph, resource_tracker.chips_used
 
     def __setup_objects(
-            self, app_graph, machine, plan_n_timesteps,
-            preallocated_resources):
+            self, app_graph, machine, plan_n_time_steps,
+            pre_allocated_resources):
         """
 
         :param ApplicationGraph app_graph: app graph
         :param ~spinn_machine.Machine machine: machine
-        :param int plan_n_timesteps: the number of timesteps to run for.
-        :param preallocated_resources: pre allocated res from other systems.
+        :param int plan_n_time_steps: the number of time steps to run for.
+        :param pre_allocated_resources: pre allocated res from other systems.
         :type PreAllocatedResourceContainer or None
         :return:
         """
@@ -100,8 +100,8 @@ class SplitterObjectPartitioner(object):
             application_graph=app_graph)
 
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps,
-            preallocated_resources=preallocated_resources)
+            machine, plan_n_time_steps,
+            preallocated_resources=pre_allocated_resources)
 
         # sort out vertex's by placement constraints
         vertices = sort_vertices_by_known_constraints(app_graph.vertices)
