@@ -21,7 +21,8 @@ from spinn_utilities.abstract_base import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
-from pacman.exceptions import PacmanValueError, PacmanAlreadyExistsException
+from pacman.exceptions import (PacmanValueError, PacmanAlreadyExistsException,
+    PacmanConfigurationException)
 
 
 @add_metaclass(AbstractBase)
@@ -30,7 +31,13 @@ class ApplicationVertex(AbstractVertex):
         based on the resources that the vertex requires.
     """
 
-    __slots__ = ["_machine_vertices"]
+    __slots__ = [
+        "_machine_vertices",
+        "_splitter_object"]
+
+    SETTING_SPLITTER_OBJECT_ERROR_MSG = (
+        "The splitter object on {} has already been set, it cannot be "
+        "reset. Please fix and try again. ")
 
     def __init__(self, label=None, constraints=None,
                  max_atoms_per_core=sys.maxsize):
@@ -46,6 +53,7 @@ class ApplicationVertex(AbstractVertex):
 
         super(ApplicationVertex, self).__init__(label, constraints)
         self._machine_vertices = OrderedSet()
+        self._splitter_object = None
 
         # add a constraint for max partitioning
         self.add_constraint(
@@ -57,6 +65,24 @@ class ApplicationVertex(AbstractVertex):
     def __repr__(self):
         return "ApplicationVertex(label={}, constraints={}".format(
             self.label, self.constraints)
+
+    @property
+    def splitter_object(self):
+        return self._splitter_object
+
+    @splitter_object.setter
+    def splitter_object(self, new_value):
+        """ sets the splitter object. Does not allow repeated settings.
+
+        :param SplitterObjectCommon new_value: the new splitter object
+        :rtype: None
+        """
+
+        if self._splitter_object is not None:
+            raise PacmanConfigurationException(
+                self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(self._label))
+        else:
+            self._splitter_object = new_value
 
     def remember_associated_machine_vertex(self, machine_vertex):
         """
