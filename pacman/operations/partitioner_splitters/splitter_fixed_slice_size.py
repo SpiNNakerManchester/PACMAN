@@ -41,8 +41,16 @@ class SplitterFixedSliceSized(AbstractSplitterCommon):
         "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
         "again.")
 
+    STR_MESSAGE = "FixedSizeSplitter governing app vertex {}"
+
     def __init__(self):
         AbstractSplitterCommon.__init__(self)
+
+    def __str__(self):
+        return self.STR_MESSAGE.format(self._governed_app_vertex)
+
+    def __repr__(self):
+        return self.__str__()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):

@@ -30,12 +30,16 @@ class AbstractSplitterCommon(object):
         "AbstractSplitterCommon. And so cannot govern app vertex {}."
         " Please fix and try again.")
 
+    STR_MESSAGE = "AbstractSplitterCommon governing app vertex {}"
+
     def __init__(self):
         self._governed_app_vertex = None
 
     def __str__(self):
-        return "AbstractSplitterCommon governing app vertex {}".format(
-            self._governed_app_vertex)
+        return self.STR_MESSAGE.format(self._governed_app_vertex)
+
+    def __repr__(self):
+        return self.__str__()
 
     def set_governed_app_vertex(self, app_vertex):
         if self._governed_app_vertex is not None:
