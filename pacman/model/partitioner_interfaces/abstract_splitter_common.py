@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
+
+from pacman.exceptions import PacmanConfigurationException
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -23,10 +25,23 @@ class AbstractSplitterCommon(object):
         "_governed_app_vertex"
     ]
 
+    SETTING_SPLITTER_OBJECT_ERROR_MSG = (
+        "The app vertex {} is already governed by this "
+        "AbstractSplitterCommon. And so cannot govern app vertex {}."
+        " Please fix and try again.")
+
     def __init__(self):
         self._governed_app_vertex = None
 
+    def __str__(self):
+        return "AbstractSplitterCommon governing app vertex {}".format(
+            self._governed_app_vertex)
+
     def set_governed_app_vertex(self, app_vertex):
+        if self._governed_app_vertex is not None:
+            raise PacmanConfigurationException(
+                self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(
+                    self._governed_app_vertex, app_vertex))
         self._governed_app_vertex = app_vertex
 
     def split(self, resource_tracker, machine_graph):

@@ -31,3 +31,4 @@ class SplitterSelector(object):
         for app_vertex in app_graph:
             if app_vertex.splitter_object is None:
                 app_vertex.splitter_object = SplitterSliceLegacy()
+
