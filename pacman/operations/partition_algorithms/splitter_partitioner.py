@@ -14,13 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.machine import MachineGraph
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import \
-    sort_vertices_by_known_constraints
+from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
+from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 
 
-class SplitterObjectPartitioner(object):
+class SplitterPartitioner(AbstractSplitterPartitioner):
     """ partitioner which hands the partitioning work to app vertices
     splitter objects.
 
@@ -168,7 +170,6 @@ class SplitterObjectPartitioner(object):
 
                     # go through the post vertices
                     for dest_machine_vertex in dest_vertices_edge_type_map:
-
                         # get the accepted edge types for each vertex
                         pre_edge_types = (
                             src_vertices_edge_type_map[src_machine_vertex])
@@ -180,10 +181,31 @@ class SplitterObjectPartitioner(object):
                             pre_edge_types, post_edge_types,
                             src_machine_vertex, dest_machine_vertex)
 
-                        # build edge and add to machine graph
-                        machine_edge = common_edge_type(
+                        self.create_machine_edge(
                             src_machine_vertex, dest_machine_vertex,
-                            app_edge=app_edge)
-                        machine_graph.add_edge(
-                            machine_edge,
-                            app_outgoing_edge_partition.identifier)
+                            common_edge_type, app_edge, machine_graph,
+                            app_outgoing_edge_partition)
+
+    @overrides(AbstractSplitterPartitioner.create_machine_edge)
+    def create_machine_edge(
+            self, src_machine_vertex, dest_machine_vertex,
+            common_edge_type, app_edge, machine_graph,
+            app_outgoing_edge_partition):
+        """ overridable method for creating the machine edges
+
+        :param MachineVertex src_machine_vertex:
+        :param MachineVertex dest_machine_vertex:
+        :param MachineEdge common_edge_type:
+        :param ApplicationEdge app_edge:
+        :param MachineGraph machine_graph:
+        :param OutgoingEdgePartition app_outgoing_edge_partition:
+        :rtype: None
+        """
+
+        # build edge and add to machine graph
+        machine_edge = common_edge_type(
+            src_machine_vertex, dest_machine_vertex,
+            app_edge=app_edge)
+        machine_graph.add_edge(
+            machine_edge,
+            app_outgoing_edge_partition.identifier)
