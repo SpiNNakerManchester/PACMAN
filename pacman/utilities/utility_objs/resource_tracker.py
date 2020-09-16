@@ -212,6 +212,10 @@ class ResourceTracker(object):
             for x, y in chips:
                 self._chips_available.add((x, y))
 
+    @property
+    def plan_n_time_steps(self):
+        return self._plan_n_timesteps
+
     def _convert_preallocated_resources(self, preallocated_resources):
         """ Allocates preallocated SDRAM and specific cores to the trackers.\
             Also builds an arbitrary core map for use throughout resource\

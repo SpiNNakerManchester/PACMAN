@@ -12,22 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.partitioner_interfaces.splitter_object_slice_legacy import \
-    SplitterBySliceLegacy
 
+from .splitter_slice_legacy import SplitterBySliceLegacy
+from .splitter_fixed_slice_size import SplitterFixedSliceSized
 
-class SplitterObjectSelector(object):
-    """ splitter object selector that allocates nothing but legacy
-    splitter objects where required
-    """
-
-    def __call__(self, app_graph):
-        """ basic selector which puts the legacy splitter object on
-        everything without a splitter object
-
-        :param ApplicationGraph app_graph: app graph
-        :rtype: None
-        """
-        for app_vertex in app_graph:
-            if app_vertex.splitter_object is None:
-                app_vertex.splitter_object = SplitterBySliceLegacy()
+__all__ = ['SplitterBySliceLegacy', 'SplitterFixedSliceSized']

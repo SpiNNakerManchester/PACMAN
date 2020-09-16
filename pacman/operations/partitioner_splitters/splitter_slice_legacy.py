@@ -12,20 +12,34 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.partitioner_interfaces.splitter_object_common import \
-    SplitterObjectCommon
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.partitioner_interfaces.abstract_splitter_common import (
+    AbstractSplitterCommon)
+from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
+    LegacyPartitionerAPI)
+from spinn_utilities.overrides import overrides
 
 
-class SplitterBySliceLegacy(SplitterObjectCommon):
+class SplitterSliceLegacy(AbstractSplitterCommon):
 
     __slots__ = []
 
+
+
     def __init__(self):
-        SplitterObjectCommon.__init__(self)
+        AbstractSplitterCommon.__init__(self)
+
+    @overrides(AbstractSplitterCommon.set_governed_app_vertex)
+    def set_governed_app_vertex(self, app_vertex):
+        AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
+        if not isinstance(app_vertex, LegacyPartitionerAPI):
+            raise PacmanConfigurationException(
+                self.NOT_SUITABLE_VERTEX_ERROR.format(app_vertex.label))
 
     def __split(self, resource_tracker, machine_graph):
         """ TODO NEEDS FILLING IN. STEAL FROM PARTITION AND PLACE"""
 
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
         slices_resources_map = self.__split(resource_tracker, machine_graph)
         for vertex_slice in slices_resources_map:
@@ -34,21 +48,23 @@ class SplitterBySliceLegacy(SplitterObjectCommon):
             machine_graph.add_vertex(machine_vertex)
         return True
 
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
         return self._governed_app_vertex.vertex_slices
 
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
         return self._governed_app_vertex.vertex_slices
 
+    @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
         return self._governed_app_vertex.machine_vertices
 
+    @overrides(AbstractSplitterCommon.get_post_vertices)
     def get_post_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
         return self._governed_app_vertex.machine_vertices
 
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
         return self._governed_app_vertex.machine_vertices
-
-    def can_support_delays_up_to(self, max_delay):
-        return self._governed_app_vertex.can_support_delays_up_to(max_delay)
