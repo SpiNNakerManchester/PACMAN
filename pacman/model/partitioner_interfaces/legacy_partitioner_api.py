@@ -19,7 +19,7 @@ from spinn_utilities.abstract_base import (
 
 
 @add_metaclass(AbstractBase)
-class SplitterByAtoms(object):
+class LegacyPartitionerAPI(object):
 
     @abstractmethod
     def get_resources_used_by_atoms(self, vertex_slice):
