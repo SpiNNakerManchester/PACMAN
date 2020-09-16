@@ -17,7 +17,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)
-class SplitterObjectCommon(object):
+class AbstractSplitterCommon(object):
 
     __slots__ = [
         "_governed_app_vertex"
@@ -32,22 +32,11 @@ class SplitterObjectCommon(object):
     def split(self, resource_tracker, machine_graph):
         """ executes splitting
 
-        :param resource_tracker:
-        :param machine_graph:
-        :return:
+        :param ResourceTracker resource_tracker: machine resources
+        :param MachineGraph machine_graph: machine graph
+        :return: bool true if successful, false otherwise
         """
-        success = self.create_machine_vertices(resource_tracker, machine_graph)
-        if success:
-            return self._do_delays(resource_tracker, machine_graph)
-        else:
-            return False
-
-    def _do_delays(self, resource_tracker, machine_graph):
-        """
-        common delay code (NEEDS FILLING IN)
-        :return: bool
-        """
-        return True
+        return self.create_machine_vertices(resource_tracker, machine_graph)
 
     @abstractmethod
     def create_machine_vertices(self, resource_tracker, machine_graph):
@@ -100,12 +89,4 @@ class SplitterObjectCommon(object):
 
         :param variable_to_record:
         :return: list of machine vertices
-        """
-
-    @abstractmethod
-    def can_support_delays_up_to(self, max_delay):
-        """
-
-        :param max_delay:
-        :return: bool
         """
