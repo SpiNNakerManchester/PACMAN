@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .basic_partitioner import BasicPartitioner
 from .partition_and_place_partitioner import PartitionAndPlacePartitioner
+from .splitter_partitioner import SplitterPartitioner
+from .splitter_selector import SplitterSelector
 
-__all__ = ['BasicPartitioner', 'PartitionAndPlacePartitioner']
+__all__ = [
+    'PartitionAndPlacePartitioner', 'SplitterPartitioner', 'SplitterSelector']
