@@ -103,14 +103,6 @@ class ApplicationVertex(AbstractVertex):
                 str(machine_vertex), machine_vertex)
         self._machine_vertices.add(machine_vertex)
 
-    @abstractproperty
-    def n_atoms(self):
-        """ The number of atoms in the vertex
-
-        :return: The number of atoms
-        :rtype: int
-        """
-
     @property
     def machine_vertices(self):
         """ The machine vertices that this application vertex maps to.
