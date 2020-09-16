@@ -83,6 +83,7 @@ class ApplicationVertex(AbstractVertex):
                 self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(self._label))
         else:
             self._splitter_object = new_value
+            self._splitter_object.set_governed_app_vertex(self)
 
     def remember_associated_machine_vertex(self, machine_vertex):
         """
