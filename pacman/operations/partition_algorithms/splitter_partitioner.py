@@ -12,14 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import PacmanConfigurationException, \
+    PacmanPartitionException
+from pacman.model.constraints.partitioner_constraints import \
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import \
+    get_same_size_vertex_groups
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities import utility_calls as utils
 
 
 class SplitterPartitioner(AbstractSplitterPartitioner):
@@ -50,6 +56,16 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         "communicate with each and therefore a machine edge cannot "
         "be created. Please fix and try again")
 
+    __ERROR_MESSAGE_CONFLICT_FIXED_ATOM = (
+        "Vertex has multiple contradictory fixed atom "
+        "constraints - cannot be both {} and {}")
+
+    __ERROR_MESSAGE_CONFLICT_MAX_ATOMS = (
+        "Max size of {} is incompatible with fixed size of {}")
+
+    __ERROR_MESSAGE_FAILED_DIVISION = (
+        "Vertex of {} atoms cannot be divided into units of {}")
+
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
@@ -74,6 +90,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             self.__setup_objects(
                 app_graph, machine, plan_n_time_steps, pre_allocated_resources))
 
+        self._set_same_max_atoms_to_splitters(app_graph)
+
         # Partition one vertex at a time
         for vertex in progress.over(vertices):
             vertex.splitter_object.split(resource_tracker, machine_graph)
@@ -83,6 +101,48 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
 
         # return the accepted things
         return machine_graph, resource_tracker.chips_used
+
+    def _set_same_max_atoms_to_splitters(self, app_graph):
+        # Group vertices that are supposed to be the same size
+        vertex_groups = get_same_size_vertex_groups(app_graph.vertices)
+        for vertex in app_graph.vertices:
+            partition_together_vertices = list(vertex_groups[vertex])
+
+            # locate max atoms per core and fixed atoms per core
+            possible_max_atoms = list()
+            n_atoms = None
+            for other_vertex in partition_together_vertices:
+                possible_max_atoms.append(
+                    other_vertex.get_max_atoms_per_core())
+                max_atom_constraints = utils.locate_constraints_of_type(
+                    other_vertex.constraints, MaxVertexAtomsConstraint)
+                for constraint in max_atom_constraints:
+                    possible_max_atoms.append(constraint.size)
+                n_atom_constraints = utils.locate_constraints_of_type(
+                    other_vertex.constraints, FixedVertexAtomsConstraint)
+                for constraint in n_atom_constraints:
+                    if n_atoms is not None and constraint.size != n_atoms:
+                        raise PacmanPartitionException(
+                            self.__ERROR_MESSAGE_CONFLICT_FIXED_ATOM.format(
+                                n_atoms, constraint.size))
+                    n_atoms = constraint.size
+
+            max_atoms_per_core = int(min(possible_max_atoms))
+            if n_atoms is not None and max_atoms_per_core < n_atoms:
+                raise PacmanPartitionException(
+                    self.__ERROR_MESSAGE_CONFLICT_MAX_ATOMS.format(
+                        max_atoms_per_core, n_atoms))
+            if n_atoms is not None:
+                max_atoms_per_core = n_atoms
+                if vertex.n_atoms % n_atoms != 0:
+                    raise PacmanPartitionException(
+                        self.__ERROR_MESSAGE_FAILED_DIVISION.format(
+                            vertex.n_atoms, n_atoms))
+
+            for other_vertex in partition_together_vertices:
+                other_vertex.splitter_object.set_maxc_atoms_per_core(
+                    max_atoms_per_core)
+            vertex.splitter_object.set_max_atoms_per_core(max_atoms_per_core)
 
     def __setup_objects(
             self, app_graph, machine, plan_n_time_steps,
