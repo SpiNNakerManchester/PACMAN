@@ -15,7 +15,5 @@
 
 from .partition_and_place_partitioner import PartitionAndPlacePartitioner
 from .splitter_partitioner import SplitterPartitioner
-from .splitter_selector import SplitterSelector
 
-__all__ = [
-    'PartitionAndPlacePartitioner', 'SplitterPartitioner', 'SplitterSelector']
+__all__ = ['PartitionAndPlacePartitioner', 'SplitterPartitioner']

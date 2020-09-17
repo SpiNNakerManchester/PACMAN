@@ -204,8 +204,6 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
 
         # build edge and add to machine graph
         machine_edge = common_edge_type(
-            src_machine_vertex, dest_machine_vertex,
-            app_edge=app_edge)
+            src_machine_vertex, dest_machine_vertex, app_edge=app_edge)
         machine_graph.add_edge(
-            machine_edge,
-            app_outgoing_edge_partition.identifier)
+            machine_edge, app_outgoing_edge_partition.identifier)
