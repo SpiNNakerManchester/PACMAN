@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .partition_and_place_partitioner import PartitionAndPlacePartitioner
 from .splitter_partitioner import SplitterPartitioner
 
-__all__ = ['PartitionAndPlacePartitioner', 'SplitterPartitioner']
+__all__ = ['SplitterPartitioner']
