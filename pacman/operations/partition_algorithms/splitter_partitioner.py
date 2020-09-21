@@ -221,13 +221,13 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             # go through each edge
             for app_edge in app_outgoing_edge_partition.edges:
                 src_vertices_edge_type_map = (
-                    app_edge.pre_vertex.splitter_object.pre_vertices(
+                    app_edge.pre_vertex.splitter_object.get_pre_vertices(
                         app_edge, app_outgoing_edge_partition))
 
                 # go through each pre vertices
                 for src_machine_vertex in src_vertices_edge_type_map:
                     dest_vertices_edge_type_map = (
-                        app_edge.post_vertex.splitter_object.post_vertices(
+                        app_edge.post_vertex.splitter_object.get_post_vertices(
                             app_edge, app_outgoing_edge_partition,
                             src_machine_vertex))
 
