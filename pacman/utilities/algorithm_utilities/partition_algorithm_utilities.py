@@ -15,7 +15,6 @@
 
 """ A collection of methods which support partitioning algorithms.
 """
-from pacman.model.partitioner_interfaces import HandOverToVertex
 from pacman.model.partitioner_interfaces.\
     abstract_controls_destination_of_edges import \
     AbstractControlsDestinationOfEdges
@@ -27,14 +26,21 @@ try:
     from collections.abc import OrderedDict
 except ImportError:
     from collections import OrderedDict
-from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
-from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.utilities import utility_calls as utils
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, SameAtomsAsVertexConstraint,
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
+
+
+VERTICES_NEED_TO_BE_SAME_SIZE_ERROR = (
+    "Vertices {} ({} atoms) and {} ({} atoms) must be of the same size to"
+    " partition them together")
+
+CONTRADICTORY_FIXED_ATOM_ERROR = (
+    "Vertex has multiple contradictory fixed atom constraints - cannot"
+    " be both {} and {}")
 
 
 def determine_max_atoms_for_vertex(vertex):
@@ -54,77 +60,13 @@ def determine_max_atoms_for_vertex(vertex):
     for constraint in n_atom_constraints:
         if n_atoms is not None and constraint.size != n_atoms:
             raise PacmanPartitionException(
-                "Vertex has multiple contradictory fixed atom "
-                "constraints - cannot be both {} and {}".format(
+                CONTRADICTORY_FIXED_ATOM_ERROR.format(
                     n_atoms, constraint.size))
         n_atoms = constraint.size
     if len(possible_max_atoms) != 0:
         return int(min(possible_max_atoms))
     else:
         return vertex.n_atoms
-
-
-def _process_edge(
-        app_edge, machine_graph, application_partition,
-        original_source_machine_vertex):
-    # get destinations
-    if isinstance(app_edge.post_vertex, AbstractControlsDestinationOfEdges):
-        dest_vertices = app_edge.post_vertex.get_destinations_for_edge_from(
-            app_edge, application_partition, original_source_machine_vertex)
-    else:
-        dest_vertices = app_edge.post_vertex.machine_vertices
-
-    # get sources
-    if isinstance(app_edge.pre_vertex, AbstractControlsSourceOfEdges):
-        source_vertices = app_edge.pre_vertex.get_sources_for_edge_from(
-            app_edge, application_partition, original_source_machine_vertex)
-    else:
-        source_vertices = [original_source_machine_vertex]
-
-    # build and update objects
-    for dest_vertex in dest_vertices:
-        for source_vertex in source_vertices:
-            # Check if edge should exist
-            if (not isinstance(app_edge, AbstractSlicesConnect) or
-                    app_edge.could_connect(
-                        source_vertex.vertex_slice,
-                        dest_vertex.vertex_slice)):
-                # create new partitions
-                machine_edge = app_edge.create_machine_edge(
-                    source_vertex, dest_vertex,
-                    "machine_edge_for{}".format(app_edge.label))
-                machine_graph.add_edge(
-                    machine_edge, application_partition.identifier)
-
-                # add constraints from the application partition
-                machine_partition = machine_graph.\
-                    get_outgoing_edge_partition_starting_at_vertex(
-                        source_vertex, application_partition.identifier)
-                machine_partition.add_constraints(
-                    application_partition.constraints)
-
-
-def generate_machine_edges(machine_graph, application_graph):
-    """ Generate the machine edges for the vertices in the graph
-
-    :param MachineGraph machine_graph: the machine graph to add edges to
-    :param ApplicationGraph application_graph:
-        the application graph to work with
-    """
-
-    # start progress bar
-    progress = ProgressBar(
-        application_graph.n_outgoing_edge_partitions,
-        "Partitioning graph edges")
-
-    for application_partition in progress.over(
-            application_graph.outgoing_edge_partitions):
-        vertex = application_partition.pre_vertex
-        for application_edge in application_partition.edges:
-            for source_vertex in vertex.machine_vertices:
-                _process_edge(
-                    application_edge, machine_graph, application_partition,
-                    source_vertex)
 
 
 def get_remaining_constraints(vertex):
@@ -159,17 +101,10 @@ def get_same_size_vertex_groups(vertices):
             if isinstance(constraint, SameAtomsAsVertexConstraint):
                 if vertex.n_atoms != constraint.vertex.n_atoms:
                     raise PacmanPartitionException(
-                        "Vertices {} ({} atoms) and {} ({} atoms) must be of"
-                        " the same size to partition them together".format(
+                        VERTICES_NEED_TO_BE_SAME_SIZE_ERROR.format(
                             vertex.label, vertex.n_atoms,
                             constraint.vertex.label,
                             constraint.vertex.n_atoms))
-                if isinstance(constraint.vertex, HandOverToVertex):
-                    raise PacmanPartitionException(
-                        "Vertex {} cannot handle being partitioned "
-                        "alongside vertex {}. Pleas efix and try "
-                        "again".format(vertex, constraint.vertex)
-                    )
                 same_size_as_vertices.append(constraint.vertex)
 
         if not same_size_as_vertices:
