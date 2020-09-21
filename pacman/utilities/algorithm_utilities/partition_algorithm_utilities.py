@@ -15,13 +15,6 @@
 
 """ A collection of methods which support partitioning algorithms.
 """
-from pacman.model.partitioner_interfaces.\
-    abstract_controls_destination_of_edges import \
-    AbstractControlsDestinationOfEdges
-from pacman.model.partitioner_interfaces.\
-    abstract_controls_source_of_edges import \
-    AbstractControlsSourceOfEdges
-
 try:
     from collections.abc import OrderedDict
 except ImportError:
