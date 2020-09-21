@@ -142,7 +142,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                             vertex.n_atoms, fixed_n_atoms))
 
             for other_vertex in partition_together_vertices:
-                other_vertex.splitter_object.set_maxc_atoms_per_core(
+                other_vertex.splitter_object.set_max_atoms_per_core(
                     max_atoms_per_core)
             vertex.splitter_object.set_max_atoms_per_core(
                 max_atoms_per_core, fixed_n_atoms is not None)
