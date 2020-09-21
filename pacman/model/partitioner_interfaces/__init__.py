@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_controls_destination_of_edges import (
-    AbstractControlsDestinationOfEdges)
 from .abstract_controls_source_of_edges import AbstractControlsSourceOfEdges
 from .legacy_partitioner_api import LegacyPartitionerAPI
 from .abstract_slices_connect import AbstractSlicesConnect
@@ -22,6 +20,6 @@ from .abstract_splitter_partitioner import AbstractSplitterPartitioner
 from .abstract_splitter_common import AbstractSplitterCommon
 
 __all__ = [
-    "AbstractControlsDestinationOfEdges", "AbstractControlsSourceOfEdges",
+    "AbstractControlsSourceOfEdges",
     "LegacyPartitionerAPI", "AbstractSlicesConnect",
     "AbstractSplitterPartitioner", "AbstractSplitterCommon"]
