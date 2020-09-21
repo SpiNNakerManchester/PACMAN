@@ -84,7 +84,7 @@ class ApplicationFPGAVertex(
             self._virtual_chip_x, self._virtual_chip_y))
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 

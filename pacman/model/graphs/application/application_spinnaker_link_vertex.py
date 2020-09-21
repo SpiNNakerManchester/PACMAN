@@ -15,7 +15,7 @@
 
 import sys
 
-from pacman.model.partitioner_interfaces import SplitterByAtoms
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
@@ -27,7 +27,7 @@ from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
 
 
 class ApplicationSpiNNakerLinkVertex(
-        ApplicationVertex, AbstractSpiNNakerLink, SplitterByAtoms):
+        ApplicationVertex, AbstractSpiNNakerLink, LegacyPartitionerAPI):
     """ A virtual vertex on a SpiNNaker Link.
     """
 
@@ -78,15 +78,15 @@ class ApplicationSpiNNakerLinkVertex(
             self._virtual_chip_x, self._virtual_chip_y))
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
-    @overrides(SplitterByAtoms.get_resources_used_by_atoms)
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer()
 
-    @overrides(SplitterByAtoms.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
