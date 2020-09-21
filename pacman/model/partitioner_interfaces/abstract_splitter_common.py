@@ -24,7 +24,8 @@ class AbstractSplitterCommon(object):
     __slots__ = [
         "_governed_app_vertex",
         "_splitter_name",
-        "_max_atoms_per_core"
+        "_max_atoms_per_core",
+        "_is_fixed_atoms_per_core"
     ]
 
     SETTING_SPLITTER_OBJECT_ERROR_MSG = (
@@ -41,6 +42,7 @@ class AbstractSplitterCommon(object):
             splitter_name = self.DEFAULT_SPLITTER_NAME
         self._splitter_name = splitter_name
         self._max_atoms_per_core = sys.maxsize
+        self._is_fixed_atoms_per_core = False
         self._governed_app_vertex = None
 
     def __str__(self):
@@ -50,8 +52,9 @@ class AbstractSplitterCommon(object):
     def __repr__(self):
         return self.__str__()
 
-    def set_max_atoms_per_core(self, max_atoms_per_core):
+    def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
         self._max_atoms_per_core = max_atoms_per_core
+        self._is_fixed_atoms_per_core = is_fixed_atoms
 
     def set_governed_app_vertex(self, app_vertex):
         if self._governed_app_vertex is not None:
@@ -121,13 +124,4 @@ class AbstractSplitterCommon(object):
 
         :param variable_to_record:
         :return: list of machine vertices
-        """
-
-    @abstractmethod
-    def set_max_atoms_per_core(self, max_atoms_per_core):
-        """ sets the max atoms per core to ensure equal splittings on
-        whatever max atoms mean for a splitter.
-
-        :param max_atoms_per_core: the max atoms per core to set
-        :rtype: None
         """
