@@ -78,7 +78,7 @@ class MachineGraph(Graph):
         Returns a double dictionary of app_vertex then
             (outgoing_edge_partition_name, traffic_type)
              a set of machine_vertex that act as pre vertices for these edges
-        :rtype dict(dict(set(MachineVertex)))
+        :rtype dict(ApplicactionVertex, dict(str, PartitionTypeAndPreVertices))
         """
         return self._pre_vertices_by_app_and_partition_name
 
