@@ -28,7 +28,7 @@ class MachineGraph(Graph):
     __slots__ = [
         # Flags to say the application level is used so all machine vertexes
         # will have an application vertex
-        "_app_level_used",
+        "_application_level_used",
         # A double dictionary of pre machine vertexes that 
         "_pre_vertexes_by_app_and_partition_name"
     ]
@@ -46,16 +46,16 @@ class MachineGraph(Graph):
             MachineVertex, MachineEdge, OutgoingEdgePartition, label)
         if application_graph:
             application_graph.forget_machine_graph()
-            self._app_level_used = application_graph.n_vertices > 0
+            self._application_level_used = application_graph.n_vertices > 0
         else:
-            self._app_level_used = False
+            self._application_level_used = False
         self._pre_vertexes_by_app_and_partition_name = DefaultOrderedDict(
             lambda : DefaultOrderedDict(set))
 
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):
         super(MachineGraph, self).add_vertex(vertex)
-        if self._app_level_used:
+        if self._application_level_used:
             if vertex.app_vertex is None:
                 raise PacmanInvalidParameterException(
                     "vertex", vertex, "The vertex does not have an app_vertex")
@@ -63,7 +63,7 @@ class MachineGraph(Graph):
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
         super(MachineGraph, self).add_edge(edge, outgoing_edge_partition_name)
-        if self._app_level_used:
+        if self._application_level_used:
             self._pre_vertexes_by_app_and_partition_name[
                 edge.pre_vertex.app_vertex][
                 outgoing_edge_partition_name].add(edge.pre_vertex)
@@ -77,3 +77,11 @@ class MachineGraph(Graph):
         :rtype dict(dict(set(MachineVertex)))
         """
         return self._pre_vertexes_by_app_and_partition_name
+
+    @property
+    def application_level_used(self):
+        """
+        Defines if the machine graph as an associated used application graph
+        :type bool
+        """
+        return self._application_level_used
