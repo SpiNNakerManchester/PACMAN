@@ -322,6 +322,7 @@ def graph_to_json(graph):
 
 def graph_from_json(json_dict):
     json_dict = json_to_object(json_dict)
+    # TODO App level if exists needed
     graph = MachineGraph(json_dict.get("label"))
     for j_vertex in json_dict["vertices"]:
         graph.add_vertex(vertex_from_json(j_vertex, convert_constraints=False))

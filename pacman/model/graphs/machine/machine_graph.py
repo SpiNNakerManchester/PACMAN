@@ -13,17 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
+from spinn_utilities.overrides import overrides
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import OutgoingEdgePartition
-
+from pacman.exceptions import PacmanInvalidParameterException
 
 class MachineGraph(Graph):
     """ A graph whose vertices can fit on the chips of a machine.
     """
 
-    __slots__ = []
+    __slots__ = [
+        # Flags to say the application level is used so all machine vertexes
+        # will have an application vertex
+        "_app_level_used",
+        # A double dictionary of pre machine vertexes that 
+        "_pre_vertexes_by_app_and_partition_name"
+    ]
 
     def __init__(self, label, application_graph=None):
         """
@@ -38,3 +46,34 @@ class MachineGraph(Graph):
             MachineVertex, MachineEdge, OutgoingEdgePartition, label)
         if application_graph:
             application_graph.forget_machine_graph()
+            self._app_level_used = application_graph.n_vertices > 0
+        else:
+            self._app_level_used = False
+        self._pre_vertexes_by_app_and_partition_name = DefaultOrderedDict(
+            lambda : DefaultOrderedDict(set))
+
+    @overrides(Graph.add_vertex)
+    def add_vertex(self, vertex):
+        super(MachineGraph, self).add_vertex(vertex)
+        if self._app_level_used:
+            if vertex.app_vertex is None:
+                raise PacmanInvalidParameterException(
+                    "vertex", vertex, "The vertex does not have an app_vertex")
+
+    @overrides(Graph.add_edge)
+    def add_edge(self, edge, outgoing_edge_partition_name):
+        super(MachineGraph, self).add_edge(edge, outgoing_edge_partition_name)
+        if self._app_level_used:
+            self._pre_vertexes_by_app_and_partition_name[
+                edge.pre_vertex.app_vertex][
+                outgoing_edge_partition_name].add(edge.pre_vertex)
+
+    @property
+    def pre_vertexes_by_app_and_partition_name(self):
+        """
+        Returns a double dictionary of app_vertex then
+            outgoing_edge_partition_name to a set of machine_vertex that act as
+            pre vertexes for edges with this partition name
+        :rtype dict(dict(set(MachineVertex)))
+        """
+        return self._pre_vertexes_by_app_and_partition_name

@@ -14,10 +14,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.model.graphs.application import (
+    ApplicationGraph, ApplicationVertex)
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+
+class AppVertex(ApplicationVertex):
+    def __init__(self, label):
+        super(AppVertex, self).__init__(label=label)
+        self._n_atoms = 3
+
+    @property
+    def n_atoms(self):
+        return self._n_atoms
+
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+        pass
+
+    def get_resources_used_by_atoms(self, vertex_slice):
+        pass
 
 
 class TestMachineGraphModel(unittest.TestCase):
@@ -145,6 +164,72 @@ class TestMachineGraphModel(unittest.TestCase):
             graph = MachineGraph("foo")
             graph.add_vertices(vertices)
             graph.add_edges(edges, "bar")
+
+    def test_pre_vertexes_by_app_and_partition_name(self):
+        app_graph = ApplicationGraph("testA")
+        a1 = AppVertex("a1")
+        a2 = AppVertex("a2")
+        a3 = AppVertex("a3")
+        a4 = AppVertex("a4")
+        app_graph.add_vertices([a1, a2, a3, a4])
+        machine_graph = MachineGraph("testM", app_graph)
+        m11 = SimpleMachineVertex(None, "M11", app_vertex=a1)
+        m12 = SimpleMachineVertex(None, "M12", app_vertex=a1)
+        m21 = SimpleMachineVertex(None, "M21", app_vertex=a2)
+        m22 = SimpleMachineVertex(None, "M22", app_vertex=a2)
+        m31 = SimpleMachineVertex(None, "M31", app_vertex=a3)
+        m41 = SimpleMachineVertex(None, "M41", app_vertex=a4)
+        m42 = SimpleMachineVertex(None, "M42", app_vertex=a4)
+        m43 = SimpleMachineVertex(None, "M43", app_vertex=a4)
+        m44 = SimpleMachineVertex(None, "M44", app_vertex=a4)
+        m45 = SimpleMachineVertex(None, "M45", app_vertex=a4)
+        m46 = SimpleMachineVertex(None, "M46", app_vertex=a4)
+        m47 = SimpleMachineVertex(None, "M47", app_vertex=a4)
+        machine_graph.add_vertices(
+            [m11, m12, m21, m22, m31, m41, m42, m43, m44, m45, m46, m47])
+        machine_graph.add_edge(MachineEdge(m11, m21), "foo")
+        machine_graph.add_edge(MachineEdge(m11, m12), "foo")
+        machine_graph.add_edge(MachineEdge(m11, m21), "foo")
+        machine_graph.add_edge(MachineEdge(m12, m21), "foo")
+        machine_graph.add_edge(MachineEdge(m31, m31), "foo")
+        machine_graph.add_edge(MachineEdge(m41, m12), "foo")
+        machine_graph.add_edge(MachineEdge(m42, m11), "foo")
+        machine_graph.add_edge(MachineEdge(m43, m11), "foo")
+        machine_graph.add_edge(MachineEdge(m42, m21), "bar")
+        machine_graph.add_edge(MachineEdge(m46, m21), "bar")
+        machine_graph.add_edge(MachineEdge(m47, m22), "bar")
+        machine_graph.add_edge(MachineEdge(m43, m21), "bar")
+        results = machine_graph.pre_vertexes_by_app_and_partition_name
+        # a2 is never a source
+        self.assertEquals(3, len(results))
+        results1 = results[a1]
+        # Only "foo"
+        self.assertEquals(1, len(results1))
+        self.assertEquals(set([m11, m12]), results1["foo"])
+        results4 = results[a4]
+        # "foo" and "bar
+        self.assertEquals(2, len(results4))
+        self.assertEquals(set([m41, m42, m43]), results4["foo"])
+        self.assertEquals(set([m42, m43, m46, m47]), results4["bar"])
+
+    def test_add_app_vertex_missing_with_app_level(self):
+        app_graph = ApplicationGraph("testA")
+        a1 = AppVertex("a1")
+        a2 = AppVertex("a2")
+        app_graph.add_vertices([a1, a2])
+        machine_graph = MachineGraph("testM", app_graph)
+        m1 = SimpleMachineVertex(None, "M11")
+        m2 = SimpleMachineVertex(None, "M21")
+        with self.assertRaises(PacmanInvalidParameterException):
+            machine_graph.add_vertices([m1, m2])
+
+    def test_add_app_vertex_missing_no_app_level(self):
+        app_graph = ApplicationGraph("testA")
+        machine_graph = MachineGraph("testM", app_graph)
+        m1 = SimpleMachineVertex(None, "M11")
+        m2 = SimpleMachineVertex(None, "M21")
+        machine_graph.add_vertices([m1, m2])
+        machine_graph.add_edge(MachineEdge(m1, m1), "foo")
 
 
 if __name__ == '__main__':
