@@ -16,6 +16,7 @@
 import unittest
 from pacman.model.graphs.application import (
     ApplicationGraph, ApplicationVertex)
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.exceptions import (
@@ -165,7 +166,7 @@ class TestMachineGraphModel(unittest.TestCase):
             graph.add_vertices(vertices)
             graph.add_edges(edges, "bar")
 
-    def test_pre_vertexes_by_app_and_partition_name(self):
+    def test_pre_vertices_by_app_and_partition_name(self):
         app_graph = ApplicationGraph("testA")
         a1 = AppVertex("a1")
         a2 = AppVertex("a2")
@@ -189,7 +190,7 @@ class TestMachineGraphModel(unittest.TestCase):
             [m11, m12, m21, m22, m31, m41, m42, m43, m44, m45, m46, m47])
         machine_graph.add_edge(MachineEdge(m11, m21), "foo")
         machine_graph.add_edge(MachineEdge(m11, m12), "foo")
-        machine_graph.add_edge(MachineEdge(m11, m21), "foo")
+        machine_graph.add_edge(MachineEdge(m12, m21), "foo")
         machine_graph.add_edge(MachineEdge(m12, m21), "foo")
         machine_graph.add_edge(MachineEdge(m31, m31), "foo")
         machine_graph.add_edge(MachineEdge(m41, m12), "foo")
@@ -199,18 +200,32 @@ class TestMachineGraphModel(unittest.TestCase):
         machine_graph.add_edge(MachineEdge(m46, m21), "bar")
         machine_graph.add_edge(MachineEdge(m47, m22), "bar")
         machine_graph.add_edge(MachineEdge(m43, m21), "bar")
-        results = machine_graph.pre_vertexes_by_app_and_partition_name
+        machine_graph.add_edge(MachineEdge(
+            m43, m31, traffic_type=EdgeTrafficType.SDRAM), "gamma")
+        machine_graph.add_edge(MachineEdge(
+            m42, m31, traffic_type=EdgeTrafficType.SDRAM), "gamma")
+        with self.assertRaises(PacmanInvalidParameterException):
+            machine_graph.add_edge(MachineEdge(
+                m44, m31, traffic_type=EdgeTrafficType.MULTICAST), "gamma")
+
+        results = machine_graph.pre_vertices_by_app_and_partition_name
         # a2 is never a source
         self.assertEquals(3, len(results))
         results1 = results[a1]
         # Only "foo"
         self.assertEquals(1, len(results1))
-        self.assertEquals(set([m11, m12]), results1["foo"])
+        vertices = results1["foo"].vertices
+        self.assertEquals(set([m11, m12]), vertices)
+        self.assertEquals(EdgeTrafficType.MULTICAST,
+                          results1["foo"].traffic_type)
         results4 = results[a4]
         # "foo" and "bar
-        self.assertEquals(2, len(results4))
-        self.assertEquals(set([m41, m42, m43]), results4["foo"])
-        self.assertEquals(set([m42, m43, m46, m47]), results4["bar"])
+        self.assertEquals(3, len(results4))
+        self.assertEquals(set([m41, m42, m43]), results4["foo"].vertices)
+        self.assertEquals(set([m42, m43, m46, m47]), results4["bar"].vertices)
+        self.assertEquals(set([m42, m43]), results4["gamma"].vertices)
+        self.assertEquals(EdgeTrafficType.SDRAM,
+                          results4["gamma"].traffic_type)
 
     def test_add_app_vertex_missing_with_app_level(self):
         app_graph = ApplicationGraph("testA")
