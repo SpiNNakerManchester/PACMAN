@@ -56,7 +56,6 @@ class ZonedRoutingInfoAllocator(object):
         "__machine_graph",
         "__n_keys_map"
     ]
-    MAX_PARTITIONS_SUPPORTED = 1
     # pylint: disable=attribute-defined-outside-init
 
     def __call__(self, application_graph, machine_graph, n_keys_map):
@@ -89,79 +88,89 @@ class ZonedRoutingInfoAllocator(object):
         :rtype: tuple(int, dict(ApplicationVertex, int))
         :raises PacmanRouteInfoAllocationException:
         """
+        by_app_and_partition_name = \
+            self.__machine_graph.pre_vertices_by_app_and_partition_name
         progress = ProgressBar(
-            self.__application_graph.n_vertices, "Calculating zones")
-        # holders
-        max_app_keys_bits = 0
-        source_zones = 0
-        max_partitions = 0
-        key_bits_per_app = dict()
+            len(by_app_and_partition_name), "Calculating zones")
+
+        # Over all application vertices work out the number of but needed for
+        # partition (names)
+
+        # For each App vertex / Partition name zone keep track of the number of
+        # bites required for the mask for each machine vertex
+        mask_bits_per_zone = dict()
+        # maximum number of bites to represent the keys and masks
+        # for a single app vertex / partition name zone
+        max_zone_keys_bits = 0
 
         # search for size of regions
-        for app_vertex in progress.over(self.__application_graph.vertices):
-            app_max_partitions = 0
-            max_keys = 0
-            for vertex in app_vertex.machine_vertices:
-                partitions = self.__machine_graph.\
-                    get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                app_max_partitions = max(app_max_partitions, len(partitions))
-                max_keys = max(max_keys, max(
-                    (self.__n_keys_map.n_keys_for_partition(partition)
-                     for partition in partitions
-                     if partition.traffic_type == EdgeTrafficType.MULTICAST),
-                    default=0))
-            if max_keys > 0:
-                max_partitions = max(max_partitions, app_max_partitions)
-                source_zones += app_max_partitions
-                key_bits = self.__bits_needed(max_keys)
-                machine_bits = self.__bits_needed(len(
-                    app_vertex.machine_vertices))
-                max_app_keys_bits = max(
-                    max_app_keys_bits, machine_bits + key_bits)
-                key_bits_per_app[app_vertex] = key_bits
-        source_bits = self.__bits_needed(source_zones)
+        for app_vertex in progress.over(by_app_and_partition_name):
+            for partition_name, by_partition_name in \
+                    by_app_and_partition_name[app_vertex].values():
+                max_keys = 0
+                for mac_vertex in by_partition_name.vertices:
+                    partition =  self.__machine_graph.\
+                        get_edges_ending_at_vertex_with_partition_name(
+                        mac_vertex, partition )
+                    n_keys = self.__n_keys_map.n_keys_for_partition(partition)
+                    max(max_keys, n_keys)
+                if max_keys > 0:
+                    key_bits = self.__bits_needed(max_keys)
+                    machine_bits = self.__bits_needed(len(
+                        by_partition_name.vertices))
+                    max_zone_keys_bits = max(
+                        max_zone_keys_bits, machine_bits + key_bits)
+                mask_bits_per_zone[(app_vertex, partition_name)] = key_bits
 
-        if source_bits + max_app_keys_bits > BITS_IN_KEY:
+        zone_bits = self.__bits_needed(len(mask_bits_per_zone))
+
+        if zone_bits + max_zone_keys_bits > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bits".format(
-                    source_bits, max_app_keys_bits))
-        if max_partitions > self.MAX_PARTITIONS_SUPPORTED:
-            raise NotImplementedError()
-        return max_app_keys_bits, key_bits_per_app
+                    zone_bits, max_zone_keys_bits))
+        return max_zone_keys_bits, mask_bits_per_zone
 
-    def _simple_allocate(self, max_app_keys_bits, key_bits_map):
+    def _simple_allocate(self, max_app_keys_bits, mask_bits_map):
         """
         :param int max_app_keys_bits: max bits for app keys
-        :param dict(ApplicationVertex,int) key_bits_map:
-            map of app vertex to max keys for that vertex
+        :param dict((ApplicationVertex, str),int) mask_bits_map:
+            map of app vertex,name to max keys for that vertex
         :return: tuple of routing infos and map from app vertex and key masks
         :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
         """
+        by_app_and_partition_name = \
+            self.__machine_graph.pre_vertices_by_app_and_partition_name
         progress = ProgressBar(
-            self.__application_graph.n_vertices, "Allocating routing keys")
+            len(by_app_and_partition_name), "Allocating routing keys")
         routing_infos = RoutingInfo()
         by_app_vertex = dict()
         app_mask = self.__mask(max_app_keys_bits)
 
-        for source_index, app_vertex in progress.over(
-                enumerate(self.__application_graph.vertices)):
-            app_key = source_index << max_app_keys_bits
-            if app_vertex in key_bits_map:
-                key_bits = key_bits_map[app_vertex]
-                for machine_index, vertex in enumerate(
-                        app_vertex.machine_vertices):
-                    partitions = self.__machine_graph.\
-                        get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                    partition = partitions.peek()
-                    if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        mask = self.__mask(key_bits)
-                        key = app_key | machine_index << key_bits
-                        key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
-                        routing_infos.add_partition_info(
-                            PartitionRoutingInfo([key_and_mask], partition))
+        zone_index = 0
+        for app_vertex in progress.over(by_app_and_partition_name ):
+            for partition_name, by_partition_name in \
+                    by_app_and_partition_name[app_vertex].values():
+                mask_bits = mask_bits_map.get(
+                    (app_vertex, partition_name), None)
+                if mask_bits is None:
+                   continue
+                app_key = zone_index << max_app_keys_bits
+                machine_vertices = list(by_partition_name.vertices)
+                machine_vertices.sort(lambda x: x.vertex_slice.lo_atom)
+                for machine_index, vertex in enumerate(machine_vertices):
+                    mask = self.__mask(mask_bits)
+                    key = app_key | machine_index << mask_bits
+                    key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
+                    partition = self.__machine_graph. \
+                        get_edges_ending_at_vertex_with_partition_name(
+                        vertex, partition)
+                    routing_infos.add_partition_info(
+                        PartitionRoutingInfo([key_and_mask], partition))
+                    # TODO what about partition ??
                 by_app_vertex[app_vertex] = BaseKeyAndMask(
                     base_key=app_key, mask=app_mask)
+                zone_index += 1
 
         return routing_infos, by_app_vertex
 
@@ -180,3 +189,10 @@ class ZonedRoutingInfoAllocator(object):
         :rtype: int
         """
         return int(math.ceil(math.log(size, 2)))
+
+    # get delay app vertex
+    delay_app_vertex = self._app_to_delay_map.get(app_edge, None)
+    if delay_app_vertex is None:
+        delay_app_vertex = self._create_delay_app_vertex(
+            app_edge, max_delay_needed, machine_time_step,
+            time_scale_factor, app_graph)
