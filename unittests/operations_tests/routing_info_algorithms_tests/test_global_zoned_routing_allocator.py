@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.operations.routing_info_allocator_algorithms import (
-    GlobalZonedRoutingInfoAllocator)
+    GlobalZonedRoutingInfoAllocator, ZonedRoutingInfoAllocator)
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
@@ -47,24 +47,26 @@ class SimpleMacVertex(MachineVertex):
     def resources_required(self):
         return None
 
-
-def test_allocator():
-    # Allocate something and check it does the right thing
-    alloc = GlobalZonedRoutingInfoAllocator()
+def create_graphs():
     app_graph = ApplicationGraph("Test")
+    # An output vertex to aim things at (to make keys required)
+    out_app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(out_app_vertex)
+    # Create 5 application vertices (3 bits)
+    app_vertices = list()
+    for app_index in range(5):
+        app_vertices.append(SimpleAppVertex())
+    app_graph.add_vertices(app_vertices)
+
     mac_graph = MachineGraph("Test", app_graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = SimpleAppVertex()
-    app_graph.add_vertex(out_app_vertex)
     out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
     mac_graph.add_vertex(out_mac_vertex)
 
     # Create 5 application vertices (3 bits)
-    for app_index in range(5):
-        app_vertex = SimpleAppVertex()
-        app_graph.add_vertex(app_vertex)
+    for app_index, app_vertex in enumerate(app_vertices):
 
         # For each, create up to (5 x 4) + 1 = 21 machine vertices (5 bits)
         for mac_index in range((app_index * 4) + 1):
@@ -83,6 +85,14 @@ def test_allocator():
                     mac_vertex, part_name)
                 n_keys_map.set_n_keys_for_partition(
                     p, (mac_edge_index * 4) + 1)
+
+    return app_graph, mac_graph, n_keys_map
+
+def test_global_allocator():
+    # Allocate something and check it does the right thing
+    alloc = GlobalZonedRoutingInfoAllocator()
+
+    app_graph, mac_graph, n_keys_map = create_graphs()
 
     # The number of bits is 3 + 5 + 6 + 8 = 22, so it shouldn't fail
     routing_info, _ = alloc.__call__(app_graph, mac_graph, n_keys_map)
@@ -112,6 +122,15 @@ def test_allocator():
                         assert((p_key & app_mask) != 0)
                 else:
                     assert((p_key & app_mask) == (key & app_mask))
+
+def test_zoned_allocator():
+    # Allocate something and check it does the right thing
+    alloc = ZonedRoutingInfoAllocator()
+
+    app_graph, mac_graph, n_keys_map = create_graphs()
+
+    # The number of bits is 3 + 5 + 6 + 8 = 22, so it shouldn't fail
+    routing_info, _ = alloc.__call__(app_graph, mac_graph, n_keys_map)
 
 
 def test_too_big():

@@ -105,22 +105,22 @@ class ZonedRoutingInfoAllocator(object):
 
         # search for size of regions
         for app_vertex in progress.over(by_app_and_partition_name):
-            for partition_name, by_partition_name in \
-                    by_app_and_partition_name[app_vertex].values():
+            by_app = by_app_and_partition_name[app_vertex]
+            for partition_name, by_partition_name  in by_app.items():
                 max_keys = 0
                 for mac_vertex in by_partition_name.vertices:
                     partition =  self.__machine_graph.\
-                        get_edges_ending_at_vertex_with_partition_name(
-                        mac_vertex, partition )
+                        get_outgoing_edge_partition_starting_at_vertex(
+                        mac_vertex, partition_name)
                     n_keys = self.__n_keys_map.n_keys_for_partition(partition)
-                    max(max_keys, n_keys)
+                    max_keys = max(max_keys, n_keys)
                 if max_keys > 0:
                     key_bits = self.__bits_needed(max_keys)
                     machine_bits = self.__bits_needed(len(
                         by_partition_name.vertices))
                     max_zone_keys_bits = max(
                         max_zone_keys_bits, machine_bits + key_bits)
-                mask_bits_per_zone[(app_vertex, partition_name)] = key_bits
+                    mask_bits_per_zone[(app_vertex, partition_name)] = key_bits
 
         zone_bits = self.__bits_needed(len(mask_bits_per_zone))
 
@@ -150,21 +150,21 @@ class ZonedRoutingInfoAllocator(object):
         zone_index = 0
         for app_vertex in progress.over(by_app_and_partition_name ):
             for partition_name, by_partition_name in \
-                    by_app_and_partition_name[app_vertex].values():
+                    by_app_and_partition_name[app_vertex].items():
                 mask_bits = mask_bits_map.get(
                     (app_vertex, partition_name), None)
                 if mask_bits is None:
                    continue
                 app_key = zone_index << max_app_keys_bits
                 machine_vertices = list(by_partition_name.vertices)
-                machine_vertices.sort(lambda x: x.vertex_slice.lo_atom)
+                machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
                 for machine_index, vertex in enumerate(machine_vertices):
                     mask = self.__mask(mask_bits)
                     key = app_key | machine_index << mask_bits
                     key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
-                    partition = self.__machine_graph. \
-                        get_edges_ending_at_vertex_with_partition_name(
-                        vertex, partition)
+                    partition =  self.__machine_graph.\
+                        get_outgoing_edge_partition_starting_at_vertex(
+                        vertex, partition_name)
                     routing_infos.add_partition_info(
                         PartitionRoutingInfo([key_and_mask], partition))
                     # TODO what about partition ??
