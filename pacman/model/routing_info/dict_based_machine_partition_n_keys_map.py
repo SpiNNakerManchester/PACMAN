@@ -43,7 +43,7 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
 
     @overrides(AbstractMachinePartitionNKeysMap.n_keys_for_partition)
     def n_keys_for_partition(self, partition):
-        self._n_keys_map.get(partition, 0)
+        return self._n_keys_map.get(partition, 0)
 
     @overrides(AbstractMachinePartitionNKeysMap.__iter__)
     def __iter__(self):
