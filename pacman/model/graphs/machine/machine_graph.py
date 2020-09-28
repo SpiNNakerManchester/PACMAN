@@ -17,9 +17,9 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.overrides import overrides
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
-from .partition_type_and_pre_vertices import PartitionTypeAndPreVertices
 from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import OutgoingEdgePartition
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.exceptions import PacmanInvalidParameterException
 
 
@@ -53,7 +53,7 @@ class MachineGraph(Graph):
         else:
             self._application_level_used = False
         self._pre_vertices_by_app_and_partition_name = DefaultOrderedDict(
-            lambda : DefaultOrderedDict(PartitionTypeAndPreVertices))
+            lambda : DefaultOrderedDict(set))
 
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):
@@ -67,18 +67,19 @@ class MachineGraph(Graph):
     def add_edge(self, edge, outgoing_edge_partition_name):
         super(MachineGraph, self).add_edge(edge, outgoing_edge_partition_name)
         if self._application_level_used:
-            by_app = self._pre_vertices_by_app_and_partition_name[
-                edge.pre_vertex.app_vertex]
-            by_partition = by_app[outgoing_edge_partition_name]
-            by_partition.add(edge)
+            if edge.traffic_type == EdgeTrafficType.MULTICAST:
+                by_app = self._pre_vertices_by_app_and_partition_name[
+                    edge.pre_vertex.app_vertex]
+                by_partition = by_app[outgoing_edge_partition_name]
+                by_partition.add(edge.pre_vertex)
 
     @property
-    def pre_vertices_by_app_and_partition_name(self):
+    def multicast_partitions(self):
         """
         Returns a double dictionary of app_vertex then
-            (outgoing_edge_partition_name, traffic_type)
-             a set of machine_vertex that act as pre vertices for these edges
-        :rtype dict(ApplicactionVertex, dict(str, PartitionTypeAndPreVertices))
+         outgoing_edge_partition_name to a set of machine_vertex that act as
+         pre vertices for these multicast edges
+        :rtype dict(ApplicactionVertex, dict(str, set(MachineVertex))
         """
         return self._pre_vertices_by_app_and_partition_name
 

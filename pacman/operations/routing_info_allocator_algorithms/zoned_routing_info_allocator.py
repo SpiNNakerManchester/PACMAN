@@ -89,7 +89,7 @@ class ZonedRoutingInfoAllocator(object):
         :raises PacmanRouteInfoAllocationException:
         """
         by_app_and_partition_name = \
-            self.__machine_graph.pre_vertices_by_app_and_partition_name
+            self.__machine_graph.multicast_partitions
         progress = ProgressBar(
             len(by_app_and_partition_name), "Calculating zones")
 
@@ -108,7 +108,7 @@ class ZonedRoutingInfoAllocator(object):
             by_app = by_app_and_partition_name[app_vertex]
             for partition_name, by_partition_name  in by_app.items():
                 max_keys = 0
-                for mac_vertex in by_partition_name.vertices:
+                for mac_vertex in by_partition_name:
                     partition =  self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
                         mac_vertex, partition_name)
@@ -116,8 +116,7 @@ class ZonedRoutingInfoAllocator(object):
                     max_keys = max(max_keys, n_keys)
                 if max_keys > 0:
                     key_bits = self.__bits_needed(max_keys)
-                    machine_bits = self.__bits_needed(len(
-                        by_partition_name.vertices))
+                    machine_bits = self.__bits_needed(len(by_partition_name))
                     max_zone_keys_bits = max(
                         max_zone_keys_bits, machine_bits + key_bits)
                     mask_bits_per_zone[(app_vertex, partition_name)] = key_bits
@@ -140,7 +139,7 @@ class ZonedRoutingInfoAllocator(object):
         :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
         """
         by_app_and_partition_name = \
-            self.__machine_graph.pre_vertices_by_app_and_partition_name
+            self.__machine_graph.multicast_partitions
         progress = ProgressBar(
             len(by_app_and_partition_name), "Allocating routing keys")
         routing_infos = RoutingInfo()
@@ -156,7 +155,7 @@ class ZonedRoutingInfoAllocator(object):
                 if mask_bits is None:
                    continue
                 app_key = zone_index << max_app_keys_bits
-                machine_vertices = list(by_partition_name.vertices)
+                machine_vertices = list(by_partition_name)
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
                 for machine_index, vertex in enumerate(machine_vertices):
                     mask = self.__mask(mask_bits)
