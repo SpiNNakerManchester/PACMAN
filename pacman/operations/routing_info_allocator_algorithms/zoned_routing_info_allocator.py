@@ -189,10 +189,3 @@ class ZonedRoutingInfoAllocator(object):
         :rtype: int
         """
         return int(math.ceil(math.log(size, 2)))
-
-    # get delay app vertex
-    delay_app_vertex = self._app_to_delay_map.get(app_edge, None)
-    if delay_app_vertex is None:
-        delay_app_vertex = self._create_delay_app_vertex(
-            app_edge, max_delay_needed, machine_time_step,
-            time_scale_factor, app_graph)
