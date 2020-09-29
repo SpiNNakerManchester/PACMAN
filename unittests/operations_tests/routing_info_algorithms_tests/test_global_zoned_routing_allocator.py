@@ -90,12 +90,12 @@ def create_graphs():
 
 def test_global_allocator():
     # Allocate something and check it does the right thing
-    alloc = GlobalZonedRoutingInfoAllocator()
 
     app_graph, mac_graph, n_keys_map = create_graphs()
 
-    # The number of bits is 3 + 5 + 6 + 8 = 22, so it shouldn't fail
-    routing_info, _ = alloc.__call__(app_graph, mac_graph, n_keys_map)
+    # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
+    routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
+        mac_graph, n_keys_map)
 
     # Check the mask is the same for all, and allows for the space required
     # for the maximum number of keys in total (bottom 8 bits)
@@ -109,19 +109,35 @@ def test_global_allocator():
 
     # Check the key for each application vertex is the same
     # The bits that should be the same are the top 3 of the 22
-    app_mask = 0x380000
+    #app_mask = 0x380000
+    # The bits that should be the same are all but the bottom 12
+    app_mask = 0xFFFFF000
+    key_check = dict()
     for app_vertex in app_graph.vertices:
-        key = None
         for m_vertex in app_vertex.machine_vertices:
             for p in mac_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     m_vertex):
-                p_key = routing_info.get_first_key_from_partition(p)
-                if key is None:
-                    key = p_key
-                    if p_key != 0:
-                        assert((p_key & app_mask) != 0)
+                key = routing_info.get_first_key_from_partition(p)
+                if (app_vertex, p.label) in key_check:
+                    if (key_check[(app_vertex, p.identifier)] & app_mask) != (key & app_mask):
+                        a = key_check[(app_vertex, p.label)]
+                        ah = hex(a)
+                        b = a & app_mask
+                        bh = hex(b)
+                        c = key & app_mask
+                        kh = hex(key)
+                        chex = hex(c)
+                        print("foo")
+                    assert((key_check[(app_vertex, p.identifier)] & app_mask) == (key & app_mask))
                 else:
-                    assert((p_key & app_mask) == (key & app_mask))
+                    if key != 0:
+                        if (key & app_mask) == 0:
+                            kh = hex(key)
+                            aph = hex(app_mask)
+                            print("n")
+
+                        assert((key & app_mask) != 0)
+                    key_check[(app_vertex, p.identifier)] = key
 
 def test_zoned_allocator():
     # Allocate something and check it does the right thing
@@ -135,24 +151,28 @@ def test_too_big():
     # This test shows how easy it is to trip up the allocator with a retina
     alloc = GlobalZonedRoutingInfoAllocator()
     app_graph = ApplicationGraph("Test")
+    # Create a single "big" vertex
+    big_app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(big_app_vertex)
+    # Create a single output vertex (which won't send)
+    out_app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(out_app_vertex)
+    # Create a load of middle vertex
+    mid_app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(mid_app_vertex)
+
     mac_graph = MachineGraph("Test", app_graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
-    # Create a single "big" vertex with a single big machine vertex
-    big_app_vertex = SimpleAppVertex()
-    app_graph.add_vertex(big_app_vertex)
+    # Create a single big machine vertex
     big_mac_vertex = SimpleMacVertex(app_vertex=big_app_vertex)
     mac_graph.add_vertex(big_mac_vertex)
 
     # Create a single output vertex (which won't send)
-    out_app_vertex = SimpleAppVertex()
-    app_graph.add_vertex(out_app_vertex)
     out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
     mac_graph.add_vertex(out_mac_vertex)
 
     # Create a load of middle vertices and connect them up
-    mid_app_vertex = SimpleAppVertex()
-    app_graph.add_vertex(mid_app_vertex)
     for _ in range(2000):  # 2000 needs 11 bits
         mid_mac_vertex = SimpleMacVertex(app_vertex=mid_app_vertex)
         mac_graph.add_vertex(mid_mac_vertex)
@@ -173,4 +193,5 @@ def test_too_big():
 
     # Make the call, and it should fail
     with pytest.raises(PacmanRouteInfoAllocationException):
-        alloc.__call__(app_graph, mac_graph, n_keys_map)
+        routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
+            mac_graph, n_keys_map)
