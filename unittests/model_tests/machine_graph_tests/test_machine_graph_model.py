@@ -20,7 +20,8 @@ from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanInvalidParameterException)
 
 class AppVertex(ApplicationVertex):
     def __init__(self, label):
@@ -204,9 +205,11 @@ class TestMachineGraphModel(unittest.TestCase):
             m43, m31, traffic_type=EdgeTrafficType.SDRAM), "gamma")
         machine_graph.add_edge(MachineEdge(
             m42, m31, traffic_type=EdgeTrafficType.SDRAM), "gamma")
-        with self.assertRaises(PacmanInvalidParameterException):
+        machine_graph.add_edge(MachineEdge(
+            m44, m31, traffic_type=EdgeTrafficType.MULTICAST), "gamma")
+        with self.assertRaises(PacmanConfigurationException):
             machine_graph.add_edge(MachineEdge(
-                m44, m31, traffic_type=EdgeTrafficType.MULTICAST), "gamma")
+                m43, m31, traffic_type=EdgeTrafficType.MULTICAST), "gamma")
 
         results = machine_graph.multicast_partitions
         # a2 is never a source
@@ -214,18 +217,13 @@ class TestMachineGraphModel(unittest.TestCase):
         results1 = results[a1]
         # Only "foo"
         self.assertEquals(1, len(results1))
-        vertices = results1["foo"].vertices
-        self.assertEquals(set([m11, m12]), vertices)
-        self.assertEquals(EdgeTrafficType.MULTICAST,
-                          results1["foo"].traffic_type)
+        self.assertEquals(set([m11, m12]), results1["foo"])
         results4 = results[a4]
         # "foo" and "bar
         self.assertEquals(3, len(results4))
-        self.assertEquals(set([m41, m42, m43]), results4["foo"].vertices)
-        self.assertEquals(set([m42, m43, m46, m47]), results4["bar"].vertices)
-        self.assertEquals(set([m42, m43]), results4["gamma"].vertices)
-        self.assertEquals(EdgeTrafficType.SDRAM,
-                          results4["gamma"].traffic_type)
+        self.assertEquals(set([m41, m42, m43]), results4["foo"])
+        self.assertEquals(set([m42, m43, m46, m47]), results4["bar"])
+        self.assertEquals(set([m44]), results4["gamma"])
 
     def test_add_app_vertex_missing_with_app_level(self):
         app_graph = ApplicationGraph("testA")
