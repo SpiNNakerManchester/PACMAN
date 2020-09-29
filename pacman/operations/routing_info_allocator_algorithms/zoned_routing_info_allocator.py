@@ -51,11 +51,17 @@ class ZonedRoutingInfoAllocator(object):
     __slots__ = [
         # Passed in parameters
         "__machine_graph",
-        "__n_keys_map"
+        "__n_keys_map",
+        # For each App vertex / Partition name zone keep track of the number of
+        # bites required for the mask for each machine vertex
+        "__mask_bits_per_zone",
+        # maximum number of bites to represent the keys and masks
+        # for a single app vertex / partition name zone
+        "__max_zone_keys_bits"
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, machine_graph, n_keys_map):
+    def __init__(self, machine_graph, n_keys_map):
         """
         :param MachineGraph machine_graph:
         :param AbstractMachinePartitionNKeysMap n_keys_map:
@@ -66,21 +72,33 @@ class ZonedRoutingInfoAllocator(object):
         # partitions
         self.__machine_graph = machine_graph
         self.__n_keys_map = n_keys_map
+        self.__max_zone_keys_bits = 0
+        self.__mask_bits_per_zone = dict()
 
         check_algorithm_can_support_constraints(
-            constrained_vertices=machine_graph.outgoing_edge_partitions,
+            constrained_vertices=machine_graph.multicast_partitions.keys(),
             supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-        max_app_keys_bits, key_bits_per_app = self._calculate_zones()
+    @staticmethod
+    def flexible_allocate(machine_graph, n_keys_map):
+        """
+        :param MachineGraph machine_graph:
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+        :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+        :raise PacmanRouteInfoAllocationException:
+        """
+        # check that this algorithm supports the constraints put onto the
+        # partitions
 
-        return self._simple_allocate(max_app_keys_bits, key_bits_per_app)
+        allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map)
+
+        allocator._calculate_zones()
+
+        return allocator._simple_allocate()
 
     def _calculate_zones(self):
         """
-        :return: tuple containing max app keys and a map of app to max keys
-            for any given machine vertex
-        :rtype: tuple(int, dict(ApplicationVertex, int))
         :raises PacmanRouteInfoAllocationException:
         """
         by_app_and_partition_name = \
@@ -88,12 +106,6 @@ class ZonedRoutingInfoAllocator(object):
         progress = ProgressBar(
             len(by_app_and_partition_name), "Calculating zones")
 
-        # For each App vertex / Partition name zone keep track of the number of
-        # bites required for the mask for each machine vertex
-        mask_bits_per_zone = dict()
-        # maximum number of bites to represent the keys and masks
-        # for a single app vertex / partition name zone
-        max_zone_keys_bits = 0
 
         # search for size of regions
         for app_vertex in progress.over(by_app_and_partition_name):
@@ -109,22 +121,21 @@ class ZonedRoutingInfoAllocator(object):
                 if max_keys > 0:
                     key_bits = self.__bits_needed(max_keys)
                     machine_bits = self.__bits_needed(len(by_partition_name))
-                    max_zone_keys_bits = max(
-                        max_zone_keys_bits, machine_bits + key_bits)
-                    mask_bits_per_zone[(app_vertex, partition_name)] = key_bits
+                    self.__max_zone_keys_bits = max(
+                        self.__max_zone_keys_bits, machine_bits + key_bits)
+                    self.__mask_bits_per_zone[
+                        (app_vertex, partition_name)] = key_bits
 
-        zone_bits = self.__bits_needed(len(mask_bits_per_zone))
+        zone_bits = self.__bits_needed(len(self.__mask_bits_per_zone))
 
-        if zone_bits + max_zone_keys_bits > BITS_IN_KEY:
+        if zone_bits + self.__max_zone_keys_bits > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bits".format(
-                    zone_bits, max_zone_keys_bits))
-        return max_zone_keys_bits, mask_bits_per_zone
+                    zone_bits, self.__max_zone_keys_bits))
 
-    def _simple_allocate(self, max_app_keys_bits, mask_bits_map):
+    def _simple_allocate(self):
         """
-        :param int max_app_keys_bits: max bits for app keys
         :param dict((ApplicationVertex, str),int) mask_bits_map:
             map of app vertex,name to max keys for that vertex
         :return: tuple of routing infos and map from app vertex and key masks
@@ -136,17 +147,17 @@ class ZonedRoutingInfoAllocator(object):
             len(by_app_and_partition_name), "Allocating routing keys")
         routing_infos = RoutingInfo()
         by_app_vertex = dict()
-        app_mask = self.__mask(max_app_keys_bits)
+        app_mask = self.__mask(self.__max_zone_keys_bits)
 
         zone_index = 0
         for app_vertex in progress.over(by_app_and_partition_name ):
             for partition_name, by_partition_name in \
                     by_app_and_partition_name[app_vertex].items():
-                mask_bits = mask_bits_map.get(
+                mask_bits = self.__mask_bits_per_zone.get(
                     (app_vertex, partition_name), None)
                 if mask_bits is None:
                    continue
-                app_key = zone_index << max_app_keys_bits
+                app_key = zone_index << self.__max_zone_keys_bits
                 machine_vertices = list(by_partition_name)
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
                 for machine_index, vertex in enumerate(machine_vertices):

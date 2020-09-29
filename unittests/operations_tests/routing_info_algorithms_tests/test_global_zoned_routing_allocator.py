@@ -125,12 +125,10 @@ def test_global_allocator():
 
 def test_zoned_allocator():
     # Allocate something and check it does the right thing
-    alloc = ZonedRoutingInfoAllocator()
-
     app_graph, mac_graph, n_keys_map = create_graphs()
 
     # The number of bits is 3 + 5 + 6 + 8 = 22, so it shouldn't fail
-    routing_info, _ = alloc.__call__(mac_graph, n_keys_map)
+    ZonedRoutingInfoAllocator.flexible_allocate(mac_graph, n_keys_map)
 
 
 def test_too_big():
