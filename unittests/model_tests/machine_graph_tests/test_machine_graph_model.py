@@ -208,7 +208,7 @@ class TestMachineGraphModel(unittest.TestCase):
             machine_graph.add_edge(MachineEdge(
                 m44, m31, traffic_type=EdgeTrafficType.MULTICAST), "gamma")
 
-        results = machine_graph.pre_vertices_by_app_and_partition_name
+        results = machine_graph.multicast_partitions
         # a2 is never a source
         self.assertEquals(3, len(results))
         results1 = results[a1]

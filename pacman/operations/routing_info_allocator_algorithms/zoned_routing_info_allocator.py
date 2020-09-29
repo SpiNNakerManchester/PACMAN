@@ -37,8 +37,6 @@ class ZonedRoutingInfoAllocator(object):
         required by each edge must be 2048 or less, and that all edges coming
         out of a vertex will be given the same key/mask assignment.
 
-    :param ApplicationGraph application_graph:
-        The application graph to allocate the routing info for
     :param MachineGraph machine_graph:
         The machine graph to allocate the routing info for
     :param AbstractMachinePartitionNKeysMap n_keys_map:
@@ -52,15 +50,13 @@ class ZonedRoutingInfoAllocator(object):
 
     __slots__ = [
         # Passed in parameters
-        "__application_graph",
         "__machine_graph",
         "__n_keys_map"
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, application_graph, machine_graph, n_keys_map):
+    def __call__(self, machine_graph, n_keys_map):
         """
-        :param ApplicationGraph application_graph:
         :param MachineGraph machine_graph:
         :param AbstractMachinePartitionNKeysMap n_keys_map:
         :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
@@ -68,7 +64,6 @@ class ZonedRoutingInfoAllocator(object):
         """
         # check that this algorithm supports the constraints put onto the
         # partitions
-        self.__application_graph = application_graph
         self.__machine_graph = machine_graph
         self.__n_keys_map = n_keys_map
 
@@ -92,9 +87,6 @@ class ZonedRoutingInfoAllocator(object):
             self.__machine_graph.multicast_partitions
         progress = ProgressBar(
             len(by_app_and_partition_name), "Calculating zones")
-
-        # Over all application vertices work out the number of but needed for
-        # partition (names)
 
         # For each App vertex / Partition name zone keep track of the number of
         # bites required for the mask for each machine vertex
