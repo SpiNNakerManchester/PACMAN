@@ -316,12 +316,8 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex = SimpleTestVertex(13, "Constrained")
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
-        constrained_vertex.splitter_object = SplitterFixedSliceSized()
-        graph = ApplicationGraph("Graph")
-        graph.add_vertex(constrained_vertex)
-        partitioner = SplitterPartitioner()
         with self.assertRaises(PacmanInvalidParameterException):
-            partitioner(graph, self.machine, 3000)
+            constrained_vertex.splitter_object = SplitterFixedSliceSized()
 
     def test_partition_with_empty_graph(self):
         """

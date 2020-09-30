@@ -17,6 +17,10 @@ from collections import OrderedDict
 
 from six import add_metaclass
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
+    AbstractPartitionerConstraint)
+from pacman.utilities import utility_calls
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -100,6 +104,11 @@ class AbstractSplitterCommon(object):
                     self._governed_app_vertex, self._splitter_name,
                     app_vertex))
         self._governed_app_vertex = app_vertex
+        utility_calls.check_algorithm_can_support_constraints(
+            constrained_vertices=[self._governed_app_vertex],
+            supported_constraints=[
+                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
+            abstract_constraint_type=AbstractPartitionerConstraint)
 
     def split(self, resource_tracker, machine_graph):
         """ executes splitting
