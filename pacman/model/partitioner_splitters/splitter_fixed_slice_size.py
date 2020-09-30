@@ -88,7 +88,7 @@ class SplitterFixedSliceSized(AbstractSplitterCommon):
         if self.__been_called:
             return self._governed_app_vertex.vertex_slices, True
         else:
-            self._get_slices_estimate(), False
+            return self._get_slices_estimate(), False
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
