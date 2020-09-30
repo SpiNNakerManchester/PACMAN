@@ -21,8 +21,7 @@ from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
 from pacman.exceptions import (
-    PacmanValueError, PacmanAlreadyExistsException,
-    PacmanConfigurationException)
+    PacmanAlreadyExistsException, PacmanConfigurationException)
 from spinn_utilities.overrides import overrides
 
 
