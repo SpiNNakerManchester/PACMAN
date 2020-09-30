@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from collections import OrderedDict
-
 from six import raise_from, add_metaclass
 
 from pacman.model.graphs.machine import MachineEdge
@@ -58,18 +56,6 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
     def __init__(self, splitter_name):
         AbstractSplitterCommon.__init__(self, splitter_name)
         self._called = False
-
-    def _get_map(self, edge_types):
-        """ builds map of machine vertex to edge type
-
-        :param edge_types: the type of edges to add to the dict.
-
-        :return: dict of vertex as key, edge types as list in value
-        """
-        result = OrderedDict()
-        for vertex in self._governed_app_vertex.machine_vertices:
-            result[vertex] = edge_types
-        return result
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):

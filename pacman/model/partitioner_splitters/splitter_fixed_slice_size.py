@@ -18,6 +18,7 @@ from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
     FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_interfaces import AbstractSplitterCommon
 from pacman.utilities import utility_calls
 from spinn_utilities.overrides import overrides
@@ -98,12 +99,13 @@ class SplitterFixedSliceSized(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
-        return self._governed_app_vertex.machine_vertices
+
+        return self._get_map([MachineEdge])
 
     @overrides(AbstractSplitterCommon.get_post_vertices)
     def get_post_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
-        return self._governed_app_vertex.machine_vertices
+        return self._get_map([MachineEdge])
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
@@ -189,7 +191,7 @@ class SplitterFixedSliceSized(AbstractSplitterCommon):
         else:
             max_atoms = sys.maxsize
 
-        return fixed_atoms, max_atoms
+        return max_atoms, fixed_atoms
 
     def _compute_atoms_per_core(self, resource_tracker):
         """ Work out how many atoms per core are required for the given\
@@ -228,3 +230,9 @@ class SplitterFixedSliceSized(AbstractSplitterCommon):
         return (int(self.__fixed_atom_by_constraint) if
                 self.__fixed_atom_by_constraint is not None else
                 int(max_atoms))
+
+    @staticmethod
+    def _get_ratio(top, bottom):
+        if bottom == 0:
+            return 1.0
+        return top / bottom

@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
+from collections import OrderedDict
+
 from six import add_metaclass
 from pacman.exceptions import PacmanConfigurationException
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -59,6 +61,18 @@ class AbstractSplitterCommon(object):
 
     def __repr__(self):
         return self.__str__()
+
+    def _get_map(self, edge_types):
+        """ builds map of machine vertex to edge type
+
+        :param edge_types: the type of edges to add to the dict.
+
+        :return: dict of vertex as key, edge types as list in value
+        """
+        result = OrderedDict()
+        for vertex in self._governed_app_vertex.machine_vertices:
+            result[vertex] = edge_types
+        return result
 
     def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
         """ sets max atoms per core for this splitter object
