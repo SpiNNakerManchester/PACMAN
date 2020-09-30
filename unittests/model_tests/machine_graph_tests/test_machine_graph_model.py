@@ -23,6 +23,7 @@ from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
 
+
 class AppVertex(ApplicationVertex):
     def __init__(self, label):
         super(AppVertex, self).__init__(label=label)

@@ -47,6 +47,7 @@ class SimpleMacVertex(MachineVertex):
     def resources_required(self):
         return None
 
+
 def create_graphs():
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
@@ -88,6 +89,7 @@ def create_graphs():
 
     return app_graph, mac_graph, n_keys_map
 
+
 def test_global_allocator():
     # Allocate something and check it does the right thing
 
@@ -108,8 +110,6 @@ def test_global_allocator():
         seen_keys.add(r_info.first_key)
 
     # Check the key for each application vertex is the same
-    # The bits that should be the same are the top 3 of the 22
-    #app_mask = 0x380000
     # The bits that should be the same are all but the bottom 12
     app_mask = 0xFFFFF000
     key_check = dict()
@@ -119,25 +119,12 @@ def test_global_allocator():
                     m_vertex):
                 key = routing_info.get_first_key_from_partition(p)
                 if (app_vertex, p.label) in key_check:
-                    if (key_check[(app_vertex, p.identifier)] & app_mask) != (key & app_mask):
-                        a = key_check[(app_vertex, p.label)]
-                        ah = hex(a)
-                        b = a & app_mask
-                        bh = hex(b)
-                        c = key & app_mask
-                        kh = hex(key)
-                        chex = hex(c)
-                        print("foo")
                     assert((key_check[(app_vertex, p.identifier)] & app_mask) == (key & app_mask))
                 else:
                     if key != 0:
-                        if (key & app_mask) == 0:
-                            kh = hex(key)
-                            aph = hex(app_mask)
-                            print("n")
-
                         assert((key & app_mask) != 0)
                     key_check[(app_vertex, p.identifier)] = key
+
 
 def test_zoned_allocator():
     # Allocate something and check it does the right thing
@@ -149,7 +136,6 @@ def test_zoned_allocator():
 
 def test_too_big():
     # This test shows how easy it is to trip up the allocator with a retina
-    alloc = GlobalZonedRoutingInfoAllocator()
     app_graph = ApplicationGraph("Test")
     # Create a single "big" vertex
     big_app_vertex = SimpleAppVertex()

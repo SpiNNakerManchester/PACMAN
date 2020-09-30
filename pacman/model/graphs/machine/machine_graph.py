@@ -53,7 +53,7 @@ class MachineGraph(Graph):
         else:
             self._application_level_used = False
         self._pre_vertices_by_app_and_partition_name = DefaultOrderedDict(
-            lambda : DefaultOrderedDict(set))
+            lambda: DefaultOrderedDict(set))
 
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):

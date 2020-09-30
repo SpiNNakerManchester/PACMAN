@@ -16,7 +16,6 @@
 from __future__ import division
 import math
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.utilities.utility_calls import (
@@ -25,6 +24,7 @@ from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint)
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+
 
 class ZonedRoutingInfoAllocator(object):
     """ A routing key allocator that uses fixed zones that are the same for
@@ -120,7 +120,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__n_bits_machine = 0
         self.__n_bits_atoms = 0
         self.__atom_bits_per_app_part = dict()
-        self.__flexible =  flexible
+        self.__flexible = flexible
 
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.multicast_partitions.keys(),
@@ -179,11 +179,10 @@ class ZonedRoutingInfoAllocator(object):
         progress = ProgressBar(
             len(by_app_and_partition_name), "Calculating zones")
 
-
         # search for size of regions
         for app_vertex in progress.over(by_app_and_partition_name):
             by_app = by_app_and_partition_name[app_vertex]
-            for partition_name, by_partition_name  in by_app.items():
+            for partition_name, by_partition_name in by_app.items():
                 max_keys = 0
                 for mac_vertex in by_partition_name:
                     partition =  self.__machine_graph.\
@@ -195,7 +194,7 @@ class ZonedRoutingInfoAllocator(object):
                     atom_bits = self.__bits_needed(max_keys)
                     self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
                     machine_bits = self.__bits_needed(len(by_partition_name))
-                    self.__n_bits_machine = max (
+                    self.__n_bits_machine = max(
                         self.__n_bits_machine, machine_bits)
                     self.__n_bits_atoms_and_mac = max(
                         self.__n_bits_atoms_and_mac, machine_bits + atom_bits)
@@ -208,10 +207,11 @@ class ZonedRoutingInfoAllocator(object):
             if app_part_bits + self.__n_bits_machine + self.__n_bits_atoms > \
                     BITS_IN_KEY:
                 raise PacmanRouteInfoAllocationException(
-                "Unable to use ZonedRoutingInfoAllocator with global settings."
-                "please select a different allocator as it needs {} + {} + {} "
-                "bits".format(app_part_bits, self.__n_bits_machine,
-                              self.__n_bits_atoms))
+                    "Unable to use ZonedRoutingInfoAllocator with global "
+                    "settings. Please select a different allocator as it "
+                    "needs {} + {} + {} bits".format(
+                        app_part_bits, self.__n_bits_machine,
+                        self.__n_bits_atoms))
             self.__n_bits_atoms_and_mac = \
                 self.__n_bits_machine + self.__n_bits_atoms
 
@@ -236,7 +236,7 @@ class ZonedRoutingInfoAllocator(object):
         by_app_vertex = dict()
         app_mask = self.__mask(self.__n_bits_atoms_and_mac)
         app_part_index = 0
-        for app_vertex in progress.over(by_app_and_partition_name ):
+        for app_vertex in progress.over(by_app_and_partition_name):
             for partition_name, by_partition_name in \
                     by_app_and_partition_name[app_vertex].items():
                 if self.__flexible:
@@ -250,13 +250,13 @@ class ZonedRoutingInfoAllocator(object):
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
                 for machine_index, vertex in enumerate(machine_vertices):
                     mask = self.__mask(n_bits_atoms)
-                    key =  app_part_index
+                    key = app_part_index
                     key = (key << n_bits_machine) | machine_index
                     key = key << n_bits_atoms
                     key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
-                    partition =  self.__machine_graph.\
+                    partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
-                        vertex, partition_name)
+                            vertex, partition_name)
                     routing_infos.add_partition_info(
                         PartitionRoutingInfo([key_and_mask], partition))
                     # TODO what about partition ??
