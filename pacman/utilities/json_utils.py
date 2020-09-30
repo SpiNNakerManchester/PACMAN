@@ -30,7 +30,6 @@ from pacman.model.resources import (
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
-from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 
 

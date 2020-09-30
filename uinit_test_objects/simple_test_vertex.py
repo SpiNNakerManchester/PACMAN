@@ -39,7 +39,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
         self._n_atoms = n_atoms
         self._fixed_sdram_value = fixed_sdram_value
 
-    overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         """
         standard method call to get the sdram, cpu and dtcm usage of a
