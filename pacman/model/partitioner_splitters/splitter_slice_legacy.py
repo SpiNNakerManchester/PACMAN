@@ -49,7 +49,7 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
         if not isinstance(app_vertex, LegacyPartitionerAPI):
             raise PacmanConfigurationException(
                 self.NOT_SUITABLE_VERTEX_ERROR.format(
-                    self.__splitter_name, app_vertex.label))
+                    self._splitter_name, app_vertex.label))
 
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
