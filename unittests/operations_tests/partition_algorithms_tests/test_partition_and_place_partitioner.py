@@ -352,7 +352,6 @@ class TestPartitionAndPlacePartitioner(unittest.TestCase):
             SameAtomsAsVertexConstraint(self.vert2))
         constrained_vertex.splitter_object = SplitterSliceLegacy()
         self.graph.add_vertex(constrained_vertex)
-        partitioner = SplitterPartitioner()
         graph, _ = self.bp(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
