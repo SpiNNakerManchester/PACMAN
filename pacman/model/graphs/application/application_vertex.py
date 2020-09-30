@@ -16,7 +16,7 @@
 import sys
 from six import add_metaclass
 from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
@@ -100,10 +100,6 @@ class ApplicationVertex(AbstractVertex):
             This vertex may not be fully initialized but will have a slice
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         """
-        if machine_vertex.vertex_slice.hi_atom >= self.n_atoms:
-            raise PacmanValueError(
-                "hi_atom {:d} >= maximum {:d}".format(
-                    machine_vertex.vertex_slice.hi_atom, self.n_atoms))
 
         machine_vertex.index = len(self._machine_vertices)
 
@@ -111,6 +107,13 @@ class ApplicationVertex(AbstractVertex):
             raise PacmanAlreadyExistsException(
                 str(machine_vertex), machine_vertex)
         self._machine_vertices.add(machine_vertex)
+
+    @abstractproperty
+    def n_atoms(self):
+        """ The number of atoms in the vertex
+
+        :rtype: int
+        """
 
     @property
     def machine_vertices(self):
@@ -140,7 +143,6 @@ class ApplicationVertex(AbstractVertex):
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
-        return self.n_atoms
 
     def forget_machine_vertices(self):
         """ Arrange to forget all machine vertices that this application
