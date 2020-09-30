@@ -23,6 +23,7 @@ from pacman.model.graphs import AbstractVertex
 from pacman.exceptions import (
     PacmanValueError, PacmanAlreadyExistsException,
     PacmanConfigurationException)
+from spinn_utilities.overrides import overrides
 
 
 @add_metaclass(AbstractBase)
@@ -86,6 +87,12 @@ class ApplicationVertex(AbstractVertex):
                 self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(self._label))
         self._splitter_object = new_value
         self._splitter_object.set_governed_app_vertex(self)
+
+    @overrides(AbstractVertex.add_constraint)
+    def add_constraint(self, constraint):
+        AbstractVertex.add_constraint(self, constraint)
+        if self._splitter_object is not None:
+            self.splitter_object.check_supported_constraints()
 
     def remember_associated_machine_vertex(self, machine_vertex):
         """
