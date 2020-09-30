@@ -91,7 +91,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         # get the setup objects
         (machine_graph, resource_tracker, vertices, progress) = (
             self.__setup_objects(
-                app_graph, machine, plan_n_time_steps, pre_allocated_resources))
+                app_graph, machine, plan_n_time_steps,
+                pre_allocated_resources))
 
         self.__set_same_max_atoms_to_splitters(app_graph)
 

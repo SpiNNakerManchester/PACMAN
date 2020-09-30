@@ -20,7 +20,8 @@ from spinn_utilities.abstract_base import AbstractBase
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
-from pacman.exceptions import (PacmanValueError, PacmanAlreadyExistsException,
+from pacman.exceptions import (
+    PacmanValueError, PacmanAlreadyExistsException,
     PacmanConfigurationException)
 
 
