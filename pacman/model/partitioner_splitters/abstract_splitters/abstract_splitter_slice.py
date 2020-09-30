@@ -186,9 +186,9 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                     self.NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
                         self._governed_app_vertex, lo_atom - 1,
                         used_resources.sdram.get_total_sdram(
-                            resource_tracker.plan_n_timesteps),
+                            resource_tracker.plan_n_time_steps),
                         resources_available.sdram.get_total_sdram(
-                            resource_tracker.plan_n_timesteps)))
+                            resource_tracker.plan_n_time_steps)))
 
             # Try to scale up until just below the resource usage
             used_resources, hi_atom = self._scale_up_resource_usage(
