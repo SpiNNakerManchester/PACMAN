@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.operations.routing_info_allocator_algorithms import (
-    GlobalZonedRoutingInfoAllocator, ZonedRoutingInfoAllocator)
+    ZonedRoutingInfoAllocator)
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
@@ -48,7 +48,7 @@ class SimpleMacVertex(MachineVertex):
         return None
 
 
-def create_graphs():
+def create_graphs1():
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = SimpleAppVertex()
@@ -89,29 +89,22 @@ def create_graphs():
 
     return app_graph, mac_graph, n_keys_map
 
-
-def test_global_allocator():
-    # Allocate something and check it does the right thing
-
-    app_graph, mac_graph, n_keys_map = create_graphs()
-
-    # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
-        mac_graph, n_keys_map)
-
+def check_masks_all_the_same(routing_info, mask):
     # Check the mask is the same for all, and allows for the space required
     # for the maximum number of keys in total (bottom 8 bits)
-    mask = 0xFFFFFF00
     seen_keys = set()
     for r_info in routing_info:
         assert(len(r_info.keys_and_masks) == 1)
-        assert(r_info.first_mask == mask)
+        if r_info.first_mask != mask:
+            label = r_info.partition.pre_vertex.label
+            assert(label == "RETINA")
         assert(r_info.first_key not in seen_keys)
         seen_keys.add(r_info.first_key)
 
-    # Check the key for each application vertex is the same
+def check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask):
+    # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
-    app_mask = 0xFFFFF000
     key_check = dict()
     for app_vertex in app_graph.vertices:
         for m_vertex in app_vertex.machine_vertices:
@@ -119,39 +112,63 @@ def test_global_allocator():
                     m_vertex):
                 key = routing_info.get_first_key_from_partition(p)
                 if (app_vertex, p.label) in key_check:
-                    assert((key_check[(app_vertex, p.identifier)] & app_mask) == (key & app_mask))
+                    assert((key_check[(app_vertex, p.identifier)] & app_mask)
+                           == (key & app_mask))
                 else:
                     if key != 0:
                         assert((key & app_mask) != 0)
                     key_check[(app_vertex, p.identifier)] = key
 
 
-def test_zoned_allocator():
+def test_global_allocator():
     # Allocate something and check it does the right thing
-    app_graph, mac_graph, n_keys_map = create_graphs()
 
-    # The number of bits is 3 + 5 + 6 + 8 = 22, so it shouldn't fail
-    ZonedRoutingInfoAllocator.flexible_allocate(mac_graph, n_keys_map)
+    app_graph, mac_graph, n_keys_map = create_graphs1()
 
+    # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
+    routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
+        mac_graph, n_keys_map)
 
-def test_too_big():
+    # Last 8 for buts
+    mask = 0xFFFFFF00
+    check_masks_all_the_same(routing_info,  mask)
+
+    # all but the bottom 13 bits should be the same
+    app_mask = 0xFFFFE000
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
+
+def test_flexible_allocator():
+    # Allocate something and check it does the right thing
+    app_graph, mac_graph, n_keys_map = create_graphs1()
+
+    # The number of bits is 7 + 11 = 20, so it shouldn't fail
+    routing_info, _ = ZonedRoutingInfoAllocator.flexible_allocate(
+        mac_graph, n_keys_map)
+
+    # all but the bottom 11 bits should be the same
+    app_mask = 0xFFFFF800
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
+
+def create_big():
     # This test shows how easy it is to trip up the allocator with a retina
     app_graph = ApplicationGraph("Test")
     # Create a single "big" vertex
-    big_app_vertex = SimpleAppVertex()
+    big_app_vertex = SimpleAppVertex(label="Retina")
     app_graph.add_vertex(big_app_vertex)
     # Create a single output vertex (which won't send)
-    out_app_vertex = SimpleAppVertex()
+    out_app_vertex = SimpleAppVertex(label="Destination")
     app_graph.add_vertex(out_app_vertex)
     # Create a load of middle vertex
-    mid_app_vertex = SimpleAppVertex()
+    mid_app_vertex = SimpleAppVertex("Population")
     app_graph.add_vertex(mid_app_vertex)
 
     mac_graph = MachineGraph("Test", app_graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # Create a single big machine vertex
-    big_mac_vertex = SimpleMacVertex(app_vertex=big_app_vertex)
+    big_mac_vertex = SimpleMacVertex(app_vertex=big_app_vertex, label="RETINA")
     mac_graph.add_vertex(big_mac_vertex)
 
     # Create a single output vertex (which won't send)
@@ -172,12 +189,38 @@ def test_too_big():
 
     big_mac_part = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
         big_mac_vertex, "Test")
-
     # Make the "retina" need 21 bits, so total is now 21 + 11 = 32 bits,
     # but the application vertices need some bits too
     n_keys_map.set_n_keys_for_partition(big_mac_part, 1024 * 768 * 2)
+    return app_graph, mac_graph, n_keys_map
 
+def test_big_flexible():
+    app_graph, mac_graph, n_keys_map = create_big()
+
+    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
+    routing_info, _ = ZonedRoutingInfoAllocator.flexible_allocate(
+        mac_graph, n_keys_map)
+
+    # The number of bits is 1 + 21 = 22, so it shouldn't fail
+    # all but the bottom 21 bits should be the same
+    app_mask = 0xFFE00000
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
+
+def test_big_global():
+    app_graph, mac_graph, n_keys_map = create_big()
     # Make the call, and it should fail
-    with pytest.raises(PacmanRouteInfoAllocationException):
-        routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
-            mac_graph, n_keys_map)
+    routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
+        mac_graph, n_keys_map)
+
+    # 1 for app 11 for machine so where possible use 20 for atoms
+    mask = 0xFFF00000
+    check_masks_all_the_same(routing_info, mask)
+
+    # The number of bits is 1 + 11 + 21, so it will not fit
+    # So flexible for the retina
+    # Others mask all bit minimum app bits (1)
+    # all but the top 1 bits should be the same
+    app_mask = 0x80000000
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)

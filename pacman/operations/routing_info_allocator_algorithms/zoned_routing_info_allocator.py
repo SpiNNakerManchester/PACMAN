@@ -203,23 +203,24 @@ class ZonedRoutingInfoAllocator(object):
 
         app_part_bits = self.__bits_needed(len(self.__atom_bits_per_app_part))
 
-        if not self.__flexible:
-            if app_part_bits + self.__n_bits_machine + self.__n_bits_atoms > \
-                    BITS_IN_KEY:
-                raise PacmanRouteInfoAllocationException(
-                    "Unable to use ZonedRoutingInfoAllocator with global "
-                    "settings. Please select a different allocator as it "
-                    "needs {} + {} + {} bits".format(
-                        app_part_bits, self.__n_bits_machine,
-                        self.__n_bits_atoms))
-            self.__n_bits_atoms_and_mac = \
-                self.__n_bits_machine + self.__n_bits_atoms
-
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bits".format(
                     app_part_bits, self.__n_bits_atoms_and_mac))
+
+        if not self.__flexible:
+            if app_part_bits + self.__n_bits_machine + self.__n_bits_atoms > \
+                    BITS_IN_KEY:
+                # We know from above test that all will fit if flexible
+                # Reduce the suggested size of n_bits_atoms
+                self.__n_bits_atoms  = \
+                    BITS_IN_KEY - app_part_bits - self.__n_bits_machine
+            else:
+                # Set the size of atoms and machine for biggest of each
+                self.__n_bits_atoms_and_mac = \
+                    self.__n_bits_machine + self.__n_bits_atoms
+
 
     def _simple_allocate(self):
         """
@@ -239,20 +240,30 @@ class ZonedRoutingInfoAllocator(object):
         for app_vertex in progress.over(by_app_and_partition_name):
             for partition_name, by_partition_name in \
                     by_app_and_partition_name[app_vertex].items():
-                if self.__flexible:
-                    n_bits_atoms = self.__atom_bits_per_app_part[
-                        (app_vertex, partition_name)]
-                    n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
-                else:
-                    n_bits_atoms = self.__n_bits_atoms
-                    n_bits_machine = self.__n_bits_machine
                 machine_vertices = list(by_partition_name)
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
+                if self.__flexible:
+                    n_bits_atomsx = self.__atom_bits_per_app_part[
+                        (app_vertex, partition_name)]
+                    n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atomsx
+                else:
+                    n_bits_atomsx = self.__atom_bits_per_app_part[
+                        (app_vertex, partition_name)]
+                    print(self.__atom_bits_per_app_part)
+                    if n_bits_atomsx < self.__n_bits_atoms:
+                        # Ok it fits use global sizes
+                        n_bits_atomsx = self.__n_bits_atoms
+                        n_bits_machine = self.__n_bits_machine
+                    else:
+                        # Nope need more use that so adjust n_bits_machine down
+                        n_bits_machine = \
+                            self.__n_bits_atoms_and_mac - n_bits_atomsx
+
                 for machine_index, vertex in enumerate(machine_vertices):
-                    mask = self.__mask(n_bits_atoms)
+                    mask = self.__mask(n_bits_atomsx)
                     key = app_part_index
                     key = (key << n_bits_machine) | machine_index
-                    key = key << n_bits_atoms
+                    key = key << n_bits_atomsx
                     key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
                     partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
