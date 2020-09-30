@@ -32,7 +32,10 @@ class ApplicationVertex(AbstractVertex):
     """
 
     __slots__ = [
+        # list of machine verts associated with this app vertex
         "_machine_vertices",
+
+        # the splitter object associated with this app vertex
         "_splitter_object"]
 
     SETTING_SPLITTER_OBJECT_ERROR_MSG = (

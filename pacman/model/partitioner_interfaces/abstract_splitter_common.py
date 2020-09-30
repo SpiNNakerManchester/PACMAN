@@ -22,9 +22,17 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 class AbstractSplitterCommon(object):
 
     __slots__ = [
+        # the app vertex this splitter governs.
         "_governed_app_vertex",
+
+        # the name of this splitter object, for human readability.
         "_splitter_name",
+
+        # the max atoms per core demanded by the tools. interpretation of
+        # this is at the splitter objects discretion.
         "_max_atoms_per_core",
+
+        # bool flag that says that the constraint is fixed or soft.
         "_is_fixed_atoms_per_core"
     ]
 
@@ -53,10 +61,25 @@ class AbstractSplitterCommon(object):
         return self.__str__()
 
     def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
+        """ sets max atoms per core for this splitter object
+
+        :param max_atoms_per_core: max atoms per core for this splitter.
+        :param is_fixed_atoms: is this a hard constraint or soft.
+        :rtype: None
+        """
+
         self._max_atoms_per_core = max_atoms_per_core
         self._is_fixed_atoms_per_core = is_fixed_atoms
 
     def set_governed_app_vertex(self, app_vertex):
+        """ sets a app vertex to be governed by this splitter object.
+        Once set it cant be reset
+
+        :param app_vertex: the app vertex to govern
+        :rtype: None
+        :raises PacmanConfigurationException if the app vertex has already\
+            been set.
+        """
         if self._governed_app_vertex is not None:
             raise PacmanConfigurationException(
                 self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(
@@ -120,8 +143,9 @@ class AbstractSplitterCommon(object):
 
     @abstractmethod
     def machine_vertices_for_recording(self, variable_to_record):
-        """
+        """ returns the machine vertices which are recording this variable.
 
-        :param variable_to_record:
+        :param variable_to_record: the variable to get machine verts for.
         :return: list of machine vertices
+        :rtype iterable of <MachineVertex>
         """

@@ -20,6 +20,11 @@ from spinn_utilities.abstract_base import (
 
 @add_metaclass(AbstractBase)
 class LegacyPartitionerAPI(object):
+    """ api used by the vertices which dont have their own splitters but use
+    what master did before the self partitioning stuff came to be.
+
+    """
+
 
     @abstractmethod
     def get_resources_used_by_atoms(self, vertex_slice):

@@ -12,14 +12,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.exceptions import PacmanConfigurationException, \
-    PacmanPartitionException
-from pacman.model.constraints.partitioner_constraints import \
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanPartitionException)
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.graphs.machine import MachineGraph
-from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
-from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import \
-    get_same_size_vertex_groups
+from pacman.model.partitioner_interfaces import (
+    AbstractSplitterPartitioner, AbstractSlicesConnect)
+from pacman.utilities.algorithm_utilities.\
+    partition_algorithm_utilities import get_same_size_vertex_groups
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
@@ -73,10 +74,11 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             self, app_graph, machine, plan_n_time_steps,
             pre_allocated_resources=None):
         """
-        :param ApplicationGraph app_graph:
-        :param ~spinn_machine.Machine machine:
-        :param int plan_n_time_steps:
-        :param pre_allocated_resources:
+        :param ApplicationGraph app_graph: app graph
+        :param ~spinn_machine.Machine machine: machine rep
+        :param int plan_n_time_steps: the number of time steps to run for
+        :param pre_allocated_resources: res needed to be pre allocated before\
+            making new machine vertices.
         :type pre_allocated_resources: PreAllocatedResourceContainer or None
         :rtype: tuple(MachineGraph, int)
         :raise PacmanPartitionException:
@@ -97,12 +99,18 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             vertex.splitter_object.split(resource_tracker, machine_graph)
 
         # process edges
-        self.__process_machine_edges(app_graph, machine_graph)
+        self.__process_machine_edges(
+            app_graph, machine_graph, resource_tracker)
 
         # return the accepted things
         return machine_graph, resource_tracker.chips_used
 
     def __set_same_max_atoms_to_splitters(self, app_graph):
+        """ get the constraints sorted out.
+
+        :param ApplicationGraph app_graph: the app graph
+        :rtype: None
+        """
         # Group vertices that are supposed to be the same size
         vertex_groups = get_same_size_vertex_groups(app_graph.vertices)
         for vertex in app_graph.vertices:
@@ -150,7 +158,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
     def __setup_objects(
             self, app_graph, machine, plan_n_time_steps,
             pre_allocated_resources):
-        """
+        """ sets up the machine_graph, resource_tracker, vertices, \
+        progress bar.
 
         :param ApplicationGraph app_graph: app graph
         :param ~spinn_machine.Machine machine: machine
@@ -202,11 +211,13 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             self.__ERROR_MESSAGE_OF_NO_COMMON_EDGE_TYPE.format(
                 src_machine_vertex, dest_machine_vertex))
 
-    def __process_machine_edges(self, app_graph, machine_graph):
+    def __process_machine_edges(
+            self, app_graph, machine_graph, resource_tracker):
         """ generate the machine edges for the machine graph
 
         :param ApplicationGraph app_graph: app graph
         :param MachineGraph machine_graph: machine graph
+        :param ResourceTracker resource_tracker: resource tracker
         :rtype: None
         """
 
@@ -247,23 +258,33 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                         self.create_machine_edge(
                             src_machine_vertex, dest_machine_vertex,
                             common_edge_type, app_edge, machine_graph,
-                            app_outgoing_edge_partition)
+                            app_outgoing_edge_partition, resource_tracker)
 
     @overrides(AbstractSplitterPartitioner.create_machine_edge)
     def create_machine_edge(
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
-            app_outgoing_edge_partition):
+            app_outgoing_edge_partition, resource_tracker):
         """ overridable method for creating the machine edges
 
-        :param MachineVertex src_machine_vertex:
-        :param MachineVertex dest_machine_vertex:
-        :param MachineEdge common_edge_type:
-        :param ApplicationEdge app_edge:
-        :param MachineGraph machine_graph:
-        :param OutgoingEdgePartition app_outgoing_edge_partition:
+        :param MachineVertex src_machine_vertex: \
+            src machine vertex of the edge.
+        :param MachineVertex dest_machine_vertex: \
+            dest machine vertex of the edge.
+        :param MachineEdge common_edge_type: the edge type to build.
+        :param ApplicationEdge app_edge: the app edge to associate the\
+            machine edge with.
+        :param MachineGraph machine_graph: machine graph
+        :param Resource resource_tracker: res tracker.
+        :param OutgoingEdgePartition app_outgoing_edge_partition: partition.
         :rtype: None
         """
+
+        if (isinstance(app_edge, AbstractSlicesConnect) and not
+                app_edge.could_connect(
+                    src_machine_vertex.vertex_slice,
+                    dest_machine_vertex.vertex_slice)):
+            return
 
         # build edge and add to machine graph
         machine_edge = common_edge_type(

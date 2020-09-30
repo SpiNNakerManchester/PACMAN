@@ -18,19 +18,25 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractSplitterPartitioner(object):
+    """ splitter API to allow other Partitioner's to add more stuff to the
+    edge creation process.
+
+    """
 
     @abstractmethod
     def create_machine_edge(
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
-            app_outgoing_edge_partition):
+            app_outgoing_edge_partition, resource_tracker):
         """ overridable method for creating the machine edges
 
-        :param MachineVertex src_machine_vertex:
-        :param MachineVertex dest_machine_vertex:
-        :param MachineEdge common_edge_type:
-        :param ApplicationEdge app_edge:
-        :param MachineGraph machine_graph:
-        :param OutgoingEdgePartition app_outgoing_edge_partition:
+        :param MachineVertex src_machine_vertex: src machine vertex of a edge
+        :param MachineVertex dest_machine_vertex: dest machine vertex of a edge
+        :param MachineEdge common_edge_type: the edge type to build
+        :param ApplicationEdge app_edge: the app edge this machine edge is\
+            to be associated with.
+        :param MachineGraph machine_graph: machine graph to add edge to.
+        :param OutgoingEdgePartition app_outgoing_edge_partition: partition
+        :param Resource resource_tracker: the resource tracker.
         :rtype: None
         """
