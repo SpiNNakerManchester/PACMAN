@@ -92,7 +92,7 @@ class ApplicationVertex(AbstractVertex):
     def add_constraint(self, constraint):
         AbstractVertex.add_constraint(self, constraint)
         if self._splitter_object is not None:
-            self.splitter_object.check_supported_constraints()
+            self._splitter_object.check_supported_constraints()
 
     def remember_associated_machine_vertex(self, machine_vertex):
         """
