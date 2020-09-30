@@ -37,7 +37,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
     :param ~spinn_machine.Machine machine:
         The machine with respect to which to partition the application
         graph
-    :param int plan_n_time_steps: number of time steps to plan for
+    :param int or None plan_n_time_steps: number of time steps to plan for
     :param pre_allocated_resources:
     :type pre_allocated_resources: PreAllocatedResourceContainer or None
     :return:
@@ -76,7 +76,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         """
         :param ApplicationGraph app_graph: app graph
         :param ~spinn_machine.Machine machine: machine rep
-        :param int plan_n_time_steps: the number of time steps to run for
+        :param int or None plan_n_time_steps: \
+            the number of time steps to run for
         :param pre_allocated_resources: res needed to be pre allocated before\
             making new machine vertices.
         :type pre_allocated_resources: PreAllocatedResourceContainer or None

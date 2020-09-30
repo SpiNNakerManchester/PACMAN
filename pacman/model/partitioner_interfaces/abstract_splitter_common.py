@@ -104,6 +104,9 @@ class AbstractSplitterCommon(object):
                     self._governed_app_vertex, self._splitter_name,
                     app_vertex))
         self._governed_app_vertex = app_vertex
+        self.check_supported_constraints()
+
+    def check_supported_constraints(self):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
             supported_constraints=[
