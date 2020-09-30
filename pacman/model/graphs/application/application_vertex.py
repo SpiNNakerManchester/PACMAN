@@ -54,10 +54,9 @@ class ApplicationVertex(AbstractVertex):
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
-
+        self._splitter_object = None
         super(ApplicationVertex, self).__init__(label, constraints)
         self._machine_vertices = OrderedSet()
-        self._splitter_object = None
 
         # add a constraint for max partitioning
         self.add_constraint(
