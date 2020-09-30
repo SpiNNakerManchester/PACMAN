@@ -78,7 +78,7 @@ class SplitterFixedSliceSized(AbstractSplitterCommon):
         atoms_per_core = self._compute_atoms_per_core(resource_tracker)
         if atoms_per_core < 1.0:
             raise PacmanPartitionException(
-                self._NOT_ENOUGH_RESOURCES_ERROR_MESSAGE)
+                self.NOT_ENOUGH_RESOURCES_ERROR_MESSAGE)
         self.__split(atoms_per_core, machine_graph, resource_tracker)
         self.__been_called = True
         return True
