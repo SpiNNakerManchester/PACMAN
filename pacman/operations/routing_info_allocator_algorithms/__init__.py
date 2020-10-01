@@ -31,5 +31,4 @@ __all__ = ['BasicRoutingInfoAllocator',
            'CompressibleMallocBasedRoutingInfoAllocator',
            'DestinationBasedRoutingInfoAllocator',
            'MallocBasedRoutingInfoAllocator',
-           'GlobalZonedRoutingInfoAllocator',
            'ZonedRoutingInfoAllocator']
