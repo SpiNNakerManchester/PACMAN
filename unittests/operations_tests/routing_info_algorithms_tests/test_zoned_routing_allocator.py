@@ -22,8 +22,6 @@ from pacman.model.graphs.application.application_graph import ApplicationGraph
 from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.model.graphs.machine.machine_edge import MachineEdge
-from pacman.exceptions import PacmanRouteInfoAllocationException
-import pytest
 
 
 class SimpleAppVertex(ApplicationVertex):
@@ -89,6 +87,7 @@ def create_graphs1():
 
     return app_graph, mac_graph, n_keys_map
 
+
 def check_masks_all_the_same(routing_info, mask):
     # Check the mask is the same for all, and allows for the space required
     # for the maximum number of keys in total (bottom 8 bits)
@@ -100,6 +99,7 @@ def check_masks_all_the_same(routing_info, mask):
             assert(label == "RETINA")
         assert(r_info.first_key not in seen_keys)
         seen_keys.add(r_info.first_key)
+
 
 def check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask):
@@ -138,6 +138,7 @@ def test_global_allocator():
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
 
+
 def test_flexible_allocator():
     # Allocate something and check it does the right thing
     app_graph, mac_graph, n_keys_map = create_graphs1()
@@ -150,6 +151,7 @@ def test_flexible_allocator():
     app_mask = 0xFFFFF800
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
+
 
 def create_big():
     # This test shows how easy it is to trip up the allocator with a retina
@@ -194,6 +196,7 @@ def create_big():
     n_keys_map.set_n_keys_for_partition(big_mac_part, 1024 * 768 * 2)
     return app_graph, mac_graph, n_keys_map
 
+
 def test_big_flexible():
     app_graph, mac_graph, n_keys_map = create_big()
 
@@ -206,6 +209,7 @@ def test_big_flexible():
     app_mask = 0xFFE00000
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
+
 
 def test_big_global():
     app_graph, mac_graph, n_keys_map = create_big()
