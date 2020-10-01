@@ -37,6 +37,7 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
         "Your vertex is deprecated. Please add a Splitter or " 
         "inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api")
+
     NOT_SUITABLE_VERTEX_ERROR = (
         "The vertex {} cannot be supported by the {} as"
         " the vertex does not support the required method {} of "
