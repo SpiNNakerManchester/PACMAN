@@ -113,10 +113,6 @@ def check_keys_for_application_partition_pairs(
                 mapped_key = mapped_base[(app_vertex, p.identifier)].key
                 assert((mapped_key & app_mask) == (key & app_mask))
                 if key != 0:
-                    if (key & app_mask) != 0:
-                        keyh = hex(key)
-                        andh = hex(key & app_mask)
-                        print("foo")
                     assert((key & app_mask) != 0)
 
 
