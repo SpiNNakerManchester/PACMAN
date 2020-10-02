@@ -79,7 +79,8 @@ class ApplicationVertex(AbstractVertex):
         :param SplitterObjectCommon new_value: the new splitter object
         :rtype: None
         """
-
+        if self._splitter_object == new_value:
+            return
         if self._splitter_object is not None:
             raise PacmanConfigurationException(
                 self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(self._label))

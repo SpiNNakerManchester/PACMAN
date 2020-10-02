@@ -98,6 +98,8 @@ class AbstractSplitterCommon(object):
         :raises PacmanConfigurationException if the app vertex has already\
             been set.
         """
+        if self._governed_app_vertex == app_vertex:
+            return
         if self._governed_app_vertex is not None:
             raise PacmanConfigurationException(
                 self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(
@@ -105,6 +107,7 @@ class AbstractSplitterCommon(object):
                     app_vertex))
         self._governed_app_vertex = app_vertex
         self.check_supported_constraints()
+        app_vertex.splitter_object = self
 
     def check_supported_constraints(self):
         utility_calls.check_algorithm_can_support_constraints(

@@ -60,3 +60,11 @@ class LegacyPartitionerAPI(object):
         :return: The number of atoms
         :rtype: int
         """
+
+    @staticmethod
+    def abstractmethods():
+        """
+        Exposes the asbtract methods and properties defined in this class
+        :rtype list(str)
+        """
+        return LegacyPartitionerAPI.__abstractmethods__

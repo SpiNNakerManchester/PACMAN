@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import logging
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import \
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint, \
@@ -21,6 +22,9 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterSlice)
 from pacman.utilities import utility_calls
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SplitterSliceLegacy(AbstractSplitterSlice):
@@ -29,9 +33,14 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
         "__splitter_name",
     ]
 
+    NOT_API_WARNING = (
+        "Your vertex is deprecated. Please add a Splitter or "
+        "inherit from the class in "
+        "pacman.model.partitioner_interfaces.legacy_partitioner_api")
+
     NOT_SUITABLE_VERTEX_ERROR = (
         "The vertex {} cannot be supported by the {} as"
-        " the vertex does not support the required API of "
+        " the vertex does not support the required method {} of "
         "LegacyPartitionerAPI. Please inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
         "again.")
@@ -47,9 +56,14 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterSlice.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, LegacyPartitionerAPI):
-            raise PacmanConfigurationException(
-                self.NOT_SUITABLE_VERTEX_ERROR.format(
-                    self._splitter_name, app_vertex.label))
+            for abstractmethod in LegacyPartitionerAPI.abstractmethods():
+                check = getattr(app_vertex, abstractmethod, None)
+                if not check:
+                    raise PacmanConfigurationException(
+                        self.NOT_SUITABLE_VERTEX_ERROR.format(
+                            self._splitter_name, app_vertex.label,
+                            abstractmethod))
+                logger.warning(self.NOT_API_WARNING)
 
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
