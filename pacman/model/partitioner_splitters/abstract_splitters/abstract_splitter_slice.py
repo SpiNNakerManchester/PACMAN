@@ -397,7 +397,8 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
             while n_atoms_placed < n_atoms:
                 if n_atoms_placed + self._max_atoms_per_core > n_atoms:
                     slices.append(Slice(
-                        n_atoms_placed, n_atoms - n_atoms_placed))
+                        n_atoms_placed,
+                        n_atoms_placed + (n_atoms - n_atoms_placed)))
                     n_atoms_placed = n_atoms
                 else:
                     slices.append(Slice(
