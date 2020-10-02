@@ -102,22 +102,22 @@ def check_masks_all_the_same(routing_info, mask):
 
 
 def check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask):
+        app_graph, mac_graph, routing_info, app_mask, mapped_base):
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
-    key_check = dict()
     for app_vertex in app_graph.vertices:
         for m_vertex in app_vertex.machine_vertices:
             for p in mac_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     m_vertex):
                 key = routing_info.get_first_key_from_partition(p)
-                if (app_vertex, p.label) in key_check:
-                    assert((key_check[(app_vertex, p.identifier)] & app_mask)
-                           == (key & app_mask))
-                else:
-                    if key != 0:
-                        assert((key & app_mask) != 0)
-                    key_check[(app_vertex, p.identifier)] = key
+                mapped_key = mapped_base[(app_vertex, p.identifier)].key
+                assert((mapped_key & app_mask) == (key & app_mask))
+                if key != 0:
+                    if (key & app_mask) != 0:
+                        keyh = hex(key)
+                        andh = hex(key & app_mask)
+                        print("foo")
+                    assert((key & app_mask) != 0)
 
 
 def test_global_allocator():
@@ -126,7 +126,7 @@ def test_global_allocator():
     app_graph, mac_graph, n_keys_map = create_graphs1()
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
+    routing_info, mapped_base = ZonedRoutingInfoAllocator.global_allocate(
         mac_graph, n_keys_map)
 
     # Last 8 for buts
@@ -136,7 +136,7 @@ def test_global_allocator():
     # all but the bottom 13 bits should be the same
     app_mask = 0xFFFFE000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, mac_graph, routing_info, app_mask, mapped_base)
 
 
 def test_flexible_allocator():
@@ -144,13 +144,13 @@ def test_flexible_allocator():
     app_graph, mac_graph, n_keys_map = create_graphs1()
 
     # The number of bits is 7 + 11 = 20, so it shouldn't fail
-    routing_info, _ = ZonedRoutingInfoAllocator.flexible_allocate(
+    routing_info, mapped_base = ZonedRoutingInfoAllocator.flexible_allocate(
         mac_graph, n_keys_map)
 
     # all but the bottom 11 bits should be the same
     app_mask = 0xFFFFF800
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, mac_graph, routing_info, app_mask, mapped_base)
 
 
 def create_big():
@@ -201,20 +201,20 @@ def test_big_flexible():
     app_graph, mac_graph, n_keys_map = create_big()
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info, _ = ZonedRoutingInfoAllocator.flexible_allocate(
+    routing_info, mapped_base = ZonedRoutingInfoAllocator.flexible_allocate(
         mac_graph, n_keys_map)
 
     # The number of bits is 1 + 21 = 22, so it shouldn't fail
     # all but the bottom 21 bits should be the same
     app_mask = 0xFFE00000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, mac_graph, routing_info, app_mask, mapped_base)
 
 
 def test_big_global():
     app_graph, mac_graph, n_keys_map = create_big()
     # Make the call, and it should fail
-    routing_info, _ = ZonedRoutingInfoAllocator.global_allocate(
+    routing_info, mapped_base = ZonedRoutingInfoAllocator.global_allocate(
         mac_graph, n_keys_map)
 
     # 1 for app 11 for machine so where possible use 20 for atoms
@@ -227,4 +227,4 @@ def test_big_global():
     # all but the top 1 bits should be the same
     app_mask = 0x80000000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, mac_graph, routing_info, app_mask, mapped_base)

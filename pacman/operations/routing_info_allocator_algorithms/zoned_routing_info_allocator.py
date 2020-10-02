@@ -77,7 +77,7 @@ class ZonedRoutingInfoAllocator(object):
         A map between the edges and the number of keys required by the
         edges
     :return: The routing information
-    :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+    :rtype: tuple(RoutingInfo, dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
         If something goes wrong with the allocation
     """
@@ -109,7 +109,6 @@ class ZonedRoutingInfoAllocator(object):
             edges
         :param bool flexible: Dettermines if flexible can be use.
             If False global settings will be attempted
-        :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
         :raise PacmanRouteInfoAllocationException:
         """
         # check that this algorithm supports the constraints put onto the
@@ -138,7 +137,8 @@ class ZonedRoutingInfoAllocator(object):
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             A map between the edges and the number of keys required by the
             edges
-        :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+        :rtype: tuple(RoutingInfo,
+            dict((ApplicationVertex, str), BaseKeyAndMask))
         :raise PacmanRouteInfoAllocationException:
         """
         # check that this algorithm supports the constraints put onto the
@@ -158,7 +158,8 @@ class ZonedRoutingInfoAllocator(object):
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             A map between the edges and the number of keys required by the
             edges
-        :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+        :rtype: tuple(RoutingInfo,
+            dict((ApplicationVertex, str), BaseKeyAndMask))
         :raise PacmanRouteInfoAllocationException:
         """
         # check that this algorithm supports the constraints put onto the
@@ -216,6 +217,7 @@ class ZonedRoutingInfoAllocator(object):
                 # Reduce the suggested size of n_bits_atoms
                 self.__n_bits_atoms = \
                     BITS_IN_KEY - app_part_bits - self.__n_bits_machine
+                self.__n_bits_atoms_and_mac = BITS_IN_KEY - app_part_bits
             else:
                 # Set the size of atoms and machine for biggest of each
                 self.__n_bits_atoms_and_mac = \
@@ -226,7 +228,8 @@ class ZonedRoutingInfoAllocator(object):
         :param dict((ApplicationVertex, str),int) mask_bits_map:
             map of app vertex,name to max keys for that vertex
         :return: tuple of routing infos and map from app vertex and key masks
-        :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
+        :rtype: tuple(RoutingInfo,
+            dict((ApplicationVertex, str), BaseKeyAndMask))
         """
         by_app_and_partition_name = \
             self.__machine_graph.multicast_partitions
@@ -269,9 +272,9 @@ class ZonedRoutingInfoAllocator(object):
                             vertex, partition_name)
                     routing_infos.add_partition_info(
                         PartitionRoutingInfo([key_and_mask], partition))
-                    # TODO what about partition ??
+
                 app_key = app_part_index << self.__n_bits_atoms_and_mac
-                by_app_vertex[app_vertex] = BaseKeyAndMask(
+                by_app_vertex[(app_vertex, partition_name)] = BaseKeyAndMask(
                     base_key=app_key, mask=app_mask)
                 app_part_index += 1
 
