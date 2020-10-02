@@ -379,7 +379,7 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
-            <param_type>ApplicationRoutingInfos</param_type>
+            <param_type>MappedBaseKeyAndMask</param_type>
         </outputs>
     </algorithm>
     <algorithm name="GlobalZonedRoutingInfoAllocator">
@@ -401,7 +401,7 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
-            <param_type>ApplicationRoutingInfos</param_type>
+            <param_type>MappedBaseKeyAndMask</param_type>
         </outputs>
     </algorithm>
     <algorithm name="DestinationBasedRoutingInfoAllocator">
@@ -532,7 +532,7 @@
             </parameter>
             <parameter>
                 <param_name>info_by_app_vertex</param_name>
-                <param_type>ApplicationRoutingInfos</param_type>
+                <param_type>MappedBaseKeyAndMask</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>

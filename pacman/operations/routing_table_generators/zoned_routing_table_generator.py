@@ -48,7 +48,8 @@ class ZonedRoutingTableGenerator(object):
     :param RoutingInfo routing_infos:
     :param MulticastRoutingTableByPartition routing_table_by_partitions:
     :param ~spinn_machine.Machine machine:
-    :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
+    :param dict((ApplicationVertex, str), BaseKeyAndMask) mapped_base_key_mask:
+        A map if ApplicationVertex and Partition Identifier to a BaseKeyAndMask
     :rtype: MulticastRoutingTables
     """
 
@@ -56,12 +57,16 @@ class ZonedRoutingTableGenerator(object):
 
     def __call__(
             self, routing_infos, routing_table_by_partitions, machine,
-            info_by_app_vertex):
+            mapped_base_key_mask):
         """
         :param RoutingInfo routing_infos:
         :param MulticastRoutingTableByPartition routing_table_by_partitions:
         :param ~spinn_machine.Machine machine:
-        :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
+        :param mapped_base_key_mask:
+            A map if ApplicationVertex and Partition Identifier to a
+            BaseKeyAndMask
+        :type mapped_base_key_mask:
+            dict((ApplicationVertex, str), BaseKeyAndMask)
         :rtype: MulticastRoutingTables
         """
         progress = ProgressBar(machine.n_chips, "Generating routing tables")
@@ -72,39 +77,44 @@ class ZonedRoutingTableGenerator(object):
             if partitions_in_table:
                 routing_tables.add_routing_table(self._create_routing_table(
                     chip, partitions_in_table, routing_infos,
-                    info_by_app_vertex))
+                    mapped_base_key_mask))
 
         return routing_tables
 
     def _create_routing_table(self, chip, partitions_in_table, routing_infos,
-                              info_by_app_vertex):
+                              mapped_base_key_mask):
         """
         :param ~spinn_machine.Chip chip:
         :param partitions_in_table:
         :type partitions_in_table:
             dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
         :param RoutingInfo routing_infos:
-        :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
+        :param mapped_base_key_mask:
+            A map if ApplicationVertex and Partition Identifier to a
+            BaseKeyAndMask
+        :type mapped_base_key_mask:
+            dict((ApplicationVertex, str), BaseKeyAndMask)
         :rtype: MulticastRoutingTable
+
         """
         table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
-        partitions_by_app_vertex = DefaultOrderedDict(set)
+        partitions_by_lookup = DefaultOrderedDict(set)
         for partition in partitions_in_table:
-            partitions_by_app_vertex[partition.pre_vertex.app_vertex].add(
-                partition)
-        for app_vertex in partitions_by_app_vertex:
-            if app_vertex in info_by_app_vertex:
+            lookup = (partition.pre_vertex.app_vertex, partition.identifier)
+            partitions_by_lookup[lookup].add(partition)
+        for lookup in partitions_by_lookup:
+            if lookup in mapped_base_key_mask:
                 shared_entry = self._find_shared_entry(
-                    partitions_by_app_vertex[app_vertex], partitions_in_table)
+                    partitions_by_lookup[lookup], partitions_in_table)
             else:
                 shared_entry = None
             if shared_entry is None:
                 self._add_partition_based(
-                    partitions_by_app_vertex[app_vertex], routing_infos,
+                    partitions_by_lookup[lookup], routing_infos,
                     partitions_in_table, table)
             else:
                 self.__add_key_and_mask(
-                    info_by_app_vertex[app_vertex], shared_entry, table)
+                    mapped_base_key_mask[lookup], shared_entry, table)
         return table
 
     def _find_shared_entry(self, partitions, partitions_in_table):
