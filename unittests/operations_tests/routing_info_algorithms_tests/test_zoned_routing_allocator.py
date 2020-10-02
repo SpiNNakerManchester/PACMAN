@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.operations.routing_info_allocator_algorithms import (
-    ZonedRoutingInfoAllocator)
+from pacman.operations.routing_info_allocator_algorithms.\
+    zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
@@ -122,8 +122,7 @@ def test_global_allocator():
     app_graph, mac_graph, n_keys_map = create_graphs1()
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info, mapped_base = ZonedRoutingInfoAllocator.global_allocate(
-        mac_graph, n_keys_map)
+    routing_info, mapped_base = global_allocate(mac_graph, n_keys_map)
 
     # Last 8 for buts
     mask = 0xFFFFFF00
@@ -140,8 +139,7 @@ def test_flexible_allocator():
     app_graph, mac_graph, n_keys_map = create_graphs1()
 
     # The number of bits is 7 + 11 = 20, so it shouldn't fail
-    routing_info, mapped_base = ZonedRoutingInfoAllocator.flexible_allocate(
-        mac_graph, n_keys_map)
+    routing_info, mapped_base = flexible_allocate(mac_graph, n_keys_map)
 
     # all but the bottom 11 bits should be the same
     app_mask = 0xFFFFF800
@@ -197,8 +195,7 @@ def test_big_flexible():
     app_graph, mac_graph, n_keys_map = create_big()
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info, mapped_base = ZonedRoutingInfoAllocator.flexible_allocate(
-        mac_graph, n_keys_map)
+    routing_info, mapped_base = flexible_allocate(mac_graph, n_keys_map)
 
     # The number of bits is 1 + 21 = 22, so it shouldn't fail
     # all but the bottom 21 bits should be the same
@@ -210,8 +207,7 @@ def test_big_flexible():
 def test_big_global():
     app_graph, mac_graph, n_keys_map = create_big()
     # Make the call, and it should fail
-    routing_info, mapped_base = ZonedRoutingInfoAllocator.global_allocate(
-        mac_graph, n_keys_map)
+    routing_info, mapped_base = global_allocate(mac_graph, n_keys_map)
 
     # 1 for app 11 for machine so where possible use 20 for atoms
     mask = 0xFFF00000

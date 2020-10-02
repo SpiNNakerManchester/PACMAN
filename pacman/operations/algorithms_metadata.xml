@@ -379,7 +379,7 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
-            <param_type>MappedBaseKeyAndMask</param_type>
+            <param_type>MappedBaseKeyMask</param_type>
         </outputs>
     </algorithm>
     <algorithm name="GlobalZonedRoutingInfoAllocator">
@@ -401,7 +401,7 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
-            <param_type>MappedBaseKeyAndMask</param_type>
+            <param_type>MappedBaseKeyMask</param_type>
         </outputs>
     </algorithm>
     <algorithm name="DestinationBasedRoutingInfoAllocator">
@@ -531,15 +531,15 @@
                 <param_type>MemoryExtendedMachine</param_type>
             </parameter>
             <parameter>
-                <param_name>info_by_app_vertex</param_name>
-                <param_type>MappedBaseKeyAndMask</param_type>
+                <param_name>mapped_base_key_mask</param_name>
+                <param_type>MappedBaseKeyMask</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>routing_infos</param_name>
             <param_name>routing_table_by_partitions</param_name>
             <param_name>machine</param_name>
-            <param_name>info_by_app_vertex</param_name>
+            <param_name>mapped_base_key_mask</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingTables</param_type>

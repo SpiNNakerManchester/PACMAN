@@ -126,51 +126,6 @@ class ZonedRoutingInfoAllocator(object):
             supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-    @staticmethod
-    def flexible_allocate(machine_graph, n_keys_map):
-        """
-        Allocated with fixed bits for the Application/Paritition index but
-        with the size of the atom and machine bit changing
-
-        :param MachineGraph machine_graph:
-            The machine graph to allocate the routing info for
-        :param AbstractMachinePartitionNKeysMap n_keys_map:
-            A map between the edges and the number of keys required by the
-            edges
-        :rtype: tuple(RoutingInfo,
-            dict((ApplicationVertex, str), BaseKeyAndMask))
-        :raise PacmanRouteInfoAllocationException:
-        """
-        # check that this algorithm supports the constraints put onto the
-        # partitions
-
-        allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, True)
-
-        allocator._calculate_zones()
-
-        return allocator._simple_allocate()
-
-    @staticmethod
-    def global_allocate(machine_graph, n_keys_map):
-        """
-        :param MachineGraph machine_graph:
-            The machine graph to allocate the routing info for
-        :param AbstractMachinePartitionNKeysMap n_keys_map:
-            A map between the edges and the number of keys required by the
-            edges
-        :rtype: tuple(RoutingInfo,
-            dict((ApplicationVertex, str), BaseKeyAndMask))
-        :raise PacmanRouteInfoAllocationException:
-        """
-        # check that this algorithm supports the constraints put onto the
-        # partitions
-
-        allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, False)
-
-        allocator._calculate_zones()
-
-        return allocator._simple_allocate()
-
     def _calculate_zones(self):
         """
         :raises PacmanRouteInfoAllocationException:
@@ -295,3 +250,48 @@ class ZonedRoutingInfoAllocator(object):
         :rtype: int
         """
         return int(math.ceil(math.log(size, 2)))
+
+
+def flexible_allocate(machine_graph, n_keys_map):
+    """
+    Allocated with fixed bits for the Application/Paritition index but
+    with the size of the atom and machine bit changing
+
+    :param MachineGraph machine_graph:
+        The machine graph to allocate the routing info for
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the
+        edges
+    :rtype: tuple(RoutingInfo,
+        dict((ApplicationVertex, str), BaseKeyAndMask))
+    :raise PacmanRouteInfoAllocationException:
+    """
+    # check that this algorithm supports the constraints put onto the
+    # partitions
+
+    allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, True)
+
+    allocator._calculate_zones()
+
+    return allocator._simple_allocate()
+
+
+def global_allocate(machine_graph, n_keys_map):
+    """
+    :param MachineGraph machine_graph:
+        The machine graph to allocate the routing info for
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the
+        edges
+    :rtype: tuple(RoutingInfo,
+        dict((ApplicationVertex, str), BaseKeyAndMask))
+    :raise PacmanRouteInfoAllocationException:
+    """
+    # check that this algorithm supports the constraints put onto the
+    # partitions
+
+    allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, False)
+
+    allocator._calculate_zones()
+
+    return allocator._simple_allocate()
