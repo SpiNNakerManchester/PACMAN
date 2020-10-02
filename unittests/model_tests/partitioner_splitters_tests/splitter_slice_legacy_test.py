@@ -19,6 +19,7 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 
+
 class VertexMissingApi(object):
 
     @property
@@ -42,11 +43,13 @@ class VertexWithApi(VertexMissingApi):
     def create_machine_vertex(self):
         return "La la la"
 
+
 class APIVertex(VertexWithApi, LegacyPartitionerAPI):
     """
     Demonstartes that API does not check params either
     """
     pass
+
 
 class TestSplitterSliceLegacy(unittest.TestCase):
     """ Tester for pacman.model.constraints.placer_constraints
