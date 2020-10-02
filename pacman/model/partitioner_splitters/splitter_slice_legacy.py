@@ -34,7 +34,7 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
     ]
 
     NOT_API_WARNING = (
-        "Your vertex is deprecated. Please add a Splitter or " 
+        "Your vertex is deprecated. Please add a Splitter or "
         "inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api")
 
