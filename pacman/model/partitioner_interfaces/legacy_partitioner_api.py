@@ -69,4 +69,3 @@ class LegacyPartitionerAPI(object):
         """
         return LegacyPartitionerAPI.__abstractmethods__
 
-
