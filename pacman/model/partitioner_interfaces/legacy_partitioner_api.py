@@ -68,4 +68,3 @@ class LegacyPartitionerAPI(object):
         :rtype list(str)
         """
         return LegacyPartitionerAPI.__abstractmethods__
-
