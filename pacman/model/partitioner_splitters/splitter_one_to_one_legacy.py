@@ -41,7 +41,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
-        self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms)
+        self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms - 1)
         self._resources_required = (
             self._governed_app_vertex.get_resources_used_by_atoms(
                 self._vertex_slice))
