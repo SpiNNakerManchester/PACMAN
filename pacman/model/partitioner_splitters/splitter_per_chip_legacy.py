@@ -29,12 +29,12 @@ class SplitterPerChipLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
-        return self._governed_app_vertex.machine_vertices
+        return self._get_map([])
 
     @overrides(AbstractSplitterCommon.get_post_vertices)
     def get_post_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
-        return self._governed_app_vertex.machine_vertices
+        return self._get_map([])
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
