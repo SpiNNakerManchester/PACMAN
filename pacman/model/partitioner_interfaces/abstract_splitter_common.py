@@ -161,7 +161,7 @@ class AbstractSplitterCommon(object):
     @abstractmethod
     def get_post_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
-        """ gets post vertices and their acceptable edge types
+        """ gets incoming vertices and their acceptable edge types
         :param ApplicationEdge edge: app edge
         :param OutgoingEdgePartition outgoing_edge_partition: \
             outgoing edge partition
