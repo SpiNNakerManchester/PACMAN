@@ -53,6 +53,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 vertex_slice=self._vertex_slice,
                 resources_required=self._resources_required, label=None,
                 constraints=None))
+        machine_graph.add_vertex(self._machine_vertex)
         return self._machine_vertex
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
