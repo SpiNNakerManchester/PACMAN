@@ -66,12 +66,12 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
-        return [self._machine_vertex]
+        return self._get_map([self._machine_vertex])
 
     @overrides(AbstractSplitterCommon.get_post_vertices)
     def get_post_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
-        return [self._machine_vertex]
+        return self._get_map([self._machine_vertex])
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
