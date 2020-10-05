@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.exceptions import PacmanPartitionException
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_interfaces import AbstractSplitterCommon
@@ -23,7 +24,11 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     __slots__ = [
         "_machine_vertex",
         "_vertex_slice",
-        "_resources_required"]
+        "_resources_required",
+        "_generated"]
+
+    CREATE_CALLED_MANY_TIMES_ERROR_MESSAGE = (
+        "The vertex was already built. I should not be called many times.")
 
     SPLITTER_NAME = "1to1SplitterLegacy"
 
@@ -32,6 +37,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._machine_vertex = None
         self._vertex_slice = None
         self._resources_required = None
+        self._generated = False
 
     def __str__(self):
         return self.STR_MESSAGE.format(self._governed_app_vertex)
@@ -49,13 +55,18 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
-        self._machine_vertex = (
-            self._governed_app_vertex.create_machine_vertex(
-                vertex_slice=self._vertex_slice,
-                resources_required=self._resources_required, label=None,
-                constraints=None))
-        machine_graph.add_vertex(self._machine_vertex)
-        return self._machine_vertex
+        if not self._generated:
+            self._machine_vertex = (
+                self._governed_app_vertex.create_machine_vertex(
+                    vertex_slice=self._vertex_slice,
+                    resources_required=self._resources_required, label=None,
+                    constraints=None))
+            machine_graph.add_vertex(self._machine_vertex)
+            self._generated = True
+            return self._machine_vertex
+        else:
+            raise PacmanPartitionException(
+                self.CREATE_CALLED_MANY_TIMES_ERROR_MESSAGE)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
