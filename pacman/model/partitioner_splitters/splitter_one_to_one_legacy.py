@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.exceptions import PacmanPartitionException
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_interfaces import AbstractSplitterCommon
@@ -25,9 +24,6 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         "_machine_vertex",
         "_vertex_slice",
         "_resources_required"]
-
-    CREATE_CALLED_MANY_TIMES_ERROR_MESSAGE = (
-        "The vertex was already built. I should not be called many times.")
 
     SPLITTER_NAME = "1to1SplitterLegacy"
 
