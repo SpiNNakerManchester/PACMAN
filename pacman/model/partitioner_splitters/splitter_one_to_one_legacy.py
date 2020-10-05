@@ -58,11 +58,11 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return self._vertex_slice, True
+        return [self._vertex_slice], True
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return self._vertex_slice, True
+        return [self._vertex_slice], True
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
