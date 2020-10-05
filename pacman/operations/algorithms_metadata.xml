@@ -5,7 +5,6 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -685,15 +684,14 @@
             </parameter>
             <parameter>
                 <param_name>graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine</param_name>
-        </required_inputs>
-        <optional_inputs>
             <param_name>graph</param_name>
-        </optional_inputs>
+        </required_inputs>
         <outputs>
             <param_type>MemoryExtendedMachine</param_type>
         </outputs>
