@@ -24,8 +24,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     __slots__ = [
         "_machine_vertex",
         "_vertex_slice",
-        "_resources_required",
-        "_generated"]
+        "_resources_required"]
 
     CREATE_CALLED_MANY_TIMES_ERROR_MESSAGE = (
         "The vertex was already built. I should not be called many times.")
@@ -37,7 +36,6 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._machine_vertex = None
         self._vertex_slice = None
         self._resources_required = None
-        self._generated = False
 
     def __str__(self):
         return self.STR_MESSAGE.format(self._governed_app_vertex)
@@ -52,21 +50,18 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._resources_required = (
             self._governed_app_vertex.get_resources_used_by_atoms(
                 self._vertex_slice))
+        self._machine_vertex = (
+            self._governed_app_vertex.create_machine_vertex(
+                vertex_slice=self._vertex_slice,
+                resources_required=self._resources_required, label=None,
+                constraints=None))
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
-        if not self._generated:
-            self._machine_vertex = (
-                self._governed_app_vertex.create_machine_vertex(
-                    vertex_slice=self._vertex_slice,
-                    resources_required=self._resources_required, label=None,
-                    constraints=None))
-            machine_graph.add_vertex(self._machine_vertex)
-            self._generated = True
-            return self._machine_vertex
-        else:
-            raise PacmanPartitionException(
-                self.CREATE_CALLED_MANY_TIMES_ERROR_MESSAGE)
+        machine_graph.add_vertex(self._machine_vertex)
+        self._governed_app_vertex.remember_associated_machine_vertex(
+            self._machine_vertex)
+        return self._machine_vertex
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
