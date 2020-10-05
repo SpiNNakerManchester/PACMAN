@@ -49,6 +49,15 @@ class AbstractSplitterCommon(object):
 
     STR_MESSAGE = "{} governing app vertex {}"
 
+    FIX_ATOMS_RESET = "Illegal attempt to set fixed atoms per core to {} " \
+                      "as it was already set to {}"
+
+    MAX_BELOW_FIXED = "Illegal attempt to set max atoms per core to {} as " \
+                      "that is lower than the previously set fixed of {}"
+
+    FIXED_ABOVE_MAX = "Illegal attempt to set fixed atoms per core to {} as " \
+                      "that is abve a previously set max atoms of {}"
+
     DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
 
     def __init__(self, splitter_name=None):
@@ -84,10 +93,45 @@ class AbstractSplitterCommon(object):
         :param max_atoms_per_core: max atoms per core for this splitter.
         :param is_fixed_atoms: is this a hard constraint or soft.
         :rtype: None
+        :raises PacmanConfigurationException:
+            If the new setting clash with a previous setting
         """
-
-        self._max_atoms_per_core = max_atoms_per_core
-        self._is_fixed_atoms_per_core = is_fixed_atoms
+        if self._is_fixed_atoms_per_core:
+            # Already fixed so
+            if is_fixed_atoms:
+                # as new also fixed they must be the same
+                if max_atoms_per_core != self._max_atoms_per_core:
+                    raise PacmanConfigurationException(
+                        self.FIX_ATOMS_RESET.format(
+                            max_atoms_per_core, self._max_atoms_per_core))
+                else:
+                    return  # No change
+            else:
+                # as new a max make sure it is not lower than current fixed
+                if max_atoms_per_core < self._max_atoms_per_core:
+                    raise PacmanConfigurationException(
+                        self.MAX_BELOW_FIXED.format(
+                            max_atoms_per_core, self._max_atoms_per_core))
+                else:
+                    return  # OK to ignore the max above the fixed
+        else:
+            # Currently on a max so
+            if is_fixed_atoms:
+                # As new is fixed max sure it is not higher than max
+                if max_atoms_per_core > self._max_atoms_per_core:
+                    raise PacmanConfigurationException(
+                        self.FIXED_ABOVE_MAX.format(
+                            max_atoms_per_core, self._max_atoms_per_core))
+                else:  # Set the new fixed
+                    self._max_atoms_per_core = max_atoms_per_core
+                    self._is_fixed_atoms_per_core = True
+            else:
+                # Both max so only change if new max if lower
+                if max_atoms_per_core < self._max_atoms_per_core:
+                    # Set the new max but leave fixed false
+                    self._max_atoms_per_core = max_atoms_per_core
+                else:
+                    return  # Ok to Ignore a higher or same max
 
     def set_governed_app_vertex(self, app_vertex):
         """ sets a app vertex to be governed by this splitter object.
@@ -115,6 +159,15 @@ class AbstractSplitterCommon(object):
             supported_constraints=[
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
+        # Check for max/fixed atoms constraints
+        for constraint in self._governed_app_vertex.constraints:
+            if isinstance(constraint, MaxVertexAtomsConstraint):
+                self.set_max_atoms_per_core(constraint.size, False)
+            if isinstance(constraint, FixedVertexAtomsConstraint):
+                self.set_max_atoms_per_core(constraint.size, True)
+        # Check for max atom constraints from the vertex itself
+        self.set_max_atoms_per_core(
+            self._governed_app_vertex.get_max_atoms_per_core(), False)
 
     def split(self, resource_tracker, machine_graph):
         """ executes splitting
