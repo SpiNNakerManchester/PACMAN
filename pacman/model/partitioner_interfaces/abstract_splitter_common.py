@@ -49,14 +49,14 @@ class AbstractSplitterCommon(object):
 
     STR_MESSAGE = "{} governing app vertex {}"
 
-    FIX_ATOMS_RESET = "Illegal attempt to set fixed atoms per core to {} " \
-                      "as it was already set to {}"
+    FIX_ATOMS_RESET = ("Illegal attempt to set fixed atoms per core to {} "
+                      "as it was already set to {}")
 
-    MAX_BELOW_FIXED = "Illegal attempt to set max atoms per core to {} as " \
-                      "that is lower than the previously set fixed of {}"
+    MAX_BELOW_FIXED = ("Illegal attempt to set max atoms per core to {} as "
+                      "that is lower than the previously set fixed of {}")
 
-    FIXED_ABOVE_MAX = "Illegal attempt to set fixed atoms per core to {} as " \
-                      "that is abve a previously set max atoms of {}"
+    FIXED_ABOVE_MAX = ("Illegal attempt to set fixed atoms per core to {} as "
+                      "that is abve a previously set max atoms of {}")
 
     DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
 
@@ -159,15 +159,6 @@ class AbstractSplitterCommon(object):
             supported_constraints=[
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
-        # Check for max/fixed atoms constraints
-        for constraint in self._governed_app_vertex.constraints:
-            if isinstance(constraint, MaxVertexAtomsConstraint):
-                self.set_max_atoms_per_core(constraint.size, False)
-            if isinstance(constraint, FixedVertexAtomsConstraint):
-                self.set_max_atoms_per_core(constraint.size, True)
-        # Check for max atom constraints from the vertex itself
-        self.set_max_atoms_per_core(
-            self._governed_app_vertex.get_max_atoms_per_core(), False)
 
     def split(self, resource_tracker, machine_graph):
         """ executes splitting
@@ -192,6 +183,7 @@ class AbstractSplitterCommon(object):
         """ allows a application vertex to control the set of slices for \
         outgoing application edges
         :return: list of Slices and bool of estimate or not
+        :rtype: tuple(list(Slice), bool
         """
 
     @abstractmethod
@@ -199,6 +191,7 @@ class AbstractSplitterCommon(object):
         """ allows a application vertex to control the set of slices for \
         incoming application edges
         :return: the slices incoming to this vertex, bool if estimate or exact
+        :rtype: tuple(list(Slice), bool
         """
 
     @abstractmethod
