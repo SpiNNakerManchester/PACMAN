@@ -192,6 +192,7 @@ class AbstractSplitterCommon(object):
         """ allows a application vertex to control the set of slices for \
         outgoing application edges
         :return: list of Slices and bool of estimate or not
+        :rtype: tuple(list(Slice), bool
         """
 
     @abstractmethod
@@ -199,6 +200,7 @@ class AbstractSplitterCommon(object):
         """ allows a application vertex to control the set of slices for \
         incoming application edges
         :return: the slices incoming to this vertex, bool if estimate or exact
+        :rtype: tuple(list(Slice), bool
         """
 
     @abstractmethod
