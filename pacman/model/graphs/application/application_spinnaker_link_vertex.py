@@ -95,7 +95,6 @@ class ApplicationSpiNNakerLinkVertex(
             self, vertex_slice)
         machine_vertex.set_virtual_chip_coordinates(
             self._virtual_chip_x, self._virtual_chip_y)
-
         if resources_required:
             assert (resources_required == machine_vertex.resources_required)
         return machine_vertex
