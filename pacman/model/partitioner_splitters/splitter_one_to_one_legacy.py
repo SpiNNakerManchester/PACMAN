@@ -46,14 +46,14 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._resources_required = (
             self._governed_app_vertex.get_resources_used_by_atoms(
                 self._vertex_slice))
+
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, resource_tracker, machine_graph):
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(
                 vertex_slice=self._vertex_slice,
                 resources_required=self._resources_required, label=None,
                 constraints=None))
-
-    @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
         machine_graph.add_vertex(self._machine_vertex)
         return self._machine_vertex
 
