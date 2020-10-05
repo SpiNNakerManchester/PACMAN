@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_interfaces import AbstractSplitterCommon
 from spinn_utilities.overrides import overrides
 
@@ -45,14 +46,14 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._resources_required = (
             self._governed_app_vertex.get_resources_used_by_atoms(
                 self._vertex_slice))
+
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, resource_tracker, machine_graph):
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(
                 vertex_slice=self._vertex_slice,
                 resources_required=self._resources_required, label=None,
                 constraints=None))
-
-    @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
         machine_graph.add_vertex(self._machine_vertex)
         return self._machine_vertex
 
@@ -66,12 +67,12 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
-        return self._get_map([self._machine_vertex])
+        return {self._machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.get_post_vertices)
     def get_post_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
-        return self._get_map([self._machine_vertex])
+        return {self._machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
