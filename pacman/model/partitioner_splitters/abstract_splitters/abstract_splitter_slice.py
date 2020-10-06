@@ -161,7 +161,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                 used_resources, resources_available,
                 resource_tracker.plan_n_time_steps)
 
-            if self._dont_reduce_ration and ratio > 1.0:
+            if self._dont_reduce_ration() and ratio > 1.0:
                 raise PacmanPartitionException(
                     self.NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
                         self._governed_app_vertex, lo_atom - 1,
