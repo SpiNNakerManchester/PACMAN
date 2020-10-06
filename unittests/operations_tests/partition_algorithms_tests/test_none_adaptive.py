@@ -32,7 +32,7 @@ from pacman.model.constraints.partitioner_constraints import (
 from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
-class TestBasicPartitioner(unittest.TestCase):
+class TestNoneAdaptive(unittest.TestCase):
     """
     test for basic partitioning algorithm
     """
