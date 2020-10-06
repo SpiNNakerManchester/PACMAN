@@ -379,7 +379,6 @@
         </optional_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
-            <param_type>MappedBaseKeyMask</param_type>
         </outputs>
     </algorithm>
     <algorithm name="GlobalZonedRoutingInfoAllocator">
@@ -401,7 +400,6 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryRoutingInfos</param_type>
-            <param_type>MappedBaseKeyMask</param_type>
         </outputs>
     </algorithm>
     <algorithm name="DestinationBasedRoutingInfoAllocator">

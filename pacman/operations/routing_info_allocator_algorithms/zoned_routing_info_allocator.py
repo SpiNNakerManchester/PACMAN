@@ -77,7 +77,7 @@ class ZonedRoutingInfoAllocator(object):
         A map between the edges and the number of keys required by the
         edges
     :return: The routing information
-    :rtype: tuple(RoutingInfo, dict((ApplicationVertex, str), BaseKeyAndMask))
+    :rtype: RoutingInfo
     :raise PacmanRouteInfoAllocationException:
         If something goes wrong with the allocation
     """
@@ -191,8 +191,6 @@ class ZonedRoutingInfoAllocator(object):
         progress = ProgressBar(
             len(by_app_and_partition_name), "Allocating routing keys")
         routing_infos = RoutingInfo()
-        by_app_vertex = dict()
-        app_mask = self.__mask(self.__n_bits_atoms_and_mac)
         app_part_index = 0
         for app_vertex in progress.over(by_app_and_partition_name):
             for partition_name, by_partition_name in \
@@ -228,12 +226,9 @@ class ZonedRoutingInfoAllocator(object):
                     routing_infos.add_partition_info(
                         PartitionRoutingInfo([key_and_mask], partition))
 
-                app_key = app_part_index << self.__n_bits_atoms_and_mac
-                by_app_vertex[(app_vertex, partition_name)] = BaseKeyAndMask(
-                    base_key=app_key, mask=app_mask)
                 app_part_index += 1
 
-        return routing_infos, by_app_vertex
+        return routing_infos
 
     @staticmethod
     def __mask(bits):

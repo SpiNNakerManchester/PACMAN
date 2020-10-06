@@ -102,16 +102,20 @@ def check_masks_all_the_same(routing_info, mask):
 
 
 def check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask, mapped_base):
+        app_graph, mac_graph, routing_info, app_mask):
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
+    mapped_base = dict()
     for app_vertex in app_graph.vertices:
         for m_vertex in app_vertex.machine_vertices:
             for p in mac_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     m_vertex):
                 key = routing_info.get_first_key_from_partition(p)
-                mapped_key = mapped_base[(app_vertex, p.identifier)].key
-                assert((mapped_key & app_mask) == (key & app_mask))
+                if (app_vertex, p.identifier) in  mapped_base:
+                    mapped_key = mapped_base[(app_vertex, p.identifier)]
+                    assert((mapped_key & app_mask) == (key & app_mask))
+                else:
+                    mapped_base[(app_vertex, p.identifier)] = key
                 if key != 0:
                     assert((key & app_mask) != 0)
 
@@ -122,7 +126,7 @@ def test_global_allocator():
     app_graph, mac_graph, n_keys_map = create_graphs1()
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info, mapped_base = global_allocate(mac_graph, n_keys_map)
+    routing_info = global_allocate(mac_graph, n_keys_map)
 
     # Last 8 for buts
     mask = 0xFFFFFF00
@@ -131,7 +135,7 @@ def test_global_allocator():
     # all but the bottom 13 bits should be the same
     app_mask = 0xFFFFE000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask, mapped_base)
+        app_graph, mac_graph, routing_info, app_mask)
 
 
 def test_flexible_allocator():
@@ -139,12 +143,12 @@ def test_flexible_allocator():
     app_graph, mac_graph, n_keys_map = create_graphs1()
 
     # The number of bits is 7 + 11 = 20, so it shouldn't fail
-    routing_info, mapped_base = flexible_allocate(mac_graph, n_keys_map)
+    routing_info = flexible_allocate(mac_graph, n_keys_map)
 
     # all but the bottom 11 bits should be the same
     app_mask = 0xFFFFF800
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask, mapped_base)
+        app_graph, mac_graph, routing_info, app_mask)
 
 
 def create_big():
@@ -195,19 +199,19 @@ def test_big_flexible():
     app_graph, mac_graph, n_keys_map = create_big()
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info, mapped_base = flexible_allocate(mac_graph, n_keys_map)
+    routing_info = flexible_allocate(mac_graph, n_keys_map)
 
     # The number of bits is 1 + 21 = 22, so it shouldn't fail
     # all but the bottom 21 bits should be the same
     app_mask = 0xFFE00000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask, mapped_base)
+        app_graph, mac_graph, routing_info, app_mask)
 
 
 def test_big_global():
     app_graph, mac_graph, n_keys_map = create_big()
     # Make the call, and it should fail
-    routing_info, mapped_base = global_allocate(mac_graph, n_keys_map)
+    routing_info = global_allocate(mac_graph, n_keys_map)
 
     # 1 for app 11 for machine so where possible use 20 for atoms
     mask = 0xFFF00000
@@ -219,4 +223,4 @@ def test_big_global():
     # all but the top 1 bits should be the same
     app_mask = 0x80000000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask, mapped_base)
+        app_graph, mac_graph, routing_info, app_mask)
