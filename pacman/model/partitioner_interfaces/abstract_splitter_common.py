@@ -133,6 +133,10 @@ class AbstractSplitterCommon(object):
                 else:
                     return  # Ok to Ignore a higher or same max
 
+    @property
+    def governed_app_vertex(self):
+        return self._governed_app_vertex
+
     def set_governed_app_vertex(self, app_vertex):
         """ sets a app vertex to be governed by this splitter object.
         Once set it cant be reset

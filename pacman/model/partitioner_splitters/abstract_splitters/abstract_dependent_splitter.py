@@ -12,8 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.partitioner_interfaces import AbstractSplitterCommon
 
-from .abstract_splitter_slice import AbstractSplitterSlice
-from .abstract_dependent_splitter import AbstractDependentSplitter
 
-__all__ = ["AbstractSplitterSlice", "AbstractDependentSplitter"]
+class AbstractDependentSplitter(AbstractSplitterCommon):
+    """ splitter that works on slices from another splitter.
+
+    """
+
+    __slots__ = [
+        "_other_splitter"
+    ]
+
+    def __init__(self, other_splitter, splitter_name):
+        AbstractSplitterCommon.__init__(self, splitter_name)
+        self._other_splitter = other_splitter
+
+    @property
+    def other_splitter(self):
+        return self._other_splitter

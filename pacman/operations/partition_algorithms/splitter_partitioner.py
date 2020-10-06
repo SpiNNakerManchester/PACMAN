@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from collections import OrderedDict
+
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanPartitionException)
 from pacman.model.constraints.partitioner_constraints import (
@@ -19,7 +21,9 @@ from pacman.model.constraints.partitioner_constraints import (
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
-from pacman.utilities.algorithm_utilities.\
+from pacman.model.partitioner_splitters.abstract_splitters\
+    .abstract_dependent_splitter import AbstractDependentSplitter
+from pacman.utilities.algorithm_utilities. \
     partition_algorithm_utilities import get_same_size_vertex_groups
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
@@ -107,6 +111,31 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         # return the accepted things
         return machine_graph, resource_tracker.chips_used
 
+    @staticmethod
+    def order_vertices_for_dependent_splitters(vertices):
+        """ orders the list so that dependent splitters are next to their other
+        splitter in terms of vertex ordering.
+
+        :param vertices: the list of application vertices
+        :type vertices: iterable of ApplicationVertex
+        :return: vertices in list with new ordering
+        :rtype: iterable of ApplicationVertex
+        """
+        dependent_vertices = OrderedDict()
+        for vertex in vertices:
+            if isinstance(vertex.splitter_object, AbstractDependentSplitter):
+                other_app_vertex = (
+                    vertex.splitter_object.other_splitter.governed_app_vertex)
+                dependent_vertices[other_app_vertex] = vertex
+
+        for main_vertex in dependent_vertices.keys():
+            old_index_of_dependent = (
+                vertices.index(dependent_vertices[main_vertex]))
+            next_to_index = vertices.index(main_vertex) + 1
+            vertices.insert(next_to_index,
+                            vertices.pop(old_index_of_dependent))
+        return vertices
+
     def __set_same_max_atoms_to_splitters(self, app_graph):
         """ get the constraints sorted out.
 
@@ -181,6 +210,9 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
 
         # sort out vertex's by placement constraints
         vertices = sort_vertices_by_known_constraints(app_graph.vertices)
+
+        # Group vertices that are supposed to be the same size
+        vertices = self.order_vertices_for_dependent_splitters(vertices)
 
         # Set up the progress
         progress = ProgressBar(

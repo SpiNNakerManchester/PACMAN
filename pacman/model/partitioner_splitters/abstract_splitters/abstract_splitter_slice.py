@@ -368,11 +368,13 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
             self, vertex_slice, resources, label, remaining_constraints):
         """ creates a machine vertex
 
-        :param vertex_slice: vertex slice
-        :param resources: resources
-        :param label: human readable label for machine vertex.
+        :param Slice vertex_slice: vertex slice
+        :param ResourceTracker resources: resources
+        :param str label: human readable label for machine vertex.
         :param remaining_constraints: none partitioner constraints.
+        :type remaining_constraints: iterable [Constraint]
         :return: machine vertex
+        :rtype: MachineVertex
         """
 
     @abstractmethod

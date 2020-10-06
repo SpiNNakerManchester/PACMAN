@@ -15,6 +15,7 @@
 
 """ A collection of methods which support partitioning algorithms.
 """
+
 try:
     from collections.abc import OrderedDict
 except ImportError:
