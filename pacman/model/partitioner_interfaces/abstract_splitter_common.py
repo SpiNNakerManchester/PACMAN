@@ -49,14 +49,17 @@ class AbstractSplitterCommon(object):
 
     STR_MESSAGE = "{} governing app vertex {}"
 
-    FIX_ATOMS_RESET = ("Illegal attempt to set fixed atoms per core to {} "
-                      "as it was already set to {}")
+    FIX_ATOMS_RESET = (
+        "Illegal attempt to set fixed atoms per core to {} "
+        "as it was already set to {}")
 
-    MAX_BELOW_FIXED = ("Illegal attempt to set max atoms per core to {} as "
-                      "that is lower than the previously set fixed of {}")
+    MAX_BELOW_FIXED = (
+        "Illegal attempt to set max atoms per core to {} "
+        "as that is lower than the previously set fixed of {}")
 
-    FIXED_ABOVE_MAX = ("Illegal attempt to set fixed atoms per core to {} as "
-                      "that is abve a previously set max atoms of {}")
+    FIXED_ABOVE_MAX = (
+        "Illegal attempt to set fixed atoms per core to {} "
+        "as that is abve a previously set max atoms of {}")
 
     DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
 
