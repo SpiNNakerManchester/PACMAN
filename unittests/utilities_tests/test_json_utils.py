@@ -138,9 +138,10 @@ class TestJsonUtils(unittest.TestCase):
         self.constraint_there_and_back(c1)
 
     def test_same_atoms_as_vertex_constraint(self):
-        v1 = SimpleMachineVertex(None, "v1")
-        c1 = SameAtomsAsVertexConstraint(v1)
-        self.constraint_there_and_back(c1)
+        with self.assertRaises(NotImplementedError):
+            v1 = SimpleMachineVertex(None, "v1")
+            c1 = SameAtomsAsVertexConstraint(v1)
+            self.constraint_there_and_back(c1)
 
     def test_max_vertex_atoms_constraint(self):
         c1 = MaxVertexAtomsConstraint(5)
@@ -228,8 +229,9 @@ class TestJsonUtils(unittest.TestCase):
         edges = list()
         for i in range(10):
             vertices.append(SimpleMachineVertex(None, "V{}".format(i)))
-        vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
-        vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
+        with self.assertRaises(NotImplementedError):
+            vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
+            vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
         for i in range(5):
             edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
         for i in range(5, 10):

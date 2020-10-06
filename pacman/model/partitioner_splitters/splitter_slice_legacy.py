@@ -74,12 +74,3 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
     def get_resources_used_by_atoms(self, vertex_slice):
         return self._governed_app_vertex.get_resources_used_by_atoms(
             vertex_slice)
-
-    @overrides(AbstractSplitterSlice.check_supported_constraints)
-    def check_supported_constraints(self):
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-                SameAtomsAsVertexConstraint],
-            abstract_constraint_type=AbstractPartitionerConstraint)

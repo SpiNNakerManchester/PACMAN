@@ -31,6 +31,10 @@ class SameAtomsAsVertexConstraint(AbstractPartitionerConstraint):
         :param ApplicationVertex vertex:
             The vertex to which the constraint refers
         """
+        raise NotImplementedError(
+            "SameAtomsAsVertexConstraint is no longer supported. "
+            "Please contact spinnakerusers@googlegroups.com to discuss your "
+            "requirements.")
         self._vertex = vertex
 
     @property
