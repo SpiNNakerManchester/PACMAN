@@ -406,7 +406,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         if self._governed_app_vertex.n_atoms < self._max_atoms_per_core:
             return (
                 [Slice(0, self._governed_app_vertex.n_atoms)],
-                self._is_fixed_atoms_per_core)
+                self._dont_reduce_ration())
         else:
             slices = list()
             n_atoms_placed = 0
@@ -422,4 +422,4 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                         n_atoms_placed,
                         n_atoms_placed + self._max_atoms_per_core))
                 n_atoms_placed += self._max_atoms_per_core
-            return slices, self._is_fixed_atoms_per_core
+            return slices, self._dont_reduce_ration()
