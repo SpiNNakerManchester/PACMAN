@@ -28,6 +28,9 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 class AbstractSplitterCommon(object):
 
     __slots__ = [
+        # adapt to remaining resources if applicable and possible
+        "_adapt_to_resources",
+
         # the app vertex this splitter governs.
         "_governed_app_vertex",
 
@@ -63,9 +66,20 @@ class AbstractSplitterCommon(object):
 
     DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
 
-    def __init__(self, splitter_name=None):
+    def __init__(self, splitter_name=None, adapt_to_resources=True):
+        """
+
+        :param splitter_name: Label of the Splitter
+        :type splitter_name: str or None
+        :param adapt_to_resources:
+            Flag to say if the splitter may adapt to the resources available
+            Only affects splitters that can adapt
+        :type adapt_to_resources:
+            bool or None
+        """
         if splitter_name is None:
             splitter_name = self.DEFAULT_SPLITTER_NAME
+        self._adapt_to_resources = adapt_to_resources
         self._splitter_name = splitter_name
         self._max_atoms_per_core = sys.maxsize
         self._is_fixed_atoms_per_core = False
@@ -171,6 +185,35 @@ class AbstractSplitterCommon(object):
         :return: bool true if successful, false otherwise
         """
         return self.create_machine_vertices(resource_tracker, machine_graph)
+
+    def disable_adapt_to_resources(self):
+        """
+        Disables the adapt to resources setting.]
+
+        If the splitter is one that adapts it splitting based on the resources
+            vailable this setting will disable that.
+
+        Instead of adapting the splitter will have to raise an exception.
+
+        note: There is intentional no equivelent enable adaptive
+        """
+        self._adapt_to_resources = False
+
+    @property
+    def adapt_to_resources(self):
+        """
+        Flag to say if the splitter may adapt to the resources avaialable
+
+        If False the splitter must raise an exception if there are not
+        enough resources of its default behaviour.
+
+        note: There is however no requirements for a splitter to have an
+        adaptive strategy so a splitter need nit check this value.
+
+        :return: True if the splitter has permission to adapt
+        :rtpye: bool
+        """
+        return self._adapt_to_resources
 
     @abstractmethod
     def create_machine_vertices(self, resource_tracker, machine_graph):

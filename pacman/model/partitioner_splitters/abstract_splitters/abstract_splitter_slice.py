@@ -52,8 +52,18 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
 
     MACHINE_LABEL = "{}:{}:{}"
 
-    def __init__(self, splitter_name):
-        AbstractSplitterCommon.__init__(self, splitter_name)
+    def __init__(self, splitter_name, adapt_to_resources):
+        """
+
+        :param splitter_name: Label of the Splitter
+        :type splitter_name: str or None
+        :param adapt_to_resources:
+            Flag to say if the splitter may adapt to the resources available
+            Only affects splitters that can adapt
+        :type adapt_to_resources:
+            bool or None
+        """
+        AbstractSplitterCommon.__init__(self, splitter_name, adapt_to_resources)
         self._called = False
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
@@ -151,7 +161,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                 used_resources, resources_available,
                 resource_tracker.plan_n_time_steps)
 
-            if self._is_fixed_atoms_per_core and ratio > 1.0:
+            if self._dont_reduce_ration and ratio > 1.0:
                 raise PacmanPartitionException(
                     self.NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
                         self._governed_app_vertex, lo_atom - 1,
@@ -223,6 +233,9 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
             final_placements.append(used_resources)
 
         return final_placements, min_hi_atom
+
+    def _dont_reduce_ration(self):
+        return self._is_fixed_atoms_per_core or not self.adapt_to_resources
 
     def _scale_up_resource_usage(
             self, used_resources, hi_atom, lo_atom, resources, ratio,

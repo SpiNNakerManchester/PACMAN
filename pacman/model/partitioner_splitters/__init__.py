@@ -17,9 +17,7 @@ from .splitter_slice_legacy import SplitterSliceLegacy
 from .splitter_per_chip_legacy import SplitterPerChipLegacy
 from .splitter_per_ethernet_chip_legacy import SplitterPerEthernetChipLegacy
 from .splitter_one_to_one_legacy import SplitterOneToOneLegacy
-from .splitter_fixed_slice_size import SplitterFixedSliceSized
 
 __all__ = [
-    'SplitterFixedSliceSized', 'SplitterOneToOneLegacy',
-    'SplitterSliceLegacy', 'SplitterPerChipLegacy',
+    'SplitterOneToOneLegacy','SplitterSliceLegacy', 'SplitterPerChipLegacy',
     'SplitterPerEthernetChipLegacy']

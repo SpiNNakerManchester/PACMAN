@@ -47,10 +47,20 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
 
     SPLITTER_NAME = "SplitterLegacy"
 
-    def __init__(self, splitter_name=None):
+    def __init__(self, splitter_name=None, adapt_to_resources=True):
+        """
+
+        :param splitter_name: Label of the Splitter
+        :type splitter_name: str or None
+        :param adapt_to_resources:
+            Flag to say if the splitter may adapt to the resources available
+            Only affects splitters that can adapt
+        :type adapt_to_resources:
+            bool or None
+        """
         if splitter_name is None:
             splitter_name = self.SPLITTER_NAME
-        AbstractSplitterSlice.__init__(self, splitter_name)
+        AbstractSplitterSlice.__init__(self, splitter_name, adapt_to_resources)
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):

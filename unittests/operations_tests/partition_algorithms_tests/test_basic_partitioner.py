@@ -19,7 +19,7 @@ test for partitioning
 
 import unittest
 
-from pacman.model.partitioner_splitters import SplitterFixedSliceSized
+from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_machine import (
     SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
@@ -45,11 +45,14 @@ class TestBasicPartitioner(unittest.TestCase):
         setup for all basic partitioner tests
         """
         self.vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
-        self.vert1.splitter_object = SplitterFixedSliceSized()
+        self.vert1.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
-        self.vert2.splitter_object = SplitterFixedSliceSized()
+        self.vert2.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3")
-        self.vert3.splitter_object = SplitterFixedSliceSized()
+        self.vert3.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.edge1 = ApplicationEdge(
             self.vert1, self.vert2, label="First edge")
         self.edge2 = ApplicationEdge(
@@ -121,7 +124,8 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = SimpleTestVertex(300, "Large vertex")
-        large_vertex.splitter_object = SplitterFixedSliceSized()
+        large_vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
@@ -135,7 +139,8 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.setup()
         large_vertex = SimpleTestVertex(500, "Large vertex")
-        large_vertex.splitter_object = SplitterFixedSliceSized()
+        large_vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -150,7 +155,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.setup()
         large_vertex = SimpleTestVertex(1000, "Large vertex")
         large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
-        large_vertex.splitter_object = SplitterFixedSliceSized()
+        large_vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         graph, _ = self.bp(self.graph, self.machine, 3000)
@@ -190,7 +196,8 @@ class TestBasicPartitioner(unittest.TestCase):
         n_neurons = 17 * 5 * 5
         singular_vertex = SimpleTestVertex(n_neurons, "Large vertex",
                                            max_atoms_per_core=1)
-        singular_vertex.splitter_object = SplitterFixedSliceSized()
+        singular_vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
@@ -232,7 +239,8 @@ class TestBasicPartitioner(unittest.TestCase):
         self.machine = machine_from_chips(chips)
         large_vertex = SimpleTestVertex(3000, "Large vertex",
                                         max_atoms_per_core=1)
-        large_vertex.splitter_object = SplitterFixedSliceSized()
+        large_vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -317,7 +325,8 @@ class TestBasicPartitioner(unittest.TestCase):
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
         with self.assertRaises(PacmanInvalidParameterException):
-            constrained_vertex.splitter_object = SplitterFixedSliceSized()
+            constrained_vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
 
     def test_partition_with_empty_graph(self):
         """
@@ -348,7 +357,8 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex = SimpleTestVertex(
             sdram_per_chip * machine.n_chips,
             max_atoms_per_core=2, constraints=[FixedVertexAtomsConstraint(2)])
-        vertex.splitter_object = SplitterFixedSliceSized()
+        vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
 
@@ -376,7 +386,8 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex = SimpleTestVertex(
             sdram_per_chip * 2, max_atoms_per_core=sdram_per_chip,
             constraints=[FixedVertexAtomsConstraint(sdram_per_chip // 2)])
-        vertex.splitter_object = SplitterFixedSliceSized()
+        vertex.splitter_object = SplitterSliceLegacy(
+            adapt_to_resources=False)
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
 
