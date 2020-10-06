@@ -326,7 +326,7 @@ class TestBasicPartitioner(unittest.TestCase):
             NewPartitionerConstraint("Mock constraint"))
         with self.assertRaises(PacmanInvalidParameterException):
             constrained_vertex.splitter_object = SplitterSliceLegacy(
-            adapt_to_resources=False)
+                adapt_to_resources=False)
 
     def test_partition_with_empty_graph(self):
         """

@@ -63,7 +63,8 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         :type adapt_to_resources:
             bool or None
         """
-        AbstractSplitterCommon.__init__(self, splitter_name, adapt_to_resources)
+        AbstractSplitterCommon.__init__(
+            self, splitter_name, adapt_to_resources)
         self._called = False
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
