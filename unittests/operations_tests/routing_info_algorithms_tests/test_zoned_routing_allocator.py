@@ -111,7 +111,7 @@ def check_keys_for_application_partition_pairs(
             for p in mac_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     m_vertex):
                 key = routing_info.get_first_key_from_partition(p)
-                if (app_vertex, p.identifier) in  mapped_base:
+                if (app_vertex, p.identifier) in mapped_base:
                     mapped_key = mapped_base[(app_vertex, p.identifier)]
                     assert((mapped_key & app_mask) == (key & app_mask))
                 else:
