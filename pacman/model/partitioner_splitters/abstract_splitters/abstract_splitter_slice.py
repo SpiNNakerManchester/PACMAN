@@ -412,3 +412,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                         n_atoms_placed + self._max_atoms_per_core))
                 n_atoms_placed += self._max_atoms_per_core
             return slices, self._is_fixed_atoms_per_core
+
+    @overrides(AbstractSplitterCommon.reset_called)
+    def reset_called(self):
+        self._called = False

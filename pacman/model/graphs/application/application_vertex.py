@@ -149,3 +149,5 @@ class ApplicationVertex(AbstractVertex):
             vertex maps to.
         """
         self._machine_vertices = OrderedSet()
+        if self._splitter_object is not None:
+            self._splitter_object.reset_called()

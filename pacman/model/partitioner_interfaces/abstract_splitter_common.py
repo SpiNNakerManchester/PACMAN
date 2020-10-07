@@ -231,3 +231,10 @@ class AbstractSplitterCommon(object):
         :return: list of machine vertices
         :rtype iterable of <MachineVertex>
         """
+
+    @abstractmethod
+    def reset_called(self):
+        """ reset the splitter as if it has not operated a splitting yet.
+
+        :rtype: None
+        """

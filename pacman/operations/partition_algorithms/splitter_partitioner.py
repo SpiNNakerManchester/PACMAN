@@ -52,6 +52,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         If something goes wrong with the partitioning
     """
 
+    MACHINE_EDGE_LABEL = "machine_edge_for_{}"
+
     __PROGRESS_BAR_VERTICES = "Partitioning graph vertices"
     __PROGRESS_BAR_EDGES = "Partitioning graph edges"
 
@@ -322,6 +324,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
 
         # build edge and add to machine graph
         machine_edge = common_edge_type(
-            src_machine_vertex, dest_machine_vertex, app_edge=app_edge)
+            src_machine_vertex, dest_machine_vertex, app_edge=app_edge,
+            label=self.MACHINE_EDGE_LABEL.format(app_edge.label))
         machine_graph.add_edge(
             machine_edge, app_outgoing_edge_partition.identifier)

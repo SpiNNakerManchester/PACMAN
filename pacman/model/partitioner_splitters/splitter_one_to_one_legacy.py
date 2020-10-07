@@ -54,6 +54,8 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
+        resource_tracker.allocate_constrained_resources(
+            self._resources_required, self._governed_app_vertex.constraints)
         machine_graph.add_vertex(self._machine_vertex)
         self._governed_app_vertex.remember_associated_machine_vertex(
             self._machine_vertex)
