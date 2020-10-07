@@ -81,3 +81,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
         return [self._machine_vertex]
+
+    @overrides(AbstractSplitterCommon.reset_called)
+    def reset_called(self):
+        pass
