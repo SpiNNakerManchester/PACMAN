@@ -74,6 +74,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
             self._virtual_chip_y = virtual_chip_y
             self.add_constraint(ChipAndCoreConstraint(
                 self._virtual_chip_x, self._virtual_chip_y))
-            if (self._app_vertex.virtual_chip_x is None and
+            if (self._app_vertex is not None and
+                    self._app_vertex.virtual_chip_x is None and
                     self._app_vertex.virtual_chip_y is None):
                 self._app_vertex.set_virtual_chip_coordinates()
