@@ -72,10 +72,19 @@ class ApplicationSpiNNakerLinkVertex(
 
     @overrides(AbstractVirtual.set_virtual_chip_coordinates)
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
-        self._virtual_chip_x = virtual_chip_x
-        self._virtual_chip_y = virtual_chip_y
-        self.add_constraint(ChipAndCoreConstraint(
-            self._virtual_chip_x, self._virtual_chip_y))
+        if virtual_chip_x is not None and virtual_chip_y is not None:
+            self._virtual_chip_x = virtual_chip_x
+            self._virtual_chip_y = virtual_chip_y
+            if len(self._machine_vertices) != 0:
+                for machine_vertex in self._machine_vertices:
+                    if (machine_vertex.virtual_chip_x != self._virtual_chip_x
+                            or machine_vertex.virtual_chip_y !=
+                            virtual_chip_y):
+                        machine_vertex.set_virtual_chip_coordinates(
+                            self._virtual_chip_x, self._virtual_chip_y)
+            else:
+                self.add_constraint(ChipAndCoreConstraint(
+                    self._virtual_chip_x, self._virtual_chip_y))
 
     @property
     @overrides(LegacyPartitionerAPI.n_atoms)
