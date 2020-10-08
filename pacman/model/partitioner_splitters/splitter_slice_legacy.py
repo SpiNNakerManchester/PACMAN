@@ -14,9 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.constraints.partitioner_constraints import \
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint, \
-    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterSlice)
