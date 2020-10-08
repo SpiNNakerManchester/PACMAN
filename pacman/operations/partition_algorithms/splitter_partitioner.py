@@ -15,6 +15,8 @@
 from collections import OrderedDict
 
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
@@ -25,6 +27,7 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.utilities import utility_calls as utils
 
 
 class SplitterPartitioner(AbstractSplitterPartitioner):
@@ -94,6 +97,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 app_graph, machine, plan_n_time_steps,
                 pre_allocated_resources))
 
+        self.__set_max_atoms_to_splitters(app_graph)
         # Currently not supported
         # self.__set_same_max_atoms_to_splitters(app_graph)
 
@@ -132,6 +136,22 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             vertices.insert(next_to_index,
                             vertices.pop(old_index_of_dependent))
         return vertices
+
+    def __set_max_atoms_to_splitters(self, app_graph):
+        """ get the constraints sorted out.
+
+        :param ApplicationGraph app_graph: the app graph
+        :rtype: None
+        """
+        for vertex in app_graph.vertices:
+            for constraint in utils.locate_constraints_of_type(
+                    vertex.constraints, MaxVertexAtomsConstraint):
+                vertex.splitter_object.set_max_atoms_per_core(
+                    constraint.size, False)
+            for constraint in utils.locate_constraints_of_type(
+                    vertex.constraints, FixedVertexAtomsConstraint):
+                vertex.splitter_object.set_max_atoms_per_core(
+                    constraint.size, True)
 
     """"
     Does not really work!
