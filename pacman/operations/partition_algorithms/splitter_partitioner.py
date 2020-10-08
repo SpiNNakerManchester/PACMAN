@@ -14,23 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from collections import OrderedDict
 
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanPartitionException)
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
 from pacman.model.partitioner_splitters.abstract_splitters\
     .abstract_dependent_splitter import AbstractDependentSplitter
-from pacman.utilities.algorithm_utilities. \
-    partition_algorithm_utilities import get_same_size_vertex_groups
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls as utils
 
 
 class SplitterPartitioner(AbstractSplitterPartitioner):
@@ -100,7 +94,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 app_graph, machine, plan_n_time_steps,
                 pre_allocated_resources))
 
-        self.__set_same_max_atoms_to_splitters(app_graph)
+        # Currently not supported
+        # self.__set_same_max_atoms_to_splitters(app_graph)
 
         # Partition one vertex at a time
         for vertex in progress.over(vertices):
@@ -138,12 +133,14 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                             vertices.pop(old_index_of_dependent))
         return vertices
 
+    """"
+    Does not really work!
     def __set_same_max_atoms_to_splitters(self, app_graph):
-        """ get the constraints sorted out.
+        " get the constraints sorted out.
 
         :param ApplicationGraph app_graph: the app graph
         :rtype: None
-        """
+        "
         # Group vertices that are supposed to be the same size
         vertex_groups = get_same_size_vertex_groups(app_graph.vertices)
         for vertex in app_graph.vertices:
@@ -187,6 +184,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                     max_atoms_per_core, fixed_n_atoms is not None)
             vertex.splitter_object.set_max_atoms_per_core(
                 max_atoms_per_core, fixed_n_atoms is not None)
+        """
 
     def __setup_objects(
             self, app_graph, machine, plan_n_time_steps,
