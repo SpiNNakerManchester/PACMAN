@@ -52,14 +52,14 @@ class ZonedRoutingInfoAllocator(object):
         The split between the M and X may vary depending on how the allocator
         is called.
 
-        In "global" mode he widths of the fields are pre determined and fixed
+        In "global" mode the widths of the fields are pre determined and fixed
         such that every key will have every field in the same place in the key,
         and the mask is the same for every vertex.
-         The global approach is pariticularly sensitive to the one large and
-         many small verticies limit.
+         The global approach is particularly sensitive to the one large and
+         many small vertices limit.
 
         In "flexible" mode the size of the M and X will change for each
-        application/partition. Ever vertext for a application/partition pair
+        application/partition. Every vertex for a application/partition pair
         but different pairs may have different masks.
         This should result in less gaps between the machine vertexes.
 
