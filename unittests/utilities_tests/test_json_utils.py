@@ -230,8 +230,10 @@ class TestJsonUtils(unittest.TestCase):
         for i in range(10):
             vertices.append(SimpleMachineVertex(None, "V{}".format(i)))
         with self.assertRaises(NotImplementedError):
-            vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
-            vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
+            vertices[1].add_constraint(SameAtomsAsVertexConstraint(
+                vertices[4]))
+            vertices[4].add_constraint(SameAtomsAsVertexConstraint(
+                vertices[1]))
         for i in range(5):
             edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
         for i in range(5, 10):

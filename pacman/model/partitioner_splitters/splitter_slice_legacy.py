@@ -17,7 +17,6 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterSlice)
-from pacman.utilities import utility_calls
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 
