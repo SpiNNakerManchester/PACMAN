@@ -36,6 +36,11 @@ class MachineGraph(Graph):
         "_pre_vertices_by_app_and_partition_name"
     ]
 
+    MISSING_APP_VERTEX_ERROR_MESSAGE = (
+        "The vertex does not have an app_vertex, and yet we have an "
+        "assocated app graph. This is deemed an error. Please fix and try "
+        "again")
+
     def __init__(self, label, application_graph=None):
         """
         :param label: The label for the graph.
@@ -61,7 +66,7 @@ class MachineGraph(Graph):
         if self._application_level_used:
             if vertex.app_vertex is None:
                 raise PacmanInvalidParameterException(
-                    "vertex", vertex, "The vertex does not have an app_vertex")
+                    "vertex", vertex, self.MISSING_APP_VERTEX_ERROR_MESSAGE)
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
@@ -77,9 +82,9 @@ class MachineGraph(Graph):
     def multicast_partitions(self):
         """
         Returns a double dictionary of app_vertex then
-         outgoing_edge_partition_name to a set of machine_vertex that act as
-         pre vertices for these multicast edges
-        :rtype dict(ApplicactionVertex, dict(str, set(MachineVertex))
+        outgoing_edge_partition_name to a set of machine_vertex that act as
+        pre vertices for these multicast edges
+        :rtype dict(ApplicationVertex, dict(str, set(MachineVertex))
         """
         return self._pre_vertices_by_app_and_partition_name
 
