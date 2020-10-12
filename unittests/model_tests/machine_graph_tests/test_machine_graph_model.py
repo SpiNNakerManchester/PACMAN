@@ -110,7 +110,8 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(edge)
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
-        graph.add_edges(edges, "bar")
+        with self.assertRaises(PacmanAlreadyExistsException):
+            graph.add_edges(edges, "bar")
 
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
