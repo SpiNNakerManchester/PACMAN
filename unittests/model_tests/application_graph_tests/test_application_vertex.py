@@ -16,8 +16,9 @@
 import unittest
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
+from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.machine import SimpleMachineVertex, MachineGraph
 from uinit_test_objects import SimpleTestVertex
 
 
@@ -145,13 +146,19 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertIn(constraint2, subv_from_vert.constraints)
 
     def test_machine_vertexes(self):
+        app_graph = ApplicationGraph("testA")
         vert = SimpleTestVertex(12, "New AbstractConstrainedVertex", 256)
+        app_graph.add_vertex(vert)
+        mach_graph = MachineGraph("testM", app_graph)
         sub1 = vert.create_machine_vertex(
             Slice(0, 7),
             vert.get_resources_used_by_atoms(Slice(0, 7)), "M1")
+        mach_graph.add_vertex(sub1)
         sub2 = vert.create_machine_vertex(
             Slice(7, 11),
             vert.get_resources_used_by_atoms(Slice(7, 11)), "M2")
+        self.assertNotIn(sub2, vert.machine_vertices)
+        mach_graph.add_vertex(sub2)
         self.assertIn(sub1, vert.machine_vertices)
         self.assertIn(sub2, vert.machine_vertices)
         self.assertIn(Slice(0, 7), vert.vertex_slices)
