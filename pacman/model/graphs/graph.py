@@ -175,6 +175,8 @@ class Graph(ConstrainedObject):
         self._incoming_edges_by_partition_name[
             (edge.post_vertex, outgoing_edge_partition_name)].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
+        if edge in self._outgoing_edge_partition_by_edge:
+            raise PacmanAlreadyExistsException("edge", edge)
         self._outgoing_edge_partition_by_edge[edge] = partition
 
     def _new_edge_partition(self, name):
