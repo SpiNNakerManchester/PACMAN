@@ -16,4 +16,4 @@
 from .abstract_splitter_slice import AbstractSplitterSlice
 from .abstract_dependent_splitter import AbstractDependentSplitter
 
-__all__ = ["AbstractSplitterSlice", "AbstractDependentSplitter"]
+__all__ = ["AbstractDependentSplitter", "AbstractSplitterSlice"]
