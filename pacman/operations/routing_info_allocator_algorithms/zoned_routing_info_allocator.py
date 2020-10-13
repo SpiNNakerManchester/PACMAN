@@ -216,7 +216,6 @@ class ZonedRoutingInfoAllocator(object):
 
                 for machine_index, vertex in enumerate(machine_vertices):
                     mask = self.__mask(n_bits_atoms)
-                    a = hex(mask)
                     key = app_part_index
                     key = (key << n_bits_machine) | machine_index
                     key = key << n_bits_atoms
