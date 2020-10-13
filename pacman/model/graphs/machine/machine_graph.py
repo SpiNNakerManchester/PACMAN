@@ -31,9 +31,9 @@ class MachineGraph(Graph):
         # Flags to say the application level is used so all machine vertices
         # will have an application vertex
         "_application_level_used",
-        # A double dictionary of pre machine vertices by their
-        # application vertex and then their (partition name)
-        "_pre_vertices_by_app_and_partition_name"
+        # A double dictionary of MULTICAST edges by their
+        # application id and then their (partition name)
+        "_multicast_partitions"
     ]
 
     MISSING_APP_VERTEX_ERROR_MESSAGE = (
@@ -56,7 +56,7 @@ class MachineGraph(Graph):
             self._application_level_used = application_graph.n_vertices > 0
         else:
             self._application_level_used = False
-        self._pre_vertices_by_app_and_partition_name = DefaultOrderedDict(
+        self._multicast_partitions = DefaultOrderedDict(
             lambda: DefaultOrderedDict(set))
 
     @overrides(Graph.add_vertex)
@@ -72,22 +72,29 @@ class MachineGraph(Graph):
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
         super(MachineGraph, self).add_edge(edge, outgoing_edge_partition_name)
-        if self._application_level_used:
-            if edge.traffic_type == EdgeTrafficType.MULTICAST:
-                by_app = self._pre_vertices_by_app_and_partition_name[
+        if edge.traffic_type == EdgeTrafficType.MULTICAST:
+            if self._application_level_used:
+                by_app = self._multicast_partitions[
                     edge.pre_vertex.app_vertex]
-                by_partition = by_app[outgoing_edge_partition_name]
-                by_partition.add(edge.pre_vertex)
+            else:
+                by_app = self._multicast_partitions[
+                    edge.pre_vertex]
+            by_partition = by_app[outgoing_edge_partition_name]
+            by_partition.add(edge.pre_vertex)
 
     @property
     def multicast_partitions(self):
         """
-        Returns a double dictionary of app_vertex then
+        Returns a double dictionary of  app id then
         outgoing_edge_partition_name to a set of machine_vertex that act as
         pre vertices for these multicast edges
-        :rtype dict(ApplicationVertex, dict(str, set(MachineVertex))
+
+        If the application level is used the app id will be App vertices,
+        if only machine level is used these will be machine vertices as there
+        is no way to group them
+        :rtype dict(Vertex, dict(str, set(MachineVertex))
         """
-        return self._pre_vertices_by_app_and_partition_name
+        return self._multicast_partitions
 
     @property
     def application_level_used(self):

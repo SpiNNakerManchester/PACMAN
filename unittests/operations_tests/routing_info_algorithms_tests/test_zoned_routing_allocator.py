@@ -87,6 +87,38 @@ def create_graphs1():
 
     return app_graph, mac_graph, n_keys_map
 
+def create_app_less():
+    app_graph = ApplicationGraph("Test")
+
+    mac_graph = MachineGraph("Test", app_graph)
+    n_keys_map = DictBasedMachinePartitionNKeysMap()
+
+    # An output vertex to aim things at (to make keys required)
+    out_mac_vertex = SimpleMacVertex()
+    mac_graph.add_vertex(out_mac_vertex)
+
+    # Create 5 application vertices (3 bits)
+    for app_index in range(5):
+
+        # For each, create up to (5 x 4) + 1 = 21 machine vertices (5 bits)
+        for mac_index in range((app_index * 4) + 1):
+            mac_vertex = SimpleMacVertex()
+            mac_graph.add_vertex(mac_vertex)
+
+            # For each machine vertex create up to
+            # (20 x 2) + 1 = 81(!) partitions (6 bits)
+            for mac_edge_index in range((mac_index * 2) + 1):
+                mac_edge = MachineEdge(mac_vertex, out_mac_vertex)
+                part_name = "Part{}".format(mac_edge_index)
+                mac_graph.add_edge(mac_edge, part_name)
+
+                # Give the partition up to (40 x 4) + 1 = 161 keys (8 bits)
+                p = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
+                    mac_vertex, part_name)
+                n_keys_map.set_n_keys_for_partition(
+                    p, (mac_edge_index * 4) + 1)
+
+    return app_graph, mac_graph, n_keys_map
 
 def check_masks_all_the_same(routing_info, mask):
     # Check the mask is the same for all, and allows for the space required
@@ -222,5 +254,28 @@ def test_big_global():
     # Others mask all bit minimum app bits (1)
     # all but the top 1 bits should be the same
     app_mask = 0x80000000
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
+
+def test_no_app_level_flexible():
+    app_graph, mac_graph, n_keys_map = create_app_less()
+    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
+    routing_info = flexible_allocate(mac_graph, n_keys_map)
+
+    # all but the bottom 8 bits should be the same
+    app_mask = 0xFFFFFF00
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
+
+def test_no_app_level_global():
+    app_graph, mac_graph, n_keys_map = create_app_less()
+    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
+    routing_info = global_allocate(mac_graph, n_keys_map)
+    # Last 8 for masks
+    mask = 0xFFFFFF00
+    check_masks_all_the_same(routing_info,  mask)
+
+    # all but the bottom 8 bits should be the same
+    app_mask = 0xFFFFFF00
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)

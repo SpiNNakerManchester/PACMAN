@@ -136,8 +136,8 @@ class ZonedRoutingInfoAllocator(object):
             len(by_app_and_partition_name), "Calculating zones")
 
         # search for size of regions
-        for app_vertex in progress.over(by_app_and_partition_name):
-            by_app = by_app_and_partition_name[app_vertex]
+        for app_id in progress.over(by_app_and_partition_name):
+            by_app = by_app_and_partition_name[app_id]
             for partition_name, by_partition_name in by_app.items():
                 max_keys = 0
                 for mac_vertex in by_partition_name:
@@ -155,7 +155,7 @@ class ZonedRoutingInfoAllocator(object):
                     self.__n_bits_atoms_and_mac = max(
                         self.__n_bits_atoms_and_mac, machine_bits + atom_bits)
                     self.__atom_bits_per_app_part[
-                        (app_vertex, partition_name)] = atom_bits
+                        (app_id, partition_name)] = atom_bits
 
         app_part_bits = self.__bits_needed(len(self.__atom_bits_per_app_part))
 
@@ -192,18 +192,18 @@ class ZonedRoutingInfoAllocator(object):
             len(by_app_and_partition_name), "Allocating routing keys")
         routing_infos = RoutingInfo()
         app_part_index = 0
-        for app_vertex in progress.over(by_app_and_partition_name):
+        for app_id in progress.over(by_app_and_partition_name):
             for partition_name, by_partition_name in \
-                    by_app_and_partition_name[app_vertex].items():
+                    by_app_and_partition_name[app_id].items():
                 machine_vertices = list(by_partition_name)
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
                 if self.__flexible:
                     n_bits_atoms = self.__atom_bits_per_app_part[
-                        (app_vertex, partition_name)]
+                        (app_id, partition_name)]
                     n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
                 else:
                     n_bits_atoms = self.__atom_bits_per_app_part[
-                        (app_vertex, partition_name)]
+                        (app_id, partition_name)]
                     print(self.__atom_bits_per_app_part)
                     if n_bits_atoms < self.__n_bits_atoms:
                         # Ok it fits use global sizes
@@ -216,6 +216,7 @@ class ZonedRoutingInfoAllocator(object):
 
                 for machine_index, vertex in enumerate(machine_vertices):
                     mask = self.__mask(n_bits_atoms)
+                    a = hex(mask)
                     key = app_part_index
                     key = (key << n_bits_machine) | machine_index
                     key = key << n_bits_atoms
