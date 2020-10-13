@@ -40,10 +40,6 @@ class MachineGraph(Graph):
         "The vertex does not have an app_vertex, "
         "which is required when other app_vertices exist.")
 
-    UNEXPECTED_APP_VERTEX_ERROR_MESSAGE = (
-        "The vertex has an app_vertex, "
-        "which is unexpected as the application level is not being used.")
-
     def __init__(self, label, application_graph=None):
         """
         :param label: The label for the graph.
@@ -72,10 +68,6 @@ class MachineGraph(Graph):
             except AttributeError:
                 raise PacmanInvalidParameterException(
                     "vertex", vertex, self.MISSING_APP_VERTEX_ERROR_MESSAGE)
-        else:
-            if vertex.app_vertex:
-                raise PacmanInvalidParameterException(
-                    "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
