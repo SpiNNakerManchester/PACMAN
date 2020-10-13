@@ -87,6 +87,7 @@ def create_graphs1():
 
     return app_graph, mac_graph, n_keys_map
 
+
 def create_app_less():
     app_graph = ApplicationGraph("Test")
 
@@ -119,6 +120,7 @@ def create_app_less():
                     p, (mac_edge_index * 4) + 1)
 
     return app_graph, mac_graph, n_keys_map
+
 
 def check_masks_all_the_same(routing_info, mask):
     # Check the mask is the same for all, and allows for the space required
@@ -257,6 +259,7 @@ def test_big_global():
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
 
+
 def test_no_app_level_flexible():
     app_graph, mac_graph, n_keys_map = create_app_less()
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
@@ -266,6 +269,7 @@ def test_no_app_level_flexible():
     app_mask = 0xFFFFFF00
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
+
 
 def test_no_app_level_global():
     app_graph, mac_graph, n_keys_map = create_app_less()
