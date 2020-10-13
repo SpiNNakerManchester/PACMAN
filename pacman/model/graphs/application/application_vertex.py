@@ -70,6 +70,9 @@ class ApplicationVertex(AbstractVertex):
 
     @property
     def splitter_object(self):
+        """
+        :rtype: ~pacman.model.partitioner_interfaces.AbstractSplitterCommon
+        """
         return self._splitter_object
 
     @splitter_object.setter
