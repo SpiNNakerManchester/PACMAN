@@ -16,7 +16,6 @@
 from __future__ import division
 import math
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.utilities.utility_calls import (
@@ -24,146 +23,212 @@ from pacman.utilities.utility_calls import (
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint)
-from pacman.model.graphs.common import EdgeTrafficType
+from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 
 
 class ZonedRoutingInfoAllocator(object):
-    """ An basic algorithm that can produce routing keys and masks for\
-        edges in a graph based on the x,y,p of the placement\
-        of the preceding vertex.
+    """ A routing key allocator that uses fixed zones that are the same for
+        all vertices.  This will hopefully make the keys more compressible.
+
+        Keys will have the format:
+              <--- 32 bits --->
+        Key:  | AP | M | X |
+        Mask: |11111111111|   | (i.e. 1s covering AP and M fields)
+
+        A: the index of the application vertex
+        P: the index of the name of outgoing edge partition of the vertex.
+        M: the index of the machine vertex of the application vertex
+        X: space for the maximum number of keys required by any outgoing edge
+           partition
+
+        The A and P are combined into a single index so that applications with
+        multiple partitions use multiple entries
+        while ones with only 1 use just one.
+
+        The split between the AP bit and other parts is always fixed
+        This also means that all machine vertices of the same
+        application vertex and partition will have a shared key.
+
+        The split between the M and X may vary depending on how the allocator
+        is called.
+
+        In "global" mode the widths of the fields are pre determined and fixed
+        such that every key will have every field in the same place in the key,
+        and the mask is the same for every vertex.
+         The global approach is particularly sensitive to the one large and
+         many small vertices limit.
+
+        In "flexible" mode the size of the M and X will change for each
+        application/partition. Every vertex for a application/partition pair
+        but different pairs may have different masks.
+        This should result in less gaps between the machine vertexes.
+
 
     .. note::
-        No constraints are supported, and that the number of keys
-        required by each edge must be 2048 or less, and that all edges coming
-        out of a vertex will be given the same key/mask assignment.
+        No special constraints (except ContiguousKeyRangeContraint) are
+        supported.  This will only work if the numbers above add up to 32-bits
+        (an error will result if not).  A single large vertex (like a retina)
+        and lots of small vertices (like a large neural network)
+        will thus not likely work here.
 
-    :param ApplicationGraph application_graph:
-        The application graph to allocate the routing info for
     :param MachineGraph machine_graph:
         The machine graph to allocate the routing info for
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         A map between the edges and the number of keys required by the
         edges
     :return: The routing information
-    :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+    :rtype: RoutingInfo
     :raise PacmanRouteInfoAllocationException:
         If something goes wrong with the allocation
     """
 
     __slots__ = [
         # Passed in parameters
-        "__application_graph",
         "__machine_graph",
-        "__n_keys_map"
+        "__n_keys_map",
+        # For each App vertex / Partition name zone keep track of the number of
+        # bites required for the mask for each machine vertex
+        "__atom_bits_per_app_part",
+        # maximum number of bites to represent the keys and masks
+        # for a single app vertex / partition name zone
+        "__n_bits_atoms_and_mac",
+        # Maximum number pf bit to represent the machine assuming global
+        "__n_bits_machine",
+        # Maximum number pf bit to represent the machine assuming global
+        "__n_bits_atoms",
+        "__flexible"
     ]
-    MAX_PARTITIONS_SUPPORTED = 1
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, application_graph, machine_graph, n_keys_map):
+    def __init__(self, machine_graph, n_keys_map, flexible):
         """
-        :param ApplicationGraph application_graph:
         :param MachineGraph machine_graph:
+            The machine graph to allocate the routing info for
         :param AbstractMachinePartitionNKeysMap n_keys_map:
-        :rtype: tuple(RoutingInfo, dict(ApplicationVertex, BaseKeyAndMask))
+            A map between the edges and the number of keys required by the
+            edges
+        :param bool flexible: Dettermines if flexible can be use.
+            If False global settings will be attempted
         :raise PacmanRouteInfoAllocationException:
         """
         # check that this algorithm supports the constraints put onto the
         # partitions
-        self.__application_graph = application_graph
         self.__machine_graph = machine_graph
         self.__n_keys_map = n_keys_map
+        self.__n_bits_atoms_and_mac = 0
+        self.__n_bits_machine = 0
+        self.__n_bits_atoms = 0
+        self.__atom_bits_per_app_part = dict()
+        self.__flexible = flexible
 
         check_algorithm_can_support_constraints(
-            constrained_vertices=machine_graph.outgoing_edge_partitions,
+            constrained_vertices=machine_graph.multicast_partitions.keys(),
             supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-        max_app_keys_bits, key_bits_per_app = self._calculate_zones()
-
-        return self._simple_allocate(max_app_keys_bits, key_bits_per_app)
-
     def _calculate_zones(self):
         """
-        :return: tuple containing max app keys and a map of app to max keys
-            for any given machine vertex
-        :rtype: tuple(int, dict(ApplicationVertex, int))
         :raises PacmanRouteInfoAllocationException:
         """
+        by_app_and_partition_name = \
+            self.__machine_graph.multicast_partitions
         progress = ProgressBar(
-            self.__application_graph.n_vertices, "Calculating zones")
-        # holders
-        max_app_keys_bits = 0
-        source_zones = 0
-        max_partitions = 0
-        key_bits_per_app = dict()
+            len(by_app_and_partition_name), "Calculating zones")
 
         # search for size of regions
-        for app_vertex in progress.over(self.__application_graph.vertices):
-            app_max_partitions = 0
-            max_keys = 0
-            for vertex in app_vertex.machine_vertices:
-                partitions = self.__machine_graph.\
-                    get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                app_max_partitions = max(app_max_partitions, len(partitions))
-                max_keys = max(max_keys, max(
-                    (self.__n_keys_map.n_keys_for_partition(partition)
-                     for partition in partitions
-                     if partition.traffic_type == EdgeTrafficType.MULTICAST),
-                    default=0))
-            if max_keys > 0:
-                max_partitions = max(max_partitions, app_max_partitions)
-                source_zones += app_max_partitions
-                key_bits = self.__bits_needed(max_keys)
-                machine_bits = self.__bits_needed(len(
-                    app_vertex.machine_vertices))
-                max_app_keys_bits = max(
-                    max_app_keys_bits, machine_bits + key_bits)
-                key_bits_per_app[app_vertex] = key_bits
-        source_bits = self.__bits_needed(source_zones)
+        for app_id in progress.over(by_app_and_partition_name):
+            by_app = by_app_and_partition_name[app_id]
+            for partition_name, by_partition_name in by_app.items():
+                max_keys = 0
+                for mac_vertex in by_partition_name:
+                    partition = self.__machine_graph.\
+                        get_outgoing_edge_partition_starting_at_vertex(
+                            mac_vertex, partition_name)
+                    n_keys = self.__n_keys_map.n_keys_for_partition(partition)
+                    max_keys = max(max_keys, n_keys)
+                if max_keys > 0:
+                    atom_bits = self.__bits_needed(max_keys)
+                    self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
+                    machine_bits = self.__bits_needed(len(by_partition_name))
+                    self.__n_bits_machine = max(
+                        self.__n_bits_machine, machine_bits)
+                    self.__n_bits_atoms_and_mac = max(
+                        self.__n_bits_atoms_and_mac, machine_bits + atom_bits)
+                    self.__atom_bits_per_app_part[
+                        (app_id, partition_name)] = atom_bits
 
-        if source_bits + max_app_keys_bits > BITS_IN_KEY:
+        app_part_bits = self.__bits_needed(len(self.__atom_bits_per_app_part))
+
+        if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
                 "different allocator as it needs {} + {} bits".format(
-                    source_bits, max_app_keys_bits))
-        if max_partitions > self.MAX_PARTITIONS_SUPPORTED:
-            raise NotImplementedError()
-        return max_app_keys_bits, key_bits_per_app
+                    app_part_bits, self.__n_bits_atoms_and_mac))
 
-    def _simple_allocate(self, max_app_keys_bits, key_bits_map):
+        if not self.__flexible:
+            if app_part_bits + self.__n_bits_machine + self.__n_bits_atoms > \
+                    BITS_IN_KEY:
+                # We know from above test that all will fit if flexible
+                # Reduce the suggested size of n_bits_atoms
+                self.__n_bits_atoms = \
+                    BITS_IN_KEY - app_part_bits - self.__n_bits_machine
+                self.__n_bits_atoms_and_mac = BITS_IN_KEY - app_part_bits
+            else:
+                # Set the size of atoms and machine for biggest of each
+                self.__n_bits_atoms_and_mac = \
+                    self.__n_bits_machine + self.__n_bits_atoms
+
+    def _simple_allocate(self):
         """
-        :param int max_app_keys_bits: max bits for app keys
-        :param dict(ApplicationVertex,int) key_bits_map:
-            map of app vertex to max keys for that vertex
+        :param dict((ApplicationVertex, str),int) mask_bits_map:
+            map of app vertex,name to max keys for that vertex
         :return: tuple of routing infos and map from app vertex and key masks
-        :rtype: tuple(RoutingInfo, dict(ApplicationVertex,BaseKeyAndMask))
+        :rtype: tuple(RoutingInfo,
+            dict((ApplicationVertex, str), BaseKeyAndMask))
         """
+        by_app_and_partition_name = \
+            self.__machine_graph.multicast_partitions
         progress = ProgressBar(
-            self.__application_graph.n_vertices, "Allocating routing keys")
+            len(by_app_and_partition_name), "Allocating routing keys")
         routing_infos = RoutingInfo()
-        by_app_vertex = dict()
-        app_mask = self.__mask(max_app_keys_bits)
+        app_part_index = 0
+        for app_id in progress.over(by_app_and_partition_name):
+            for partition_name, by_partition_name in \
+                    by_app_and_partition_name[app_id].items():
+                machine_vertices = list(by_partition_name)
+                machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
+                if self.__flexible:
+                    n_bits_atoms = self.__atom_bits_per_app_part[
+                        (app_id, partition_name)]
+                    n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
+                else:
+                    n_bits_atoms = self.__atom_bits_per_app_part[
+                        (app_id, partition_name)]
+                    print(self.__atom_bits_per_app_part)
+                    if n_bits_atoms < self.__n_bits_atoms:
+                        # Ok it fits use global sizes
+                        n_bits_atoms = self.__n_bits_atoms
+                        n_bits_machine = self.__n_bits_machine
+                    else:
+                        # Nope need more use that so adjust n_bits_machine down
+                        n_bits_machine = \
+                            self.__n_bits_atoms_and_mac - n_bits_atoms
 
-        for source_index, app_vertex in progress.over(
-                enumerate(self.__application_graph.vertices)):
-            app_key = source_index << max_app_keys_bits
-            if app_vertex in key_bits_map:
-                key_bits = key_bits_map[app_vertex]
-                for machine_index, vertex in enumerate(
-                        app_vertex.machine_vertices):
-                    partitions = self.__machine_graph.\
-                        get_outgoing_edge_partitions_starting_at_vertex(vertex)
-                    partition = partitions.peek()
-                    if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                        mask = self.__mask(key_bits)
-                        key = app_key | machine_index << key_bits
-                        key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
-                        routing_infos.add_partition_info(
-                            PartitionRoutingInfo([key_and_mask], partition))
-                by_app_vertex[app_vertex] = BaseKeyAndMask(
-                    base_key=app_key, mask=app_mask)
+                for machine_index, vertex in enumerate(machine_vertices):
+                    mask = self.__mask(n_bits_atoms)
+                    key = app_part_index
+                    key = (key << n_bits_machine) | machine_index
+                    key = key << n_bits_atoms
+                    key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
+                    partition = self.__machine_graph.\
+                        get_outgoing_edge_partition_starting_at_vertex(
+                            vertex, partition_name)
+                    routing_infos.add_partition_info(
+                        PartitionRoutingInfo([key_and_mask], partition))
 
-        return routing_infos, by_app_vertex
+                app_part_index += 1
+
+        return routing_infos
 
     @staticmethod
     def __mask(bits):
@@ -180,3 +245,48 @@ class ZonedRoutingInfoAllocator(object):
         :rtype: int
         """
         return int(math.ceil(math.log(size, 2)))
+
+
+def flexible_allocate(machine_graph, n_keys_map):
+    """
+    Allocated with fixed bits for the Application/Paritition index but
+    with the size of the atom and machine bit changing
+
+    :param MachineGraph machine_graph:
+        The machine graph to allocate the routing info for
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the
+        edges
+    :rtype: tuple(RoutingInfo,
+        dict((ApplicationVertex, str), BaseKeyAndMask))
+    :raise PacmanRouteInfoAllocationException:
+    """
+    # check that this algorithm supports the constraints put onto the
+    # partitions
+
+    allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, True)
+
+    allocator._calculate_zones()
+
+    return allocator._simple_allocate()
+
+
+def global_allocate(machine_graph, n_keys_map):
+    """
+    :param MachineGraph machine_graph:
+        The machine graph to allocate the routing info for
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        A map between the edges and the number of keys required by the
+        edges
+    :rtype: tuple(RoutingInfo,
+        dict((ApplicationVertex, str), BaseKeyAndMask))
+    :raise PacmanRouteInfoAllocationException:
+    """
+    # check that this algorithm supports the constraints put onto the
+    # partitions
+
+    allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, False)
+
+    allocator._calculate_zones()
+
+    return allocator._simple_allocate()
