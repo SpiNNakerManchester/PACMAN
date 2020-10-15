@@ -64,7 +64,8 @@ class MachineVertex(SimpleMachineVertex):
     def __init__(self, lo_atom, hi_atom, resources_required, label=None,
                  constraints=None):
         super(MachineVertex, self).__init__(
-            resources_required, label=label, constraints=constraints)
+            resources_required, label=label, constraints=constraints,
+            vertex_slice=Slice(lo_atom, hi_atom))
         self.lo_atom = lo_atom
         self.hi_atom = hi_atom
         self._model_based_max_atoms_per_core = 256
