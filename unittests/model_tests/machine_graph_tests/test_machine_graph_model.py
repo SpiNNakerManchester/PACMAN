@@ -149,7 +149,6 @@ class TestMachineGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanInvalidParameterException):
             graph.add_vertex(mach3)
 
-
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
         test that adding a edge where the pre vertex has not been added
