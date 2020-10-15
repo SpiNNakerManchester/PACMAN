@@ -230,7 +230,8 @@ class TestJsonUtils(unittest.TestCase):
         vertices = list()
         edges = list()
         for i in range(10):
-            vertices.append(SimpleMachineVertex(ResourceContainer(), "V{}".format(i)))
+            vertices.append(
+                SimpleMachineVertex(ResourceContainer(), "V{}".format(i)))
         vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
         vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
         for i in range(5):
