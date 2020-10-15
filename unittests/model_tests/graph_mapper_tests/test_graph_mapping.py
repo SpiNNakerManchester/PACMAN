@@ -17,7 +17,6 @@
 tests for graph mapping
 """
 import unittest
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
 from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
 
