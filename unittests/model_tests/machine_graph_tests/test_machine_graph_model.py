@@ -170,5 +170,6 @@ class TestMachineGraphModel(unittest.TestCase):
         self.assertIn(mach3, app1.machine_vertices)
         self.assertIn(mach4, app2.machine_vertices)
 
+
 if __name__ == '__main__':
     unittest.main()
