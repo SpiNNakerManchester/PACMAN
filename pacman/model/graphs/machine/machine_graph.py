@@ -53,7 +53,7 @@ class MachineGraph(Graph):
         if application_graph:
             application_graph.forget_machine_graph()
             # Check the first vertex added
-            self._application_level_used = None
+            self._application_level_used = True
         else:
             # Must be false as there is no App_graph
             self._application_level_used = False
@@ -61,12 +61,14 @@ class MachineGraph(Graph):
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):
         super(MachineGraph, self).add_vertex(vertex)
-        if self._application_level_used is None:
-            self._application_level_used = vertex.app_vertex is not None
         if self._application_level_used:
             if not vertex.app_vertex:
-                raise PacmanInvalidParameterException(
-                    "vertex", vertex, self.MISSING_APP_VERTEX_ERROR_MESSAGE)
+                if self.n_vertices == 1:
+                    self._application_level_used = False
+                else:
+                    raise PacmanInvalidParameterException(
+                        "vertex", vertex,
+                        self.MISSING_APP_VERTEX_ERROR_MESSAGE)
         else:
             if vertex.app_vertex:
                 raise PacmanInvalidParameterException(
