@@ -76,6 +76,7 @@ class ZonedRoutingInfoAllocator(object):
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         A map between the edges and the number of keys required by the
         edges
+    :param bool flexible: Use flexible mode
     :return: The routing information
     :rtype: RoutingInfo
     :raise PacmanRouteInfoAllocationException:
@@ -100,7 +101,7 @@ class ZonedRoutingInfoAllocator(object):
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __init__(self, machine_graph, n_keys_map, flexible):
+    def __call__(self, machine_graph, n_keys_map, flexible):
         """
         :param MachineGraph machine_graph:
             The machine graph to allocate the routing info for
@@ -126,7 +127,11 @@ class ZonedRoutingInfoAllocator(object):
             supported_constraints=[ContiguousKeyRangeContraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
-    def _calculate_zones(self):
+        self.__calculate_zones()
+        self.__check_zones()
+        return self.__allocate()
+
+    def __calculate_zones(self):
         """
         :raises PacmanRouteInfoAllocationException:
         """
@@ -157,6 +162,7 @@ class ZonedRoutingInfoAllocator(object):
                     self.__atom_bits_per_app_part[
                         (app_id, partition_name)] = atom_bits
 
+    def __check_zones(self, ):
         app_part_bits = self.__bits_needed(len(self.__atom_bits_per_app_part))
 
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
@@ -178,7 +184,7 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_atoms_and_mac = \
                     self.__n_bits_machine + self.__n_bits_atoms
 
-    def _simple_allocate(self):
+    def __allocate(self):
         """
         :param dict((ApplicationVertex, str),int) mask_bits_map:
             map of app vertex,name to max keys for that vertex
@@ -264,11 +270,9 @@ def flexible_allocate(machine_graph, n_keys_map):
     # check that this algorithm supports the constraints put onto the
     # partitions
 
-    allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, True)
+    allocator = ZonedRoutingInfoAllocator()
 
-    allocator._calculate_zones()
-
-    return allocator._simple_allocate()
+    return allocator(machine_graph, n_keys_map, True)
 
 
 def global_allocate(machine_graph, n_keys_map):
@@ -285,8 +289,6 @@ def global_allocate(machine_graph, n_keys_map):
     # check that this algorithm supports the constraints put onto the
     # partitions
 
-    allocator = ZonedRoutingInfoAllocator(machine_graph, n_keys_map, False)
+    allocator = ZonedRoutingInfoAllocator()
 
-    allocator._calculate_zones()
-
-    return allocator._simple_allocate()
+    return allocator(machine_graph, n_keys_map, False)
