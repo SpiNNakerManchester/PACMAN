@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineEdge
 from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
