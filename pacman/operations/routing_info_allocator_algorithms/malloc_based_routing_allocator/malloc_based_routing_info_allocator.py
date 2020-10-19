@@ -204,7 +204,6 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         partition_info = PartitionRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)
 
-
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
         """ Allocate fixed keys and masks.
 

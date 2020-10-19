@@ -153,7 +153,7 @@ class ZonedRoutingInfoAllocator(object):
                 for mac_vertex in by_partition_name:
                     partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
-                        mac_vertex, partition_name)
+                            mac_vertex, partition_name)
                     for constraint in partition.constraints:
                         if isinstance(constraint, FixedKeyAndMaskConstraint):
                             self.__add_fixed(partition, constraint)
@@ -206,7 +206,6 @@ class ZonedRoutingInfoAllocator(object):
                 "different allocator as it needs {} + {} bits".format(
                     app_part_bits, self.__n_bits_atoms_and_mac))
 
-
         # Reserve fixed and check it still works
         self.__check_fixed()
         app_part_bits = self.__bits_needed(
@@ -235,8 +234,8 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_machine + self.__n_bits_atoms:
             return  # felibible same a s none flexible
 
-        raw_app_part_bits = self.__bits_needed\
-            (len(self.__atom_bits_per_app_part))
+        raw_app_part_bits = self.__bits_needed(
+            len(self.__atom_bits_per_app_part))
 
         while self.__n_bits_atoms >= 0:
             self.__n_bits_atoms_and_mac = \
@@ -245,9 +244,10 @@ class ZonedRoutingInfoAllocator(object):
                 self.__check_fixed()
                 self.__check_fixed()
                 app_part_bits = self.__bits_needed(
-                    len(self.__atom_bits_per_app_part) + len(self.__fixed_used))
+                    len(self.__atom_bits_per_app_part) +
+                    len(self.__fixed_used))
                 if app_part_bits + self.__n_bits_atoms_and_mac <= BITS_IN_KEY:
-                    return # working result found
+                    return  # working result found
             self.__n_bits_atoms -= 1
 
         raise PacmanRouteInfoAllocationException(
@@ -311,13 +311,14 @@ class ZonedRoutingInfoAllocator(object):
                         key = app_part_index
                         key = (key << n_bits_machine) | machine_index
                         key = key << n_bits_atoms
-                        keys_and_masks = [BaseKeyAndMask(base_key=key, mask=mask)]
+                        keys_and_masks = [BaseKeyAndMask(
+                            base_key=key, mask=mask)]
                     routing_infos.add_partition_info(
                         PartitionRoutingInfo(keys_and_masks, partition))
                 app_part_index += 1
 
         return routing_infos
-    
+
     @staticmethod
     def __mask(bits):
         """
