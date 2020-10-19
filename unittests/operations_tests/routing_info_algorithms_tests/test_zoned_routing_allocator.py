@@ -22,6 +22,9 @@ from pacman.model.graphs.application.application_graph import ApplicationGraph
 from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.model.graphs.machine.machine_edge import MachineEdge
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.constraints.key_allocator_constraints \
+    import FixedKeyAndMaskConstraint
 
 
 class SimpleAppVertex(ApplicationVertex):
@@ -185,7 +188,7 @@ def test_flexible_allocator():
         app_graph, mac_graph, routing_info, app_mask)
 
 
-def create_big():
+def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
     app_graph = ApplicationGraph("Test")
     # Create a single "big" vertex
@@ -223,14 +226,17 @@ def create_big():
 
     big_mac_part = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
         big_mac_vertex, "Test")
+    if with_fixed:
+        big_mac_part.add_constraint(FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0x0, 0x180000)]))
     # Make the "retina" need 21 bits, so total is now 21 + 11 = 32 bits,
     # but the application vertices need some bits too
     n_keys_map.set_n_keys_for_partition(big_mac_part, 1024 * 768 * 2)
     return app_graph, mac_graph, n_keys_map
 
 
-def test_big_flexible():
-    app_graph, mac_graph, n_keys_map = create_big()
+def test_big_flexible_no_fixed():
+    app_graph, mac_graph, n_keys_map = create_big(False)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
     routing_info = flexible_allocate(mac_graph, n_keys_map)
@@ -242,8 +248,8 @@ def test_big_flexible():
         app_graph, mac_graph, routing_info, app_mask)
 
 
-def test_big_global():
-    app_graph, mac_graph, n_keys_map = create_big()
+def test_big_global_no_fixed():
+    app_graph, mac_graph, n_keys_map = create_big(False)
     # Make the call, and it should fail
     routing_info = global_allocate(mac_graph, n_keys_map)
 
@@ -259,6 +265,36 @@ def test_big_global():
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
 
+
+def test_big_flexible_fixed():
+    app_graph, mac_graph, n_keys_map = create_big(True)
+
+    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
+    routing_info = flexible_allocate(mac_graph, n_keys_map)
+
+    # The number of bits is 1 + 21 = 22, so it shouldn't fail
+    # all but the bottom 21 bits should be the same
+    app_mask = 0xFFE00000
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
+
+
+def test_big_global_fixed():
+    app_graph, mac_graph, n_keys_map = create_big(True)
+    # Make the call, and it should fail
+    routing_info = global_allocate(mac_graph, n_keys_map)
+
+    # 1 for app 11 for machine so where possible use 20 for atoms
+    mask = 0xFFF00000
+    check_masks_all_the_same(routing_info, mask)
+
+    # The number of bits is 1 + 11 + 21, so it will not fit
+    # So flexible for the retina
+    # Others mask all bit minimum app bits (1)
+    # all but the top 1 bits should be the same
+    app_mask = 0x80000000
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
 
 def test_no_app_level_flexible():
     app_graph, mac_graph, n_keys_map = create_app_less()
