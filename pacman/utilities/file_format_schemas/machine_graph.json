@@ -46,7 +46,7 @@
         },
         "additionalProperties": false,
         "anyOf": [
-          { "required": [ "pre_vertex", "post_vertex", "traffic_type", "label", "traffic_weight"] },
+          { "required": [ "pre_vertex", "post_vertex", "traffic_type", "traffic_weight"] },
           { "required": [ "exception"] }
         ]
       }
