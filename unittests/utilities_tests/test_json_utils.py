@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
-
 import json
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
@@ -28,6 +27,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer)
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import (
     constraint_to_json, constraint_from_json,
     edge_to_json, edge_from_json,
@@ -36,6 +36,8 @@ from pacman.utilities.json_utils import (
     vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
+
+MACHINE_GRAPH_FILENAME = "machine_graph.json"
 
 
 class TestJsonUtils(unittest.TestCase):
@@ -108,6 +110,7 @@ class TestJsonUtils(unittest.TestCase):
     def graph_there_and_back(self, there):
         j_object = graph_to_json(there)
         print(j_object)
+        file_format_schemas.validate(j_object, MACHINE_GRAPH_FILENAME)
         back = graph_from_json(j_object)
         self.assertEqual(there.n_vertices, back.n_vertices)
         for vertex in there.vertices:
@@ -227,7 +230,8 @@ class TestJsonUtils(unittest.TestCase):
         vertices = list()
         edges = list()
         for i in range(10):
-            vertices.append(SimpleMachineVertex(None, "V{}".format(i)))
+            vertices.append(
+                SimpleMachineVertex(ResourceContainer(), "V{}".format(i)))
         vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
         vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
         for i in range(5):
