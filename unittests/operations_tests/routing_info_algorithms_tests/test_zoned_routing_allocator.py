@@ -296,6 +296,7 @@ def test_big_global_fixed():
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
 
+
 def test_no_app_level_flexible():
     app_graph, mac_graph, n_keys_map = create_app_less()
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
