@@ -142,8 +142,8 @@ class ZonedRoutingInfoAllocator(object):
     def __find_fixed(self):
         multicast_partitions = self.__machine_graph.multicast_partitions
         for app_id in multicast_partitions:
-            # multicast_partitions is a map of app_id to by_partition
-            # paritition_vertices is a map of partitioin name to list of vertices
+            # multicast_partitions is a map of app_id to paritition_vertices
+            # paritition_vertices is a map of partition(name) to set(vertex)
             by_app = multicast_partitions[app_id]
             for partition_name, paritition_vertices in by_app.items():
                 for mac_vertex in paritition_vertices:
