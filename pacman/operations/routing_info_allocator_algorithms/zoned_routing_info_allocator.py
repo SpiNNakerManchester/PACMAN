@@ -63,14 +63,9 @@ class ZonedRoutingInfoAllocator(object):
         application/partition. Every vertex for a application/partition pair
         but different pairs may have different masks.
         This should result in less gaps between the machine vertexes.
-
-
-    .. note::
-        No special constraints (except ContiguousKeyRangeContraint) are
-        supported.  This will only work if the numbers above add up to 32-bits
-        (an error will result if not).  A single large vertex (like a retina)
-        and lots of small vertices (like a large neural network)
-        will thus not likely work here.
+        Even in none Flexible mode if the sizes are too big to keep M and X the
+        same size they will be allowed to change for those vertexes will a
+        very high number of atoms.
 
     :param MachineGraph machine_graph:
         The machine graph to allocate the routing info for
@@ -148,6 +143,8 @@ class ZonedRoutingInfoAllocator(object):
         by_app_and_partition_name = \
             self.__machine_graph.multicast_partitions
         for app_id in by_app_and_partition_name:
+            # by_app is a map of app_id to by_partition
+            # by_partition is a map of partitioin name to list of vertices
             by_app = by_app_and_partition_name[app_id]
             for partition_name, by_partition_name in by_app.items():
                 for mac_vertex in by_partition_name:
@@ -168,6 +165,13 @@ class ZonedRoutingInfoAllocator(object):
 
     def __calculate_zones(self):
         """
+        Computes the size for the zones.
+
+        Note: Even Parititions with FicedKeysAndMasks a included here.
+        This does waste a little space.
+        However makes this and the allocate code slightly simpler
+        It also keeps the "AP" zone working for these partitions too
+
         :raises PacmanRouteInfoAllocationException:
         """
         by_app_and_partition_name = \
@@ -207,7 +211,7 @@ class ZonedRoutingInfoAllocator(object):
                     app_part_bits, self.__n_bits_atoms_and_mac))
 
         # Reserve fixed and check it still works
-        self.__check_fixed()
+        self.__set_fixed_used()
         app_part_bits = self.__bits_needed(
             len(self.__atom_bits_per_app_part) + len(self.__fixed_used))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
@@ -241,8 +245,8 @@ class ZonedRoutingInfoAllocator(object):
             self.__n_bits_atoms_and_mac = \
                 self.__n_bits_machine + self.__n_bits_atoms
             if self.__n_bits_atoms_and_mac + raw_app_part_bits <= BITS_IN_KEY:
-                self.__check_fixed()
-                self.__check_fixed()
+                self.__set_fixed_used()
+                self.__set_fixed_used()
                 app_part_bits = self.__bits_needed(
                     len(self.__atom_bits_per_app_part) +
                     len(self.__fixed_used))
@@ -254,7 +258,7 @@ class ZonedRoutingInfoAllocator(object):
             "Unable to use ZonedRoutingInfoAllocator please select a "
             "different allocator")
 
-    def __check_fixed(self):
+    def __set_fixed_used(self):
         self.__fixed_used = set()
         bucket_size = 2 ** self.__n_bits_atoms_and_mac
         for (key, n_keys) in self.__fixed_keys:
@@ -264,13 +268,6 @@ class ZonedRoutingInfoAllocator(object):
                 self.__fixed_used.add(i)
 
     def __allocate(self):
-        """
-        :param dict((ApplicationVertex, str),int) mask_bits_map:
-            map of app vertex,name to max keys for that vertex
-        :return: tuple of routing infos and map from app vertex and key masks
-        :rtype: tuple(RoutingInfo,
-            dict((ApplicationVertex, str), BaseKeyAndMask))
-        """
         by_app_and_partition_name = \
             self.__machine_graph.multicast_partitions
         progress = ProgressBar(
@@ -296,7 +293,7 @@ class ZonedRoutingInfoAllocator(object):
                         n_bits_atoms = self.__n_bits_atoms
                         n_bits_machine = self.__n_bits_machine
                     else:
-                        # Nope need more use that so adjust n_bits_machine down
+                        # Nope need more bits! Use the flexible approach here
                         n_bits_machine = \
                             self.__n_bits_atoms_and_mac - n_bits_atoms
 
@@ -305,6 +302,7 @@ class ZonedRoutingInfoAllocator(object):
                         get_outgoing_edge_partition_starting_at_vertex(
                             vertex, partition_name)
                     if partition in self.__fixed_partitions:
+                        # Ignore zone calculations and just use fixed
                         keys_and_masks = self.__fixed_partitions[partition]
                     else:
                         mask = self.__mask(n_bits_atoms)
