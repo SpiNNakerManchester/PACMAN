@@ -140,14 +140,13 @@ class ZonedRoutingInfoAllocator(object):
         return self.__allocate()
 
     def __find_fixed(self):
-        by_app_and_partition_name = \
-            self.__machine_graph.multicast_partitions
-        for app_id in by_app_and_partition_name:
-            # by_app is a map of app_id to by_partition
-            # by_partition is a map of partitioin name to list of vertices
-            by_app = by_app_and_partition_name[app_id]
-            for partition_name, by_partition_name in by_app.items():
-                for mac_vertex in by_partition_name:
+        multicast_partitions = self.__machine_graph.multicast_partitions
+        for app_id in multicast_partitions:
+            # multicast_partitions is a map of app_id to by_partition
+            # paritition_vertices is a map of partitioin name to list of vertices
+            by_app = multicast_partitions[app_id]
+            for partition_name, paritition_vertices in by_app.items():
+                for mac_vertex in paritition_vertices:
                     partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
                             mac_vertex, partition_name)
@@ -174,17 +173,16 @@ class ZonedRoutingInfoAllocator(object):
 
         :raises PacmanRouteInfoAllocationException:
         """
-        by_app_and_partition_name = \
-            self.__machine_graph.multicast_partitions
+        multicast_partitions = self.__machine_graph.multicast_partitions
         progress = ProgressBar(
-            len(by_app_and_partition_name), "Calculating zones")
+            len(multicast_partitions), "Calculating zones")
 
         # search for size of regions
-        for app_id in progress.over(by_app_and_partition_name):
-            by_app = by_app_and_partition_name[app_id]
-            for partition_name, by_partition_name in by_app.items():
+        for app_id in progress.over(multicast_partitions):
+            by_app = multicast_partitions[app_id]
+            for partition_name, paritition_vertices in by_app.items():
                 max_keys = 0
-                for mac_vertex in by_partition_name:
+                for mac_vertex in paritition_vertices:
                     partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
                             mac_vertex, partition_name)
@@ -193,7 +191,7 @@ class ZonedRoutingInfoAllocator(object):
                 if max_keys > 0:
                     atom_bits = self.__bits_needed(max_keys)
                     self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
-                    machine_bits = self.__bits_needed(len(by_partition_name))
+                    machine_bits = self.__bits_needed(len(paritition_vertices))
                     self.__n_bits_machine = max(
                         self.__n_bits_machine, machine_bits)
                     self.__n_bits_atoms_and_mac = max(
@@ -268,18 +266,18 @@ class ZonedRoutingInfoAllocator(object):
                 self.__fixed_used.add(i)
 
     def __allocate(self):
-        by_app_and_partition_name = \
-            self.__machine_graph.multicast_partitions
+        multicast_partitions = self.__machine_graph.multicast_partitions
         progress = ProgressBar(
-            len(by_app_and_partition_name), "Allocating routing keys")
+            len(multicast_partitions), "Allocating routing keys")
         routing_infos = RoutingInfo()
         app_part_index = 0
-        for app_id in progress.over(by_app_and_partition_name):
+        for app_id in progress.over(multicast_partitions):
             while app_id in self.__fixed_used:
                 app_part_index += 1
-            for partition_name, by_partition_name in \
-                    by_app_and_partition_name[app_id].items():
-                machine_vertices = list(by_partition_name)
+            for partition_name, paritition_vertices in \
+                    multicast_partitions[app_id].items():
+                # convert set to a list and sort by slice
+                machine_vertices = list(paritition_vertices)
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
                 if self.__flexible:
                     n_bits_atoms = self.__atom_bits_per_app_part[
