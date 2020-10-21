@@ -25,10 +25,9 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         "_vertex_slice",
         "_resources_required"]
 
-    SPLITTER_NAME = "1to1SplitterLegacy"
-
     def __init__(self):
-        AbstractSplitterCommon.__init__(self, splitter_name=self.SPLITTER_NAME)
+        AbstractSplitterCommon.__init__(
+            self, splitter_name=type(self).__name__)
         self._machine_vertex = None
         self._vertex_slice = None
         self._resources_required = None
