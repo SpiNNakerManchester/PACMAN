@@ -88,9 +88,13 @@ class ApplicationVertex(AbstractVertex):
             Constraints to be passed on to the machine vertex.
         """
 
-    def remember_associated_machine_vertex(self, machine_vertex):
+    def remember_machine_vertex(self, machine_vertex):
         """
         Adds the Machine vertex the iterable returned by machine_vertices
+
+        This method will be called by MachineVertex.app_vertex
+        No other place should call it.
+
         :param machine_vertex: A pointer to a machine_vertex.
             This vertex may not be fully initialized but will have a slice
         :raises PacmanValueError: If the slice of the machine_vertex is too big

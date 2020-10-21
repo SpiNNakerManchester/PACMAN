@@ -15,6 +15,7 @@
 
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import OutgoingEdgePartition
 
@@ -38,3 +39,9 @@ class MachineGraph(Graph):
             MachineVertex, MachineEdge, OutgoingEdgePartition, label)
         if application_graph:
             application_graph.forget_machine_graph()
+
+    @overrides(Graph.add_vertex)
+    def add_vertex(self, vertex):
+        super(MachineGraph, self).add_vertex(vertex)
+        if vertex.app_vertex:
+            vertex.app_vertex.remember_machine_vertex(vertex)
