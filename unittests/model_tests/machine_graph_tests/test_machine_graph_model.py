@@ -14,10 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from uinit_test_objects import SimpleTestVertex
 
 
 class TestMachineGraphModel(unittest.TestCase):
@@ -110,7 +112,8 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(edge)
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
-        graph.add_edges(edges, "bar")
+        with self.assertRaises(PacmanAlreadyExistsException):
+            graph.add_edges(edges, "bar")
 
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
@@ -145,6 +148,27 @@ class TestMachineGraphModel(unittest.TestCase):
             graph = MachineGraph("foo")
             graph.add_vertices(vertices)
             graph.add_edges(edges, "bar")
+
+    def test_remember_machine_vertex(self):
+        app_graph = ApplicationGraph("Test")
+        graph = MachineGraph("foo", app_graph)
+        app1 = SimpleTestVertex(12, "app1")
+        app2 = SimpleTestVertex(12, "app2")
+        mach1 = SimpleMachineVertex("mach1",  app_vertex=app1)
+        mach2 = SimpleMachineVertex("mach2",  app_vertex=app1)
+        mach3 = SimpleMachineVertex("mach3",  app_vertex=app1)
+        mach4 = SimpleMachineVertex("mach4",  app_vertex=app2)
+        self.assertEquals(0, len(app1.machine_vertices))
+        self.assertEquals(0, len(app2.machine_vertices))
+        graph.add_vertices([mach1, mach2])
+        graph.add_vertex(mach3)
+        graph.add_vertex(mach4)
+        self.assertEquals(3, len(app1.machine_vertices))
+        self.assertEquals(1, len(app2.machine_vertices))
+        self.assertIn(mach1, app1.machine_vertices)
+        self.assertIn(mach2, app1.machine_vertices)
+        self.assertIn(mach3, app1.machine_vertices)
+        self.assertIn(mach4, app2.machine_vertices)
 
 
 if __name__ == '__main__':
