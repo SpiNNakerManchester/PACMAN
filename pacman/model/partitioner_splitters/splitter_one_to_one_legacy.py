@@ -12,13 +12,33 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import logging
+from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
-from pacman.model.partitioner_interfaces import AbstractSplitterCommon
-from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters.abstract_splitters import (
+    AbstractSplitterCommon)
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SplitterOneToOneLegacy(AbstractSplitterCommon):
+
+    NOT_API_WARNING = (
+        "Your vertex is deprecated. Please add a Splitter or "
+        "inherit from the class in "
+        "pacman.model.partitioner_interfaces.legacy_partitioner_api")
+
+    NOT_SUITABLE_VERTEX_ERROR = (
+        "The vertex {} cannot be supported by the {} as"
+        " the vertex does not support the required method {} of "
+        "LegacyPartitionerAPI. Please inherit from the class in "
+        "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
+        "again.")
 
     __slots__ = [
         "_machine_vertex",
@@ -50,6 +70,15 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 vertex_slice=self._vertex_slice,
                 resources_required=self._resources_required, label=None,
                 constraints=None))
+        if not isinstance(app_vertex, LegacyPartitionerAPI):
+            for abstractmethod in LegacyPartitionerAPI.abstractmethods():
+                check = getattr(app_vertex, abstractmethod, None)
+                if not check:
+                    raise PacmanConfigurationException(
+                        self.NOT_SUITABLE_VERTEX_ERROR.format(
+                            self._splitter_name, app_vertex.label,
+                            abstractmethod))
+                logger.warning(self.NOT_API_WARNING)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):

@@ -16,8 +16,7 @@
 from .legacy_partitioner_api import LegacyPartitionerAPI
 from .abstract_slices_connect import AbstractSlicesConnect
 from .abstract_splitter_partitioner import AbstractSplitterPartitioner
-from .abstract_splitter_common import AbstractSplitterCommon
 
 __all__ = [
-    "AbstractSlicesConnect", "AbstractSplitterCommon",
-    "AbstractSplitterPartitioner", "LegacyPartitionerAPI"]
+    "AbstractSlicesConnect", "AbstractSplitterPartitioner",
+    "LegacyPartitionerAPI"]

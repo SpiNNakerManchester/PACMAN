@@ -29,10 +29,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SplitterSliceLegacy(AbstractSplitterSlice):
 
-    __slots__ = [
-        "__splitter_name",
-    ]
-
     NOT_API_WARNING = (
         "Your vertex is deprecated. Please add a Splitter or "
         "inherit from the class in "
@@ -45,7 +41,7 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
         "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
         "again.")
 
-    SPLITTER_NAME = "SplitterLegacy"
+    SPLITTER_NAME = "SplitterSliceLegacy"
 
     def __init__(self, splitter_name=None):
         if splitter_name is None:
