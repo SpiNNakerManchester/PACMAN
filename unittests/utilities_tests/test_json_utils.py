@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
-
 import json
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
