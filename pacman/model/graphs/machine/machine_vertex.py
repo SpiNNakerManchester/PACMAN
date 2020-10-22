@@ -58,17 +58,6 @@ class MachineVertex(AbstractVertex):
             self._vertex_slice = vertex_slice
         else:
             self._vertex_slice = self._DEFAULT_SLICE
-        # associate depends on self._vertex_slice and self._app_vertex
-        self.associate_application_vertex()
-
-    def associate_application_vertex(self):
-        """
-        Asks the application vertex (if any) to remember this machine vertex.
-        :raises PacmanValueError: If the slice of the machine_vertex is too big
-        """
-        # remember depends on slice already being set
-        if self._app_vertex:
-            self._app_vertex.remember_associated_machine_vertex(self)
 
     @property
     def app_vertex(self):
