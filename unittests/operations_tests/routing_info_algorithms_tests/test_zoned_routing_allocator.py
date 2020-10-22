@@ -49,7 +49,7 @@ class SimpleMacVertex(MachineVertex):
         return None
 
 
-def create_graphs1():
+def create_graphs1(with_fixed):
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = SimpleAppVertex()
@@ -85,6 +85,27 @@ def create_graphs1():
                 # Give the partition up to (40 x 4) + 1 = 161 keys (8 bits)
                 p = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
                     mac_vertex, part_name)
+                if with_fixed:
+                    if (app_index == 2 and mac_index == 4 and
+                            part_name == "Part7"):
+                        p.add_constraint(FixedKeyAndMaskConstraint(
+                            [BaseKeyAndMask(0xFE00000, 0xFFFFFFC0)]))
+                    if (app_index == 2 and mac_index == 0 and
+                            part_name == "Part1"):
+                        p.add_constraint(FixedKeyAndMaskConstraint(
+                            [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)]))
+                    if (app_index == 2 and mac_index == 0 and
+                            part_name == "Part1"):
+                        p.add_constraint(FixedKeyAndMaskConstraint(
+                            [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)]))
+                    if (app_index == 3 and mac_index == 0 and
+                            part_name == "Part1"):
+                        p.add_constraint(FixedKeyAndMaskConstraint(
+                            [BaseKeyAndMask(0x3300000, 0xFFFFFFFF)]))
+                    if (app_index == 3 and mac_index == 0 and
+                            part_name == "Part1"):
+                        p.add_constraint(FixedKeyAndMaskConstraint(
+                            [BaseKeyAndMask(0x3300001, 0)]))
                 n_keys_map.set_n_keys_for_partition(
                     p, (mac_edge_index * 4) + 1)
 
@@ -137,6 +158,12 @@ def check_masks_all_the_same(routing_info, mask):
         assert(r_info.first_key not in seen_keys)
         seen_keys.add(r_info.first_key)
 
+def check_fixed(p, key):
+    for constraint in p.constraints:
+        if isinstance(constraint, FixedKeyAndMaskConstraint):
+            assert key == constraint.keys_and_masks[0].key
+            return True
+    return False
 
 def check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask):
@@ -148,6 +175,8 @@ def check_keys_for_application_partition_pairs(
             for p in mac_graph.get_outgoing_edge_partitions_starting_at_vertex(
                     m_vertex):
                 key = routing_info.get_first_key_from_partition(p)
+                if check_fixed(p, key):
+                    continue
                 if (app_vertex, p.identifier) in mapped_base:
                     mapped_key = mapped_base[(app_vertex, p.identifier)]
                     assert((mapped_key & app_mask) == (key & app_mask))
@@ -160,7 +189,7 @@ def check_keys_for_application_partition_pairs(
 def test_global_allocator():
     # Allocate something and check it does the right thing
 
-    app_graph, mac_graph, n_keys_map = create_graphs1()
+    app_graph, mac_graph, n_keys_map = create_graphs1(False)
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
     routing_info = global_allocate(mac_graph, n_keys_map)
@@ -175,9 +204,9 @@ def test_global_allocator():
         app_graph, mac_graph, routing_info, app_mask)
 
 
-def test_flexible_allocator():
+def test_flexible_allocator_no_fixed():
     # Allocate something and check it does the right thing
-    app_graph, mac_graph, n_keys_map = create_graphs1()
+    app_graph, mac_graph, n_keys_map = create_graphs1(False)
 
     # The number of bits is 7 + 11 = 20, so it shouldn't fail
     routing_info = flexible_allocate(mac_graph, n_keys_map)
@@ -187,6 +216,18 @@ def test_flexible_allocator():
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
 
+
+def test_flexible_allocator_with_fixed():
+    # Allocate something and check it does the right thing
+    app_graph, mac_graph, n_keys_map = create_graphs1(True)
+
+    # The number of bits is 7 + 11 = 20, so it shouldn't fail
+    routing_info = flexible_allocate(mac_graph, n_keys_map)
+
+    # all but the bottom 11 bits should be the same
+    app_mask = 0xFFFFF800
+    check_keys_for_application_partition_pairs(
+        app_graph, mac_graph, routing_info, app_mask)
 
 def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
