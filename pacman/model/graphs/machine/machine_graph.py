@@ -74,3 +74,5 @@ class MachineGraph(Graph):
                 raise PacmanInvalidParameterException(
                     "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
             assert(vertex.app_vertex is None)
+        if vertex.app_vertex:
+            vertex.app_vertex.remember_machine_vertex(vertex)
