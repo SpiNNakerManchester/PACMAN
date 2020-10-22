@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .splitter_one_app_one_machine import SplitterOneAppOneMachine
 from .splitter_slice_legacy import SplitterSliceLegacy
 from .splitter_one_to_one_legacy import SplitterOneToOneLegacy
 
-__all__ = ['SplitterOneToOneLegacy', 'SplitterSliceLegacy']
+__all__ = ['SplitterOneAppOneMachine', 'SplitterOneToOneLegacy',
+           'SplitterSliceLegacy']

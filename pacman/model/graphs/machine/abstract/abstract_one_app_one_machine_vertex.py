@@ -46,3 +46,7 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
     @property
     def machine_vertex(self):
         return self._machine_vertex
+
+    @overrides(ApplicationVertex.n_atoms)
+    def n_atoms(self):
+        return self._machine_vertex.vertex_slice.n_atoms
