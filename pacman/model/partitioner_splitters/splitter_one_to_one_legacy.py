@@ -76,7 +76,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 if not check:
                     raise PacmanConfigurationException(
                         self.NOT_SUITABLE_VERTEX_ERROR.format(
-                            self._splitter_name, app_vertex.label,
+                            app_vertex.label, self._splitter_name,
                             abstractmethod))
                 logger.warning(self.NOT_API_WARNING)
 
