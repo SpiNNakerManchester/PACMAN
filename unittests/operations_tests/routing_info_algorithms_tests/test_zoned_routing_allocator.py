@@ -158,12 +158,14 @@ def check_masks_all_the_same(routing_info, mask):
         assert(r_info.first_key not in seen_keys)
         seen_keys.add(r_info.first_key)
 
+
 def check_fixed(p, key):
     for constraint in p.constraints:
         if isinstance(constraint, FixedKeyAndMaskConstraint):
             assert key == constraint.keys_and_masks[0].key
             return True
     return False
+
 
 def check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask):
@@ -183,7 +185,7 @@ def check_keys_for_application_partition_pairs(
                 else:
                     mapped_base[(app_vertex, p.identifier)] = key
                 if key != 0:
-                     assert((key & app_mask) != 0)
+                    assert((key & app_mask) != 0)
 
 
 def test_global_allocator():
@@ -228,6 +230,7 @@ def test_flexible_allocator_with_fixed():
     app_mask = 0xFFFFF800
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
+
 
 def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
