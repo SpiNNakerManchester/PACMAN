@@ -76,3 +76,9 @@ class MachineGraph(Graph):
         :rtype dict(Vertex, dict(str, set(MachineVertex))
         """
         return self._multicast_partitions
+
+    @overrides(Graph.add_vertex)
+    def add_vertex(self, vertex):
+        super(MachineGraph, self).add_vertex(vertex)
+        if vertex.app_vertex:
+            vertex.app_vertex.remember_machine_vertex(vertex)
