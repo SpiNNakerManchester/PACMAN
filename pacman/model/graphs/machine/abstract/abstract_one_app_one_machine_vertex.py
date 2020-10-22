@@ -18,11 +18,8 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 
 
-class AbstractOneAppOneMachineVertex(
-        ApplicationVertex, LegacyPartitionerAPI):
+class AbstractOneAppOneMachineVertex(ApplicationVertex):
     """ An Application Vertex that has a fixed Singleton Machine Vertex
-
-    The overiding class MUST create the MachineVertex in its init
     """
     __slots__ = [
         # A pointer to the machine vertex that must be set by the sub class
@@ -40,23 +37,6 @@ class AbstractOneAppOneMachineVertex(
             label, constraints, 1)
         self._machine_vertex = machine_vertex
 
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        return self._machine_vertex.resources_required
-
-    @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(self, vertex_slice, resources_required,
-                              label=None, constraints=None):
-        if vertex_slice:
-            assert (vertex_slice == self._machine_vertex.vertex_slice)
-        if resources_required:
-            assert (resources_required ==
-                    self._machine_vertex.resources_required)
-        # The label may now include x, y. p so need to ignore that
-        if constraints:
-            assert (constraints == self._machine_vertex.constraints)
-        return self._machine_vertex
-
     @overrides(ApplicationVertex.remember_machine_vertex)
     def remember_machine_vertex(self, machine_vertex):
         super(AbstractOneAppOneMachineVertex, self).\
@@ -66,8 +46,3 @@ class AbstractOneAppOneMachineVertex(
     @property
     def machine_vertex(self):
         return self._machine_vertex
-
-    @property
-    @overrides(LegacyPartitionerAPI.n_atoms)
-    def n_atoms(self):
-        return 1
