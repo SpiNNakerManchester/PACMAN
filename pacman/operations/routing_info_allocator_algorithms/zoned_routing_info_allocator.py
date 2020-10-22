@@ -137,6 +137,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__find_fixed()
         self.__calculate_zones()
         self.__check_zones()
+        self.__check_flexible_zones()
         return self.__allocate()
 
     def __find_fixed(self):
@@ -186,8 +187,10 @@ class ZonedRoutingInfoAllocator(object):
                     partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
                             mac_vertex, partition_name)
-                    n_keys = self.__n_keys_map.n_keys_for_partition(partition)
-                    max_keys = max(max_keys, n_keys)
+                    if partition not in self.__fixed_partitions:
+                        n_keys = self.__n_keys_map.n_keys_for_partition(
+                            partition)
+                        max_keys = max(max_keys, n_keys)
                 if max_keys > 0:
                     atom_bits = self.__bits_needed(max_keys)
                     self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
@@ -198,6 +201,8 @@ class ZonedRoutingInfoAllocator(object):
                         self.__n_bits_atoms_and_mac, machine_bits + atom_bits)
                     self.__atom_bits_per_app_part[
                         (app_id, partition_name)] = atom_bits
+                else:
+                    self.__atom_bits_per_app_part[(app_id, partition_name)] = 0
 
     def __check_zones(self):
         # See if it could fit even before considerding fixed
@@ -231,10 +236,10 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_atoms_and_mac = \
                     self.__n_bits_machine + self.__n_bits_atoms
 
-    def check_flexible_zones(self):
+    def __check_flexible_zones(self):
         if self.__n_bits_atoms_and_mac == \
                 self.__n_bits_machine + self.__n_bits_atoms:
-            return  # felibible same a s none flexible
+            return  # felibible same as none flexible
 
         raw_app_part_bits = self.__bits_needed(
             len(self.__atom_bits_per_app_part))
@@ -262,7 +267,7 @@ class ZonedRoutingInfoAllocator(object):
         for (key, n_keys) in self.__fixed_keys:
             start = key // bucket_size
             end = (key + n_keys) // bucket_size
-            for i in range(start, end):
+            for i in range(start, end + 1):
                 self.__fixed_used.add(i)
 
     def __allocate(self):
@@ -272,7 +277,7 @@ class ZonedRoutingInfoAllocator(object):
         routing_infos = RoutingInfo()
         app_part_index = 0
         for app_id in progress.over(multicast_partitions):
-            while app_id in self.__fixed_used:
+            while app_part_index in self.__fixed_used:
                 app_part_index += 1
             for partition_name, paritition_vertices in \
                     multicast_partitions[app_id].items():

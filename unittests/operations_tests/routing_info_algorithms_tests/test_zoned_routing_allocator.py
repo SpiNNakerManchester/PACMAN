@@ -154,7 +154,7 @@ def check_keys_for_application_partition_pairs(
                 else:
                     mapped_base[(app_vertex, p.identifier)] = key
                 if key != 0:
-                    assert((key & app_mask) != 0)
+                     assert((key & app_mask) != 0)
 
 
 def test_global_allocator():
@@ -272,9 +272,8 @@ def test_big_flexible_fixed():
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
     routing_info = flexible_allocate(mac_graph, n_keys_map)
 
-    # The number of bits is 1 + 21 = 22, so it shouldn't fail
-    # all but the bottom 21 bits should be the same
-    app_mask = 0xFFE00000
+    # all but the bottom 18 bits should be the same
+    app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
 
@@ -284,15 +283,15 @@ def test_big_global_fixed():
     # Make the call, and it should fail
     routing_info = global_allocate(mac_graph, n_keys_map)
 
-    # 1 for app 11 for machine so where possible use 20 for atoms
-    mask = 0xFFF00000
+    # 7 bit atoms is 7 as it ignore the retina
+    mask = 0xFFFFFF80
     check_masks_all_the_same(routing_info, mask)
 
     # The number of bits is 1 + 11 + 21, so it will not fit
     # So flexible for the retina
     # Others mask all bit minimum app bits (1)
     # all but the top 1 bits should be the same
-    app_mask = 0x80000000
+    app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
 
