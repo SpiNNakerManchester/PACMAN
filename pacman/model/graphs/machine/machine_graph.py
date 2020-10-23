@@ -62,7 +62,9 @@ class MachineGraph(Graph):
     def add_vertex(self, vertex):
         super(MachineGraph, self).add_vertex(vertex)
         if self._application_level_used:
-            if not vertex.app_vertex:
+            try:
+                vertex.app_vertex.remember_machine_vertex(vertex)
+            except AttributeError:
                 if self.n_vertices == 1:
                     self._application_level_used = False
                 else:
@@ -73,6 +75,3 @@ class MachineGraph(Graph):
             if vertex.app_vertex:
                 raise PacmanInvalidParameterException(
                     "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
-            assert(vertex.app_vertex is None)
-        if vertex.app_vertex:
-            vertex.app_vertex.remember_machine_vertex(vertex)
