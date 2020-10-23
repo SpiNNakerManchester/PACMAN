@@ -166,7 +166,7 @@ def test_sdram_links():
     for x in range(20):
         vertex = SimpleMachineVertex(
             resources=ResourceContainer(),
-            label="Vertex_{}".format(x))
+            label="Vertex_{}".format(x), sdram_cost=20)
         machine_graph.add_vertex(vertex)
         last_vertex = vertex
 
@@ -174,7 +174,7 @@ def test_sdram_links():
         machine_graph.add_outgoing_edge_partition(
             ConstantSDRAMMachinePartition(
                 identifier="SDRAM", pre_vertex=vertex, label="ffff"))
-        edge = SDRAMMachineEdge(vertex, last_vertex, 20, "hhhh")
+        edge = SDRAMMachineEdge(vertex, last_vertex, "hhhh")
         machine_graph.add_edge(edge, "SDRAM")
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 

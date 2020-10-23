@@ -33,7 +33,8 @@ class TestSameChipConstraint(unittest.TestCase):
         plan_n_timesteps = 100
 
         vertices = [
-            SimpleMachineVertex(ResourceContainer(), label="v{}".format(i))
+            SimpleMachineVertex(
+                ResourceContainer(), label="v{}".format(i), sdram_cost=20)
             for i in range(100)
         ]
         for vertex in vertices:
@@ -52,8 +53,7 @@ class TestSameChipConstraint(unittest.TestCase):
                     identifier="Test", pre_vertex=vertex, label="ffff"))
             for _i in range(0, random.randint(1, 5)):
                 sdram_edge = SDRAMMachineEdge(
-                    vertex, vertices[random.randint(0, 99)], sdram_size=20,
-                    label="fffg")
+                    vertex, vertices[random.randint(0, 99)], label="fffg")
                 sdram_edges.append(sdram_edge)
                 graph.add_edge(sdram_edge, "Test")
         n_keys_map = DictBasedMachinePartitionNKeysMap()
