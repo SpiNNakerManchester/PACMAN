@@ -239,7 +239,7 @@ class ZonedRoutingInfoAllocator(object):
                     app_part_bits, self.__n_bits_atoms_and_mac))
 
         if not self.__flexible:
-            #If using global see if the fixed M and X zones are too big
+            # If using global see if the fixed M and X zones are too big
             if app_part_bits + self.__n_bits_machine + self.__n_bits_atoms > \
                     BITS_IN_KEY:
                 # We know from above test that all will fit if flexible
