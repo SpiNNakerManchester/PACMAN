@@ -124,7 +124,8 @@ class TestMachineGraphModel(unittest.TestCase):
         graph.add_vertices(vertices)
         graph.add_outgoing_edge_partition(
             MachineEdgePartition("bar", vertices[0]))
-        graph.add_edges(edges, "bar")
+        self.assertRaises(PacmanAlreadyExistsException,
+                          graph.add_edges(edges, "bar"))
 
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
