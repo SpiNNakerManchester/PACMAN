@@ -137,10 +137,14 @@ class ZonedRoutingInfoAllocator(object):
         self.__find_fixed()
         self.__calculate_zones()
         self.__check_zones()
-        self.__check_flexible_zones()
         return self.__allocate()
 
     def __find_fixed(self):
+        """
+        Looks for FixedKeyAmdMask Constraints and keeps track of these.
+
+        See __ add_fixed
+        """
         multicast_partitions = self.__machine_graph.multicast_partitions
         for app_id in multicast_partitions:
             # multicast_partitions is a map of app_id to paritition_vertices
@@ -156,6 +160,17 @@ class ZonedRoutingInfoAllocator(object):
                             self.__add_fixed(partition, constraint)
 
     def __add_fixed(self, partition, constraint):
+        """
+        Pre computes and caches FixedKeyAmdMask for easier use later
+
+        Saves a map of parition to the constraintit records theese in a dict by
+        Partition so they can be found easier in future passes.
+
+        Saves a list of the keys and their n_keys so these zones can be blocked
+
+        :param pacman.model.graphs.OutgoingEdgePartition partition:
+        :param FixedKeyAndMaskConstraint constraint:
+        """
         self.__fixed_partitions[partition] = constraint.keys_and_masks
         for key_and_mask in constraint.keys_and_masks:
             # Go through the mask sets and save keys and n_keys
@@ -224,6 +239,7 @@ class ZonedRoutingInfoAllocator(object):
                     app_part_bits, self.__n_bits_atoms_and_mac))
 
         if not self.__flexible:
+            #If using global see if the fixed M and X zones are too big
             if app_part_bits + self.__n_bits_machine + self.__n_bits_atoms > \
                     BITS_IN_KEY:
                 # We know from above test that all will fit if flexible
@@ -236,32 +252,10 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_atoms_and_mac = \
                     self.__n_bits_machine + self.__n_bits_atoms
 
-    def __check_flexible_zones(self):
-        if self.__n_bits_atoms_and_mac == \
-                self.__n_bits_machine + self.__n_bits_atoms:
-            return  # felibible same as none flexible
-
-        raw_app_part_bits = self.__bits_needed(
-            len(self.__atom_bits_per_app_part))
-
-        while self.__n_bits_atoms >= 0:
-            self.__n_bits_atoms_and_mac = \
-                self.__n_bits_machine + self.__n_bits_atoms
-            if self.__n_bits_atoms_and_mac + raw_app_part_bits <= BITS_IN_KEY:
-                self.__set_fixed_used()
-                self.__set_fixed_used()
-                app_part_bits = self.__bits_needed(
-                    len(self.__atom_bits_per_app_part) +
-                    len(self.__fixed_used))
-                if app_part_bits + self.__n_bits_atoms_and_mac <= BITS_IN_KEY:
-                    return  # working result found
-            self.__n_bits_atoms -= 1
-
-        raise PacmanRouteInfoAllocationException(
-            "Unable to use ZonedRoutingInfoAllocator please select a "
-            "different allocator")
-
     def __set_fixed_used(self):
+        """
+        Block the use of AP indexes that would clash with fixed keys
+        """
         self.__fixed_used = set()
         bucket_size = 2 ** self.__n_bits_atoms_and_mac
         for (key, n_keys) in self.__fixed_keys:
