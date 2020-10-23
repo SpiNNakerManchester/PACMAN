@@ -15,7 +15,6 @@
 
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.exceptions import PacmanException
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex,
     MachineEdge, SDRAMMachineEdge)
