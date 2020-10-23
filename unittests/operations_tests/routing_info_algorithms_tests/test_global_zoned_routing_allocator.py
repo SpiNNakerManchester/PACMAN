@@ -141,12 +141,12 @@ def test_too_big():
     # Create a load of middle vertices and connect them up
     mid_app_vertex = SimpleAppVertex()
     app_graph.add_vertex(mid_app_vertex)
+    mac_graph.add_outgoing_edge_partition(
+        MachineEdgePartition(identifier="Test", pre_vertex=big_mac_vertex))
     for _ in range(2000):  # 2000 needs 11 bits
         mid_mac_vertex = SimpleMacVertex(app_vertex=mid_app_vertex)
         mac_graph.add_vertex(mid_mac_vertex)
         edge = MachineEdge(big_mac_vertex, mid_mac_vertex)
-        mac_graph.add_outgoing_edge_partition(
-            MachineEdgePartition(identifier="Test", pre_vertex=big_mac_vertex))
         mac_graph.add_outgoing_edge_partition(
             MachineEdgePartition(identifier="Test", pre_vertex=mid_mac_vertex))
         mac_graph.add_edge(edge, "Test")
