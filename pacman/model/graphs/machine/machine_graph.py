@@ -15,9 +15,10 @@
 
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
-from spinn_utilities.overrides import overrides
+from pacman.model.graphs.machine.outgoing_edge_partitions.\
+    machine_edge_partition import MachineEdgePartition
 from pacman.model.graphs.graph import Graph
-from pacman.model.graphs import OutgoingEdgePartition
+from pacman.model.graphs import AbstractEdgePartition
 
 
 class MachineGraph(Graph):
@@ -36,7 +37,8 @@ class MachineGraph(Graph):
         :type application_graph: ApplicationGraph or None
         """
         super(MachineGraph, self).__init__(
-            MachineVertex, MachineEdge, OutgoingEdgePartition, label)
+            MachineVertex, MachineEdge, AbstractEdgePartition, label,
+            MachineEdgePartition)
         if application_graph:
             application_graph.forget_machine_graph()
 

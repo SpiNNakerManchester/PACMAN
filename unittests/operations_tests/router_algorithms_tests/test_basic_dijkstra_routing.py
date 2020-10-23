@@ -18,6 +18,8 @@ from collections import deque
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
+from pacman.model.graphs.machine.outgoing_edge_partitions import (
+    MachineEdgePartition)
 from pacman.operations.router_algorithms import BasicDijkstraRouting
 from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
@@ -41,6 +43,8 @@ class TestBasicDijkstraRouting(unittest.TestCase):
                     vertices.append(vertex)
 
         for vertex in vertices:
+            graph.add_outgoing_edge_partition(
+                MachineEdgePartition(identifier="Test", pre_vertex=vertex))
             for vertex_to in vertices:
                 if vertex != vertex_to:
                     graph.add_edge(MachineEdge(vertex, vertex_to), "Test")

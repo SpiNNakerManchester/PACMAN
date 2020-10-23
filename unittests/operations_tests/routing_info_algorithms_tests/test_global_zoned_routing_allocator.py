@@ -23,6 +23,8 @@ from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 from pacman.exceptions import PacmanRouteInfoAllocationException
+from pacman.model.graphs.machine.outgoing_edge_partitions import (
+    MachineEdgePartition)
 import pytest
 
 
@@ -76,6 +78,9 @@ def test_allocator():
             for mac_edge_index in range((mac_index * 2) + 1):
                 mac_edge = MachineEdge(mac_vertex, out_mac_vertex)
                 part_name = "Part{}".format(mac_edge_index)
+                mac_graph.add_outgoing_edge_partition(
+                    MachineEdgePartition(
+                        identifier=part_name, pre_vertex=mac_vertex))
                 mac_graph.add_edge(mac_edge, part_name)
 
                 # Give the partition up to (40 x 4) + 1 = 161 keys (8 bits)
@@ -140,6 +145,10 @@ def test_too_big():
         mid_mac_vertex = SimpleMacVertex(app_vertex=mid_app_vertex)
         mac_graph.add_vertex(mid_mac_vertex)
         edge = MachineEdge(big_mac_vertex, mid_mac_vertex)
+        mac_graph.add_outgoing_edge_partition(
+            MachineEdgePartition(identifier="Test", pre_vertex=big_mac_vertex))
+        mac_graph.add_outgoing_edge_partition(
+            MachineEdgePartition(identifier="Test", pre_vertex=mid_mac_vertex))
         mac_graph.add_edge(edge, "Test")
         edge_2 = MachineEdge(mid_mac_vertex, out_mac_vertex)
         mac_graph.add_edge(edge_2, "Test")

@@ -213,7 +213,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:
         :param RoutingInfo routing_infos:
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         """
         # Allocate the routing information
         partition_info = PartitionRoutingInfo(keys_and_masks, partition)

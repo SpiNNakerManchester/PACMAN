@@ -15,8 +15,9 @@
 
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
+from .application_edge_partition import ApplicationEdgePartition
 from pacman.model.graphs.graph import Graph
-from pacman.model.graphs import OutgoingEdgePartition
+from pacman.model.graphs import AbstractEdgePartition
 
 
 class ApplicationGraph(Graph):
@@ -31,7 +32,8 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, OutgoingEdgePartition, label)
+            ApplicationVertex, ApplicationEdge, AbstractEdgePartition, label,
+            ApplicationEdgePartition)
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.

@@ -15,8 +15,8 @@
 
 """ test vertex used in many unit tests
 """
-from pacman.model.partitioner_interfaces.legacy_partitioner_api import \
-    LegacyPartitionerAPI
+from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
+    LegacyPartitionerAPI)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex

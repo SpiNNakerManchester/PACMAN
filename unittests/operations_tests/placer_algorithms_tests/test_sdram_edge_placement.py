@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_machine import virtual_machine
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.graphs.machine import (
+    MachineGraph, SimpleMachineVertex, SDRAMMachineEdge)
+from pacman.model.graphs.machine.outgoing_edge_partitions import (
+    ConstantSDRAMMachinePartition)
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.machine.machine_edge import MachineEdge
-from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.executor.pacman_algorithm_executor import PACMANAlgorithmExecutor
 import random
@@ -46,10 +47,13 @@ class TestSameChipConstraint(unittest.TestCase):
         sdram_edges = list()
         for vertex in same_vertices:
             graph.add_vertex(vertex)
+            graph.add_outgoing_edge_partition(
+                ConstantSDRAMMachinePartition(
+                    identifier="Test", pre_vertex=vertex, label="ffff"))
             for _i in range(0, random.randint(1, 5)):
-                sdram_edge = MachineEdge(
-                    vertex, vertices[random.randint(0, 99)],
-                    traffic_type=EdgeTrafficType.SDRAM)
+                sdram_edge = SDRAMMachineEdge(
+                    vertex, vertices[random.randint(0, 99)], sdram_size=20,
+                    label="fffg")
                 sdram_edges.append(sdram_edge)
                 graph.add_edge(sdram_edge, "Test")
         n_keys_map = DictBasedMachinePartitionNKeysMap()

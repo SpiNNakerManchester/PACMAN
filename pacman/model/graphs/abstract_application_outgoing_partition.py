@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2019-2020 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,28 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
 @add_metaclass(AbstractBase)
-class AbstractMachinePartitionNKeysMap(object):
-    """ A map that provides the number of keys required by each partition
-    """
-
-    __slots__ = []
+class AbstractApplicationOutgoingPartition(object):
 
     @abstractmethod
-    def n_keys_for_partition(self, partition):
-        """ The number of keys required by the given partition
+    def convert_to_machine_outgoing_partition(self, machine_pre_vertex):
+        """ Build an equivalent of this application outgoing partition as a\
+            machine outgoing partition.
 
-        :param ~pacman.model.graphs.AbstractSingleSourcePartition partition:
-            The partition to set the number of keys for
-        :return: The number of keys required by the partition
-        :rtype: int
+        :param MachineVertex machine_pre_vertex:
+            the machine vertex to be the pre-vertex
+        :return: The machine outgoing partition
+        :rtype: AbstractEdgePartition
         """
-
-    @abstractmethod
-    def __iter__(self):
-        """ Returns an iterator over the mapped partitions"""

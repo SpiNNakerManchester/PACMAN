@@ -35,7 +35,7 @@ class MulticastRoutingTableByPartition(object):
         :param MulticastRoutingTableByPartitionEntry entry: the entry to add
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
             the partition containing the machine edge
         """
 
@@ -63,7 +63,7 @@ class MulticastRoutingTableByPartition(object):
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
         :return: all router_path_entries for the router.
-        :rtype: dict(OutgoingEdgePartition,
+        :rtype: dict(AbstractSingleSourcePartition,
             MulticastRoutingTableByPartitionEntry)
         """
         key = (router_x, router_y)
@@ -74,7 +74,7 @@ class MulticastRoutingTableByPartition(object):
     def get_entry_on_coords_for_edge(self, partition, router_x, router_y):
         """ Get an entry from a specific coordinate
 
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
         :rtype: MulticastRoutingTableByPartitionEntry or None

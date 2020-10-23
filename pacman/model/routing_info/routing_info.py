@@ -83,7 +83,7 @@ class RoutingInfo(object):
     def get_first_key_from_partition(self, partition):
         """ Get the first key associated with a particular partition
 
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
             The partition to get the first key of
         :return: The routing key, or None if the partition does not exist
         :rtype: int or None
@@ -96,7 +96,7 @@ class RoutingInfo(object):
     def get_routing_info_from_partition(self, partition):
         """ Get the routing information for a given partition.
 
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
             The partition to obtain routing information about.
         :return: the partition_routing_info for the partition, if any exists
         :rtype: PartitionRoutingInfo or None

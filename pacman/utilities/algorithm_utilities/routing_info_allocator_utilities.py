@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.common import EdgeTrafficType
 
 from collections import OrderedDict
 from six import itervalues
@@ -35,7 +36,7 @@ class ConstraintGroup(list):
 
     def __init__(self, values):
         """
-        :param iterable(OutgoingEdgePartition) values:
+        :param iterable(AbstractSingleSourcePartition) values:
         """
         super(ConstraintGroup, self).__init__(values)
         self._constraint = None
@@ -172,6 +173,8 @@ def check_types_of_edge_constraint(machine_graph):
     :raises PacmanConfigurationException: if a problem is found
     """
     for partition in machine_graph.outgoing_edge_partitions:
+        if partition.traffic_type != EdgeTrafficType.MULTICAST:
+            continue
         fixed_key = locate_constraints_of_type(
             partition.constraints, FixedKeyAndMaskConstraint)
         fixed_mask = locate_constraints_of_type(
@@ -215,7 +218,7 @@ def _check_masks_are_correct(partition):
     """ Check that the masks between a fixed mask constraint and a fixed_field\
         constraint. Raises error if not.
 
-    :param OutgoingEdgePartition partition:
+    :param AbstractSingleSourcePartition partition:
         the outgoing_edge_partition to search for these constraints
     :raise PacmanInvalidParameterException: if the masks are incompatible
     """

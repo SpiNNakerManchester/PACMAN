@@ -17,7 +17,10 @@ from spinn_machine.virtual_machine import virtual_machine
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge)
+    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex,
+    MachineEdge, SDRAMMachineEdge)
+from pacman.model.graphs.machine.outgoing_edge_partitions import (
+    ConstantSDRAMMachinePartition)
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms import SpreaderPlacer
@@ -169,8 +172,10 @@ def test_sdram_links():
         last_vertex = vertex
 
     for vertex in machine_graph.vertices:
-        edge = MachineEdge(vertex, last_vertex,
-                           traffic_type=EdgeTrafficType.SDRAM)
+        machine_graph.add_outgoing_edge_partition(
+            ConstantSDRAMMachinePartition(
+                identifier="SDRAM", pre_vertex=vertex, label="ffff"))
+        edge = SDRAMMachineEdge(vertex, last_vertex, 20, "hhhh")
         machine_graph.add_edge(edge, "SDRAM")
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 

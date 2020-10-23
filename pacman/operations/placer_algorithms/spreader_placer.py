@@ -22,7 +22,8 @@ from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import OneToOnePlacer
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
-    create_vertices_groups, get_same_chip_vertex_groups)
+    create_vertices_groups, get_same_chip_vertex_groups,
+    create_requirement_collections)
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
@@ -248,9 +249,9 @@ class SpreaderPlacer(OneToOnePlacer):
                     to_do_as_group = list()
                     for other_vert in same_chip_vertex_groups[vertex]:
                         if other_vert not in placed_vertices:
-                            to_do_as_group.append(
-                                (other_vert.resources_required,
-                                 other_vert.constraints))
+                            to_do_as_group.extend(
+                                create_requirement_collections(
+                                    [other_vert], machine_graph))
 
                     # allocate as a group to sorted chips so that ones with
                     # least incoming packets are considered first

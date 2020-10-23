@@ -18,6 +18,8 @@ from collections import deque
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
+from pacman.model.graphs.machine.outgoing_edge_partitions import (
+    MachineEdgePartition)
 from pacman.operations.router_algorithms import NerRouteTrafficAware
 from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
@@ -43,6 +45,9 @@ class MyTestCase(unittest.TestCase):
 
         for vertex in vertices:
             for vertex_to in vertices:
+                graph.add_outgoing_edge_partition(
+                    MachineEdgePartition(
+                        identifier="Test", pre_vertex=vertex))
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
         router = NerRouteTrafficAware()

@@ -33,7 +33,7 @@ class PartitionRoutingInfo(object):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:
             The keys allocated to the machine partition
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
             The partition to set the number of keys for
         """
         self._keys_and_masks = keys_and_masks
@@ -97,7 +97,7 @@ class PartitionRoutingInfo(object):
     @property
     def partition(self):
         """
-        :rtype: OutgoingEdgePartition
+        :rtype: AbstractSingleSourcePartition
         """
         return self._partition
 
