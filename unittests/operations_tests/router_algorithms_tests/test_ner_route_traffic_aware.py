@@ -44,10 +44,10 @@ class MyTestCase(unittest.TestCase):
                     vertices.append(vertex)
 
         for vertex in vertices:
+            graph.add_outgoing_edge_partition(
+                MachineEdgePartition(
+                    identifier="Test", pre_vertex=vertex))
             for vertex_to in vertices:
-                graph.add_outgoing_edge_partition(
-                    MachineEdgePartition(
-                        identifier="Test", pre_vertex=vertex))
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
         router = NerRouteTrafficAware()
