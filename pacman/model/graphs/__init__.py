@@ -27,10 +27,12 @@ from .abstract_application_outgoing_partition import (
     AbstractApplicationOutgoingPartition)
 from .outgoing_edge_partition import OutgoingEdgePartition
 from .graph import Graph
+from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
 
 __all__ = [
     "AbstractApplicationOutgoingPartition", "AbstractCostedPartition",
     "AbstractEdge", "AbstractEdgePartition", "AbstractFPGA",
     "AbstractMultiplePartition", "AbstractSDRAMPartition",
     "AbstractSingleSourcePartition", "AbstractSpiNNakerLink",
-    "AbstractVertex", "AbstractVirtual", "Graph", "OutgoingEdgePartition"]
+    "AbstractSupportsSDRAMEdges", "AbstractVertex", "AbstractVirtual",
+    "Graph", "OutgoingEdgePartition"]
