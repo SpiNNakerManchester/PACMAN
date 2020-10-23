@@ -85,8 +85,6 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         resource_tracker.allocate_constrained_resources(
             self._resources_required, self._governed_app_vertex.constraints)
         machine_graph.add_vertex(self._machine_vertex)
-        self._governed_app_vertex.remember_associated_machine_vertex(
-            self._machine_vertex)
         return self._machine_vertex
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
