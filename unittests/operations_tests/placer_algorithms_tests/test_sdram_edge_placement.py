@@ -41,7 +41,8 @@ class TestSameChipConstraint(unittest.TestCase):
             graph.add_vertex(vertex)
 
         same_vertices = [
-            SimpleMachineVertex(ResourceContainer(), label="same{}".format(i))
+            SimpleMachineVertex(ResourceContainer(), label="same{}".format(i),
+                                sdram_cost=20)
             for i in range(10)
         ]
         random.seed(12345)
