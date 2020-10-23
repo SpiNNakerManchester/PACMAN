@@ -56,13 +56,18 @@ class TestGraphMapping(unittest.TestCase):
         test getting the vertex from a graph mapper via the vertex
         """
         vertices = list()
-        vert = SimpleTestVertex(4, "Some testing vertex")
+        app_graph = ApplicationGraph("bacon")
+        vert = SimpleTestVertex(10, "Some testing vertex")
+        app_graph.add_vertex(vert)
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
+        mac_graph = MachineGraph("cooked bacon")
         vertex1 = SimpleMachineVertex(
             None, "", vertex_slice=Slice(0, 1), app_vertex=vert)
         vertex2 = SimpleMachineVertex(
             None, "", vertex_slice=Slice(2, 3), app_vertex=vert)
+        mac_graph.add_vertex(vertex1)
+        mac_graph.add_vertex(vertex2)
 
         returned_vertices = vert.machine_vertices
 
