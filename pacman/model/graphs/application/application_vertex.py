@@ -43,23 +43,30 @@ class ApplicationVertex(AbstractVertex):
         "reset. Please fix and try again. ")
 
     def __init__(self, label=None, constraints=None,
-                 max_atoms_per_core=sys.maxsize):
+                 max_atoms_per_core=sys.maxsize, splitter=None):
         """
         :param str label: The optional name of the vertex.
         :param iterable(AbstractConstraint) constraints:
             The optional initial constraints of the vertex.
         :param int max_atoms_per_core: The max number of atoms that can be
             placed on a core, used in partitioning.
+        :param splitter: The splitter object needed for this vertex.
+            Leave as None to delegate the choice of splitter to the selector.
+        :type splitter None or AbstractSplitterCommon
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
-        self._splitter = None
         super(ApplicationVertex, self).__init__(label, constraints)
         self._machine_vertices = OrderedSet()
 
         # add a constraint for max partitioning
         self.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
+
+        # Need to set to None temporarily as setter check previous value
+        self._splitter = None
+        # Use setter as there is extra work to do
+        self.splitter = splitter
 
     def __str__(self):
         return self.label
@@ -82,11 +89,6 @@ class ApplicationVertex(AbstractVertex):
         :param SplitterObjectCommon new_value: the new splitter object
         :rtype: None
         """
-        if self._splitter == new_value:
-            return
-        if self._splitter is not None:
-            raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
 
