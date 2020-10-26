@@ -17,7 +17,6 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
@@ -48,9 +47,9 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
-                raise PacmanConfigurationException(
-                    self.NOT_SUITABLE_VERTEX_ERROR.format(
-                        app_vertex.label, self._splitter_name))
+            raise PacmanConfigurationException(
+                self.NOT_SUITABLE_VERTEX_ERROR.format(
+                    app_vertex.label, self._splitter_name))
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
