@@ -36,9 +36,9 @@ class ApplicationVertex(AbstractVertex):
         "_machine_vertices",
 
         # the splitter object associated with this app vertex
-        "_splitter_object"]
+        "_splitter"]
 
-    SETTING_SPLITTER_OBJECT_ERROR_MSG = (
+    SETTING_SPLITTER_ERROR_MSG = (
         "The splitter object on {} has already been set, it cannot be "
         "reset. Please fix and try again. ")
 
@@ -53,7 +53,7 @@ class ApplicationVertex(AbstractVertex):
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
-        self._splitter_object = None
+        self._splitter = None
         super(ApplicationVertex, self).__init__(label, constraints)
         self._machine_vertices = OrderedSet()
 
@@ -69,32 +69,32 @@ class ApplicationVertex(AbstractVertex):
             self.label, self.constraints)
 
     @property
-    def splitter_object(self):
+    def splitter(self):
         """
         :rtype: ~pacman.model.partitioner_interfaces.AbstractSplitterCommon
         """
-        return self._splitter_object
+        return self._splitter
 
-    @splitter_object.setter
-    def splitter_object(self, new_value):
+    @splitter.setter
+    def splitter(self, new_value):
         """ sets the splitter object. Does not allow repeated settings.
 
         :param SplitterObjectCommon new_value: the new splitter object
         :rtype: None
         """
-        if self._splitter_object == new_value:
+        if self._splitter == new_value:
             return
-        if self._splitter_object is not None:
+        if self._splitter is not None:
             raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(self._label))
-        self._splitter_object = new_value
-        self._splitter_object.set_governed_app_vertex(self)
+                self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
+        self._splitter = new_value
+        self._splitter.set_governed_app_vertex(self)
 
     @overrides(AbstractVertex.add_constraint)
     def add_constraint(self, constraint):
         AbstractVertex.add_constraint(self, constraint)
-        if self._splitter_object is not None:
-            self._splitter_object.check_supported_constraints()
+        if self._splitter is not None:
+            self._splitter.check_supported_constraints()
 
     def remember_machine_vertex(self, machine_vertex):
         """
@@ -156,5 +156,5 @@ class ApplicationVertex(AbstractVertex):
             vertex maps to.
         """
         self._machine_vertices = OrderedSet()
-        if self._splitter_object is not None:
-            self._splitter_object.reset_called()
+        if self._splitter is not None:
+            self._splitter.reset_called()
