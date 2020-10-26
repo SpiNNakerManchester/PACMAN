@@ -30,7 +30,7 @@ class MachineEdgePartition(AbstractSingleSourcePartition):
 
     def __init__(
             self, identifier, pre_vertex, constraints=None, label=None,
-            traffic_weight=1):
+            traffic_weight=1, traffic_type=EdgeTrafficType.MULTICAST):
         """
         :param str identifier: The identifier of the partition
         :param MachineVertex pre_vertex: The source of this partition
@@ -45,7 +45,7 @@ class MachineEdgePartition(AbstractSingleSourcePartition):
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=MachineEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
-            traffic_type=EdgeTrafficType.MULTICAST,
+            traffic_type=traffic_type,
             class_name="MachineEdgePartition")
 
     @overrides(AbstractEdgePartition.clone_for_graph_move)

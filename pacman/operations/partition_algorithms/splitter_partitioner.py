@@ -18,6 +18,9 @@ from pacman.exceptions import (
     PacmanConfigurationException, PacmanPartitionException)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
+from pacman.model.graphs import AbstractCostedMultiplePartition, \
+    AbstractCostedSinglePartition, AbstractSDRAMMultiplePartition, \
+    AbstractSDRAMSinglePartition, AbstractSDRAMPartition
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
@@ -295,6 +298,46 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                             src_machine_vertex, dest_machine_vertex,
                             common_edge_type, app_edge, machine_graph,
                             app_outgoing_edge_partition, resource_tracker)
+
+        self.__process_costed_outgoing_partitions(
+            machine_graph, resource_tracker)
+
+    @staticmethod
+    def __process_costed_outgoing_partitions(machine_graph, resource_tracker):
+        """ process the costed outgoing partitions
+
+        :param machine_graph: machine graph
+        :param resource_tracker: resource tracker.
+        :rtype: None
+        :raises PacmanException when outgoing partition requirements is\
+            too much.
+        """
+        for machine_outgoing_partition in machine_graph.\
+                outgoing_edge_partitions:
+            if (isinstance(
+                    machine_outgoing_partition,
+                    AbstractCostedMultiplePartition) or
+                    isinstance(machine_outgoing_partition,
+                               AbstractCostedSinglePartition)):
+
+                if machine_outgoing_partition.allocated:
+                    continue
+                if isinstance(
+                        machine_outgoing_partition, AbstractSDRAMPartition):
+                    sdram_cost = (
+                        machine_outgoing_partition.total_sdram_requirements)
+                    chip = None
+                    if isinstance(
+                            machine_outgoing_partition,
+                            AbstractSDRAMMultiplePartition):
+                        chip = resource_tracker.chip_of(
+                            machine_outgoing_partition.pre_vertices.peek())
+                    elif isinstance(
+                            machine_outgoing_partition,
+                            AbstractSDRAMSinglePartition):
+                        chip = resource_tracker.chip_of(
+                            machine_outgoing_partition.pre_vertex)
+                    resource_tracker.allocate_sdram(chip, sdram_cost)
 
     @overrides(AbstractSplitterPartitioner.create_machine_edge)
     def create_machine_edge(

@@ -14,12 +14,30 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
+
+from pacman.model.graphs import AbstractMultiplePartition
 from spinn_utilities.abstract_base import AbstractBase
 
 
 @add_metaclass(AbstractBase)
-class AbstractCostedPartition(object):
+class AbstractCostedMultiplePartition(AbstractMultiplePartition):
     """ needed for future proofing against other types of costed partitions.
     """
 
-    __slots__ = []
+    __slots__ = ["_allocated"]
+
+    def __init__(
+            self, pre_vertices, identifier, allowed_edge_types, constraints,
+            label, traffic_weight, class_name, traffic_type):
+        super(AbstractCostedMultiplePartition, self).__init__(
+            pre_vertices, identifier, allowed_edge_types, constraints,
+            label, traffic_weight, class_name, traffic_type)
+        self._allocated = False
+
+    @property
+    def allocated(self):
+        return self._allocated
+
+    @allocated.setter
+    def allocated(self, new_value):
+        self._allocated = new_value

@@ -19,8 +19,6 @@ from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
 from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_edge_partition import AbstractEdgePartition
-from .abstract_costed_partition import AbstractCostedPartition
-from .abstract_sdram_partition import AbstractSDRAMPartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_application_outgoing_partition import (
@@ -28,11 +26,18 @@ from .abstract_application_outgoing_partition import (
 from .outgoing_edge_partition import OutgoingEdgePartition
 from .graph import Graph
 from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
+from .abstract_costed_single_partition import AbstractCostedSinglePartition
+from .abstract_costed_multiple_partition import (
+    AbstractCostedMultiplePartition)
+from .abstract_sdram_single_partition import AbstractSDRAMSinglePartition
+from .abstract_sdram_multiple_partition import AbstractSDRAMMultiplePartition
+from .abstract_sdram_partition import AbstractSDRAMPartition
 
 __all__ = [
-    "AbstractApplicationOutgoingPartition", "AbstractCostedPartition",
-    "AbstractEdge", "AbstractEdgePartition", "AbstractFPGA",
-    "AbstractMultiplePartition", "AbstractSDRAMPartition",
-    "AbstractSingleSourcePartition", "AbstractSpiNNakerLink",
-    "AbstractSupportsSDRAMEdges", "AbstractVertex", "AbstractVirtual",
-    "Graph", "OutgoingEdgePartition"]
+    "AbstractApplicationOutgoingPartition", "AbstractCostedMultiplePartition",
+    "AbstractCostedMultiplePartition", "AbstractEdge",
+    "AbstractEdgePartition", "AbstractFPGA", "AbstractMultiplePartition",
+    "AbstractSDRAMMultiplePartition", "AbstractSDRAMPartition",
+    "AbstractSDRAMSinglePartition", "AbstractSingleSourcePartition",
+    "AbstractSpiNNakerLink", "AbstractSupportsSDRAMEdges", "AbstractVertex",
+    "AbstractVirtual", "Graph", "OutgoingEdgePartition"]

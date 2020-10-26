@@ -18,8 +18,9 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from .abstract_costed_multiple_partition import AbstractCostedMultiplePartition
+from .abstract_costed_single_partition import AbstractCostedSinglePartition
 from .abstract_edge_partition import AbstractEdgePartition
-from .abstract_costed_partition import AbstractCostedPartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_edge import AbstractEdge
@@ -262,9 +263,10 @@ class Graph(ConstrainedObject):
                     self._outgoing_edge_partitions_by_name):
                 raise PacmanAlreadyExistsException(
                     str(AbstractEdgePartition.__class__),
-                    (pre_vertex, edge_partition.identifier))
+                    str(pre_vertex, edge_partition.identifier))
 
-        if isinstance(edge_partition, AbstractCostedPartition):
+        if (isinstance(edge_partition, AbstractCostedSinglePartition) or
+                isinstance(edge_partition, AbstractCostedMultiplePartition)):
             for pre_vertex in pre_vertices:
                 self._outgoing_costed_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
@@ -383,7 +385,8 @@ class Graph(ConstrainedObject):
 
         :param AbstractVertex vertex:
             The vertex at which the costed edge partitions to find starts
-        :rtype: iterable(AbstractCostedPartition)
+        :rtype: iterable(AbstractCostedSinglePartition or
+                         AbstractCostedMultiplePartition)
         """
         return self._outgoing_costed_edge_partitions_by_pre_vertex[vertex]
 
