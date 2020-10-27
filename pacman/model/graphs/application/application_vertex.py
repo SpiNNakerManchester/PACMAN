@@ -93,7 +93,7 @@ class ApplicationVertex(AbstractVertex):
             return
         if self._splitter is not None:
             raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(self._label))
+                self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
         self._splitter.check_supported_constraints()
