@@ -21,8 +21,7 @@ from pacman.model.graphs.machine import (
 from pacman.model.graphs.machine.outgoing_edge_partitions import (
     ConstantSDRAMMachinePartition)
 from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint, \
-    SameChipAsConstraint
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms import SpreaderPlacer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.chip_id_allocator_algorithms import (
