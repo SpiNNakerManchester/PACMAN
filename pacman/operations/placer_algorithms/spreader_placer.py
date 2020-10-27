@@ -342,7 +342,7 @@ class SpreaderPlacer(OneToOnePlacer):
                 (x, y, p, _, _) = \
                     resource_tracker.allocate_constrained_resources(
                         one_to_one_vertex.resources_required,
-                        one_to_one_vertex.constraints, chips)
+                        one_to_one_vertex.constraints, chips=chips)
 
                 # add to placed tracker
                 placed_vertices.add(one_to_one_vertex)
@@ -390,7 +390,7 @@ class SpreaderPlacer(OneToOnePlacer):
         for vertex in sorted_verts:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 vertex.resources_required,
-                vertex.constraints, chips_in_order)
+                vertex.constraints, chips=chips_in_order)
             placements.add_placement(Placement(vertex=vertex, x=x, y=y, p=p))
             cost_per_chip[x, y] += self._get_cost(
                 vertex, machine_graph, n_keys_map)
