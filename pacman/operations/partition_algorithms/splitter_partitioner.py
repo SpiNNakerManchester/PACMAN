@@ -101,7 +101,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
 
         # Partition one vertex at a time
         for vertex in progress.over(vertices):
-            vertex.splitter_object.split(resource_tracker, machine_graph)
+            vertex.splitter.split(resource_tracker, machine_graph)
 
         # process edges
         self.__process_machine_edges(
@@ -122,9 +122,9 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         """
         dependent_vertices = OrderedDict()
         for vertex in vertices:
-            if isinstance(vertex.splitter_object, AbstractDependentSplitter):
+            if isinstance(vertex.splitter, AbstractDependentSplitter):
                 other_app_vertex = (
-                    vertex.splitter_object.other_splitter.governed_app_vertex)
+                    vertex.splitter.other_splitter.governed_app_vertex)
                 dependent_vertices[other_app_vertex] = vertex
 
         for main_vertex in dependent_vertices.keys():
@@ -144,11 +144,11 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         for vertex in app_graph.vertices:
             for constraint in utils.locate_constraints_of_type(
                     vertex.constraints, MaxVertexAtomsConstraint):
-                vertex.splitter_object.set_max_atoms_per_core(
+                vertex.splitter.set_max_atoms_per_core(
                     constraint.size, False)
             for constraint in utils.locate_constraints_of_type(
                     vertex.constraints, FixedVertexAtomsConstraint):
-                vertex.splitter_object.set_max_atoms_per_core(
+                vertex.splitter.set_max_atoms_per_core(
                     constraint.size, True)
 
     def __setup_objects(
@@ -231,13 +231,13 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             # go through each edge
             for app_edge in app_outgoing_edge_partition.edges:
                 src_vertices_edge_type_map = (
-                    app_edge.pre_vertex.splitter_object.get_pre_vertices(
+                    app_edge.pre_vertex.splitter.get_pre_vertices(
                         app_edge, app_outgoing_edge_partition))
 
                 # go through each pre vertices
                 for src_machine_vertex in src_vertices_edge_type_map:
                     dest_vertices_edge_type_map = (
-                        app_edge.post_vertex.splitter_object.get_post_vertices(
+                        app_edge.post_vertex.splitter.get_post_vertices(
                             app_edge, app_outgoing_edge_partition,
                             src_machine_vertex))
 

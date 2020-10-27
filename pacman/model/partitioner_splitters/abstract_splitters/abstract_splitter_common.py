@@ -42,7 +42,7 @@ class AbstractSplitterCommon(object):
         "_is_fixed_atoms_per_core"
     ]
 
-    SETTING_SPLITTER_OBJECT_ERROR_MSG = (
+    SETTING_SPLITTER_ERROR_MSG = (
         "The app vertex {} is already governed by this "
         "{}. And so cannot govern app vertex {}."
         " Please fix and try again.")
@@ -153,12 +153,12 @@ class AbstractSplitterCommon(object):
             return
         if self._governed_app_vertex is not None:
             raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(
+                self.SETTING_SPLITTER_ERROR_MSG.format(
                     self._governed_app_vertex, self._splitter_name,
                     app_vertex))
         self._governed_app_vertex = app_vertex
         self.check_supported_constraints()
-        app_vertex.splitter_object = self
+        app_vertex.splitter = self
 
     def check_supported_constraints(self):
         utility_calls.check_algorithm_can_support_constraints(

@@ -46,7 +46,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1)
-            vertex.splitter_object = SplitterSliceLegacy()
+            vertex.splitter = SplitterSliceLegacy()
             graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
@@ -72,7 +72,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1)
-            vertex.splitter_object = SplitterSliceLegacy()
+            vertex.splitter = SplitterSliceLegacy()
             graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
@@ -97,7 +97,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0, p=p)],
                 n_atoms=1)
-            vertex.splitter_object = SplitterSliceLegacy()
+            vertex.splitter = SplitterSliceLegacy()
             graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
@@ -129,7 +129,7 @@ class TestPartitionerWithPreAllocatedResources(object):
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
                 fixed_sdram_value=eight_meg)
-            vertex.splitter_object = SplitterSliceLegacy()
+            vertex.splitter = SplitterSliceLegacy()
             graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
@@ -163,7 +163,7 @@ class TestPartitionerWithPreAllocatedResources(object):
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
                 fixed_sdram_value=eight_meg)
-            vertex.splitter_object = SplitterSliceLegacy()
+            vertex.splitter = SplitterSliceLegacy()
             graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
