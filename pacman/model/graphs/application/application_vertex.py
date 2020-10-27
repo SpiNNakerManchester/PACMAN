@@ -56,17 +56,18 @@ class ApplicationVertex(AbstractVertex):
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
+        # Need to set to None temporarily as add_constraint checks splitter
+        self._splitter = None
         super(ApplicationVertex, self).__init__(label, constraints)
         self._machine_vertices = OrderedSet()
+
+        # Use setter as there is extra work to do
+        self.splitter = splitter
 
         # add a constraint for max partitioning
         self.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
 
-        # Need to set to None temporarily as setter check previous value
-        self._splitter = None
-        # Use setter as there is extra work to do
-        self.splitter = splitter
 
     def __str__(self):
         return self.label
@@ -89,8 +90,14 @@ class ApplicationVertex(AbstractVertex):
         :param SplitterObjectCommon new_value: the new splitter object
         :rtype: None
         """
+        if self._splitter == new_value:
+            return
+        if self._splitter is not None:
+            raise PacmanConfigurationException(
+                self.SETTING_SPLITTER_OBJECT_ERROR_MSG.format(self._label))
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
+        self._splitter.check_supported_constraints()
 
     @overrides(AbstractVertex.add_constraint)
     def add_constraint(self, constraint):
