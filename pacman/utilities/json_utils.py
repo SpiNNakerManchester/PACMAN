@@ -302,6 +302,7 @@ def edge_from_json(json_dict, graph=None):
 
 
 def graph_to_json(graph):
+    #  TODO Appplication vertex info needed for ZonedRoutingInfoAllocator
     json_dict = OrderedDict()
     try:
         if graph.label is not None:
