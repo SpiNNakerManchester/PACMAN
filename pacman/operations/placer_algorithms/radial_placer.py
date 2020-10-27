@@ -100,15 +100,10 @@ class RadialPlacer(object):
                 machine, resource_tracker, start_x, start_y)
 
         if len(vertices) > 1:
-            assigned_values2 = \
+            assigned_values = \
                 resource_tracker.allocate_constrained_group_resources(
                     create_requirement_collections(vertices, machine_graph),
                     chips=chips)
-            assigned_values = \
-                resource_tracker.allocate_constrained_group_resources([
-                    (vert.resources_required, vert.constraints)
-                    for vert in vertices
-                ], chips=chips)
             for (x, y, p, _, _), vert in zip(assigned_values, vertices):
                 placement = Placement(vert, x, y, p)
                 placements.add_placement(placement)

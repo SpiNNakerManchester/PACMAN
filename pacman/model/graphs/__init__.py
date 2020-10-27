@@ -35,7 +35,7 @@ from .abstract_sdram_partition import AbstractSDRAMPartition
 
 __all__ = [
     "AbstractApplicationOutgoingPartition", "AbstractCostedMultiplePartition",
-    "AbstractCostedMultiplePartition", "AbstractEdge",
+    "AbstractCostedSinglePartition", "AbstractEdge",
     "AbstractEdgePartition", "AbstractFPGA", "AbstractMultiplePartition",
     "AbstractSDRAMMultiplePartition", "AbstractSDRAMPartition",
     "AbstractSDRAMSinglePartition", "AbstractSingleSourcePartition",
