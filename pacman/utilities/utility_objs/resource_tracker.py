@@ -1536,4 +1536,3 @@ class ResourceTracker(object):
         :return: tuple of chip x and chip y values, or None.
         """
         return self._vertex_to_chip_map.get(vertex, None)
-
