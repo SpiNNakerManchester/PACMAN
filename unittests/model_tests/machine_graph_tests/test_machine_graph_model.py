@@ -115,6 +115,40 @@ class TestMachineGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             graph.add_edges(edges, "bar")
 
+    def test_all_have_app_vertex(self):
+        app_graph = ApplicationGraph("Test")
+        graph = MachineGraph("foo", app_graph)
+        app1 = SimpleTestVertex(12, "app1")
+        mach1 = SimpleMachineVertex("mach1",  app_vertex=app1)
+        mach2 = SimpleMachineVertex("mach2",  app_vertex=app1)
+        mach3 = SimpleMachineVertex("mach3",  app_vertex=None)
+        graph.add_vertices([mach1, mach2])
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_vertex(mach3)
+
+    def test_none_have_app_vertex(self):
+        app_graph = ApplicationGraph("Test")
+        graph = MachineGraph("foo", app_graph)
+        app1 = SimpleTestVertex(12, "app1")
+        mach1 = SimpleMachineVertex("mach1",  app_vertex=None)
+        mach2 = SimpleMachineVertex("mach2",  app_vertex=None)
+        mach3 = SimpleMachineVertex("mach3",  app_vertex=app1)
+        graph.add_vertices([mach1, mach2])
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_vertex(mach3)
+
+    def test_no_app_graph_no_app_vertex(self):
+        graph = MachineGraph("foo")
+        app1 = SimpleTestVertex(12, "app1")
+        mach1 = SimpleMachineVertex("mach1", app_vertex=app1)
+        mach2 = SimpleMachineVertex("mach2", app_vertex=None)
+        mach3 = SimpleMachineVertex("mach3", app_vertex=app1)
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_vertex(mach1)
+        graph.add_vertex(mach2)
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_vertex(mach3)
+
     def test_add_edge_with_no_existing_pre_vertex_in_graph(self):
         """
         test that adding a edge where the pre vertex has not been added
