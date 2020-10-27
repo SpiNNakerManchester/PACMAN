@@ -30,8 +30,7 @@ class MachineGraph(Graph):
     __slots__ = [
         # A double dictionary of MULTICAST edges by their
         # application id and then their (partition name)
-        "_multicast_partitions"
-    ]
+        "_multicast_partitions",
         # Flags to say the application level is used so all machine vertices
         # will have an application vertex
         "_application_level_used",
