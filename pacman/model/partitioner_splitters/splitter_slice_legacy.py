@@ -29,6 +29,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SplitterSliceLegacy(AbstractSplitterSlice):
 
+    __slots__ = []
+
     NOT_API_WARNING = (
         "Your vertex is deprecated. Please add a Splitter or "
         "inherit from the class in "
