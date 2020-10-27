@@ -14,7 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+import logging
 import math
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
@@ -25,6 +27,8 @@ from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint,
     FixedKeyAndMaskConstraint)
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ZonedRoutingInfoAllocator(object):
@@ -247,6 +251,9 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_atoms = \
                     BITS_IN_KEY - app_part_bits - self.__n_bits_machine
                 self.__n_bits_atoms_and_mac = BITS_IN_KEY - app_part_bits
+                logger.warning(
+                    "The ZonedRoutingInfoAllocator could not use the global "
+                    "approach for all vertexes.")
             else:
                 # Set the size of atoms and machine for biggest of each
                 self.__n_bits_atoms_and_mac = \
@@ -278,14 +285,12 @@ class ZonedRoutingInfoAllocator(object):
                 # convert set to a list and sort by slice
                 machine_vertices = list(paritition_vertices)
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
+                n_bits_atoms = self.__atom_bits_per_app_part[
+                    (app_id, partition_name)]
                 if self.__flexible:
-                    n_bits_atoms = self.__atom_bits_per_app_part[
-                        (app_id, partition_name)]
                     n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
                 else:
-                    n_bits_atoms = self.__atom_bits_per_app_part[
-                        (app_id, partition_name)]
-                    if n_bits_atoms < self.__n_bits_atoms:
+                    if n_bits_atoms <= self.__n_bits_atoms:
                         # Ok it fits use global sizes
                         n_bits_atoms = self.__n_bits_atoms
                         n_bits_machine = self.__n_bits_machine
