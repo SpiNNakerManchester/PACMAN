@@ -68,7 +68,6 @@ class ApplicationVertex(AbstractVertex):
         self.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
 
-
     def __str__(self):
         return self.label
 
