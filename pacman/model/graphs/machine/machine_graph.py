@@ -15,10 +15,12 @@
 
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import OutgoingEdgePartition
+from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.graphs.graph import Graph
 
 
 class MachineGraph(Graph):
@@ -26,6 +28,9 @@ class MachineGraph(Graph):
     """
 
     __slots__ = [
+        # A double dictionary of MULTICAST edges by their
+        # application id and then their (partition name)
+        "_multicast_partitions",
         # Flags to say the application level is used so all machine vertices
         # will have an application vertex
         "_application_level_used",
@@ -57,6 +62,37 @@ class MachineGraph(Graph):
         else:
             # Must be false as there is no App_graph
             self._application_level_used = False
+        self._multicast_partitions = DefaultOrderedDict(
+            lambda: DefaultOrderedDict(set))
+
+    @overrides(Graph.add_edge)
+    def add_edge(self, edge, outgoing_edge_partition_name):
+        super(MachineGraph, self).add_edge(edge, outgoing_edge_partition_name)
+        if edge.traffic_type == EdgeTrafficType.MULTICAST:
+            if edge.pre_vertex.app_vertex:
+                by_app = self._multicast_partitions[
+                    edge.pre_vertex.app_vertex]
+            else:
+                by_app = self._multicast_partitions[
+                    edge.pre_vertex]
+            by_partition = by_app[outgoing_edge_partition_name]
+            by_partition.add(edge.pre_vertex)
+
+    @property
+    def multicast_partitions(self):
+        """
+        Returns a double dictionary of  app id then
+        outgoing_edge_partition_name to a set of machine_vertex that act as
+        pre vertices for these multicast edges
+
+        The app_id is normally the (machine) edge.pre_vertex.app_vertex.
+        This then groups the edges which come from the same app_vertex
+        If the (machine) edge.pre_vertex has no app vertex then the app_id will
+        be the machine vertex which will then form its own group of 1
+
+        :rtype dict(Vertex, dict(str, set(MachineVertex))
+        """
+        return self._multicast_partitions
 
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):
