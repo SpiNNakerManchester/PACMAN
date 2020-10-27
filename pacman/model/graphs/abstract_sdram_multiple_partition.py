@@ -30,6 +30,6 @@ class AbstractSDRAMMultiplePartition(
     def __init__(
             self, pre_vertices, identifier, allowed_edge_types, constraints,
             label, traffic_weight, class_name, traffic_type):
-        super(AbstractCostedMultiplePartition, self).__init__(
+        super(AbstractSDRAMMultiplePartition, self).__init__(
             pre_vertices, identifier, allowed_edge_types, constraints,
             label, traffic_weight, class_name, traffic_type)
