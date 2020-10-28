@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_splitter_slice import AbstractSplitterSlice
 from .abstract_dependent_splitter import AbstractDependentSplitter
+from .abstract_splitter_common import AbstractSplitterCommon
+from .abstract_splitter_slice import AbstractSplitterSlice
 
-__all__ = ["AbstractDependentSplitter", "AbstractSplitterSlice"]
+__all__ = ["AbstractDependentSplitter",  "AbstractSplitterCommon",
+           "AbstractSplitterSlice"]
