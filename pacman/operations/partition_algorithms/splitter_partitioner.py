@@ -113,8 +113,19 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         # return the accepted things
         return machine_graph, resource_tracker.chips_used
 
-    @staticmethod
-    def order_vertices_for_dependent_splitters(vertices):
+    def __make_dependent_after(self, vertices, dependent):
+        if not isinstance(dependent.splitter, AbstractDependentSplitter):
+            return  # Not dependent so done
+        other_app_vertex = (
+            dependent.splitter.other_splitter.governed_app_vertex)
+        # check the other is not also dependent
+        self.__make_dependent_after(vertices, other_app_vertex)
+        old_index = vertices.index(dependent)
+        other_index = vertices.index(other_app_vertex)
+        if old_index < other_index:
+            vertices.insert(other_index+1, vertices.pop(old_index))
+
+    def order_vertices_for_dependent_splitters(self, vertices):
         """ orders the list so that dependent splitters are next to their other
         splitter in terms of vertex ordering.
 
@@ -123,20 +134,21 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :return: vertices in list with new ordering
         :rtype: iterable of ApplicationVertex
         """
-        dependent_vertices = OrderedDict()
+        dependent_vertices = list()
+        other_vertices = set()
         for vertex in vertices:
             if isinstance(vertex.splitter, AbstractDependentSplitter):
                 other_app_vertex = (
                     vertex.splitter.other_splitter.governed_app_vertex)
-                dependent_vertices[other_app_vertex] = vertex
+                other_vertices.add(other_app_vertex)
+                dependent_vertices.append(vertex)
 
-        for main_vertex in dependent_vertices.keys():
-            old_index_of_dependent = (
-                vertices.index(dependent_vertices[main_vertex]))
-            next_to_index = vertices.index(main_vertex) + 1
-            vertices.insert(next_to_index,
-                            vertices.pop(old_index_of_dependent))
-        return vertices
+        for vertex in other_vertices:
+            while vertex in dependent_vertices:
+                dependent_vertices.remove(vertex)
+
+        for vertex in dependent_vertices:
+            self.__make_dependent_after(vertices, vertex)
 
     def __set_same_max_atoms_to_splitters(self, app_graph):
         """ get the constraints sorted out.
@@ -214,7 +226,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         vertices = sort_vertices_by_known_constraints(app_graph.vertices)
 
         # Group vertices that are supposed to be the same size
-        vertices = self.order_vertices_for_dependent_splitters(vertices)
+        self.order_vertices_for_dependent_splitters(vertices)
 
         # Set up the progress
         progress = ProgressBar(
