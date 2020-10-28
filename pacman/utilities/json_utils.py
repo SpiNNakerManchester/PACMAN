@@ -188,8 +188,8 @@ def key_masks_from_json(json_list):
 def resource_container_to_json(container):
     json_dict = OrderedDict()
     try:
-        json_dict["dtcm"] = container.dtcm.get_value()
-        json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
+        json_dict["dtcm"] = int(container.dtcm.get_value())
+        json_dict["cpu_cycles"] = int(container.cpu_cycles.get_value())
         json_dict["fixed_sdram"] = int(container.sdram.fixed)
         json_dict["per_timestep_sdram"] = int(container.sdram.per_timestep)
         json_dict["iptags"] = iptag_resources_to_json(container.iptags)

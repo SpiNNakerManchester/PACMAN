@@ -29,7 +29,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class NumpyEncoder(json.JSONEncoder):
     """ Custom encoder for numpy data types """
     def default(self, obj):
-        if isinstance(obj, (numpy.int_, numpy.intc, numpy.intp, numpy.int8,
+        if isinstance(obj, (numpy.int, numpy.int_, numpy.intc, numpy.intp, numpy.int8,
                             numpy.int16, numpy.int32, numpy.int64, numpy.uint8,
                             numpy.uint16, numpy.uint32, numpy.uint64)):
 
