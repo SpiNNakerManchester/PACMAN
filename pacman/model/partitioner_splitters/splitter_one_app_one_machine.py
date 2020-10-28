@@ -72,8 +72,8 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
         return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, edge, outgoing_edge_partition,
-                          src_machine_vertex):
+    def get_in_coming_vertices(
+            self, edge, outgoing_edge_partition, src_machine_vertex):
         return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
