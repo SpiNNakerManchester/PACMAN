@@ -111,3 +111,7 @@ class MachineGraph(Graph):
             if vertex.app_vertex:
                 raise PacmanInvalidParameterException(
                     "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
+
+    @property
+    def application_level_used(self):
+        return self._application_level_used
