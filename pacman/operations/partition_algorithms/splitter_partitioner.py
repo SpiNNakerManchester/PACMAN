@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanPartitionException)
 from pacman.model.constraints.partitioner_constraints import (
@@ -112,17 +113,16 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         # return the accepted things
         return machine_graph, resource_tracker.chips_used
 
-    def __make_dependent_after(self, vertices, dependent):
-        if not isinstance(dependent.splitter, AbstractDependentSplitter):
-            return  # Not dependent so done
-        other_app_vertex = (
-            dependent.splitter.other_splitter.governed_app_vertex)
-        # check the other is not also dependent
-        self.__make_dependent_after(vertices, other_app_vertex)
-        old_index = vertices.index(dependent)
-        other_index = vertices.index(other_app_vertex)
-        if old_index < other_index:
-            vertices.insert(other_index+1, vertices.pop(old_index))
+    def __make_dependent_after(self, vertices, dependent_vertices, dependent):
+        if dependent in dependent_vertices:
+            other_app_vertex = dependent_vertices[dependent]
+            # check the other is not also dependent
+            self.__make_dependent_after(
+                vertices, dependent_vertices, other_app_vertex)
+            old_index = vertices.index(dependent)
+            other_index = vertices.index(other_app_vertex)
+            if old_index < other_index:
+                vertices.insert(other_index+1, vertices.pop(old_index))
 
     def order_vertices_for_dependent_splitters(self, vertices):
         """ orders the list so that dependent splitters are next to their other
@@ -133,21 +133,21 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :return: vertices in list with new ordering
         :rtype: iterable of ApplicationVertex
         """
-        dependent_vertices = list()
+        dependent_vertices = OrderedDict()
         other_vertices = set()
         for vertex in vertices:
             if isinstance(vertex.splitter, AbstractDependentSplitter):
-                other_app_vertex = (
-                    vertex.splitter.other_splitter.governed_app_vertex)
-                other_vertices.add(other_app_vertex)
-                dependent_vertices.append(vertex)
-
-        for vertex in other_vertices:
-            while vertex in dependent_vertices:
-                dependent_vertices.remove(vertex)
+                other_splitter = vertex.splitter.other_splitter
+                if other_splitter:
+                    other_app_vertex = other_splitter.governed_app_vertex
+                    other_vertices.add(other_app_vertex)
+                    dependent_vertices[vertex] = other_app_vertex
 
         for vertex in dependent_vertices:
-            self.__make_dependent_after(vertices, vertex)
+            # As we do the whole dependency chain only start at the bottom
+            if vertex not in other_vertices:
+                self.__make_dependent_after(
+                    vertices, dependent_vertices, vertex)
 
     def __set_same_max_atoms_to_splitters(self, app_graph):
         """ get the constraints sorted out.
