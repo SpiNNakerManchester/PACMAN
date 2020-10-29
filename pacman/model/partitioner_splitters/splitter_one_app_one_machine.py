@@ -20,7 +20,8 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.graphs.machine.abstract import AbstractOneAppOneMachineVertex
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
