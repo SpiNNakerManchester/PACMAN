@@ -334,7 +334,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                             machine_outgoing_partition,
                             AbstractSDRAMMultiplePartition):
                         (chip_x, chip_y) = resource_tracker.chip_of(
-                            machine_outgoing_partition.pre_vertices.peek())
+                            list(machine_outgoing_partition.pre_vertices)[0])
                     elif isinstance(
                             machine_outgoing_partition,
                             AbstractSDRAMSinglePartition):
