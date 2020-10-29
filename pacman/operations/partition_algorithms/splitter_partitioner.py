@@ -30,6 +30,7 @@ from pacman.utilities.algorithm_utilities. \
     partition_algorithm_utilities import get_same_size_vertex_groups
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
+from pacman.utilities.constants import SARK_PER_MALLOC_SDRAM_USAGE
 from pacman.utilities.utility_objs import ResourceTracker
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
@@ -325,19 +326,21 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 if isinstance(
                         machine_outgoing_partition, AbstractSDRAMPartition):
                     sdram_cost = (
-                        machine_outgoing_partition.total_sdram_requirements)
-                    chip = None
+                        machine_outgoing_partition.total_sdram_requirements())
+                    sdram_cost += SARK_PER_MALLOC_SDRAM_USAGE
+                    chip_x = None
+                    chip_y = None
                     if isinstance(
                             machine_outgoing_partition,
                             AbstractSDRAMMultiplePartition):
-                        chip = resource_tracker.chip_of(
+                        (chip_x, chip_y) = resource_tracker.chip_of(
                             machine_outgoing_partition.pre_vertices.peek())
                     elif isinstance(
                             machine_outgoing_partition,
                             AbstractSDRAMSinglePartition):
-                        chip = resource_tracker.chip_of(
+                        (chip_x, chip_y) = resource_tracker.chip_of(
                             machine_outgoing_partition.pre_vertex)
-                    resource_tracker.allocate_sdram(chip, sdram_cost)
+                    resource_tracker.allocate_sdram(chip_x, chip_y, sdram_cost)
 
     @overrides(AbstractSplitterPartitioner.create_machine_edge)
     def create_machine_edge(
