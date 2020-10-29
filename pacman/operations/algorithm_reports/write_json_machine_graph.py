@@ -27,8 +27,7 @@ MACHINE_GRAPH_FILENAME = "machine_graph.json"
 logger = FormatAdapter(logging.getLogger(__name__))
 
 class NumpyEncoder(json.JSONEncoder):
-    """ Custom encoder for numpy data types """
-    def default(self, obj):
+    def to_py(self, obj):
         if isinstance(obj, (numpy.int, numpy.int_, numpy.intc, numpy.intp, numpy.int8,
                             numpy.int16, numpy.int32, numpy.int64, numpy.uint8,
                             numpy.uint16, numpy.uint32, numpy.uint64)):
@@ -41,8 +40,13 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, (numpy.complex_, numpy.complex64, numpy.complex128)):
             return {'real': obj.real, 'imag': obj.imag}
 
-        elif isinstance(obj, (numpy.ndarray,)):
-            return obj.tolist()
+        else:
+            return json.JSONEncoder.default(self, obj)
+
+    """ Custom encoder for numpy data types """
+    def default(self, obj):
+        if isinstance(obj, (numpy.ndarray,)):
+            return [self.to_py(x) for x in obj]
 
         elif isinstance(obj, (numpy.bool_)):
             return bool(obj)
@@ -50,7 +54,8 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, (numpy.void)):
             return None
 
-        return json.JSONEncoder.default(self, obj)
+        else:
+            return self.to_py(obj)
 
 class WriteJsonMachineGraph(object):
     """ Converter (:py:obj:`callable`) from :py:class:`MulticastRoutingTables`
