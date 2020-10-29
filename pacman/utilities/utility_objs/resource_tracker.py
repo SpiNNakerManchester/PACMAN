@@ -788,20 +788,21 @@ class ResourceTracker(object):
         self._sdram_tracker[chip.x, chip.y] -= \
             resources.sdram.get_total_sdram(self._plan_n_timesteps)
 
-    def allocate_sdram(self, chip, sdram_value):
+    def allocate_sdram(self, chip_x, chip_y, sdram_value):
         """ Allocates sdram value directly to a chip
 
         :param sdram_value: the number fo bytes to allocate
-        :param chip: machine chip
+        :param chip_x: machine chip x coord.
+        :param chip_y: machine chip y coord.
         :rtype: None
         :raises   when the sdram cant be allocated
         """
-        if self._sdram_tracker[chip.x, chip.y] - sdram_value < 0:
+        if self._sdram_tracker[chip_x, chip_y] - sdram_value < 0:
             raise PacmanException(self.ALLOCATION_SDRAM_ERROR.format(
-                sdram_value, chip.x, chip.y,
-                self._sdram_tracker[chip.x, chip.y]))
+                sdram_value, chip_x, chip_y,
+                self._sdram_tracker[chip_x, chip_y]))
         else:
-            self._sdram_tracker[chip.x, chip.y] -= sdram_value
+            self._sdram_tracker[chip_x, chip_y] -= sdram_value
 
     def _allocate_core(self, chip, key, processor_id):
         """ Allocates a core on the given chip
