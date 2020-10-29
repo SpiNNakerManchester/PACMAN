@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-test for partitioning
+test for SplitterPartitioner functions
 """
 
 import unittest
@@ -23,6 +23,7 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractDependentSplitter)
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+
 
 class MockVertex(LegacyPartitionerAPI):
     def __init__(self, splitter, label):
@@ -96,12 +97,12 @@ class TestSplitterPartitioner(unittest.TestCase):
         v3a = MockVertex(MockDependant(s3, "depends on v3"), "A depends on v3")
         vertices.append(v3a)
         vertices.append(v2a)
-        v2b= MockVertex(MockDependant(s2, "depends on v2"), "B depends on v2")
+        v2b = MockVertex(MockDependant(s2, "depends on v2"), "B depends on v2")
         vertices.append(v2b)
         vertices.append(v2)
-        v3 = MockVertex(s3,"v3")
+        v3 = MockVertex(s3, "v3")
         vertices.append(v3)
-        v4 = MockVertex(SplitterSliceLegacy(),"v4")
+        v4 = MockVertex(SplitterSliceLegacy(), "v4")
         vertices.append(v4)
         sp = SplitterPartitioner()
         sp.order_vertices_for_dependent_splitters(vertices)
@@ -112,6 +113,7 @@ class TestSplitterPartitioner(unittest.TestCase):
         self.assertLess(vertices.index(v2a), vertices.index(v2aa))
         self.assertLess(vertices.index(v2), vertices.index(v2b))
         self.assertLess(vertices.index(v3), vertices.index(v3a))
+
 
 if __name__ == '__main__':
     unittest.main()
