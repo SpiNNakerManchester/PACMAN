@@ -55,16 +55,18 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param region: Key to identify the region
         :type region: int or String or enum
-        :param int fixed_sdram: The fixed cost for this region.
-        :param int per_timestep_sdram: The variable cost for this region is any
+        :param fixed_sdram: The fixed cost for this region.
+        :type fixed_sdram: int or numpy.integer
+        :param per_timestep_sdram: The variable cost for this region is any
+        :type per_timestep_sdram: int or numpy.integer
         """
         self._fixed_sdram = self._fixed_sdram + fixed_sdram
         self._per_timestep_sdram = \
             self._per_timestep_sdram + per_timestep_sdram
         if per_timestep_sdram:
-            sdram = VariableSDRAM(fixed_sdram, per_timestep_sdram)
+            sdram = VariableSDRAM(int(fixed_sdram), int(per_timestep_sdram))
         else:
-            sdram = ConstantSDRAM(fixed_sdram)
+            sdram = ConstantSDRAM(int(fixed_sdram))
         if region in self.__regions:
             self.__regions[region] += sdram
         else:
