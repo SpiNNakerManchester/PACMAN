@@ -51,10 +51,11 @@ class TestSameChipConstraint(unittest.TestCase):
             graph.add_vertex(vertex)
             graph.add_outgoing_edge_partition(
                 ConstantSDRAMMachinePartition(
-                    identifier="Test", pre_vertex=vertex, label="ffff"))
+                    identifier="Test", pre_vertex=vertex, label="bacon"))
             for _i in range(0, random.randint(1, 5)):
                 sdram_edge = SDRAMMachineEdge(
-                    vertex, vertices[random.randint(0, 99)], label="fffg")
+                    vertex, vertices[random.randint(0, 99)], label="bacon",
+                    app_edge=None)
                 sdram_edges.append(sdram_edge)
                 graph.add_edge(sdram_edge, "Test")
         n_keys_map = DictBasedMachinePartitionNKeysMap()

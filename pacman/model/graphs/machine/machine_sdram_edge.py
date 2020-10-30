@@ -38,7 +38,7 @@ class SDRAMMachineEdge(MachineEdge):
         "sdram size {}. The SDRAM machine edge does not yet know how to "
         "handle this case. Please fix and try again.")
 
-    def __init__(self, pre_vertex, post_vertex, label, app_edge):
+    def __init__(self, pre_vertex, post_vertex, label, app_edge=None):
         MachineEdge.__init__(
             self, pre_vertex, post_vertex, traffic_type=EdgeTrafficType.SDRAM,
             label=label, traffic_weight=1, app_edge=app_edge)
