@@ -40,10 +40,10 @@ class VariableSDRAM(AbstractSDRAM):
         :param per_timestep_sdram:
             The amount of SDRAM (in bytes) required per timestep.
             Often represents the space to record a timestep.
-        :type per_timestep_sdram: int or numpy.integer
+        :type per_timestep_sdram: float or numpy.float
         """
         self._fixed_sdram = int(fixed_sdram)
-        self._per_timestep_sdram = int(per_timestep_sdram)
+        self._per_timestep_sdram = float(per_timestep_sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
     def get_total_sdram(self, n_timesteps):
