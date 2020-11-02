@@ -63,10 +63,10 @@ class MockDependant(AbstractDependentSplitter):
     def get_in_coming_slices(self):
         raise NotImplementedError()
 
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         raise NotImplementedError()
 
-    def get_post_vertices(self, edge, outgoing_edge_partition,
+    def get_in_coming_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
         raise NotImplementedError()
 
