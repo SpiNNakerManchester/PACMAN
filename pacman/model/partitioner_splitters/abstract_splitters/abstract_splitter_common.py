@@ -187,22 +187,53 @@ class AbstractSplitterCommon(object):
 
     @abstractmethod
     def get_out_going_slices(self):
-        """ allows a application vertex to control the set of slices for \
-        outgoing application edges
+        """ A best effort prediction of the slices of the output vertices.
+
+        If this method is called after create_machine_vertices the splitter
+        should return the actual slices of the output vertices.
+        The second value returned is then always True
+
+        If this method is called before create_machine_vertices the splitter
+        will have to make an estimate unless the actual slices it will use are
+        already known. The second value returned is True if and only if the
+        slices will not be changed.
+
+        The output vertices are the ones that will serve as source vertices
+        for external edges.  If more than one set of vertices match this
+        description the splitter should use the ones used by the most general
+        edge type/ down stream splitter.
+
         :return: list of Slices and bool of estimate or not
         :rtype: tuple(list(Slice), bool
         """
 
     @abstractmethod
     def get_in_coming_slices(self):
-        """ allows a application vertex to control the set of slices for \
-        incoming application edges
+        """ A best effort prediction of the slices of the input vertices.
+
+        If this method is called after create_machine_vertices the splitter
+        should return the actual slices of the input vertices.
+        The second value returned is then always True
+
+        If this method is called before create_machine_vertices the splitter
+        will have to make an estimate unless the actual slices it will use are
+        already known. The second value returned is True if and only if the
+        slices will not be changed.
+
+        The output vertices are the ones that will serve as source vertices
+        for external edges.  If more than one set of vertices match this
+        description the splitter should use the ones used by the most general
+        edge type/ down stream splitter.
+
+        :return: list of Slices and bool of estimate or not
+        :rtype: tuple(list(Slice), bool
+
         :return: the slices incoming to this vertex, bool if estimate or exact
         :rtype: tuple(list(Slice), bool
         """
 
     @abstractmethod
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         """ gets pre vertices and their acceptable edge types
         :param ApplicationEdge edge: app edge
         :param OutgoingEdgePartition outgoing_edge_partition: \
@@ -212,8 +243,8 @@ class AbstractSplitterCommon(object):
         """
 
     @abstractmethod
-    def get_post_vertices(self, edge, outgoing_edge_partition,
-                          src_machine_vertex):
+    def get_in_coming_vertices(self, edge, outgoing_edge_partition,
+                               src_machine_vertex):
         """ gets incoming vertices and their acceptable edge types
         :param ApplicationEdge edge: app edge
         :param OutgoingEdgePartition outgoing_edge_partition: \
