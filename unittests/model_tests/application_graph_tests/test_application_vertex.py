@@ -153,6 +153,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert = SimpleTestVertex(near)
         self.assertEqual(1, vert.n_atoms)
         with self.assertRaises(PacmanInvalidParameterException):
-            vert = SimpleTestVertex(1.5)
+            SimpleTestVertex(1.5)
         vert = SimpleTestVertex(numpy.int64(23))
-        self.assertEqual(int, type(vert.n_atoms))
+        self.assertTrue(isinstance(vert.n_atoms, int))
