@@ -114,6 +114,14 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         return machine_graph, resource_tracker.chips_used
 
     def __make_dependent_after(self, vertices, dependent_vertices, dependent):
+        """ orders the vertices so that dependants are split after the
+        things they depend upon.
+
+        :param vertices: machine vertices
+        :param dependent_vertices: list of dependent vertices
+        :param dependent: the vertex that's dependent on things.
+        :rtype: None
+        """
         if dependent in dependent_vertices:
             other_app_vertex = dependent_vertices[dependent]
             # check the other is not also dependent
@@ -122,7 +130,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             old_index = vertices.index(dependent)
             other_index = vertices.index(other_app_vertex)
             if old_index < other_index:
-                vertices.insert(other_index+1, vertices.pop(old_index))
+                vertices.insert(other_index + 1, vertices.pop(old_index))
 
     def order_vertices_for_dependent_splitters(self, vertices):
         """ orders the list so that dependent splitters are next to their other

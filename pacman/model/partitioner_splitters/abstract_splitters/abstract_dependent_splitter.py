@@ -27,6 +27,10 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
         "_other_splitter"
     ]
 
+    CIRCULAR_ERROR_MESSAGE = (
+        "Circular dependency found when setting splitter {} to be "
+        "dependent on splitter {}")
+
     def __init__(self, other_splitter, splitter_name):
         """
         Creates a splitter that must be done after the other unless None.
@@ -54,11 +58,11 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
         """
         Supports the delayed setting ot the other to depend on
 
-        :param new_value:
+        :param new_value: other splitter
         :raise PacmanAlreadyExistsException:
             If there is already a different other set
         :raise PacmanPartitionException:
-            If a circular depenceny is detected
+            If a circular dependency is detected
         """
         if (self._other_splitter is not None and
                 self._other_splitter != new_value):
@@ -66,6 +70,5 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
                 "other_splitter", self._other_splitter)
         if self.check_circular(new_value):
             raise PacmanPartitionException(
-                "Ciruclar dependency found when setting splitter {} "
-                "to be dependent on splitter {}".format(self, new_value))
+                self.CIRCULAR_ERROR_MESSAGE.format(self, new_value))
         self._other_splitter = new_value
