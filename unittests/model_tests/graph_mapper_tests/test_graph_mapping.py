@@ -61,7 +61,7 @@ class TestGraphMapping(unittest.TestCase):
         app_graph.add_vertex(vert)
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
-        mac_graph = MachineGraph("cooked bacon")
+        mac_graph = MachineGraph("cooked bacon", application_graph=app_graph)
         vertex1 = SimpleMachineVertex(
             None, "", vertex_slice=Slice(0, 1), app_vertex=vert)
         vertex2 = SimpleMachineVertex(
