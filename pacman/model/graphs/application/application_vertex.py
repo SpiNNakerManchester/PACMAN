@@ -136,15 +136,14 @@ class ApplicationVertex(AbstractVertex):
             return n_atoms
         # Allow a float which has a near int value
         temp = int(round(n_atoms))
-        if temp == n_atoms:
-            return n_atoms
         if abs(temp - n_atoms) < 0.001:
-            logger.warning("Size of the {} rounded "
+            if temp != n_atoms:
+                logger.warning("Size of the {} rounded "
                            "from {} to {}. Please use int values for n_atoms",
                            label, n_atoms, temp)
             return temp
         raise PacmanInvalidParameterException(
-            label, n_atoms, "int value expected")
+            label, n_atoms, "int value expected for {}".format(label))
 
     @property
     def machine_vertices(self):
