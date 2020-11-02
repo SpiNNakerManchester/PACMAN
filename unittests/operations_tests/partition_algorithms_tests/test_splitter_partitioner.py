@@ -118,11 +118,11 @@ class TestSplitterPartitioner(unittest.TestCase):
 
     def test_detect_circular(self):
         s1 = MockDependant(None, "depends on s3")
-        v1 = MockVertex(s1, "v1")
+        MockVertex(s1, "v1")
         s2 = MockDependant(s1, "depends on s1")
-        v2 = MockVertex(s2, "v1")
+        MockVertex(s2, "v1")
         s3 = MockDependant(s2, "depends on s2")
-        v3 = MockVertex(s3, "v1")
+        MockVertex(s3, "v1")
         with self.assertRaises(PacmanAlreadyExistsException):
             s3.other_splitter = s1
         with self.assertRaises(PacmanPartitionException):
