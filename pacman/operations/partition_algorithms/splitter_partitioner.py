@@ -320,20 +320,6 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-        """ overridable method for creating the machine edges
-
-        :param MachineVertex src_machine_vertex: \
-            src machine vertex of the edge.
-        :param MachineVertex dest_machine_vertex: \
-            dest machine vertex of the edge.
-        :param MachineEdge common_edge_type: the edge type to build.
-        :param ApplicationEdge app_edge: the app edge to associate the\
-            machine edge with.
-        :param MachineGraph machine_graph: machine graph
-        :param Resource resource_tracker: res tracker.
-        :param OutgoingEdgePartition app_outgoing_edge_partition: partition.
-        :rtype: None
-        """
 
         if (isinstance(app_edge, AbstractSlicesConnect) and not
                 app_edge.could_connect(
