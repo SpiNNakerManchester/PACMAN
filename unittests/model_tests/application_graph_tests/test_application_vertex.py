@@ -16,6 +16,7 @@
 import unittest
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
+from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex, MachineGraph
 from uinit_test_objects import SimpleTestVertex
@@ -144,8 +145,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertIn(constraint1, subv_from_vert.constraints)
         self.assertIn(constraint2, subv_from_vert.constraints)
 
-    def test_machine_vertexes(self):
-        machine_graph = MachineGraph("bacon")
+    def test_machine_vertices(self):
+        app_graph = ApplicationGraph("super bacon")
+        machine_graph = MachineGraph("bacon", application_graph=app_graph)
         vert = SimpleTestVertex(12, "New AbstractConstrainedVertex", 256)
         sub1 = vert.create_machine_vertex(
             Slice(0, 7),
