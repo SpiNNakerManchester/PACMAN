@@ -17,40 +17,26 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class SplitterOneToOneLegacy(AbstractSplitterCommon):
-
-    NOT_API_WARNING = (
-        "Your vertex is deprecated. Please add a Splitter or "
-        "inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api")
+class SplitterOneAppOneMachine(AbstractSplitterCommon):
 
     NOT_SUITABLE_VERTEX_ERROR = (
-        "The vertex {} cannot be supported by the {} as"
-        " the vertex does not support the required method {} of "
-        "LegacyPartitionerAPI. Please inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
-        "again.")
+        "The vertex {} cannot be supported by the {} as "
+        "the vertex does implement AbstractOneAppOneMachineVertex")
 
-    __slots__ = [
-        "_machine_vertex",
-        "_vertex_slice",
-        "_resources_required"]
+    __slots__ = []
 
     def __init__(self):
         AbstractSplitterCommon.__init__(
             self, splitter_name=type(self).__name__)
-        self._machine_vertex = None
-        self._vertex_slice = None
-        self._resources_required = None
 
     def __str__(self):
         return self.STR_MESSAGE.format(self._governed_app_vertex)
@@ -61,53 +47,39 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
-        self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms - 1)
-        self._resources_required = (
-            self._governed_app_vertex.get_resources_used_by_atoms(
-                self._vertex_slice))
-        self._machine_vertex = (
-            self._governed_app_vertex.create_machine_vertex(
-                vertex_slice=self._vertex_slice,
-                resources_required=self._resources_required, label=None,
-                constraints=None))
-        if not isinstance(app_vertex, LegacyPartitionerAPI):
-            for abstractmethod in LegacyPartitionerAPI.abstractmethods():
-                check = getattr(app_vertex, abstractmethod, None)
-                if not check:
-                    raise PacmanConfigurationException(
-                        self.NOT_SUITABLE_VERTEX_ERROR.format(
-                            app_vertex.label, self._splitter_name,
-                            abstractmethod))
-                logger.warning(self.NOT_API_WARNING)
+        if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
+            raise PacmanConfigurationException(
+                self.NOT_SUITABLE_VERTEX_ERROR.format(
+                    app_vertex.label, self._splitter_name))
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
+        machine_vertex = self._governed_app_vertex.machine_vertex
         resource_tracker.allocate_constrained_resources(
-            self._resources_required, self._governed_app_vertex.constraints,
-            vertices=[self._machine_vertex])
-        machine_graph.add_vertex(self._machine_vertex)
-        return self._machine_vertex
+            machine_vertex.resources_required, machine_vertex.constraints)
+        machine_graph.add_vertex(machine_vertex)
+        return machine_vertex
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return [self._vertex_slice], True
+        return [self._governed_app_vertex.machine_vertex.vertex_slice], True
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return [self._vertex_slice], True
+        return [self._governed_app_vertex.machine_vertex.vertex_slice], True
 
     @overrides(AbstractSplitterCommon.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
-        return {self._machine_vertex: [MachineEdge]}
+        return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.get_post_vertices)
     def get_post_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
-        return {self._machine_vertex: [MachineEdge]}
+        return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
-        return [self._machine_vertex]
+        return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):

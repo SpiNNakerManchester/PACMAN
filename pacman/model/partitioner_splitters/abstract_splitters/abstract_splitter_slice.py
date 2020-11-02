@@ -14,16 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import raise_from, add_metaclass
 
+from spinn_utilities.overrides import overrides
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.machine import MachineEdge
-from pacman.model.partitioner_interfaces.abstract_splitter_common import (
-    AbstractSplitterCommon)
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import get_remaining_constraints
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.graphs.common import Slice
-from spinn_utilities.overrides import overrides
+from .abstract_splitter_common import AbstractSplitterCommon
 
 
 @add_metaclass(AbstractBase)
