@@ -138,9 +138,10 @@ class ApplicationVertex(AbstractVertex):
         temp = int(round(n_atoms))
         if abs(temp - n_atoms) < 0.001:
             if temp != n_atoms:
-                logger.warning("Size of the {} rounded "
-                           "from {} to {}. Please use int values for n_atoms",
-                           label, n_atoms, temp)
+                logger.warning(
+                    "Size of the {} rounded from {} to {}. "
+                    "Please use int values for n_atoms",
+                    label, n_atoms, temp)
             return temp
         raise PacmanInvalidParameterException(
             label, n_atoms, "int value expected for {}".format(label))
