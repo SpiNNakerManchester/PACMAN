@@ -23,6 +23,8 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractDependentSplitter)
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanPartitionException)
 
 
 class MockVertex(LegacyPartitionerAPI):
@@ -113,6 +115,20 @@ class TestSplitterPartitioner(unittest.TestCase):
         self.assertLess(vertices.index(v2a), vertices.index(v2aa))
         self.assertLess(vertices.index(v2), vertices.index(v2b))
         self.assertLess(vertices.index(v3), vertices.index(v3a))
+
+    def test_detect_circular(self):
+        s1 = MockDependant(None, "depends on s3")
+        v1 = MockVertex(s1, "v1")
+        s2 = MockDependant(s1, "depends on s1")
+        v2 = MockVertex(s2, "v1")
+        s3 = MockDependant(s2, "depends on s2")
+        v3 = MockVertex(s3, "v1")
+        with self.assertRaises(PacmanAlreadyExistsException):
+            s3.other_splitter = s1
+        with self.assertRaises(PacmanPartitionException):
+            s1.other_splitter = s3
+        with self.assertRaises(PacmanPartitionException):
+            s1.other_splitter = s1
 
 
 if __name__ == '__main__':
