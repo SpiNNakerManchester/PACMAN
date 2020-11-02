@@ -21,6 +21,9 @@ class AbstractSplitterPartitioner(object):
     """ splitter API to allow other Partitioner's to add more stuff to the
     edge creation process.
 
+    This makes sure that the methods super class expect to be there are not
+    removed.
+
     """
 
     @abstractmethod
@@ -28,7 +31,11 @@ class AbstractSplitterPartitioner(object):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-        """ overridable method for creating the machine edges
+        """ Creates the machine edge (if needed) and adding it
+        to the graph
+
+        Some implementations of this method are able to detect that the
+        requested edge is not actually needed so never create or add it,.
 
         :param MachineVertex src_machine_vertex: src machine vertex of a edge
         :param MachineVertex dest_machine_vertex: dest machine vertex of a edge
