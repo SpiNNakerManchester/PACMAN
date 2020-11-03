@@ -16,12 +16,11 @@
 from collections import OrderedDict
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanRoutingException)
-from pacman.model.routing_tables.abstract_multicast_routing_table import \
-    AbsractMulticastRoutingTable
+from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
 
 
-class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
+class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """ Represents a uncompressed routing table for a chip.
     """
 
@@ -99,7 +98,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
             self._number_of_defaulted_routing_entries += 1
 
     @property
-    @overrides(AbsractMulticastRoutingTable.x)
+    @overrides(AbstractMulticastRoutingTable.x)
     def x(self):
         """ The x-coordinate of the chip of this table
 
@@ -108,7 +107,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._x
 
     @property
-    @overrides(AbsractMulticastRoutingTable.y)
+    @overrides(AbstractMulticastRoutingTable.y)
     def y(self):
         """ The y-coordinate of the chip of this table
 
@@ -117,7 +116,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._y
 
     @property
-    @overrides(AbsractMulticastRoutingTable.multicast_routing_entries)
+    @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
         """ The multicast routing entries in the table
 
@@ -127,7 +126,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._multicast_routing_entries
 
     @property
-    @overrides(AbsractMulticastRoutingTable.number_of_entries)
+    @overrides(AbstractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
         """ The number of multicast routing entries there are in the\
             multicast routing table
@@ -137,7 +136,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return len(self._multicast_routing_entries)
 
     @property
-    @overrides(AbsractMulticastRoutingTable.number_of_defaultable_entries)
+    @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
         """ The number of multicast routing entries that are set to be\
             defaultable within this multicast routing table
@@ -183,7 +182,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
                 tuple_key]
         return None
 
-    @overrides(AbsractMulticastRoutingTable.__eq__)
+    @overrides(AbstractMulticastRoutingTable.__eq__)
     def __eq__(self, other):
         if not isinstance(other, UnCompressedMulticastRoutingTable):
             return False
@@ -192,17 +191,17 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._multicast_routing_entries == \
             other.multicast_routing_entries
 
-    @overrides(AbsractMulticastRoutingTable.__ne__)
+    @overrides(AbstractMulticastRoutingTable.__ne__)
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    @overrides(AbsractMulticastRoutingTable.__repr__)
+    @overrides(AbstractMulticastRoutingTable.__repr__)
     def __repr__(self):
         entry_string = ""
         for entry in self._multicast_routing_entries:
             entry_string += "{}\n".format(entry)
         return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
 
-    @overrides(AbsractMulticastRoutingTable.__hash__)
+    @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self):
         return id(self)
